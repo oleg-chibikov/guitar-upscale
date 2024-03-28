@@ -12,18 +12,15 @@ import { scalesMap } from "./data/scales";
 // TODO
 // More scales
 // Scales by category - classical, expitic, major, minor, japanese, arabic, gypsy. several levels of nesting
-// refactor - store bools in neck
 // mobile screen - not usable
 // dark/light
 // smaller image for preload to load immediately
 // youtube videos for each scale
 // playable notes - https://github.com/nabehide/react-native-piano-example
 // synthetic examples - play scale using this piano above
-
-// Define scales as a map
+// get the formula to avoid hardcoding each string
 
 const calculateTop = (string: number, fret: number) => {
-  // TODO get the formula to avoid hardcoding each string
   switch (string) {
     case 0:
       return -(fret * 0.4 * 4);
@@ -43,7 +40,7 @@ const calculateTop = (string: number, fret: number) => {
 };
 
 interface FretLineProps {
-  elements: string[];
+  elements: (string | boolean)[];
   string?: number;
 }
 
@@ -61,7 +58,9 @@ const FretLine: React.FC<FretLineProps> = ({ elements, string }) => {
           top = calculateTop(string, fret);
         }
 
-        const isInScale = element !== "-";
+        const isInScale = element !== false;
+        const isHeader = typeof element === "string";
+        const circleWidth = isHeader ? "w-10 h-10" : "w-6 h-6";
 
         return (
           <View
@@ -81,10 +80,10 @@ const FretLine: React.FC<FretLineProps> = ({ elements, string }) => {
               ]}
             >
               <View
-                style={tw`bg-transparent p-2 w-6 h-6 flex justify-center items-center rounded-full bg-orange-100 border-slate-800 border-2`}
+                style={tw`bg-transparent p-2 ${circleWidth} flex justify-center items-center rounded-full bg-orange-100 border-slate-800 border-2`}
               >
                 <Text style={tw`text-red-500 text-xl font-mono`}>
-                  {element}
+                  {!isHeader ? "X" : element}
                 </Text>
               </View>
             </Text>
@@ -100,7 +99,7 @@ const Fretboard: React.FC = () => {
     scalesMap.keys().next().value
   );
   const [selectedBaseNote, setSelectedBaseNote] = useState<Note>(Note.E);
-  const [neck, setNeck] = useState<string[][]>();
+  const [neck, setNeck] = useState<boolean[][]>();
   useEffect(() => {
     console.log(selectedBaseNote);
     console.log(selectedScale);

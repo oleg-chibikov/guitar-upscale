@@ -5,8 +5,8 @@ export const generateNeckRepresentation = (
   scalePattern: Set<number>,
   stringTuning: Note[],
   baseNote: number
-): string[][] => {
-  const neck: string[][] = [];
+): boolean[][] => {
+  const neck: boolean[][] = [];
 
   for (let i = 0; i < stringTuning.length; i++) {
     const stringModifier: number = FretCount - stringTuning[i];
@@ -23,7 +23,7 @@ export const generateNeckRepresentation = (
       const isInScale: boolean = scalePattern.has(position);
 
       // Set 'X' or '-' based on whether the position is in the scale pattern
-      neck[i][j] = isInScale ? "X" : "-";
+      neck[i][j] = isInScale;
     }
   }
 
