@@ -1,15 +1,15 @@
-import { Tuning } from "./Fretboard";
+import { Note } from "./data/notes";
 
 export const FretCount: number = 12;
 export const generateNeckRepresentation = (
   scalePattern: Set<number>,
-  stringTuning: Tuning[],
+  stringTuning: Note[],
   baseNote: number
 ): string[][] => {
   const neck: string[][] = [];
 
   for (let i = 0; i < stringTuning.length; i++) {
-    const stringModifier: number = stringTuning[i].modifier;
+    const stringModifier: number = FretCount - stringTuning[i];
     neck[i] = [];
 
     for (let j = 0; j <= FretCount; j++) {

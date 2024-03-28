@@ -6,12 +6,12 @@ import {
   FretCount,
   generateNeckRepresentation,
 } from "./generateNeckRepresentation";
+import { Note, stringTuning } from "./data/notes";
+import { scalesMap } from "./data/scales";
 
 // TODO
 // More scales
 // Scales by category - classical, expitic, major, minor, japanese, arabic, gypsy. several levels of nesting
-// refactor - move types
-// refactor - use notes for GuitarTuning
 // refactor - store bools in neck
 // mobile screen - not usable
 // dark/light
@@ -20,50 +20,7 @@ import {
 // playable notes - https://github.com/nabehide/react-native-piano-example
 // synthetic examples - play scale using this piano above
 
-export interface Tuning {
-  key: string;
-  modifier: number;
-}
-
-enum Note {
-  E = 0,
-  F = 1,
-  "F#" = 2,
-  G = 3,
-  "G#" = 4,
-  A = 5,
-  "A#" = 6,
-  B = 7,
-  C = 8,
-  "C#" = 9,
-  D = 10,
-  "D#" = 11,
-}
-
 // Define scales as a map
-const scalesMap: Map<string, number[]> = new Map([
-  ["Dorian (Minor)", [0, 2, 3, 5, 7, 8, 10, 12]],
-  ["Hijaz (Arabic)", [0, 1, 4, 5, 7, 8, 11, 12]],
-  ["Iwato (Japanese)", [0, 1, 5, 6, 10, 12]],
-  ["Kumoi (Japanese)", [0, 1, 5, 7, 8, 12]],
-  ["Insen (Japanese)", [0, 1, 5, 7, 10, 12]],
-  ["Yo (Chinese Major)", [0, 2, 5, 7, 9, 12]],
-  ["Hungarian Major (Gypsy)", [0, 3, 4, 6, 7, 9, 10, 12]],
-]);
-
-const stringTuning: Tuning[] = [
-  { key: "E", modifier: 0 },
-  { key: "B", modifier: 5 },
-  { key: "G", modifier: 9 },
-  { key: "D", modifier: 2 },
-  { key: "A", modifier: 7 },
-  { key: "E", modifier: 0 },
-];
-
-interface FretLineProps {
-  elements: string[];
-  string?: number;
-}
 
 const calculateTop = (string: number, fret: number) => {
   // TODO get the formula to avoid hardcoding each string
@@ -84,6 +41,11 @@ const calculateTop = (string: number, fret: number) => {
       return 0;
   }
 };
+
+interface FretLineProps {
+  elements: string[];
+  string?: number;
+}
 
 const FretLine: React.FC<FretLineProps> = ({ elements, string }) => {
   const widthStep = 10.25; // Width step for each subsequent fret
@@ -147,7 +109,7 @@ const Fretboard: React.FC = () => {
       generateNeckRepresentation(
         scalePattern,
         stringTuning,
-        parseInt(selectedBaseNote as unknown as string)
+        selectedBaseNote as number
       )
     );
   }, [selectedBaseNote, selectedScale]);
