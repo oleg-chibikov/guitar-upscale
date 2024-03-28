@@ -7,7 +7,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build-web": "expo export:web"
+    "build-web": "expo export -p web",
+    "serve-build-web": "npm run build-web && serve dist --single",
+    "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
+    "build-and-deploy-web": "npm run build-web && npm run deploy-surge"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.1.3",

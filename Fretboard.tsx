@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { View, Text, Image, ImageBackground } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import tw from "./tailwind";
 import {
