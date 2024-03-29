@@ -13,10 +13,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    overflow: "hidden",
+    alignItems: "flex-start",
+    // overflow: "hidden",
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "flex-start",
   },
 });

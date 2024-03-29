@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import tw from "./tailwind";
@@ -19,6 +19,9 @@ import { scalesMap } from "./data/scales";
 // playable notes - https://github.com/nabehide/react-native-piano-example
 // synthetic examples - play scale using this piano above
 // get the formula to avoid hardcoding each string
+// hide scrollbar but allow moving by dragging
+// check scripts - HMR not working when app.json contains "bundler": "metro"
+//check scripts - build-and-deploy-web seems to be broken
 
 const calculateTop = (string: number, fret: number) => {
   switch (string) {
@@ -99,19 +102,19 @@ const Fretboard: React.FC = () => {
     scalesMap.keys().next().value
   );
   const [selectedBaseNote, setSelectedBaseNote] = useState<Note>(Note.E);
-  const [neck, setNeck] = useState<boolean[][]>();
   useEffect(() => {
     console.log(selectedBaseNote);
     console.log(selectedScale);
-    const scalePattern: Set<number> = new Set(scalesMap.get(selectedScale));
-    setNeck(
-      generateNeckRepresentation(
-        scalePattern,
-        stringTuning,
-        selectedBaseNote as number
-      )
-    );
   }, [selectedBaseNote, selectedScale]);
+
+  const neck = useMemo(() => {
+    const scalePattern = new Set(scalesMap.get(selectedScale));
+    return generateNeckRepresentation(
+      scalePattern,
+      stringTuning,
+      selectedBaseNote
+    );
+  }, [selectedBaseNote, selectedScale, stringTuning]);
 
   if (!neck) {
     return "Loading...";
