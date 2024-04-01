@@ -6,8 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build-web": "expo export -p web",
+    "web": "copy app.dev.json app.json && expo start --web",
+    "build-web": "copy app.prod.json app.json && expo export -p web",
     "serve-build-web": "npm run build-web && serve dist --single",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
     "build-and-deploy-web": "npm run build-web && npm run deploy-surge"

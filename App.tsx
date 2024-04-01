@@ -1,20 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import Fretboard from "./Fretboard";
+import tw from "./tailwind";
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <View style={tw`w-full h-full items-start bg-white`}>
       <Fretboard />
       <StatusBar style="auto" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "flex-start",
-    // overflow: "hidden",
-    backgroundColor: "#fff",
-  },
-});
