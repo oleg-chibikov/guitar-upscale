@@ -12,8 +12,6 @@ import PinchableBox from "./PinchableBox";
 // youtube videos for each scale
 // get the formula to avoid hardcoding each string
 // more instruments + dropdown
-// menu layout
-// zoom with pinch
 
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);

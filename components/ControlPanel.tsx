@@ -1,7 +1,6 @@
-// ControlPanel.tsx
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect } from "react";
-import { View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Play } from "./Play";
 
@@ -22,6 +21,7 @@ const ControlPanel: React.FC = () => {
   const { selectedScale, selectedBaseNote, selectedShowNoteMode, neck } =
     useSelector(selectControlPanel);
   const dispatch = useDispatch();
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (selectedBaseNote === null) {
@@ -39,66 +39,88 @@ const ControlPanel: React.FC = () => {
   }, [selectedBaseNote, selectedScale, stringTuning]);
 
   return (
-    <View
-      style={[
-        tw`top-0 left-0 z-10 flex gap-4 flex-row ml-16 mt-4`,
-        { position: "fixed" },
-      ]}
-    >
-      {/* Scale Picker */}
-      <Picker
-        style={tw`text-2xl`}
-        selectedValue={selectedScale}
-        onValueChange={(scale) => {
-          dispatch(setSelectedScale(scale));
-        }}
+    <>
+      <View
+        style={[
+          tw`z-10 top-3 left-3 flex flex-row gap-4 items-center`,
+          { position: "fixed" },
+        ]}
       >
-        {Array.from(scalesMap.entries()).map((scale, index) => (
-          <Picker.Item key={index} label={scale[0]} value={scale[0]} />
-        ))}
-      </Picker>
+        <TouchableOpacity
+          style={[tw`bg-gray-200 p-2 rounded-lg w-96`]}
+          onPress={() => setExpanded(!expanded)}
+        >
+          <Text style={tw`text-2xl`}>Control Panel</Text>
+        </TouchableOpacity>
 
-      {/* Base Note Picker */}
-      <Picker
-        style={tw`text-2xl`}
-        selectedValue={selectedBaseNote}
-        onValueChange={(itemValue) => {
-          dispatch(
-            setSelectedBaseNote(parseInt(itemValue as unknown as string))
-          ); // Assuming itemValue is of type Note
-        }}
-      >
-        {Object.entries(Note)
-          .filter(([key]) => isNaN(key as any))
-          .map(([key, value]) => (
-            <Picker.Item
-              key={key}
-              label={key + "(" + (value === 0 ? "" : "+") + value + ")"}
-              value={value}
-            />
-          ))}
-      </Picker>
+        {neck && <Play />}
+      </View>{" "}
+      {expanded && (
+        <View
+          style={[
+            tw`left-3 z-20 top-20 bg-gray-200 p-2 rounded-lg`,
+            {
+              position: "fixed",
+              display: "grid",
+              gridTemplateColumns: "auto auto",
+              gridTemplateRows: "repeat(3, auto)",
+              gap: "10px", // Adjust the gap as needed
+            },
+          ]}
+        >
+          <Text style={tw`text-lg mb-2`}>Scale:</Text>
+          <Picker
+            style={tw`text-2xl`}
+            selectedValue={selectedScale}
+            onValueChange={(scale) => {
+              dispatch(setSelectedScale(scale));
+            }}
+          >
+            {Array.from(scalesMap.entries()).map((scale, index) => (
+              <Picker.Item key={index} label={scale[0]} value={scale[0]} />
+            ))}
+          </Picker>
 
-      {/* Show Note Mode Picker */}
-      <Picker
-        style={tw`text-2xl`}
-        selectedValue={selectedShowNoteMode}
-        onValueChange={(mode) => {
-          dispatch(
-            setSelectedShowNoteMode(parseInt(mode as unknown as string))
-          ); // Assuming mode is of type ShowNoteMode
-        }}
-      >
-        {Object.entries(ShowNoteMode)
-          .filter(([key]) => isNaN(key as any))
-          .map(([key, value]) => (
-            <Picker.Item key={key} label={key} value={value} />
-          ))}
-      </Picker>
+          <Text style={tw`text-lg mb-2`}>Base Note:</Text>
+          <Picker
+            style={tw`text-2xl`}
+            selectedValue={selectedBaseNote}
+            onValueChange={(itemValue) => {
+              dispatch(
+                setSelectedBaseNote(parseInt(itemValue as unknown as string))
+              ); // Assuming itemValue is of type Note
+            }}
+          >
+            {Object.entries(Note)
+              .filter(([key]) => isNaN(key as any))
+              .map(([key, value]) => (
+                <Picker.Item
+                  key={key}
+                  label={key + "(" + (value === 0 ? "" : "+") + value + ")"}
+                  value={value}
+                />
+              ))}
+          </Picker>
 
-      {/* Play Component */}
-      {neck && <Play />}
-    </View>
+          <Text style={tw`text-lg mb-2`}>Note Mode:</Text>
+          <Picker
+            style={tw`text-2xl`}
+            selectedValue={selectedShowNoteMode}
+            onValueChange={(mode) => {
+              dispatch(
+                setSelectedShowNoteMode(parseInt(mode as unknown as string))
+              ); // Assuming mode is of type ShowNoteMode
+            }}
+          >
+            {Object.entries(ShowNoteMode)
+              .filter(([key]) => isNaN(key as any))
+              .map(([key, value]) => (
+                <Picker.Item key={key} label={key} value={value} />
+              ))}
+          </Picker>
+        </View>
+      )}
+    </>
   );
 };
 

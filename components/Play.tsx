@@ -62,7 +62,7 @@ export const Play: React.FC = () => {
   };
   return (
     <Pressable
-      style={tw`flex items-center w-7 h-7 justify-center`}
+      style={tw`flex items-center justify-center`}
       onPress={handlePlay}
     >
       <Text style={tw`text-2xl`}>{isPlaying ? "⏸️" : "▶️"}</Text>
