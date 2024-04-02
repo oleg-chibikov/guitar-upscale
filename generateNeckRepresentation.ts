@@ -1,29 +1,37 @@
-import { Note } from "./data/notes";
+import { Note, OctaveNote } from "./data/notes";
 
-export const FretCount: number = 12;
+export type Neck = (OctaveNote | undefined)[][];
+export const NoteCount: number = 12;
 export const generateNeckRepresentation = (
-  scalePattern: Set<number>,
-  stringTuning: Note[],
-  baseNote: number
-): boolean[][] => {
-  const neck: boolean[][] = [];
+  scalePattern: Set<Note>,
+  stringTuning: OctaveNote[],
+  baseNote: Note
+): Neck => {
+  const neck: Neck = [];
 
-  for (let i = 0; i < stringTuning.length; i++) {
-    const stringModifier: number = FretCount - stringTuning[i];
+  for (let i = stringTuning.length - 1; i >= 0; i--) {
+    const octaveNoteForString = stringTuning[i];
+    const stringModifier = octaveNoteForString.note;
     neck[i] = [];
+    let octave = octaveNoteForString.octave;
 
-    for (let j = 0; j <= FretCount; j++) {
+    for (let j = 0; j < NoteCount * 2; j++) {
       // Calculate the position on the neck for the current fret and string
-      let position: number = (j + stringModifier - baseNote) % FretCount;
+      let position = (j + stringModifier - baseNote) % NoteCount;
 
       // Ensure position is non-negative
-      position = position < 0 ? FretCount + position : position;
+      position = position < 0 ? NoteCount + position : position;
 
       // Check if the position is in the scale pattern
       const isInScale: boolean = scalePattern.has(position);
 
-      // Set 'X' or '-' based on whether the position is in the scale pattern
-      neck[i][j] = isInScale;
+      const note = (position + baseNote) % NoteCount;
+
+      if (note === Note.C) {
+        octave++;
+      }
+
+      neck[i][j] = isInScale ? { note, octave } : undefined;
     }
   }
 

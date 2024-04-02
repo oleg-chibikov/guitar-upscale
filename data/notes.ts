@@ -13,11 +13,41 @@ export enum Note {
   "D#" = 11,
 }
 
-export const stringTuning: Note[] = [
-  Note.E,
-  Note.B,
-  Note.G,
-  Note.D,
-  Note.A,
-  Note.E,
+// Reverse mapping object
+const noteReverseMapping: { [key: number]: string } = {};
+Object.keys(Note)
+  .filter((key) => !isNaN(Number(Note[key as keyof typeof Note])))
+  .forEach((key) => {
+    const enumKey = key as keyof typeof Note;
+    const enumValue = Note[enumKey];
+    if (typeof enumValue === "number") {
+      noteReverseMapping[enumValue] = enumKey;
+    }
+  });
+
+export function getNoteText(noteNumber: number): string {
+  if (noteNumber < 0 || noteNumber > 11) {
+    throw new Error("Invalid note number");
+  }
+
+  const noteText = noteReverseMapping[noteNumber];
+  if (noteText === undefined) {
+    throw new Error("Note not found for the given number");
+  }
+
+  return noteText;
+}
+
+export interface OctaveNote {
+  octave: number;
+  note: Note;
+}
+
+export const stringTuning: OctaveNote[] = [
+  { note: Note.E, octave: 5 },
+  { note: Note.B, octave: 4 },
+  { note: Note.G, octave: 4 },
+  { note: Note.D, octave: 4 },
+  { note: Note.A, octave: 3 },
+  { note: Note.E, octave: 3 },
 ];
