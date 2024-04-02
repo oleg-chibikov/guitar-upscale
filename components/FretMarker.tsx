@@ -1,9 +1,9 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { Note, OctaveNote, getNoteText } from "./data/notes";
-import { ShowNoteMode } from "./data/showNoteMode";
-import { playNote } from "./soundProvider";
-import tw from "./tailwind";
+import { Note, OctaveNote, getNoteText } from "../data/notes";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { playNote } from "../engine/soundProvider";
+import tw from "../tailwind";
 
 interface FretMarkerProps {
   fret: number;

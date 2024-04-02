@@ -1,12 +1,12 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { View } from "react-native";
+import { Note } from "../data/notes";
+import { scalesMap } from "../data/scales";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { Neck } from "../engine/generateNeckRepresentation";
+import tw from "../tailwind";
 import { Play } from "./Play";
-import { Note } from "./data/notes";
-import { scalesMap } from "./data/scales";
-import { ShowNoteMode } from "./data/showNoteMode";
-import { Neck } from "./generateNeckRepresentation";
-import tw from "./tailwind";
 
 interface ControlPanelProps {
   selectedScale: string;

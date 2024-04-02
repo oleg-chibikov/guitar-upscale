@@ -1,10 +1,10 @@
 import React from "react";
 import { Image, ImageRequireSource, View } from "react-native";
+import { Note } from "../data/notes";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { Neck, NoteCount } from "../engine/generateNeckRepresentation";
+import tw from "../tailwind";
 import { Fretline } from "./Fretline";
-import { Note } from "./data/notes";
-import { ShowNoteMode } from "./data/showNoteMode";
-import { Neck, NoteCount } from "./generateNeckRepresentation";
-import tw from "./tailwind";
 
 export interface FretboardProps {
   scaleFactor: number;

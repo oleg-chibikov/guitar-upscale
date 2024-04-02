@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "react-native";
-import { Neck } from "./generateNeckRepresentation";
-import { playNote } from "./soundProvider";
+import { Neck } from "../engine/generateNeckRepresentation";
+import { playNote } from "../engine/soundProvider";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { View } from "react-native";
+import { Note, OctaveNote } from "../data/notes";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { NoteCount } from "../engine/generateNeckRepresentation";
+import tw from "../tailwind";
 import { FretMarker } from "./FretMarker";
-import { Note, OctaveNote } from "./data/notes";
-import { ShowNoteMode } from "./data/showNoteMode";
-import { NoteCount } from "./generateNeckRepresentation";
-import tw from "./tailwind";
 
 const calculateTop = (string: number, fret: number) => {
   switch (string) {

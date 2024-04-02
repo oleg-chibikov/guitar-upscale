@@ -1,4 +1,4 @@
-import { Note, OctaveNote } from "./data/notes";
+import { Note, OctaveNote } from "../data/notes";
 
 export type Neck = (OctaveNote | undefined)[][];
 export const NoteCount: number = 12;

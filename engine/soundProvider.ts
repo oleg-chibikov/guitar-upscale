@@ -1,5 +1,5 @@
 import { Soundfont } from "smplr";
-import { OctaveNote, getNoteText } from "./data/notes";
+import { OctaveNote, getNoteText } from "../data/notes";
 
 const context = new AudioContext();
 const soundfont = new Soundfont(context, {

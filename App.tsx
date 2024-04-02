@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 import Orientation from "react-native-orientation-locker";
-import { Main } from "./Main";
+import { Main } from "./components/Main";
 import tw from "./tailwind";
 
 export default function App() {

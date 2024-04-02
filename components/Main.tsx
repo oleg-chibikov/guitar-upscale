@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, ScaledSize, View } from "react-native";
+import { Note, stringTuning } from "../data/notes";
+import { scalesMap } from "../data/scales";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
+import tw from "../tailwind";
 import { ControlPanel } from "./ControlPanel";
 import { Fretboard } from "./Fretboard";
-import { Note, stringTuning } from "./data/notes";
-import { scalesMap } from "./data/scales";
-import { ShowNoteMode } from "./data/showNoteMode";
-import { generateNeckRepresentation } from "./generateNeckRepresentation";
-import tw from "./tailwind";
 
 // TODO
 // More scales
