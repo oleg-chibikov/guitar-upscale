@@ -46,13 +46,13 @@ export const Main: React.FC = () => {
   }, []);
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        dispatch(setSettingsExpanded(false));
-      }}
-    >
-      <View>
-        <ControlPanel />
+    <>
+      <ControlPanel />
+      <TouchableWithoutFeedback
+        onPress={() => {
+          dispatch(setSettingsExpanded(false));
+        }}
+      >
         <View style={[tw`w-full h-full items-start justify-center`]}>
           <PinchableBox>
             {!highResLoaded && (
@@ -73,7 +73,7 @@ export const Main: React.FC = () => {
             />
           </PinchableBox>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </>
   );
 };
