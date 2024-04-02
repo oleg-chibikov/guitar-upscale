@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, Text } from "react-native";
-import { playNote } from "../engine/soundProvider";
+import { useDispatch } from "react-redux";
+import { setNoteToAnimate } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -18,6 +19,7 @@ export const Play: React.FC = () => {
     setIsPlaying(false);
     isPlayingRef.current = false;
   }, [neck, selectedBaseNote, selectedScale]);
+  const dispatch = useDispatch();
 
   const handlePlay = async () => {
     if (isPlayingRef.current) {
@@ -48,7 +50,9 @@ export const Play: React.FC = () => {
         if (!isPlayingRef.current) {
           break;
         }
-        playNote(note!);
+        if (note) {
+          dispatch(setNoteToAnimate(note));
+        }
         await sleep(100);
       }
     }

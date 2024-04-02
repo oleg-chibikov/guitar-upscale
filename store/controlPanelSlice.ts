@@ -1,6 +1,6 @@
 // controlPanelSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Note } from "../data/notes";
+import { Note, OctaveNote } from "../data/notes";
 import { scalesMap } from "../data/scales";
 import { ShowNoteMode } from "../data/showNoteMode";
 import { Neck } from "../engine/generateNeckRepresentation";
@@ -11,6 +11,7 @@ interface ControlPanelState {
   selectedBaseNote: Note;
   selectedShowNoteMode: ShowNoteMode;
   neck: Neck | null;
+  noteToAnimate?: OctaveNote;
 }
 
 const initialState: ControlPanelState = {
@@ -36,6 +37,9 @@ export const controlPanelSlice = createSlice({
     setNeck: (state, action: PayloadAction<Neck>) => {
       state.neck = action.payload;
     },
+    setNoteToAnimate: (state, action: PayloadAction<OctaveNote>) => {
+      state.noteToAnimate = action.payload;
+    },
   },
 });
 
@@ -43,6 +47,7 @@ export const {
   setSelectedScale,
   setSelectedBaseNote,
   setSelectedShowNoteMode,
+  setNoteToAnimate,
   setNeck,
 } = controlPanelSlice.actions;
 

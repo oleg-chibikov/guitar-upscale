@@ -1,8 +1,13 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
 import { Note, OctaveNote, getNoteText } from "../data/notes";
 import { ShowNoteMode } from "../data/showNoteMode";
 import { playNote } from "../engine/soundProvider";
+import {
+  selectControlPanel,
+  setNoteToAnimate,
+} from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 import tw from "../tailwind";
 
@@ -21,9 +26,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   octaveNote,
   isHeader,
 }) => {
-  const { selectedBaseNote, selectedShowNoteMode } = useAppSelector(
-    (state) => state.controlPanel
-  );
+  const dispatch = useDispatch();
+  const { selectedBaseNote, selectedShowNoteMode, noteToAnimate } =
+    useAppSelector(selectControlPanel);
 
   const isInScale: boolean = octaveNote !== undefined;
   const note: Note | undefined = octaveNote?.note;
@@ -36,25 +41,36 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   // Animation state
   const glowAnim = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    if (noteToAnimate !== null && noteToAnimate === octaveNote) {
+      playNoteAndAnimate();
+    }
+  }, [noteToAnimate]);
+
   // Function to handle note press
   const handleNotePress = () => {
     if (!isHeader && octaveNote !== null) {
-      playNote(octaveNote);
-
-      // Start the animation
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      dispatch(setNoteToAnimate(octaveNote));
     }
+  };
+
+  // Function to play note and start animation
+  const playNoteAndAnimate = () => {
+    if (octaveNote) {
+      playNote(octaveNote);
+    }
+    Animated.sequence([
+      Animated.timing(glowAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   return (
@@ -82,11 +98,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             <Animated.View
               style={{
                 position: "absolute",
-                backgroundColor: "rgba(255, 165, 0, 0.5)", // Adjust glow color and opacity
                 width: "100%",
                 height: "100%",
                 borderRadius: 9999,
                 opacity: glowAnim,
+                backgroundColor: "orange", // Change to the desired glow color
                 transform: [
                   {
                     scale: glowAnim.interpolate({
