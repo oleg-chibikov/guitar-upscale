@@ -34,7 +34,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     note === selectedBaseNote ? "text-black" : "text-red-500";
 
   // Animation state
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   // Function to handle note press
   const handleNotePress = () => {
@@ -43,14 +43,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
       // Start the animation
       Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
+        Animated.timing(glowAnim, {
+          toValue: 1,
           duration: 500,
           useNativeDriver: true,
         }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 0,
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 500,
           useNativeDriver: true,
         }),
       ]).start();
@@ -81,21 +81,32 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           >
             <Animated.View
               style={{
-                opacity: fadeAnim,
-                transform: [{ scale: fadeAnim }],
+                position: "absolute",
+                backgroundColor: "rgba(255, 165, 0, 0.5)", // Adjust glow color and opacity
+                width: "100%",
+                height: "100%",
+                borderRadius: 9999,
+                opacity: glowAnim,
+                transform: [
+                  {
+                    scale: glowAnim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [1, 1.2, 1],
+                    }),
+                  },
+                ],
               }}
+            />
+            <Text
+              selectable={false}
+              style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
             >
-              <Text
-                selectable={false}
-                style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
-              >
-                {isHeader
-                  ? octaveNote.note
-                  : selectedShowNoteMode === ShowNoteMode.Note
-                  ? getNoteText(octaveNote.note) + octaveNote.octave
-                  : fret}
-              </Text>
-            </Animated.View>
+              {isHeader
+                ? octaveNote.note
+                : selectedShowNoteMode === ShowNoteMode.Note
+                ? getNoteText(octaveNote.note) + octaveNote.octave
+                : fret}
+            </Text>
           </Pressable>
         )}
       </Text>
