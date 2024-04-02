@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, ScaledSize, View } from "react-native";
+import {
+  Dimensions,
+  ScaledSize,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { useDispatch } from "react-redux";
+import { setSettingsExpanded } from "../store/controlPanelSlice";
 import tw from "../tailwind";
 import ControlPanel from "./ControlPanel";
 import { Fretboard } from "./Fretboard";
@@ -16,6 +23,7 @@ import PinchableBox from "./PinchableBox";
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const dispatch = useDispatch();
 
   const recalculateScaleFactor = (size: ScaledSize) => {
     const isLandscape = size.width > size.height;
@@ -38,28 +46,34 @@ export const Main: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <ControlPanel />
-      <View style={[tw`w-full h-full items-start justify-center`]}>
-        <PinchableBox>
-          {!highResLoaded && (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        dispatch(setSettingsExpanded(false));
+      }}
+    >
+      <View>
+        <ControlPanel />
+        <View style={[tw`w-full h-full items-start justify-center`]}>
+          <PinchableBox>
+            {!highResLoaded && (
+              <Fretboard
+                scaleFactor={scaleFactor}
+                imageSource={require("../assets/guitar_low.png")}
+              />
+            )}
+
             <Fretboard
               scaleFactor={scaleFactor}
-              imageSource={require("../assets/guitar_low.png")}
+              imageSource={require("../assets/guitar.png")}
+              onImageLoaded={() => {
+                console.log("Loaded full res image");
+                setHighResLoaded(true);
+              }}
+              isCollapsed={!highResLoaded}
             />
-          )}
-
-          <Fretboard
-            scaleFactor={scaleFactor}
-            imageSource={require("../assets/guitar.png")}
-            onImageLoaded={() => {
-              console.log("Loaded full res image");
-              setHighResLoaded(true);
-            }}
-            isCollapsed={!highResLoaded}
-          />
-        </PinchableBox>
+          </PinchableBox>
+        </View>
       </View>
-    </>
+    </TouchableWithoutFeedback>
   );
 };

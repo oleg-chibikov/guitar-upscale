@@ -12,6 +12,7 @@ interface ControlPanelState {
   selectedShowNoteMode: ShowNoteMode;
   neck: Neck | null;
   noteToAnimate?: OctaveNote;
+  settingsExpanded: boolean;
 }
 
 const initialState: ControlPanelState = {
@@ -19,6 +20,7 @@ const initialState: ControlPanelState = {
   selectedBaseNote: Note.E,
   selectedShowNoteMode: ShowNoteMode.Fret,
   neck: null,
+  settingsExpanded: false,
 };
 
 export const controlPanelSlice = createSlice({
@@ -40,6 +42,9 @@ export const controlPanelSlice = createSlice({
     setNoteToAnimate: (state, action: PayloadAction<OctaveNote>) => {
       state.noteToAnimate = action.payload;
     },
+    setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
+      state.settingsExpanded = action.payload;
+    },
   },
 });
 
@@ -49,6 +54,7 @@ export const {
   setSelectedShowNoteMode,
   setNoteToAnimate,
   setNeck,
+  setSettingsExpanded,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

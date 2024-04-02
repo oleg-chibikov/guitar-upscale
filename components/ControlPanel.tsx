@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Play } from "./Play";
@@ -14,15 +14,20 @@ import {
   setSelectedBaseNote,
   setSelectedScale,
   setSelectedShowNoteMode,
+  setSettingsExpanded,
 } from "../store/controlPanelSlice";
 import tw from "../tailwind";
 import IconButton from "./IconButton";
 
 const ControlPanel: React.FC = () => {
-  const { selectedScale, selectedBaseNote, selectedShowNoteMode, neck } =
-    useSelector(selectControlPanel);
+  const {
+    selectedScale,
+    selectedBaseNote,
+    selectedShowNoteMode,
+    neck,
+    settingsExpanded,
+  } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (selectedBaseNote === null) {
@@ -47,10 +52,13 @@ const ControlPanel: React.FC = () => {
           { position: "fixed" },
         ]}
       >
-        <IconButton icon="⚙️" onPress={() => setExpanded(!expanded)} />
+        <IconButton
+          icon="⚙️"
+          onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
+        />
         {neck && <Play />}
-      </View>{" "}
-      {expanded && (
+      </View>
+      {settingsExpanded && (
         <View
           style={[
             tw`left-3 z-20 top-20 bg-gray-200 p-2 rounded-lg`,
