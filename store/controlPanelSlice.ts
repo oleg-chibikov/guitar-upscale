@@ -1,25 +1,39 @@
-// controlPanelSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+// controlPanelSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Note } from "../data/notes";
+import { scalesMap } from "../data/scales";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { Neck } from "../engine/generateNeckRepresentation";
+import { RootState } from "./store"; // Define RootState type
+
+interface ControlPanelState {
+  selectedScale: string;
+  selectedBaseNote: Note;
+  selectedShowNoteMode: ShowNoteMode;
+  neck: Neck | null;
+}
+
+const initialState: ControlPanelState = {
+  selectedScale: scalesMap.keys().next().value,
+  selectedBaseNote: Note.E,
+  selectedShowNoteMode: ShowNoteMode.Fret,
+  neck: null,
+};
 
 export const controlPanelSlice = createSlice({
   name: "controlPanel",
-  initialState: {
-    selectedScale: "",
-    selectedBaseNote: null,
-    selectedShowNoteMode: null,
-    neck: null,
-  },
+  initialState,
   reducers: {
-    setSelectedScale: (state, action) => {
+    setSelectedScale: (state, action: PayloadAction<string>) => {
       state.selectedScale = action.payload;
     },
-    setSelectedBaseNote: (state, action) => {
+    setSelectedBaseNote: (state, action: PayloadAction<Note>) => {
       state.selectedBaseNote = action.payload;
     },
-    setSelectedShowNoteMode: (state, action) => {
+    setSelectedShowNoteMode: (state, action: PayloadAction<ShowNoteMode>) => {
       state.selectedShowNoteMode = action.payload;
     },
-    setNeck: (state, action) => {
+    setNeck: (state, action: PayloadAction<Neck>) => {
       state.neck = action.payload;
     },
   },
@@ -31,5 +45,7 @@ export const {
   setSelectedShowNoteMode,
   setNeck,
 } = controlPanelSlice.actions;
+
+export const selectControlPanel = (state: RootState) => state.controlPanel;
 
 export default controlPanelSlice.reducer;

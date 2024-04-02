@@ -1,7 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import { Note, OctaveNote } from "../data/notes";
-import { ShowNoteMode } from "../data/showNoteMode";
+import { OctaveNote } from "../data/notes";
 import { NoteCount } from "../engine/generateNeckRepresentation";
 import tw from "../tailwind";
 import { FretMarker } from "./FretMarker";
@@ -26,19 +25,15 @@ const calculateTop = (string: number, fret: number) => {
 };
 
 export interface FretlineProps {
-  elements: (OctaveNote | undefined)[];
+  elements: (OctaveNote | null)[];
   string?: number;
   isHeader?: boolean;
-  baseNote: Note;
-  showNoteMode: ShowNoteMode;
 }
 
 export const Fretline: React.FC<FretlineProps> = ({
   elements,
   string,
   isHeader,
-  baseNote,
-  showNoteMode,
 }) => {
   const widthStep = 10.25; // Width step for each subsequent fret
   const initialWidth = (NoteCount + 1) * widthStep; // Initial width for the first fret
@@ -55,13 +50,12 @@ export const Fretline: React.FC<FretlineProps> = ({
 
         return (
           <FretMarker
+            key={fret}
             fret={fret}
             width={width}
             isHeader={isHeader}
             top={top}
             octaveNote={octaveNote}
-            baseNote={baseNote}
-            showNoteMode={showNoteMode}
           />
         );
       })}

@@ -1,32 +1,43 @@
+// ControlPanel.tsx
 import { Picker } from "@react-native-picker/picker";
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
-import { Note } from "../data/notes";
-import { scalesMap } from "../data/scales";
-import { ShowNoteMode } from "../data/showNoteMode";
-import { Neck } from "../engine/generateNeckRepresentation";
-import tw from "../tailwind";
+import { useDispatch, useSelector } from "react-redux";
 import { Play } from "./Play";
 
-interface ControlPanelProps {
-  selectedScale: string;
-  setSelectedScale: (scale: string) => void;
-  selectedBaseNote: Note;
-  setSelectedBaseNote: (note: Note) => void;
-  selectedShowNoteMode: ShowNoteMode;
-  setSelectedShowNoteMode: (mode: ShowNoteMode) => void;
-  neck: Neck;
-}
-
-export const ControlPanel: React.FC<ControlPanelProps> = ({
-  selectedScale,
-  setSelectedScale,
-  selectedBaseNote,
+import { Note, stringTuning } from "../data/notes";
+import { scalesMap } from "../data/scales";
+import { ShowNoteMode } from "../data/showNoteMode";
+import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
+import {
+  selectControlPanel,
+  setNeck,
   setSelectedBaseNote,
-  selectedShowNoteMode,
+  setSelectedScale,
   setSelectedShowNoteMode,
-  neck,
-}) => {
+} from "../store/controlPanelSlice";
+import tw from "../tailwind";
+
+const ControlPanel: React.FC = () => {
+  const { selectedScale, selectedBaseNote, selectedShowNoteMode, neck } =
+    useSelector(selectControlPanel);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedBaseNote === null) {
+      return;
+    }
+
+    const scalePattern = new Set(scalesMap.get(selectedScale));
+    const neck = generateNeckRepresentation(
+      scalePattern,
+      stringTuning,
+      selectedBaseNote
+    );
+
+    dispatch(setNeck(neck));
+  }, [selectedBaseNote, selectedScale, stringTuning]);
+
   return (
     <View
       style={[
@@ -34,11 +45,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         { position: "fixed" },
       ]}
     >
+      {/* Scale Picker */}
       <Picker
         style={tw`text-2xl`}
         selectedValue={selectedScale}
         onValueChange={(scale) => {
-          setSelectedScale(scale);
+          dispatch(setSelectedScale(scale));
         }}
       >
         {Array.from(scalesMap.entries()).map((scale, index) => (
@@ -46,11 +58,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         ))}
       </Picker>
 
+      {/* Base Note Picker */}
       <Picker
         style={tw`text-2xl`}
         selectedValue={selectedBaseNote}
         onValueChange={(itemValue) => {
-          setSelectedBaseNote(parseInt(itemValue as unknown as string));
+          dispatch(
+            setSelectedBaseNote(parseInt(itemValue as unknown as string))
+          ); // Assuming itemValue is of type Note
         }}
       >
         {Object.entries(Note)
@@ -63,11 +78,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             />
           ))}
       </Picker>
+
+      {/* Show Note Mode Picker */}
       <Picker
         style={tw`text-2xl`}
         selectedValue={selectedShowNoteMode}
         onValueChange={(mode) => {
-          setSelectedShowNoteMode(parseInt(mode as unknown as string));
+          dispatch(
+            setSelectedShowNoteMode(parseInt(mode as unknown as string))
+          ); // Assuming mode is of type ShowNoteMode
         }}
       >
         {Object.entries(ShowNoteMode)
@@ -76,7 +95,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <Picker.Item key={key} label={key} value={value} />
           ))}
       </Picker>
-      <Play neck={neck} stopSignal={selectedScale + selectedBaseNote} />
+
+      {/* Play Component */}
+      {neck && <Play />}
     </View>
   );
 };
+
+export default ControlPanel;

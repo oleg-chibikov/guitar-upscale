@@ -1,22 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "react-native";
-import { Neck } from "../engine/generateNeckRepresentation";
+import { Pressable, Text } from "react-native";
 import { playNote } from "../engine/soundProvider";
+import { useAppSelector } from "../store/store";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-interface PlayProps {
-  neck: Neck;
-  stopSignal: unknown;
-}
-
-export const Play: React.FC<PlayProps> = ({ neck, stopSignal }) => {
+export const Play: React.FC = () => {
+  const { neck, selectedBaseNote, selectedScale } = useAppSelector(
+    (state) => state.controlPanel
+  );
+  if (!neck) {
+    return "Loading...";
+  }
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
   useEffect(() => {
     setIsPlaying(false);
     isPlayingRef.current = false;
-  }, [stopSignal]);
+  }, [neck, selectedBaseNote, selectedScale]);
 
   const handlePlay = async () => {
     if (isPlayingRef.current) {
@@ -32,11 +33,17 @@ export const Play: React.FC<PlayProps> = ({ neck, stopSignal }) => {
 
     const reverseString = Math.random() < 0.5;
     const reverseNeck = Math.random() < 0.5;
+    var neckCopy = [...neck];
+    if (reverseNeck) {
+      neckCopy.reverse();
+    }
 
-    for (const string of reverseNeck ? neck : neck.reverse()) {
-      for (const note of (reverseString ? string : string.reverse()).filter(
-        (x) => x
-      )) {
+    for (const string of neckCopy) {
+      const stringCopy = [...string];
+      if (reverseString) {
+        stringCopy.reverse();
+      }
+      for (const note of stringCopy.filter((x) => x)) {
         // Check if playback should be stopped
         if (!isPlayingRef.current) {
           break;
@@ -48,5 +55,9 @@ export const Play: React.FC<PlayProps> = ({ neck, stopSignal }) => {
     setIsPlaying(false);
     isPlayingRef.current = false;
   };
-  return <Button onPress={handlePlay} title={isPlaying ? "⏸️" : "▶️"} />;
+  return (
+    <Pressable onPress={handlePlay}>
+      <Text>{isPlaying ? "⏸️" : "▶️"}</Text>
+    </Pressable>
+  );
 };

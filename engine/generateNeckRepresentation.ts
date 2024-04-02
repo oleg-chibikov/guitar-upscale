@@ -1,6 +1,6 @@
 import { Note, OctaveNote } from "../data/notes";
 
-export type Neck = (OctaveNote | undefined)[][];
+export type Neck = (OctaveNote | null)[][];
 export const NoteCount: number = 12;
 export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
@@ -31,7 +31,7 @@ export const generateNeckRepresentation = (
         octave++;
       }
 
-      neck[i][j] = isInScale ? { note, octave } : undefined;
+      neck[i][j] = isInScale ? { note, octave } : null;
     }
   }
 

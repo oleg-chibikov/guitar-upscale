@@ -3,16 +3,15 @@ import { Pressable, Text, View } from "react-native";
 import { Note, OctaveNote, getNoteText } from "../data/notes";
 import { ShowNoteMode } from "../data/showNoteMode";
 import { playNote } from "../engine/soundProvider";
+import { useAppSelector } from "../store/store";
 import tw from "../tailwind";
 
 interface FretMarkerProps {
   fret: number;
   width: number;
   top: number;
-  octaveNote: OctaveNote | undefined;
+  octaveNote: OctaveNote | null;
   isHeader?: boolean;
-  baseNote: Note;
-  showNoteMode: ShowNoteMode;
 }
 
 export const FretMarker: React.FC<FretMarkerProps> = ({
@@ -21,14 +20,18 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   top,
   octaveNote,
   isHeader,
-  baseNote,
-  showNoteMode,
 }) => {
+  const { selectedBaseNote, selectedShowNoteMode } = useAppSelector(
+    (state) => state.controlPanel
+  );
+
   const isInScale: boolean = octaveNote !== undefined;
   const note: Note | undefined = octaveNote?.note;
   const circleWidth: string = isHeader ? "w-12 h-12" : "w-7 h-7";
-  const bg: string = note === baseNote ? "bg-orange-500" : "bg-orange-100";
-  const color: string = note === baseNote ? "text-black" : "text-red-500";
+  const bg: string =
+    note === selectedBaseNote ? "bg-orange-500" : "bg-orange-100";
+  const color: string =
+    note === selectedBaseNote ? "text-black" : "text-red-500";
 
   return (
     <View
@@ -46,7 +49,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           },
         ]}
       >
-        {octaveNote !== undefined && (
+        {octaveNote !== null && (
           <Pressable
             disabled={isHeader}
             onPress={() => {
@@ -59,8 +62,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
             >
               {isHeader
-                ? note
-                : showNoteMode === ShowNoteMode.Note
+                ? octaveNote.note
+                : selectedShowNoteMode === ShowNoteMode.Note
                 ? getNoteText(octaveNote.note) + octaveNote.octave
                 : fret}
             </Text>
