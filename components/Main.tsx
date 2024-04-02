@@ -10,8 +10,6 @@ import { Fretboard } from "./Fretboard";
 // dark/light
 // youtube videos for each scale
 // get the formula to avoid hardcoding each string
-// highlight notes when playing/autoplay
-// redux
 // more instruments + dropdown
 // menu layout
 // zoom with pinch
