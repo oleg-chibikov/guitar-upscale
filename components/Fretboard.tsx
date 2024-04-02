@@ -19,9 +19,11 @@ export const Fretboard: React.FC<FretboardProps> = ({
   isCollapsed = false,
 }) => {
   const neck = useAppSelector((state) => state.controlPanel.neck);
+
   if (!neck) {
     return "Loading...";
   }
+
   return (
     <View
       style={[

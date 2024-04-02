@@ -3,6 +3,7 @@ import { Dimensions, ScaledSize, View } from "react-native";
 import tw from "../tailwind";
 import ControlPanel from "./ControlPanel";
 import { Fretboard } from "./Fretboard";
+import PinchableBox from "./PinchableBox";
 
 // TODO
 // More scales
@@ -41,28 +42,25 @@ export const Main: React.FC = () => {
   return (
     <>
       <ControlPanel />
-      <View
-        style={[
-          tw`overflow-hidden w-full h-full items-start justify-center bg-white`,
-          { minWidth: 2300 * scaleFactor },
-        ]}
-      >
-        {!highResLoaded && (
+      <View style={[tw`w-full h-full items-start justify-center`]}>
+        <PinchableBox>
+          {!highResLoaded && (
+            <Fretboard
+              scaleFactor={scaleFactor}
+              imageSource={require("../assets/guitar_low.png")}
+            />
+          )}
+
           <Fretboard
             scaleFactor={scaleFactor}
-            imageSource={require("../assets/guitar_low.png")}
+            imageSource={require("../assets/guitar.png")}
+            onImageLoaded={() => {
+              console.log("Loaded full res image");
+              setHighResLoaded(true);
+            }}
+            isCollapsed={!highResLoaded}
           />
-        )}
-
-        <Fretboard
-          scaleFactor={scaleFactor}
-          imageSource={require("../assets/guitar.png")}
-          onImageLoaded={() => {
-            console.log("Loaded full res image");
-            setHighResLoaded(true);
-          }}
-          isCollapsed={!highResLoaded}
-        />
+        </PinchableBox>
       </View>
     </>
   );

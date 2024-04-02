@@ -3,6 +3,7 @@ import { Pressable, Text } from "react-native";
 import { useDispatch } from "react-redux";
 import { setNoteToAnimate } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
+import tw from "../tailwind";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -60,8 +61,11 @@ export const Play: React.FC = () => {
     isPlayingRef.current = false;
   };
   return (
-    <Pressable onPress={handlePlay}>
-      <Text>{isPlaying ? "⏸️" : "▶️"}</Text>
+    <Pressable
+      style={tw`flex items-center w-7 h-7 justify-center`}
+      onPress={handlePlay}
+    >
+      <Text style={tw`text-2xl`}>{isPlaying ? "⏸️" : "▶️"}</Text>
     </Pressable>
   );
 };
