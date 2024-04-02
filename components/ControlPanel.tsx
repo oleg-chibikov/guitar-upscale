@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Play } from "./Play";
 
@@ -16,6 +16,7 @@ import {
   setSelectedShowNoteMode,
 } from "../store/controlPanelSlice";
 import tw from "../tailwind";
+import IconButton from "./IconButton";
 
 const ControlPanel: React.FC = () => {
   const { selectedScale, selectedBaseNote, selectedShowNoteMode, neck } =
@@ -46,13 +47,7 @@ const ControlPanel: React.FC = () => {
           { position: "fixed" },
         ]}
       >
-        <TouchableOpacity
-          style={[tw`bg-gray-200 p-2 rounded-lg w-96`]}
-          onPress={() => setExpanded(!expanded)}
-        >
-          <Text style={tw`text-2xl`}>Control Panel</Text>
-        </TouchableOpacity>
-
+        <IconButton icon="⚙️" onPress={() => setExpanded(!expanded)} />
         {neck && <Play />}
       </View>{" "}
       {expanded && (

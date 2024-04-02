@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Pressable, Text } from "react-native";
 import { useDispatch } from "react-redux";
 import { setNoteToAnimate } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
+import IconButton from "./IconButton";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -60,12 +59,5 @@ export const Play: React.FC = () => {
     setIsPlaying(false);
     isPlayingRef.current = false;
   };
-  return (
-    <Pressable
-      style={tw`flex items-center justify-center`}
-      onPress={handlePlay}
-    >
-      <Text style={tw`text-2xl`}>{isPlaying ? "⏸️" : "▶️"}</Text>
-    </Pressable>
-  );
+  return <IconButton icon={isPlaying ? "⏸️" : "▶️"} onPress={handlePlay} />;
 };
