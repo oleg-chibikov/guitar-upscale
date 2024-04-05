@@ -33,6 +33,13 @@ const initialState: ControlPanelState = {
   playIntervalMs: 100,
 };
 
+// A value that changes immediately without the need for rerender
+export let playIntervalMsValue: number | undefined = undefined;
+export let examplesForScale: string[] | undefined = undefined;
+export const setExamples = (examples?: string[]) => {
+  examplesForScale = examples;
+};
+
 export const controlPanelSlice = createSlice({
   name: "controlPanel",
   initialState,
@@ -77,8 +84,5 @@ export const {
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;
-
-// A value that changes immediately without the need for rerender
-export let playIntervalMsValue = initialState.playIntervalMs;
 
 export default controlPanelSlice.reducer;

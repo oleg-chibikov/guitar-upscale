@@ -1,8 +1,90 @@
-export const scalesMap: Map<string, Map<string, number[]>> = new Map([
+export type Scale = number[] | { scale: number[]; examples: string[] };
+
+// Debug - check duplicates
+export const checkDuplicateScales = (
+  scalesMap: Map<string, Map<string, Scale>>
+): void => {
+  // Create a Map to store encountered scales and their names
+  const encounteredScales = new Map<string, string>();
+
+  // Iterate through each group
+  for (const [group, groupMap] of scalesMap.entries()) {
+    // Iterate through each scale within the group
+    for (const [scaleName, scaleObject] of groupMap.entries()) {
+      const scaleNotes = getScaleNotes(scaleObject);
+      const scaleString = JSON.stringify(scaleNotes);
+
+      // If the scale is encountered more than once, log the duplicate
+      if (encounteredScales.has(scaleString)) {
+        console.log(
+          `Duplicate found: Scale '${scaleName}' in '${group}' duplicates '${encounteredScales.get(
+            scaleString
+          )}'`
+        );
+      } else {
+        // Otherwise, add the scale to the map
+        encounteredScales.set(scaleString, scaleName);
+      }
+    }
+  }
+};
+
+export const getScaleNotes = (scale?: Scale) => {
+  if (!Array.isArray(scale)) {
+    return scale?.scale;
+  }
+  return scale;
+};
+
+export const getScaleExamples = (scale?: Scale) => {
+  if (!Array.isArray(scale)) {
+    return scale?.examples;
+  }
+  return undefined;
+};
+
+export const scalesMap: Map<string, Map<string, Scale>> = new Map([
+  [
+    "Common Major",
+    new Map([
+      ["Pentatonic Major", [2, 4, 7, 9]],
+      ["Pentatonic Dominant", [2, 4, 7, 10]],
+      ["Lydian", [2, 4, 6, 7, 9, 11]],
+      ["Lydian Augmented", [2, 4, 6, 8, 9, 11]],
+      ["Mixolydian", [2, 4, 5, 7, 9, 10]],
+      ["Ionian", [2, 4, 5, 7, 9, 11]],
+      ["Phrygian", [1, 3, 5, 7, 8, 10]],
+    ]),
+  ],
+  [
+    "Common Minor",
+    new Map([
+      ["Pentatonic Minor", [3, 5, 7, 10]],
+      ["Lydian", [2, 4, 6, 7, 8, 10]],
+      ["Locrian", [1, 3, 5, 6, 8, 10]],
+      ["Aeolian / Natural", [2, 3, 5, 7, 8, 10]],
+      [
+        "Dorian",
+        {
+          scale: [2, 3, 5, 7, 9, 10],
+          examples: [
+            "1(0|3|0)0(0__3__2______)1(0|3|0)0(3__2)1(__3______)1(0|3|0)",
+          ],
+        },
+      ],
+      ["Melodic", [2, 3, 5, 7, 9, 11]],
+    ]),
+  ],
   [
     "Middle Eastern",
     new Map([
-      ["Hijaz", [1, 4, 5, 7, 8, 10]],
+      [
+        "Hijaz / Ahaba Rabba",
+        {
+          scale: [1, 4, 5, 7, 8, 10],
+          examples: ["0(0_0__4|1|0|4_4__7|5|4|5_5__8|7|5|4|1|0|1|0)"],
+        },
+      ],
       ["Arabian", [2, 4, 5, 6, 8, 10]],
       ["Persian", [1, 4, 5, 6, 8, 11]],
       ["Mohammedan / Harmonic", [2, 3, 5, 7, 8, 11]],
@@ -42,7 +124,13 @@ export const scalesMap: Map<string, Map<string, number[]>> = new Map([
       ["Hindu", [2, 4, 5, 7, 8, 10]],
       ["Neapolitan", [1, 3, 5, 7, 8, 11]],
       ["Neapolitan Major", [1, 3, 5, 7, 9, 11]],
-      ["Prodigy - Narayan", [2, 3, 7, 9, 10]],
+      [
+        "Prodigy - Narayan",
+        {
+          scale: [2, 3, 7, 9, 10],
+          examples: ["0(0|2|3|7|10|9|3|2|0|2|3|7|10|9|3|2)"],
+        },
+      ],
       ["Algerian", [2, 3, 5, 6, 7, 8, 11]],
       ["Pelog / Balinese", [1, 3, 7, 8]],
       ["Pelog 2", [1, 3, 7, 10]],
@@ -55,29 +143,6 @@ export const scalesMap: Map<string, Map<string, number[]>> = new Map([
       ["Prometheus", [2, 4, 6, 9, 10]],
       ["Prometheus Neapolitan", [1, 4, 6, 9, 10]],
       ["Moorish Phrygian", [1, 3, 4, 5, 7, 8, 10, 11]],
-    ]),
-  ],
-  [
-    "Common Major",
-    new Map([
-      ["Pentatonic Major", [2, 4, 7, 9]],
-      ["Pentatonic Dominant", [2, 4, 7, 10]],
-      ["Lydian", [2, 4, 6, 7, 9, 11]],
-      ["Lydian Augmented", [2, 4, 6, 8, 9, 11]],
-      ["Mixolydian", [2, 4, 5, 7, 9, 10]],
-      ["Ionian", [2, 4, 5, 7, 9, 11]],
-      ["Phrygian", [1, 3, 5, 7, 8, 10]],
-    ]),
-  ],
-  [
-    "Common Minor",
-    new Map([
-      ["Pentatonic Minor", [3, 5, 7, 10]],
-      ["Lydian", [2, 4, 6, 7, 8, 10]],
-      ["Locrian", [1, 3, 5, 6, 8, 10]],
-      ["Aeolian / Natural", [2, 3, 5, 7, 8, 10]],
-      ["Dorian", [2, 3, 5, 7, 9, 10]],
-      ["Melodic", [2, 3, 5, 7, 9, 11]],
     ]),
   ],
   [

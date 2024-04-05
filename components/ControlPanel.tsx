@@ -6,10 +6,16 @@ import { PlayButton } from "./PlayButton";
 
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { Note, stringTuning } from "../data/notes";
-import { scalesMap } from "../data/scales";
+import {
+  checkDuplicateScales,
+  getScaleExamples,
+  getScaleNotes,
+  scalesMap,
+} from "../data/scales";
 import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
 import {
   selectControlPanel,
+  setExamples,
   setNeck,
   setSelectedBaseNote,
   setSelectedNoteDisplayMode,
@@ -37,39 +43,13 @@ const ControlPanel: React.FC = () => {
       return;
     }
 
-    const scalePattern = new Set(
-      scalesMap.get(selectedScaleGroup)!.get(selectedScale)?.concat([0])
-    );
+    const scaleObject = scalesMap.get(selectedScaleGroup)!.get(selectedScale);
 
-    // Debug - check duplicates
-    function checkDuplicateScales(
-      scalesMap: Map<string, Map<string, number[]>>
-    ): void {
-      // Create a Map to store encountered scales and their names
-      const encounteredScales = new Map<string, string>();
+    let scaleNotes = getScaleNotes(scaleObject);
 
-      // Iterate through each group
-      for (const [group, groupMap] of scalesMap.entries()) {
-        // Iterate through each scale within the group
-        for (const [scaleName, scale] of groupMap.entries()) {
-          const scaleString = JSON.stringify(scale);
+    const scalePattern = new Set(scaleNotes?.concat([0]));
 
-          // If the scale is encountered more than once, log the duplicate
-          if (encounteredScales.has(scaleString)) {
-            console.log(
-              `Duplicate found: Scale '${scaleName}' in '${group}' duplicates '${encounteredScales.get(
-                scaleString
-              )}'`
-            );
-          } else {
-            // Otherwise, add the scale to the map
-            encounteredScales.set(scaleString, scaleName);
-          }
-        }
-      }
-    }
-
-    // Example usage:
+    // Debug
     checkDuplicateScales(scalesMap);
 
     const neck = generateNeckRepresentation(
@@ -77,8 +57,9 @@ const ControlPanel: React.FC = () => {
       stringTuning,
       selectedBaseNote
     );
-
     dispatch(setNeck(neck));
+
+    setExamples(getScaleExamples(scaleObject));
   }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);
 
   const scales = scalesMap;
@@ -91,12 +72,18 @@ const ControlPanel: React.FC = () => {
           { position: "fixed" },
         ]}
       >
-        <IconButton
-          icon="⚙️"
-          onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
-        />
-        {neck && <PlayButton />}
-        <View style={[tw`flex flex-column gap-1`]}>
+        <View
+          style={[
+            tw`bg-gray-200 p-2 rounded-md`,
+            {
+              display: "grid",
+              gridTemplateColumns: "auto minmax(200px, auto)",
+              gridTemplateRows: "repeat(3, auto)",
+              gap: "10px", // Adjust the gap as needed
+            },
+          ]}
+        >
+          <Text style={tw`text-md`}>Style:</Text>
           <Picker
             style={tw`text-md`}
             selectedValue={selectedScaleGroup}
@@ -109,21 +96,33 @@ const ControlPanel: React.FC = () => {
             ))}
           </Picker>
           {selectedScaleGroup && (
-            <Picker
-              style={tw`text-md`}
-              selectedValue={selectedScale}
-              onValueChange={(value) => {
-                dispatch(setSelectedScale(value));
-              }}
-            >
-              {Array.from(scales.get(selectedScaleGroup)!.entries()).map(
-                (scale, index) => (
-                  <Picker.Item key={index} label={scale[0]} value={scale[0]} />
-                )
-              )}
-            </Picker>
+            <>
+              <Text style={tw`text-md`}>Scale:</Text>
+              <Picker
+                style={tw`text-md`}
+                selectedValue={selectedScale}
+                onValueChange={(value) => {
+                  dispatch(setSelectedScale(value));
+                }}
+              >
+                {Array.from(scales.get(selectedScaleGroup)!.entries()).map(
+                  (scale, index) => (
+                    <Picker.Item
+                      key={index}
+                      label={scale[0]}
+                      value={scale[0]}
+                    />
+                  )
+                )}
+              </Picker>
+            </>
           )}
         </View>
+        <IconButton
+          icon="⚙️"
+          onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
+        />
+        {neck && <PlayButton />}
       </View>
       {settingsExpanded && (
         <View

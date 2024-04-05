@@ -13,12 +13,11 @@ import { Fretboard } from "./Fretboard";
 import PinchableBox from "./PinchableBox";
 
 // TODO
-// More scales
-// Scales by category - classical, expitic, major, minor, japanese, arabic, gypsy. several levels of nesting
 // dark/light
 // youtube videos for each scale
 // get the formula to avoid hardcoding each string
 // more instruments + dropdown
+// Alternative to youtube - code melodies with the language
 
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);
