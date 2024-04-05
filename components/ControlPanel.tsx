@@ -14,6 +14,7 @@ import {
 } from "../data/scales";
 import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
 import {
+  neck,
   selectControlPanel,
   setExamples,
   setNeck,
@@ -33,7 +34,6 @@ const ControlPanel: React.FC = () => {
     selectedScaleGroup,
     selectedBaseNote,
     selectedNoteDisplayMode,
-    neck,
     settingsExpanded,
   } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const ControlPanel: React.FC = () => {
       stringTuning,
       selectedBaseNote
     );
-    dispatch(setNeck(neck));
+    setNeck(neck);
 
     setExamples(getScaleExamples(scaleObject));
   }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);

@@ -11,7 +11,6 @@ interface ControlPanelState {
   selectedScaleGroup: string;
   selectedBaseNote: Note;
   selectedNoteDisplayMode: NoteDisplayMode;
-  neck: Neck | null;
   settingsExpanded: boolean;
   playIntervalMs: number;
 }
@@ -28,12 +27,14 @@ const initialState: ControlPanelState = {
   selectedScale: firstScaleKey,
   selectedBaseNote: Note.E,
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
-  neck: null,
   settingsExpanded: false,
   playIntervalMs: 100,
 };
 
 // A value that changes immediately without the need for rerender
+
+export let neck: Neck | null;
+export const setNeck = (value: Neck) => (neck = value);
 export let playIntervalMsValue: number | undefined = undefined;
 export let examplesForScale: string[] | undefined = undefined;
 export const setExamples = (examples?: string[]) => {
@@ -60,9 +61,6 @@ export const controlPanelSlice = createSlice({
     ) => {
       state.selectedNoteDisplayMode = action.payload;
     },
-    setNeck: (state, action: PayloadAction<Neck>) => {
-      state.neck = action.payload;
-    },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
     },
@@ -78,7 +76,6 @@ export const {
   setSelectedScaleGroup,
   setSelectedBaseNote,
   setSelectedNoteDisplayMode,
-  setNeck,
   setSettingsExpanded,
   setPlayIntervalMs,
 } = controlPanelSlice.actions;
