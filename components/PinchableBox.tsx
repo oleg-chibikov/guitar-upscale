@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Animated } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, Dimensions } from "react-native";
 import {
   HandlerStateChangeEvent,
   PanGestureHandler,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   State,
 } from "react-native-gesture-handler";
+import { useScreenOrientation } from "../engine/useScreenOrientation";
 import tw from "../tailwind";
 
 interface PinchableBoxProps {
@@ -16,13 +17,36 @@ interface PinchableBoxProps {
 }
 
 const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
+  const orientation = useScreenOrientation();
+
   const baseScale = useRef(new Animated.Value(1)).current;
   const pinchScale = useRef(new Animated.Value(1)).current;
   const lastScale = useRef(1);
-  const translateX = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
-  const lastTranslateX = useRef(0);
-  const lastTranslateY = useRef(0);
+  let initialX = useRef(0).current;
+  let initialY = useRef(0).current;
+  let lastTranslateX = useRef(initialX).current;
+  let lastTranslateY = useRef(initialY).current;
+
+  useEffect(() => {
+    console.log(orientation);
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    console.log(isTouchDevice ? "touch" : "mouse");
+    const dimensions = Dimensions.get("screen");
+
+    initialY = dimensions.height > 500 ? 50 : -10;
+    initialX = dimensions.width < 1000 ? -150 : 0;
+    lastTranslateX = initialX;
+    lastTranslateY = initialY;
+    onPanHandlerStateChange({
+      nativeEvent: {
+        oldState: State.ACTIVE,
+        translationX: initialX,
+        translationY: initialY,
+      } as any,
+    });
+  }, [orientation]);
+  const translateX = useRef(new Animated.Value(initialX)).current; // Initial X position set to -100
+  const translateY = useRef(new Animated.Value(initialY)).current; // Initial Y position set to -100
 
   const scale = Animated.multiply(baseScale, pinchScale);
 
@@ -57,12 +81,15 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
     event: HandlerStateChangeEvent<PanGestureHandlerEventPayload>
   ) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
-      lastTranslateX.current += event.nativeEvent.translationX;
-      lastTranslateY.current += event.nativeEvent.translationY;
-      translateX.setOffset(lastTranslateX.current);
+      lastTranslateX += event.nativeEvent.translationX;
+      lastTranslateY += event.nativeEvent.translationY;
+      translateX.setOffset(lastTranslateX);
       translateX.setValue(0);
-      translateY.setOffset(lastTranslateY.current);
+      translateY.setOffset(lastTranslateY);
       translateY.setValue(0);
+    } else {
+      translateX.setOffset(lastTranslateX);
+      translateY.setOffset(lastTranslateY);
     }
   };
 
@@ -76,7 +103,7 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
         onHandlerStateChange={onPanHandlerStateChange}
       >
         <ScrollView
-          style={[tw`w-full h-full`, { minWidth: 3000 }]}
+          style={[tw`w-full h-full`, { minWidth: 2500 }]}
           maximumZoomScale={5}
           minimumZoomScale={1}
           showsHorizontalScrollIndicator={true}

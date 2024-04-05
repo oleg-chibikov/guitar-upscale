@@ -1,62 +1,84 @@
 // controlPanelSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Note, OctaveNote } from "../data/notes";
+import { NoteDisplayMode } from "../data/noteDisplayMode";
+import { Note } from "../data/notes";
 import { scalesMap } from "../data/scales";
-import { ShowNoteMode } from "../data/showNoteMode";
 import { Neck } from "../engine/generateNeckRepresentation";
 import { RootState } from "./store"; // Define RootState type
 
 interface ControlPanelState {
   selectedScale: string;
+  selectedScaleGroup: string;
   selectedBaseNote: Note;
-  selectedShowNoteMode: ShowNoteMode;
+  selectedNoteDisplayMode: NoteDisplayMode;
   neck: Neck | null;
-  noteToAnimate?: OctaveNote;
   settingsExpanded: boolean;
+  playIntervalMs: number;
 }
 
+const firstScaleGroupKey = scalesMap.keys().next().value;
+
+const getFirstScaleForGroup = (groupKey: string) =>
+  scalesMap.get(groupKey)!.keys().next().value;
+
+const firstScaleKey = getFirstScaleForGroup(firstScaleGroupKey);
+
 const initialState: ControlPanelState = {
-  selectedScale: scalesMap.keys().next().value,
+  selectedScaleGroup: firstScaleGroupKey,
+  selectedScale: firstScaleKey,
   selectedBaseNote: Note.E,
-  selectedShowNoteMode: ShowNoteMode.Fret,
+  selectedNoteDisplayMode: NoteDisplayMode.Fret,
   neck: null,
   settingsExpanded: false,
+  playIntervalMs: 100,
 };
 
 export const controlPanelSlice = createSlice({
   name: "controlPanel",
   initialState,
   reducers: {
+    setSelectedScaleGroup: (state, action: PayloadAction<string>) => {
+      state.selectedScaleGroup = action.payload;
+      state.selectedScale = getFirstScaleForGroup(action.payload);
+    },
     setSelectedScale: (state, action: PayloadAction<string>) => {
       state.selectedScale = action.payload;
     },
     setSelectedBaseNote: (state, action: PayloadAction<Note>) => {
       state.selectedBaseNote = action.payload;
     },
-    setSelectedShowNoteMode: (state, action: PayloadAction<ShowNoteMode>) => {
-      state.selectedShowNoteMode = action.payload;
+    setSelectedNoteDisplayMode: (
+      state,
+      action: PayloadAction<NoteDisplayMode>
+    ) => {
+      state.selectedNoteDisplayMode = action.payload;
     },
     setNeck: (state, action: PayloadAction<Neck>) => {
       state.neck = action.payload;
     },
-    setNoteToAnimate: (state, action: PayloadAction<OctaveNote>) => {
-      state.noteToAnimate = action.payload;
-    },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
+    },
+    setPlayIntervalMs: (state, action: PayloadAction<number>) => {
+      state.playIntervalMs = action.payload;
+      playIntervalMsValue = action.payload;
     },
   },
 });
 
 export const {
   setSelectedScale,
+  setSelectedScaleGroup,
   setSelectedBaseNote,
-  setSelectedShowNoteMode,
-  setNoteToAnimate,
+  setSelectedNoteDisplayMode,
   setNeck,
   setSettingsExpanded,
+  setPlayIntervalMs,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;
+
+// A value that changes immediately without the need for rerender
+export let playIntervalMsValue = initialState.playIntervalMs;
 
 export default controlPanelSlice.reducer;

@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
-import { useDispatch } from "react-redux";
-import { Note, OctaveNote, getNoteText } from "../data/notes";
-import { ShowNoteMode } from "../data/showNoteMode";
-import { playNote } from "../engine/soundProvider";
+import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
-  selectControlPanel,
-  setNoteToAnimate,
-} from "../store/controlPanelSlice";
+  Note,
+  StringOctaveNote,
+  getNoteText,
+  serizlizeStringOctaveNote,
+} from "../data/notes";
+import { NoteMap } from "../engine/eventBus";
+import { playNote } from "../engine/soundProvider";
+import { selectControlPanel } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 import tw from "../tailwind";
 
@@ -15,7 +17,7 @@ interface FretMarkerProps {
   fret: number;
   width: number;
   top: number;
-  octaveNote: OctaveNote | null;
+  stringOctaveNote: StringOctaveNote | null;
   isHeader?: boolean;
 }
 
@@ -23,15 +25,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   fret,
   width,
   top,
-  octaveNote,
+  stringOctaveNote,
   isHeader,
 }) => {
-  const dispatch = useDispatch();
-  const { selectedBaseNote, selectedShowNoteMode, noteToAnimate } =
+  const { selectedBaseNote, selectedNoteDisplayMode } =
     useAppSelector(selectControlPanel);
 
-  const isInScale: boolean = octaveNote !== undefined;
-  const note: Note | undefined = octaveNote?.note;
+  const isInScale: boolean = stringOctaveNote !== undefined;
+  const note: Note | undefined = stringOctaveNote?.note;
   const circleWidth: string = isHeader ? "w-12 h-12" : "w-7 h-7";
   const bg: string =
     note === selectedBaseNote ? "bg-orange-500" : "bg-orange-100";
@@ -42,22 +43,21 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (noteToAnimate !== null && noteToAnimate === octaveNote) {
-      playNoteAndAnimate();
+    if (stringOctaveNote) {
+      const key = serizlizeStringOctaveNote(stringOctaveNote);
+      NoteMap.set(key, () => {
+        console.log("Playing note (auto): " + JSON.stringify(stringOctaveNote));
+        playNoteAndAnimate();
+      });
+      return () => NoteMap.delete(key);
     }
-  }, [noteToAnimate]);
-
-  // Function to handle note press
-  const handleNotePress = () => {
-    if (!isHeader && octaveNote !== null) {
-      dispatch(setNoteToAnimate(octaveNote));
-    }
-  };
+    return () => {};
+  }, [stringOctaveNote]);
 
   // Function to play note and start animation
   const playNoteAndAnimate = () => {
-    if (octaveNote) {
-      playNote(octaveNote);
+    if (stringOctaveNote) {
+      playNote(stringOctaveNote);
     }
     Animated.sequence([
       Animated.timing(glowAnim, {
@@ -89,10 +89,15 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           },
         ]}
       >
-        {octaveNote !== null && (
+        {stringOctaveNote !== null && (
           <Pressable
             disabled={isHeader}
-            onPress={handleNotePress}
+            onPress={() => {
+              console.log(
+                "Playing note (manual): " + JSON.stringify(stringOctaveNote)
+              );
+              playNoteAndAnimate();
+            }}
             style={tw`bg-transparent p-2 ${circleWidth} flex justify-center items-center rounded-full ${bg} border-slate-800 border-2`}
           >
             <Animated.View
@@ -118,9 +123,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
             >
               {isHeader
-                ? octaveNote.note
-                : selectedShowNoteMode === ShowNoteMode.Note
-                ? getNoteText(octaveNote.note) + octaveNote.octave
+                ? stringOctaveNote.note
+                : selectedNoteDisplayMode === NoteDisplayMode.Note
+                ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
                 : fret}
             </Text>
           </Pressable>

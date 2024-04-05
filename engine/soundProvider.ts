@@ -10,5 +10,6 @@ const soundfont = new Soundfont(context, {
 export const playNote = (note: OctaveNote) =>
   soundfont.start({
     note: getNoteText(note.note) + note.octave,
+    decayTime: 1000,
     velocity: 80,
   });

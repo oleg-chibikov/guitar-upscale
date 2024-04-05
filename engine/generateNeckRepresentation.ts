@@ -15,7 +15,7 @@ export const generateNeckRepresentation = (
     neck[i] = [];
     let octave = octaveNoteForString.octave;
 
-    for (let j = 0; j < NoteCount * 2; j++) {
+    for (let j = 0; j <= NoteCount * 2; j++) {
       // Calculate the position on the neck for the current fret and string
       let position = (j + stringModifier - baseNote) % NoteCount;
 

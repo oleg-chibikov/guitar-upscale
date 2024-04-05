@@ -38,6 +38,10 @@ export function getNoteText(noteNumber: number): string {
   return noteText;
 }
 
+export interface StringOctaveNote extends OctaveNote {
+  string: number;
+}
+
 export interface OctaveNote {
   octave: number;
   note: Note;
@@ -51,3 +55,9 @@ export const stringTuning: OctaveNote[] = [
   { note: Note.A, octave: 3 },
   { note: Note.E, octave: 3 },
 ];
+
+export const serizlizeOctaveNote = (note: OctaveNote) =>
+  [note.octave, note.note].join("_");
+
+export const serizlizeStringOctaveNote = (note: StringOctaveNote) =>
+  [note.string, note.octave, note.note].join("_");

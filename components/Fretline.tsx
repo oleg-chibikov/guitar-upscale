@@ -55,7 +55,9 @@ export const Fretline: React.FC<FretlineProps> = ({
             width={width}
             isHeader={isHeader}
             top={top}
-            octaveNote={octaveNote}
+            stringOctaveNote={
+              octaveNote ? { ...octaveNote, string: string ?? 0 } : null
+            }
           />
         );
       })}

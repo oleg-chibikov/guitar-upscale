@@ -33,16 +33,17 @@ export const Main: React.FC = () => {
       baseScale +
       (isLandscape
         ? Math.log10(size.width / size.height)
-        : Math.log(size.height / size.width));
+        : Math.log10(size.height / size.width));
     setScaleFactor(scaleFactor * size.fontScale);
   };
 
   useEffect(() => {
-    Dimensions.addEventListener("change", (e) =>
+    var handler = Dimensions.addEventListener("change", (e) =>
       // TODO: Debounce
       recalculateScaleFactor(e.window)
     );
     recalculateScaleFactor(Dimensions.get("window"));
+    return () => handler.remove();
   }, []);
 
   return (
