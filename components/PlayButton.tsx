@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { playExample, playWholeScale } from "../engine/player";
+import {
+  OctaveNote,
+  StringOctaveNote,
+  serizlizeOctaveNote,
+} from "../data/notes";
+import { NotePlayEventBus } from "../engine/eventBus";
+import { decodeMelody } from "../engine/melodyDecoder";
 import {
   examplesForScale,
-  neck,
   playIntervalMsValue,
 } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 import IconButton from "./IconButton";
 
 export const PlayButton: React.FC = () => {
-  const { selectedBaseNote, selectedScale, playIntervalMs } = useAppSelector(
-    (state) => state.controlPanel
-  );
+  const { neck, selectedBaseNote, selectedScale, playIntervalMs } =
+    useAppSelector((state) => state.controlPanel);
   if (!neck) {
     return "Loading...";
   }
@@ -26,9 +30,6 @@ export const PlayButton: React.FC = () => {
   }, [neck, selectedBaseNote, selectedScale]);
 
   const handlePlay = async () => {
-    if (!neck) {
-      return;
-    }
     if (isPlayingRef.current) {
       // If already playing, stop playback
       setIsPlaying(false);
