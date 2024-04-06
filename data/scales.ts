@@ -43,7 +43,40 @@ export const getScaleExamples = (scale?: Scale) => {
   return undefined;
 };
 
+// examples follow these rules:
+
+// *4 - play 4th string onwards
+// 8 - play 8th fret on the previously remembered string and pause for one step
+// 1-0 - paly 10th fret following the same rules
+// ^51 - immediately play 1st fret on 5th string without pausing (useful for chords)
+// ^41-2 - immediately play 12th fret on 4th string following the same rules
+
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
+  [
+    "Common Minor",
+    new Map([
+      [
+        "Aeolian / Natural",
+        {
+          scale: [2, 3, 5, 7, 8, 10],
+          examples: [
+            "*1030*^5000__3__2_^43_____*1030*0^533__2*1__3_^30_____030",
+          ],
+        },
+      ],
+      ["Pentatonic Minor", [3, 5, 7, 10]],
+      ["Lydian", [2, 4, 6, 7, 8, 10]],
+      ["Locrian", [1, 3, 5, 6, 8, 10]],
+      [
+        "Dorian",
+        {
+          scale: [2, 3, 5, 7, 9, 10],
+          examples: [],
+        },
+      ],
+      ["Melodic", [2, 3, 5, 7, 9, 11]],
+    ]),
+  ],
   [
     "Common Major",
     new Map([
@@ -57,32 +90,13 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
     ]),
   ],
   [
-    "Common Minor",
-    new Map([
-      ["Pentatonic Minor", [3, 5, 7, 10]],
-      ["Lydian", [2, 4, 6, 7, 8, 10]],
-      ["Locrian", [1, 3, 5, 6, 8, 10]],
-      ["Aeolian / Natural", [2, 3, 5, 7, 8, 10]],
-      [
-        "Dorian",
-        {
-          scale: [2, 3, 5, 7, 9, 10],
-          examples: [
-            "1(0|3|0)0(0__3__2______)1(0|3|0)0(3__2)1(__3______)1(0|3|0)",
-          ],
-        },
-      ],
-      ["Melodic", [2, 3, 5, 7, 9, 11]],
-    ]),
-  ],
-  [
     "Middle Eastern",
     new Map([
       [
         "Hijaz / Ahaba Rabba",
         {
           scale: [1, 4, 5, 7, 8, 10],
-          examples: ["0(0_0__4|1|0|4_4__7|5|4|5_5__8|7|5|4|1|0|1|0)"],
+          examples: ["^50*00_0__410^544_4__754^555_5__875^5441010"],
         },
       ],
       ["Arabian", [2, 4, 5, 6, 8, 10]],
@@ -121,16 +135,18 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
     "Various Exotic",
     new Map([
-      ["Hindu", [2, 4, 5, 7, 8, 10]],
-      ["Neapolitan", [1, 3, 5, 7, 8, 11]],
-      ["Neapolitan Major", [1, 3, 5, 7, 9, 11]],
       [
         "Prodigy - Narayan",
         {
           scale: [2, 3, 7, 9, 10],
-          examples: ["0(0|2|3|7|10|9|3|2|0|2|3|7|10|9|3|2)"],
+          examples: [
+            "^50*002371-0932^5002371-0932^53*002371-0932^5302371-0932",
+          ],
         },
       ],
+      ["Hindu", [2, 4, 5, 7, 8, 10]],
+      ["Neapolitan", [1, 3, 5, 7, 8, 11]],
+      ["Neapolitan Major", [1, 3, 5, 7, 9, 11]],
       ["Algerian", [2, 3, 5, 6, 7, 8, 11]],
       ["Pelog / Balinese", [1, 3, 7, 8]],
       ["Pelog 2", [1, 3, 7, 10]],

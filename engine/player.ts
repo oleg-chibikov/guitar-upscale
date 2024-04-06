@@ -8,7 +8,7 @@ import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
 
 export const playWholeScale = async (
-  waitInterval: number,
+  wait: () => Promise<void>,
   neck: Neck,
   isPlayingRef: React.MutableRefObject<boolean>
 ) => {
@@ -70,16 +70,14 @@ export const playWholeScale = async (
 
       console.log("Requesting auto play note: " + JSON.stringify(note));
       NotePlayEventBus.next(note);
-      await sleep(waitInterval);
+      await wait();
     }
   }
 };
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 export const playExample = async (
   examplesForScale: string[],
-  waitInterval: number,
+  wait: () => Promise<void>,
   neck: Neck,
   isPlayingRef: React.MutableRefObject<boolean>
 ) => {
@@ -96,9 +94,7 @@ export const playExample = async (
       );
       NotePlayEventBus.next(note);
     },
-    async () => {
-      await sleep(waitInterval);
-    },
+    wait,
     neck,
     isPlayingRef
   );

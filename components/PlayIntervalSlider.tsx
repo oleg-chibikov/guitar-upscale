@@ -16,7 +16,7 @@ const PlayIntervalSlider: React.FC = () => {
   };
   const progress = useSharedValue(playIntervalMs);
   const min = useSharedValue(50);
-  const max = useSharedValue(2000);
+  const max = useSharedValue(1000);
   return (
     <View style={[tw`items-center flex flex-row gap-2`]}>
       <Slider

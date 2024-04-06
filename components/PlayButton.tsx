@@ -1,11 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  OctaveNote,
-  StringOctaveNote,
-  serizlizeOctaveNote,
-} from "../data/notes";
-import { NotePlayEventBus } from "../engine/eventBus";
-import { decodeMelody } from "../engine/melodyDecoder";
+import { playExample, playWholeScale } from "../engine/player";
 import {
   examplesForScale,
   playIntervalMsValue,
@@ -20,8 +14,6 @@ export const PlayButton: React.FC = () => {
     return "Loading...";
   }
 
-  // We are taking value from a variable to be able to adjust it while playing, but the initial value comes from the store in order to use redux-persist and restore previous value
-  const waitInterval = playIntervalMsValue ?? playIntervalMs;
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
   useEffect(() => {
@@ -41,10 +33,19 @@ export const PlayButton: React.FC = () => {
     setIsPlaying(true);
     isPlayingRef.current = true;
 
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    const wait = async () => {
+      await sleep(
+        // We are taking value from a variable to be able to adjust it while playing, but the initial value comes from the store in order to use redux-persist and restore previous value
+        playIntervalMsValue ?? playIntervalMs
+      );
+    };
+
     if (examplesForScale) {
-      await playExample(examplesForScale, waitInterval, neck, isPlayingRef);
+      await playExample(examplesForScale, wait, neck, isPlayingRef);
     } else {
-      await playWholeScale(waitInterval, neck, isPlayingRef);
+      await playWholeScale(wait, neck, isPlayingRef);
     }
     setIsPlaying(false);
     isPlayingRef.current = false;
