@@ -22,6 +22,9 @@ import PinchableBox from "./PinchableBox";
 // Slider - vometimes doesnt update
 // more examples
 // multi touch
+// Play mode - scale or example
+// Mark with star where there are examples
+// Panning - restrict view
 
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);
@@ -68,7 +71,9 @@ export const Main: React.FC = () => {
           dispatch(setSettingsExpanded(false));
         }}
       >
-        <View style={[tw`w-full h-full items-start justify-center`]}>
+        <View
+          style={[tw`overflow-hidden w-full h-full items-start justify-center`]}
+        >
           <PinchableBox>
             {!highResLoaded && (
               <Fretboard

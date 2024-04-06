@@ -75,12 +75,10 @@ const ControlPanel: React.FC = () => {
       >
         <View
           style={[
-            tw`bg-gray-200 p-2 rounded-md`,
+            tw`bg-gray-200 p-2 rounded-md gap-2`,
             {
               display: "grid",
               gridTemplateColumns: "auto minmax(200px, auto)",
-              gridTemplateRows: "repeat(3, auto)",
-              gap: "10px", // Adjust the gap as needed
             },
           ]}
         >
@@ -128,13 +126,11 @@ const ControlPanel: React.FC = () => {
       {settingsExpanded && (
         <View
           style={[
-            tw`left-3 z-20 top-25 bg-gray-200 p-2 rounded-md`,
+            tw`left-3 z-20 top-25 bg-gray-200 p-2 rounded-md gap-2`,
             {
               position: "fixed",
               display: "grid",
               gridTemplateColumns: "auto minmax(200px, auto)",
-              gridTemplateRows: "repeat(3, auto)",
-              gap: "10px", // Adjust the gap as needed
             },
           ]}
         >

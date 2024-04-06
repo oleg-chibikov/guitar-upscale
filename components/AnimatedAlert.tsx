@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
+import tw from "../tailwind";
 
 interface AnimatedAlertProps {
   message: string;
@@ -49,39 +44,19 @@ const AnimatedAlert: React.FC<AnimatedAlertProps> = ({ message, onClose }) => {
   };
 
   return (
-    <Animated.View style={[styles.container, { transform: [{ translateY }] }]}>
+    <Animated.View
+      style={[
+        tw`absolute top-3 left-20 right-20 z-10 flex items-center`,
+        { transform: [{ translateY }] },
+      ]}
+    >
       <TouchableOpacity onPress={handlePress}>
-        <View style={styles.alert}>
-          <Text style={styles.message}>{message}</Text>
+        <View style={tw`bg-white p-4 rounded-md flex items-center`}>
+          <Text style={tw`text-base text-gray-800`}>{message}</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    right: 20,
-    zIndex: 999,
-    alignItems: "center",
-  },
-  alert: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 5,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  message: {
-    fontSize: 16,
-    color: "#333",
-  },
-});
 
 export default AnimatedAlert;

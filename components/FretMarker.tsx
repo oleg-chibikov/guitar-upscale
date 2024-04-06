@@ -73,6 +73,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     ]).start();
   };
 
+  const handlePress = () => {
+    if (isHeader) {
+      return;
+    }
+    console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
+    playNoteAndAnimate();
+  };
   return (
     <View
       style={[
@@ -91,45 +98,42 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       >
         {stringOctaveNote !== null && (
           <View
-            onTouchStart={() => {
-              if (isHeader) {
-                return;
-              }
-              console.log(
-                "Playing note (manual): " + JSON.stringify(stringOctaveNote)
-              );
-              playNoteAndAnimate();
-            }}
-            style={tw`bg-transparent p-2 ${circleWidth} flex justify-center items-center rounded-full ${bg} border-slate-800 border-2`}
+            onTouchStart={handlePress}
+            onStartShouldSetResponder={() => true} // Capture both touch and mouse events
+            style={tw`bg-transparent p-5 flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`}
           >
-            <Animated.View
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                borderRadius: 9999,
-                opacity: glowAnim,
-                backgroundColor: "orange", // Change to the desired glow color
-                transform: [
-                  {
-                    scale: glowAnim.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [1, 1.2, 1],
-                    }),
-                  },
-                ],
-              }}
-            />
-            <Text
-              selectable={false}
-              style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
+            <View
+              style={tw`p-2 flex justify-center ${circleWidth} items-center rounded-full ${bg} border-slate-800 border-2`}
             >
-              {isHeader
-                ? stringOctaveNote.note
-                : selectedNoteDisplayMode === NoteDisplayMode.Note
-                ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
-                : fret}
-            </Text>
+              <Animated.View
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: 9999,
+                  opacity: glowAnim,
+                  backgroundColor: "orange", // Change to the desired glow color
+                  transform: [
+                    {
+                      scale: glowAnim.interpolate({
+                        inputRange: [0, 0.5, 1],
+                        outputRange: [1, 1.2, 1],
+                      }),
+                    },
+                  ],
+                }}
+              />
+              <Text
+                selectable={false}
+                style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
+              >
+                {isHeader
+                  ? stringOctaveNote.note
+                  : selectedNoteDisplayMode === NoteDisplayMode.Note
+                  ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
+                  : fret}
+              </Text>
+            </View>
           </View>
         )}
       </Text>

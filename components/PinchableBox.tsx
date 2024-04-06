@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Dimensions } from "react-native";
+import { Animated, Dimensions, ScrollView } from "react-native";
 import {
   HandlerStateChangeEvent,
   PanGestureHandler,
   PanGestureHandlerEventPayload,
   PinchGestureHandler,
   PinchGestureHandlerEventPayload,
-  ScrollView,
   State,
 } from "react-native-gesture-handler";
 import { useScreenOrientation } from "../engine/useScreenOrientation";
@@ -16,25 +15,28 @@ interface PinchableBoxProps {
   children: React.ReactNode;
 }
 
+const minScale = 0.7;
+const maxScale = 2;
+const maxY = 40;
+const minY = -40;
+
+let initialX: number = 0;
+let initialY: number = 0;
+let lastTranslateX = 0;
+let lastTranslateY = 0;
+let lastScale = 1;
+let baseScale = new Animated.Value(lastScale);
+let pinchScale = new Animated.Value(lastScale);
+
 const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
   const orientation = useScreenOrientation();
 
-  const baseScale = useRef(new Animated.Value(1)).current;
-  const pinchScale = useRef(new Animated.Value(1)).current;
-  const lastScale = useRef(1);
-  let initialX = useRef(0).current;
-  let initialY = useRef(0).current;
-  let lastTranslateX = useRef(initialX).current;
-  let lastTranslateY = useRef(initialY).current;
-
   useEffect(() => {
     console.log(orientation);
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    console.log(isTouchDevice ? "touch" : "mouse");
     const dimensions = Dimensions.get("screen");
 
-    initialY = dimensions.height > 500 ? 50 : -10;
     initialX = dimensions.width < 1000 ? -150 : 0;
+    initialY = dimensions.height > 500 ? 50 : -10;
     lastTranslateX = initialX;
     lastTranslateY = initialY;
     onPanHandlerStateChange({
@@ -47,8 +49,49 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
   }, [orientation]);
   const translateX = useRef(new Animated.Value(initialX)).current; // Initial X position set to -100
   const translateY = useRef(new Animated.Value(initialY)).current; // Initial Y position set to -100
-
   const scale = Animated.multiply(baseScale, pinchScale);
+
+  function setTranslateXBasedOnScale(
+    newTranslateX: number,
+    translateX: Animated.Value
+  ) {
+    function interpolate(
+      scale: number,
+      x0: number,
+      x1: number,
+      y0: number,
+      y1: number
+    ) {
+      return y0 + (y1 - y0) * ((scale - x0) / (x1 - x0));
+    }
+
+    const maxX =
+      lastScale < 1
+        ? interpolate(lastScale, minScale, 1, -250, 0)
+        : interpolate(lastScale, 1, maxScale, 0, -200);
+
+    const minX =
+      lastScale < 1
+        ? interpolate(lastScale, minScale, 1, -800, -1300)
+        : interpolate(lastScale, 1, maxScale, -1300, -3000);
+
+    const clampedTranslateX = Math.max(minX, Math.min(maxX, newTranslateX));
+
+    // Set the offset and value for X translation
+    translateX.setOffset(clampedTranslateX);
+    translateX.setValue(0);
+    lastTranslateX = clampedTranslateX;
+  }
+
+  function setTranslateY(newTranslateY: number, translateY: Animated.Value) {
+    const clampedTranslateY = Math.max(minY, Math.min(maxY, newTranslateY));
+
+    // Set the offset and value for Y translation
+    translateY.setOffset(clampedTranslateY);
+    translateY.setValue(0);
+
+    lastTranslateY = clampedTranslateY;
+  }
 
   const onPinchGestureEvent = Animated.event(
     [{ nativeEvent: { scale: pinchScale } }],
@@ -59,9 +102,23 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
     event: HandlerStateChangeEvent<PinchGestureHandlerEventPayload>
   ) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
-      lastScale.current *= event.nativeEvent.scale;
-      baseScale.setValue(lastScale.current);
+      // Calculate the new scale value
+      const newScale = lastScale * event.nativeEvent.scale;
+
+      // Clamp the scale within the limits
+      const clampedScale = Math.max(minScale, Math.min(maxScale, newScale));
+
+      // Set the base scale value to the clamped scale
+      baseScale.setValue(clampedScale);
+
+      // Reset pinch scale value
       pinchScale.setValue(1);
+
+      // Update last scale value
+      lastScale = clampedScale;
+
+      // Adjust TranslateX as it's dependent on scale
+      setTranslateXBasedOnScale(lastTranslateX, translateX);
     }
   };
 
@@ -81,15 +138,13 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
     event: HandlerStateChangeEvent<PanGestureHandlerEventPayload>
   ) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
-      lastTranslateX += event.nativeEvent.translationX;
-      lastTranslateY += event.nativeEvent.translationY;
-      translateX.setOffset(lastTranslateX);
-      translateX.setValue(0);
-      translateY.setOffset(lastTranslateY);
-      translateY.setValue(0);
-    } else {
-      translateX.setOffset(lastTranslateX);
-      translateY.setOffset(lastTranslateY);
+      const newTranslateX = lastTranslateX + event.nativeEvent.translationX;
+      const newTranslateY = lastTranslateY + event.nativeEvent.translationY;
+
+      // Clamp the translations within the limits
+      setTranslateXBasedOnScale(newTranslateX, translateX);
+
+      setTranslateY(newTranslateY, translateY);
     }
   };
 
@@ -102,13 +157,7 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
         onGestureEvent={onPanGestureEvent}
         onHandlerStateChange={onPanHandlerStateChange}
       >
-        <ScrollView
-          style={[tw`overflow-hidden w-full h-full`, { minWidth: 2500 }]}
-          maximumZoomScale={5}
-          minimumZoomScale={1}
-          showsHorizontalScrollIndicator={true}
-          showsVerticalScrollIndicator={true}
-        >
+        <ScrollView style={[tw`overflow-hidden w-full h-full`]}>
           <Animated.View
             style={{
               transform: [
