@@ -1,4 +1,5 @@
-export type Scale = number[] | { scale: number[]; examples: string[] };
+export type Example = { band: string; title: string; melody: string };
+export type Scale = number[] | { scale: number[]; examples: Example[] };
 
 // Debug - check duplicates
 export const checkDuplicateScales = (
@@ -36,7 +37,7 @@ export const getScaleNotes = (scale?: Scale) => {
   return scale;
 };
 
-export const getScaleExamples = (scale?: Scale) => {
+export const getScaleExamples = (scale?: Scale): Example[] | undefined => {
   if (!Array.isArray(scale)) {
     return scale?.examples;
   }
@@ -60,20 +61,19 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
         {
           scale: [2, 3, 5, 7, 8, 10],
           examples: [
-            "*1030*^5000__3__2_^43_____*1030*0^533__2*1__3_^30_____030",
+            {
+              band: "Linkin Park",
+              title: "Numb",
+              melody:
+                "*1030*^5000__3__2_^43_____*1030*0^533__2*1__3_^30_____030",
+            },
           ],
         },
       ],
       ["Pentatonic Minor", [3, 5, 7, 10]],
       ["Lydian", [2, 4, 6, 7, 8, 10]],
       ["Locrian", [1, 3, 5, 6, 8, 10]],
-      [
-        "Dorian",
-        {
-          scale: [2, 3, 5, 7, 9, 10],
-          examples: [],
-        },
-      ],
+      ["Dorian", [2, 3, 5, 7, 9, 10]],
       ["Melodic", [2, 3, 5, 7, 9, 11]],
     ]),
   ],
@@ -96,7 +96,13 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
         "Hijaz / Ahaba Rabba",
         {
           scale: [1, 4, 5, 7, 8, 10],
-          examples: ["^50*00_0__410^544_4__754^555_5__875^5441010"],
+          examples: [
+            {
+              band: "Jewish Traditional Song",
+              title: "Hava Nagila",
+              melody: "^50*00_0__410^544_4__754^555_5__875^544101^540",
+            },
+          ],
         },
       ],
       ["Arabian", [2, 4, 5, 6, 8, 10]],
@@ -136,11 +142,16 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
     "Various Exotic",
     new Map([
       [
-        "Prodigy - Narayan",
+        "Narayan",
         {
           scale: [2, 3, 7, 9, 10],
           examples: [
-            "^50*002371-0932^5002371-0932^53*002371-0932^5302371-0932",
+            {
+              band: "The Prodigy",
+              title: "Narayan",
+              melody:
+                "^50*002371-0932^5002371-0932^53*002371-0932^5302371-0^52932",
+            },
           ],
         },
       ],

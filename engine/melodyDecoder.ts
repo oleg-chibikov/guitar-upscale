@@ -1,4 +1,4 @@
-import { StringOctaveNote } from "../data/notes";
+import { Note, StringOctaveNote } from "../data/notes";
 import { Neck } from "./generateNeckRepresentation";
 
 export const decodeMelody = async (
@@ -6,6 +6,7 @@ export const decodeMelody = async (
   play: (note: StringOctaveNote) => void,
   wait: () => Promise<void>,
   neck: Neck,
+  baseNote: Note,
   isPlayingRef: React.MutableRefObject<boolean>
 ): Promise<void> => {
   let index = 0;
@@ -37,6 +38,7 @@ export const decodeMelody = async (
           if (fretNumberBuilder !== "") {
             // Note is fully read - we can play it
             await playNote(
+              baseNote,
               fretNumberBuilder,
               neck,
               immediateStringNumber,
@@ -47,7 +49,14 @@ export const decodeMelody = async (
           }
         } else if (fretNumberBuilder !== "" && stringNumber !== undefined) {
           // Note is fully read - we can play it
-          await playNote(fretNumberBuilder, neck, stringNumber, play, wait);
+          await playNote(
+            baseNote,
+            fretNumberBuilder,
+            neck,
+            stringNumber,
+            play,
+            wait
+          );
           fretNumberBuilder = "";
         }
       }
@@ -63,13 +72,14 @@ export const decodeMelody = async (
   }
 };
 async function playNote(
+  baseNote: Note,
   fretNumberBuilder: string,
   neck: Neck,
   stringNumber: number,
   play: (note: StringOctaveNote) => void,
   wait?: () => Promise<void>
 ) {
-  const fret = parseInt(fretNumberBuilder);
+  const fret = parseInt(fretNumberBuilder) + baseNote;
   const string = neck[stringNumber];
   const note = string[fret];
   if (note) {

@@ -5,9 +5,11 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { useDispatch } from "react-redux";
-import { setSettingsExpanded } from "../store/controlPanelSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { hideAlert, setSettingsExpanded } from "../store/controlPanelSlice";
+import { RootState } from "../store/store";
 import tw from "../tailwind";
+import AnimatedAlert from "./AnimatedAlert";
 import ControlPanel from "./ControlPanel";
 import { Fretboard } from "./Fretboard";
 import PinchableBox from "./PinchableBox";
@@ -22,6 +24,9 @@ import PinchableBox from "./PinchableBox";
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const { showAlert: isAlertShown, alertMessage } = useSelector(
+    (state: RootState) => state.controlPanel
+  );
   const dispatch = useDispatch();
 
   const recalculateScaleFactor = (size: ScaledSize) => {
@@ -45,8 +50,16 @@ export const Main: React.FC = () => {
     return () => handler.remove();
   }, []);
 
+  const handleCloseAlert = () => {
+    dispatch(hideAlert());
+  };
+
   return (
     <>
+      {isAlertShown && (
+        <AnimatedAlert message={alertMessage} onClose={handleCloseAlert} />
+      )}
+
       <ControlPanel />
       <TouchableWithoutFeedback
         onPress={() => {

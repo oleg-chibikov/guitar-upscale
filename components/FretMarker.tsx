@@ -9,7 +9,7 @@ import {
 } from "../data/notes";
 import { NoteMap } from "../engine/eventBus";
 import { playNote } from "../engine/soundProvider";
-import { selectControlPanel } from "../store/controlPanelSlice";
+import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 import tw from "../tailwind";
 
@@ -28,7 +28,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { selectedBaseNote, selectedNoteDisplayMode } =
+  const { velocity, selectedBaseNote, selectedNoteDisplayMode } =
     useAppSelector(selectControlPanel);
 
   const isInScale: boolean = stringOctaveNote !== undefined;
@@ -57,7 +57,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   // Function to play note and start animation
   const playNoteAndAnimate = () => {
     if (stringOctaveNote) {
-      playNote(stringOctaveNote);
+      playNote(stringOctaveNote, velocityValue ?? velocity);
     }
     Animated.sequence([
       Animated.timing(glowAnim, {

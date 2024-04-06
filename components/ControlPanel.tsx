@@ -26,6 +26,7 @@ import {
 import tw from "../tailwind";
 import IconButton from "./IconButton";
 import PlayIntervalSlider from "./PlayIntervalSlider";
+import VelocitySlider from "./VelocitySlider";
 
 const ControlPanel: React.FC = () => {
   const {
@@ -127,7 +128,7 @@ const ControlPanel: React.FC = () => {
       {settingsExpanded && (
         <View
           style={[
-            tw`left-3 z-20 top-20 bg-gray-200 p-2 rounded-md`,
+            tw`left-3 z-20 top-25 bg-gray-200 p-2 rounded-md`,
             {
               position: "fixed",
               display: "grid",
@@ -174,8 +175,10 @@ const ControlPanel: React.FC = () => {
                 <Picker.Item key={key} label={key} value={value} />
               ))}
           </Picker>
-          <Text style={tw`text-md`}>Play Interval (ms):</Text>
+          <Text style={tw`text-md`}>Play Interval:</Text>
           <PlayIntervalSlider />
+          <Text style={tw`text-md`}>Note Velocity:</Text>
+          <VelocitySlider />
         </View>
       )}
     </>

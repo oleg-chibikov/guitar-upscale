@@ -1,8 +1,10 @@
 import {
+  Note,
   OctaveNote,
   StringOctaveNote,
   serizlizeOctaveNote,
 } from "../data/notes";
+import { Example } from "../data/scales";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
@@ -76,18 +78,23 @@ export const playWholeScale = async (
 };
 
 export const playExample = async (
-  examplesForScale: string[],
+  baseNote: Note,
+  examplesForScale: Example[],
   wait: () => Promise<void>,
   neck: Neck,
-  isPlayingRef: React.MutableRefObject<boolean>
+  isPlayingRef: React.MutableRefObject<boolean>,
+  showAlert: (message: string) => void
 ) => {
   function getRandomRecord<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
   }
 
+  const randomExample = getRandomRecord(examplesForScale);
+  showAlert(randomExample.band + " - " + randomExample.title);
+
   await decodeMelody(
-    getRandomRecord(examplesForScale),
+    randomExample.melody,
     (note) => {
       console.log(
         "Requesting auto play note in a melody: " + JSON.stringify(note)
@@ -96,6 +103,7 @@ export const playExample = async (
     },
     wait,
     neck,
+    baseNote,
     isPlayingRef
   );
   return;

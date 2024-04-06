@@ -7,9 +7,9 @@ const soundfont = new Soundfont(context, {
   // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
 });
 
-export const playNote = (note: OctaveNote) =>
+export const playNote = (note: OctaveNote, velocity: number) =>
   soundfont.start({
     note: getNoteText(note.note) + note.octave,
     decayTime: 1000,
-    velocity: 80,
+    velocity: velocity,
   });

@@ -2,7 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { Note } from "../data/notes";
-import { scalesMap } from "../data/scales";
+import { Example, scalesMap } from "../data/scales";
 import { Neck } from "../engine/generateNeckRepresentation";
 import { RootState } from "./store"; // Define RootState type
 
@@ -13,7 +13,10 @@ interface ControlPanelState {
   selectedNoteDisplayMode: NoteDisplayMode;
   neck: Neck | null;
   settingsExpanded: boolean;
-  playIntervalMs: number;
+  playIntervalBpm: number;
+  velocity: number;
+  showAlert: boolean;
+  alertMessage: string;
 }
 
 const firstScaleGroupKey = scalesMap.keys().next().value;
@@ -30,13 +33,17 @@ const initialState: ControlPanelState = {
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
   neck: null,
   settingsExpanded: false,
-  playIntervalMs: 100,
+  playIntervalBpm: 100,
+  velocity: 125,
+  showAlert: false,
+  alertMessage: "",
 };
 
 // A value that changes immediately without the need for rerender
-export let playIntervalMsValue: number | undefined = undefined;
-export let examplesForScale: string[] | undefined = undefined;
-export const setExamples = (examples?: string[]) => {
+export let playIntervalBpmValue: number | undefined = undefined;
+export let velocityValue: number | undefined = undefined;
+export let examplesForScale: Example[] | undefined = undefined;
+export const setExamples = (examples?: Example[]) => {
   examplesForScale = examples;
 };
 
@@ -66,9 +73,21 @@ export const controlPanelSlice = createSlice({
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
     },
-    setPlayIntervalMs: (state, action: PayloadAction<number>) => {
-      state.playIntervalMs = action.payload;
-      playIntervalMsValue = action.payload;
+    setPlayIntervalBpm: (state, action: PayloadAction<number>) => {
+      state.playIntervalBpm = action.payload;
+      playIntervalBpmValue = action.payload;
+    },
+    setVelocity: (state, action: PayloadAction<number>) => {
+      state.velocity = action.payload;
+      velocityValue = action.payload;
+    },
+    showAlert(state, action: PayloadAction<string>) {
+      state.showAlert = true;
+      state.alertMessage = action.payload;
+    },
+    hideAlert(state) {
+      state.showAlert = false;
+      state.alertMessage = "";
     },
   },
 });
@@ -80,7 +99,10 @@ export const {
   setSelectedNoteDisplayMode,
   setNeck,
   setSettingsExpanded,
-  setPlayIntervalMs,
+  setPlayIntervalBpm,
+  setVelocity,
+  showAlert,
+  hideAlert,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;
