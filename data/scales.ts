@@ -100,7 +100,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
             {
               band: "Jewish Traditional Song",
               title: "Hava Nagila",
-              melody: "^50*00_0__410^544_4__754^555_5__875^544101^540",
+              melody: "*0^500_0__410^544_4__754^555_5__875^544101^540",
             },
           ],
         },

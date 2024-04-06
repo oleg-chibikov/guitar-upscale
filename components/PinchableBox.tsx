@@ -103,7 +103,7 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
         onHandlerStateChange={onPanHandlerStateChange}
       >
         <ScrollView
-          style={[tw`w-full h-full`, { minWidth: 2500 }]}
+          style={[tw`overflow-hidden w-full h-full`, { minWidth: 2500 }]}
           maximumZoomScale={5}
           minimumZoomScale={1}
           showsHorizontalScrollIndicator={true}

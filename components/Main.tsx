@@ -19,7 +19,9 @@ import PinchableBox from "./PinchableBox";
 // youtube videos for each scale
 // get the formula to avoid hardcoding each string
 // more instruments + dropdown
-// Alternative to youtube - code melodies with the language
+// Slider - vometimes doesnt update
+// more examples
+// multi touch
 
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);

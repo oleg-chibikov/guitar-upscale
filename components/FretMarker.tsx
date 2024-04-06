@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
   Note,
@@ -90,9 +90,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         ]}
       >
         {stringOctaveNote !== null && (
-          <Pressable
-            disabled={isHeader}
-            onPress={() => {
+          <View
+            onTouchStart={() => {
+              if (isHeader) {
+                return;
+              }
               console.log(
                 "Playing note (manual): " + JSON.stringify(stringOctaveNote)
               );
@@ -128,7 +130,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
                 : fret}
             </Text>
-          </Pressable>
+          </View>
         )}
       </Text>
     </View>

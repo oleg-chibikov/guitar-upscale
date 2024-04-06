@@ -1,4 +1,4 @@
-import Slider from "@react-native-community/slider";
+import { Slider } from "@react-native-assets/slider";
 import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch } from "react-redux";
