@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import Orientation from "react-native-orientation-locker";
 import { Main } from "./components/Main";
-import tw from "./tailwind";
+import { tw } from "./tailwind";
 
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";

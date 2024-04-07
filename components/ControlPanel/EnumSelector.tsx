@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
-import tw from "../tailwind";
+import { tw } from "../../tailwind";
 
 interface EnumSelectorProps<T> {
   enumObj: T;
@@ -9,7 +9,7 @@ interface EnumSelectorProps<T> {
   customLabel?: (key: string, value: unknown) => string;
 }
 
-function EnumSelector<T>({
+export function EnumSelector<T>({
   enumObj,
   selectedValue,
   onValueChange,
@@ -35,5 +35,3 @@ function EnumSelector<T>({
     </Picker>
   );
 }
-
-export default EnumSelector;

@@ -1,9 +1,35 @@
 import React from "react";
 import { Image, ImageRequireSource, View } from "react-native";
+import { useSelector } from "react-redux";
 import { NoteCount } from "../engine/generateNeckRepresentation";
-import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
+import { Skin, selectControlPanel } from "../store/controlPanelSlice";
+import { tw } from "../tailwind";
 import { Fretline } from "./Fretline";
+
+const getDimensionsForSkin = (skin?: Skin) => {
+  switch (skin) {
+    case Skin.PRS_SE_AX20E:
+    case undefined:
+      return {
+        top: -543,
+      };
+    case Skin.Ibanez_AE140_WKH:
+      return {
+        top: -549,
+        left: -88,
+      };
+    case Skin.Yamaha_CSF3M:
+      return {
+        top: -533,
+        left: -9,
+      };
+    case Skin.Yamaha_SLG200NW:
+      return {
+        top: -527,
+        left: -65,
+      };
+  }
+};
 
 export interface FretboardProps {
   scaleFactor: number;
@@ -18,11 +44,13 @@ export const Fretboard: React.FC<FretboardProps> = ({
   onImageLoaded,
   isCollapsed = false,
 }) => {
-  const neck = useAppSelector((state) => state.controlPanel.neck);
+  const { neck, selectedSkin } = useSelector(selectControlPanel);
 
   if (!neck) {
     return "Loading...";
   }
+
+  const dimensions = getDimensionsForSkin(selectedSkin);
 
   return (
     <View
@@ -61,8 +89,8 @@ export const Fretboard: React.FC<FretboardProps> = ({
       <Image
         style={[
           tw`absolute`,
+          dimensions,
           {
-            top: -543,
             width: 5504,
             height: 2200,
             transform: [

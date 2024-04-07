@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getNoteText } from "../data/notes";
 import { playExample, playWholeScale } from "../engine/player";
 import { sleep } from "../engine/sleep";
@@ -7,21 +7,23 @@ import {
   PlaybackType,
   examplesForScale,
   playIntervalBpmValue,
+  selectControlPanel,
   showAlert,
 } from "../store/controlPanelSlice";
-import { useAppSelector } from "../store/store";
-import IconButton from "./IconButton";
+import { IconButton, IconButtonProps } from "./IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
-export const PlayButton: React.FC = () => {
+export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
+  props
+) => {
   const {
     neck,
     selectedBaseNote,
     selectedScale,
     playIntervalBpm,
     playbackType,
-  } = useAppSelector((state) => state.controlPanel);
+  } = useSelector(selectControlPanel);
   if (!neck) {
     return "Loading...";
   }
@@ -82,5 +84,11 @@ export const PlayButton: React.FC = () => {
     setIsPlaying(false);
     isPlayingRef.current = false;
   };
-  return <IconButton icon={isPlaying ? "⏸️" : "▶️"} onPress={handlePlay} />;
+  return (
+    <IconButton
+      {...props}
+      icon={isPlaying ? "⏸️" : "▶️"}
+      onPress={handlePlay}
+    />
+  );
 };

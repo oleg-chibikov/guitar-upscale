@@ -1,13 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
-import tw from "../tailwind";
+import { tw } from "../tailwind";
 
 interface AnimatedAlertProps {
   message: string;
   onClose: () => void;
 }
 
-const AnimatedAlert: React.FC<AnimatedAlertProps> = ({ message, onClose }) => {
+export const AnimatedAlert: React.FC<AnimatedAlertProps> = ({
+  message,
+  onClose,
+}) => {
   const translateY = useRef(new Animated.Value(-100)).current;
 
   useEffect(() => {
@@ -58,5 +61,3 @@ const AnimatedAlert: React.FC<AnimatedAlertProps> = ({ message, onClose }) => {
     </Animated.View>
   );
 };
-
-export default AnimatedAlert;

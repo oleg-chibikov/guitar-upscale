@@ -1,40 +1,44 @@
 import React, { useEffect } from "react";
-import { Text, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { PlayButton } from "./PlayButton";
+import { Appearance, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
+import { PlayButton } from "../PlayButton";
 
-import { stringTuning } from "../data/notes";
+import { stringTuning } from "../../data/notes";
 import {
   checkDuplicateScales,
   getScaleExamples,
   getScaleNotes,
   scalesMap,
-} from "../data/scales";
-import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
+} from "../../data/scales";
+import { generateNeckRepresentation } from "../../engine/generateNeckRepresentation";
 import {
+  Theme,
   selectControlPanel,
   setExamples,
   setNeck,
   setSettingsExpanded,
-} from "../store/controlPanelSlice";
-import tw from "../tailwind";
-import BaseNoteSelector from "./BaseNoteSelector";
-import IconButton from "./IconButton";
-import NoteDisplayModeSelector from "./NoteDisplayModeSelector";
-import PlayIntervalSlider from "./PlayIntervalSlider";
-import PlaybackTypeSelector from "./PlaybackTypeSelector";
-import ScaleSelector from "./ScaleSelector";
-import ThemeSelector from "./ThemeSelector";
-import VelocitySlider from "./VelocitySlider";
+} from "../../store/controlPanelSlice";
+import { useAppSelector } from "../../store/store";
+import { tw } from "../../tailwind";
+import { IconButton } from "../IconButton";
+import { VelocitySlider } from "../VelocitySlider";
+import { BaseNoteSelector } from "./BaseNoteSelector";
+import { NoteDisplayModeSelector } from "./NoteDisplayModeSelector";
+import { PlayIntervalSlider } from "./PlayIntervalSlider";
+import { PlaybackTypeSelector } from "./PlaybackTypeSelector";
+import { ScaleSelector } from "./ScaleSelector";
+import { SkinSelector } from "./SkinSelector";
+import { ThemeSelector } from "./ThemeSelector";
 
-const ControlPanel: React.FC = () => {
+export const ControlPanel: React.FC = () => {
   const {
     selectedScale,
     selectedScaleGroup,
     selectedBaseNote,
     neck,
     settingsExpanded,
-  } = useSelector(selectControlPanel);
+    theme,
+  } = useAppSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -61,6 +65,14 @@ const ControlPanel: React.FC = () => {
     setExamples(getScaleExamples(scaleObject));
   }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);
 
+  let tempTheme = theme;
+  if (theme === Theme.MatchOS) {
+    tempTheme =
+      Appearance.getColorScheme() === "dark" ? Theme.Dark : Theme.Light;
+  }
+
+  const bg = tempTheme === Theme.Dark ? "bg-gray-600" : "bg-gray-200";
+
   return (
     <>
       <View
@@ -69,17 +81,18 @@ const ControlPanel: React.FC = () => {
           { position: "fixed" },
         ]}
       >
-        <ScaleSelector />
+        <ScaleSelector bg={bg} />
         <IconButton
+          bg={bg}
           icon="⚙️"
           onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
         />
-        {neck && <PlayButton />}
+        {neck && <PlayButton bg={bg} />}
       </View>
       {settingsExpanded && (
         <View
           style={[
-            tw`left-3 z-20 top-25 bg-gray-200 p-2 rounded-md gap-2`,
+            tw`opacity-95 left-3 z-20 top-25 ${bg} p-2 rounded-md gap-2`,
             {
               position: "fixed",
               display: "grid",
@@ -99,10 +112,10 @@ const ControlPanel: React.FC = () => {
           <PlayIntervalSlider />
           <Text style={tw`text-md`}>Playback volume:</Text>
           <VelocitySlider />
+          <Text style={tw`text-md`}>Skin:</Text>
+          <SkinSelector />
         </View>
       )}
     </>
   );
 };
-
-export default ControlPanel;

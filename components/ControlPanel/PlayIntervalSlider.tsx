@@ -1,13 +1,15 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
-import { setPlayIntervalBpm } from "../store/controlPanelSlice";
-import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectControlPanel,
+  setPlayIntervalBpm,
+} from "../../store/controlPanelSlice";
+import { tw } from "../../tailwind";
 import { Slider } from "./Slider";
 
-const PlayIntervalSlider: React.FC = () => {
-  const { playIntervalBpm } = useAppSelector((state) => state.controlPanel);
+export const PlayIntervalSlider: React.FC = () => {
+  const { playIntervalBpm } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
@@ -28,5 +30,3 @@ const PlayIntervalSlider: React.FC = () => {
     </View>
   );
 };
-
-export default PlayIntervalSlider;

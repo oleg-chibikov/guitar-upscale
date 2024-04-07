@@ -1,13 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
-import { setVelocity } from "../store/controlPanelSlice";
-import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
-import { Slider } from "./Slider";
+import { useDispatch, useSelector } from "react-redux";
+import { selectControlPanel, setVelocity } from "../store/controlPanelSlice";
+import { tw } from "../tailwind";
+import { Slider } from "./ControlPanel/Slider";
 
-const VelocitySlider: React.FC = () => {
-  const { velocity } = useAppSelector((state) => state.controlPanel);
+export const VelocitySlider: React.FC = () => {
+  const { velocity } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
@@ -28,5 +27,3 @@ const VelocitySlider: React.FC = () => {
     </View>
   );
 };
-
-export default VelocitySlider;

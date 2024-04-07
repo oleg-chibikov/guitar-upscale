@@ -1,28 +1,11 @@
 import React from "react";
 import { View } from "react-native";
+import { useSelector } from "react-redux";
 import { OctaveNote } from "../data/notes";
 import { NoteCount } from "../engine/generateNeckRepresentation";
-import tw from "../tailwind";
+import { Skin, selectControlPanel } from "../store/controlPanelSlice";
+import { tw } from "../tailwind";
 import { FretMarker } from "./FretMarker";
-
-const calculateTop = (string: number, fret: number) => {
-  switch (string) {
-    case 0:
-      return -(fret * 0.4 * 4);
-    case 1:
-      return -(fret * 0.3 * 3);
-    case 2:
-      return -(fret * 0.2 * 2);
-    case 3:
-      return fret * 0.1 * 2;
-    case 4:
-      return fret * 0.2 * 3;
-    case 5:
-      return fret * 0.3 * 4;
-    default:
-      return 0;
-  }
-};
 
 export interface FretlineProps {
   elements: (OctaveNote | null)[];
@@ -30,22 +13,80 @@ export interface FretlineProps {
   isHeader?: boolean;
 }
 
+const calculateTop = (string: number, fret: number, modifiers: number[]) => {
+  switch (string) {
+    case 0:
+      return -(fret * 0.4 * modifiers[0]);
+    case 1:
+      return -(fret * 0.3 * modifiers[1]);
+    case 2:
+      return -(fret * 0.2 * modifiers[2]);
+    case 3:
+      return fret * -0.1 * modifiers[3];
+    case 4:
+      return fret * 0.2 * modifiers[4];
+    case 5:
+      return fret * 0.3 * modifiers[5];
+    default:
+      return 0;
+  }
+};
+
+const getParametersForSkin = (skin?: Skin) => {
+  switch (skin) {
+    case Skin.PRS_SE_AX20E:
+    case undefined:
+      return {
+        height: 25,
+        widthStep: 10.25,
+        stringTiltModifiers: [3.2, 3, 2, 1, 2, 2.5],
+      };
+    case Skin.Ibanez_AE140_WKH:
+      return {
+        height: 27,
+        widthStep: 10.2,
+        stringTiltModifiers: [2.5, 2.2, 2, 1, 2, 2.5],
+      };
+    case Skin.Yamaha_CSF3M:
+      return {
+        height: 29,
+        widthStep: 10.56,
+        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3],
+      };
+    case Skin.Yamaha_SLG200NW:
+      return {
+        height: 30,
+        widthStep: 10.85,
+        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3],
+      };
+  }
+};
+
 export const Fretline: React.FC<FretlineProps> = ({
   elements,
   string,
   isHeader,
 }) => {
-  const widthStep = 10.25; // Width step for each subsequent fret
+  const { selectedSkin } = useSelector(selectControlPanel);
+
+  const { widthStep, height, stringTiltModifiers } =
+    getParametersForSkin(selectedSkin);
+  const widthFactor = 1.06;
   const initialWidth = (NoteCount + 1) * widthStep; // Initial width for the first fret
-  const widthFactor = 1.06; // Exponential factor for fret width increase
 
   return (
-    <View style={tw`flex-row justify-between items-center`}>
+    <View
+      style={[
+        // descending z index gives click preference for top strings
+        tw`z-${(6 - (string ?? 1)) * 10} flex-row justify-between items-center`,
+        { height },
+      ]}
+    >
       {elements.map((octaveNote, fret) => {
         const width = initialWidth / Math.pow(widthFactor, fret);
         let top = 0;
         if (string !== undefined) {
-          top = calculateTop(string, fret);
+          top = calculateTop(string, fret, stringTiltModifiers);
         }
 
         return (

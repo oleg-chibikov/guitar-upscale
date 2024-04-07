@@ -3,15 +3,15 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch } from "react-redux";
 
-import { ScaleObject, scalesMap } from "../data/scales";
+import { ScaleObject, scalesMap } from "../../data/scales";
 import {
   setSelectedScale,
   setSelectedScaleGroup,
-} from "../store/controlPanelSlice";
-import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
+} from "../../store/controlPanelSlice";
+import { useAppSelector } from "../../store/store";
+import { tw } from "../../tailwind";
 
-const ScaleSelector: React.FC = () => {
+export const ScaleSelector: React.FC<{ bg: string }> = ({ bg }) => {
   const { selectedScale, selectedScaleGroup } = useAppSelector(
     (state) => state.controlPanel
   );
@@ -22,7 +22,7 @@ const ScaleSelector: React.FC = () => {
   return (
     <View
       style={[
-        tw`bg-gray-200 p-2 rounded-md gap-2`,
+        tw`${bg} opacity-95 p-2 rounded-md gap-2`,
         {
           display: "grid",
           gridTemplateColumns: "auto minmax(200px, auto)",
@@ -71,5 +71,3 @@ const ScaleSelector: React.FC = () => {
     </View>
   );
 };
-
-export default ScaleSelector;

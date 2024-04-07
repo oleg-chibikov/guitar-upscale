@@ -18,11 +18,19 @@ export enum PlaybackType {
   FullStringScale,
 }
 
+export enum Skin {
+  PRS_SE_AX20E,
+  Ibanez_AE140_WKH,
+  Yamaha_CSF3M,
+  Yamaha_SLG200NW,
+}
+
 interface ControlPanelState {
   selectedScale: string;
   selectedScaleGroup: string;
   selectedBaseNote: Note;
   selectedNoteDisplayMode: NoteDisplayMode;
+  selectedSkin: Skin;
   neck: Neck | null;
   settingsExpanded: boolean;
   playIntervalBpm: number;
@@ -45,6 +53,7 @@ const initialState: ControlPanelState = {
   selectedScale: firstScaleKey,
   selectedBaseNote: Note.E,
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
+  selectedSkin: Skin.PRS_SE_AX20E,
   neck: null,
   settingsExpanded: false,
   playIntervalBpm: 120,
@@ -83,6 +92,9 @@ export const controlPanelSlice = createSlice({
     ) => {
       state.selectedNoteDisplayMode = action.payload;
     },
+    setSelectedSkin(state, action: PayloadAction<Skin>) {
+      state.selectedSkin = action.payload;
+    },
     setNeck: (state, action: PayloadAction<Neck>) => {
       state.neck = action.payload;
     },
@@ -119,6 +131,7 @@ export const {
   setSelectedScaleGroup,
   setSelectedBaseNote,
   setSelectedNoteDisplayMode,
+  setSelectedSkin,
   setNeck,
   setSettingsExpanded,
   setPlayIntervalBpm,

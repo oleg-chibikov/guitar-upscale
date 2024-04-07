@@ -9,7 +9,7 @@ import {
   State,
 } from "react-native-gesture-handler";
 import { useScreenOrientation } from "../engine/useScreenOrientation";
-import tw from "../tailwind";
+import { tw } from "../tailwind";
 
 interface PinchableBoxProps {
   children: React.ReactNode;
@@ -18,7 +18,7 @@ interface PinchableBoxProps {
 const minScale = 0.7;
 const maxScale = 2;
 const maxY = 40;
-const minY = -40;
+const minY = -80;
 
 let initialX: number = 0;
 let initialY: number = 0;
@@ -28,7 +28,7 @@ let lastScale = 1;
 let baseScale = new Animated.Value(lastScale);
 let pinchScale = new Animated.Value(lastScale);
 
-const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
+export const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
   const orientation = useScreenOrientation();
 
   useEffect(() => {
@@ -67,13 +67,13 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
 
     const maxX =
       lastScale < 1
-        ? interpolate(lastScale, minScale, 1, -250, 0)
-        : interpolate(lastScale, 1, maxScale, 0, -200);
+        ? interpolate(lastScale, minScale, 1, -250, 50)
+        : interpolate(lastScale, 1, maxScale, 50, -200);
 
     const minX =
       lastScale < 1
-        ? interpolate(lastScale, minScale, 1, -800, -1300)
-        : interpolate(lastScale, 1, maxScale, -1300, -3000);
+        ? interpolate(lastScale, minScale, 1, -800, -1400)
+        : interpolate(lastScale, 1, maxScale, -1400, -3000);
 
     const clampedTranslateX = Math.max(minX, Math.min(maxX, newTranslateX));
 
@@ -176,5 +176,3 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
     </PinchGestureHandler>
   );
 };
-
-export default PinchableBox;

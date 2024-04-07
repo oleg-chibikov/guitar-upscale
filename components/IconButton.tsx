@@ -1,25 +1,27 @@
 import React from "react";
 import { Pressable, PressableProps, Text, TextStyle } from "react-native";
-import tw from "../tailwind";
+import { tw } from "../tailwind";
 
-interface IconButtonProps extends PressableProps {
+export interface IconButtonProps extends PressableProps {
   onPress: () => void;
   icon: string;
   textStyle?: TextStyle;
+  bg: string;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({
+export const IconButton: React.FC<IconButtonProps> = ({
   onPress,
   icon,
   textStyle,
+  bg,
   ...rest
 }) => {
   return (
     <Pressable
       style={({ pressed }) => [
         tw`${
-          pressed ? "bg-gray-400" : "bg-gray-200"
-        } p-2 rounded-lg flex items-center justify-center`,
+          pressed ? "bg-gray-400" : bg
+        } opacity-95 p-2 rounded-lg flex items-center justify-center`,
       ]}
       onPress={onPress}
       {...rest}
@@ -28,5 +30,3 @@ const IconButton: React.FC<IconButtonProps> = ({
     </Pressable>
   );
 };
-
-export default IconButton;

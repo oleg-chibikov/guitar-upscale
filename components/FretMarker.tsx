@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Platform, Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
   Note,
@@ -10,8 +11,7 @@ import {
 import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
 import { playNote } from "../engine/soundProvider";
 import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
-import { useAppSelector } from "../store/store";
-import tw from "../tailwind";
+import { tw } from "../tailwind";
 
 interface FretMarkerProps {
   fret: number;
@@ -29,7 +29,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   isHeader,
 }) => {
   const { velocity, selectedBaseNote, selectedNoteDisplayMode, neck } =
-    useAppSelector(selectControlPanel);
+    useSelector(selectControlPanel);
 
   const hasMouseInput = useRef<boolean>(
     Platform.OS === "web" && window.matchMedia("(pointer:fine)").matches
@@ -128,8 +128,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               return true;
             }} // Capture both touch and mouse events
             style={[
-              tw`bg-transparent p-2 flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`,
-              { cursor: "pointer" },
+              tw`bg-transparent flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`,
+              {
+                cursor: "pointer",
+                width,
+                paddingVertical: 2,
+              },
             ]}
           >
             <View
