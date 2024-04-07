@@ -56,7 +56,7 @@ export const stringTuning: OctaveNote[] = [
   { note: Note.E, octave: 3 },
 ];
 
-export const serizlizeOctaveNote = (note: OctaveNote) =>
+export const serializeOctaveNote = (note: OctaveNote) =>
   [note.octave, note.note].join("_");
 
 export const serizlizeStringOctaveNote = (note: StringOctaveNote) =>

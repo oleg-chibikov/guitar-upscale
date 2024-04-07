@@ -46,12 +46,12 @@ const AnimatedAlert: React.FC<AnimatedAlertProps> = ({ message, onClose }) => {
   return (
     <Animated.View
       style={[
-        tw`absolute top-3 left-20 right-20 z-10 flex items-center`,
+        tw`w-56 rounded-md p-4 bg-green-300 absolute opacity-90 top-3 left-0 right-0 m-auto z-30 flex items-center`,
         { transform: [{ translateY }] },
       ]}
     >
       <TouchableOpacity onPress={handlePress}>
-        <View style={tw`bg-white p-4 rounded-md flex items-center`}>
+        <View style={tw`flex items-center`}>
           <Text style={tw`text-base text-gray-800`}>{message}</Text>
         </View>
       </TouchableOpacity>

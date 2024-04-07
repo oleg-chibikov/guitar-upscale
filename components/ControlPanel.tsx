@@ -1,11 +1,9 @@
-import { Picker } from "@react-native-picker/picker";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { PlayButton } from "./PlayButton";
 
-import { NoteDisplayMode } from "../data/noteDisplayMode";
-import { Note, stringTuning } from "../data/notes";
+import { stringTuning } from "../data/notes";
 import {
   checkDuplicateScales,
   getScaleExamples,
@@ -17,15 +15,16 @@ import {
   selectControlPanel,
   setExamples,
   setNeck,
-  setSelectedBaseNote,
-  setSelectedNoteDisplayMode,
-  setSelectedScale,
-  setSelectedScaleGroup,
   setSettingsExpanded,
 } from "../store/controlPanelSlice";
 import tw from "../tailwind";
+import BaseNoteSelector from "./BaseNoteSelector";
 import IconButton from "./IconButton";
+import NoteDisplayModeSelector from "./NoteDisplayModeSelector";
 import PlayIntervalSlider from "./PlayIntervalSlider";
+import PlaybackTypeSelector from "./PlaybackTypeSelector";
+import ScaleSelector from "./ScaleSelector";
+import ThemeSelector from "./ThemeSelector";
 import VelocitySlider from "./VelocitySlider";
 
 const ControlPanel: React.FC = () => {
@@ -33,7 +32,6 @@ const ControlPanel: React.FC = () => {
     selectedScale,
     selectedScaleGroup,
     selectedBaseNote,
-    selectedNoteDisplayMode,
     neck,
     settingsExpanded,
   } = useSelector(selectControlPanel);
@@ -63,8 +61,6 @@ const ControlPanel: React.FC = () => {
     setExamples(getScaleExamples(scaleObject));
   }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);
 
-  const scales = scalesMap;
-
   return (
     <>
       <View
@@ -73,50 +69,7 @@ const ControlPanel: React.FC = () => {
           { position: "fixed" },
         ]}
       >
-        <View
-          style={[
-            tw`bg-gray-200 p-2 rounded-md gap-2`,
-            {
-              display: "grid",
-              gridTemplateColumns: "auto minmax(200px, auto)",
-            },
-          ]}
-        >
-          <Text style={tw`text-md`}>Style:</Text>
-          <Picker
-            style={tw`text-md`}
-            selectedValue={selectedScaleGroup}
-            onValueChange={(value) => {
-              dispatch(setSelectedScaleGroup(value));
-            }}
-          >
-            {Array.from(scales.entries()).map((scale, index) => (
-              <Picker.Item key={index} label={scale[0]} value={scale[0]} />
-            ))}
-          </Picker>
-          {selectedScaleGroup && (
-            <>
-              <Text style={tw`text-md`}>Scale:</Text>
-              <Picker
-                style={tw`text-md`}
-                selectedValue={selectedScale}
-                onValueChange={(value) => {
-                  dispatch(setSelectedScale(value));
-                }}
-              >
-                {Array.from(scales.get(selectedScaleGroup)!.entries()).map(
-                  (scale, index) => (
-                    <Picker.Item
-                      key={index}
-                      label={scale[0]}
-                      value={scale[0]}
-                    />
-                  )
-                )}
-              </Picker>
-            </>
-          )}
-        </View>
+        <ScaleSelector />
         <IconButton
           icon="⚙️"
           onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
@@ -134,46 +87,17 @@ const ControlPanel: React.FC = () => {
             },
           ]}
         >
+          <Text style={tw`text-md`}>Theme:</Text>
+          <ThemeSelector />
           <Text style={tw`text-md`}>Base Note:</Text>
-          <Picker
-            style={tw`text-md`}
-            selectedValue={selectedBaseNote}
-            onValueChange={(itemValue) => {
-              dispatch(
-                setSelectedBaseNote(parseInt(itemValue as unknown as string))
-              ); // Assuming itemValue is of type Note
-            }}
-          >
-            {Object.entries(Note)
-              .filter(([key]) => isNaN(key as any))
-              .map(([key, value]) => (
-                <Picker.Item
-                  key={key}
-                  label={key + "(" + (value === 0 ? "" : "+") + value + ")"}
-                  value={value}
-                />
-              ))}
-          </Picker>
-
+          <BaseNoteSelector />
           <Text style={tw`text-md`}>Note Display Mode:</Text>
-          <Picker
-            style={tw`text-md`}
-            selectedValue={selectedNoteDisplayMode}
-            onValueChange={(mode) => {
-              dispatch(
-                setSelectedNoteDisplayMode(parseInt(mode as unknown as string))
-              ); // Assuming mode is of type NoteDisplayMode
-            }}
-          >
-            {Object.entries(NoteDisplayMode)
-              .filter(([key]) => isNaN(key as any))
-              .map(([key, value]) => (
-                <Picker.Item key={key} label={key} value={value} />
-              ))}
-          </Picker>
-          <Text style={tw`text-md`}>Play Interval:</Text>
+          <NoteDisplayModeSelector />
+          <Text style={tw`text-md`}>Playback type:</Text>
+          <PlaybackTypeSelector />
+          <Text style={tw`text-md`}>Playback speed:</Text>
           <PlayIntervalSlider />
-          <Text style={tw`text-md`}>Note Velocity:</Text>
+          <Text style={tw`text-md`}>Playback volume:</Text>
           <VelocitySlider />
         </View>
       )}

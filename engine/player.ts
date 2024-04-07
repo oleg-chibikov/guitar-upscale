@@ -2,7 +2,7 @@ import {
   Note,
   OctaveNote,
   StringOctaveNote,
-  serizlizeOctaveNote,
+  serializeOctaveNote,
 } from "../data/notes";
 import { Example } from "../data/scales";
 import { NotePlayEventBus } from "./eventBus";
@@ -12,7 +12,8 @@ import { decodeMelody } from "./melodyDecoder";
 export const playWholeScale = async (
   wait: () => Promise<void>,
   neck: Neck,
-  isPlayingRef: React.MutableRefObject<boolean>
+  isPlayingRef: React.MutableRefObject<boolean>,
+  playFullString: boolean
 ) => {
   const reverse = Math.random() < 0.5;
   var neckCopy = [...neck];
@@ -42,17 +43,20 @@ export const playWholeScale = async (
       stringCopy.reverse();
     }
 
-    const nextString =
-      orderedStringIndex < neckCopy.length
-        ? neckCopy[orderedStringIndex]
-        : undefined;
-
     let boundaryNote: string | undefined = undefined;
-    if (nextString !== undefined) {
-      const trimmedString = nextString.filter((x) => x) as OctaveNote[];
-      const firstOrLastIndex = !reverse ? trimmedString.length - 1 : 0;
-      const firstOrLastNoteOfNextString = trimmedString[firstOrLastIndex];
-      boundaryNote = serizlizeOctaveNote(firstOrLastNoteOfNextString);
+
+    if (!playFullString) {
+      const nextString =
+        orderedStringIndex < neckCopy.length
+          ? neckCopy[orderedStringIndex]
+          : undefined;
+
+      if (nextString !== undefined) {
+        const trimmedString = nextString.filter((x) => x) as OctaveNote[];
+        const firstOrLastIndex = !reverse ? trimmedString.length - 1 : 0;
+        const firstOrLastNoteOfNextString = trimmedString[firstOrLastIndex];
+        boundaryNote = serializeOctaveNote(firstOrLastNoteOfNextString);
+      }
     }
 
     for (const note of stringCopy) {
@@ -62,7 +66,7 @@ export const playWholeScale = async (
       }
 
       if (boundaryNote) {
-        const serializedNote = serizlizeOctaveNote(note);
+        const serializedNote = serializeOctaveNote(note);
 
         if (serializedNote === boundaryNote) {
           // going to the next string when the note repeats

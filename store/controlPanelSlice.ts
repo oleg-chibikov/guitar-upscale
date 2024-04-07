@@ -6,6 +6,18 @@ import { Example, scalesMap } from "../data/scales";
 import { Neck } from "../engine/generateNeckRepresentation";
 import { RootState } from "./store"; // Define RootState type
 
+export enum Theme {
+  Dark,
+  Light,
+  MatchOS,
+}
+
+export enum PlaybackType {
+  Melody,
+  Scale,
+  FullStringScale,
+}
+
 interface ControlPanelState {
   selectedScale: string;
   selectedScaleGroup: string;
@@ -17,6 +29,8 @@ interface ControlPanelState {
   velocity: number;
   showAlert: boolean;
   alertMessage: string;
+  playbackType: PlaybackType;
+  theme: Theme;
 }
 
 const firstScaleGroupKey = scalesMap.keys().next().value;
@@ -33,10 +47,12 @@ const initialState: ControlPanelState = {
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
   neck: null,
   settingsExpanded: false,
-  playIntervalBpm: 100,
+  playIntervalBpm: 120,
   velocity: 125,
   showAlert: false,
   alertMessage: "",
+  playbackType: PlaybackType.Melody,
+  theme: Theme.MatchOS,
 };
 
 // A value that changes immediately without the need for rerender
@@ -89,6 +105,12 @@ export const controlPanelSlice = createSlice({
       state.showAlert = false;
       state.alertMessage = "";
     },
+    setPlaybackType(state, action: PayloadAction<PlaybackType>) {
+      state.playbackType = action.payload;
+    },
+    setTheme(state, action: PayloadAction<Theme>) {
+      state.theme = action.payload;
+    },
   },
 });
 
@@ -103,6 +125,8 @@ export const {
   setVelocity,
   showAlert,
   hideAlert,
+  setPlaybackType,
+  setTheme,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

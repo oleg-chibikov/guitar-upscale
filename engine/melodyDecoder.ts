@@ -15,11 +15,14 @@ export const decodeMelody = async (
   let fretNumberBuilder = "";
   let nextIsImmediateString = false;
   let immediateStringNumber: number | undefined;
+  let indexToRepeat: number | undefined;
+  let repeatCount: number | undefined;
   while (index < melody.length) {
     if (isPlayingRef.current === false) {
       return;
     }
     const char = melody[index];
+    const nextChar = index !== melody.length - 1 && melody[index + 1];
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
     if (isNumeric) {
@@ -32,7 +35,7 @@ export const decodeMelody = async (
         nextIsString = false;
       } else {
         fretNumberBuilder += char;
-        if (index !== melody.length - 1 && melody[index + 1] === "-") {
+        if (nextChar === "-") {
           // The same note continues
         } else if (immediateStringNumber !== undefined) {
           if (fretNumberBuilder !== "") {
@@ -58,6 +61,27 @@ export const decodeMelody = async (
             wait
           );
           fretNumberBuilder = "";
+        }
+      }
+    } else if (char === "(") {
+      indexToRepeat = index;
+    } else if (char === ")") {
+      if (indexToRepeat !== undefined) {
+        if (repeatCount !== undefined) {
+          if (repeatCount === 0) {
+            // all repeats are played
+            index += 2;
+            repeatCount = undefined;
+            indexToRepeat = undefined;
+            continue; // skip the next char which is repeat count and continue with the further melody
+          } else {
+            repeatCount--;
+            index = indexToRepeat; // returning to the beginning of the pattern
+          }
+        } else {
+          repeatCount = nextChar ? parseInt(nextChar) - 1 : 0;
+          repeatCount--;
+          index = indexToRepeat; // returning to the beginning of the pattern
         }
       }
     } else if (char === "_") {

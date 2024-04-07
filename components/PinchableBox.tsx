@@ -157,7 +157,9 @@ const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
         onGestureEvent={onPanGestureEvent}
         onHandlerStateChange={onPanHandlerStateChange}
       >
-        <ScrollView style={[tw`overflow-hidden w-full h-full`]}>
+        <ScrollView
+          style={[tw`overflow-hidden w-full h-full`, { cursor: "move" }]}
+        >
           <Animated.View
             style={{
               transform: [

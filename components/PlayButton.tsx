@@ -1,17 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { getNoteText } from "../data/notes";
 import { playExample, playWholeScale } from "../engine/player";
+import { sleep } from "../engine/sleep";
 import {
+  PlaybackType,
   examplesForScale,
   playIntervalBpmValue,
   showAlert,
 } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
 import IconButton from "./IconButton";
+const melodyType = PlaybackType.Melody;
+const fullStringScaleType = PlaybackType.FullStringScale;
 
 export const PlayButton: React.FC = () => {
-  const { neck, selectedBaseNote, selectedScale, playIntervalBpm } =
-    useAppSelector((state) => state.controlPanel);
+  const {
+    neck,
+    selectedBaseNote,
+    selectedScale,
+    playIntervalBpm,
+    playbackType,
+  } = useAppSelector((state) => state.controlPanel);
   if (!neck) {
     return "Loading...";
   }
@@ -23,7 +33,7 @@ export const PlayButton: React.FC = () => {
   useEffect(() => {
     setIsPlaying(false);
     isPlayingRef.current = false;
-  }, [neck, selectedBaseNote, selectedScale]);
+  }, [neck, selectedBaseNote, selectedScale, playbackType]);
 
   const handlePlay = async () => {
     if (isPlayingRef.current) {
@@ -37,8 +47,6 @@ export const PlayButton: React.FC = () => {
     setIsPlaying(true);
     isPlayingRef.current = true;
 
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
     const bpmToMilliseconds = (bpm: number): number => {
       return 60000 / bpm / 2;
     };
@@ -51,17 +59,25 @@ export const PlayButton: React.FC = () => {
       await sleep(waitMs);
     };
 
-    if (examplesForScale) {
+    const dispatchAlert = (message: string) => dispatch(showAlert(message));
+
+    if (playbackType === melodyType && examplesForScale) {
       await playExample(
         selectedBaseNote,
         examplesForScale,
         wait,
         neck,
         isPlayingRef,
-        (message) => dispatch(showAlert(message))
+        dispatchAlert
       );
     } else {
-      await playWholeScale(wait, neck, isPlayingRef);
+      const isFullStringScalePlayback = playbackType === fullStringScaleType;
+      dispatchAlert(
+        `${getNoteText(selectedBaseNote)} ${selectedScale} ${
+          isFullStringScalePlayback ? " (full string)" : ""
+        }`
+      );
+      await playWholeScale(wait, neck, isPlayingRef, isFullStringScalePlayback);
     }
     setIsPlaying(false);
     isPlayingRef.current = false;

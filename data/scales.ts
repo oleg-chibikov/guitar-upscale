@@ -1,5 +1,6 @@
 export type Example = { band: string; title: string; melody: string };
-export type Scale = number[] | { scale: number[]; examples: Example[] };
+export type Scale = number[] | ScaleObject;
+export type ScaleObject = { scale: number[]; examples: Example[] };
 
 // Debug - check duplicates
 export const checkDuplicateScales = (
@@ -51,6 +52,7 @@ export const getScaleExamples = (scale?: Scale): Example[] | undefined => {
 // 1-0 - paly 10th fret following the same rules
 // ^51 - immediately play 1st fret on 5th string without pausing (useful for chords)
 // ^41-2 - immediately play 12th fret on 4th string following the same rules
+// (<melody>)3 play <melody> for 3 times
 
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
@@ -65,7 +67,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "Linkin Park",
               title: "Numb",
               melody:
-                "*1030*^5000__3__2_^43_____*1030*0^533__2*1__3_^30_____030",
+                "_(*1030*0^500__3__2_^43_____*1030*0^533__2*1__3_^30_____)2030",
             },
           ],
         },
@@ -73,8 +75,21 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
       ["Pentatonic Minor", [3, 5, 7, 10]],
       ["Lydian", [2, 4, 6, 7, 8, 10]],
       ["Locrian", [1, 3, 5, 6, 8, 10]],
+      [
+        "Melodic",
+        {
+          scale: [2, 3, 5, 7, 9, 11],
+          examples: [
+            {
+              band: "Michael Jackson",
+              title: "Billie Jean",
+              melody:
+                "(*34*44*3242*4424)2(*3 ^12^22^34^44 4*44*32 ^14^24^36^46 42*4424 *3 ^15^26^37^47 4*44*32 ^14^24^36^46 42*4424)2",
+            },
+          ],
+        },
+      ],
       ["Dorian", [2, 3, 5, 7, 9, 10]],
-      ["Melodic", [2, 3, 5, 7, 9, 11]],
     ]),
   ],
   [
@@ -100,7 +115,8 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
             {
               band: "Jewish Traditional Song",
               title: "Hava Nagila",
-              melody: "*0^500_0__410^544_4__754^555_5__875^544101^540",
+              melody:
+                "_(*0 ^50 0_0__410 ^54 4_4__754 ^55 5_5__875 ^54 4101 ^540 ___)2*0 ^58 88_ ^57 7555_ ^57 77_ ^55 5444_ ^54 4_75 ^54 4_5_ ^54 4_ ^51 1_ ^50 0",
             },
           ],
         },
@@ -150,7 +166,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "The Prodigy",
               title: "Narayan",
               melody:
-                "^50*002371-0932^5002371-0932^53*002371-0932^5302371-0^52932",
+                "_(^50*002371-0932^5002371-0932^53*002371-0932^5302371-0^52932)2",
             },
           ],
         },

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Text, View } from "react-native";
+import { Animated, Platform, Text, View } from "react-native";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
   Note,
@@ -7,7 +7,7 @@ import {
   getNoteText,
   serizlizeStringOctaveNote,
 } from "../data/notes";
-import { NoteMap } from "../engine/eventBus";
+import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
 import { playNote } from "../engine/soundProvider";
 import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
 import { useAppSelector } from "../store/store";
@@ -28,8 +28,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { velocity, selectedBaseNote, selectedNoteDisplayMode } =
+  const { velocity, selectedBaseNote, selectedNoteDisplayMode, neck } =
     useAppSelector(selectControlPanel);
+
+  const hasMouseInput = useRef<boolean>(
+    Platform.OS === "web" && window.matchMedia("(pointer:fine)").matches
+  ).current;
 
   const isInScale: boolean = stringOctaveNote !== undefined;
   const note: Note | undefined = stringOctaveNote?.note;
@@ -75,6 +79,17 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
   const handlePress = () => {
     if (isHeader) {
+      if (!neck) {
+        return;
+      }
+
+      console.log("Playing all the notes on fret " + fret);
+      neck.map((s, i) => {
+        const note = s[fret];
+        if (note) {
+          NotePlayEventBus.next({ ...note, string: i });
+        }
+      });
       return;
     }
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
@@ -98,9 +113,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       >
         {stringOctaveNote !== null && (
           <View
-            onTouchStart={handlePress}
-            onStartShouldSetResponder={() => true} // Capture both touch and mouse events
-            style={tw`bg-transparent p-5 flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`}
+            onTouchStart={() => {
+              // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
+              if (!hasMouseInput) {
+                // this event handler is only for touch devices
+                handlePress();
+              }
+            }}
+            onStartShouldSetResponder={() => {
+              if (hasMouseInput) {
+                // this event handler is only for mouse devices
+                handlePress();
+              }
+              return true;
+            }} // Capture both touch and mouse events
+            style={[
+              tw`bg-transparent p-2 flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`,
+              { cursor: "pointer" },
+            ]}
           >
             <View
               style={tw`p-2 flex justify-center ${circleWidth} items-center rounded-full ${bg} border-slate-800 border-2`}

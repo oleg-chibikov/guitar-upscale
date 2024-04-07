@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
+  Appearance,
   Dimensions,
   ScaledSize,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { hideAlert, setSettingsExpanded } from "../store/controlPanelSlice";
+import {
+  Theme,
+  hideAlert,
+  setSettingsExpanded,
+} from "../store/controlPanelSlice";
 import { RootState } from "../store/store";
 import tw from "../tailwind";
 import AnimatedAlert from "./AnimatedAlert";
@@ -17,21 +22,21 @@ import PinchableBox from "./PinchableBox";
 // TODO
 // dark/light
 // youtube videos for each scale
-// get the formula to avoid hardcoding each string
+// get the formula to avoid hardcoding each string height offset
 // more instruments + dropdown
-// Slider - vometimes doesnt update
+// Slider - used HTML element - most likely won't work for Native
 // more examples
-// multi touch
 // Play mode - scale or example
 // Mark with star where there are examples
-// Panning - restrict view
 
 export const Main: React.FC = () => {
   const [highResLoaded, setHighResLoaded] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
-  const { showAlert: isAlertShown, alertMessage } = useSelector(
-    (state: RootState) => state.controlPanel
-  );
+  const {
+    showAlert: isAlertShown,
+    alertMessage,
+    theme,
+  } = useSelector((state: RootState) => state.controlPanel);
   const dispatch = useDispatch();
 
   const recalculateScaleFactor = (size: ScaledSize) => {
@@ -59,6 +64,13 @@ export const Main: React.FC = () => {
     dispatch(hideAlert());
   };
 
+  let tempTheme = theme;
+  if (theme === Theme.MatchOS) {
+    tempTheme =
+      Appearance.getColorScheme() === "dark" ? Theme.Dark : Theme.Light;
+  }
+
+  const bg = tempTheme === Theme.Dark ? "bg-neutral-700" : "bg-neutral-100";
   return (
     <>
       {isAlertShown && (
@@ -72,7 +84,9 @@ export const Main: React.FC = () => {
         }}
       >
         <View
-          style={[tw`overflow-hidden w-full h-full items-start justify-center`]}
+          style={[
+            tw`${bg} overflow-hidden w-full h-full items-start justify-center`,
+          ]}
         >
           <PinchableBox>
             {!highResLoaded && (
