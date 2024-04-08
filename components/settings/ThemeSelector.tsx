@@ -5,7 +5,7 @@ import {
   selectControlPanel,
   setTheme,
 } from "../../store/controlPanelSlice";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../core/EnumSelector";
 
 export const ThemeSelector: React.FC = () => {
   const { theme } = useSelector(selectControlPanel);

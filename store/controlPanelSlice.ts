@@ -1,9 +1,11 @@
 // controlPanelSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Appearance } from "react-native";
+import { Appearance, StyleProp, TextStyle } from "react-native";
+import { ChordPlayMode } from "../data/chordPlayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { Note } from "../data/notes";
 import { Example, scalesMap } from "../data/scales";
+import { NoteChords } from "../engine/generateChords";
 import { Neck } from "../engine/generateNeckRepresentation";
 import { RootState } from "./store"; // Define RootState type
 
@@ -33,6 +35,7 @@ interface ControlPanelState {
   selectedNoteDisplayMode: NoteDisplayMode;
   selectedSkin: Skin;
   neck: Neck | null;
+  chords: NoteChords[] | null;
   settingsExpanded: boolean;
   chordsExpanded: boolean;
   playIntervalBpm: number;
@@ -42,8 +45,13 @@ interface ControlPanelState {
   playbackType: PlaybackType;
   theme: Theme;
   switchToChromaticScale: boolean;
-  matchFullChord: boolean;
   useAdvancedChords: boolean;
+  bg: string;
+  mainBg: string;
+  color: string;
+  textStyle: StyleProp<TextStyle>;
+  chordStrummingDelayMs: number;
+  chordPlayMode: ChordPlayMode;
 }
 
 const firstScaleGroupKey = scalesMap.keys().next().value;
@@ -61,6 +69,20 @@ const getTheme = (theme: Theme) => {
   return tempTheme;
 };
 
+const initialTheme = getTheme(Theme.MatchOS);
+
+const getViewSettings = (theme: Theme) => {
+  const color = theme === Theme.Dark ? "white" : "black";
+  return {
+    bg: theme === Theme.Dark ? "bg-gray-600" : "bg-gray-300",
+    mainBg: theme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100",
+    color: color,
+    textStyle: { fontSize: 14, color },
+  };
+};
+
+const initialSettings = getViewSettings(initialTheme);
+
 const initialState: ControlPanelState = {
   selectedScaleGroup: firstScaleGroupKey,
   selectedScale: firstScaleKey,
@@ -68,6 +90,7 @@ const initialState: ControlPanelState = {
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
   selectedSkin: Skin.Yamaha_SLG200NW,
   neck: null,
+  chords: null,
   settingsExpanded: false,
   chordsExpanded: true,
   playIntervalBpm: 120,
@@ -75,10 +98,15 @@ const initialState: ControlPanelState = {
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,
-  theme: getTheme(Theme.MatchOS),
+  theme: initialTheme,
   switchToChromaticScale: false,
-  matchFullChord: true,
   useAdvancedChords: false,
+  bg: initialSettings.bg,
+  mainBg: initialSettings.mainBg,
+  color: initialSettings.color,
+  textStyle: initialSettings.textStyle,
+  chordStrummingDelayMs: 10,
+  chordPlayMode: ChordPlayMode.RoundRobin,
 };
 
 // A value that changes immediately without the need for rerender
@@ -115,6 +143,9 @@ export const controlPanelSlice = createSlice({
     setNeck: (state, action: PayloadAction<Neck>) => {
       state.neck = action.payload;
     },
+    setChords: (state, action: PayloadAction<NoteChords[]>) => {
+      state.chords = action.payload;
+    },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
     },
@@ -142,15 +173,23 @@ export const controlPanelSlice = createSlice({
     },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = getTheme(action.payload);
+      const settings = getViewSettings(action.payload);
+      state.bg = settings.bg;
+      state.mainBg = settings.mainBg;
+      state.color = settings.color;
+      state.textStyle = settings.textStyle;
     },
     setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
       state.switchToChromaticScale = action.payload;
     },
-    setMatchFullChord(state, action: PayloadAction<boolean>) {
-      state.matchFullChord = action.payload;
-    },
     setUseAdvancedChords(state, action: PayloadAction<boolean>) {
       state.useAdvancedChords = action.payload;
+    },
+    setChordStrummingDelayMs(state, action: PayloadAction<number>) {
+      state.chordStrummingDelayMs = action.payload;
+    },
+    setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
+      state.chordPlayMode = action.payload;
     },
   },
 });
@@ -162,6 +201,7 @@ export const {
   setSelectedNoteDisplayMode,
   setSelectedSkin,
   setNeck,
+  setChords,
   setSettingsExpanded,
   setPlayIntervalBpm,
   setVelocity,
@@ -171,8 +211,9 @@ export const {
   setTheme,
   setChordsExpanded,
   setSwitchToChromaticScale,
-  setMatchFullChord,
   setUseAdvancedChords,
+  setChordStrummingDelayMs,
+  setChordPlayMode,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

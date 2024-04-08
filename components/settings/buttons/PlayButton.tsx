@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNoteText } from "../../data/notes";
-import { playExample, playWholeScale } from "../../engine/player";
-import { sleep } from "../../engine/sleep";
+import { getNoteText } from "../../../data/notes";
+import { playExample, playWholeScale } from "../../../engine/player";
+import { sleep } from "../../../engine/sleep";
 import {
   PlaybackType,
   examplesForScale,
   playIntervalBpmValue,
   selectControlPanel,
   showAlert,
-} from "../../store/controlPanelSlice";
-import { IconButton, IconButtonProps } from "../IconButton";
+} from "../../../store/controlPanelSlice";
+import { IconButton, IconButtonProps } from "../../IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
@@ -25,7 +25,7 @@ export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
     playbackType,
   } = useSelector(selectControlPanel);
   if (!neck) {
-    return "Loading...";
+    return null;
   }
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active

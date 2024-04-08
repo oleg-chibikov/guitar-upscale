@@ -5,7 +5,7 @@ import {
   selectControlPanel,
   setSelectedBaseNote,
 } from "../../store/controlPanelSlice";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../core/EnumSelector";
 
 export const BaseNoteSelector: React.FC = () => {
   const { selectedBaseNote } = useSelector(selectControlPanel);

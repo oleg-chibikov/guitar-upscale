@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Platform, Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
@@ -9,10 +9,11 @@ import {
   serizlizeStringOctaveNote,
 } from "../data/notes";
 import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
+import { sleep } from "../engine/sleep";
 import { playNote } from "../engine/soundProvider";
+import { mouseAvailable } from "../helpers/mouseAvailable";
 import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
-import { mouseAvailable } from "../helpers/mouseAvailable";
 
 interface FretMarkerProps {
   fret: number;
@@ -29,8 +30,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { velocity, selectedBaseNote, selectedNoteDisplayMode, neck } =
-    useSelector(selectControlPanel);
+  const {
+    velocity,
+    selectedBaseNote,
+    selectedNoteDisplayMode,
+    neck,
+    chordStrummingDelayMs,
+  } = useSelector(selectControlPanel);
 
   const hasMouseInput = mouseAvailable();
 
@@ -83,10 +89,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       }
 
       console.log("Playing all the notes on fret " + fret);
-      neck.map((s, i) => {
-        const note = s[fret];
+      neck.map(async (string, stringIndex) => {
+        const note = string[fret];
         if (note) {
-          NotePlayEventBus.next({ ...note, string: i });
+          NotePlayEventBus.next({ ...note, string: stringIndex });
+          await sleep(chordStrummingDelayMs);
         }
       });
       return;

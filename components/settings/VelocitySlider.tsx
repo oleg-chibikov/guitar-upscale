@@ -3,11 +3,10 @@ import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { selectControlPanel, setVelocity } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
-import { Slider } from "./Slider";
-import { WithTextStyle } from "./WithTextStyle";
+import { Slider } from "../core/Slider";
 
-export const VelocitySlider: React.FC<WithTextStyle> = ({ textStyle }) => {
-  const { velocity } = useSelector(selectControlPanel);
+export const VelocitySlider: React.FC = () => {
+  const { velocity, textStyle } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

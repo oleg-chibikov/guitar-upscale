@@ -105,13 +105,9 @@ async function playNote(
 ) {
   const fret = parseInt(fretNumberBuilder) + baseNote;
   const string = neck[stringNumber];
-  const note = string[fret];
-  if (note) {
-    play({
-      note: note.note,
-      octave: note.octave,
-      string: stringNumber,
-    });
+  const stringOctaveNote = string[fret];
+  if (stringOctaveNote) {
+    play(stringOctaveNote);
     if (wait) {
       await wait();
     }

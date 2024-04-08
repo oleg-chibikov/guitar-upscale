@@ -1,5 +1,8 @@
 // first note - high E string, last note - low E
 //https://gtrlib.com/chords/e-minor-7th
+
+// TODO: deprecated - hardcoding chords.
+// prefer generated chords
 export const ChordsMap: { [key: string]: string } = {
   A: "02220x",
   Am: "01220x",

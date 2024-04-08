@@ -4,7 +4,7 @@ import { tw } from "../../tailwind";
 
 interface ChordButtonProps {
   chordName: string; // Change chord to chordName
-  onPress: (chord: string) => void;
+  onPress: () => void;
   disabled?: boolean;
 }
 
@@ -17,7 +17,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const [opacityAnim] = useState(new Animated.Value(1)); // State for opacity animation
 
   const handleClick = () => {
-    onPress(chordName);
+    onPress();
 
     // Start the animation sequence
     startAnimation();

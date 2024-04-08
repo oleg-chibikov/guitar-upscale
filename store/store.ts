@@ -4,7 +4,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 
-import { TypedUseSelectorHook, useSelector } from "react-redux";
 import controlPanelReducer from "./controlPanelSlice";
 
 const rootReducer = combineReducers({
@@ -28,4 +27,3 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

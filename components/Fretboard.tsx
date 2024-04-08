@@ -47,7 +47,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
   const { neck, selectedSkin } = useSelector(selectControlPanel);
 
   if (!neck) {
-    return "Loading...";
+    return null;
   }
 
   const dimensions = getDimensionsForSkin(selectedSkin);

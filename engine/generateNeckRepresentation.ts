@@ -1,7 +1,8 @@
-import { Note, OctaveNote } from "../data/notes";
+import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
 
-export type Neck = (OctaveNote | null)[][];
+export type Neck = (StringOctaveNote | null)[][];
 export const NoteCount: number = 12;
+
 export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
   stringTuning: OctaveNote[],
@@ -31,7 +32,7 @@ export const generateNeckRepresentation = (
         octave++;
       }
 
-      neck[i][j] = isInScale ? { note, octave } : null;
+      neck[i][j] = isInScale ? { note, octave, string: i } : null;
     }
   }
 

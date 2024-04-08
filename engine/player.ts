@@ -30,11 +30,7 @@ export const playWholeScale = async (
       break;
     }
     const stringCopy = [...string]
-      .filter((x) => x)
-      .map((note) => ({
-        ...note,
-        string: realStringIndex,
-      })) as StringOctaveNote[];
+      .filter((x) => x) as StringOctaveNote[];
 
     realStringIndex = reverse ? realStringIndex - 1 : realStringIndex + 1; //incrementing string index here
     orderedStringIndex++;

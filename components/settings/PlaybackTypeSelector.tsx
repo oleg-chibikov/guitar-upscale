@@ -5,7 +5,7 @@ import {
   selectControlPanel,
   setPlaybackType,
 } from "../../store/controlPanelSlice";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../core/EnumSelector";
 
 export const PlaybackTypeSelector: React.FC = () => {
   const { playbackType } = useSelector(selectControlPanel);

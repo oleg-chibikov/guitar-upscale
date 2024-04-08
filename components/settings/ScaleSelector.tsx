@@ -1,24 +1,19 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ScaleObject, scalesMap } from "../../data/scales";
 import {
+  selectControlPanel,
   setSelectedScale,
   setSelectedScaleGroup,
 } from "../../store/controlPanelSlice";
-import { useAppSelector } from "../../store/store";
 import { tw } from "../../tailwind";
-import { WithTextStyle } from "./WithTextStyle";
 
-export const ScaleSelector: React.FC<WithTextStyle & { bg: string }> = ({
-  bg,
-  textStyle,
-}) => {
-  const { selectedScale, selectedScaleGroup } = useAppSelector(
-    (state) => state.controlPanel
-  );
+export const ScaleSelector: React.FC = () => {
+  const { selectedScale, selectedScaleGroup, bg, textStyle } =
+    useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const scales = scalesMap;

@@ -4,7 +4,7 @@ import {
   selectControlPanel,
   setUseAdvancedChords,
 } from "../../store/controlPanelSlice";
-import { CheckBox, Styleable } from "./CheckBox";
+import { CheckBox, Styleable } from "../core/CheckBox";
 
 export const UseAdvancedChordsCheckbox: React.FC<Styleable> = (props) => {
   const { useAdvancedChords } = useSelector(selectControlPanel);

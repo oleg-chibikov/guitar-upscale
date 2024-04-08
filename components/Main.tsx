@@ -5,19 +5,18 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Skin,
-  Theme,
   hideAlert,
   setSettingsExpanded,
 } from "../store/controlPanelSlice";
-import { RootState, useAppSelector } from "../store/store";
+import { RootState } from "../store/store";
 import { tw } from "../tailwind";
 import { AnimatedAlert } from "./AnimatedAlert";
-import { ControlPanel } from "./ControlPanel/ControlPanel";
 import { Fretboard } from "./Fretboard";
 import { PinchableBox } from "./PinchableBox";
+import { ControlPanel } from "./settings/ControlPanel";
 
 // TODO
 // youtube videos for each scale
@@ -25,8 +24,6 @@ import { PinchableBox } from "./PinchableBox";
 // more instruments + dropdown
 // Slider - used HTML element - most likely won't work for Native
 // more examples
-// Chords - layout, scrollable
-// Chords generate them rather than hardcode
 // Guitar tunings
 // 7,8 string guitars
 // Ads
@@ -64,9 +61,9 @@ export const Main: React.FC = () => {
   const {
     showAlert: isAlertShown,
     alertMessage,
-    theme,
+    mainBg,
     selectedSkin,
-  } = useAppSelector((state: RootState) => state.controlPanel);
+  } = useSelector((state: RootState) => state.controlPanel);
 
   const dispatch = useDispatch();
 
@@ -99,8 +96,6 @@ export const Main: React.FC = () => {
     dispatch(hideAlert());
   };
 
-  const bg = theme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100";
-
   const assets = getAssetsForSkin(selectedSkin);
 
   return (
@@ -118,7 +113,7 @@ export const Main: React.FC = () => {
       >
         <View
           style={[
-            tw`${bg} overflow-hidden w-full h-full items-start justify-center`,
+            tw`${mainBg} overflow-hidden w-full h-full items-start justify-center`,
           ]}
         >
           <PinchableBox>

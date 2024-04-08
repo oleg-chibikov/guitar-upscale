@@ -1,21 +1,20 @@
 import React from "react";
-import { Pressable, PressableProps, Text, TextStyle } from "react-native";
+import { Pressable, PressableProps, Text } from "react-native";
+import { useSelector } from "react-redux";
+import { selectControlPanel } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
 
 export interface IconButtonProps extends PressableProps {
   onPress: () => void;
   icon: string;
-  textStyle?: TextStyle;
-  bg: string;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
   onPress,
   icon,
-  textStyle,
-  bg,
   ...rest
 }) => {
+  const { textStyle, bg } = useSelector(selectControlPanel);
   return (
     <Pressable
       style={({ pressed }) => [

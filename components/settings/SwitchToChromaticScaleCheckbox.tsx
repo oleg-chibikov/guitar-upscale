@@ -4,7 +4,7 @@ import {
   selectControlPanel,
   setSwitchToChromaticScale,
 } from "../../store/controlPanelSlice";
-import { CheckBox, Styleable } from "./CheckBox";
+import { CheckBox, Styleable } from "../core/CheckBox";
 
 export const SwitchToChromaticScaleCheckbox: React.FC<Styleable> = (props) => {
   const { switchToChromaticScale } = useSelector(selectControlPanel);
