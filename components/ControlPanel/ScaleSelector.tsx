@@ -10,8 +10,12 @@ import {
 } from "../../store/controlPanelSlice";
 import { useAppSelector } from "../../store/store";
 import { tw } from "../../tailwind";
+import { WithTextStyle } from "./WithTextStyle";
 
-export const ScaleSelector: React.FC<{ bg: string }> = ({ bg }) => {
+export const ScaleSelector: React.FC<WithTextStyle & { bg: string }> = ({
+  bg,
+  textStyle,
+}) => {
   const { selectedScale, selectedScaleGroup } = useAppSelector(
     (state) => state.controlPanel
   );
@@ -29,7 +33,7 @@ export const ScaleSelector: React.FC<{ bg: string }> = ({ bg }) => {
         },
       ]}
     >
-      <Text style={tw`text-md`}>Style:</Text>
+      <Text style={textStyle}>Style:</Text>
       <Picker
         style={tw`text-md`}
         selectedValue={selectedScaleGroup}
@@ -43,7 +47,7 @@ export const ScaleSelector: React.FC<{ bg: string }> = ({ bg }) => {
       </Picker>
       {selectedScaleGroup && (
         <>
-          <Text style={tw`text-md`}>Scale:</Text>
+          <Text style={textStyle}>Scale:</Text>
           <Picker
             style={tw`text-md`}
             selectedValue={selectedScale}

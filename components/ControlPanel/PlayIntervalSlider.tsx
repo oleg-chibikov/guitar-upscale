@@ -7,8 +7,9 @@ import {
 } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { Slider } from "./Slider";
+import { WithTextStyle } from "./WithTextStyle";
 
-export const PlayIntervalSlider: React.FC = () => {
+export const PlayIntervalSlider: React.FC<WithTextStyle> = ({ textStyle }) => {
   const { playIntervalBpm } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
@@ -26,7 +27,7 @@ export const PlayIntervalSlider: React.FC = () => {
         step={1}
         style={tw`w-48`}
       />
-      <Text style={tw`text-md`}>{playIntervalBpm} BPM</Text>
+      <Text style={textStyle}>{playIntervalBpm} BPM</Text>
     </View>
   );
 };

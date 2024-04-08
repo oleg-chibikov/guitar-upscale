@@ -1,11 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { selectControlPanel, setVelocity } from "../store/controlPanelSlice";
-import { tw } from "../tailwind";
-import { Slider } from "./ControlPanel/Slider";
+import { selectControlPanel, setVelocity } from "../../store/controlPanelSlice";
+import { tw } from "../../tailwind";
+import { Slider } from "./Slider";
+import { WithTextStyle } from "./WithTextStyle";
 
-export const VelocitySlider: React.FC = () => {
+export const VelocitySlider: React.FC<WithTextStyle> = ({ textStyle }) => {
   const { velocity } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
@@ -23,7 +24,7 @@ export const VelocitySlider: React.FC = () => {
         step={1}
         style={tw`w-48`}
       />
-      <Text style={tw`text-md`}>{velocity}</Text>
+      <Text style={textStyle}>{velocity}</Text>
     </View>
   );
 };

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Appearance,
   Dimensions,
   ScaledSize,
   TouchableWithoutFeedback,
@@ -26,7 +25,10 @@ import { PinchableBox } from "./PinchableBox";
 // more instruments + dropdown
 // Slider - used HTML element - most likely won't work for Native
 // more examples
-// Chords
+// Chords - layout, scrollable
+// Chords generate them rather than hardcode
+// Guitar tunings
+// 7,8 string guitars
 // Ads
 // Record melodies to saveable midi files
 
@@ -97,13 +99,7 @@ export const Main: React.FC = () => {
     dispatch(hideAlert());
   };
 
-  let tempTheme = theme;
-  if (theme === Theme.MatchOS) {
-    tempTheme =
-      Appearance.getColorScheme() === "dark" ? Theme.Dark : Theme.Light;
-  }
-
-  const bg = tempTheme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100";
+  const bg = theme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100";
 
   const assets = getAssetsForSkin(selectedSkin);
 
@@ -117,6 +113,7 @@ export const Main: React.FC = () => {
       <TouchableWithoutFeedback
         onPress={() => {
           dispatch(setSettingsExpanded(false));
+          // dispatch(setChordsExpanded(false));
         }}
       >
         <View

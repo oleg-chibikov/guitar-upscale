@@ -32,7 +32,7 @@ export function getNoteText(noteNumber: number): string {
 
   const noteText = noteReverseMapping[noteNumber];
   if (noteText === undefined) {
-    throw new Error("Note not found for the given number");
+    throw new Error("Note not found for the given number " + noteNumber);
   }
 
   return noteText;

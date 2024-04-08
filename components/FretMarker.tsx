@@ -12,6 +12,7 @@ import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
 import { playNote } from "../engine/soundProvider";
 import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
+import { mouseAvailable } from "../helpers/mouseAvailable";
 
 interface FretMarkerProps {
   fret: number;
@@ -31,9 +32,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const { velocity, selectedBaseNote, selectedNoteDisplayMode, neck } =
     useSelector(selectControlPanel);
 
-  const hasMouseInput = useRef<boolean>(
-    Platform.OS === "web" && window.matchMedia("(pointer:fine)").matches
-  ).current;
+  const hasMouseInput = mouseAvailable();
 
   const isInScale: boolean = stringOctaveNote !== undefined;
   const note: Note | undefined = stringOctaveNote?.note;
@@ -113,6 +112,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       >
         {stringOctaveNote !== null && (
           <View
+            style={[
+              tw`bg-transparent flex justify-center items-center border-slate-100 border-opacity-30 border-2`,
+              {
+                cursor: "pointer",
+                width,
+                paddingVertical: 2,
+              },
+            ]}
             onTouchStart={() => {
               // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
               if (!hasMouseInput) {
@@ -127,14 +134,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               }
               return true;
             }} // Capture both touch and mouse events
-            style={[
-              tw`bg-transparent flex justify-center items-center rounded-full border-slate-100 border-opacity-30 border-2`,
-              {
-                cursor: "pointer",
-                width,
-                paddingVertical: 2,
-              },
-            ]}
           >
             <View
               style={tw`p-2 flex justify-center ${circleWidth} items-center rounded-full ${bg} border-slate-800 border-2`}
