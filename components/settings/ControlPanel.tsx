@@ -1,58 +1,37 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { stringTuning } from "../../data/notes";
-import { getScaleNotes, scalesMap } from "../../data/scales";
-import { generateNeckRepresentation } from "../../engine/generateNeckRepresentation";
-import { selectControlPanel, setNeck } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { ChordsView } from "../chords/ChordsView";
 import { ScaleSelector } from "./ScaleSelector";
 import { SettingsView } from "./SettingsView";
+import { FullscreenButton } from "./buttons/FullscreenButton";
 import { OpenChordsButton } from "./buttons/OpenChordsButton";
 import { OpenSettingsButton } from "./buttons/OpenSettingsButton";
 import { PlayButton } from "./buttons/PlayButton";
 
 export const ControlPanel: React.FC = () => {
-  const { selectedScale, selectedScaleGroup, selectedBaseNote } =
-    useSelector(selectControlPanel);
-  const dispatch = useDispatch();
-  if (selectedBaseNote === null || !selectedScaleGroup || !selectedScale) {
-    return null;
-  }
-
-  useEffect(() => {
-    // TODO: Check why debugger ends up in this method even when it should have memoized the neck
-    const scaleObject = scalesMap.get(selectedScaleGroup)!.get(selectedScale);
-    let scaleNotes = getScaleNotes(scaleObject);
-    const scalePattern = new Set(scaleNotes?.concat([0]));
-
-    // Just for debug
-    // checkDuplicateScales(scalesMap);
-    const generatedNeck = generateNeckRepresentation(
-      scalePattern,
-      stringTuning,
-      selectedBaseNote
-    );
-
-    dispatch(setNeck(generatedNeck));
-  }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);
-
   return (
     <>
       <View
         style={[
-          tw`max-w-full max-h-full z-10 top-3 left-3 flex flex-row gap-2 items-center`,
+          tw`z-30 top-1 left-1 flex flex-row gap-1 items-center pr-4`,
           {
+            maxWidth: "95%",
+            maxHeight: "95%",
             overflow: "auto",
             position: "fixed",
           },
         ]}
       >
         <ScaleSelector />
-        <OpenSettingsButton />
-        <OpenChordsButton />
-        <PlayButton />
+        <View style={tw`flex flex-col gap-1`}>
+          <OpenSettingsButton />
+          <OpenChordsButton />
+        </View>
+        <View style={tw`flex flex-col gap-1`}>
+          <PlayButton />
+          <FullscreenButton />
+        </View>
       </View>
       <SettingsView />
       <ChordsView />

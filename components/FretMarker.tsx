@@ -60,7 +60,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       });
       return () => {
         // TODO: Why deleting handlers here leads to absense of sounds? they should be recreated
-        //    NoteToFretMarkerEventMap.delete(key);
+        // NoteToFretMarkerEventMap.delete(key);
       };
     }
     return () => {};

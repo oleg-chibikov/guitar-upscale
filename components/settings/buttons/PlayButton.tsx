@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { PressableProps } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { getNoteText } from "../../../data/notes";
 import { playExample, playWholeScale } from "../../../engine/player";
@@ -10,13 +11,11 @@ import {
   selectControlPanel,
   showAlert,
 } from "../../../store/controlPanelSlice";
-import { IconButton, IconButtonProps } from "../../IconButton";
+import { IconButton } from "../../core/IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
-export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
-  props
-) => {
+export const PlayButton: React.FC<PressableProps> = (props) => {
   const {
     neck,
     selectedBaseNote,
@@ -85,10 +84,12 @@ export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
     setIsPlaying(false);
     isPlayingRef.current = false;
   };
+
   return (
     <IconButton
       {...props}
-      icon={isPlaying ? "⏸️" : "▶️"}
+      isActive={isPlaying}
+      icon={isPlaying ? "pause" : "play-arrow"}
       onPress={handlePlay}
     />
   );

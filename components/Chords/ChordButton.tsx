@@ -65,8 +65,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     <Pressable
       disabled={disabled}
       onPress={handleClick}
-      style={() => [
-        tw`w-10 px-2 py-1 items-center justify-center`,
+      style={[
+        tw`w-13 px-2 py-1 items-center justify-center`,
         disabled ? tw`bg-gray-400` : tw`bg-blue-500 hover:bg-blue-600`,
       ]}
     >

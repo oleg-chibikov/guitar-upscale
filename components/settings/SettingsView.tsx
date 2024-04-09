@@ -21,8 +21,10 @@ export const SettingsView: React.FC = () => {
     settingsExpanded && (
       <View
         style={[
-          tw`max-w-full max-h-full opacity-95 left-3 z-20 top-25 ${bg} p-2 rounded-md gap-2`,
+          tw`opacity-95 left-1 z-40 top-15 ${bg} p-2 gap-2`,
           {
+            maxWidth: "95%",
+            maxHeight: "95%",
             overflow: "auto",
             position: "fixed",
           },

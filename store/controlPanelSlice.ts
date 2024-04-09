@@ -3,10 +3,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Appearance, StyleProp, TextStyle } from "react-native";
 import { ChordPlayMode } from "../data/chordPlayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
-import { Note } from "../data/notes";
-import { Example, scalesMap } from "../data/scales";
-import { NoteChords } from "../engine/generateChords";
-import { Neck } from "../engine/generateNeckRepresentation";
+import { Note, stringTuning } from "../data/notes";
+import {
+  Example,
+  getScaleExamples,
+  getScaleNotes,
+  scalesMap,
+} from "../data/scales";
+import { generateAllChords, NoteChords } from "../engine/generateChords";
+import {
+  generateNeckRepresentation,
+  Neck,
+} from "../engine/generateNeckRepresentation";
 import { RootState } from "./store"; // Define RootState type
 
 export enum Theme {
@@ -59,7 +67,6 @@ const firstScaleGroupKey = scalesMap.keys().next().value;
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;
 
-const firstScaleKey = getFirstScaleForGroup(firstScaleGroupKey);
 const getTheme = (theme: Theme) => {
   let tempTheme = theme;
   if (tempTheme === Theme.MatchOS) {
@@ -84,8 +91,8 @@ const getViewSettings = (theme: Theme) => {
 const initialSettings = getViewSettings(initialTheme);
 
 const initialState: ControlPanelState = {
-  selectedScaleGroup: firstScaleGroupKey,
-  selectedScale: firstScaleKey,
+  selectedScaleGroup: "Special",
+  selectedScale: "Chromatic (All notes)",
   selectedBaseNote: Note.E,
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
   selectedSkin: Skin.Yamaha_SLG200NW,
@@ -93,19 +100,19 @@ const initialState: ControlPanelState = {
   chords: null,
   settingsExpanded: false,
   chordsExpanded: true,
-  playIntervalBpm: 120,
+  playIntervalBpm: 140,
   velocity: 125,
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,
   theme: initialTheme,
-  switchToChromaticScale: false,
+  switchToChromaticScale: true,
   useAdvancedChords: false,
   bg: initialSettings.bg,
   mainBg: initialSettings.mainBg,
   color: initialSettings.color,
   textStyle: initialSettings.textStyle,
-  chordStrummingDelayMs: 10,
+  chordStrummingDelayMs: 20,
   chordPlayMode: ChordPlayMode.RoundRobin,
 };
 
@@ -117,19 +124,51 @@ export const setExamples = (examples?: Example[]) => {
   examplesForScale = examples;
 };
 
+const onGuitarSettingsUpdate = (state: {
+  selectedScaleGroup: string;
+  selectedScale: string;
+  selectedBaseNote: Note;
+  neck: Neck | null;
+  chords: NoteChords[] | null;
+}) => {
+  const scaleObject = scalesMap
+    .get(state.selectedScaleGroup)!
+    .get(state.selectedScale);
+  setExamples(getScaleExamples(scaleObject));
+  let scaleNotes = getScaleNotes(scaleObject);
+  const scalePattern = new Set(scaleNotes?.concat([0]));
+
+  // Just for debug
+  // checkDuplicateScales(scalesMap);
+  const neck = generateNeckRepresentation(
+    scalePattern,
+    stringTuning,
+    state.selectedBaseNote
+  );
+  state.neck = neck;
+  const chordsForNeck = generateAllChords(neck);
+  state.chords = chordsForNeck;
+};
+
 export const controlPanelSlice = createSlice({
   name: "controlPanel",
   initialState,
   reducers: {
+    init: (state) => {
+      onGuitarSettingsUpdate(state);
+    },
     setSelectedScaleGroup: (state, action: PayloadAction<string>) => {
       state.selectedScaleGroup = action.payload;
       state.selectedScale = getFirstScaleForGroup(action.payload);
+      onGuitarSettingsUpdate(state);
     },
     setSelectedScale: (state, action: PayloadAction<string>) => {
       state.selectedScale = action.payload;
+      onGuitarSettingsUpdate(state);
     },
     setSelectedBaseNote: (state, action: PayloadAction<Note>) => {
       state.selectedBaseNote = action.payload;
+      onGuitarSettingsUpdate(state);
     },
     setSelectedNoteDisplayMode: (
       state,
@@ -139,12 +178,6 @@ export const controlPanelSlice = createSlice({
     },
     setSelectedSkin(state, action: PayloadAction<Skin>) {
       state.selectedSkin = action.payload;
-    },
-    setNeck: (state, action: PayloadAction<Neck>) => {
-      state.neck = action.payload;
-    },
-    setChords: (state, action: PayloadAction<NoteChords[]>) => {
-      state.chords = action.payload;
     },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
@@ -195,13 +228,12 @@ export const controlPanelSlice = createSlice({
 });
 
 export const {
+  init,
   setSelectedScale,
   setSelectedScaleGroup,
   setSelectedBaseNote,
   setSelectedNoteDisplayMode,
   setSelectedSkin,
-  setNeck,
-  setChords,
   setSettingsExpanded,
   setPlayIntervalBpm,
   setVelocity,

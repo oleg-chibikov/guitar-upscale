@@ -21,7 +21,7 @@ export const ScaleSelector: React.FC = () => {
   return (
     <View
       style={[
-        tw`${bg} opacity-95 p-2 rounded-md gap-2`,
+        tw`${bg} opacity-95 p-1 gap-1`,
         {
           display: "grid",
           gridTemplateColumns: "auto minmax(200px, auto)",

@@ -5,9 +5,14 @@ export enum ChordMode {
   Major,
   Minor,
   Diminished,
+  Augmented,
+  Suspended4,
+  Suspended2,
+  Fifth,
+  Fifth3Note,
+  Sixth,
   Seventh,
   SeventhMinor,
-  Sixth,
 }
 
 export function getModeText(mode: ChordMode): string {
@@ -18,12 +23,22 @@ export function getModeText(mode: ChordMode): string {
       return "m";
     case ChordMode.Diminished:
       return "dim";
+    case ChordMode.Augmented:
+      return "aug";
+    case ChordMode.Suspended4:
+      return "sus4";
+    case ChordMode.Suspended2:
+      return "sus2";
+    case ChordMode.Fifth:
+      return "5";
+    case ChordMode.Fifth3Note:
+      return "5/3";
+    case ChordMode.Sixth:
+      return "6";
     case ChordMode.Seventh:
       return "7";
     case ChordMode.SeventhMinor:
       return "7m";
-    case ChordMode.Sixth:
-      return "6";
   }
 }
 
@@ -31,9 +46,14 @@ const chordModes = new Map<ChordMode, number[]>([
   [ChordMode.Major, [0, 7, 0, 4, 7, 0]],
   [ChordMode.Minor, [0, 7, 0, 3, 7, 0]],
   [ChordMode.Diminished, [0, 6, 0, 3, 7, 0]],
+  [ChordMode.Augmented, [0, 8, 0, 4, 7, 0]],
+  [ChordMode.Suspended4, [0, 5, 0, 5, 7, 0]],
+  [ChordMode.Suspended2, [0, 7, 0, 7, 7, 2]],
+  [ChordMode.Fifth, [0, 7, 0, 7, 7, 0]],
+  [ChordMode.Fifth3Note, [0, 7, 0]],
+  [ChordMode.Sixth, [0, 7, 0, 4, 9, 0]],
   [ChordMode.Seventh, [0, 7, 0, 4, 10, 0]],
   [ChordMode.SeventhMinor, [0, 7, 10, 3, 10, 0]],
-  [ChordMode.Sixth, [0, 4, 7, 9, 2, 5]],
 ]);
 
 export type NoteChordMode = {
@@ -57,26 +77,31 @@ function generateChord(note: Note, intervals: number[]): Note[] {
 }
 
 // Function to find the next occurrence of a note in the chord on the given string within the specified range
-const findNextNoteInChord = (
+const findNextNotesInChord = (
   stringIndex: number,
   fretIndex: number,
   noteToFind: Note,
   neck: Neck,
   maxFretDistance: number
-): StringOctaveNote | null => {
-  // TODO: why only 4 strings?
-  // TODO: we need to consider searching for 0 fret always
+): StringOctaveNote[] => {
+  const notes = [];
+
+  const note = neck[stringIndex][0];
+  if (note?.note === noteToFind) {
+    notes.push(note);
+  }
+
   for (
-    let j = Math.max(0, fretIndex - maxFretDistance);
+    let j = Math.max(1, fretIndex - maxFretDistance);
     j <= Math.min(fretIndex + maxFretDistance, neck[stringIndex].length - 1);
     j++
   ) {
     const note = neck[stringIndex][j];
     if (note?.note === noteToFind) {
-      return note;
+      notes.push(note);
     }
   }
-  return null;
+  return notes;
 };
 
 export const generateAllChords = (neck: Neck): NoteChords[] => {
@@ -101,6 +126,30 @@ export const generateAllChords = (neck: Neck): NoteChords[] => {
   return allChords;
 };
 
+function generateCombinations<T>(
+  arrays: T[][],
+  currentCombination: T[] = [],
+  currentIndex: number = 0,
+  result: T[][] = []
+) {
+  if (currentIndex === arrays.length) {
+    result.push(currentCombination.slice());
+    return;
+  }
+
+  for (let i = 0; i < arrays[currentIndex].length; i++) {
+    currentCombination[currentIndex] = arrays[currentIndex][i];
+    generateCombinations(
+      arrays,
+      currentCombination.slice(),
+      currentIndex + 1,
+      result
+    );
+  }
+
+  return result;
+}
+
 // Function to generate all the variations of a chord on the guitar neck
 const generateChordVariations = (
   chordNotes: Note[], // Notes that constitute the chord
@@ -119,24 +168,31 @@ const generateChordVariations = (
         stringOctaveNote !== null &&
         stringOctaveNote.note === chordNotes[0]
       ) {
-        const variation: StringOctaveNote[] = [];
-        variation.push(stringOctaveNote);
+        const variation: StringOctaveNote[][] = [];
+        variation.push([stringOctaveNote]);
 
         // Find the next notes in the chord on the upper strings
         for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
-          const nextNote = findNextNoteInChord(
+          const nextNotes = findNextNotesInChord(
             stringIndex - i, // search for the next note on the next string
             fretIndex,
             chordNotes[i],
             neck,
             4
           );
-          if (nextNote !== null) {
-            variation.push(nextNote);
+          if (nextNotes.length) {
+            variation.push(nextNotes);
           }
         }
-        if (variation.length >= 3) {
-          chordVariations.push(variation);
+
+        const combinations = generateCombinations(variation);
+        if (combinations) {
+          console.log(variation.length);
+          for (const combination of combinations) {
+            if (combination.length >= 3) {
+              chordVariations.push(combination);
+            }
+          }
         }
       }
     }

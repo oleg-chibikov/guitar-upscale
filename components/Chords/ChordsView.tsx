@@ -1,14 +1,12 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useRef } from "react";
 import { View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
-import { ChordsMap } from "../../data/chords";
 import { StringOctaveNote, getNoteText } from "../../data/notes";
 import { NotePlayEventBus } from "../../engine/eventBus";
 import {
   ChordMode,
   NoteChordMode,
-  generateAllChords,
   getModeText,
 } from "../../engine/generateChords";
 import { sleep } from "../../engine/sleep";
@@ -16,7 +14,7 @@ import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../../helpers/arrayHelper";
-import { selectControlPanel, setChords } from "../../store/controlPanelSlice";
+import { selectControlPanel } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { ChordButton } from "./ChordButton";
 
@@ -32,34 +30,10 @@ export const ChordsView: React.FC = memo(() => {
 
   const { chordsExpanded } = useSelector(selectControlPanel);
   const chordRoundRobinMap = useRef(new Map<string, number>()).current;
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (!neck) {
-      return;
-    }
-
-    const chordsForNeck = generateAllChords(neck);
-    dispatch(setChords(chordsForNeck));
-  }, [neck]);
 
   if (!chordsExpanded || !neck || !chords) {
     return null;
   }
-
-  const chordRows: { [key: string]: string[] } = {};
-  // Group chords by their starting letter
-  Object.keys(ChordsMap).forEach((chordName) => {
-    let startingLetter = chordName.charAt(0).toUpperCase();
-    if (chordName.charAt(1) === "#") {
-      startingLetter += "#";
-    }
-
-    if (!chordRows[startingLetter]) {
-      chordRows[startingLetter] = [];
-    }
-    chordRows[startingLetter].push(chordName);
-  });
 
   const selectRandomVariation = (variations: StringOctaveNote[][]) => {
     const randomIndex = Math.floor(Math.random() * variations.length);
@@ -118,20 +92,19 @@ export const ChordsView: React.FC = memo(() => {
   return (
     <View
       style={[
-        tw`opacity-95 right-3 z-20 bottom-3 ${bg} p-1 gap-2`,
-        tw`flex ${
-          useAdvancedChords ? "flex-col" : "flex-row"
-        } max-w-full max-h-full gap-1`,
-        { overflow: "auto", position: "fixed" },
+        tw`opacity-95 right-1 z-20 bottom-1 ${bg} p-1 gap-1 flex flex-row`,
+        {
+          overflow: "auto",
+          position: "fixed",
+          maxWidth: "95%",
+          maxHeight: "95%",
+        },
       ]}
     >
       {chords.map((noteChord) => (
         <View
           key={noteChord.note}
-          style={[
-            tw`gap-1 flex ${useAdvancedChords ? "flex-row" : "flex-col"}`,
-            { justifyContent: "space-between" },
-          ]}
+          style={[tw`gap-1 flex flex-col`, { justifyContent: "space-between" }]}
         >
           {noteChord.modes.map((mode) => {
             if (
@@ -169,57 +142,6 @@ export const ChordsView: React.FC = memo(() => {
           })}
         </View>
       ))}
-
-      {/* {Object.entries(chordRows).map(([letter, chords]) => (
-        <View
-          key={letter}
-          style={[
-            tw`gap-1 flex ${useAdvancedChords ? "flex-row" : "flex-col"}`,
-            { justifyContent: "space-between" },
-          ]}
-        >
-          {chords.map((chordName) => {
-            if (!useAdvancedChords && /6|dim|sus|7/.test(chordName)) {
-              return null;
-            }
-
-            const chordNotesString = ChordsMap[chordName];
-            let lastNoteIsInNeck = false;
-            const notes = chordNotesString
-              .split("")
-              .map((char, string) => {
-                const fret = parseInt(char);
-                if (!isNaN(fret)) {
-                  const note = neck[string][fret];
-                  if (!note) {
-                    lastNoteIsInNeck = false;
-                    return undefined;
-                  } else {
-                    // we wanna track the lowest (base) note in the chord and see if it's in neck. If so - chord is applicable to the current scale
-                    lastNoteIsInNeck = true;
-                  }
-                  return { ...note, string };
-                }
-                return undefined;
-              })
-              .filter((note) => note)
-              .map((note) => note as StringOctaveNote);
-
-            return (
-              <ChordButton
-                disabled={!lastNoteIsInNeck || !notes.length}
-                key={chordName}
-                chordName={chordName}
-                onPress={() => {
-                  notes.forEach((note) => {
-                    NotePlayEventBus.next(note);
-                  });
-                }}
-              />
-            );
-          })}
-        </View>
-      ))} */}
     </View>
   );
 });

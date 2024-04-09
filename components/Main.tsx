@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Skin,
   hideAlert,
+  init,
   setSettingsExpanded,
 } from "../store/controlPanelSlice";
 import { RootState } from "../store/store";
@@ -56,6 +57,10 @@ const getAssetsForSkin = (skin?: Skin) => {
 };
 
 export const Main: React.FC = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(init());
+  }, []);
   const [highResLoaded, setHighResLoaded] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
   const {
@@ -64,8 +69,6 @@ export const Main: React.FC = () => {
     mainBg,
     selectedSkin,
   } = useSelector((state: RootState) => state.controlPanel);
-
-  const dispatch = useDispatch();
 
   const recalculateScaleFactor = (size: ScaledSize) => {
     const isLandscape = size.width > size.height;
