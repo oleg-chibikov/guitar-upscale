@@ -77,6 +77,8 @@ export const Fretboard: React.FC<FretboardProps> = ({
           elements={Array.from({ length: NoteCount * 2 + 1 }, (_, index) => ({
             note: index,
             octave: 4,
+            string: 0,
+            fret: index,
           }))}
         />
         {/* Notes */}

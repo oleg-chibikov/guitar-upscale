@@ -24,9 +24,6 @@ export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
     playIntervalBpm,
     playbackType,
   } = useSelector(selectControlPanel);
-  if (!neck) {
-    return null;
-  }
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
@@ -36,6 +33,9 @@ export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
     setIsPlaying(false);
     isPlayingRef.current = false;
   }, [neck, selectedBaseNote, selectedScale, playbackType]);
+  if (!neck) {
+    return null;
+  }
 
   const handlePlay = async () => {
     if (isPlayingRef.current) {

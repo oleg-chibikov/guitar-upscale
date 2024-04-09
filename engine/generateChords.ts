@@ -28,12 +28,12 @@ export function getModeText(mode: ChordMode): string {
 }
 
 const chordModes = new Map<ChordMode, number[]>([
-  [ChordMode.Major, [0, 7, 0, 4, 7, 0]], // Major chord with 6 notes
-  [ChordMode.Minor, [0, 7, 0, 3, 7, 0]], // Minor chord with 6 notes
-  [ChordMode.Diminished, [0, 3, 6, 9, 0, 3]], // Diminished chord with 6 notes
-  [ChordMode.Seventh, [0, 4, 7, 10, 2, 5]], // Seventh chord with 6 notes
-  [ChordMode.SeventhMinor, [0, 3, 7, 10, 2, 5]], // Seventh Minor chord with 6 notes
-  [ChordMode.Sixth, [0, 4, 7, 9, 2, 5]], // Sixth chord with 6 notes
+  [ChordMode.Major, [0, 7, 0, 4, 7, 0]],
+  [ChordMode.Minor, [0, 7, 0, 3, 7, 0]],
+  [ChordMode.Diminished, [0, 6, 0, 3, 7, 0]],
+  [ChordMode.Seventh, [0, 7, 0, 4, 10, 0]],
+  [ChordMode.SeventhMinor, [0, 7, 10, 3, 10, 0]],
+  [ChordMode.Sixth, [0, 4, 7, 9, 2, 5]],
 ]);
 
 export type NoteChordMode = {
@@ -112,8 +112,8 @@ const generateChordVariations = (
   for (let stringIndex = neck.length - 1; stringIndex >= 0; stringIndex--) {
     const string = neck[stringIndex];
 
-    // Find the first note in the chord on current string. Don't go over 12th string as not representative
-    for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
+    // Find the first note in the chord on current string. Don't go over 15th string as not representative
+    for (let fretIndex = 0; fretIndex < 15; fretIndex++) {
       const stringOctaveNote = string[fretIndex];
       if (
         stringOctaveNote !== null &&
@@ -135,7 +135,7 @@ const generateChordVariations = (
             variation.push(nextNote);
           }
         }
-        if (variation.length >= 4) {
+        if (variation.length >= 3) {
           chordVariations.push(variation);
         }
       }

@@ -1,14 +1,14 @@
 import React from "react";
 import { View } from "react-native";
 import { useSelector } from "react-redux";
-import { OctaveNote } from "../data/notes";
+import { StringOctaveNote } from "../data/notes";
 import { NoteCount } from "../engine/generateNeckRepresentation";
 import { Skin, selectControlPanel } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
 import { FretMarker } from "./FretMarker";
 
 export interface FretlineProps {
-  elements: (OctaveNote | null)[];
+  elements: (StringOctaveNote | null)[];
   string?: number;
   isHeader?: boolean;
 }
@@ -82,7 +82,7 @@ export const Fretline: React.FC<FretlineProps> = ({
         { height },
       ]}
     >
-      {elements.map((octaveNote, fret) => {
+      {elements.map((stringOctaveNote, fret) => {
         const width = initialWidth / Math.pow(widthFactor, fret);
         let top = 0;
         if (string !== undefined) {
@@ -96,9 +96,7 @@ export const Fretline: React.FC<FretlineProps> = ({
             width={width}
             isHeader={isHeader}
             top={top}
-            stringOctaveNote={
-              octaveNote ? { ...octaveNote, string: string ?? 0 } : null
-            }
+            stringOctaveNote={stringOctaveNote}
           />
         );
       })}

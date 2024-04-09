@@ -6,7 +6,7 @@ import {
   Note,
   StringOctaveNote,
   getNoteText,
-  serizlizeStringOctaveNote,
+  serializeStringOctaveNote,
 } from "../data/notes";
 import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
 import { sleep } from "../engine/sleep";
@@ -53,12 +53,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
   useEffect(() => {
     if (stringOctaveNote) {
-      const key = serizlizeStringOctaveNote(stringOctaveNote);
+      const key = serializeStringOctaveNote(stringOctaveNote);
       NoteMap.set(key, () => {
         console.log("Playing note (auto): " + JSON.stringify(stringOctaveNote));
         playNoteAndAnimate();
       });
-      return () => NoteMap.delete(key);
+      return () => {
+        NoteMap.delete(key);
+      };
     }
     return () => {};
   }, [stringOctaveNote]);
@@ -82,20 +84,22 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     ]).start();
   };
 
-  const handlePress = () => {
+  const handlePress = async () => {
     if (isHeader) {
       if (!neck) {
         return;
       }
 
       console.log("Playing all the notes on fret " + fret);
-      neck.map(async (string, stringIndex) => {
+      for (let stringIndex = 0; stringIndex < neck.length; stringIndex++) {
+        const string = neck[stringIndex];
         const note = string[fret];
         if (note) {
           NotePlayEventBus.next({ ...note, string: stringIndex });
           await sleep(chordStrummingDelayMs);
         }
-      });
+      }
+
       return;
     }
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
@@ -127,11 +131,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 paddingVertical: 2,
               },
             ]}
-            onTouchStart={() => {
+            onTouchStart={async () => {
               // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
               if (!hasMouseInput) {
                 // this event handler is only for touch devices
-                handlePress();
+                await handlePress();
               }
             }}
             onStartShouldSetResponder={() => {

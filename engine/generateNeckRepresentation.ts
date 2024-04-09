@@ -32,7 +32,7 @@ export const generateNeckRepresentation = (
         octave++;
       }
 
-      neck[i][j] = isInScale ? { note, octave, string: i } : null;
+      neck[i][j] = isInScale ? { note, octave, string: i, fret: j } : null;
     }
   }
 
