@@ -8,7 +8,7 @@ import {
   getNoteText,
   serializeStringOctaveNote,
 } from "../data/notes";
-import { NoteMap, NotePlayEventBus } from "../engine/eventBus";
+import { NotePlayEventBus, NoteToFretMarkerEventMap } from "../engine/eventBus";
 import { sleep } from "../engine/sleep";
 import { playNote } from "../engine/soundProvider";
 import { mouseAvailable } from "../helpers/mouseAvailable";
@@ -54,12 +54,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   useEffect(() => {
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
-      NoteMap.set(key, () => {
+      NoteToFretMarkerEventMap.set(key, () => {
         console.log("Playing note (auto): " + JSON.stringify(stringOctaveNote));
         playNoteAndAnimate();
       });
       return () => {
-        NoteMap.delete(key);
+        // TODO: Why deleting handlers here leads to absense of sounds? they should be recreated
+        //    NoteToFretMarkerEventMap.delete(key);
       };
     }
     return () => {};

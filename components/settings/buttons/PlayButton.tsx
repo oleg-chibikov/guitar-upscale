@@ -33,6 +33,7 @@ export const PlayButton: React.FC<Omit<IconButtonProps, "onPress" | "icon">> = (
     setIsPlaying(false);
     isPlayingRef.current = false;
   }, [neck, selectedBaseNote, selectedScale, playbackType]);
+
   if (!neck) {
     return null;
   }
