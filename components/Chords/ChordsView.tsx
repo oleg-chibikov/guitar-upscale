@@ -1,6 +1,6 @@
-import { memo, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { View } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import { ChordsMap } from "../../data/chords";
 import { StringOctaveNote, getNoteText } from "../../data/notes";
@@ -8,10 +8,15 @@ import { NotePlayEventBus } from "../../engine/eventBus";
 import {
   ChordMode,
   NoteChordMode,
+  generateAllChords,
   getModeText,
 } from "../../engine/generateChords";
 import { sleep } from "../../engine/sleep";
-import { selectControlPanel } from "../../store/controlPanelSlice";
+import {
+  calculateAverage,
+  findObjectWithMinValue,
+} from "../../helpers/arrayHelper";
+import { selectControlPanel, setChords } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { ChordButton } from "./ChordButton";
 
@@ -24,8 +29,19 @@ export const ChordsView: React.FC = memo(() => {
     chordStrummingDelayMs,
     chordPlayMode,
   } = useSelector(selectControlPanel);
+
   const { chordsExpanded } = useSelector(selectControlPanel);
   const chordRoundRobinMap = useRef(new Map<string, number>()).current;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!neck) {
+      return;
+    }
+
+    const chordsForNeck = generateAllChords(neck);
+    dispatch(setChords(chordsForNeck));
+  }, [neck]);
 
   if (!chordsExpanded || !neck || !chords) {
     return null;
@@ -44,6 +60,60 @@ export const ChordsView: React.FC = memo(() => {
     }
     chordRows[startingLetter].push(chordName);
   });
+
+  const selectRandomVariation = (variations: StringOctaveNote[][]) => {
+    const randomIndex = Math.floor(Math.random() * variations.length);
+    return variations[randomIndex];
+  };
+
+  const playVariation = async (variation: StringOctaveNote[]) => {
+    for (const note of variation) {
+      NotePlayEventBus.next(note);
+      await sleep(chordStrummingDelayMs);
+    }
+  };
+
+  const playRandomChordVariation = async (mode: NoteChordMode) => {
+    const randomVariation = selectRandomVariation(mode.variations);
+    await playVariation(randomVariation);
+  };
+
+  const playFirstChordVariation = async (mode: NoteChordMode) => {
+    const randomVariation = mode.variations[0];
+    await playVariation(randomVariation);
+  };
+
+  const playClosestChordVariation = async (mode: NoteChordMode) => {
+    const variationAvgDistances = mode.variations.map((variation) => {
+      const distances = variation.map((note) => note.fret);
+      const avgDistance = calculateAverage(distances);
+      return { object: variation, number: avgDistance };
+    });
+    const variation = findObjectWithMinValue(variationAvgDistances);
+
+    await playVariation(variation);
+  };
+
+  const playAllVariations = async (mode: NoteChordMode) => {
+    for (const variation of mode.variations) {
+      await playVariation(variation);
+      await sleep(1000);
+    }
+  };
+
+  const playRoundRobin = async (title: string, mode: NoteChordMode) => {
+    let currentVariation = chordRoundRobinMap.get(title);
+    if (currentVariation === undefined) {
+      currentVariation = 0;
+    } else {
+      currentVariation++;
+      if (currentVariation >= mode.variations.length) {
+        currentVariation = 0;
+      }
+    }
+    await playVariation(mode.variations[currentVariation]);
+    chordRoundRobinMap.set(title, currentVariation);
+  };
 
   return (
     <View
@@ -71,59 +141,14 @@ export const ChordsView: React.FC = memo(() => {
             ) {
               return null;
             }
-            const selectRandomVariation = (
-              variations: StringOctaveNote[][]
-            ) => {
-              const randomIndex = Math.floor(Math.random() * variations.length);
-              return variations[randomIndex];
-            };
-
-            const playVariation = async (variation: StringOctaveNote[]) => {
-              for (const note of variation) {
-                NotePlayEventBus.next(note);
-                await sleep(chordStrummingDelayMs);
-              }
-            };
-
-            const playRandomChordVariation = async (mode: NoteChordMode) => {
-              const randomVariation = selectRandomVariation(mode.variations);
-              await playVariation(randomVariation);
-            };
-
-            const playFirstChordVariation = async (mode: NoteChordMode) => {
-              const randomVariation = mode.variations[0];
-              await playVariation(randomVariation);
-            };
-
-            const playAllVariations = async (mode: NoteChordMode) => {
-              for (const variation of mode.variations) {
-                await playVariation(variation);
-                await sleep(1000);
-              }
-            };
-
-            const playRoundRobin = async (
-              title: string,
-              mode: NoteChordMode
-            ) => {
-              let currentVariation = chordRoundRobinMap.get(title);
-              if (currentVariation === undefined) {
-                currentVariation = 0;
-              } else {
-                currentVariation++;
-                if (currentVariation >= mode.variations.length) {
-                  currentVariation = 0;
-                }
-              }
-              await playVariation(mode.variations[currentVariation]);
-              chordRoundRobinMap.set(title, currentVariation);
-            };
 
             const title = getNoteText(noteChord.note) + getModeText(mode.mode);
 
             return (
               <ChordButton
+                disabled={!mode.variations.length}
                 chordName={title}
+                key={title}
                 onPress={async () => {
                   switch (chordPlayMode) {
                     case ChordPlayMode.RoundRobin:
@@ -133,6 +158,8 @@ export const ChordsView: React.FC = memo(() => {
                       return await playAllVariations(mode);
                     case ChordPlayMode.FirstVariation:
                       return await playFirstChordVariation(mode);
+                    case ChordPlayMode.ClosestVariation:
+                      return await playClosestChordVariation(mode);
                     case ChordPlayMode.RandomVariation:
                       return await playRandomChordVariation(mode);
                   }

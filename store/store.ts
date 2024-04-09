@@ -13,6 +13,17 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  transforms: [
+    {
+      in: (state: any) => {
+        const newState = { ...state };
+        delete newState.neck;
+        delete newState.chords;
+        return newState;
+      },
+      out: (state: any) => state, // No transformation needed when deserializing
+    },
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

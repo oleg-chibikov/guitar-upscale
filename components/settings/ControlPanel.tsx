@@ -1,15 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { stringTuning } from "../../data/notes";
 import { getScaleNotes, scalesMap } from "../../data/scales";
-import { generateAllChords } from "../../engine/generateChords";
 import { generateNeckRepresentation } from "../../engine/generateNeckRepresentation";
-import {
-  selectControlPanel,
-  setChords,
-  setNeck,
-} from "../../store/controlPanelSlice";
+import { selectControlPanel, setNeck } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { ChordsView } from "../chords/ChordsView";
 import { ScaleSelector } from "./ScaleSelector";
@@ -25,7 +20,8 @@ export const ControlPanel: React.FC = () => {
   if (selectedBaseNote === null || !selectedScaleGroup || !selectedScale) {
     return null;
   }
-  const { neck, chords } = useMemo(() => {
+
+  useEffect(() => {
     // TODO: Check why debugger ends up in this method even when it should have memoized the neck
     const scaleObject = scalesMap.get(selectedScaleGroup)!.get(selectedScale);
     let scaleNotes = getScaleNotes(scaleObject);
@@ -39,20 +35,8 @@ export const ControlPanel: React.FC = () => {
       selectedBaseNote
     );
 
-    const chordsForNeck = generateAllChords(generatedNeck);
-
-    return {
-      neck: generatedNeck,
-      chords: chordsForNeck,
-    };
+    dispatch(setNeck(generatedNeck));
   }, [selectedBaseNote, selectedScale, selectedScaleGroup, stringTuning]);
-
-  useEffect(() => {
-    if (neck) {
-      dispatch(setNeck(neck));
-      dispatch(setChords(chords));
-    }
-  }, [neck, dispatch]);
 
   return (
     <>
