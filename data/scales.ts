@@ -79,6 +79,19 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
         "Melodic",
         {
           scale: [2, 3, 5, 7, 9, 11],
+          examples: [],
+        },
+      ],
+      ["Dorian", [2, 3, 5, 7, 9, 10]],
+    ]),
+  ],
+  [
+    "Common Major",
+    new Map([
+      [
+        "Ionian",
+        {
+          scale: [2, 4, 5, 7, 9, 11],
           examples: [
             {
               band: "Michael Jackson",
@@ -89,18 +102,11 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
           ],
         },
       ],
-      ["Dorian", [2, 3, 5, 7, 9, 10]],
-    ]),
-  ],
-  [
-    "Common Major",
-    new Map([
       ["Pentatonic Major", [2, 4, 7, 9]],
       ["Pentatonic Dominant", [2, 4, 7, 10]],
       ["Lydian", [2, 4, 6, 7, 9, 11]],
       ["Lydian Augmented", [2, 4, 6, 8, 9, 11]],
       ["Mixolydian", [2, 4, 5, 7, 9, 10]],
-      ["Ionian", [2, 4, 5, 7, 9, 11]],
       ["Phrygian", [1, 3, 5, 7, 8, 10]],
     ]),
   ],

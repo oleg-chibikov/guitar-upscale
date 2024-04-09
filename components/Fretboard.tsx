@@ -11,21 +11,21 @@ const getDimensionsForSkin = (skin?: Skin) => {
     case Skin.PRS_SE_AX20E:
     case undefined:
       return {
-        top: -543,
+        top: -583,
       };
     case Skin.Ibanez_AE140_WKH:
       return {
-        top: -549,
+        top: -589,
         left: -88,
       };
     case Skin.Yamaha_CSF3M:
       return {
-        top: -533,
+        top: -573,
         left: -9,
       };
     case Skin.Yamaha_SLG200NW:
       return {
-        top: -527,
+        top: -567,
         left: -65,
       };
   }
@@ -82,7 +82,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
           }))}
         />
         {/* Notes */}
-        <View style={tw`mt-20`}>
+        <View style={tw`mt-10`}>
           {neck.map((row, rowIndex) => (
             <Fretline string={rowIndex} key={rowIndex} elements={row} />
           ))}

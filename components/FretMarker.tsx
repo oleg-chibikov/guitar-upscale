@@ -42,7 +42,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
   const isInScale: boolean = stringOctaveNote !== undefined;
   const note: Note | undefined = stringOctaveNote?.note;
-  const circleWidth: string = isHeader ? "w-12 h-12" : "w-7 h-7";
+  const circleWidth: string = isHeader ? "w-9 h-9" : "w-7 h-7";
   const bg: string =
     note === selectedBaseNote ? "bg-orange-500" : "bg-orange-100";
   const color: string =
@@ -170,7 +170,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               />
               <Text
                 selectable={false}
-                style={tw`${color} text-${isHeader ? "2xl" : "md"} font-mono`}
+                style={tw`${color} text-${isHeader ? "xl" : "md"} font-mono`}
               >
                 {isHeader
                   ? stringOctaveNote.note

@@ -1,10 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import Orientation from "react-native-orientation-locker";
 import { Main } from "./components/Main";
 import { tw } from "./tailwind";
 
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./store/store";
@@ -17,10 +18,16 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <View style={tw`w-full h-full`}>
-          <Main />
-          <StatusBar style="auto" />
-        </View>
+        <HelmetProvider>
+          <Helmet>
+            <title>Guitar Upscale</title>
+            <link rel="manifest" href="manifest.json" />
+          </Helmet>
+          <View style={tw`w-full h-full`}>
+            <Main />
+            <StatusBar style="auto" />
+          </View>
+        </HelmetProvider>
       </PersistGate>
     </Provider>
   );

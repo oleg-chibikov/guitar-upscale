@@ -7,8 +7,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "copy app.dev.json app.json && expo start --web",
-    "copy-file": "ncp .surgeignore dist/.surgeignore",
-    "build-web": "copy app.prod.json app.json && expo export -p web && npm run copy-file",
+    "copy-files": "ncp .surgeignore dist/.surgeignore && ncp manifest.json dist/manifest.json && ncp assets/icon.png dist/icon.png && ncp assets/icon512.png dist/icon512.png && ncp assets/icon192.png dist/icon192.png",
+    "copy-manifest": "",
+    "build-web": "copy app.prod.json app.json && expo export -p web && npm run copy-files",
     "serve-build-web": "npm run build-web && serve dist --single",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
     "build-and-deploy-web": "npm run build-web && npm run deploy-surge"
