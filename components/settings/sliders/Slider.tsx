@@ -10,6 +10,7 @@ interface SliderProps {
   maximumTrackTintColor?: string;
   step?: number;
   style?: any; // or use specific styles
+  isVertical?: boolean;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -19,11 +20,14 @@ const Slider: React.FC<SliderProps> = ({
   maximumValue,
   step = 1,
   style,
+  isVertical,
 }) => {
+  const props = isVertical ? { orient: "vertical" } : undefined; // firefox
   return (
-    <View style={[{ width: "100%", alignItems: "stretch" }, style]}>
+    <View style={[{ width: "100%", alignItems: "center" }, style]}>
       <input
         type="range"
+        {...props}
         min={minimumValue}
         max={maximumValue}
         value={value}
@@ -32,10 +36,10 @@ const Slider: React.FC<SliderProps> = ({
           onValueChange && onValueChange(parseInt(event.target.value))
         }
         style={{
-          width: "100%",
-          height: 5,
+          width: isVertical ? 5 : "100%",
+          height: isVertical ? "100%" : 5,
           cursor: "pointer",
-          appearance: "none",
+          appearance: isVertical ? "slider-vertical" : ("none" as any),
           marginTop: 8,
         }}
       />

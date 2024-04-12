@@ -3,13 +3,13 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ScaleObject, scalesMap } from "../../data/scales";
+import { ScaleObject, scalesMap } from "../../../data/scales";
 import {
   selectControlPanel,
   setSelectedScale,
   setSelectedScaleGroup,
-} from "../../store/controlPanelSlice";
-import { tw } from "../../tailwind";
+} from "../../../store/controlPanelSlice";
+import { tw } from "../../../tailwind";
 
 export const ScaleSelector: React.FC = () => {
   const { selectedScale, selectedScaleGroup, bg, textStyle } =
@@ -23,6 +23,7 @@ export const ScaleSelector: React.FC = () => {
       style={[
         tw`${bg} opacity-95 p-1 gap-1`,
         {
+          maxWidth: 200,
           display: "grid",
           gridTemplateColumns: "auto minmax(200px, auto)",
         },

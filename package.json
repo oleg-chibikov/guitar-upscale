@@ -12,6 +12,8 @@
     "build-web": "copy app.prod.json app.json && expo export -p web && npm run copy-files",
     "serve-build-web": "npm run build-web && serve dist --single",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
+    "deploy-surge-org.uk": "surge --domain guitar-upscale.org.uk dist/",
+    "deploy-surge-co.uk": "surge --domain guitar-upscale.co.uk dist/",
     "build-and-deploy-web": "npm run build-web && npm run deploy-surge"
   },
   "dependencies": {
@@ -20,10 +22,12 @@
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-picker/picker": "2.6.1",
     "@reduxjs/toolkit": "^2.2.3",
+    "crypto-browserify": "^3.12.0",
     "expo": "~50.0.14",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-helmet-async": "^2.0.4",
     "react-native": "0.73.6",
     "react-native-bouncy-checkbox": "^4.0.0",
     "react-native-gesture-handler": "~2.14.0",
@@ -36,7 +40,9 @@
     "rxjs": "^7.8.1",
     "screenfull": "^6.0.2",
     "smplr": "^0.12.3",
-    "twrnc": "^4.2.0"
+    "stream-browserify": "^3.0.0",
+    "twrnc": "^4.2.0",
+    "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",

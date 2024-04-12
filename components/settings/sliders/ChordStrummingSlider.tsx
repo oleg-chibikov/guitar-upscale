@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
   setChordStrummingDelayMs,
-} from "../../store/controlPanelSlice";
-import { tw } from "../../tailwind";
-import { Slider } from "../core/Slider";
+} from "../../../store/controlPanelSlice";
+import { tw } from "../../../tailwind";
+import { Slider } from "./Slider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
   const { chordStrummingDelayMs, textStyle } = useSelector(selectControlPanel);

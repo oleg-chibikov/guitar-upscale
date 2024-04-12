@@ -4,8 +4,8 @@ import {
   Skin,
   selectControlPanel,
   setSelectedSkin,
-} from "../../store/controlPanelSlice";
-import { EnumSelector } from "../core/EnumSelector";
+} from "../../../store/controlPanelSlice";
+import { EnumSelector } from "./EnumSelector";
 
 export const SkinSelector: React.FC = () => {
   const { selectedSkin } = useSelector(selectControlPanel);

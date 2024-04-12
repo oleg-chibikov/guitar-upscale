@@ -11,7 +11,7 @@ import {
   selectControlPanel,
   showAlert,
 } from "../../../store/controlPanelSlice";
-import { IconButton } from "../../core/IconButton";
+import { IconButton } from "./IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
@@ -21,6 +21,7 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
     selectedBaseNote,
     selectedScale,
     playIntervalBpm,
+    chordsMap,
     playbackType,
   } = useSelector(selectControlPanel);
 
@@ -34,6 +35,9 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
   }, [neck, selectedBaseNote, selectedScale, playbackType]);
 
   if (!neck) {
+    return null;
+  }
+  if (!chordsMap) {
     return null;
   }
 
@@ -53,7 +57,7 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
       return 60000 / bpm / 2;
     };
 
-    const wait = async () => {
+    const waitNote = async () => {
       // We are taking value from a variable to be able to adjust it while playing, but the initial value comes from the store in order to use redux-persist and restore previous value
       const waitBpm = playIntervalBpmValue ?? playIntervalBpm;
       const waitMs = bpmToMilliseconds(waitBpm);
@@ -67,7 +71,7 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
       await playExample(
         selectedBaseNote,
         examplesForScale,
-        wait,
+        waitNote,
         neck,
         isPlayingRef,
         dispatchAlert
@@ -79,7 +83,12 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
           isFullStringScalePlayback ? " (full string)" : ""
         }`
       );
-      await playWholeScale(wait, neck, isPlayingRef, isFullStringScalePlayback);
+      await playWholeScale(
+        waitNote,
+        neck,
+        isPlayingRef,
+        isFullStringScalePlayback
+      );
     }
     setIsPlaying(false);
     isPlayingRef.current = false;

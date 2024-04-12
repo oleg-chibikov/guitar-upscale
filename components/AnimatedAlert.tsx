@@ -55,7 +55,7 @@ export const AnimatedAlert: React.FC<AnimatedAlertProps> = ({
     >
       <TouchableOpacity onPress={handlePress}>
         <View style={tw`flex items-center`}>
-          <Text style={tw`text-base text-gray-800`}>{message}</Text>
+          <Text style={tw`text-base text-center text-gray-800`}>{message}</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>

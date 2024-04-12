@@ -44,7 +44,8 @@ export const Fretboard: React.FC<FretboardProps> = ({
   onImageLoaded,
   isCollapsed = false,
 }) => {
-  const { neck, selectedSkin } = useSelector(selectControlPanel);
+  const { neck, selectedSkin, fretboardScaleX } =
+    useSelector(selectControlPanel);
 
   if (!neck) {
     return null;
@@ -57,7 +58,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
       style={[
         tw`mt-24 mb-24`,
         {
-          transform: [{ scale: scaleFactor }],
+          transform: [{ scale: scaleFactor }, { scaleX: 1 / fretboardScaleX }],
           transformOrigin: "top left",
           opacity: isCollapsed ? 0 : 1,
         },

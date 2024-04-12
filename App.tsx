@@ -13,6 +13,17 @@ import { persistor, store } from "./store/store";
 export default function App() {
   useEffect(() => {
     Orientation.lockToLandscape(); // this will lock the view to Landscape
+
+    // prevent the Google translate bottom popup from appearing on mobile screen
+    document.addEventListener(
+      "click",
+      function (event: any) {
+        if (event.target.nodeName === "SPAN") {
+          event.preventDefault();
+        }
+      },
+      true
+    );
   }, []);
 
   return (
@@ -20,8 +31,9 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <HelmetProvider>
           <Helmet>
-            <title>Guitar Upscale</title>
+            <title>Upscale your guitar skills</title>
             <link rel="manifest" href="manifest.json" />
+            <meta name="google" content="notranslate" />
           </Helmet>
           <View style={tw`w-full h-full`}>
             <Main />

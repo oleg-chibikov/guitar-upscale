@@ -2,15 +2,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Appearance, StyleProp, TextStyle } from "react-native";
 import { ChordPlayMode } from "../data/chordPlayMode";
+import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
-import { Note, stringTuning } from "../data/notes";
+import { Chord, getNoteText, Note, stringTuning } from "../data/notes";
 import {
   Example,
   getScaleExamples,
   getScaleNotes,
   scalesMap,
 } from "../data/scales";
-import { generateAllChords, NoteChords } from "../engine/generateChords";
+import {
+  generateAllChords,
+  getClosestVariation,
+  getModeText,
+  NoteChords,
+} from "../engine/chordsGenerator";
 import {
   generateNeckRepresentation,
   Neck,
@@ -35,34 +41,6 @@ export enum Skin {
   Yamaha_CSF3M,
   Yamaha_SLG200NW,
 }
-
-interface ControlPanelState {
-  selectedScale: string;
-  selectedScaleGroup: string;
-  selectedBaseNote: Note;
-  selectedNoteDisplayMode: NoteDisplayMode;
-  selectedSkin: Skin;
-  neck: Neck | null;
-  chords: NoteChords[] | null;
-  settingsExpanded: boolean;
-  chordsExpanded: boolean;
-  playIntervalBpm: number;
-  velocity: number;
-  showAlert: boolean;
-  alertMessage: string;
-  playbackType: PlaybackType;
-  theme: Theme;
-  switchToChromaticScale: boolean;
-  useAdvancedChords: boolean;
-  bg: string;
-  mainBg: string;
-  color: string;
-  textStyle: StyleProp<TextStyle>;
-  chordStrummingDelayMs: number;
-  chordPlayMode: ChordPlayMode;
-}
-
-const firstScaleGroupKey = scalesMap.keys().next().value;
 
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;
@@ -90,17 +68,57 @@ const getViewSettings = (theme: Theme) => {
 
 const initialSettings = getViewSettings(initialTheme);
 
+interface WithNeck {
+  neck: Neck | null;
+  chords: NoteChords[] | null;
+  chordsMap: Map<string, Chord> | null;
+}
+
+interface WithControls {
+  selectedScaleGroup: string;
+  selectedScale: string;
+  selectedBaseNote: Note;
+}
+
+interface ControlPanelState extends WithNeck, WithControls {
+  selectedNoteDisplayMode: NoteDisplayMode;
+  selectedChordsDisplayMode: ChordsDisplayMode;
+  selectedSkin: Skin;
+  settingsExpanded: boolean;
+  isRecording: boolean;
+  chordsExpanded: boolean;
+  playIntervalBpm: number;
+  chordStrummingDelayMs: number;
+  velocity: number;
+  showAlert: boolean;
+  alertMessage: string;
+  playbackType: PlaybackType;
+  theme: Theme;
+  switchToChromaticScale: boolean;
+  useAdvancedChords: boolean;
+  bg: string;
+  mainBg: string;
+  color: string;
+  textStyle: StyleProp<TextStyle>;
+  chordPlayMode: ChordPlayMode;
+  fretboardScaleX: number;
+}
+
 const initialState: ControlPanelState = {
   selectedScaleGroup: "Special",
   selectedScale: "Chromatic (All notes)",
   selectedBaseNote: Note.E,
   selectedNoteDisplayMode: NoteDisplayMode.Fret,
+  selectedChordsDisplayMode: ChordsDisplayMode.Left,
   selectedSkin: Skin.Yamaha_SLG200NW,
   neck: null,
   chords: null,
+  chordsMap: null,
   settingsExpanded: false,
+  isRecording: false,
   chordsExpanded: true,
   playIntervalBpm: 140,
+  chordStrummingDelayMs: 20,
   velocity: 125,
   showAlert: false,
   alertMessage: "",
@@ -112,25 +130,20 @@ const initialState: ControlPanelState = {
   mainBg: initialSettings.mainBg,
   color: initialSettings.color,
   textStyle: initialSettings.textStyle,
-  chordStrummingDelayMs: 20,
   chordPlayMode: ChordPlayMode.RoundRobin,
+  fretboardScaleX: 1,
 };
 
 // A value that changes immediately without the need for rerender
 export let playIntervalBpmValue: number | undefined = undefined;
+export let chordStrummingDelayMsValue: number | undefined = undefined;
 export let velocityValue: number | undefined = undefined;
 export let examplesForScale: Example[] | undefined = undefined;
 export const setExamples = (examples?: Example[]) => {
   examplesForScale = examples;
 };
 
-const onGuitarSettingsUpdate = (state: {
-  selectedScaleGroup: string;
-  selectedScale: string;
-  selectedBaseNote: Note;
-  neck: Neck | null;
-  chords: NoteChords[] | null;
-}) => {
+const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   const scaleObject = scalesMap
     .get(state.selectedScaleGroup)!
     .get(state.selectedScale);
@@ -146,8 +159,28 @@ const onGuitarSettingsUpdate = (state: {
     state.selectedBaseNote
   );
   state.neck = neck;
-  const chordsForNeck = generateAllChords(neck);
-  state.chords = chordsForNeck;
+  setChords(state);
+};
+
+const setChords = (state: WithNeck) => {
+  if (state.neck) {
+    const chordsForNeck = generateAllChords(state.neck, true);
+    state.chords = chordsForNeck;
+    const map = new Map<string, Chord>();
+    state.chordsMap = new Map();
+    for (const chord of chordsForNeck) {
+      const key = getNoteText(chord.note);
+      for (const mode of chord.modes) {
+        const modeKey = getModeText(mode.mode);
+        const fullKey = key + modeKey;
+        const closestVariation = getClosestVariation(mode);
+        if (closestVariation) {
+          map.set(fullKey, closestVariation);
+        }
+      }
+    }
+    state.chordsMap = map;
+  }
 };
 
 export const controlPanelSlice = createSlice({
@@ -176,6 +209,12 @@ export const controlPanelSlice = createSlice({
     ) => {
       state.selectedNoteDisplayMode = action.payload;
     },
+    setSelectedChordsDisplayMode: (
+      state,
+      action: PayloadAction<ChordsDisplayMode>
+    ) => {
+      state.selectedChordsDisplayMode = action.payload;
+    },
     setSelectedSkin(state, action: PayloadAction<Skin>) {
       state.selectedSkin = action.payload;
     },
@@ -185,9 +224,16 @@ export const controlPanelSlice = createSlice({
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
     },
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      state.isRecording = action.payload;
+    },
     setPlayIntervalBpm: (state, action: PayloadAction<number>) => {
       state.playIntervalBpm = action.payload;
       playIntervalBpmValue = action.payload;
+    },
+    setChordStrummingDelayMs(state, action: PayloadAction<number>) {
+      state.chordStrummingDelayMs = action.payload;
+      chordStrummingDelayMsValue = action.payload;
     },
     setVelocity: (state, action: PayloadAction<number>) => {
       state.velocity = action.payload;
@@ -218,11 +264,11 @@ export const controlPanelSlice = createSlice({
     setUseAdvancedChords(state, action: PayloadAction<boolean>) {
       state.useAdvancedChords = action.payload;
     },
-    setChordStrummingDelayMs(state, action: PayloadAction<number>) {
-      state.chordStrummingDelayMs = action.payload;
-    },
     setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
       state.chordPlayMode = action.payload;
+    },
+    setFretboardScaleX(state, action: PayloadAction<number>) {
+      state.fretboardScaleX = action.payload;
     },
   },
 });
@@ -233,6 +279,7 @@ export const {
   setSelectedScaleGroup,
   setSelectedBaseNote,
   setSelectedNoteDisplayMode,
+  setSelectedChordsDisplayMode,
   setSelectedSkin,
   setSettingsExpanded,
   setPlayIntervalBpm,
@@ -246,6 +293,8 @@ export const {
   setUseAdvancedChords,
   setChordStrummingDelayMs,
   setChordPlayMode,
+  setIsRecording,
+  setFretboardScaleX,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

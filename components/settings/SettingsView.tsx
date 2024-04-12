@@ -1,27 +1,35 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
+import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { selectControlPanel } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
-import { BaseNoteSelector } from "./BaseNoteSelector";
-import { ChordPlayModeSelector } from "./ChordPlayModeSelector";
-import { ChordStrummingDelaySlider } from "./ChordStrummingSlider";
-import { NoteDisplayModeSelector } from "./NoteDisplayModeSelector";
-import { PlayIntervalSlider } from "./PlayIntervalSlider";
-import { PlaybackTypeSelector } from "./PlaybackTypeSelector";
-import { SkinSelector } from "./SkinSelector";
-import { SwitchToChromaticScaleCheckbox } from "./SwitchToChromaticScaleCheckbox";
-import { ThemeSelector } from "./ThemeSelector";
-import { UseAdvancedChordsCheckbox } from "./UseAdvancedChordsChekbox";
-import { VelocitySlider } from "./VelocitySlider";
+import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
+import { UseAdvancedChordsCheckbox } from "./checkboxes/UseAdvancedChordsChekbox";
+import { BaseNoteSelector } from "./selectors/BaseNoteSelector";
+import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
+import { ChordsDisplayModeSelector } from "./selectors/ChordsDisplayModeSelector";
+import { NoteDisplayModeSelector } from "./selectors/NoteDisplayModeSelector";
+import { PlaybackTypeSelector } from "./selectors/PlaybackTypeSelector";
+import { SkinSelector } from "./selectors/SkinSelector";
+import { ThemeSelector } from "./selectors/ThemeSelector";
+import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
+import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
+import { VelocitySlider } from "./sliders/VelocitySlider";
 
 export const SettingsView: React.FC = () => {
-  const { settingsExpanded, bg, textStyle } = useSelector(selectControlPanel);
+  const { settingsExpanded, bg, textStyle, selectedChordsDisplayMode } =
+    useSelector(selectControlPanel);
   return (
     settingsExpanded && (
       <View
         style={[
-          tw`opacity-95 left-1 z-40 top-15 ${bg} p-2 gap-2`,
+          tw`opacity-95 ${
+            // it should be on the opposite side of chords to avoid overlapping
+            selectedChordsDisplayMode === ChordsDisplayMode.Left
+              ? "right"
+              : "left"
+          }-1 z-40 top-15 ${bg} p-2 gap-2`,
           {
             maxWidth: "95%",
             maxHeight: "95%",
@@ -45,6 +53,8 @@ export const SettingsView: React.FC = () => {
           <BaseNoteSelector />
           <Text style={textStyle}>Note Display Mode:</Text>
           <NoteDisplayModeSelector />
+          <Text style={textStyle}>Chords Display Mode:</Text>
+          <ChordsDisplayModeSelector />
           <Text style={textStyle}>Playback type:</Text>
           <PlaybackTypeSelector />
           <Text style={textStyle}>Playback speed:</Text>

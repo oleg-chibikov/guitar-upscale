@@ -1,9 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { selectControlPanel, setVelocity } from "../../store/controlPanelSlice";
-import { tw } from "../../tailwind";
-import { Slider } from "../core/Slider";
+import {
+  selectControlPanel,
+  setVelocity,
+} from "../../../store/controlPanelSlice";
+import { tw } from "../../../tailwind";
+import { Slider } from "./Slider";
 
 export const VelocitySlider: React.FC = () => {
   const { velocity, textStyle } = useSelector(selectControlPanel);

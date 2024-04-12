@@ -1,11 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NoteDisplayMode } from "../../data/noteDisplayMode";
+import { NoteDisplayMode } from "../../../data/noteDisplayMode";
 import {
   selectControlPanel,
   setSelectedNoteDisplayMode,
-} from "../../store/controlPanelSlice";
-import { EnumSelector } from "../core/EnumSelector";
+} from "../../../store/controlPanelSlice";
+import { EnumSelector } from "./EnumSelector";
 
 export const NoteDisplayModeSelector: React.FC = () => {
   const { selectedNoteDisplayMode } = useSelector(selectControlPanel);

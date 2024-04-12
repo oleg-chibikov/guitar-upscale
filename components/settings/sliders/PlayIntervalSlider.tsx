@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
   setPlayIntervalBpm,
-} from "../../store/controlPanelSlice";
-import { tw } from "../../tailwind";
-import { Slider } from "../core/Slider";
+} from "../../../store/controlPanelSlice";
+import { tw } from "../../../tailwind";
+import { Slider } from "./Slider";
 
 export const PlayIntervalSlider: React.FC = () => {
   const { playIntervalBpm, textStyle } = useSelector(selectControlPanel);

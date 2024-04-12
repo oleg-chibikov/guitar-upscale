@@ -2,7 +2,7 @@ import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useSelector } from "react-redux";
-import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
+import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
 
 export type Styleable = {
   style?: StyleProp<ViewStyle>;

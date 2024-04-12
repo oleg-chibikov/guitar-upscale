@@ -1,9 +1,4 @@
-import {
-  Note,
-  OctaveNote,
-  StringOctaveNote,
-  serializeOctaveNote,
-} from "../data/notes";
+import { Chord, Note, OctaveNote, serializeOctaveNote } from "../data/notes";
 import { Example } from "../data/scales";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
@@ -29,8 +24,7 @@ export const playWholeScale = async (
     if (!isPlayingRef.current) {
       break;
     }
-    const stringCopy = [...string]
-      .filter((x) => x) as StringOctaveNote[];
+    const stringCopy = [...string].filter((x) => x) as Chord;
 
     realStringIndex = reverse ? realStringIndex - 1 : realStringIndex + 1; //incrementing string index here
     orderedStringIndex++;
@@ -80,7 +74,7 @@ export const playWholeScale = async (
 export const playExample = async (
   baseNote: Note,
   examplesForScale: Example[],
-  wait: () => Promise<void>,
+  waitNote: () => Promise<void>,
   neck: Neck,
   isPlayingRef: React.MutableRefObject<boolean>,
   showAlert: (message: string) => void
@@ -101,7 +95,7 @@ export const playExample = async (
       );
       NotePlayEventBus.next(note);
     },
-    wait,
+    waitNote,
     neck,
     baseNote,
     isPlayingRef

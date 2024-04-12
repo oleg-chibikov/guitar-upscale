@@ -47,13 +47,16 @@ export const getScaleExamples = (scale?: Scale): Example[] | undefined => {
 
 // examples follow these rules:
 
+// They are written for EBGDAE tuning, converting to other tunings will require shifting notes
 // *4 - play 4th string onwards
 // 8 - play 8th fret on the previously remembered string and pause for one step
 // 1-0 - paly 10th fret following the same rules
 // ^51 - immediately play 1st fret on 5th string without pausing (useful for chords)
 // ^41-2 - immediately play 12th fret on 4th string following the same rules
 // (<melody>)3 play <melody> for 3 times
+// <Asus4> - play Asus4 chord immediately. It uses the variation closest to the neck head and the strumming delay from settings
 
+// TODO: Chords support
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
     "Common Minor",
@@ -67,12 +70,26 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "Linkin Park",
               title: "Numb",
               melody:
-                "_*1030*0 ^50 0__3__2_ ^43 _____*1030*0 ^53 3__2*1__3_ ^30 _____*1030(*0 ^50 0_ ^50 _ ^50 3_ ^50 _ ^50 2_ ^43 __ ^43 _ ^43 __ ^43 *10 ^43 3 ^43 0*0 ^53 3_ ^53 _ ^53 2*1_ ^53 _ ^53 3_ ^30 __ ^30 _ ^30 __*1 ^30 0 ^30 3 ^30 0)2",
+                "_*1030*0<Em>0__3__2_<C>_____*1030*0<G>3__2*1__3_<D>_____*1030(*0 <Em> 0_ ^50 _ ^50 3_ ^50 _ ^50 2_ <C> __ ^43 _ ^43 __ ^43 *10 ^43 3 ^43 0*0 <G> 3_ ^53 _ ^53 2*1_ ^53 _ ^53 3_ <D> __ ^30 _ ^30 __*1 ^30 0 ^30 3 ^30 0)2",
             },
           ],
         },
       ],
       ["Pentatonic Minor", [3, 5, 7, 10]],
+      [
+        "Phrygian",
+        {
+          scale: [1, 3, 5, 7, 8, 10],
+          examples: [
+            {
+              band: "Кино",
+              title: "Кукушка",
+              melody:
+                "_*2<Am>2__*135_3_<C>5__35_*03_*1<G>3__*254___<G>____5420<Am>2__*135_3_<C>5__35_*03_*1<G>3__*254___<G>____545*13",
+            },
+          ],
+        },
+      ],
       ["Lydian", [2, 4, 6, 7, 8, 10]],
       ["Locrian", [1, 3, 5, 6, 8, 10]],
       [
@@ -107,7 +124,6 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
       ["Lydian", [2, 4, 6, 7, 9, 11]],
       ["Lydian Augmented", [2, 4, 6, 8, 9, 11]],
       ["Mixolydian", [2, 4, 5, 7, 9, 10]],
-      ["Phrygian", [1, 3, 5, 7, 8, 10]],
     ]),
   ],
   [
@@ -122,7 +138,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "Jewish Traditional Song",
               title: "Hava Nagila",
               melody:
-                "_(*0 ^50 0_0__410 ^54 4_4__754 ^55 5_5__875 ^54 4101 ^540 ___)2 *0 ^58 88_ ^57 7555_ ^57 77_ ^55 5444_ ^54 4_75 ^54 4_5_ ^54 4_ ^51 1_ ^50 0",
+                "_(*0 <E> 0_0__410 <G#dim> 4_4__754 <Adim> 5_5__875 <G#dim> 4101 ^540 ___)2 *0 <Caug> 88_ ^57 7555_ <Bdim> 77_ ^55 5444_ <E6> 4_75 <E6> 4_5_ <E6> 4_ ^51 1_ ^50 0",
             },
           ],
         },
@@ -172,7 +188,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "The Prodigy",
               title: "Narayan",
               melody:
-                "_(^50*002371-0932^5002371-0932^53*002371-0932^5302371-0^52932)2",
+                "_(<E5/3>*002371-0932<E5/3>02371-0932<G5/3>*002371-0932<G5/3>02371-0<B5/3>932)2",
             },
           ],
         },

@@ -1,7 +1,7 @@
 import React from "react";
 import { PressableProps } from "react-native";
 import screenfull from "screenfull";
-import { IconButton } from "../../core/IconButton";
+import { IconButton } from "./IconButton";
 
 export const FullscreenButton: React.FC<PressableProps> = (props) => {
   return (

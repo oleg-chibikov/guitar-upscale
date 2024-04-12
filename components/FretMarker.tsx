@@ -11,7 +11,7 @@ import {
 import { NotePlayEventBus, NoteToFretMarkerEventMap } from "../engine/eventBus";
 import { sleep } from "../engine/sleep";
 import { playNote } from "../engine/soundProvider";
-import { mouseAvailable } from "../helpers/mouseAvailable";
+import { useInputChecker } from "../helpers/useInputChecker";
 import { selectControlPanel, velocityValue } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
 
@@ -36,17 +36,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     selectedNoteDisplayMode,
     neck,
     chordStrummingDelayMs,
+    fretboardScaleX,
+    isRecording,
   } = useSelector(selectControlPanel);
 
-  const hasMouseInput = mouseAvailable();
+  const hasTouchInput = useInputChecker();
 
   const isInScale: boolean = stringOctaveNote !== undefined;
   const note: Note | undefined = stringOctaveNote?.note;
-  const circleWidth: string = isHeader ? "w-9 h-9" : "w-7 h-7";
-  const bg: string =
-    note === selectedBaseNote ? "bg-orange-500" : "bg-orange-100";
-  const color: string =
-    note === selectedBaseNote ? "text-black" : "text-red-500";
+  const coloredHeaders = new Set<number>([
+    0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24,
+  ]);
+  const isColored =
+    (isHeader &&
+      stringOctaveNote &&
+      coloredHeaders.has(stringOctaveNote?.fret)) ||
+    note === selectedBaseNote;
+  const bg: string = isColored ? "bg-orange-500" : "bg-orange-100";
+  const color: string = isColored ? "text-black" : "text-red-500";
 
   // Animation state
   const glowAnim = useRef(new Animated.Value(0)).current;
@@ -74,7 +81,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     Animated.sequence([
       Animated.timing(glowAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 0,
         useNativeDriver: true,
       }),
       Animated.timing(glowAnim, {
@@ -96,7 +103,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         const string = neck[stringIndex];
         const note = string[fret];
         if (note) {
-          NotePlayEventBus.next({ ...note, string: stringIndex });
+          NotePlayEventBus.next(note);
           await sleep(chordStrummingDelayMs);
         }
       }
@@ -104,7 +111,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       return;
     }
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
-    playNoteAndAnimate();
+    if (stringOctaveNote) {
+      NotePlayEventBus.next(stringOctaveNote);
+    }
   };
   return (
     <View
@@ -123,35 +132,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         ]}
       >
         {stringOctaveNote !== null && (
-          <View
-            style={[
-              tw`bg-transparent flex justify-center items-center border-slate-100 border-opacity-30 border-2`,
-              {
-                cursor: "pointer",
-                width,
-                paddingVertical: 2,
-              },
-            ]}
-            onTouchStart={async () => {
-              // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
-              if (!hasMouseInput) {
-                // this event handler is only for touch devices
-                await handlePress();
-              }
-            }}
-            onStartShouldSetResponder={() => {
-              if (hasMouseInput) {
-                // this event handler is only for mouse devices
-                handlePress();
-              }
-              return true;
-            }} // Capture both touch and mouse events
-          >
-            <View
-              style={tw`p-2 flex justify-center ${circleWidth} items-center rounded-full ${bg} border-slate-800 border-2`}
-            >
-              <Animated.View
-                style={{
+          <>
+            <Animated.View
+              style={[
+                {
                   position: "absolute",
                   width: "100%",
                   height: "100%",
@@ -161,25 +145,86 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                   transform: [
                     {
                       scale: glowAnim.interpolate({
-                        inputRange: [0, 0.5, 1],
-                        outputRange: [1, 1.2, 1],
+                        inputRange: [0, 0.1, 1],
+                        outputRange: [1, 5, 1],
                       }),
                     },
+                    {
+                      scaleX: fretboardScaleX,
+                    },
                   ],
-                }}
-              />
-              <Text
-                selectable={false}
-                style={tw`${color} text-${isHeader ? "xl" : "md"} font-mono`}
+                },
+              ]}
+            />
+            <View
+              style={[
+                tw`bg-transparent flex justify-center items-center border-slate-100 border-opacity-5 border-2`,
+                {
+                  cursor: "pointer",
+                  width,
+                  paddingVertical: 2,
+                },
+              ]}
+              onTouchStart={async () => {
+                // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
+                if (hasTouchInput) {
+                  // this event handler is only for touch devices
+                  await handlePress();
+                }
+              }}
+              onStartShouldSetResponder={() => {
+                if (!hasTouchInput) {
+                  // this event handler is only for mouse devices
+                  handlePress();
+                }
+                return true;
+              }} // Capture both touch and mouse events
+            >
+              <View
+                style={[
+                  tw`p-2 flex justify-center ${
+                    isHeader ? "w-9 h-9" : "w-7 h-7"
+                  } ${isHeader ? "opacity-75" : ""} items-center ${
+                    isHeader ? "" : "rounded-full"
+                  } ${
+                    isHeader ? "w-full" : ""
+                  } ${bg} border-slate-800 border-2`,
+                  {
+                    transform: !isHeader
+                      ? [
+                          {
+                            scaleX: fretboardScaleX,
+                          },
+                        ]
+                      : undefined,
+                  },
+                ]}
               >
-                {isHeader
-                  ? stringOctaveNote.note
-                  : selectedNoteDisplayMode === NoteDisplayMode.Note
-                  ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
-                  : fret}
-              </Text>
+                <Text
+                  selectable={false}
+                  style={[
+                    tw`${color} text-${isHeader ? "xl" : "md"} font-mono`,
+                    {
+                      transform: isHeader
+                        ? [
+                            {
+                              scaleX: fretboardScaleX,
+                            },
+                          ]
+                        : undefined,
+                    },
+                  ]}
+                >
+                  {isHeader
+                    ? stringOctaveNote.note
+                    : selectedNoteDisplayMode === NoteDisplayMode.Note
+                    ? getNoteText(stringOctaveNote.note) +
+                      stringOctaveNote.octave
+                    : fret}
+                </Text>
+              </View>
             </View>
-          </View>
+          </>
         )}
       </Text>
     </View>

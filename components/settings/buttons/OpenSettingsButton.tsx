@@ -5,7 +5,7 @@ import {
   selectControlPanel,
   setSettingsExpanded,
 } from "../../../store/controlPanelSlice";
-import { IconButton } from "../../core/IconButton";
+import { IconButton } from "./IconButton";
 
 export const OpenSettingsButton: React.FC<PressableProps> = (props) => {
   const dispatch = useDispatch();

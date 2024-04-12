@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
   setSwitchToChromaticScale,
-} from "../../store/controlPanelSlice";
-import { CheckBox, Styleable } from "../core/CheckBox";
+} from "../../../store/controlPanelSlice";
+import { CheckBox, Styleable } from "./CheckBox";
 
 export const SwitchToChromaticScaleCheckbox: React.FC<Styleable> = (props) => {
   const { switchToChromaticScale } = useSelector(selectControlPanel);

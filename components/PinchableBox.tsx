@@ -8,7 +8,9 @@ import {
   PinchGestureHandlerEventPayload,
   State,
 } from "react-native-gesture-handler";
+import { useSelector } from "react-redux";
 import { useScreenOrientation } from "../engine/useScreenOrientation";
+import { selectControlPanel } from "../store/controlPanelSlice";
 import { tw } from "../tailwind";
 
 interface PinchableBoxProps {
@@ -29,14 +31,33 @@ let baseScale = new Animated.Value(lastScale);
 let pinchScale = new Animated.Value(lastScale);
 
 export const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
+  const { fretboardScaleX } = useSelector(selectControlPanel);
   const orientation = useScreenOrientation();
+
+  // magic numbers!
+  const widthLimit = 1000 / fretboardScaleX;
+  const initialXBelowLimit = -150 / fretboardScaleX;
+  const initialXAboveLimit = 0 / fretboardScaleX;
+  const heightLimit = 500;
+  const initialYBelowLimit = -10;
+  const initialYAboveLimit = 50;
+
+  const minXInterpolationForZoomOut = -800 / fretboardScaleX;
+  const minXInterpolationForNoZoom = -1400 / fretboardScaleX;
+  const minXInterpolationForZoomIn = -3000 / fretboardScaleX;
+
+  const maxXInterpolationForZoomOut = -250 / fretboardScaleX;
+  const maxXInterpolationForNoZoom = 50 / fretboardScaleX;
+  const maxXInterpolationForZoomIn = -200 / fretboardScaleX;
 
   useEffect(() => {
     console.log(orientation);
     const dimensions = Dimensions.get("screen");
 
-    initialX = dimensions.width < 1000 ? -150 : 0;
-    initialY = dimensions.height > 500 ? 50 : -10;
+    initialX =
+      dimensions.width < widthLimit ? initialXBelowLimit : initialXAboveLimit;
+    initialY =
+      dimensions.height > heightLimit ? initialYAboveLimit : initialYBelowLimit;
     lastTranslateX = initialX;
     lastTranslateY = initialY;
     onPanHandlerStateChange({
@@ -67,13 +88,37 @@ export const PinchableBox: React.FC<PinchableBoxProps> = ({ children }) => {
 
     const maxX =
       lastScale < 1
-        ? interpolate(lastScale, minScale, 1, -250, 50)
-        : interpolate(lastScale, 1, maxScale, 50, -200);
+        ? interpolate(
+            lastScale,
+            minScale,
+            1,
+            maxXInterpolationForZoomOut,
+            maxXInterpolationForNoZoom
+          )
+        : interpolate(
+            lastScale,
+            1,
+            maxScale,
+            maxXInterpolationForNoZoom,
+            maxXInterpolationForZoomIn
+          );
 
     const minX =
       lastScale < 1
-        ? interpolate(lastScale, minScale, 1, -800, -1400)
-        : interpolate(lastScale, 1, maxScale, -1400, -3000);
+        ? interpolate(
+            lastScale,
+            minScale,
+            1,
+            minXInterpolationForZoomOut,
+            minXInterpolationForNoZoom
+          )
+        : interpolate(
+            lastScale,
+            1,
+            maxScale,
+            minXInterpolationForZoomIn,
+            minXInterpolationForZoomIn
+          );
 
     const clampedTranslateX = Math.max(minX, Math.min(maxX, newTranslateX));
 

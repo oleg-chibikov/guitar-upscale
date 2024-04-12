@@ -7,7 +7,7 @@ import {
   setSelectedScale,
   setSelectedScaleGroup,
 } from "../../../store/controlPanelSlice";
-import { IconButton } from "../../core/IconButton";
+import { IconButton } from "./IconButton";
 
 export const OpenChordsButton: React.FC<PressableProps> = (props) => {
   const dispatch = useDispatch();

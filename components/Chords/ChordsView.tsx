@@ -1,19 +1,19 @@
-import { memo, useRef } from "react";
-import { View } from "react-native";
+import { memo, useEffect, useRef, useState } from "react";
+import { Dimensions, View } from "react-native";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
-import { StringOctaveNote, getNoteText } from "../../data/notes";
+import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
+import { Chord, getNoteText } from "../../data/notes";
 import { NotePlayEventBus } from "../../engine/eventBus";
+
 import {
   ChordMode,
   NoteChordMode,
+  getClosestVariation,
   getModeText,
-} from "../../engine/generateChords";
+} from "../../engine/chordsGenerator";
 import { sleep } from "../../engine/sleep";
-import {
-  calculateAverage,
-  findObjectWithMinValue,
-} from "../../helpers/arrayHelper";
+import { useInputChecker } from "../../helpers/useInputChecker";
 import { selectControlPanel } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 import { ChordButton } from "./ChordButton";
@@ -28,19 +28,32 @@ export const ChordsView: React.FC = memo(() => {
     chordPlayMode,
   } = useSelector(selectControlPanel);
 
-  const { chordsExpanded } = useSelector(selectControlPanel);
+  const [height, setHeight] = useState(Dimensions.get("window").height);
+
+  useEffect(() => {
+    var handler = Dimensions.addEventListener("change", (e) => {
+      // TODO: Debounce and use CSS media queries on web instead
+      setHeight(e.window.height);
+    });
+    return () => handler.remove();
+  }, []);
+
+  // it's ergonomic to display chords vertically for touch devices in order to play with right hand
+  const hasTouchInput = useInputChecker();
+  const { chordsExpanded, selectedChordsDisplayMode } =
+    useSelector(selectControlPanel);
   const chordRoundRobinMap = useRef(new Map<string, number>()).current;
 
   if (!chordsExpanded || !neck || !chords) {
     return null;
   }
 
-  const selectRandomVariation = (variations: StringOctaveNote[][]) => {
+  const selectRandomVariation = (variations: Chord[]) => {
     const randomIndex = Math.floor(Math.random() * variations.length);
     return variations[randomIndex];
   };
 
-  const playVariation = async (variation: StringOctaveNote[]) => {
+  const playVariation = async (variation: Chord) => {
     for (const note of variation) {
       NotePlayEventBus.next(note);
       await sleep(chordStrummingDelayMs);
@@ -58,14 +71,10 @@ export const ChordsView: React.FC = memo(() => {
   };
 
   const playClosestChordVariation = async (mode: NoteChordMode) => {
-    const variationAvgDistances = mode.variations.map((variation) => {
-      const distances = variation.map((note) => note.fret);
-      const avgDistance = calculateAverage(distances);
-      return { object: variation, number: avgDistance };
-    });
-    const variation = findObjectWithMinValue(variationAvgDistances);
-
-    await playVariation(variation);
+    const closestVariation = getClosestVariation(mode);
+    if (closestVariation) {
+      await playVariation(closestVariation);
+    }
   };
 
   const playAllVariations = async (mode: NoteChordMode) => {
@@ -92,11 +101,17 @@ export const ChordsView: React.FC = memo(() => {
   return (
     <View
       style={[
-        tw`opacity-95 right-1 z-20 bottom-1 ${bg} p-1 gap-1 flex flex-row`,
+        tw`opacity-95 ${
+          selectedChordsDisplayMode === ChordsDisplayMode.Left
+            ? "left"
+            : "right"
+        }-1 z-20 bottom-1 ${bg} p-1 gap-1 flex ${
+          !hasTouchInput ? "flex-row" : "flex-col"
+        }`,
         {
           overflow: "auto",
           position: "fixed",
-          maxWidth: "95%",
+          maxWidth: height < 700 ? 200 : "95%", // when height is 700+ there's enough space under the guitar to show full chords
           maxHeight: "95%",
         },
       ]}
@@ -104,7 +119,10 @@ export const ChordsView: React.FC = memo(() => {
       {chords.map((noteChord) => (
         <View
           key={noteChord.note}
-          style={[tw`gap-1 flex flex-col`, { justifyContent: "space-between" }]}
+          style={[
+            tw`gap-1 flex  ${!hasTouchInput ? "flex-col" : "flex-row"}`,
+            { justifyContent: "space-between" },
+          ]}
         >
           {noteChord.modes.map((mode) => {
             if (
@@ -114,7 +132,6 @@ export const ChordsView: React.FC = memo(() => {
             ) {
               return null;
             }
-
             const title = getNoteText(noteChord.note) + getModeText(mode.mode);
 
             return (

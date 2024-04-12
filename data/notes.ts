@@ -62,3 +62,5 @@ export const serializeOctaveNote = (note: OctaveNote) =>
 
 export const serializeStringOctaveNote = (note: StringOctaveNote) =>
   [note.string, note.octave, note.note].join("_");
+
+export type Chord = StringOctaveNote[];

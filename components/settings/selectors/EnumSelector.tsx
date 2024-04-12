@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
-import { tw } from "../../tailwind";
+import { tw } from "../../../tailwind";
 
 interface EnumSelectorProps<T> {
   enumObj: T;

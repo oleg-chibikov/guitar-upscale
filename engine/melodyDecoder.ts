@@ -1,10 +1,11 @@
-import { Note, StringOctaveNote } from "../data/notes";
+import { Chord, Note, StringOctaveNote } from "../data/notes";
+import { ChordEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 
 export const decodeMelody = async (
   melody: string,
   play: (note: StringOctaveNote) => void,
-  wait: () => Promise<void>,
+  waitNote: () => Promise<void>,
   neck: Neck,
   baseNote: Note,
   isPlayingRef: React.MutableRefObject<boolean>
@@ -14,7 +15,9 @@ export const decodeMelody = async (
   let nextIsString = false;
   let fretNumberBuilder = "";
   let nextIsImmediateString = false;
+  let nextIsImmediateChord = false;
   let immediateStringNumber: number | undefined;
+  let immediateChord: string | undefined;
   let indexToRepeat: number | undefined;
   let repeatCount: number | undefined;
   while (index < melody.length) {
@@ -25,7 +28,27 @@ export const decodeMelody = async (
     const nextChar = index !== melody.length - 1 && melody[index + 1];
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
-    if (isNumeric) {
+    const playChordAndReset = () => {
+      if (immediateChord != undefined) {
+        nextIsImmediateChord = false;
+        ChordEventBus.next(immediateChord);
+        immediateChord = undefined;
+      }
+    };
+    if (nextIsImmediateChord) {
+      if (char === ">") {
+        // end recording chord
+        playChordAndReset();
+      } else {
+        // keep recording chord
+        if (!immediateChord) {
+          immediateChord = char;
+        } else {
+          immediateChord += char;
+        }
+      }
+    } else if (isNumeric) {
+      // note
       if (nextIsImmediateString) {
         // Remember the string number to play ONLY with the next note
         immediateStringNumber = number;
@@ -58,14 +81,16 @@ export const decodeMelody = async (
             neck,
             stringNumber,
             play,
-            wait
+            waitNote
           );
           fretNumberBuilder = "";
         }
       }
     } else if (char === "(") {
+      // repeat section start
       indexToRepeat = index;
     } else if (char === ")") {
+      // repeat section end
       if (indexToRepeat !== undefined) {
         if (repeatCount !== undefined) {
           if (repeatCount === 0) {
@@ -85,11 +110,17 @@ export const decodeMelody = async (
         }
       }
     } else if (char === "_") {
-      await wait();
+      // wait between notes
+      await waitNote();
     } else if (char === "*") {
+      // set string marker for upcoming (not immediate) notes
       nextIsString = true;
     } else if (char === "^") {
+      // start recording immediate string
       nextIsImmediateString = true;
+    } else if (char === "<") {
+      // start recording immediate string
+      nextIsImmediateChord = true;
     }
 
     index++;
@@ -107,9 +138,17 @@ async function playNote(
   const string = neck[stringNumber];
   const stringOctaveNote = string[fret];
   if (stringOctaveNote) {
-    play(stringOctaveNote);
-    if (wait) {
-      await wait();
-    }
+    await playStringOctaveNote(stringOctaveNote, play, wait);
+  }
+}
+
+async function playStringOctaveNote(
+  stringOctaveNote: StringOctaveNote,
+  play: (note: StringOctaveNote) => void,
+  wait?: () => Promise<void>
+) {
+  play(stringOctaveNote);
+  if (wait) {
+    await wait();
   }
 }
