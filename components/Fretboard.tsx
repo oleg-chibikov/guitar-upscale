@@ -44,21 +44,25 @@ export const Fretboard: React.FC<FretboardProps> = ({
   onImageLoaded,
   isCollapsed = false,
 }) => {
-  const { neck, selectedSkin, fretboardScaleX } =
+  const { neck, skin, fretboardScaleX, fretboardScaleY, mainBg } =
     useSelector(selectControlPanel);
 
   if (!neck) {
     return null;
   }
 
-  const dimensions = getDimensionsForSkin(selectedSkin);
+  const dimensions = getDimensionsForSkin(skin);
 
   return (
     <View
       style={[
         tw`mt-24 mb-24`,
         {
-          transform: [{ scale: scaleFactor }, { scaleX: 1 / fretboardScaleX }],
+          transform: [
+            { scale: scaleFactor },
+            { scaleX: 1 / fretboardScaleX },
+            { scaleY: 1 / fretboardScaleY },
+          ],
           transformOrigin: "top left",
           opacity: isCollapsed ? 0 : 1,
         },
@@ -91,7 +95,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
       </View>
       <Image
         style={[
-          tw`absolute`,
+          tw`absolute ${mainBg}`,
           dimensions,
           {
             width: 5504,

@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
   setChordsExpanded,
-  setSelectedScale,
-  setSelectedScaleGroup,
+  setScale,
+  setScaleGroup,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
@@ -20,8 +20,8 @@ export const OpenChordsButton: React.FC<PressableProps> = (props) => {
       isActive={chordsExpanded}
       onPress={() => {
         if (switchToChromaticScale && !chordsExpanded) {
-          dispatch(setSelectedScaleGroup("Special"));
-          dispatch(setSelectedScale("Chromatic (All notes)"));
+          dispatch(setScaleGroup("Special"));
+          dispatch(setScale("Chromatic (All notes)"));
         }
         dispatch(setChordsExpanded(!chordsExpanded));
       }}

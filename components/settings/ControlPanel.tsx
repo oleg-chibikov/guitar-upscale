@@ -7,23 +7,23 @@ import { tw } from "../../tailwind";
 import { ChordsView } from "../chords/ChordsView";
 import { SettingsView } from "./SettingsView";
 import { ButtonContainer } from "./buttons/ButtonContainer";
+import { LockRatioButton } from "./buttons/LockRatioButton";
 import { ScaleSelector } from "./selectors/ScaleSelector";
 import { FretboardScaleXSlider } from "./sliders/FretboardScaleXSlider";
+import { FretboardScaleYSlider } from "./sliders/FretboardScaleYSlider";
 
 export const ControlPanel: React.FC = () => {
-  const { selectedChordsDisplayMode } = useSelector(selectControlPanel);
+  const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
     <>
       <View
         style={[
           tw`z-30 top-1 ${
             // it should be on the opposite side of chords to avoid overlapping
-            selectedChordsDisplayMode === ChordsDisplayMode.Left
-              ? "right"
-              : "left"
+            chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
           }-1} flex ${
             // it should be on the opposite side of chords to avoid overlapping
-            selectedChordsDisplayMode === ChordsDisplayMode.Left
+            chordsDisplayMode === ChordsDisplayMode.Left
               ? "flex-row-reverse"
               : "flex-row"
           } gap-1 items-center`,
@@ -40,13 +40,12 @@ export const ControlPanel: React.FC = () => {
       </View>
       <SettingsView />
       <ChordsView />
+
       <View
         style={[
           tw`z-30 bottom-1 ${
             // it should be on the opposite side of chords to avoid overlapping
-            selectedChordsDisplayMode === ChordsDisplayMode.Left
-              ? "right"
-              : "left"
+            chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
           }-1}`,
           {
             position: "fixed",
@@ -54,6 +53,32 @@ export const ControlPanel: React.FC = () => {
         ]}
       >
         <FretboardScaleXSlider />
+      </View>
+      <View
+        style={[
+          tw`z-30 bottom-7 ${
+            // it should be on the opposite side of chords to avoid overlapping
+            chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
+          }-1}`,
+          {
+            position: "fixed",
+          },
+        ]}
+      >
+        <FretboardScaleYSlider />
+      </View>
+      <View
+        style={[
+          tw`z-30 bottom-7 ${
+            // it should be on the opposite side of chords to avoid overlapping
+            chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
+          }-12}`,
+          {
+            position: "fixed",
+          },
+        ]}
+      >
+        <LockRatioButton />
       </View>
     </>
   );

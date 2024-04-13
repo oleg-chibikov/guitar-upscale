@@ -6,14 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { ScaleObject, scalesMap } from "../../../data/scales";
 import {
   selectControlPanel,
-  setSelectedScale,
-  setSelectedScaleGroup,
+  setScale,
+  setScaleGroup,
 } from "../../../store/controlPanelSlice";
 import { tw } from "../../../tailwind";
 
 export const ScaleSelector: React.FC = () => {
-  const { selectedScale, selectedScaleGroup, bg, textStyle } =
-    useSelector(selectControlPanel);
+  const { scale, scaleGroup, bg, textStyle } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const scales = scalesMap;
@@ -32,26 +31,26 @@ export const ScaleSelector: React.FC = () => {
       <Text style={textStyle}>Style:</Text>
       <Picker
         style={tw`text-md`}
-        selectedValue={selectedScaleGroup}
+        selectedValue={scaleGroup}
         onValueChange={(value) => {
-          dispatch(setSelectedScaleGroup(value));
+          dispatch(setScaleGroup(value));
         }}
       >
         {Array.from(scales.entries()).map((scale, index) => (
           <Picker.Item key={index} label={scale[0]} value={scale[0]} />
         ))}
       </Picker>
-      {selectedScaleGroup && (
+      {scaleGroup && (
         <>
           <Text style={textStyle}>Scale:</Text>
           <Picker
             style={tw`text-md`}
-            selectedValue={selectedScale}
+            selectedValue={scale}
             onValueChange={(value) => {
-              dispatch(setSelectedScale(value));
+              dispatch(setScale(value));
             }}
           >
-            {Array.from(scales.get(selectedScaleGroup)!.entries()).map(
+            {Array.from(scales.get(scaleGroup)!.entries()).map(
               (scale, index) => {
                 const scaleObject = scale[1];
                 const hasExamples =

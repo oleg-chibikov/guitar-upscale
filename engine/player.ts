@@ -65,7 +65,7 @@ export const playWholeScale = async (
       }
 
       console.log("Requesting auto play note: " + JSON.stringify(note));
-      NotePlayEventBus.next(note);
+      NotePlayEventBus.next({ note, metadata: { fromChord: false } });
       await wait();
     }
   }
@@ -93,7 +93,7 @@ export const playExample = async (
       console.log(
         "Requesting auto play note in a melody: " + JSON.stringify(note)
       );
-      NotePlayEventBus.next(note);
+      NotePlayEventBus.next({ note, metadata: { fromChord: false } });
     },
     waitNote,
     neck,

@@ -1,30 +1,54 @@
 import { Subject } from "rxjs";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
 
-export const NotePlayEventBus = new Subject<StringOctaveNote>();
+export type NoteMetadata = {
+  fromChord?: boolean;
+  clearChordMarker?: boolean;
+};
+
+export type NoteWithPlayMetadata = {
+  note: StringOctaveNote;
+  metadata: NoteMetadata;
+};
+
+export const NotePlayEventBus = new Subject<NoteWithPlayMetadata>();
 export const ChordEventBus = new Subject<string>();
 
-export const NoteToFretMarkerEventMap: Map<string, () => void> = new Map<
+export const NoteToFretMarkerEventMap: Map<
   string,
-  () => void
->();
+  (metadata: NoteMetadata) => void
+> = new Map<string, () => void>();
 
 export const ChordToChordButtonEventMap: Map<string, () => void> = new Map<
   string,
   () => void
 >();
 
-NotePlayEventBus.subscribe((note: StringOctaveNote) => {
-  const serialized = serializeStringOctaveNote(note);
+export const ClearChordMarkerSet: Set<string> = new Set<string>();
+
+let lastChord: string | undefined;
+
+NotePlayEventBus.subscribe((note: NoteWithPlayMetadata) => {
+  const serialized = serializeStringOctaveNote(note.note);
   console.log("EventBus: Note play requested: " + serialized);
   const playAction = NoteToFretMarkerEventMap.get(serialized);
+  if (note.metadata.fromChord && playAction) {
+    ClearChordMarkerSet.add(serialized);
+  }
 
-  playAction?.();
+  playAction?.(note.metadata);
 });
 
 ChordEventBus.subscribe((chord: string) => {
   console.log("EventBus: chord play requested: " + chord);
+  for (const note of ClearChordMarkerSet) {
+    const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
+    noteFromThePreviousChordAction?.({ clearChordMarker: true });
+  }
+  ClearChordMarkerSet.clear(); // clear previous chord;
+
   const playAction = ChordToChordButtonEventMap.get(chord);
 
   playAction?.();
+  lastChord = chord;
 });

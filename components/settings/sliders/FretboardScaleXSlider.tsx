@@ -2,6 +2,8 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  maxXZoom,
+  minXZoom,
   selectControlPanel,
   setFretboardScaleX,
 } from "../../../store/controlPanelSlice";
@@ -17,17 +19,16 @@ export const FretboardScaleXSlider: React.FC = () => {
   };
 
   return (
-    <View style={[tw`items-center flex flex-col gap-2`]}>
+    <View style={[tw`items-center flex flex-row gap-2`]}>
       <Slider
         onValueChange={handleSliderChange}
         value={fretboardScaleX * 10}
-        minimumValue={10}
-        maximumValue={30}
+        minimumValue={minXZoom * 10}
+        maximumValue={maxXZoom * 10}
         step={1}
-        style={tw`h-32`}
-        isVertical
+        style={tw`w-32`}
       />
-      <Text style={textStyle}>{fretboardScaleX}</Text>
+      <Text style={textStyle}>X{(1 / fretboardScaleX).toFixed(2)}</Text>
     </View>
   );
 };

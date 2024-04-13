@@ -67,10 +67,9 @@ export const Fretline: React.FC<FretlineProps> = ({
   string,
   isHeader,
 }) => {
-  const { selectedSkin } = useSelector(selectControlPanel);
+  const { skin } = useSelector(selectControlPanel);
 
-  const { widthStep, height, stringTiltModifiers } =
-    getParametersForSkin(selectedSkin);
+  const { widthStep, height, stringTiltModifiers } = getParametersForSkin(skin);
   const widthFactor = 1.06;
   const initialWidth = (NoteCount + 1) * widthStep; // Initial width for the first fret
 

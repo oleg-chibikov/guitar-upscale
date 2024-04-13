@@ -18,7 +18,7 @@ import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
 import { VelocitySlider } from "./sliders/VelocitySlider";
 
 export const SettingsView: React.FC = () => {
-  const { settingsExpanded, bg, textStyle, selectedChordsDisplayMode } =
+  const { settingsExpanded, bg, textStyle, chordsDisplayMode } =
     useSelector(selectControlPanel);
   return (
     settingsExpanded && (
@@ -26,9 +26,7 @@ export const SettingsView: React.FC = () => {
         style={[
           tw`opacity-95 ${
             // it should be on the opposite side of chords to avoid overlapping
-            selectedChordsDisplayMode === ChordsDisplayMode.Left
-              ? "right"
-              : "left"
+            chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
           }-1 z-40 top-15 ${bg} p-2 gap-2`,
           {
             maxWidth: "95%",

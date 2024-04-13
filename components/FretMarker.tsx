@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
@@ -32,28 +32,40 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 }) => {
   const {
     velocity,
-    selectedBaseNote,
-    selectedNoteDisplayMode,
+    baseNote,
+    noteDisplayMode,
     neck,
     chordStrummingDelayMs,
     fretboardScaleX,
+    fretboardScaleY,
     isRecording,
   } = useSelector(selectControlPanel);
 
   const hasTouchInput = useInputChecker();
+  const [isFromPreviousChord, setIsFromPreviousChord] =
+    useState<boolean>(false);
+  useState<boolean>();
 
   const isInScale: boolean = stringOctaveNote !== undefined;
   const note: Note | undefined = stringOctaveNote?.note;
   const coloredHeaders = new Set<number>([
     0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24,
   ]);
+
   const isColored =
     (isHeader &&
       stringOctaveNote &&
       coloredHeaders.has(stringOctaveNote?.fret)) ||
-    note === selectedBaseNote;
-  const bg: string = isColored ? "bg-orange-500" : "bg-orange-100";
-  const color: string = isColored ? "text-black" : "text-red-500";
+    note === baseNote;
+  const bg: string = isColored
+    ? isFromPreviousChord
+      ? "bg-indigo-500"
+      : "bg-orange-400"
+    : isFromPreviousChord
+    ? "bg-green-500"
+    : "bg-orange-100";
+  const color: string =
+    isFromPreviousChord || isColored ? "text-black" : "text-red-500";
 
   // Animation state
   const glowAnim = useRef(new Animated.Value(0)).current;
@@ -61,13 +73,29 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   useEffect(() => {
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
-      NoteToFretMarkerEventMap.set(key, () => {
-        console.log("Playing note (auto): " + JSON.stringify(stringOctaveNote));
-        playNoteAndAnimate();
+      NoteToFretMarkerEventMap.set(key, (metadata) => {
+        if (metadata.clearChordMarker) {
+          // console.log(
+          //   "Clearning previous chord marker: " +
+          //     JSON.stringify(stringOctaveNote)
+          // );
+          setIsFromPreviousChord(false);
+        } else {
+          // console.log(
+          //   "Playing note (auto): " + JSON.stringify(stringOctaveNote)
+          // );
+          playNoteAndAnimate();
+          if (metadata.fromChord) {
+            // console.log(
+            //   "Setting chord marker: " + JSON.stringify(stringOctaveNote)
+            // );
+            setIsFromPreviousChord(true);
+          }
+        }
       });
       return () => {
         // TODO: Why deleting handlers here leads to absense of sounds? they should be recreated
-        // NoteToFretMarkerEventMap.delete(key);
+        NoteToFretMarkerEventMap.delete(key);
       };
     }
     return () => {};
@@ -103,7 +131,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         const string = neck[stringIndex];
         const note = string[fret];
         if (note) {
-          NotePlayEventBus.next(note);
+          NotePlayEventBus.next({ note, metadata: { fromChord: false } });
           await sleep(chordStrummingDelayMs);
         }
       }
@@ -112,7 +140,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
     if (stringOctaveNote) {
-      NotePlayEventBus.next(stringOctaveNote);
+      NotePlayEventBus.next({
+        note: stringOctaveNote,
+        metadata: { fromChord: false },
+      });
     }
   };
   return (
@@ -151,6 +182,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                     },
                     {
                       scaleX: fretboardScaleX,
+                    },
+                    {
+                      scaleY: fretboardScaleY,
                     },
                   ],
                 },
@@ -195,6 +229,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                           {
                             scaleX: fretboardScaleX,
                           },
+                          {
+                            scaleY: fretboardScaleY,
+                          },
                         ]
                       : undefined,
                   },
@@ -210,6 +247,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                             {
                               scaleX: fretboardScaleX,
                             },
+                            {
+                              scaleY: fretboardScaleY,
+                            },
                           ]
                         : undefined,
                     },
@@ -217,7 +257,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 >
                   {isHeader
                     ? stringOctaveNote.note
-                    : selectedNoteDisplayMode === NoteDisplayMode.Note
+                    : noteDisplayMode === NoteDisplayMode.Note
                     ? getNoteText(stringOctaveNote.note) +
                       stringOctaveNote.octave
                     : fret}

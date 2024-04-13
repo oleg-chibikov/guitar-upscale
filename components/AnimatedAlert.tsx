@@ -49,7 +49,7 @@ export const AnimatedAlert: React.FC<AnimatedAlertProps> = ({
   return (
     <Animated.View
       style={[
-        tw`w-56 p-4 bg-green-300 absolute opacity-90 top-3 left-0 right-0 m-auto z-50 flex items-center`,
+        tw`w-56 p-4 bg-green-300 absolute opacity-90 top-3 left-0 right-0 m-auto z-100 flex items-center justify-center`,
         { transform: [{ translateY }] },
       ]}
     >

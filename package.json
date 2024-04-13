@@ -7,14 +7,16 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "copy app.dev.json app.json && expo start --web",
-    "copy-files": "ncp .surgeignore dist/.surgeignore && ncp manifest.json dist/manifest.json && ncp assets/icon.png dist/icon.png && ncp assets/icon512.png dist/icon512.png && ncp assets/icon192.png dist/icon192.png",
-    "copy-manifest": "",
+    "copy-files": "ncp .surgeignore dist/.surgeignore && ncp manifest.json dist/manifest.json && ncp assets/icon.png dist/icon.png && ncp assets/icon512.png dist/icon512.png && ncp assets/icon192.png dist/icon192.png && ncp ads.txt dist/ads.txt",
     "build-web": "copy app.prod.json app.json && expo export -p web && npm run copy-files",
     "serve-build-web": "npm run build-web && serve dist --single",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
     "deploy-surge-org.uk": "surge --domain guitar-upscale.org.uk dist/",
     "deploy-surge-co.uk": "surge --domain guitar-upscale.co.uk dist/",
-    "build-and-deploy-web": "npm run build-web && npm run deploy-surge"
+    "build-and-deploy-web-stage": "npm run build-web && npm run deploy-surge",
+    "build-and-deploy-web-prod-1": "npm run build-web && npm run deploy-surge-org.uk",
+    "build-and-deploy-web-prod-2": "npm run build-web && npm run deploy-surge-co.uk",
+    "build-and-deploy-web-all": "npm run build-web && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.1.3",

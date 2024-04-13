@@ -1,45 +1,84 @@
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Text } from "react-native"; // Import Animated and Easing
-import { ChordToChordButtonEventMap } from "../../engine/eventBus";
+import { useSelector } from "react-redux";
+import { ChordPlayMode } from "../../data/chordPlayMode";
+import {
+  playAllVariations,
+  playClosestChordVariation,
+  playFirstChordVariation,
+  playRandomChordVariation,
+  playRoundRobin,
+} from "../../engine/chordPlayer";
+import { NoteChordMode } from "../../engine/chordsGenerator";
+import {
+  ChordEventBus,
+  ChordToChordButtonEventMap,
+} from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
+import { selectControlPanel } from "../../store/controlPanelSlice";
 import { tw } from "../../tailwind";
 
 interface ChordButtonProps {
   chordName: string; // Change chord to chordName
-  onPress: () => void;
-  disabled?: boolean;
+  noteChordMode: NoteChordMode;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
-  onPress,
-  disabled,
+  noteChordMode,
 }) => {
+  const { chordPlayMode, chords, chordStrummingDelayMs } =
+    useSelector(selectControlPanel);
+  const disabled = !noteChordMode.variations.length;
   useEffect(() => {
-    ChordToChordButtonEventMap.set(chordName, () => {
-      console.log("Playing chord (auto): " + chordName);
-      handleClick();
+    ChordToChordButtonEventMap.set(chordName, async () => {
+      if (disabled) {
+        console.log("Chord not enabled: " + chordName);
+        return;
+      }
+
+      console.log("Playing chord: " + chordName);
+
+      // Start the animation sequence
+      startAnimation();
+
+      const delayMs = chordStrummingDelayMs;
+
+      switch (chordPlayMode) {
+        case ChordPlayMode.RoundRobin:
+          await playRoundRobin(chordName, noteChordMode, delayMs);
+          return;
+        case ChordPlayMode.AllVariations:
+          return await playAllVariations(chordName, noteChordMode, delayMs);
+        case ChordPlayMode.FirstVariation:
+          return await playFirstChordVariation(
+            chordName,
+            noteChordMode,
+            delayMs
+          );
+        case ChordPlayMode.ClosestVariation:
+          return await playClosestChordVariation(
+            chordName,
+            noteChordMode,
+            delayMs
+          );
+        case ChordPlayMode.RandomVariation:
+          return await playRandomChordVariation(
+            chordName,
+            noteChordMode,
+            delayMs
+          );
+      }
     });
     return () => {
       // TODO: Why deleting handlers here leads to absense of sounds? they should be recreated
-      // NoteToFretMarkerEventMap.delete(key);
+      ChordToChordButtonEventMap.delete(chordName);
     };
-  }, [chordName]);
+  }, [chordName, chordPlayMode, chords, disabled, chordStrummingDelayMs]);
   const hasTouchInput = useInputChecker();
   const [scaleAnim] = useState(new Animated.Value(1)); // State for scaling animation
   const [opacityAnim] = useState(new Animated.Value(1)); // State for opacity animationconst
   const [colorAnim] = useState(new Animated.Value(0)); // State for color animation
-
-  const handleClick = () => {
-    if (disabled) {
-      return;
-    }
-
-    onPress();
-
-    // Start the animation sequence
-    startAnimation();
-  };
 
   const animationTime = 300;
   const easing = Easing.ease;
@@ -100,13 +139,16 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         // using onTouchStart on a View supports multiouch (play chords), while the other methods don't seem to support
         if (hasTouchInput) {
           // this event handler is only for touch devices
-          await handleClick();
+
+          ChordEventBus.next(chordName);
         }
       }}
       onStartShouldSetResponder={() => {
         if (!hasTouchInput) {
+          console.log(2);
           // this event handler is only for mouse devices
-          handleClick();
+
+          ChordEventBus.next(chordName);
         }
         return true;
       }} // Capture both touch and mouse events

@@ -3,20 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../../data/noteDisplayMode";
 import {
   selectControlPanel,
-  setSelectedNoteDisplayMode,
+  setNoteDisplayMode,
 } from "../../../store/controlPanelSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const NoteDisplayModeSelector: React.FC = () => {
-  const { selectedNoteDisplayMode } = useSelector(selectControlPanel);
+  const { noteDisplayMode } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   return (
     <EnumSelector
       enumObj={NoteDisplayMode}
-      selectedValue={selectedNoteDisplayMode}
+      selectedValue={noteDisplayMode}
       onValueChange={(value) => {
-        dispatch(setSelectedNoteDisplayMode(value));
+        dispatch(setNoteDisplayMode(value));
       }}
     />
   );

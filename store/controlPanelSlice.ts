@@ -66,6 +66,11 @@ const getViewSettings = (theme: Theme) => {
   };
 };
 
+export const minXZoom = 1;
+export const maxXZoom = 3;
+export const minYZoom = 0.7;
+export const maxYZoom = 1;
+
 const initialSettings = getViewSettings(initialTheme);
 
 interface WithNeck {
@@ -75,15 +80,15 @@ interface WithNeck {
 }
 
 interface WithControls {
-  selectedScaleGroup: string;
-  selectedScale: string;
-  selectedBaseNote: Note;
+  scaleGroup: string;
+  scale: string;
+  baseNote: Note;
 }
 
 interface ControlPanelState extends WithNeck, WithControls {
-  selectedNoteDisplayMode: NoteDisplayMode;
-  selectedChordsDisplayMode: ChordsDisplayMode;
-  selectedSkin: Skin;
+  noteDisplayMode: NoteDisplayMode;
+  chordsDisplayMode: ChordsDisplayMode;
+  skin: Skin;
   settingsExpanded: boolean;
   isRecording: boolean;
   chordsExpanded: boolean;
@@ -102,15 +107,17 @@ interface ControlPanelState extends WithNeck, WithControls {
   textStyle: StyleProp<TextStyle>;
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
+  fretboardScaleY: number;
+  lockRatio: boolean;
 }
 
 const initialState: ControlPanelState = {
-  selectedScaleGroup: "Special",
-  selectedScale: "Chromatic (All notes)",
-  selectedBaseNote: Note.E,
-  selectedNoteDisplayMode: NoteDisplayMode.Fret,
-  selectedChordsDisplayMode: ChordsDisplayMode.Left,
-  selectedSkin: Skin.Yamaha_SLG200NW,
+  scaleGroup: "Special",
+  scale: "Chromatic (All notes)",
+  baseNote: Note.E,
+  noteDisplayMode: NoteDisplayMode.Fret,
+  chordsDisplayMode: ChordsDisplayMode.Left,
+  skin: Skin.Yamaha_SLG200NW,
   neck: null,
   chords: null,
   chordsMap: null,
@@ -132,11 +139,12 @@ const initialState: ControlPanelState = {
   textStyle: initialSettings.textStyle,
   chordPlayMode: ChordPlayMode.RoundRobin,
   fretboardScaleX: 1,
+  fretboardScaleY: 1,
+  lockRatio: false,
 };
 
 // A value that changes immediately without the need for rerender
 export let playIntervalBpmValue: number | undefined = undefined;
-export let chordStrummingDelayMsValue: number | undefined = undefined;
 export let velocityValue: number | undefined = undefined;
 export let examplesForScale: Example[] | undefined = undefined;
 export const setExamples = (examples?: Example[]) => {
@@ -144,9 +152,7 @@ export const setExamples = (examples?: Example[]) => {
 };
 
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
-  const scaleObject = scalesMap
-    .get(state.selectedScaleGroup)!
-    .get(state.selectedScale);
+  const scaleObject = scalesMap.get(state.scaleGroup)!.get(state.scale);
   setExamples(getScaleExamples(scaleObject));
   let scaleNotes = getScaleNotes(scaleObject);
   const scalePattern = new Set(scaleNotes?.concat([0]));
@@ -156,7 +162,7 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   const neck = generateNeckRepresentation(
     scalePattern,
     stringTuning,
-    state.selectedBaseNote
+    state.baseNote
   );
   state.neck = neck;
   setChords(state);
@@ -183,6 +189,26 @@ const setChords = (state: WithNeck) => {
   }
 };
 
+const calculatePercentage = (
+  minimum: number,
+  maximum: number,
+  currentPosition: number
+): number => {
+  const percentage: number =
+    ((currentPosition - minimum) / (maximum - minimum)) * 100;
+  return percentage;
+};
+
+const getValueFromPercentage = (
+  minimum: number,
+  maximum: number,
+  percentage: number
+): number => {
+  const range = maximum - minimum;
+  const valueInRange = (percentage / 100) * range + minimum;
+  return valueInRange;
+};
+
 export const controlPanelSlice = createSlice({
   name: "controlPanel",
   initialState,
@@ -190,33 +216,27 @@ export const controlPanelSlice = createSlice({
     init: (state) => {
       onGuitarSettingsUpdate(state);
     },
-    setSelectedScaleGroup: (state, action: PayloadAction<string>) => {
-      state.selectedScaleGroup = action.payload;
-      state.selectedScale = getFirstScaleForGroup(action.payload);
+    setScaleGroup: (state, action: PayloadAction<string>) => {
+      state.scaleGroup = action.payload;
+      state.scale = getFirstScaleForGroup(action.payload);
       onGuitarSettingsUpdate(state);
     },
-    setSelectedScale: (state, action: PayloadAction<string>) => {
-      state.selectedScale = action.payload;
+    setScale: (state, action: PayloadAction<string>) => {
+      state.scale = action.payload;
       onGuitarSettingsUpdate(state);
     },
-    setSelectedBaseNote: (state, action: PayloadAction<Note>) => {
-      state.selectedBaseNote = action.payload;
+    setBaseNote: (state, action: PayloadAction<Note>) => {
+      state.baseNote = action.payload;
       onGuitarSettingsUpdate(state);
     },
-    setSelectedNoteDisplayMode: (
-      state,
-      action: PayloadAction<NoteDisplayMode>
-    ) => {
-      state.selectedNoteDisplayMode = action.payload;
+    setNoteDisplayMode: (state, action: PayloadAction<NoteDisplayMode>) => {
+      state.noteDisplayMode = action.payload;
     },
-    setSelectedChordsDisplayMode: (
-      state,
-      action: PayloadAction<ChordsDisplayMode>
-    ) => {
-      state.selectedChordsDisplayMode = action.payload;
+    setChordsDisplayMode: (state, action: PayloadAction<ChordsDisplayMode>) => {
+      state.chordsDisplayMode = action.payload;
     },
-    setSelectedSkin(state, action: PayloadAction<Skin>) {
-      state.selectedSkin = action.payload;
+    setSkin(state, action: PayloadAction<Skin>) {
+      state.skin = action.payload;
     },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
@@ -233,7 +253,6 @@ export const controlPanelSlice = createSlice({
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;
-      chordStrummingDelayMsValue = action.payload;
     },
     setVelocity: (state, action: PayloadAction<number>) => {
       state.velocity = action.payload;
@@ -269,18 +288,60 @@ export const controlPanelSlice = createSlice({
     },
     setFretboardScaleX(state, action: PayloadAction<number>) {
       state.fretboardScaleX = action.payload;
+      if (state.lockRatio) {
+        const relativePosition = calculatePercentage(
+          minXZoom,
+          maxXZoom,
+          action.payload
+        );
+        state.fretboardScaleY = getValueFromPercentage(
+          minYZoom,
+          maxYZoom,
+          100 - relativePosition
+        );
+      }
+    },
+    setFretboardScaleY(state, action: PayloadAction<number>) {
+      state.fretboardScaleY = action.payload;
+      if (state.lockRatio) {
+        const relativePosition = calculatePercentage(
+          minYZoom,
+          maxYZoom,
+          action.payload
+        );
+        state.fretboardScaleX = getValueFromPercentage(
+          minXZoom,
+          maxXZoom,
+          100 - relativePosition
+        );
+      }
+    },
+    setLockRatio(state, action: PayloadAction<boolean>) {
+      state.lockRatio = action.payload;
+      if (state.lockRatio) {
+        const relativePositionY = calculatePercentage(
+          minYZoom,
+          maxYZoom,
+          state.fretboardScaleY
+        );
+        state.fretboardScaleX = getValueFromPercentage(
+          minXZoom,
+          maxXZoom,
+          100 - relativePositionY
+        );
+      }
     },
   },
 });
 
 export const {
   init,
-  setSelectedScale,
-  setSelectedScaleGroup,
-  setSelectedBaseNote,
-  setSelectedNoteDisplayMode,
-  setSelectedChordsDisplayMode,
-  setSelectedSkin,
+  setScale,
+  setScaleGroup,
+  setBaseNote,
+  setNoteDisplayMode,
+  setChordsDisplayMode,
+  setSkin,
   setSettingsExpanded,
   setPlayIntervalBpm,
   setVelocity,
@@ -295,6 +356,8 @@ export const {
   setChordPlayMode,
   setIsRecording,
   setFretboardScaleX,
+  setFretboardScaleY,
+  setLockRatio,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

@@ -3,20 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Skin,
   selectControlPanel,
-  setSelectedSkin,
+  setSkin,
 } from "../../../store/controlPanelSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const SkinSelector: React.FC = () => {
-  const { selectedSkin } = useSelector(selectControlPanel);
+  const { skin } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   return (
     <EnumSelector
       enumObj={Skin}
-      selectedValue={selectedSkin}
+      selectedValue={skin}
       onValueChange={(value) => {
-        dispatch(setSelectedSkin(value));
+        dispatch(setSkin(value));
       }}
     />
   );

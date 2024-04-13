@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   ScaledSize,
+  Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -16,7 +17,6 @@ import { RootState } from "../store/store";
 import { tw } from "../tailwind";
 import { AnimatedAlert } from "./AnimatedAlert";
 import { Fretboard } from "./Fretboard";
-import { PinchableBox } from "./PinchableBox";
 import { ControlPanel } from "./settings/ControlPanel";
 
 // TODO
@@ -68,8 +68,17 @@ export const Main: React.FC = () => {
     showAlert: isAlertShown,
     alertMessage,
     mainBg,
-    selectedSkin,
+    fretboardScaleX,
+    fretboardScaleY,
+    skin,
   } = useSelector((state: RootState) => state.controlPanel);
+
+  const [retrigger, setRetrigger] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Update the background color when the state changes
+    (document.body.style.backgroundColor as any) = tw.color(mainBg);
+  }, [mainBg]);
 
   const recalculateScaleFactor = (size: ScaledSize) => {
     const isLandscape = size.width > size.height;
@@ -93,15 +102,30 @@ export const Main: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    setRetrigger(true);
+    setTimeout(() => setRetrigger(false), 1);
+  }, [fretboardScaleX, fretboardScaleY]);
+
+  useEffect(() => {
     setHighResLoaded(false);
-  }, [selectedSkin]);
+  }, [skin]);
 
   const handleCloseAlert = () => {
     dispatch(hideAlert());
   };
 
-  const assets = getAssetsForSkin(selectedSkin);
-
+  const assets = getAssetsForSkin(skin);
+  if (retrigger) {
+    // I didn't find a better way to reflow the page and therefore re-render the scrollbars which need adjusting after scale changes
+    // The only solution I found is to return this template view and then straight away return the original one but with scale applied
+    return (
+      <View
+        style={[tw`${mainBg} min-w-full min-h-full items-start justify-center`]}
+      >
+        <Text>Retriggering</Text>
+      </View>
+    );
+  }
   return (
     <>
       {isAlertShown && (
@@ -117,24 +141,18 @@ export const Main: React.FC = () => {
       >
         <View
           style={[
-            tw`${mainBg} overflow-hidden w-full h-full items-start justify-center`,
+            tw`${mainBg} min-w-full min-h-full items-start justify-center`,
           ]}
         >
-          <PinchableBox>
-            {!highResLoaded && (
-              <Fretboard scaleFactor={scaleFactor} imageSource={assets[0]} />
-            )}
-
-            <Fretboard
-              scaleFactor={scaleFactor}
-              imageSource={assets[1]}
-              onImageLoaded={() => {
-                console.log("Loaded full res image");
-                setHighResLoaded(true);
-              }}
-              isCollapsed={!highResLoaded}
-            />
-          </PinchableBox>
+          <Fretboard
+            scaleFactor={scaleFactor}
+            imageSource={assets[1]}
+            onImageLoaded={() => {
+              console.log("Loaded full res image");
+              setHighResLoaded(true);
+            }}
+            isCollapsed={!highResLoaded}
+          />
         </View>
       </TouchableWithoutFeedback>
     </>
