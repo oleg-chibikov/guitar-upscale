@@ -3,7 +3,13 @@ import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
 import { NotePlayEventBus } from "./eventBus";
 import { sleep } from "./sleep";
 
-// TODO add type instead of having all params separately
+export type ChordPlayParameters = {
+  chordName: string;
+  noteChordMode: NoteChordMode;
+  delayMs?: number;
+  notesToPlay?: number;
+};
+
 const chordRoundRobinMap = new Map<string, number>();
 
 const selectRandomVariation = (variations: Chord[]) => {
@@ -14,12 +20,10 @@ const selectRandomVariation = (variations: Chord[]) => {
 const playVariation = async (
   variation: Chord,
   variationKey: string,
-  chord: string,
-  delayMs?: number,
-  notesToPlay?: number
+  { chordName, delayMs, notesToPlay }: ChordPlayParameters
 ) => {
   let i = 0;
-  console.log(`Playing ${variationKey} variation of ${chord}`);
+  console.log(`Playing ${variationKey} variation of ${chordName}`);
   for (const note of variation) {
     NotePlayEventBus.next({ note, metadata: { fromChord: true } });
     if (notesToPlay && ++i >= notesToPlay) {
@@ -31,77 +35,48 @@ const playVariation = async (
   }
 };
 
-export const playRandomChordVariation = async (
-  chord: string,
-  mode: NoteChordMode,
-  delayMs?: number,
-  notesToPlay?: number
-) => {
-  const randomVariation = selectRandomVariation(mode.variations);
-  await playVariation(randomVariation, "random", chord, delayMs, notesToPlay);
+export const playRandomChordVariation = async (params: ChordPlayParameters) => {
+  const randomVariation = selectRandomVariation(
+    params.noteChordMode.variations
+  );
+  await playVariation(randomVariation, "random", params);
 };
 
-export const playFirstChordVariation = async (
-  chord: string,
-  mode: NoteChordMode,
-  delayMs?: number,
-  notesToPlay?: number
-) => {
-  const randomVariation = mode.variations[0];
-  await playVariation(randomVariation, "first", chord, delayMs, notesToPlay);
+export const playFirstChordVariation = async (params: ChordPlayParameters) => {
+  const randomVariation = params.noteChordMode.variations[0];
+  await playVariation(randomVariation, "first", params);
 };
 
 export const playClosestChordVariation = async (
-  chord: string,
-  mode: NoteChordMode,
-  delayMs?: number,
-  notesToPlay?: number
+  params: ChordPlayParameters
 ) => {
-  const closestVariation = getClosestVariation(mode);
+  const closestVariation = getClosestVariation(params.noteChordMode);
   if (closestVariation) {
-    await playVariation(
-      closestVariation,
-      "closest",
-      chord,
-      delayMs,
-      notesToPlay
-    );
+    await playVariation(closestVariation, "closest", params);
   }
 };
 
-export const playAllVariations = async (
-  chord: string,
-  mode: NoteChordMode,
-  delayMs?: number,
-  notesToPlay?: number
-) => {
-  for (const variation of mode.variations) {
-    await playVariation(variation, "combined", chord, delayMs, notesToPlay);
+export const playAllVariations = async (params: ChordPlayParameters) => {
+  for (const variation of params.noteChordMode.variations) {
+    await playVariation(variation, "combined", params);
     await sleep(1000);
   }
 };
 
-export const playRoundRobin = async (
-  chord: string,
-  mode: NoteChordMode,
-  delayMs?: number,
-  notesToPlay?: number
-) => {
-  let currentVariation = chordRoundRobinMap.get(chord);
+export const playRoundRobin = async (params: ChordPlayParameters) => {
+  let currentVariation = chordRoundRobinMap.get(params.chordName);
   if (currentVariation === undefined) {
     currentVariation = 0;
   } else {
     currentVariation++;
-    if (currentVariation >= mode.variations.length) {
+    if (currentVariation >= params.noteChordMode.variations.length) {
       currentVariation = 0;
     }
   }
   await playVariation(
-    mode.variations[currentVariation],
+    params.noteChordMode.variations[currentVariation],
     "round robin",
-    chord,
-    delayMs,
-    notesToPlay
+    params
   );
-  chordRoundRobinMap.set(chord, currentVariation);
+  chordRoundRobinMap.set(params.chordName, currentVariation);
 };

@@ -3,6 +3,7 @@ import { Animated, Easing, Text } from "react-native"; // Import Animated and Ea
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
+  ChordPlayParameters,
   playAllVariations,
   playClosestChordVariation,
   playFirstChordVariation,
@@ -43,44 +44,24 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       startAnimation();
 
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
+      const params: ChordPlayParameters = {
+        chordName,
+        noteChordMode,
+        delayMs,
+        notesToPlay: metadata.notesToPlay,
+      };
 
       switch (chordPlayMode) {
         case ChordPlayMode.RoundRobin:
-          await playRoundRobin(
-            chordName,
-            noteChordMode,
-            delayMs,
-            metadata.notesToPlay
-          );
-          return;
+          return await playRoundRobin(params);
         case ChordPlayMode.AllVariations:
-          return await playAllVariations(
-            chordName,
-            noteChordMode,
-            delayMs,
-            metadata.notesToPlay
-          );
+          return await playAllVariations(params);
         case ChordPlayMode.FirstVariation:
-          return await playFirstChordVariation(
-            chordName,
-            noteChordMode,
-            delayMs,
-            metadata.notesToPlay
-          );
+          return await playFirstChordVariation(params);
         case ChordPlayMode.ClosestVariation:
-          return await playClosestChordVariation(
-            chordName,
-            noteChordMode,
-            delayMs,
-            metadata.notesToPlay
-          );
+          return await playClosestChordVariation(params);
         case ChordPlayMode.RandomVariation:
-          return await playRandomChordVariation(
-            chordName,
-            noteChordMode,
-            delayMs,
-            metadata.notesToPlay
-          );
+          return await playRandomChordVariation(params);
       }
     });
     return () => {
