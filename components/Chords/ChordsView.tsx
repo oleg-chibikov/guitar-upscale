@@ -44,7 +44,7 @@ export const ChordsView: React.FC = () => {
           overflow: "auto",
           position: "fixed",
           maxWidth: hasTouchInput && height < 700 ? 150 : "95%", // when height is 700+ there's enough space under the guitar to show full chords
-          maxHeight: "95%",
+          maxHeight: hasTouchInput ? "95%" : 350,
         },
       ]}
     >

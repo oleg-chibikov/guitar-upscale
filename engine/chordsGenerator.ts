@@ -15,13 +15,20 @@ export enum ChordMode {
   Suspended2,
   Fifth, // Power chord
   Sixth,
-  SixthMinor,
+  SixthMinorMajor,
+  SixthAdd9,
   Seventh,
+  SeventhMajor,
   SeventhMinor,
+  SeventhMinorMajor,
   Ninth,
+  NinthMajor,
   NinthMinor,
+  NinthMinorMajor,
   Eleventh,
+  EleventhMajor,
   EleventhMinor,
+  EleventhMinorMajor,
   Add2,
   Hendrix,
 }
@@ -49,20 +56,34 @@ export function getModeText(mode: ChordMode): string {
       return "5";
     case ChordMode.Sixth:
       return "6";
-    case ChordMode.SixthMinor:
-      return "m6";
+    case ChordMode.SixthMinorMajor:
+      return "mM6";
+    case ChordMode.SixthAdd9:
+      return "6add9";
     case ChordMode.Seventh:
       return "7";
+    case ChordMode.SeventhMajor:
+      return "maj7";
     case ChordMode.SeventhMinor:
       return "m7";
+    case ChordMode.SeventhMinorMajor:
+      return "mM7";
     case ChordMode.Ninth:
       return "9";
+    case ChordMode.NinthMajor:
+      return "maj9";
     case ChordMode.NinthMinor:
       return "m9";
+    case ChordMode.NinthMinorMajor:
+      return "mM9";
     case ChordMode.Eleventh:
       return "11";
+    case ChordMode.EleventhMajor:
+      return "maj11";
     case ChordMode.EleventhMinor:
       return "m11";
+    case ChordMode.EleventhMinorMajor:
+      return "mM11";
     case ChordMode.Add2:
       return "add2";
     case ChordMode.Hendrix:
@@ -106,15 +127,24 @@ const chordModes = new Map<ChordMode, number[][]>([
     ],
   ],
   [
-    ChordMode.SixthMinor,
+    ChordMode.SixthMinorMajor,
     [
       [0, 7, 0, 3, 9, 0],
       [0, 7, 0, 3, 9, 3],
       [0, 9, 0, 3, 7, 0],
     ],
   ],
-  [ChordMode.Seventh, [[0, 7, 0, 4, 10, 0]]],
-  [ChordMode.SeventhMinor, [[0, 7, 10, 3, 10, 0]]],
+  [ChordMode.SixthAdd9, [[0, 7, 2, 7, 9, 4]]],
+  [
+    ChordMode.Seventh,
+    [
+      [0, 7, 10, 4, 7, 0],
+      [0, 7, 0, 4, 10, 0],
+    ],
+  ],
+  [ChordMode.SeventhMajor, [[0, 7, 11, 4, 7, 0]]],
+  [ChordMode.SeventhMinor, [[0, 7, 10, 3, 7, 0]]],
+  [ChordMode.SeventhMinorMajor, [[0, 7, 11, 3, 7, 0]]],
   [
     ChordMode.Ninth,
     [
@@ -122,6 +152,7 @@ const chordModes = new Map<ChordMode, number[][]>([
       [0, 7, 2, 7, 10, 4],
     ],
   ],
+  [ChordMode.NinthMajor, [[0, 7, 11, 4, 7, 2]]],
   [
     ChordMode.NinthMinor,
     [
@@ -130,6 +161,7 @@ const chordModes = new Map<ChordMode, number[][]>([
       [0, 7, 0, 3, 10, 2],
     ],
   ],
+  [ChordMode.NinthMinorMajor, [[0, 7, 11, 3, 7, 2]]],
   [
     ChordMode.Eleventh,
     [
@@ -137,6 +169,7 @@ const chordModes = new Map<ChordMode, number[][]>([
       [0, 5, 2, 7, 10, 4],
     ],
   ],
+  [ChordMode.EleventhMajor, [[0, 5, 11, 4, 7, 2]]],
   [
     ChordMode.EleventhMinor,
     [
@@ -144,6 +177,7 @@ const chordModes = new Map<ChordMode, number[][]>([
       [0, 7, 2, 5, 10, 3],
     ],
   ],
+  [ChordMode.EleventhMinorMajor, [[0, 5, 11, 3, 7, 2]]],
   [ChordMode.Add2, [[0, 7, 2, 4, 7, 0]]],
   [
     ChordMode.Hendrix,
@@ -194,8 +228,8 @@ const findNextNotesInChord = (
     let j = Math.max(1, baseFretIndex - maxFretDistance);
     j <=
     Math.min(
-      baseFretIndex === 0 ? 1000 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index) - then we search for the next base fret index on the next string (therefore allowing any fret without limitations, hence 1000)
-      NoteCount + maxFretDistance // avaoiding too high frets
+      baseFretIndex === 0 ? NoteCount - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
+      neck[stringIndex].length - 1
     );
     j++
   ) {
@@ -224,7 +258,7 @@ export const generateAllChords = (
       }
 
       const chordVariations = intervals.flatMap((interval) =>
-        generateChordVariations(note, interval, neck, mode, 4)
+        generateChordVariations(note, interval, neck, mode)
       );
       noteChords.push({ mode, variations: chordVariations });
     }
@@ -256,9 +290,9 @@ const generateChordVariations = (
   baseNote: Note,
   interval: number[], // Notes that constitute the chord
   neck: Neck, // Representation of the guitar neck
-  _mode: ChordMode, // needed here for debugging only
-  minConsecutiveNotesInValidChord: number
+  _mode: ChordMode // needed here for debugging only
 ): Chord[] => {
+  const minConsecutiveNotesInValidChord = 4;
   const chordNotes = generateChord(baseNote, interval);
   const chordVariations: Chord[] = [];
 
@@ -277,7 +311,7 @@ const generateChordVariations = (
 
         // Find the next notes in the chord on the upper strings
 
-        // if (chordNotes[0] === Note.F && _mode === ChordMode.Hendrix) {
+        // if (chordNotes[0] === Note.E && _mode === ChordMode.Eleventh) {
         //   debugger;
         // }
         for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
@@ -295,7 +329,7 @@ const generateChordVariations = (
 
           if (baseFretIndex === 0) {
             for (const note of notesOnHigherString) {
-              if (note.fret > 0) {
+              if (note.fret > 0 && note.fret < NoteCount) {
                 baseFretIndex = note.fret;
                 break;
               }
