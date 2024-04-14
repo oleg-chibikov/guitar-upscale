@@ -109,6 +109,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   fretboardScaleX: number;
   fretboardScaleY: number;
   lockRatio: boolean;
+  chordNotesToPlay: number;
 }
 
 const initialState: ControlPanelState = {
@@ -141,6 +142,7 @@ const initialState: ControlPanelState = {
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
+  chordNotesToPlay: 6,
 };
 
 // A value that changes immediately without the need for rerender
@@ -331,6 +333,9 @@ export const controlPanelSlice = createSlice({
         );
       }
     },
+    setChordNotesToPlay(state, action: PayloadAction<number>) {
+      state.chordNotesToPlay = action.payload;
+    },
   },
 });
 
@@ -358,6 +363,7 @@ export const {
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,
+  setChordNotesToPlay,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

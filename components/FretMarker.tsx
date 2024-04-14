@@ -59,7 +59,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     note === baseNote;
   const bg: string = isColored
     ? isFromPreviousChord
-      ? "bg-indigo-500"
+      ? "bg-lime-500"
       : "bg-orange-400"
     : isFromPreviousChord
     ? "bg-green-500"

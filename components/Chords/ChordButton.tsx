@@ -28,7 +28,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   noteChordMode,
 }) => {
-  const { chordPlayMode, chords, chordStrummingDelayMs } =
+  const { chordPlayMode, chords, chordStrummingDelayMs, chordNotesToPlay } =
     useSelector(selectControlPanel);
   const disabled = !noteChordMode.variations.length;
   useEffect(() => {
@@ -48,7 +48,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         chordName,
         noteChordMode,
         delayMs,
-        notesToPlay: metadata.notesToPlay,
+        notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
       };
 
       switch (chordPlayMode) {
@@ -68,7 +68,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       // TODO: Why deleting handlers here leads to absense of sounds? they should be recreated
       ChordToChordButtonEventMap.delete(chordName);
     };
-  }, [chordName, chordPlayMode, chords, disabled, chordStrummingDelayMs]);
+  }, [
+    chordName,
+    chordPlayMode,
+    chords,
+    disabled,
+    chordStrummingDelayMs,
+    chordNotesToPlay,
+  ]);
   const hasTouchInput = useInputChecker();
   const [scaleAnim] = useState(new Animated.Value(1)); // State for scaling animation
   const [opacityAnim] = useState(new Animated.Value(1)); // State for opacity animationconst

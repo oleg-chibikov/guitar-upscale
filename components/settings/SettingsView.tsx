@@ -13,6 +13,7 @@ import { NoteDisplayModeSelector } from "./selectors/NoteDisplayModeSelector";
 import { PlaybackTypeSelector } from "./selectors/PlaybackTypeSelector";
 import { SkinSelector } from "./selectors/SkinSelector";
 import { ThemeSelector } from "./selectors/ThemeSelector";
+import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
 import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
 import { VelocitySlider } from "./sliders/VelocitySlider";
@@ -59,6 +60,8 @@ export const SettingsView: React.FC = () => {
           <PlayIntervalSlider />
           <Text style={textStyle}>Chord strumming delay:</Text>
           <ChordStrummingDelaySlider />
+          <Text style={textStyle}>Notes to play in chord:</Text>
+          <ChordNotesToPlaySlider />
           <Text style={textStyle}>Playback volume:</Text>
           <VelocitySlider />
           <Text style={textStyle}>Skin:</Text>
