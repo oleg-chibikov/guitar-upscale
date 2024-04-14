@@ -13,7 +13,6 @@ export enum ChordMode {
   Suspended4,
   Suspended2,
   Fifth,
-  Fifth3Note,
   Sixth,
   Seventh,
   SeventhMinor,
@@ -38,8 +37,6 @@ export function getModeText(mode: ChordMode): string {
       return "sus2";
     case ChordMode.Fifth:
       return "5";
-    case ChordMode.Fifth3Note:
-      return "5/3";
     case ChordMode.Sixth:
       return "6";
     case ChordMode.Seventh:
@@ -61,9 +58,14 @@ const chordModes = new Map<ChordMode, number[][]>([
   [ChordMode.Diminished, [[0, 6, 0, 3, 7, 0]]],
   [ChordMode.Augmented, [[0, 8, 0, 4, 7, 0]]],
   [ChordMode.Suspended4, [[0, 5, 0, 5, 7, 0]]],
-  [ChordMode.Suspended2, [[0, 7, 0, 7, 7, 2]]],
+  [
+    ChordMode.Suspended2,
+    [
+      [0, 7, 0, 2, 7, 0],
+      [0, 7, 4, 2, 7, 0],
+    ],
+  ],
   [ChordMode.Fifth, [[0, 7, 0, 7, 7, 0]]],
-  [ChordMode.Fifth3Note, [[0, 7, 0]]],
   [ChordMode.Sixth, [[0, 7, 0, 4, 9, 0]]],
   [ChordMode.Seventh, [[0, 7, 0, 4, 10, 0]]],
   [ChordMode.SeventhMinor, [[0, 7, 10, 3, 10, 0]]],
@@ -135,13 +137,7 @@ export const generateAllChords = (
       }
 
       const chordVariations = intervals.flatMap((interval) =>
-        generateChordVariations(
-          note,
-          interval,
-          neck,
-          mode,
-          mode === ChordMode.Fifth3Note ? 3 : 4
-        )
+        generateChordVariations(note, interval, neck, mode, 4)
       );
       noteChords.push({ mode, variations: chordVariations });
     }

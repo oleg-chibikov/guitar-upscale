@@ -29,7 +29,8 @@ import { ControlPanel } from "./settings/ControlPanel";
 // 7,8 string guitars
 // Ads
 // Record melodies to saveable midi files
-// Highlight chords when playing - separate bus
+// Melodies chords - separate fixed settings (add settings to Bus event)
+// select how many notes to play max in the chord
 
 const getAssetsForSkin = (skin?: Skin) => {
   switch (skin) {

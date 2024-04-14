@@ -1,4 +1,4 @@
-import { Chord, Note, StringOctaveNote } from "../data/notes";
+import { Note, StringOctaveNote } from "../data/notes";
 import { ChordEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 
@@ -31,7 +31,10 @@ export const decodeMelody = async (
     const playChordAndReset = () => {
       if (immediateChord != undefined) {
         nextIsImmediateChord = false;
-        ChordEventBus.next(immediateChord);
+        ChordEventBus.next({
+          chord: immediateChord,
+          metadata: { notesToPlay: 3, strummingDelayMs: 10 }, // override default settings
+        });
         immediateChord = undefined;
       }
     };

@@ -6,23 +6,33 @@ export type NoteMetadata = {
   clearChordMarker?: boolean;
 };
 
+export type ChordMetadata = {
+  notesToPlay?: number;
+  strummingDelayMs?: number;
+};
+
 export type NoteWithPlayMetadata = {
   note: StringOctaveNote;
   metadata: NoteMetadata;
 };
 
+export type ChordWithPlayMetadata = {
+  chord: string;
+  metadata: ChordMetadata;
+};
+
 export const NotePlayEventBus = new Subject<NoteWithPlayMetadata>();
-export const ChordEventBus = new Subject<string>();
+export const ChordEventBus = new Subject<ChordWithPlayMetadata>();
 
 export const NoteToFretMarkerEventMap: Map<
   string,
   (metadata: NoteMetadata) => void
 > = new Map<string, () => void>();
 
-export const ChordToChordButtonEventMap: Map<string, () => void> = new Map<
+export const ChordToChordButtonEventMap: Map<
   string,
-  () => void
->();
+  (metadata: ChordMetadata) => void
+> = new Map<string, (metadata: ChordMetadata) => void>();
 
 export const ClearChordMarkerSet: Set<string> = new Set<string>();
 
@@ -39,7 +49,7 @@ NotePlayEventBus.subscribe((note: NoteWithPlayMetadata) => {
   playAction?.(note.metadata);
 });
 
-ChordEventBus.subscribe((chord: string) => {
+ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
   console.log("EventBus: chord play requested: " + chord);
   for (const note of ClearChordMarkerSet) {
     const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
@@ -47,8 +57,8 @@ ChordEventBus.subscribe((chord: string) => {
   }
   ClearChordMarkerSet.clear(); // clear previous chord;
 
-  const playAction = ChordToChordButtonEventMap.get(chord);
+  const playAction = ChordToChordButtonEventMap.get(chord.chord);
 
-  playAction?.();
-  lastChord = chord;
+  playAction?.(chord.metadata);
+  lastChord = chord.chord;
 });

@@ -31,7 +31,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     useSelector(selectControlPanel);
   const disabled = !noteChordMode.variations.length;
   useEffect(() => {
-    ChordToChordButtonEventMap.set(chordName, async () => {
+    ChordToChordButtonEventMap.set(chordName, async (metadata) => {
       if (disabled) {
         console.log("Chord not enabled: " + chordName);
         return;
@@ -42,31 +42,44 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       // Start the animation sequence
       startAnimation();
 
-      const delayMs = chordStrummingDelayMs;
+      const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
 
       switch (chordPlayMode) {
         case ChordPlayMode.RoundRobin:
-          await playRoundRobin(chordName, noteChordMode, delayMs);
+          await playRoundRobin(
+            chordName,
+            noteChordMode,
+            delayMs,
+            metadata.notesToPlay
+          );
           return;
         case ChordPlayMode.AllVariations:
-          return await playAllVariations(chordName, noteChordMode, delayMs);
+          return await playAllVariations(
+            chordName,
+            noteChordMode,
+            delayMs,
+            metadata.notesToPlay
+          );
         case ChordPlayMode.FirstVariation:
           return await playFirstChordVariation(
             chordName,
             noteChordMode,
-            delayMs
+            delayMs,
+            metadata.notesToPlay
           );
         case ChordPlayMode.ClosestVariation:
           return await playClosestChordVariation(
             chordName,
             noteChordMode,
-            delayMs
+            delayMs,
+            metadata.notesToPlay
           );
         case ChordPlayMode.RandomVariation:
           return await playRandomChordVariation(
             chordName,
             noteChordMode,
-            delayMs
+            delayMs,
+            metadata.notesToPlay
           );
       }
     });
@@ -140,7 +153,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         if (hasTouchInput) {
           // this event handler is only for touch devices
 
-          ChordEventBus.next(chordName);
+          ChordEventBus.next({ chord: chordName, metadata: {} });
         }
       }}
       onStartShouldSetResponder={() => {
@@ -148,7 +161,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           console.log(2);
           // this event handler is only for mouse devices
 
-          ChordEventBus.next(chordName);
+          ChordEventBus.next({ chord: chordName, metadata: {} });
         }
         return true;
       }} // Capture both touch and mouse events
