@@ -12,6 +12,11 @@ export const FullscreenButton: React.FC<PressableProps> = (props) => {
           ? "open-in-full"
           : "close-fullscreen"
       }
+      tooltip={
+        screenfull.isEnabled && !screenfull.isFullscreen
+          ? "Go fullscreen"
+          : "Exit fullscreen"
+      }
       isActive={screenfull.isEnabled && screenfull.isFullscreen}
       onPress={() => {
         if (screenfull.isEnabled) {

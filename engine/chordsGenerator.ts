@@ -17,6 +17,7 @@ export enum ChordMode {
   Sixth,
   SixthMinorMajor,
   SixthAdd9,
+  SixthMinorAdd9,
   Seventh,
   SeventhMajor,
   SeventhMinor,
@@ -30,6 +31,8 @@ export enum ChordMode {
   EleventhMinor,
   EleventhMinorMajor,
   Add2,
+  Add9,
+  MinorAdd9,
   Hendrix,
 }
 
@@ -60,6 +63,8 @@ export function getModeText(mode: ChordMode): string {
       return "mM6";
     case ChordMode.SixthAdd9:
       return "6add9";
+    case ChordMode.SixthMinorAdd9:
+      return "6madd9";
     case ChordMode.Seventh:
       return "7";
     case ChordMode.SeventhMajor:
@@ -86,6 +91,10 @@ export function getModeText(mode: ChordMode): string {
       return "mM11";
     case ChordMode.Add2:
       return "add2";
+    case ChordMode.Add9:
+      return "add9";
+    case ChordMode.MinorAdd9:
+      return "madd9";
     case ChordMode.Hendrix:
       return "7#9";
   }
@@ -135,6 +144,7 @@ const chordModes = new Map<ChordMode, number[][]>([
     ],
   ],
   [ChordMode.SixthAdd9, [[0, 7, 2, 7, 9, 4]]],
+  [ChordMode.SixthMinorAdd9, [[0, 7, 2, 7, 9, 3]]],
   [
     ChordMode.Seventh,
     [
@@ -179,6 +189,20 @@ const chordModes = new Map<ChordMode, number[][]>([
   ],
   [ChordMode.EleventhMinorMajor, [[0, 5, 11, 3, 7, 2]]],
   [ChordMode.Add2, [[0, 7, 2, 4, 7, 0]]],
+  [
+    ChordMode.Add9,
+    [
+      [0, 7, 0, 4, 7, 2],
+      [0, 7, 2, 7, 7, 4],
+    ],
+  ],
+  [
+    ChordMode.MinorAdd9,
+    [
+      [0, 7, 0, 3, 7, 2],
+      [0, 7, 2, 7, 7, 3],
+    ],
+  ],
   [
     ChordMode.Hendrix,
     [

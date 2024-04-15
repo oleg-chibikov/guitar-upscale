@@ -14,6 +14,9 @@ export const OpenSettingsButton: React.FC<PressableProps> = (props) => {
     <IconButton
       {...props}
       icon="settings"
+      tooltip={
+        settingsExpanded ? "Close settings panel" : "Open settings panel"
+      }
       isActive={settingsExpanded}
       onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
     />

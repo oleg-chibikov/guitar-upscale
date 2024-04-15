@@ -1,5 +1,8 @@
 import React from "react";
 import { View, ViewStyle } from "react-native";
+import { useSelector } from "react-redux";
+import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
+import { selectControlPanel } from "../../../store/controlPanelSlice";
 import { tw } from "../../../tailwind";
 import { FullscreenButton } from "./FullscreenButton";
 import { OpenChordsButton } from "./OpenChordsButton";
@@ -12,13 +15,30 @@ interface ButtonContainerProps {
 }
 
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
+  const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
-    <View style={[tw`flex flex-row gap-1`, style]}>
-      <OpenSettingsButton />
-      <OpenChordsButton />
-      <PlayButton />
-      <FullscreenButton />
-      <RecordButton />
+    <View style={[tw`flex flex-col gap-1`, style]}>
+      <View
+        style={[
+          tw`flex flex-row gap-1 justify-${
+            chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
+          }`,
+        ]}
+      >
+        <OpenSettingsButton />
+        <OpenChordsButton />
+        <FullscreenButton />
+      </View>
+      <View
+        style={[
+          tw`flex flex-row gap-1 justify-${
+            chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
+          }`,
+        ]}
+      >
+        <PlayButton />
+        <RecordButton />
+      </View>
     </View>
   );
 };

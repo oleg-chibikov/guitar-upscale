@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
+  Platform,
   ScaledSize,
   Text,
   TouchableWithoutFeedback,
@@ -28,7 +29,6 @@ import { ControlPanel } from "./settings/ControlPanel";
 // Guitar tunings
 // 7,8 string guitars
 // Ads
-// Record melodies to saveable midi files
 // More chords
 
 const getAssetsForSkin = (skin?: Skin) => {
@@ -77,7 +77,9 @@ export const Main: React.FC = () => {
 
   useEffect(() => {
     // Update the background color when the state changes
-    (document.body.style.backgroundColor as any) = tw.color(mainBg);
+    if (Platform.OS === "web") {
+      (document.body.style.backgroundColor as any) = tw.color(mainBg);
+    }
   }, [mainBg]);
 
   const recalculateScaleFactor = (size: ScaledSize) => {

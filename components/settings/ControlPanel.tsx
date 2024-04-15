@@ -26,7 +26,7 @@ export const ControlPanel: React.FC = () => {
             chordsDisplayMode === ChordsDisplayMode.Left
               ? "flex-row-reverse"
               : "flex-row"
-          } gap-1 items-center`,
+          } gap-1 items-start`,
           {
             maxWidth: "95%",
             maxHeight: "95%",

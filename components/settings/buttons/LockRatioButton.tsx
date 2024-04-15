@@ -14,6 +14,7 @@ export const LockRatioButton: React.FC<PressableProps> = (props) => {
     <IconButton
       {...props}
       icon="lock"
+      tooltip={lockRatio ? "Unlock aspect ratio" : "Lock aspect ratio"}
       isActive={lockRatio}
       onPress={() => {
         dispatch(setLockRatio(!lockRatio));

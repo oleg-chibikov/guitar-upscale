@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 interface SliderProps {
   onValueChange: (value: number) => void;
@@ -22,6 +22,10 @@ const Slider: React.FC<SliderProps> = ({
   style,
   isVertical,
 }) => {
+  if (Platform.OS !== "web") {
+    // TODO: Implement for native
+    return null;
+  }
   const props = isVertical ? { orient: "vertical" } : undefined; // firefox
   return (
     <View style={[{ width: "100%", alignItems: "center" }, style]}>

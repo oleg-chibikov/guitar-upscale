@@ -24,5 +24,13 @@
     }
   ],
   "start_url": ".",
-  "display": "standalone"
+  "display": "fullscreen",
+  "theme_color": "#262626",
+  "background_color": "#262626",
+  "id": "guitar-upscale",
+  "description": "A guitar emulator - great for learning and playing",
+  "dir": "ltr",
+  "lang": "en",
+  "orientation": "landscape",
+  "categories": ["lifestyle", "music", "productivity"]
 }

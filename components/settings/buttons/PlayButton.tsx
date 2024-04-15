@@ -92,6 +92,7 @@ export const PlayButton: React.FC<PressableProps> = (props) => {
     <IconButton
       {...props}
       isActive={isPlaying}
+      tooltip={isPlaying ? "Stop playing scale" : "Play scale"}
       icon={isPlaying ? "pause" : "play-arrow"}
       onPress={handlePlay}
     />
