@@ -1,5 +1,5 @@
 {
-  "short_name": "Guitar Upscale",
+  "short_name": "GuitarUp",
   "name": "Guitar Upscale - A guitar simulator",
   "icons": [
     {
@@ -31,6 +31,6 @@
   "description": "A guitar emulator - great for learning and playing",
   "dir": "ltr",
   "lang": "en",
-  "orientation": "landscape",
+  "orientation": "natural",
   "categories": ["lifestyle", "music", "productivity"]
 }
