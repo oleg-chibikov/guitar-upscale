@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
     "@reduxjs/toolkit": "^2.2.3",
     "midi-writer-js": "^3.1.1",
     "next": "14.2.1",
@@ -17,6 +21,7 @@
     "react-helmet-async": "^2.0.4",
     "react-redux": "^9.1.1",
     "redux-persist": "^6.0.0",
+    "rxjs": "^7.8.1",
     "screenfull": "^6.0.2",
     "smplr": "^0.12.3"
   },

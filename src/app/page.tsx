@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { Main } from "./components/Main";
 import { persistor, store } from "./store/store";
 
 export default function Home() {
@@ -36,7 +37,9 @@ export default function Home() {
             <link rel="manifest" href="manifest.json" />
             <meta name="google" content="notranslate" />
           </Helmet>
-          <main className="w-full h-full">{/* <Main /> */}</main>
+          <main className="w-full h-full">
+            <Main />
+          </main>
         </HelmetProvider>
       </PersistGate>
     </Provider>

@@ -45,20 +45,7 @@ export enum Skin {
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;
 
-const getTheme = (theme: Theme) => {
-  let tempTheme = theme;
-  // if (tempTheme === Theme.MatchOS) {
-  //   tempTheme =
-  //     window.matchMedia &&
-  //     window.matchMedia("(prefers-color-scheme: dark)").matches
-  //       ? Theme.Dark
-  //       : Theme.Light;
-  // }
-  // TODO: Get OSTheme from window
-  return tempTheme;
-};
-
-const initialTheme = getTheme(Theme.MatchOS);
+const initialTheme = Theme.Dark;
 
 const getViewSettings = (theme: Theme) => {
   const color = theme === Theme.Dark ? "white" : "black";
@@ -66,7 +53,7 @@ const getViewSettings = (theme: Theme) => {
     bg: theme === Theme.Dark ? "bg-gray-600" : "bg-gray-300",
     mainBg: theme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100",
     color: color,
-    textStyle: { fontSize: 14, color },
+    textStyle: `text-md text-${color}`,
   };
 };
 
@@ -108,7 +95,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   bg: string;
   mainBg: string;
   color: string;
-  textStyle: any; // TODO: change type
+  textStyle: string; // TODO: change type
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
   fretboardScaleY: number;
@@ -282,7 +269,7 @@ export const controlPanelSlice = createSlice({
       state.playbackType = action.payload;
     },
     setTheme(state, action: PayloadAction<Theme>) {
-      state.theme = getTheme(action.payload);
+      state.theme = action.payload;
       const settings = getViewSettings(action.payload);
       state.bg = settings.bg;
       state.mainBg = settings.mainBg;

@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+select,
+option {
+  color: black;
+}

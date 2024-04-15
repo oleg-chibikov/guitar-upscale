@@ -95,7 +95,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   return (
     <div
-      onClick={() => {
+      onTouchStart={() => {
         if (hasTouchInput) {
           ChordEventBus.next({ chord: chordName, metadata: {} });
         }
