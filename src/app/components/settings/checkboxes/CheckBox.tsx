@@ -1,4 +1,6 @@
+import { selectControlPanel } from "@/app/store/controlPanelSlice";
 import React from "react";
+import { useSelector } from "react-redux";
 
 export type CheckBoxProps = {
   value: boolean;
@@ -15,16 +17,19 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
     onValueChange(event.target.checked);
   };
 
+  const { themeString } = useSelector(selectControlPanel);
   return (
     <div>
       <input
         type="checkbox"
+        className={`mr-2 accent-primary-${themeString}`}
         id={label}
         checked={value}
         onChange={handleChange}
-        style={{ marginRight: "8px" }}
       />
-      <label htmlFor={label}>{label}</label>
+      <label className={`text-foreground-${themeString}`} htmlFor={label}>
+        {label}
+      </label>
     </div>
   );
 };

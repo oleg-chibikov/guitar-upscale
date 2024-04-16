@@ -1,4 +1,4 @@
-import React from "react";
+import { SelectWrapper } from "./SelectWrapper";
 
 interface EnumSelectorProps<
   T extends Record<string | number, string | number>
@@ -17,20 +17,20 @@ export function EnumSelector<
   onValueChange,
   customLabel,
 }: EnumSelectorProps<T>) {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = parseInt(event.target.value);
-    onValueChange(value as any);
-  };
+  const options = Object.entries(enumObj)
+    .filter(([key]) => isNaN(Number(key)))
+    .map(([key, value]) => ({
+      value,
+      label: customLabel?.(String(key), value as T[keyof T]) ?? String(key),
+    }));
 
   return (
-    <select value={selectedValue} onChange={handleChange}>
-      {Object.entries(enumObj)
-        .filter(([key]) => isNaN(Number(key)))
-        .map(([key, value]) => (
-          <option key={key} value={value}>
-            {customLabel?.(String(key), value as T[keyof T]) ?? String(key)}
-          </option>
-        ))}
-    </select>
+    <SelectWrapper
+      options={options}
+      value={selectedValue.toString()}
+      onChange={(value: string | number) =>
+        onValueChange(parseInt(value as string) as any)
+      }
+    />
   );
 }

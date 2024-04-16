@@ -28,8 +28,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
-  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
-    useSelector(selectControlPanel);
+  const {
+    chordPlayMode,
+    chordStrummingDelayMs,
+    chordNotesToPlay,
+    themeString,
+  } = useSelector(selectControlPanel);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
 
@@ -96,8 +100,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   }
 
   const animationClasses = pressed
-    ? "scale-50 bg-green-500"
-    : "scale-100 bg-blue-500";
+    ? `scale-50 bg-accent-${themeString}`
+    : `scale-100 bg-primary-${themeString}`;
 
   return (
     <ul
@@ -113,7 +117,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       }}
       className={`text-center w-16 h-6 items-center justify-center cursor-pointer content-center ${
         disabled ? "bg-gray-400" : animationClasses
-      } font-mono select-none text-white transition-transform transform origin-center`}
+      } font-mono select-none text-foreground-${themeString} transition-transform transform origin-center`}
     >
       {chordName}
     </ul>

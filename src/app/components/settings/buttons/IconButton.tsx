@@ -22,15 +22,15 @@ export const IconButton: React.FC<IconButtonProps> = ({
   id,
   ...rest
 }) => {
-  const { bg } = useSelector(selectControlPanel);
+  const { bg, themeString } = useSelector(selectControlPanel);
 
   return (
     <button
       id={id}
       title={tooltip}
       className={`${
-        isActive ? activeBg ?? "bg-blue-400" : inactiveBg ?? bg
-      } opacity-95 p-1 flex items-center justify-center`}
+        isActive ? activeBg ?? `bg-primary-${themeString}` : inactiveBg ?? bg
+      } text-foreground-${themeString} opacity-95 p-1 flex items-center justify-center`}
       onClick={onPress}
       {...rest}
     >

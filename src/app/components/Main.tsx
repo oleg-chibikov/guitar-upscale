@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { initSoundfont } from "../engine/soundProvider";
-import { getHexValue } from "../helpers/colorHelper";
-import { hideAlert, init } from "../store/controlPanelSlice";
-import { RootState } from "../store/store";
+import {
+  hideAlert,
+  init,
+  selectControlPanel,
+} from "../store/controlPanelSlice";
 import { AnimatedAlert } from "./AnimatedAlert";
 import { Fretboard } from "./fret/Fretboard";
 import { ControlPanel } from "./settings/ControlPanel";
@@ -30,15 +32,13 @@ export const Main = () => {
     mainBg,
     fretboardScaleX,
     fretboardScaleY,
-  } = useSelector((state: RootState) => state.controlPanel);
+  } = useSelector(selectControlPanel);
 
   const [retrigger, setRetrigger] = useState<boolean>(false);
 
   useEffect(() => {
-    const bgHex = getHexValue(mainBg);
-    if (bgHex) {
-      document.body.style.backgroundColor = bgHex;
-    }
+    document.body.classList.add(mainBg);
+    return () => document.body.classList.remove(mainBg);
   }, [mainBg]);
 
   useEffect(() => {
@@ -87,9 +87,7 @@ export const Main = () => {
       {isAlertShown && (
         <AnimatedAlert message={alertMessage} onClose={handleCloseAlert} />
       )}
-
       <ControlPanel />
-
       <Fretboard />
     </>
   );

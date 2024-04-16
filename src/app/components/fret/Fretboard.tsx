@@ -124,7 +124,6 @@ export const Fretboard: React.FC = () => {
           style={{
             ...dimensions,
             maxWidth: 2900,
-            maxHeight: 1000,
           }}
         >
           <Image

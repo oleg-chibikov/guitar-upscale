@@ -6,7 +6,7 @@ import { ChordsView } from "../chords/ChordsView";
 import { SettingsView } from "./SettingsView";
 import { ButtonContainer } from "./buttons/ButtonContainer";
 import { LockRatioButton } from "./buttons/LockRatioButton";
-import { ScaleSelector } from "./selectors/ScaleSelector";
+import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 import { FretboardScaleXSlider } from "./sliders/FretboardScaleXSlider";
 import { FretboardScaleYSlider } from "./sliders/FretboardScaleYSlider";
 
@@ -29,7 +29,7 @@ export const ControlPanel: React.FC = () => {
           maxHeight: "95%",
         }}
       >
-        <ScaleSelector />
+        <ScaleAndGroupSelector />
         <ButtonContainer />
       </section>
       <SettingsView />

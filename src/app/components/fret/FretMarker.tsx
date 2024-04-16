@@ -43,6 +43,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     fretboardScaleX,
     fretboardScaleY,
     baseNote,
+    themeString,
   } = useSelector(selectControlPanel);
 
   const hasTouchInput = useInputChecker();
@@ -117,10 +118,16 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     // Space for the marker - it's drawn even if the marker is not present for the current scale
     <div
       className={`
-      flex relative justify-center items-center h-5 pt-1 pb-1
-      ${fret > 0 && "border-l-2 border-red-500"}
-      ${isHeader && "h-9 " + (isColored ? "bg-orange-400" : "bg-orange-100")}
-      `}
+          flex relative justify-center items-center h-5 pt-1 pb-1
+          ${fret > 0 && `border-l-2 border-primary-${themeString}`}
+          ${
+            isHeader &&
+            "h-9 " +
+              (isColored
+                ? `bg-marker-${themeString}`
+                : `bg-secondary-${themeString}`)
+          }
+          `}
       style={{ width, top }}
     >
       {stringOctaveNote && (
@@ -128,20 +135,20 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <span
             className={`relative z-60 flex justify-center items-center select-none font-mono
-              ${!isHeader && "rounded-full"}
-              ${
-                !isHeader &&
-                (isFromPreviousChord
-                  ? isColored
-                    ? "bg-lime-500"
-                    : "bg-green-500"
-                  : isColored
-                  ? "bg-orange-400"
-                  : "bg-orange-100")
-              }
-              ${isHeader ? "text-xl" : "text-md"}
-              ${isHeader || isColored ? "text-black" : "text-red-500"}
-              ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
+                  ${!isHeader && "rounded-full"}
+                  ${
+                    !isHeader &&
+                    (isFromPreviousChord
+                      ? isColored
+                        ? `bg-accent-${themeString}`
+                        : `bg-primary-${themeString}`
+                      : isColored
+                      ? `bg-marker-${themeString}`
+                      : `bg-secondary-${themeString}`)
+                  }
+                  ${isHeader ? "text-xl" : "text-md"}
+                  ${`text-foreground-${themeString}`}
+                  ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
             style={{
               width: `${30 * fretboardScaleX}px`, // Set width based on fretboard scaling
               height: `${30 * fretboardScaleY}px`, // Set height based on fretboard scaling

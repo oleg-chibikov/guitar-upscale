@@ -28,7 +28,7 @@ const Slider: React.FC<SliderProps> = ({
   label,
   labelClass,
 }) => {
-  const { chordsDisplayMode } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, themeString } = useSelector(selectControlPanel);
   return (
     <div
       className={`items-center flex ${
@@ -47,7 +47,7 @@ const Slider: React.FC<SliderProps> = ({
       >
         <input
           type="range"
-          className={`cursor-pointer`}
+          className={`cursor-pointer accent-primary-${themeString}`}
           min={minimumValue}
           max={maximumValue}
           value={value}
@@ -62,7 +62,11 @@ const Slider: React.FC<SliderProps> = ({
           }}
         />
       </div>
-      <span className={`text-nowrap ${labelClass}`}>{label}</span>
+      <span
+        className={`text-nowrap text-foreground-${themeString} ${labelClass}`}
+      >
+        {label}
+      </span>
     </div>
   );
 };

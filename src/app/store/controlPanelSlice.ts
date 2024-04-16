@@ -24,6 +24,9 @@ import {
 import { midiRecorder } from "../engine/midiRecorder";
 import { RootState } from "./store"; // Define RootState type
 
+export const toString = (theme: Theme) =>
+  theme === Theme.Dark ? "dark" : "light";
+
 export enum Theme {
   Dark,
   Light,
@@ -49,12 +52,14 @@ const getFirstScaleForGroup = (groupKey: string) =>
 const initialTheme = Theme.Dark;
 
 const getViewSettings = (theme: Theme) => {
-  const color = theme === Theme.Dark ? "white" : "black";
+  const themeString = toString(theme);
+  const color = "foreground-" + themeString;
   return {
-    bg: theme === Theme.Dark ? "bg-gray-600" : "bg-gray-300",
-    mainBg: theme === Theme.Dark ? "bg-neutral-800" : "bg-neutral-100",
+    bg: "bg-accentedbackground-" + themeString,
+    mainBg: "bg-background-" + themeString,
     color: color,
     textStyle: `text-md text-${color}`,
+    themeString,
   };
 };
 
@@ -91,6 +96,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   alertMessage: string;
   playbackType: PlaybackType;
   theme: Theme;
+  themeString: string;
   switchToChromaticScale: boolean;
   useAdvancedChords: boolean;
   bg: string;
@@ -124,6 +130,7 @@ const initialState: ControlPanelState = {
   alertMessage: "",
   playbackType: PlaybackType.Melody,
   theme: initialTheme,
+  themeString: toString(initialTheme),
   switchToChromaticScale: true,
   useAdvancedChords: false,
   bg: initialSettings.bg,
@@ -277,6 +284,7 @@ export const controlPanelSlice = createSlice({
       state.mainBg = settings.mainBg;
       state.color = settings.color;
       state.textStyle = settings.textStyle;
+      state.themeString = settings.themeString;
     },
     setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
       state.switchToChromaticScale = action.payload;
