@@ -57,7 +57,6 @@ const getViewSettings = (theme: Theme) => {
   return {
     bg: "bg-accentedbackground-" + themeString,
     mainBg: "bg-background-" + themeString,
-    color: color,
     textStyle: `text-md text-${color}`,
     themeString,
   };
@@ -101,7 +100,6 @@ interface ControlPanelState extends WithNeck, WithControls {
   useAdvancedChords: boolean;
   bg: string;
   mainBg: string;
-  color: string;
   textStyle: string;
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
@@ -135,7 +133,6 @@ const initialState: ControlPanelState = {
   useAdvancedChords: false,
   bg: initialSettings.bg,
   mainBg: initialSettings.mainBg,
-  color: initialSettings.color,
   textStyle: initialSettings.textStyle,
   chordPlayMode: ChordPlayMode.RoundRobin,
   fretboardScaleX: 1,
@@ -282,7 +279,6 @@ export const controlPanelSlice = createSlice({
       const settings = getViewSettings(action.payload);
       state.bg = settings.bg;
       state.mainBg = settings.mainBg;
-      state.color = settings.color;
       state.textStyle = settings.textStyle;
       state.themeString = settings.themeString;
     },

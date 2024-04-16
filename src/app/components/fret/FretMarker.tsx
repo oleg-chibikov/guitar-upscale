@@ -124,8 +124,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             isHeader &&
             "h-9 " +
               (isColored
-                ? `bg-fret_marker-${themeString}`
-                : `bg-fret_marker_match-${themeString}`)
+                ? `bg-fret_marker_match-${themeString}`
+                : `bg-fret_marker-${themeString}`)
           }
           `}
       style={{ width, top }}
@@ -147,6 +147,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                       : `bg-fret_marker-${themeString} text-foreground-${themeString}`)
                   }
                   ${isHeader ? "text-xl" : "text-md"}
+                  ${isHeader && `text-foreground-${themeString}`}
                   ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
