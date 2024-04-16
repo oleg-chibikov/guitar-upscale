@@ -100,8 +100,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   }
 
   const animationClasses = pressed
-    ? `scale-50 bg-accent-${themeString}`
-    : `scale-100 bg-primary-${themeString}`;
+    ? `scale-50 bg-button_pressed-${themeString}`
+    : `scale-100 bg-button-${themeString}`;
 
   return (
     <ul

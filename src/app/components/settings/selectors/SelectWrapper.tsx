@@ -21,11 +21,11 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
     <select
       value={value}
       onChange={(event) => onChange && onChange(event.target.value)}
-      className={`text-background-${themeString} bg-foreground-${themeString} ${className}`}
+      className={`text-select_foreground-${themeString} bg-select_background-${themeString} ${className}`}
     >
       {options.map((option) => (
         <option
-          className={`text-background-${themeString} hover:bg-background-${themeString}`}
+          className={`text-select_foreground-${themeString} hover:bg-select_background-${themeString}`}
           key={option.value}
           value={option.value}
         >

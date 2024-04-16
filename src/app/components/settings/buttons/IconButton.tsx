@@ -29,7 +29,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       id={id}
       title={tooltip}
       className={`${
-        isActive ? activeBg ?? `bg-primary-${themeString}` : inactiveBg ?? bg
+        isActive ? activeBg ?? `bg-button-${themeString}` : inactiveBg ?? bg
       } text-foreground-${themeString} opacity-95 p-1 flex items-center justify-center`}
       onClick={onPress}
       {...rest}
