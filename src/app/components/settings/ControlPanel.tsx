@@ -14,7 +14,7 @@ export const ControlPanel: React.FC = () => {
   const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
     <>
-      <div
+      <section
         className={`z-30 overflow-auto fixed top-1 ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
@@ -31,7 +31,7 @@ export const ControlPanel: React.FC = () => {
       >
         <ScaleSelector />
         <ButtonContainer />
-      </div>
+      </section>
       <SettingsView />
       <ChordsView />
 

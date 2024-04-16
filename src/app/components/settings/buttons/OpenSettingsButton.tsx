@@ -13,6 +13,7 @@ export const OpenSettingsButton: React.FC = (props) => {
   return (
     <IconButton
       {...props}
+      id="open-settings-button"
       icon={<SettingsApplications />}
       tooltip={
         settingsExpanded ? "Close settings panel" : "Open settings panel"

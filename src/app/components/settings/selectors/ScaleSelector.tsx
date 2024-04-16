@@ -25,14 +25,13 @@ export const ScaleSelector: React.FC = () => {
   };
 
   return (
-    <div
-      className={`bg-${bg} opacity-95 p-1 gap-2 grid`}
+    <section
+      className={`${bg} opacity-95 p-1 gap-3 grid ${textStyle}`}
       style={{
         gridTemplateColumns: "auto minmax(100px, auto)",
       }}
     >
-      {/* TODO Add text component */}
-      <span className={textStyle}>Style:</span>
+      <span>Style:</span>
       <select
         className="text-md"
         value={scaleGroup}
@@ -46,7 +45,7 @@ export const ScaleSelector: React.FC = () => {
       </select>
       {scaleGroup && (
         <>
-          <span className={textStyle}>Scale:</span>
+          <span>Scale:</span>
           <select
             className="text-md"
             value={scale}
@@ -67,6 +66,6 @@ export const ScaleSelector: React.FC = () => {
           </select>
         </>
       )}
-    </div>
+    </section>
   );
 };

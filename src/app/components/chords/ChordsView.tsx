@@ -12,7 +12,7 @@ export const ChordsView: React.FC = () => {
   const { neck, useAdvancedChords, chords, bg } =
     useSelector(selectControlPanel);
 
-    const [height, setHeight] = useState(window.innerHeight);
+  const [height, setHeight] = useState(window.innerHeight);
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,40 +33,48 @@ export const ChordsView: React.FC = () => {
     return null;
   }
 
-  return (
-    <div
-  className={`opacity-95 overflow-auto fixed ${chordsDisplayMode === ChordsDisplayMode.Left ? "left" : "right"}-1 z-20 bottom-1 ${bg} p-1 gap-1 flex ${!hasTouchInput ? "flex-row" : "flex-col"}`}
-  style={{
-    maxWidth: hasTouchInput && height < 700 ? 150 : "95%", // when height is 700+ there's enough space under the guitar to show full chords
-    maxHeight: hasTouchInput ? "95%" : 350,
-  }}
->
-      {chords.map((noteChord) => (
-        <div
-          key={noteChord.note}
-          className={`gap-1 flex justify-between ${!hasTouchInput ? "flex-col" : "flex-row"}`}
-        >
-          {noteChord.modes.map((noteChordMode) => {
-            if (
-              !useAdvancedChords &&
-              noteChordMode.mode !== ChordMode.Major &&
-              noteChordMode.mode !== ChordMode.Minor
-            ) {
-              return null;
-            }
-            const title =
-              getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
+  const totalRows = chords.length;
+  const totalColumns = chords[0].modes.filter((x) =>
+    useAdvancedChords
+      ? true
+      : x.mode === ChordMode.Major || x.mode === ChordMode.Minor
+  ).length;
 
-            return (
-              <ChordButton
-                noteChordMode={noteChordMode}
-                chordName={title}
-                key={title}
-              />
-            );
-          })}
-        </div>
-      ))}
-    </div>
+  return (
+    <section
+      className={`opacity-95 overflow-auto fixed ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "left" : "right"
+      }-1 z-20 bottom-1 ${bg} p-1 gap-1 ${
+        !hasTouchInput ? "grid-cols-2" : "grid-rows-2"
+      }`}
+      style={{
+        maxWidth: hasTouchInput && height < 700 ? 150 : "95%", // when height is 700+ there's enough space under the guitar to show full chords
+        maxHeight: hasTouchInput ? "95%" : 350,
+        display: "grid",
+        gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+        gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+      }}
+    >
+      {chords.flatMap((noteChord) =>
+        noteChord.modes.map((noteChordMode) => {
+          const isHidden =
+            !useAdvancedChords &&
+            noteChordMode.mode !== ChordMode.Major &&
+            noteChordMode.mode !== ChordMode.Minor;
+
+          const title =
+            getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
+
+          return (
+            <ChordButton
+              key={title}
+              isHidden={isHidden}
+              noteChordMode={noteChordMode}
+              chordName={title}
+            />
+          );
+        })
+      )}
+    </section>
   );
 };

@@ -14,6 +14,7 @@ interface SliderProps {
   className?: string;
   isVertical?: boolean;
   label: string;
+  labelClass?: string;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -25,6 +26,7 @@ const Slider: React.FC<SliderProps> = ({
   className,
   isVertical,
   label,
+  labelClass,
 }) => {
   const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
@@ -60,7 +62,7 @@ const Slider: React.FC<SliderProps> = ({
           }}
         />
       </div>
-      <div>{label}</div>
+      <span className={`text-nowrap ${labelClass}`}>{label}</span>
     </div>
   );
 };

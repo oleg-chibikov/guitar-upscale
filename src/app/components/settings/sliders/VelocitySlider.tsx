@@ -15,16 +15,13 @@ export const VelocitySlider: React.FC = () => {
   };
 
   return (
-    <div className="items-center flex flex-row gap-2">
-      <Slider
-        onValueChange={handleSliderChange}
-        value={velocity}
-        minimumValue={1}
-        maximumValue={125}
-        step={1}
-        className="w-48"
-      />
-      <span className={textStyle}>{velocity}</span>
-    </div>
+    <Slider
+      onValueChange={handleSliderChange}
+      value={velocity}
+      minimumValue={1}
+      maximumValue={125}
+      step={1}
+      label={velocity.toString()}
+    />
   );
 };

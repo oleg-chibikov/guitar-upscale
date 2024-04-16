@@ -21,7 +21,6 @@ export const ChordNotesToPlaySlider: React.FC = () => {
       minimumValue={1}
       maximumValue={6}
       step={1}
-      className="w-48"
       label={chordNotesToPlay.toString()}
     />
   );

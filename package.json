@@ -4,9 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rimraf dist && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
+    "deploy-surge-org.uk": "surge --domain guitar-upscale.org.uk dist/",
+    "deploy-surge-co.uk": "surge --domain guitar-upscale.co.uk dist/",
+    "build-and-deploy-web-stage": "npm run build && npm run deploy-surge",
+    "build-and-deploy-web-prod-1": "npm run build && npm run deploy-surge-org.uk",
+    "build-and-deploy-web-prod-2": "npm run build && npm run deploy-surge-co.uk",
+    "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -32,6 +39,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.1",
     "postcss": "^8",
+    "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.3",
     "typescript": "^5"
   }

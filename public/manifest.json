@@ -31,6 +31,6 @@
   "description": "A guitar emulator - great for learning and playing",
   "dir": "ltr",
   "lang": "en",
-  "orientation": "natural",
+  "orientation": "landscape-primary",
   "categories": ["lifestyle", "music", "productivity"]
 }

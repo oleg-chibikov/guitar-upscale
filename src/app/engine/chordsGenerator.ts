@@ -212,6 +212,8 @@ const chordModes = new Map<ChordMode, number[][]>([
   ], // [0, 7, 0, 4, 7, 0],
 ]);
 
+const chordModesArray = Array.from(chordModes);
+
 export type NoteChordMode = {
   mode: ChordMode;
   variations: Chord[];
@@ -276,7 +278,7 @@ export const generateAllChords = (
     const noteChords: NoteChordMode[] = [];
 
     // Generate all chord variations for the current note
-    for (const [mode, intervals] of chordModes) {
+    for (const [mode, intervals] of chordModesArray) {
       if (!useAdvancedChords && isAdvancedMode(mode)) {
         continue;
       }
@@ -335,7 +337,7 @@ const generateChordVariations = (
 
         // Find the next notes in the chord on the upper strings
 
-        // if (chordNotes[0] === Note.E && _mode === ChordMode.Eleventh) {
+        // if (chordNotes[0] === Note.E && _mode === ChordMode.Major) {
         //   debugger;
         // }
         for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
@@ -376,7 +378,7 @@ const generateChordVariations = (
           for (const combination of cartesianProduct) {
             if (
               combination.length >= minConsecutiveNotesInValidChord &&
-              // first 3 notes of the chord should be present to consider it valid
+              // first n notes of the chord should be present to consider it valid
               // TODO: different modes of chord might require more notes
               [...combination]
                 .slice(0, minConsecutiveNotesInValidChord)

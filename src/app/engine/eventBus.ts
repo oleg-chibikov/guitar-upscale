@@ -54,7 +54,7 @@ NotePlayEventBus.subscribe((noteWithMetadata: NoteWithPlayMetadata) => {
 
 ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
   console.log("EventBus: chord play requested: " + chord);
-  for (const note of ClearChordMarkerSet) {
+  for (const note of Array.from(ClearChordMarkerSet)) {
     const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
     noteFromThePreviousChordAction?.({ clearChordMarker: true });
   }

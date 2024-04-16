@@ -21,8 +21,8 @@ export const PlayIntervalSlider: React.FC = () => {
       minimumValue={50}
       maximumValue={500}
       step={1}
-      className="w-48"
       label={`${playIntervalBpm} BPM`}
+      labelClass="w-20"
     />
   );
 };

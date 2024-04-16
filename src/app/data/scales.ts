@@ -10,9 +10,9 @@ export const checkDuplicateScales = (
   const encounteredScales = new Map<string, string>();
 
   // Iterate through each group
-  for (const [group, groupMap] of scalesMap.entries()) {
+  for (const [group, groupMap] of Array.from(scalesMap.entries())) {
     // Iterate through each scale within the group
-    for (const [scaleName, scaleObject] of groupMap.entries()) {
+    for (const [scaleName, scaleObject] of Array.from(groupMap.entries())) {
       const scaleNotes = getScaleNotes(scaleObject);
       const scaleString = JSON.stringify(scaleNotes);
 
@@ -56,7 +56,6 @@ export const getScaleExamples = (scale?: Scale): Example[] | undefined => {
 // (<melody>)3 play <melody> for 3 times
 // <Asus4> - play Asus4 chord immediately. It uses the variation closest to the neck head and the strumming delay from settings
 
-// TODO: Chords support
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
     "Common Minor",
@@ -144,7 +143,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "Jewish Traditional Song",
               title: "Hava Nagila",
               melody:
-                "(*0 <E> 0_0__410 <G#dim> 4_4__754 <Adim> 5_5__875 <G#dim> 4101 ^540 ___)2 *0 <Caug> 88_ ^57 7555_ <Bdim> 77_ ^55 5444_ <E6> 4_75 <E6> 4_5_ <E6> 4_ ^51 1_ ^50 0",
+                "(*0 <E> 0_0__410 <G#dim> 4_4__754 <Am> 5_5__875 <G#dim> 4101 ^540 ___)2 *0 <Caug> 88_ ^57 7555_ <Bdim> 77_ ^55 5444_ <E6> 4_75 <E6> 4_5_ <E6> 4_ ^51 1_ ^50 0",
             },
           ],
         },

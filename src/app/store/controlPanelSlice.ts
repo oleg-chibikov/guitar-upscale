@@ -95,7 +95,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   bg: string;
   mainBg: string;
   color: string;
-  textStyle: string; // TODO: change type
+  textStyle: string;
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
   fretboardScaleY: number;

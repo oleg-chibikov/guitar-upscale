@@ -16,7 +16,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div>
       <input
         type="checkbox"
         id={label}

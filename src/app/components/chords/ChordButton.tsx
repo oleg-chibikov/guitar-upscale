@@ -20,11 +20,13 @@ import { selectControlPanel } from "../../store/controlPanelSlice";
 interface ChordButtonProps {
   chordName: string;
   noteChordMode: NoteChordMode;
+  isHidden: boolean;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   noteChordMode,
+  isHidden,
 }) => {
   const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
     useSelector(selectControlPanel);
@@ -44,7 +46,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       // Start the animation sequence
       setPressed(true);
-      setTimeout(() => setPressed(false), 300);
+      setTimeout(() => setPressed(false), 150);
 
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
       const params: ChordPlayParameters = {
@@ -89,12 +91,16 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     noteChordMode,
   ]);
 
+  if (isHidden) {
+    return null;
+  }
+
   const animationClasses = pressed
     ? "scale-50 bg-green-500"
     : "scale-100 bg-blue-500";
 
   return (
-    <div
+    <ul
       onTouchStart={() => {
         if (hasTouchInput) {
           ChordEventBus.next({ chord: chordName, metadata: {} });
@@ -105,13 +111,11 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           ChordEventBus.next({ chord: chordName, metadata: {} });
         }
       }}
-      className={`w-14 h-6 px-2 py-1 items-center justify-center cursor-pointer ${
+      className={`text-center w-16 h-6 items-center justify-center cursor-pointer content-center ${
         disabled ? "bg-gray-400" : animationClasses
-      }`}
+      } font-mono select-none text-white transition-transform transform origin-center`}
     >
-      <div className="text-white transition-transform transition-opacity transform origin-center">
-        <span className="font-mono select-none">{chordName}</span>
-      </div>
-    </div>
+      {chordName}
+    </ul>
   );
 };

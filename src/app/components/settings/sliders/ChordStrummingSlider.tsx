@@ -21,8 +21,8 @@ export const ChordStrummingDelaySlider: React.FC = () => {
       minimumValue={0}
       maximumValue={500}
       step={1}
-      className="w-48"
       label={`${chordStrummingDelayMs}ms`}
+      labelClass="w-20"
     />
   );
 };

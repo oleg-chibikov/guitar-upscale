@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { StringOctaveNote } from "../data/notes";
-import { NoteCount } from "../engine/generateNeckRepresentation";
-import { Skin, selectControlPanel } from "../store/controlPanelSlice";
+import { StringOctaveNote } from "../../data/notes";
+import { NoteCount } from "../../engine/generateNeckRepresentation";
+import { Skin, selectControlPanel } from "../../store/controlPanelSlice";
 import { FretMarker } from "./FretMarker";
 
 export interface FretlineProps {
@@ -33,7 +33,7 @@ const calculateTop = (string: number, fret: number, modifiers: number[]) => {
 const getParametersForSkin = (skin?: Skin) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
-    case undefined:
+    default:
       return {
         height: 25,
         widthStep: 10.25,
@@ -73,7 +73,7 @@ export const Fretline: React.FC<FretlineProps> = ({
 
   return (
     <div
-      className={`z-${
+      className={`flex z-${
         (6 - (string ?? 1)) * 10
       } flex-row justify-between items-center`}
       style={

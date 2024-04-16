@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { initSoundfont } from "../engine/soundProvider";
 import { getHexValue } from "../helpers/colorHelper";
-import { getAssetsForSkin } from "../helpers/skinHelper";
 import { hideAlert, init } from "../store/controlPanelSlice";
 import { RootState } from "../store/store";
 import { AnimatedAlert } from "./AnimatedAlert";
-import { Fretboard } from "./Fretboard";
+import { Fretboard } from "./fret/Fretboard";
 import { ControlPanel } from "./settings/ControlPanel";
 
+// TODO
+// youtube videos for each scale
+// get the formula to avoid hardcoding each string height offset
+// more instruments + dropdown
+// Slider - used HTML element - most likely won't work for Native
+// more examples
+// Guitar tunings
+// 7,8 string guitars
+// Ads
+// More chords
 export const Main = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(init());
   }, [dispatch]);
-
-  const [highResLoaded, setHighResLoaded] = useState(false);
-  const [scaleFactor, setScaleFactor] = useState(1);
 
   const {
     showAlert: isAlertShown,
@@ -23,7 +30,6 @@ export const Main = () => {
     mainBg,
     fretboardScaleX,
     fretboardScaleY,
-    skin,
   } = useSelector((state: RootState) => state.controlPanel);
 
   const [retrigger, setRetrigger] = useState<boolean>(false);
@@ -32,44 +38,8 @@ export const Main = () => {
     const bgHex = getHexValue(mainBg);
     if (bgHex) {
       document.body.style.backgroundColor = bgHex;
-      // TODO: Check
     }
   }, [mainBg]);
-
-  const recalculateScaleFactor = (size: {
-    width: number;
-    height: number;
-    fontScale: number;
-  }) => {
-    const isLandscape = size.width > size.height;
-    const baseScale = 0.5;
-
-    const scaleFactor =
-      baseScale +
-      (isLandscape
-        ? Math.log10(size.width / size.height)
-        : Math.log10(size.height / size.width));
-    setScaleFactor(scaleFactor * size.fontScale);
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      recalculateScaleFactor({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        fontScale: 1, // You may need to adjust this value based on your requirements
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Call handleResize initially to calculate scaleFactor
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     setRetrigger(true);
@@ -77,44 +47,50 @@ export const Main = () => {
   }, [fretboardScaleX, fretboardScaleY]);
 
   useEffect(() => {
-    setHighResLoaded(false);
-  }, [skin]);
+    initSoundfont();
+  }, []);
+
+  useEffect(() => {
+    // Orientation.lockToLandscape(); // this will lock the view to Landscape
+
+    // prevent the Google translate bottom popup from appearing on mobile screen
+    document.addEventListener(
+      "click",
+      function (event: any) {
+        if (
+          event.target.nodeName === "UL" ||
+          event.target.nodeName === "LI" ||
+          event.target.nodeName === "SPAN"
+        ) {
+          event.preventDefault();
+        }
+      },
+      true
+    );
+
+    if (typeof navigator.serviceWorker !== "undefined") {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  }, []);
 
   const handleCloseAlert = () => {
     dispatch(hideAlert());
   };
 
-  const assets = getAssetsForSkin(skin);
-
+  // retriggering is needed to refresh scrollbars, otherwise they stay not updated
   if (retrigger) {
-    return (
-      <div
-        className={`min-w-full min-h-full items-start justify-center ${mainBg}`}
-      ></div>
-    );
+    return null;
   }
 
-  // TODO: Close menu on touch anywhere else
   return (
-    <div>
+    <>
       {isAlertShown && (
         <AnimatedAlert message={alertMessage} onClose={handleCloseAlert} />
       )}
 
       <ControlPanel />
-      <div
-        className={`min-w-full min-h-full items-start justify-center ${mainBg}`}
-      >
-        <Fretboard
-          scaleFactor={scaleFactor}
-          imageSource={assets[1]}
-          onImageLoaded={() => {
-            console.log("Loaded full res image");
-            setHighResLoaded(true);
-          }}
-          isCollapsed={!highResLoaded}
-        />
-      </div>
-    </div>
+
+      <Fretboard />
+    </>
   );
 };

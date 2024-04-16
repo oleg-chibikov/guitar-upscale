@@ -15,10 +15,11 @@ interface ButtonContainerProps {
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
   const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
-    <div className="flex flex-col gap-1" style={style}>
-      <div className={`flex flex-row gap-1 justify-${
-            chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
-          }`}
+    <section className="flex flex-col gap-1" style={style}>
+      <div
+        className={`flex flex-row gap-1 justify-${
+          chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
+        }`}
       >
         <OpenSettingsButton />
         <OpenChordsButton />
@@ -32,6 +33,6 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
         <PlayButton />
         <RecordButton />
       </div>
-    </div>
+    </section>
   );
 };

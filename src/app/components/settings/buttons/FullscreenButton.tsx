@@ -1,33 +1,27 @@
 import CloseFullscreen from "@mui/icons-material/CloseFullscreen";
 import OpenInFull from "@mui/icons-material/OpenInFull";
-import React from "react";
+import React, { useState } from "react";
 import screenfull from "screenfull";
 import { IconButton } from "./IconButton";
 
 export const FullscreenButton: React.FC = (props) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  if (!screenfull.isEnabled) {
+    return false;
+  }
   return (
     <IconButton
       {...props}
-      icon={
-        screenfull.isEnabled && !screenfull.isFullscreen ? (
-          <OpenInFull />
-        ) : (
-          <CloseFullscreen />
-        )
-      }
-      tooltip={
-        screenfull.isEnabled && !screenfull.isFullscreen
-          ? "Go fullscreen"
-          : "Exit fullscreen"
-      }
-      isActive={screenfull.isEnabled && screenfull.isFullscreen}
-      onPress={() => {
-        if (screenfull.isEnabled) {
-          if (!screenfull.isFullscreen) {
-            screenfull.request();
-          } else {
-            screenfull.exit();
-          }
+      icon={!screenfull.isFullscreen ? <OpenInFull /> : <CloseFullscreen />}
+      tooltip={!screenfull.isFullscreen ? "Go fullscreen" : "Exit fullscreen"}
+      isActive={screenfull.isFullscreen}
+      onPress={async () => {
+        if (!screenfull.isFullscreen) {
+          await screenfull.request();
+          setIsFullscreen(true);
+        } else {
+          await screenfull.exit();
+          setIsFullscreen(false);
         }
       }}
     />
