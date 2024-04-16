@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  /* background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb)); */
+}
+
+html,
+body {
+  width: 100vw;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+select,
+option {
+  color: black;
+}
+
+@keyframes expandAndFade {
+  0% {
+    background-color: inherit; /* or the original background color */
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.5);
+    background-color: rgb(207, 135, 0); /* or any color you want */
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    background-color: inherit; /* back to original color */
+  }
+}
+
+.fret-note-circle-animation {
+  animation: expandAndFade 0.3s linear;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease forwards;
+}
+
+.animate-slideOut {
+  animation: slideOut 0.1s linear forwards;
+}
