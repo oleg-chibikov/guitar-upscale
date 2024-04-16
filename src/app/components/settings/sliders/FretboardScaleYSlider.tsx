@@ -23,7 +23,7 @@ export const FretboardScaleYSlider: React.FC = () => {
       minimumValue={minYZoom * 10}
       maximumValue={maxYZoom * 10}
       step={1}
-      className="h-32"
+      className="h-32 px-2"
       isVertical
       label={`Y${(1 / fretboardScaleY).toFixed(2)}`}
     />

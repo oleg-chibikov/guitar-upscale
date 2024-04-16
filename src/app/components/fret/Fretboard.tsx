@@ -123,8 +123,8 @@ export const Fretboard: React.FC = () => {
           className={`absolute overflow-hidden`}
           style={{
             ...dimensions,
-            maxWidth: 3000,
-            maxHeight: 1300,
+            maxWidth: 2900,
+            maxHeight: 1000,
           }}
         >
           <Image

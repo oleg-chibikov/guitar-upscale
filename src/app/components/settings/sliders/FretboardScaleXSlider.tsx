@@ -23,7 +23,7 @@ export const FretboardScaleXSlider: React.FC = () => {
       minimumValue={minXZoom * 10}
       maximumValue={maxXZoom * 10}
       step={1}
-      className="w-32"
+      className="w-32 py-2"
       label={`X${(1 / fretboardScaleX).toFixed(2)}`}
     />
   );

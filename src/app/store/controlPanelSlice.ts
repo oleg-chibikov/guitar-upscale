@@ -16,6 +16,7 @@ import {
   getModeText,
   NoteChords,
 } from "../engine/chordsGenerator";
+import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
   Neck,
@@ -159,6 +160,7 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   );
   state.neck = neck;
   setChords(state);
+  clearPreviousChords();
 };
 
 const setChords = (state: WithNeck) => {

@@ -52,13 +52,17 @@ NotePlayEventBus.subscribe((noteWithMetadata: NoteWithPlayMetadata) => {
   playAction?.(noteWithMetadata.metadata);
 });
 
-ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
-  console.log("EventBus: chord play requested: " + chord);
+export const clearPreviousChords = () => {
   for (const note of Array.from(ClearChordMarkerSet)) {
     const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
     noteFromThePreviousChordAction?.({ clearChordMarker: true });
   }
   ClearChordMarkerSet.clear(); // clear previous chord;
+};
+
+ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
+  console.log("EventBus: chord play requested: " + chord);
+  clearPreviousChords();
 
   const playAction = ChordToChordButtonEventMap.get(chord.chord);
 

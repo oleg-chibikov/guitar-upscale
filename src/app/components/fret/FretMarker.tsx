@@ -125,20 +125,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     >
       {stringOctaveNote && (
         <>
-          {isNoteClicked && (
-            // Animated circle when clicked
-            <div
-              style={{
-                width: `${50 * fretboardScaleX}px`, // Set width based on fretboard scaling
-                height: `${50 * fretboardScaleY}px`, // Set height based on fretboard scaling
-              }}
-              className="fret-note-circle-animation absolute z-10 rounded-full bg-amber-500"
-            />
-          )}
           {/* The marker itself */}
           <span
             className={`relative z-60 flex justify-center items-center select-none font-mono
-              ${!isHeader && "w-7 h-7 rounded-full"}
+              ${!isHeader && "rounded-full"}
               ${
                 !isHeader &&
                 (isFromPreviousChord
@@ -151,9 +141,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               }
               ${isHeader ? "text-xl" : "text-md"}
               ${isHeader || isColored ? "text-black" : "text-red-500"}
-              ${isNoteClicked ? "fret-note-color-animation" : ""}`}
+              ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
             style={{
-              transform: `scale(${fretboardScaleX}, ${fretboardScaleY})`,
+              width: `${30 * fretboardScaleX}px`, // Set width based on fretboard scaling
+              height: `${30 * fretboardScaleY}px`, // Set height based on fretboard scaling
             }}
           >
             {isHeader
