@@ -96,15 +96,6 @@ export const tunings: string[] = [
   "DAGDAD|544433",
 ];
 
-export const stringTuning: OctaveNote[] = [
-  { note: Note.E, octave: 5 },
-  { note: Note.B, octave: 4 },
-  { note: Note.G, octave: 4 },
-  { note: Note.D, octave: 4 },
-  { note: Note.A, octave: 3 },
-  { note: Note.E, octave: 3 },
-];
-
 export const serializeOctaveNote = (note: OctaveNote) =>
   [note.octave, note.note].join("_");
 
