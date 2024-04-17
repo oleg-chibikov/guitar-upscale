@@ -43,8 +43,8 @@ export const ChordsView: React.FC = () => {
   return (
     <section
       className={`opacity-95 overflow-auto fixed ${
-        chordsDisplayMode === ChordsDisplayMode.Left ? "left" : "right"
-      }-1 z-20 bottom-1 ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
+      } z-20 bottom-1 ${
         theme === Theme.Light
           ? "bg-accented_background-light"
           : "bg-accented_background-dark"

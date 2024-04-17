@@ -17,8 +17,10 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
   return (
     <section className="flex flex-col gap-1" style={style}>
       <div
-        className={`flex flex-row gap-1 justify-${
-          chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
+        className={`flex flex-row gap-1 ${
+          chordsDisplayMode === ChordsDisplayMode.Left
+            ? "justify-end"
+            : "justify-start"
         }`}
       >
         <OpenSettingsButton />
@@ -26,8 +28,10 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
         <FullscreenButton />
       </div>
       <div
-        className={`flex flex-row gap-1 justify-${
-          chordsDisplayMode === ChordsDisplayMode.Left ? "end" : "start"
+        className={`flex flex-row gap-1 ${
+          chordsDisplayMode === ChordsDisplayMode.Left
+            ? "justify-end"
+            : "justify-start"
         }`}
       >
         <PlayButton />

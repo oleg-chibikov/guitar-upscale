@@ -37,12 +37,11 @@ const Slider: React.FC<SliderProps> = ({
     >
       <div
         className={`w-full flex items-center ${
-          "justify-" +
-          (isVertical
+          isVertical
             ? chordsDisplayMode === ChordsDisplayMode.Left
-              ? "end"
-              : "start"
-            : "center")
+              ? "justify-end"
+              : "justify-start"
+            : "justify-center"
         } ${className}`}
       >
         <input

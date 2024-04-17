@@ -21,8 +21,8 @@ export const ControlPanel: React.FC = () => {
             : "bg-panel-dark border-border-dark"
         } ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
-        }-1 flex ${
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+        } flex ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left
             ? "flex-row-reverse"

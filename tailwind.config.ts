@@ -1,11 +1,6 @@
 import type { Config } from "tailwindcss";
 const safelist = [
-  "justify-end",
-  "justify-start",
-  "right-1",
-  "left-1",
-  "right-12",
-  "left-12",
+  // Dynamically generating z-indexes for strings
   "z-10",
   "z-20",
   "z-30",

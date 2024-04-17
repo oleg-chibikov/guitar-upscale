@@ -68,8 +68,8 @@ export const SettingsView: React.FC = () => {
         ref={settingsRef}
         className={`flex flex-col opacity-95 overflow-auto fixed ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
-        }-1 z-40 top-20 ${
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+        } z-40 top-20 ${
           theme === Theme.Light
             ? "bg-accented_background-light"
             : "bg-accented_background-dark"
