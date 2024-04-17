@@ -69,10 +69,12 @@ export const SettingsView: React.FC = () => {
           chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
         }-1 z-40 top-20 ${bg} p-2 gap-2`}
         style={{
-          maxWidth: "95%",
-          maxHeight: "95%",
+          maxWidth: "80vw",
+          maxHeight: "60vh",
         }}
       >
+        <SwitchToChromaticScaleCheckbox />
+        <UseAdvancedChordsCheckbox />
         <div
           className={`grid gap-2 ${textStyle}`}
           style={{
@@ -89,6 +91,10 @@ export const SettingsView: React.FC = () => {
           <ChordsDisplayModeSelector />
           <span>Playback type:</span>
           <PlaybackTypeSelector />
+          <span>Skin:</span>
+          <SkinSelector />
+          <span>Chord play mode:</span>
+          <ChordPlayModeSelector />
           <span>Playback speed:</span>
           <PlayIntervalSlider />
           <span>Chord strumming delay:</span>
@@ -97,13 +103,7 @@ export const SettingsView: React.FC = () => {
           <ChordNotesToPlaySlider />
           <span>Playback volume:</span>
           <VelocitySlider />
-          <span>Skin:</span>
-          <SkinSelector />
-          <span>Chord play mode:</span>
-          <ChordPlayModeSelector />
         </div>
-        <SwitchToChromaticScaleCheckbox />
-        <UseAdvancedChordsCheckbox />
       </section>
     )
   );

@@ -107,8 +107,8 @@ const config: Config = {
           dark: "#999999",
         },
         border_accent: {
-          light: "#65a300",
-          dark: "#bf5337",
+          light: "#bf5337", // Red
+          dark: "#65a300", // Green
         },
         select_background: {
           light: "#F2F2F2",

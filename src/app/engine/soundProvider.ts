@@ -11,6 +11,12 @@ export const initSoundfont = () => {
       decayTime: 10,
       // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
     });
+
+    // test note
+    soundfont?.start({
+      note: "E4",
+      velocity: 125,
+    });
   }
 };
 

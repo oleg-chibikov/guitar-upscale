@@ -8,9 +8,7 @@ export default function Home() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <main className="w-full h-full">
-          <Main />
-        </main>
+        <Main />
       </PersistGate>
     </Provider>
   );

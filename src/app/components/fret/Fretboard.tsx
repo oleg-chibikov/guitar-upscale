@@ -1,19 +1,19 @@
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteCount } from "../../engine/generateNeckRepresentation";
 import { getAssetsForSkin } from "../../helpers/skinHelper";
-import { imageLoader } from "../../imageLoader";
 import { Skin } from "../../store/controlPanelSlice";
 import { RootState } from "../../store/store";
 import { Fretline } from "./Fretline";
+import { GuitarImage } from "./GuitarImage";
 
-const getDimensionsForSkin = (skin?: Skin) => {
+const getPositionForSkin = (skin?: Skin) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
     case undefined:
       return {
         top: -583,
+        left: 0,
       };
     case Skin.Ibanez_AE140_WKH:
       return {
@@ -37,31 +37,15 @@ export const Fretboard: React.FC = () => {
   const { skin, neck, fretboardScaleX, fretboardScaleY } = useSelector(
     (state: RootState) => state.controlPanel
   );
-  const [highResLoaded, setHighResLoaded] = useState(false);
-  const [scaleFactor, setScaleFactor] = useState(1);
-  const recalculateScaleFactor = (size: {
-    width: number;
-    height: number;
-    fontScale: number;
-  }) => {
-    const isLandscape = size.width > size.height;
-    const baseScale = 0.5;
-
-    const scaleFactor =
-      baseScale +
-      (isLandscape
-        ? Math.log10(size.width / size.height)
-        : Math.log10(size.height / size.width));
-    setScaleFactor(scaleFactor * size.fontScale);
-  };
+  // const [highResLoaded, setHighResLoaded] = useState(false);
+  const [maxHeight, setMaxHeight] = useState(window.innerHeight);
+  const [maxWidth, setMaxWidth] = useState(window.innerWidth);
+  const [position, setPosition] = useState(getPositionForSkin(skin));
 
   useEffect(() => {
     const handleResize = () => {
-      recalculateScaleFactor({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        fontScale: 1, // You may need to adjust this value based on your requirements
-      });
+      setMaxHeight(window.innerHeight);
+      setMaxWidth(window.innerWidth);
     };
 
     window.addEventListener("resize", handleResize);
@@ -69,30 +53,36 @@ export const Fretboard: React.FC = () => {
     // Call handleResize initially to calculate scaleFactor
     handleResize();
 
+    // scroll a bit right to see the notes straight away
+    window.scrollTo(130, 0); // values are x,y-offset
+
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  useEffect(() => {
-    setHighResLoaded(false);
-  }, [skin]);
+  // useEffect(() => {
+  //   setHighResLoaded(false);
+  // }, [skin]);
 
-  const assets = getAssetsForSkin(skin);
+  useEffect(() => {
+    const skinPosition = getPositionForSkin(skin);
+    setPosition(skinPosition);
+  }, [skin]);
 
   if (!neck) {
     return null;
   }
 
-  const dimensions = getDimensionsForSkin(skin);
+  const assets = getAssetsForSkin(skin);
 
   return (
     <section
-      className={`flex flex-col mt-24 mb-24 origin-top-left min-w-full min-h-full items-start justify-center`}
+      className={`flex flex-col mt-24 mb-24 origin-top-left min-w-full min-h-full items-start justify-start`}
       style={{
-        transform: `scale(${scaleFactor}) scaleX(${
-          1 / fretboardScaleX
-        }) scaleY(${1 / fretboardScaleY})`,
+        transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
+          1 / fretboardScaleY
+        })`,
       }}
     >
       <>
@@ -122,27 +112,23 @@ export const Fretboard: React.FC = () => {
         <div
           className={`absolute overflow-hidden`}
           style={{
-            ...dimensions,
-            maxWidth: 2900,
+            ...position,
+            maxWidth:
+              Math.max(maxWidth * fretboardScaleX, 2500) - position.left,
+            maxHeight:
+              Math.max((maxHeight - 120) * fretboardScaleY, 400) - position.top,
           }}
         >
-          <Image
-            className={`origin-top-left`}
-            loader={imageLoader}
-            style={{
-              maxWidth: "unset",
-              width: 5504,
-              height: 2200,
-              transform: "scale(0.662)", // Scale the image to fit the Fretboard class
-            }}
-            width={5504}
-            height={2200}
-            onLoad={() => {
-              console.log("Loaded full res image");
-              setHighResLoaded(true);
-            }}
-            src={assets[highResLoaded ? 1 : 0]}
-            alt="Guitar"
+          {/* {!highResLoaded && <GuitarImage asset={assets[0]} />} */}
+          <GuitarImage
+            // className={!highResLoaded ? "collapse" : undefined}
+            asset={assets[1]}
+            // onLoad={() => {
+            //   if (!highResLoaded) {
+            //     console.log("Loaded full res image");
+            //     setHighResLoaded(true);
+            //   }
+            // }}
           />
         </div>
       </>

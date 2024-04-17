@@ -10,9 +10,39 @@ const rootReducer = combineReducers({
   controlPanel: controlPanelReducer,
 });
 
+const VERSION = 3;
+
 const persistConfig = {
   key: "root",
+  version: VERSION,
   storage,
+  migrate: (state: any) => {
+    console.log("Checking migration needed");
+    const storedVersionRaw = localStorage.getItem("reduxPersist:root:version");
+    const setCurrentVersionToLocalStorage = () => {
+      console.log("Setting version " + VERSION);
+      localStorage.setItem("reduxPersist:root:version", VERSION.toString());
+    };
+    if (storedVersionRaw === null) {
+      persistor.purge(); // if there is something before introducing versions
+      setCurrentVersionToLocalStorage();
+      return Promise.resolve(state);
+    }
+    const storedVersion = parseInt(storedVersionRaw);
+    console.log("Currently stored version: " + storedVersion);
+    if (storedVersion !== VERSION) {
+      console.log(
+        "Purging version" +
+          storedVersion +
+          " as there is a newer version " +
+          VERSION
+      );
+      // Clear previous state if version has changed
+      persistor.purge();
+      setCurrentVersionToLocalStorage();
+    }
+    return Promise.resolve(state);
+  },
   transforms: [
     {
       in: (state: any) => {

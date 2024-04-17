@@ -20,6 +20,9 @@ import { ControlPanel } from "./settings/ControlPanel";
 // 7,8 string guitars
 // Ads
 // More chords
+// Too ar scrolling default on mobile
+// Patreon subscriptions
+
 export const Main = () => {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -83,12 +86,12 @@ export const Main = () => {
   }
 
   return (
-    <>
+    <main>
       {isAlertShown && (
         <AnimatedAlert message={alertMessage} onClose={handleCloseAlert} />
       )}
       <ControlPanel />
       <Fretboard />
-    </>
+    </main>
   );
 };
