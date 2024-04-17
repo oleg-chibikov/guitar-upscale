@@ -25,8 +25,8 @@ export const ControlPanel: React.FC = () => {
             : "flex-row"
         } gap-1 items-start`}
         style={{
-          maxWidth: "95%",
-          maxHeight: "95%",
+          maxWidth: "80vw",
+          maxHeight: "60vh",
         }}
       >
         <ScaleAndGroupSelector />

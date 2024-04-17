@@ -53,13 +53,15 @@ export const Fretboard: React.FC = () => {
     // Call handleResize initially to calculate scaleFactor
     handleResize();
 
-    // scroll a bit right to see the notes straight away
-    window.scrollTo(130, 0); // values are x,y-offset
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    // scroll a bit right to see the notes straight away
+    window.scrollTo(300 / Math.pow(fretboardScaleX, 2), 0); // values are x,y-offset
+  }, [fretboardScaleX]);
 
   // useEffect(() => {
   //   setHighResLoaded(false);
