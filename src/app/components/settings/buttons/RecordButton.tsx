@@ -4,6 +4,7 @@ import StopCircle from "@mui/icons-material/StopCircle";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  Theme,
   selectControlPanel,
   toggleRecording,
 } from "../../../store/controlPanelSlice";
@@ -11,7 +12,7 @@ import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { isRecording } = useSelector(selectControlPanel);
+  const { isRecording, theme } = useSelector(selectControlPanel);
   return (
     <>
       {isRecording && (
@@ -20,7 +21,9 @@ export const RecordButton: React.FC = (props) => {
           icon={<Cancel />}
           isActive={true}
           tooltip="Cancel recording"
-          activeBg="bg-gray-500"
+          activeBg={
+            theme === Theme.Light ? "bg-disabled-light" : "bg-disabled-dark"
+          }
           onPress={() => dispatch(toggleRecording(false))}
         />
       )}

@@ -48,7 +48,7 @@ const config: Config = {
           dark: "#849db3",
         },
         foreground: {
-          light: "#4E342E", // French Roast
+          light: "#2E1F1B", // French Roast
           dark: "#F2F2F2",
         },
         background: {
@@ -56,7 +56,7 @@ const config: Config = {
           dark: "#001b2e",
         },
         accented_background: {
-          light: "#ECE0D9", // Light Mocha
+          light: "#e5cdbf", // Light Mocha
           dark: "#333333",
         },
         panel: {
@@ -76,8 +76,12 @@ const config: Config = {
           dark: "#F2F2F2",
         },
         select_foreground: {
-          light: "#4E342E",
+          light: "#2E1F1B",
           dark: "#001b2e",
+        },
+        disabled: {
+          light: "#dadada",
+          dark: "#8c8c8c",
         },
       },
       fontFamily: {

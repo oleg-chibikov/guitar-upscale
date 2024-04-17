@@ -107,16 +107,18 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           ChordEventBus.next({ chord: chordName, metadata: {} });
         }
       }}
-      className={`text-center w-16 h-6 items-center justify-center cursor-pointer content-center ${
+      className={`text-center w-16 h-6 items-center justify-center content-center ${
         disabled
-          ? "bg-gray-400"
+          ? theme === Theme.Light
+            ? "bg-disabled-light"
+            : "bg-disabled-dark"
           : pressed
           ? `scale-50 ${
               theme === Theme.Light
                 ? "bg-button_pressed-light"
                 : "bg-button_pressed-dark"
             }`
-          : `scale-100 ${
+          : `scale-100 cursor-pointer ${
               theme === Theme.Light ? "bg-button-light" : "bg-button-dark"
             }`
       } font-mono select-none ${

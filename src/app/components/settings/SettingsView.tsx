@@ -69,11 +69,11 @@ export const SettingsView: React.FC = () => {
         className={`flex flex-col opacity-95 overflow-auto fixed ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
-        } z-40 top-20 ${
+        } z-40 top-20 border-2 ${
           theme === Theme.Light
-            ? "bg-accented_background-light"
-            : "bg-accented_background-dark"
-        } p-2 gap-2`}
+            ? "bg-accented_background-light border-border-light"
+            : "bg-accented_background-dark border-border-dark"
+        } p-4 gap-2`}
         style={{
           maxWidth: "80vw",
           maxHeight: "60vh",
