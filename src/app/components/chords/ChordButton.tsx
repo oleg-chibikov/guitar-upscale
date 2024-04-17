@@ -15,7 +15,7 @@ import {
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectControlPanel } from "../../store/controlPanelSlice";
+import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -28,12 +28,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
-  const {
-    chordPlayMode,
-    chordStrummingDelayMs,
-    chordNotesToPlay,
-    themeString,
-  } = useSelector(selectControlPanel);
+  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay, theme } =
+    useSelector(selectControlPanel);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
 
@@ -99,10 +95,6 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     return null;
   }
 
-  const animationClasses = pressed
-    ? `scale-50 bg-button_pressed-${themeString}`
-    : `scale-100 bg-button-${themeString}`;
-
   return (
     <ul
       onTouchStart={() => {
@@ -116,8 +108,20 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         }
       }}
       className={`text-center w-16 h-6 items-center justify-center cursor-pointer content-center ${
-        disabled ? "bg-gray-400" : animationClasses
-      } font-mono select-none text-foreground-${themeString} transition-transform transform origin-center`}
+        disabled
+          ? "bg-gray-400"
+          : pressed
+          ? `scale-50 ${
+              theme === Theme.Light
+                ? "bg-button_pressed-light"
+                : "bg-button_pressed-dark"
+            }`
+          : `scale-100 ${
+              theme === Theme.Light ? "bg-button-light" : "bg-button-dark"
+            }`
+      } font-mono select-none ${
+        theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
+      } transition-transform transform origin-center`}
     >
       {chordName}
     </ul>

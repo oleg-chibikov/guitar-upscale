@@ -1,4 +1,4 @@
-import { selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -17,17 +17,26 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
     onValueChange(event.target.checked);
   };
 
-  const { themeString } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectControlPanel);
   return (
     <div>
       <input
         type="checkbox"
-        className={`mr-2 accent-primary-${themeString}`}
+        className={`mr-2 ${
+          theme === Theme.Light ? "accent-primary-light" : "accent-primary-dark"
+        }`}
         id={label}
         checked={value}
         onChange={handleChange}
       />
-      <label className={`text-foreground-${themeString}`} htmlFor={label}>
+      <label
+        className={
+          theme === Theme.Light
+            ? "text-foreground-light"
+            : "text-foreground-dark"
+        }
+        htmlFor={label}
+      >
         {label}
       </label>
     </div>

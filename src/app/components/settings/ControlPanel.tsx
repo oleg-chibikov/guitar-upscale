@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
-import { selectControlPanel } from "../../store/controlPanelSlice";
+import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ChordsView } from "../chords/ChordsView";
 import { SettingsView } from "./SettingsView";
 import { ButtonContainer } from "./buttons/ButtonContainer";
@@ -11,11 +11,15 @@ import { FretboardScaleXSlider } from "./sliders/FretboardScaleXSlider";
 import { FretboardScaleYSlider } from "./sliders/FretboardScaleYSlider";
 
 export const ControlPanel: React.FC = () => {
-  const { chordsDisplayMode } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
   return (
     <>
       <section
-        className={`z-30 overflow-auto fixed top-1 ${
+        className={`z-30 p-1  overflow-auto fixed top-1 ${
+          theme === Theme.Light
+            ? "bg-panel-light border-border-light"
+            : "bg-panel-dark border-border-dark"
+        } ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
         }-1 flex ${

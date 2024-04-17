@@ -14,6 +14,7 @@ import { sleep } from "../../engine/sleep";
 import { playNote } from "../../engine/soundProvider";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import {
+  Theme,
   selectControlPanel,
   velocityValue,
 } from "../../store/controlPanelSlice";
@@ -43,7 +44,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     fretboardScaleX,
     fretboardScaleY,
     baseNote,
-    themeString,
+    theme,
   } = useSelector(selectControlPanel);
 
   const hasTouchInput = useInputChecker();
@@ -119,13 +120,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     <div
       className={`
           flex relative justify-center items-center h-5 pt-1 pb-1
-          ${fret > 0 && `border-l-2 border-border-${themeString}`}
+          ${
+            fret > 0 &&
+            `border-l-2 ${
+              theme === Theme.Light
+                ? "border-border-light"
+                : "border-border-dark"
+            }`
+          }
           ${
             isHeader &&
             "h-9 " +
               (isColored
-                ? `bg-fret_marker_match-${themeString}`
-                : `bg-fret_marker-${themeString}`)
+                ? theme === Theme.Light
+                  ? "bg-fret_marker_match-light"
+                  : "bg-fret_marker_match-dark"
+                : theme === Theme.Light
+                ? "bg-fret_marker-light"
+                : "bg-fret_marker-dark")
           }
           `}
       style={{ width, top }}
@@ -134,20 +146,49 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         <>
           {/* The marker itself */}
           <span
-            className={`relative  z-60 flex justify-center items-center select-none font-mono
+            className={`z-60 flex justify-center items-center select-none font-mono
                   ${!isHeader && "rounded-full w-7 h-7"}
                   ${
                     !isHeader &&
                     (isFromPreviousChord
-                      ? isColored
-                        ? `bg-previous_fret_marker_match-${themeString} text-background-${themeString} border-4 border-border_accent-${themeString}`
-                        : `bg-previous_fret_marker-${themeString} text-background-${themeString}  border-4 border-border_accent-${themeString}`
-                      : isColored
-                      ? `bg-fret_marker_match-${themeString} text-foreground-${themeString}`
-                      : `bg-fret_marker-${themeString} text-foreground-${themeString}`)
+                      ? `border-4 ${
+                          theme === Theme.Light
+                            ? "text-background-light border-border_accent-light"
+                            : "text-background-dark border-border_accent-dark"
+                        } ${
+                          isColored
+                            ? `${
+                                theme === Theme.Light
+                                  ? "bg-previous_fret_marker_match-light"
+                                  : "bg-previous_fret_marker_match-dark"
+                              }`
+                            : `${
+                                theme === Theme.Light
+                                  ? "bg-previous_fret_marker-light"
+                                  : "bg-previous_fret_marker-dark"
+                              }`
+                        }`
+                      : `${
+                          theme === Theme.Light
+                            ? "text-foreground-light"
+                            : "text-foreground-dark"
+                        } ${
+                          isColored
+                            ? theme === Theme.Light
+                              ? "bg-fret_marker_match-light"
+                              : "bg-fret_marker_match-dark"
+                            : theme === Theme.Light
+                            ? "bg-fret_marker-light"
+                            : "bg-fret_marker-dark"
+                        }`)
                   }
                   ${isHeader ? "text-xl" : "text-md"}
-                  ${isHeader && `text-foreground-${themeString}`}
+                  ${
+                    isHeader &&
+                    (theme === Theme.Light
+                      ? "text-foreground-light"
+                      : "text-foreground-dark")
+                  }
                   ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,

@@ -12,40 +12,6 @@ const safelist = [
   "z-40",
   "z-50",
   "z-60",
-  "bg-primary-light",
-  "bg-primary-dark",
-  "bg-previous_fret_marker_match-light",
-  "bg-previous_fret_marker_match-dark",
-  "bg-previous_fret_marker-light",
-  "bg-previous_fret_marker-dark",
-  "bg-fret_marker_match-light",
-  "bg-fret_marker_match-dark",
-  "bg-fret_marker-light",
-  "bg-fret_marker-dark",
-  "bg-background-light",
-  "bg-background-dark",
-  "bg-foreground-light", // for selects
-  "bg-foreground-dark",
-  "bg-accentedbackground-light",
-  "bg-accentedbackground-dark",
-  "bg-button-light",
-  "bg-button-dark",
-  "bg-button_pressed-light",
-  "bg-button_pressed-dark",
-  "bg-select_background-light",
-  "bg-select_background-dark",
-  "text-select_foreground-light",
-  "text-select_foreground-dark",
-  "accent-primary-light",
-  "accent-primary-dark",
-  "text-foreground-light",
-  "text-foreground-dark",
-  "text-background-light", // for selects
-  "text-background-dark",
-  "border-border-light",
-  "border-border-dark",
-  "border-border_accent-light",
-  "border-border_accent-dark",
 ];
 
 const config: Config = {
@@ -94,11 +60,11 @@ const config: Config = {
           light: "#FDF6F1", // Light Cream
           dark: "#001b2e",
         },
-        accentedbackground: {
+        accented_background: {
           light: "#ECE0D9", // Light Mocha
           dark: "#333333",
         },
-        hover: {
+        panel: {
           light: "#F6E7D2", // Cream
           dark: "#666666",
         },

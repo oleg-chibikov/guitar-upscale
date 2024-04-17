@@ -1,4 +1,4 @@
-import { selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -15,17 +15,25 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
   onChange,
   className,
 }) => {
-  const { themeString } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectControlPanel);
 
   return (
     <select
       value={value}
       onChange={(event) => onChange && onChange(event.target.value)}
-      className={`text-select_foreground-${themeString} bg-select_background-${themeString} ${className}`}
+      className={`${
+        theme === Theme.Light
+          ? "text-select_foreground-light bg-select_background-light"
+          : "text-select_foreground-dark bg-select_background-dark"
+      } ${className}`}
     >
       {options.map((option) => (
         <option
-          className={`text-select_foreground-${themeString} hover:bg-select_background-${themeString}`}
+          className={
+            theme === Theme.Light
+              ? "text-select_foreground-light"
+              : "text-select_foreground-dark"
+          }
           key={option.value}
           value={option.value}
         >

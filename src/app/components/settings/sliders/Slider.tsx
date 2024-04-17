@@ -1,5 +1,5 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -28,7 +28,7 @@ const Slider: React.FC<SliderProps> = ({
   label,
   labelClass,
 }) => {
-  const { chordsDisplayMode, themeString } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
   return (
     <div
       className={`items-center flex ${
@@ -47,7 +47,11 @@ const Slider: React.FC<SliderProps> = ({
       >
         <input
           type="range"
-          className={`cursor-pointer accent-primary-${themeString}`}
+          className={`cursor-pointer ${
+            theme === Theme.Light
+              ? "accent-primary-light"
+              : "accent-primary-dark"
+          }`}
           min={minimumValue}
           max={maximumValue}
           value={value}
@@ -63,7 +67,11 @@ const Slider: React.FC<SliderProps> = ({
         />
       </div>
       <span
-        className={`text-nowrap text-foreground-${themeString} ${labelClass}`}
+        className={`text-nowrap ${
+          theme === Theme.Light
+            ? "text-foreground-light"
+            : "text-foreground-dark"
+        } ${labelClass}`}
       >
         {label}
       </span>

@@ -5,12 +5,11 @@ import { getNoteText } from "../../data/notes";
 
 import { ChordMode, getModeText } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectControlPanel } from "../../store/controlPanelSlice";
+import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ChordButton } from "./ChordButton";
 
 export const ChordsView: React.FC = () => {
-  const { neck, useAdvancedChords, chords, bg } =
-    useSelector(selectControlPanel);
+  const { neck, useAdvancedChords, chords } = useSelector(selectControlPanel);
 
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -27,7 +26,8 @@ export const ChordsView: React.FC = () => {
 
   // it's ergonomic to display chords vertically for touch devices in order to play with right hand
   const hasTouchInput = useInputChecker();
-  const { chordsExpanded, chordsDisplayMode } = useSelector(selectControlPanel);
+  const { chordsExpanded, chordsDisplayMode, theme } =
+    useSelector(selectControlPanel);
 
   if (!chordsExpanded || !neck || !chords) {
     return null;
@@ -44,9 +44,11 @@ export const ChordsView: React.FC = () => {
     <section
       className={`opacity-95 overflow-auto fixed ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left" : "right"
-      }-1 z-20 bottom-1 ${bg} p-1 gap-1 ${
-        !hasTouchInput ? "grid-cols-2" : "grid-rows-2"
-      }`}
+      }-1 z-20 bottom-1 ${
+        theme === Theme.Light
+          ? "bg-accented_background-light"
+          : "bg-accented_background-dark"
+      } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
       style={{
         maxWidth: hasTouchInput && height < 700 ? 150 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
         maxHeight: hasTouchInput ? "95vh" : 450,

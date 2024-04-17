@@ -24,9 +24,6 @@ import {
 import { midiRecorder } from "../engine/midiRecorder";
 import { RootState } from "./store"; // Define RootState type
 
-export const toString = (theme: Theme) =>
-  theme === Theme.Dark ? "dark" : "light";
-
 export enum Theme {
   Dark,
   Light,
@@ -51,23 +48,10 @@ const getFirstScaleForGroup = (groupKey: string) =>
 
 const initialTheme = Theme.Dark;
 
-const getViewSettings = (theme: Theme) => {
-  const themeString = toString(theme);
-  const color = "foreground-" + themeString;
-  return {
-    bg: "bg-accentedbackground-" + themeString,
-    mainBg: "bg-background-" + themeString,
-    textStyle: `text-md text-${color}`,
-    themeString,
-  };
-};
-
 export const minXZoom = 1;
 export const maxXZoom = 3;
 export const minYZoom = 0.7;
 export const maxYZoom = 1;
-
-const initialSettings = getViewSettings(initialTheme);
 
 interface WithNeck {
   neck: Neck | null;
@@ -95,12 +79,8 @@ interface ControlPanelState extends WithNeck, WithControls {
   alertMessage: string;
   playbackType: PlaybackType;
   theme: Theme;
-  themeString: string;
   switchToChromaticScale: boolean;
   useAdvancedChords: boolean;
-  bg: string;
-  mainBg: string;
-  textStyle: string;
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
   fretboardScaleY: number;
@@ -128,12 +108,8 @@ const initialState: ControlPanelState = {
   alertMessage: "",
   playbackType: PlaybackType.Melody,
   theme: initialTheme,
-  themeString: toString(initialTheme),
   switchToChromaticScale: true,
   useAdvancedChords: false,
-  bg: initialSettings.bg,
-  mainBg: initialSettings.mainBg,
-  textStyle: initialSettings.textStyle,
   chordPlayMode: ChordPlayMode.RoundRobin,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
@@ -276,11 +252,6 @@ export const controlPanelSlice = createSlice({
     },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;
-      const settings = getViewSettings(action.payload);
-      state.bg = settings.bg;
-      state.mainBg = settings.mainBg;
-      state.textStyle = settings.textStyle;
-      state.themeString = settings.themeString;
     },
     setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
       state.switchToChromaticScale = action.payload;

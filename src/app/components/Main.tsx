@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { initSoundfont } from "../engine/soundProvider";
 import {
+  Theme,
   hideAlert,
   init,
   selectControlPanel,
@@ -31,7 +32,7 @@ export const Main = () => {
   const {
     showAlert: isAlertShown,
     alertMessage,
-    mainBg,
+    theme,
     fretboardScaleX,
     fretboardScaleY,
   } = useSelector(selectControlPanel);
@@ -39,9 +40,11 @@ export const Main = () => {
   const [retrigger, setRetrigger] = useState<boolean>(false);
 
   useEffect(() => {
+    const mainBg =
+      theme === Theme.Light ? "bg-background-light" : "bg-background-dark";
     document.body.classList.add(mainBg);
     return () => document.body.classList.remove(mainBg);
-  }, [mainBg]);
+  }, [theme]);
 
   useEffect(() => {
     setRetrigger(true);
