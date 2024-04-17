@@ -16,7 +16,6 @@ import { ControlPanel } from "./settings/ControlPanel";
 // get the formula to avoid hardcoding each string height offset
 // more instruments + dropdown
 // more examples
-// Guitar tunings
 // 7,8 string guitars
 // Ads
 // More chords

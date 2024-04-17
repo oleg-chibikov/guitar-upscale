@@ -15,6 +15,7 @@ import { NoteDisplayModeSelector } from "./selectors/NoteDisplayModeSelector";
 import { PlaybackTypeSelector } from "./selectors/PlaybackTypeSelector";
 import { SkinSelector } from "./selectors/SkinSelector";
 import { ThemeSelector } from "./selectors/ThemeSelector";
+import { TuningSelector } from "./selectors/TuningSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
 import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
@@ -92,6 +93,8 @@ export const SettingsView: React.FC = () => {
         >
           <span>Theme:</span>
           <ThemeSelector />
+          <span>Tuning:</span>
+          <TuningSelector />
           <span>Base Note:</span>
           <BaseNoteSelector />
           <span>Note Display Mode:</span>

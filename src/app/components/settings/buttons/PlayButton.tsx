@@ -2,7 +2,7 @@ import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNoteText } from "../../../data/notes";
+import { getNoteText, parseStringToNotes } from "../../../data/notes";
 import { playExample, playWholeScale } from "../../../engine/player";
 import { sleep } from "../../../engine/sleep";
 import {
@@ -17,8 +17,15 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
 export const PlayButton: React.FC = (props) => {
-  const { neck, baseNote, scale, playIntervalBpm, chordsMap, playbackType } =
-    useSelector(selectControlPanel);
+  const {
+    neck,
+    tuning,
+    baseNote,
+    scale,
+    playIntervalBpm,
+    chordsMap,
+    playbackType,
+  } = useSelector(selectControlPanel);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
@@ -27,7 +34,7 @@ export const PlayButton: React.FC = (props) => {
   useEffect(() => {
     setIsPlaying(false);
     isPlayingRef.current = false;
-  }, [neck, baseNote, scale, playbackType]);
+  }, [neck, tuning, baseNote, scale, playbackType]);
 
   if (!neck) {
     return null;
@@ -68,6 +75,7 @@ export const PlayButton: React.FC = (props) => {
         examplesForScale,
         waitNote,
         neck,
+        parseStringToNotes(tuning),
         isPlayingRef,
         dispatchAlert
       );

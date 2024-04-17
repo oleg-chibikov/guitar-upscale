@@ -1,4 +1,11 @@
-export type Example = { band: string; title: string; melody: string };
+import { tunings } from "./notes";
+
+export type Example = {
+  band: string;
+  title: string;
+  melody: string;
+  tuning?: string;
+};
 export type Scale = number[] | ScaleObject;
 export type ScaleObject = { scale: number[]; examples: Example[] };
 
@@ -94,7 +101,13 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
           ],
         },
       ],
-      ["Lydian", [2, 4, 6, 7, 8, 10]],
+      [
+        "Lydian",
+        {
+          scale: [2, 4, 6, 7, 8, 10],
+          examples: [],
+        },
+      ],
       ["Locrian", [1, 3, 5, 6, 8, 10]],
       [
         "Melodic",
@@ -193,7 +206,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
               band: "The Prodigy",
               title: "Narayan",
               melody:
-                "(<E5>*002371-0932<E5>02371-0932<G5>*002371-0932<G5>02371-0<B5>932)2",
+                "(<E5>*002371-0932<E5>02371-0932<G5>*002371-0932<G5>02371-0^52932)2",
             },
           ],
         },
@@ -238,7 +251,20 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
     "Special",
     new Map([
-      ["Chromatic (All notes)", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+      [
+        "Chromatic (All notes)",
+        {
+          scale: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+          examples: [
+            {
+              tuning: tunings[1],
+              band: "Test",
+              title: "Test",
+              melody: "*50002221-01-01-01-21-21-2",
+            },
+          ],
+        },
+      ],
       ["Whole tone", [2, 4, 6, 8, 10]],
       ["Leading whole tone", [2, 4, 6, 8, 10, 11]],
       ["Diminished", [2, 3, 5, 6, 8, 9, 11]],

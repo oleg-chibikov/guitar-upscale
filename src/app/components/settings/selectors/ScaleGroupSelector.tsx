@@ -13,7 +13,6 @@ const ScaleGroupSelector: React.FC = () => {
 
   return (
     <SelectWrapper
-      className="text-md"
       value={scaleGroup}
       onChange={(value) => {
         dispatch(setScaleGroup(value as string));

@@ -26,7 +26,6 @@ const ScaleSelector: React.FC = () => {
       onChange={(value) => {
         dispatch(setScale(value as string));
       }}
-      className="text-md"
     />
   );
 };

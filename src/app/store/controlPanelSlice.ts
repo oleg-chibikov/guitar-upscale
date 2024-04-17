@@ -3,7 +3,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordPlayMode } from "../data/chordPlayMode";
 import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
-import { Chord, getNoteText, Note, stringTuning } from "../data/notes";
+import {
+  Chord,
+  getNoteText,
+  Note,
+  parseStringToNotes,
+  tunings,
+} from "../data/notes";
 import {
   Example,
   getScaleExamples,
@@ -63,6 +69,7 @@ interface WithControls {
   scaleGroup: string;
   scale: string;
   baseNote: Note;
+  tuning: string;
 }
 
 interface ControlPanelState extends WithNeck, WithControls {
@@ -86,6 +93,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   fretboardScaleY: number;
   lockRatio: boolean;
   chordNotesToPlay: number;
+  tuning: string;
 }
 
 const initialState: ControlPanelState = {
@@ -115,6 +123,7 @@ const initialState: ControlPanelState = {
   fretboardScaleY: 1,
   lockRatio: false,
   chordNotesToPlay: 6,
+  tuning: tunings[0],
 };
 
 // A value that changes immediately without the need for rerender
@@ -135,7 +144,7 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   // checkDuplicateScales(scalesMap);
   const neck = generateNeckRepresentation(
     scalePattern,
-    stringTuning,
+    parseStringToNotes(state.tuning),
     state.baseNote
   );
   state.neck = neck;
@@ -202,6 +211,10 @@ export const controlPanelSlice = createSlice({
     },
     setBaseNote: (state, action: PayloadAction<Note>) => {
       state.baseNote = action.payload;
+      onGuitarSettingsUpdate(state);
+    },
+    setTuning(state, action: PayloadAction<string>) {
+      state.tuning = action.payload;
       onGuitarSettingsUpdate(state);
     },
     setNoteDisplayMode: (state, action: PayloadAction<NoteDisplayMode>) => {
@@ -338,6 +351,7 @@ export const {
   setFretboardScaleY,
   setLockRatio,
   setChordNotesToPlay,
+  setTuning,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

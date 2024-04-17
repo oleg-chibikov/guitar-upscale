@@ -1,4 +1,11 @@
-import { Chord, Note, OctaveNote, serializeOctaveNote } from "../data/notes";
+import {
+  Chord,
+  Note,
+  OctaveNote,
+  parseStringToNotes,
+  serializeOctaveNote,
+  tunings,
+} from "../data/notes";
 import { Example } from "../data/scales";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
@@ -16,7 +23,7 @@ export const playWholeScale = async (
     neckCopy.reverse();
   }
 
-  // usaed to be stored in StringOctaveNotes
+  // used to be stored in StringOctaveNotes
   let realStringIndex = reverse ? neckCopy.length - 1 : 0;
   let orderedStringIndex = 0;
   for (const string of neckCopy) {
@@ -76,6 +83,7 @@ export const playExample = async (
   examplesForScale: Example[],
   waitNote: () => Promise<void>,
   neck: Neck,
+  tuning: OctaveNote[],
   isPlayingRef: React.MutableRefObject<boolean>,
   showAlert: (message: string) => void
 ) => {
@@ -97,6 +105,8 @@ export const playExample = async (
     },
     waitNote,
     neck,
+    parseStringToNotes(randomExample.tuning ?? tunings[0]),
+    tuning,
     baseNote,
     isPlayingRef
   );

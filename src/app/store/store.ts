@@ -10,7 +10,7 @@ const rootReducer = combineReducers({
   controlPanel: controlPanelReducer,
 });
 
-const VERSION = 3;
+const VERSION = 1;
 
 const persistConfig = {
   key: "root",
