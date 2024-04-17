@@ -1,3 +1,4 @@
+import { interpolate } from "@/app/helpers/interpolation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteCount } from "../../engine/generateNeckRepresentation";
@@ -59,9 +60,11 @@ export const Fretboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const scrollX = interpolate(fretboardScaleX, 1, 2, 300, 0); // max value is 3 but setting 2 gives better outcome
+    const scrollY = interpolate(fretboardScaleY, 0.7, 1, 100, 0);
     // scroll a bit right to see the notes straight away
-    window.scrollTo(300 / Math.pow(fretboardScaleX, 2), 0); // values are x,y-offset
-  }, [fretboardScaleX]);
+    window.scrollTo(scrollX, scrollY); // values are x,y-offset
+  }, [fretboardScaleX, fretboardScaleY]);
 
   // useEffect(() => {
   //   setHighResLoaded(false);
