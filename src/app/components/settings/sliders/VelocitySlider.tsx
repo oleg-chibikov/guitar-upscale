@@ -7,7 +7,7 @@ import {
 import { Slider } from "./Slider";
 
 export const VelocitySlider: React.FC = () => {
-  const { velocity, textStyle } = useSelector(selectControlPanel);
+  const { velocity } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
