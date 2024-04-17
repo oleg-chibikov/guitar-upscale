@@ -7,7 +7,7 @@ import {
 import { Slider } from "./Slider";
 
 export const PlayIntervalSlider: React.FC = () => {
-  const { playIntervalBpm, textStyle } = useSelector(selectControlPanel);
+  const { playIntervalBpm } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

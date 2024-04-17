@@ -9,7 +9,7 @@ import {
 import { Slider } from "./Slider";
 
 export const FretboardScaleXSlider: React.FC = () => {
-  const { fretboardScaleX, textStyle } = useSelector(selectControlPanel);
+  const { fretboardScaleX } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
@@ -24,7 +24,6 @@ export const FretboardScaleXSlider: React.FC = () => {
       maximumValue={maxXZoom * 10}
       step={1}
       className="w-32 py-2"
-      label={`X${(1 / fretboardScaleX).toFixed(2)}`}
     />
   );
 };

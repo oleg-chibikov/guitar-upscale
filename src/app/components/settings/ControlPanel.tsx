@@ -40,26 +40,34 @@ export const ControlPanel: React.FC = () => {
       <ChordsView />
 
       <div
-        className={`z-30 fixed bottom-1 ${
+        className={`z-30 fixed bottom-1 p-1 ${
+          theme === Theme.Light
+            ? " bg-accented_background-light"
+            : " bg-accented_background-dark"
+        } ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
-        }-1`}
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-8" : "left-8"
+        }`}
       >
         <FretboardScaleXSlider />
       </div>
       <div
-        className={`z-30 fixed bottom-7 ${
+        className={`z-30 fixed bottom-8 p-1 ${
+          theme === Theme.Light
+            ? " bg-accented_background-light"
+            : " bg-accented_background-dark"
+        } ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
-        }-1`}
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+        }`}
       >
         <FretboardScaleYSlider />
       </div>
       <div
-        className={`z-30 fixed bottom-7 ${
+        className={`z-30 fixed bottom-1 ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"
-        }-12`}
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+        }`}
       >
         <LockRatioButton />
       </div>

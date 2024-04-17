@@ -7,7 +7,7 @@ import {
 import { Slider } from "./Slider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
-  const { chordStrummingDelayMs, textStyle } = useSelector(selectControlPanel);
+  const { chordStrummingDelayMs } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

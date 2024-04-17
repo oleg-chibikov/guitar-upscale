@@ -13,7 +13,7 @@ interface SliderProps {
   step?: number;
   className?: string;
   isVertical?: boolean;
-  label: string;
+  label?: string;
   labelClass?: string;
 }
 
@@ -66,15 +66,17 @@ const Slider: React.FC<SliderProps> = ({
           }}
         />
       </div>
-      <span
-        className={`text-nowrap ${
-          theme === Theme.Light
-            ? "text-foreground-light"
-            : "text-foreground-dark"
-        } ${labelClass}`}
-      >
-        {label}
-      </span>
+      {label && (
+        <span
+          className={`text-nowrap ${
+            theme === Theme.Light
+              ? "text-foreground-light"
+              : "text-foreground-dark"
+          } ${labelClass}`}
+        >
+          {label}
+        </span>
+      )}
     </div>
   );
 };

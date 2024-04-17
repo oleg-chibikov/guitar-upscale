@@ -9,7 +9,7 @@ import {
 import { Slider } from "./Slider";
 
 export const FretboardScaleYSlider: React.FC = () => {
-  const { fretboardScaleY, textStyle } = useSelector(selectControlPanel);
+  const { fretboardScaleY } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
@@ -25,7 +25,6 @@ export const FretboardScaleYSlider: React.FC = () => {
       step={1}
       className="h-32 px-2"
       isVertical
-      label={`Y${(1 / fretboardScaleY).toFixed(2)}`}
     />
   );
 };

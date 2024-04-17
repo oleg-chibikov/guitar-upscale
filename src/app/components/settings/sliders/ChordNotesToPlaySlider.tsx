@@ -7,7 +7,7 @@ import {
 import { Slider } from "./Slider";
 
 export const ChordNotesToPlaySlider: React.FC = () => {
-  const { chordNotesToPlay, textStyle } = useSelector(selectControlPanel);
+  const { chordNotesToPlay } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
