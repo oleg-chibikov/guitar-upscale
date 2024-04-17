@@ -15,7 +15,6 @@ import { ControlPanel } from "./settings/ControlPanel";
 // youtube videos for each scale
 // get the formula to avoid hardcoding each string height offset
 // more instruments + dropdown
-// Slider - used HTML element - most likely won't work for Native
 // more examples
 // Guitar tunings
 // 7,8 string guitars
@@ -56,8 +55,6 @@ export const Main = () => {
   }, []);
 
   useEffect(() => {
-    // Orientation.lockToLandscape(); // this will lock the view to Landscape
-
     // prevent the Google translate bottom popup from appearing on mobile screen
     document.addEventListener(
       "click",

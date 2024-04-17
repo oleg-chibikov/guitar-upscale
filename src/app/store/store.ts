@@ -17,6 +17,9 @@ const persistConfig = {
   version: VERSION,
   storage,
   migrate: (state: any) => {
+    if (typeof window === "undefined") {
+      return Promise.resolve(state);
+    }
     console.log("Checking migration needed");
     const storedVersionRaw = localStorage.getItem("reduxPersist:root:version");
     const setCurrentVersionToLocalStorage = () => {
