@@ -30,12 +30,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
       title={tooltip}
       className={`${
         isActive
-          ? activeBg ?? theme === Theme.Light
-            ? "bg-button-light"
-            : "bg-button-dark"
-          : inactiveBg ?? theme === Theme.Light
-          ? "bg-accented_background-light"
-          : "bg-accented_background-dark"
+          ? activeBg ??
+            (theme === Theme.Light ? "bg-button-light" : "bg-button-dark")
+          : inactiveBg ??
+            (theme === Theme.Light
+              ? "bg-accented_background-light"
+              : "bg-accented_background-dark")
       } ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       } opacity-95 p-1 flex items-center justify-center`}
