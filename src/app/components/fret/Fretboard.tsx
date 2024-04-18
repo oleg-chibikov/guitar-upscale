@@ -1,5 +1,6 @@
+import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { interpolate } from "@/app/helpers/interpolation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
 import { getAssetsForSkin } from "../../helpers/skinHelper";
@@ -42,6 +43,7 @@ export const Fretboard: React.FC = () => {
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
   const [maxWidth, setMaxWidth] = useState(window.innerWidth);
   const [position, setPosition] = useState(getPositionForSkin(skin));
+  const orientation = useScreenOrientation();
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,12 +61,14 @@ export const Fretboard: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
+  const repostion = useCallback(() => {
     const scrollX = interpolate(fretboardScaleX, 1, 2, 300, 0); // max value is 3 but setting 2 gives better outcome
     const scrollY = interpolate(fretboardScaleY, 0.7, 1, 100, 0);
     // scroll a bit right to see the notes straight away
     window.scrollTo(scrollX, scrollY); // values are x,y-offset
   }, [fretboardScaleX, fretboardScaleY]);
+
+  useEffect(repostion, [repostion, orientation]);
 
   // useEffect(() => {
   //   setHighResLoaded(false);
