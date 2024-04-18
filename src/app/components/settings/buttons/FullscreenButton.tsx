@@ -1,11 +1,21 @@
 import CloseFullscreen from "@mui/icons-material/CloseFullscreen";
 import OpenInFull from "@mui/icons-material/OpenInFull";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import screenfull from "screenfull";
 import { IconButton } from "./IconButton";
 
 export const FullscreenButton: React.FC = (props) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    if (!screenfull.isEnabled) {
+      return;
+    }
+    const handler = () => {
+      setIsFullscreen(screenfull.isFullscreen);
+    };
+    screenfull.on("change", handler);
+    return () => screenfull.off("change", handler);
+  }, []);
   if (!screenfull.isEnabled) {
     return false;
   }
@@ -18,10 +28,8 @@ export const FullscreenButton: React.FC = (props) => {
       onPress={async () => {
         if (!screenfull.isFullscreen) {
           await screenfull.request();
-          setIsFullscreen(true);
         } else {
           await screenfull.exit();
-          setIsFullscreen(false);
         }
       }}
     />
