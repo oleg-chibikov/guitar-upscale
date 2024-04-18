@@ -73,13 +73,8 @@ export const Fretline: React.FC<FretlineProps> = ({
 
   return (
     <div
-      className={`flex z-${
-        (6 - (string ?? 1)) * 10
-      } flex-row justify-between items-center`}
-      style={
-        // descending z index gives click preference for top strings
-        { height }
-      }
+      className={`flex flex-row justify-between items-center`}
+      style={{ height }}
     >
       {elements.map((stringOctaveNote, fret) => {
         const width = initialWidth / Math.pow(widthFactor, fret);

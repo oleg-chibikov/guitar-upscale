@@ -12,14 +12,17 @@ import { Fretboard } from "./fret/Fretboard";
 import { ControlPanel } from "./settings/ControlPanel";
 
 // TODO
-// youtube videos for each scale
-// get the formula to avoid hardcoding each string height offset
+// Chord finder!
+// Reverb toggle
+// Better animation on play
+// More chords
 // more instruments + dropdown
+// Patreon subscriptions
+// Ads
 // more examples
 // 7,8 string guitars
-// Ads
-// More chords
-// Patreon subscriptions
+// get the formula to avoid hardcoding each string height offset
+// youtube videos for each scale
 
 export const Main = () => {
   const dispatch = useDispatch();

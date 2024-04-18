@@ -1,13 +1,5 @@
 import type { Config } from "tailwindcss";
-const safelist = [
-  // Dynamically generating z-indexes for strings
-  "z-10",
-  "z-20",
-  "z-30",
-  "z-40",
-  "z-50",
-  "z-60",
-];
+const safelist = [];
 
 const config: Config = {
   content: [

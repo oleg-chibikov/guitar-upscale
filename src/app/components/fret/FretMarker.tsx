@@ -189,7 +189,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                       ? "text-foreground-light"
                       : "text-foreground-dark")
                   }
-                  ${isNoteClicked ? "fret-note-circle-animation" : ""}`}
+                  ${
+                    isNoteClicked
+                      ? "fret-note-circle-animation-" +
+                        (theme === Theme.Light ? "light" : "dark")
+                      : ""
+                  }`}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
             }}
