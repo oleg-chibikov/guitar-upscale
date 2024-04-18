@@ -36,6 +36,11 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 # Create an APK
+
+Option 1 (online):
+https://www.pwabuilder.com/reportcard?site=https://guitar-upscale.org.uk/
+
+Option 2 (local):
 https://github.com/GoogleChromeLabs/bubblewrap/tree/main/packages/cli
 
 Navigate to a folder where APK should appear and run
