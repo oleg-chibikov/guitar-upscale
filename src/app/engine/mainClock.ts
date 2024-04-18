@@ -42,12 +42,12 @@ export const setBpm = (bpm: number) => {
     }
     const isBeat = tick === 0 || tick === 8;
     if (isBeat) {
-      console.log("Accented Tick!");
+      // console.log("Accented Tick!");
       resolveCurrentPromiseForNextBeat();
       recreatePromiseForNextBeat();
     }
     MetronomeEventBus.next({ isBeat, tick });
-    console.log("TICK!");
+    // console.log("TICK!");
     resolveCurrentPromiseForNextTick();
     recreatePromiseForNextTick();
   }, bpmToMilliseconds(bpm));

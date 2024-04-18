@@ -38,7 +38,7 @@ body {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.3;
     background-color: rgb(235, 188, 102); /* or any color you want */
   }
   100% {
@@ -53,7 +53,7 @@ body {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.3;
     background-color: rgb(99, 9, 245); /* or any color you want */
   }
   100% {
@@ -63,10 +63,10 @@ body {
 }
 
 .fret-note-circle-animation-light {
-  animation: notePressLight 0.5s linear;
+  animation: notePressLight 0.3s ease;
 }
 .fret-note-circle-animation-dark {
-  animation: notePressDark 0.5s linear;
+  animation: notePressDark 0.3s ease;
 }
 
 @keyframes slideIn {
@@ -93,4 +93,19 @@ body {
 
 .animate-slideOut {
   animation: slideOut 0.1s linear forwards;
+}
+
+@keyframes blast {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(30);
+    opacity: 0;
+  }
+}
+
+.animate-blast {
+  animation: blast 0.3s ease-out;
 }

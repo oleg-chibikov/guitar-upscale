@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-const safelist = [];
+const safelist: string[] = [];
 
 const config: Config = {
   content: [
@@ -74,6 +74,10 @@ const config: Config = {
         disabled: {
           light: "#dadada",
           dark: "#8c8c8c",
+        },
+        animation_blast: {
+          light: "#e6cc5c",
+          dark: "#547fc4",
         },
       },
       fontFamily: {

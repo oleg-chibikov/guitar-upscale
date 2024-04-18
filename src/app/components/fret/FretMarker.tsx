@@ -115,86 +115,99 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
   };
 
+  const clickAttrs = {
+    onTouchStart: async () => {
+      if (stringOctaveNote && hasTouchInput) {
+        await handlePress();
+      }
+    },
+    onMouseDown: () => {
+      if (stringOctaveNote && !hasTouchInput) {
+        handlePress();
+      }
+    },
+  };
+
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale
     <div
       className={`
-          flex relative justify-center items-center h-5 pt-1 pb-1
-          ${
-            fret > 0 &&
-            `border-l-2 ${
-              theme === Theme.Light
-                ? "border-border-light"
-                : "border-border-dark"
-            }`
-          }
-          ${
-            isHeader &&
-            "h-9 " +
-              (isColored
-                ? theme === Theme.Light
-                  ? "bg-fret_marker_match-light"
-                  : "bg-fret_marker_match-dark"
-                : theme === Theme.Light
-                ? "bg-fret_marker-light"
-                : "bg-fret_marker-dark")
-          }
-          `}
+            flex relative justify-center items-center h-5 pt-1 pb-1
+            ${
+              fret > 0 &&
+              `border-l-2 ${
+                theme === Theme.Light
+                  ? "border-border-light"
+                  : "border-border-dark"
+              }`
+            }
+            ${
+              isHeader &&
+              "h-9 " +
+                (isColored
+                  ? theme === Theme.Light
+                    ? "bg-fret_marker_match-light"
+                    : "bg-fret_marker_match-dark"
+                  : theme === Theme.Light
+                  ? "bg-fret_marker-light"
+                  : "bg-fret_marker-dark")
+            }
+            `}
       style={{ width, top }}
     >
       {stringOctaveNote && (
         <>
           {/* The marker itself */}
           <span
-            className={`z-60 flex justify-center items-center select-none font-mono
-                  ${!isHeader && "rounded-full w-7 h-7"}
-                  ${
-                    !isHeader &&
-                    (isFromPreviousChord
-                      ? `border-4 ${
-                          theme === Theme.Light
-                            ? "text-background-light border-border_accent-light"
-                            : "text-background-dark border-border_accent-dark"
-                        } ${
-                          isColored
-                            ? `${
-                                theme === Theme.Light
-                                  ? "bg-previous_fret_marker_match-light"
-                                  : "bg-previous_fret_marker_match-dark"
-                              }`
-                            : `${
-                                theme === Theme.Light
-                                  ? "bg-previous_fret_marker-light"
-                                  : "bg-previous_fret_marker-dark"
-                              }`
-                        }`
-                      : `${
-                          theme === Theme.Light
-                            ? "text-foreground-light"
-                            : "text-foreground-dark"
-                        } ${
-                          isColored
-                            ? theme === Theme.Light
-                              ? "bg-fret_marker_match-light"
-                              : "bg-fret_marker_match-dark"
-                            : theme === Theme.Light
-                            ? "bg-fret_marker-light"
-                            : "bg-fret_marker-dark"
-                        }`)
-                  }
-                  ${isHeader ? "text-xl" : "text-md"}
-                  ${
-                    isHeader &&
-                    (theme === Theme.Light
-                      ? "text-foreground-light"
-                      : "text-foreground-dark")
-                  }
-                  ${
-                    isNoteClicked
-                      ? "fret-note-circle-animation-" +
-                        (theme === Theme.Light ? "light" : "dark")
-                      : ""
-                  }`}
+            className={`flex justify-center items-center select-none font-mono
+                    ${!isHeader && "rounded-full w-7 h-7"}
+                    ${
+                      !isHeader &&
+                      (isFromPreviousChord
+                        ? `border-4 ${
+                            theme === Theme.Light
+                              ? "text-background-light border-border_accent-light"
+                              : "text-background-dark border-border_accent-dark"
+                          } ${
+                            isColored
+                              ? `${
+                                  theme === Theme.Light
+                                    ? "bg-previous_fret_marker_match-light"
+                                    : "bg-previous_fret_marker_match-dark"
+                                }`
+                              : `${
+                                  theme === Theme.Light
+                                    ? "bg-previous_fret_marker-light"
+                                    : "bg-previous_fret_marker-dark"
+                                }`
+                          }`
+                        : `${
+                            theme === Theme.Light
+                              ? "text-foreground-light"
+                              : "text-foreground-dark"
+                          } ${
+                            isColored
+                              ? theme === Theme.Light
+                                ? "bg-fret_marker_match-light"
+                                : "bg-fret_marker_match-dark"
+                              : theme === Theme.Light
+                              ? "bg-fret_marker-light"
+                              : "bg-fret_marker-dark"
+                          }`)
+                    }
+                    ${isHeader ? "text-xl" : "text-md"}
+                    ${
+                      isHeader &&
+                      (theme === Theme.Light
+                        ? "text-foreground-light"
+                        : "text-foreground-dark")
+                    }
+                    ${
+                      isNoteClicked
+                        ? "fret-note-circle-animation-" +
+                          (theme === Theme.Light ? "light" : "dark")
+                        : ""
+                    }`}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
             }}
@@ -207,19 +220,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           </span>
           {/* Clickable area */}
           <div
-            className="absolute cursor-pointer z-70 bg-transparent h-9"
+            className="absolute cursor-pointer z-20 bg-transparent h-9"
             style={{ width }}
-            onTouchStart={async () => {
-              if (stringOctaveNote && hasTouchInput) {
-                await handlePress();
-              }
-            }}
-            onMouseDown={() => {
-              if (stringOctaveNote && !hasTouchInput) {
-                handlePress();
-              }
-            }}
+            {...clickAttrs}
           />
+          {isNoteClicked && (
+            <div
+              key={Date.now()} // Use a unique key to trigger re-render and start animation
+              style={{
+                width: `${5 * fretboardScaleX}px`, // Set width based on fretboard scaling
+                height: `${5 * fretboardScaleY}px`, // Set height based on fretboard scaling
+              }}
+              className={`${
+                theme === Theme.Light
+                  ? "bg-animation_blast-light"
+                  : "bg-animation_blast-dark"
+              } animate-blast absolute z-10 rounded-3xl`}
+            />
+          )}
         </>
       )}
     </div>
