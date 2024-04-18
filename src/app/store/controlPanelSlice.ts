@@ -84,6 +84,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   playIntervalBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
+  metronomeVelocity: number;
   showAlert: boolean;
   alertMessage: string;
   playbackType: PlaybackType;
@@ -114,6 +115,7 @@ const initialState: ControlPanelState = {
   playIntervalBpm: 140,
   chordStrummingDelayMs: 20,
   velocity: MAX_VELOCITY,
+  metronomeVelocity: MAX_VELOCITY,
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,
@@ -129,8 +131,8 @@ const initialState: ControlPanelState = {
 };
 
 // A value that changes immediately without the need for rerender
-export let playIntervalBpmValue: number | undefined = undefined;
 export let velocityValue: number | undefined = undefined;
+export let metronomeVelocityValue: number | undefined = undefined;
 export let examplesForScale: Example[] | undefined = undefined;
 export let isMetronomeTicking = false;
 
@@ -208,7 +210,6 @@ export const controlPanelSlice = createSlice({
     init: (state) => {
       onGuitarSettingsUpdate(state);
       velocityValue = state.velocity;
-      playIntervalBpmValue = state.playIntervalBpm;
       setBpm(state.playIntervalBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
@@ -254,7 +255,6 @@ export const controlPanelSlice = createSlice({
     },
     setPlayIntervalBpm: (state, action: PayloadAction<number>) => {
       state.playIntervalBpm = action.payload;
-      playIntervalBpmValue = action.payload;
       setBpm(action.payload);
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
@@ -263,6 +263,10 @@ export const controlPanelSlice = createSlice({
     setVelocity: (state, action: PayloadAction<number>) => {
       state.velocity = action.payload;
       velocityValue = action.payload;
+    },
+    setMetronomeVelocity: (state, action: PayloadAction<number>) => {
+      state.metronomeVelocity = action.payload;
+      metronomeVelocityValue = action.payload;
     },
     showAlert(state, action: PayloadAction<string>) {
       state.showAlert = true;
@@ -349,6 +353,7 @@ export const {
   setSettingsExpanded,
   setPlayIntervalBpm,
   setVelocity,
+  setMetronomeVelocity,
   showAlert,
   hideAlert,
   setPlaybackType,

@@ -1,6 +1,7 @@
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
 import { playExample, playWholeScale } from "@/app/engine/player";
+import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React, { useEffect, useRef, useState } from "react";
@@ -8,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   PlaybackType,
   examplesForScale,
+  isMetronomeTicking,
   selectControlPanel,
   showAlert,
 } from "../../../store/controlPanelSlice";
@@ -20,6 +22,7 @@ export const PlayButton: React.FC = (props) => {
     useSelector(selectControlPanel);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
+  const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
   const dispatch = useDispatch();
 
@@ -44,11 +47,15 @@ export const PlayButton: React.FC = (props) => {
     }
 
     // Start playback
-    setIsPlaying(true);
+    setIsWaiting(true);
     isPlayingRef.current = true;
 
-    await waitForNextBeat();
+    if (isMetronomeTicking) {
+      await waitForNextBeat();
+    }
 
+    setIsWaiting(false);
+    setIsPlaying(true);
     try {
       console.log("Start playing");
       const dispatchAlert = (message: string) => dispatch(showAlert(message));
@@ -86,8 +93,16 @@ export const PlayButton: React.FC = (props) => {
     <IconButton
       {...props}
       isActive={isPlaying}
-      tooltip={isPlaying ? "Stop playing scale" : "Play scale"}
-      icon={isPlaying ? <Pause /> : <PlayArrow />}
+      tooltip={
+        isWaiting
+          ? "Waiting for the next beat..."
+          : isPlaying
+          ? "Stop playing scale"
+          : "Play scale"
+      }
+      icon={
+        isWaiting ? <HourglassTopIcon /> : isPlaying ? <Pause /> : <PlayArrow />
+      }
       onPress={handlePlay}
     />
   );

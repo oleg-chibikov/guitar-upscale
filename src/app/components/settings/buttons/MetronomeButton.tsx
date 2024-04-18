@@ -1,14 +1,13 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { playMetronomeTick } from "@/app/engine/soundProvider";
-import type { SVGProps } from "react";
 import React, { useEffect, useState } from "react";
 import {
+  metronomeVelocityValue,
   setMetronomeTicking,
-  velocityValue,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
-function MdiMetronome(props: SVGProps<SVGSVGElement>) {
+function MdiMetronome() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -32,9 +31,9 @@ export const MetronomeButton: React.FC = (props) => {
     const sub = MetronomeEventBus.subscribe(({ isBeat, tick }) => {
       if (isTicking) {
         if (isBeat) {
-          playMetronomeTick(true, velocityValue ?? 80);
+          playMetronomeTick(true, metronomeVelocityValue ?? 80);
         } else if (tick % 2 === 0) {
-          playMetronomeTick(false, velocityValue ?? 80);
+          playMetronomeTick(false, metronomeVelocityValue ?? 80);
         }
       }
     });

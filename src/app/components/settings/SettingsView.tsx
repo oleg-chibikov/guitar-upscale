@@ -18,6 +18,7 @@ import { ThemeSelector } from "./selectors/ThemeSelector";
 import { TuningSelector } from "./selectors/TuningSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
+import { MetronomeVelocitySlider } from "./sliders/MetronomeVelocitySlider";
 import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
 import { VelocitySlider } from "./sliders/VelocitySlider";
 
@@ -115,6 +116,8 @@ export const SettingsView: React.FC = () => {
           <ChordNotesToPlaySlider />
           <span>Playback volume:</span>
           <VelocitySlider />
+          <span>Metronome volume:</span>
+          <MetronomeVelocitySlider />
         </div>
       </section>
     )
