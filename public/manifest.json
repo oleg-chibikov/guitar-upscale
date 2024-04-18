@@ -25,12 +25,36 @@
   ],
   "start_url": ".",
   "display": "fullscreen",
-  "theme_color": "#262626",
-  "background_color": "#262626",
+  "theme_color": "#b3cde4",
+  "background_color": "#333333",
   "id": "guitar-upscale",
-  "description": "A guitar emulator - great for learning and playing",
+  "description": "A guitar simulator that supports chords, scales and MIDI recording - a great way to learn guitar and have fun.\n\nIdeal for\n* people who want to learn scales and chords\n* composers who want to quickly play a melody in a selected scale and save the results to later process it in DAW\n* relaxing and strumming",
   "dir": "ltr",
   "lang": "en",
-  "orientation": "landscape-primary",
-  "categories": ["lifestyle", "music", "productivity"]
+  "orientation": "landscape",
+  "categories": ["lifestyle", "music", "productivity"],
+  "display_override": ["fullscreen", "window-controls-overlay"],
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "screenshots/Guitar upscale - Light.webp",
+      "sizes": "1180x766",
+      "type": "image/webp"
+    },
+    {
+      "src": "screenshots/Guitar upscale - Dark.webp",
+      "sizes": "1180x766",
+      "type": "image/webp"
+    },
+    {
+      "src": "screenshots/Guitar upscale - Menu.webp",
+      "sizes": "1180x766",
+      "type": "image/webp"
+    },
+    {
+      "src": "screenshots/Guitar upscale - Playing a melody.webp",
+      "sizes": "1180x766",
+      "type": "image/webp"
+    }
+  ]
 }
