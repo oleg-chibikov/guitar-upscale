@@ -62,13 +62,13 @@ export function getModeText(mode: ChordMode): string {
     case ChordMode.SixthMinorMajor:
       return "mM6";
     case ChordMode.SixthAdd9:
-      return "6add9";
+      return "6/9";
     case ChordMode.SixthMinorAdd9:
-      return "6madd9";
+      return "6m/9";
     case ChordMode.Seventh:
       return "7";
     case ChordMode.SeventhMajor:
-      return "maj7";
+      return "M7";
     case ChordMode.SeventhMinor:
       return "m7";
     case ChordMode.SeventhMinorMajor:
@@ -76,7 +76,7 @@ export function getModeText(mode: ChordMode): string {
     case ChordMode.Ninth:
       return "9";
     case ChordMode.NinthMajor:
-      return "maj9";
+      return "M9";
     case ChordMode.NinthMinor:
       return "m9";
     case ChordMode.NinthMinorMajor:
@@ -84,7 +84,7 @@ export function getModeText(mode: ChordMode): string {
     case ChordMode.Eleventh:
       return "11";
     case ChordMode.EleventhMajor:
-      return "maj11";
+      return "M11";
     case ChordMode.EleventhMinor:
       return "m11";
     case ChordMode.EleventhMinorMajor:
