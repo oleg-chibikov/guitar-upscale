@@ -1,6 +1,6 @@
 import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
 import { ChordEventBus } from "./eventBus";
-import { Neck, NoteCount } from "./generateNeckRepresentation";
+import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 export const decodeMelody = async (
   melody: string,
@@ -156,7 +156,7 @@ async function playNote(
       scriptStringTuning.octave * 12 -
       (stringTuning.note + stringTuning.octave * 12)); // Adjust fret position based on tuning
   while (fret < 0) {
-    fret = NoteCount + fret; // take similar note but one octave higher
+    fret = NOTE_COUNT + fret; // take similar note but one octave higher
   }
 
   // TODO: go to the upper string (we already do that when playing scales)

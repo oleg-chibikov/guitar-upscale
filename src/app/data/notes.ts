@@ -13,6 +13,8 @@ export enum Note {
   "D#" = 11,
 }
 
+export const MAX_VELOCITY = 127;
+
 // Reverse mapping object
 const noteReverseMapping: { [key: number]: string } = {};
 Object.keys(Note)

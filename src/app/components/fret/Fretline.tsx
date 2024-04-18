@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { StringOctaveNote } from "../../data/notes";
-import { NoteCount } from "../../engine/generateNeckRepresentation";
+import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
 import { Skin, selectControlPanel } from "../../store/controlPanelSlice";
 import { FretMarker } from "./FretMarker";
 
@@ -69,7 +69,7 @@ export const Fretline: React.FC<FretlineProps> = ({
 
   const { widthStep, height, stringTiltModifiers } = getParametersForSkin(skin);
   const widthFactor = 1.06;
-  const initialWidth = (NoteCount + 1) * widthStep; // Initial width for the first fret
+  const initialWidth = (NOTE_COUNT + 1) * widthStep; // Initial width for the first fret
 
   return (
     <div

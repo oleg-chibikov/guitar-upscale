@@ -1,3 +1,4 @@
+import { MAX_VELOCITY } from "@/app/data/notes";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,7 +20,7 @@ export const VelocitySlider: React.FC = () => {
       onValueChange={handleSliderChange}
       value={velocity}
       minimumValue={1}
-      maximumValue={127}
+      maximumValue={MAX_VELOCITY}
       step={1}
       label={velocity.toString()}
     />

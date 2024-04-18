@@ -1,5 +1,5 @@
 import { Soundfont } from "smplr";
-import { Note, OctaveNote, getNoteText } from "../data/notes";
+import { MAX_VELOCITY, Note, OctaveNote, getNoteText } from "../data/notes";
 
 let soundfont: Soundfont;
 let metronomeSoundfond: Soundfont;
@@ -22,7 +22,7 @@ export const initSoundfont = () => {
     // test note
     soundfont?.start({
       note: "E4",
-      velocity: 127,
+      velocity: MAX_VELOCITY,
     });
   }
 };
@@ -50,7 +50,7 @@ export const playMetronomeTick = (
   };
   playNote(
     metronomeTickNote,
-    Math.min(baseVelocity + (isAccented ? 20 : 0), 127),
+    Math.min(baseVelocity + (isAccented ? 20 : 0), MAX_VELOCITY),
     true
   );
 };

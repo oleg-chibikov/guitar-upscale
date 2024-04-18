@@ -6,6 +6,7 @@ import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
   Chord,
   getNoteText,
+  MAX_VELOCITY,
   Note,
   parseStringToNotes,
   tunings,
@@ -112,7 +113,7 @@ const initialState: ControlPanelState = {
   chordsExpanded: true,
   playIntervalBpm: 140,
   chordStrummingDelayMs: 20,
-  velocity: 127,
+  velocity: MAX_VELOCITY,
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,

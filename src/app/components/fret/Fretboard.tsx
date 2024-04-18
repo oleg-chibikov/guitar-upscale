@@ -1,7 +1,7 @@
 import { interpolate } from "@/app/helpers/interpolation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { NoteCount } from "../../engine/generateNeckRepresentation";
+import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
 import { getAssetsForSkin } from "../../helpers/skinHelper";
 import { Skin } from "../../store/controlPanelSlice";
 import { RootState } from "../../store/store";
@@ -100,12 +100,15 @@ export const Fretboard: React.FC = () => {
           {/* Header */}
           <Fretline
             isHeader
-            elements={Array.from({ length: NoteCount * 2 + 1 }, (_, index) => ({
-              note: index,
-              octave: 4,
-              string: 0,
-              fret: index,
-            }))}
+            elements={Array.from(
+              { length: NOTE_COUNT * 2 + 1 },
+              (_, index) => ({
+                note: index,
+                octave: 4,
+                string: 0,
+                fret: index,
+              })
+            )}
           />
           {/* Notes */}
           <div className="mt-10">

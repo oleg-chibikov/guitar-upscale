@@ -3,7 +3,7 @@ import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../helpers/arrayHelper";
-import { Neck, NoteCount } from "./generateNeckRepresentation";
+import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 export enum ChordMode {
   Major,
@@ -254,7 +254,7 @@ const findNextNotesInChord = (
     let j = Math.max(1, baseFretIndex - maxFretDistance);
     j <=
     Math.min(
-      baseFretIndex === 0 ? NoteCount - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
+      baseFretIndex === 0 ? NOTE_COUNT - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
       neck[stringIndex].length - 1
     );
     j++
@@ -274,7 +274,7 @@ export const generateAllChords = (
   const allChords: NoteChords[] = [];
 
   // Loop through all notes
-  for (let note = 0; note < NoteCount; note++) {
+  for (let note = 0; note < NOTE_COUNT; note++) {
     const noteChords: NoteChordMode[] = [];
 
     // Generate all chord variations for the current note
@@ -327,7 +327,7 @@ const generateChordVariations = (
     const string = neck[stringIndex];
 
     // Find the first note in the chord on current string - limit at 12 to avoid unrealistic chords
-    for (let fretIndex = 0; fretIndex < NoteCount; fretIndex++) {
+    for (let fretIndex = 0; fretIndex < NOTE_COUNT; fretIndex++) {
       const stringOctaveNote = string[fretIndex];
       if (stringOctaveNote !== null && stringOctaveNote.note === baseNote) {
         const possibleNotesForThisBaseNote: StringOctaveNote[][] = [];
@@ -355,7 +355,7 @@ const generateChordVariations = (
 
           if (baseFretIndex === 0) {
             for (const note of notesOnHigherString) {
-              if (note.fret > 0 && note.fret < NoteCount) {
+              if (note.fret > 0 && note.fret < NOTE_COUNT) {
                 baseFretIndex = note.fret;
                 break;
               }

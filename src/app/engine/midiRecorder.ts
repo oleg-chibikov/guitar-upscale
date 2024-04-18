@@ -1,7 +1,7 @@
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
-import { OctaveNote, getNoteText } from "../data/notes";
-import { NoteCount } from "./generateNeckRepresentation";
+import { MAX_VELOCITY, OctaveNote, getNoteText } from "../data/notes";
+import { NOTE_COUNT } from "./generateNeckRepresentation";
 
 // Define a class for MIDI recorder
 class MidiRecorder {
@@ -55,9 +55,9 @@ class MidiRecorder {
           pitch: [
             note.note +
               this.noteShift +
-              (this.octaveShift + note.octave) * NoteCount,
+              (this.octaveShift + note.octave) * NOTE_COUNT,
           ],
-          velocity: 127,
+          velocity: MAX_VELOCITY,
           duration: "4",
           channel: 1,
           sequential: false,
