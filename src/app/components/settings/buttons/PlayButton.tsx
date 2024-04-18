@@ -31,6 +31,23 @@ export const PlayButton: React.FC = (props) => {
     isPlayingRef.current = false;
   }, [neck, tuning, baseNote, scale, playbackType]);
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        // Call your function here
+        handlePlay();
+      }
+    };
+
+    // Add event listener when the component mounts
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Remove event listener when the component unmounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+
   if (!neck) {
     return null;
   }
