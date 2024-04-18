@@ -19,7 +19,7 @@ export const VelocitySlider: React.FC = () => {
       onValueChange={handleSliderChange}
       value={velocity}
       minimumValue={1}
-      maximumValue={125}
+      maximumValue={127}
       step={1}
       label={velocity.toString()}
     />

@@ -1,7 +1,8 @@
 import { Soundfont } from "smplr";
-import { OctaveNote, getNoteText } from "../data/notes";
+import { Note, OctaveNote, getNoteText } from "../data/notes";
 
 let soundfont: Soundfont;
+let metronomeSoundfond: Soundfont;
 
 export const initSoundfont = () => {
   if (!soundfont) {
@@ -12,17 +13,44 @@ export const initSoundfont = () => {
       // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
     });
 
+    metronomeSoundfond = new Soundfont(context, {
+      instrument: "woodblock",
+      decayTime: 10,
+      // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
+    });
+
     // test note
     soundfont?.start({
       note: "E4",
-      velocity: 125,
+      velocity: 127,
     });
   }
 };
 
-export const playNote = (note: OctaveNote, velocity: number) => {
-  return soundfont?.start({
+export const playNote = (
+  note: OctaveNote,
+  velocity: number,
+  metronome: boolean = false
+) => {
+  const instrument = metronome ? metronomeSoundfond : soundfont;
+  return instrument?.start({
     note: getNoteText(note.note) + note.octave,
     velocity: velocity,
   });
+};
+
+export const playMetronomeTick = (
+  isAccented: boolean,
+  baseVelocity: number
+) => {
+  // Adjust the note and velocity as needed for your metronome tick sound
+  const metronomeTickNote: OctaveNote = {
+    note: Note.C,
+    octave: isAccented ? 5 : 4,
+  };
+  playNote(
+    metronomeTickNote,
+    Math.min(baseVelocity + (isAccented ? 20 : 0), 127),
+    true
+  );
 };

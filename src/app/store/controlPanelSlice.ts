@@ -27,6 +27,7 @@ import {
   generateNeckRepresentation,
   Neck,
 } from "../engine/generateNeckRepresentation";
+import { setBpm } from "../engine/mainClock";
 import { midiRecorder } from "../engine/midiRecorder";
 import { RootState } from "./store"; // Define RootState type
 
@@ -111,7 +112,7 @@ const initialState: ControlPanelState = {
   chordsExpanded: true,
   playIntervalBpm: 140,
   chordStrummingDelayMs: 20,
-  velocity: 125,
+  velocity: 127,
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,
@@ -130,6 +131,12 @@ const initialState: ControlPanelState = {
 export let playIntervalBpmValue: number | undefined = undefined;
 export let velocityValue: number | undefined = undefined;
 export let examplesForScale: Example[] | undefined = undefined;
+export let isMetronomeTicking = false;
+
+export const setMetronomeTicking = (value: boolean) => {
+  isMetronomeTicking = value;
+};
+
 export const setExamples = (examples?: Example[]) => {
   examplesForScale = examples;
 };
@@ -199,6 +206,9 @@ export const controlPanelSlice = createSlice({
   reducers: {
     init: (state) => {
       onGuitarSettingsUpdate(state);
+      velocityValue = state.velocity;
+      playIntervalBpmValue = state.playIntervalBpm;
+      setBpm(state.playIntervalBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
@@ -244,6 +254,7 @@ export const controlPanelSlice = createSlice({
     setPlayIntervalBpm: (state, action: PayloadAction<number>) => {
       state.playIntervalBpm = action.payload;
       playIntervalBpmValue = action.payload;
+      setBpm(action.payload);
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;

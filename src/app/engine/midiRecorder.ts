@@ -57,7 +57,7 @@ class MidiRecorder {
               this.noteShift +
               (this.octaveShift + note.octave) * NoteCount,
           ],
-          velocity: 125,
+          velocity: 127,
           duration: "4",
           channel: 1,
           sequential: false,

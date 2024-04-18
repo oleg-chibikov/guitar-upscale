@@ -1,14 +1,13 @@
+import { getNoteText, parseStringToNotes } from "@/app/data/notes";
+import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
+import { playExample, playWholeScale } from "@/app/engine/player";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNoteText, parseStringToNotes } from "../../../data/notes";
-import { playExample, playWholeScale } from "../../../engine/player";
-import { sleep } from "../../../engine/sleep";
 import {
   PlaybackType,
   examplesForScale,
-  playIntervalBpmValue,
   selectControlPanel,
   showAlert,
 } from "../../../store/controlPanelSlice";
@@ -17,15 +16,8 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
 export const PlayButton: React.FC = (props) => {
-  const {
-    neck,
-    tuning,
-    baseNote,
-    scale,
-    playIntervalBpm,
-    chordsMap,
-    playbackType,
-  } = useSelector(selectControlPanel);
+  const { neck, tuning, baseNote, scale, chordsMap, playbackType } =
+    useSelector(selectControlPanel);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
@@ -55,46 +47,39 @@ export const PlayButton: React.FC = (props) => {
     setIsPlaying(true);
     isPlayingRef.current = true;
 
-    const bpmToMilliseconds = (bpm: number): number => {
-      return 60000 / bpm / 2;
-    };
+    await waitForNextBeat();
 
-    const waitNote = async () => {
-      // We are taking value from a variable to be able to adjust it while playing, but the initial value comes from the store in order to use redux-persist and restore previous value
-      const waitBpm = playIntervalBpmValue ?? playIntervalBpm;
-      const waitMs = bpmToMilliseconds(waitBpm);
-
-      await sleep(waitMs);
-    };
-
-    const dispatchAlert = (message: string) => dispatch(showAlert(message));
-
-    if (playbackType === melodyType && examplesForScale) {
-      await playExample(
-        baseNote,
-        examplesForScale,
-        waitNote,
-        neck,
-        parseStringToNotes(tuning),
-        isPlayingRef,
-        dispatchAlert
-      );
-    } else {
-      const isFullStringScalePlayback = playbackType === fullStringScaleType;
-      dispatchAlert(
-        `${getNoteText(baseNote)} ${scale} ${
-          isFullStringScalePlayback ? " (full string)" : ""
-        }`
-      );
-      await playWholeScale(
-        waitNote,
-        neck,
-        isPlayingRef,
-        isFullStringScalePlayback
-      );
+    try {
+      console.log("Start playing");
+      const dispatchAlert = (message: string) => dispatch(showAlert(message));
+      if (playbackType === melodyType && examplesForScale) {
+        await playExample(
+          baseNote,
+          examplesForScale,
+          waitForNextTick,
+          neck,
+          parseStringToNotes(tuning),
+          isPlayingRef,
+          dispatchAlert
+        );
+      } else {
+        const isFullStringScalePlayback = playbackType === fullStringScaleType;
+        dispatchAlert(
+          `${getNoteText(baseNote)} ${scale} ${
+            isFullStringScalePlayback ? " (full string)" : ""
+          }`
+        );
+        await playWholeScale(
+          waitForNextTick,
+          neck,
+          isPlayingRef,
+          isFullStringScalePlayback
+        );
+      }
+    } finally {
+      setIsPlaying(false);
+      isPlayingRef.current = false;
     }
-    setIsPlaying(false);
-    isPlayingRef.current = false;
   };
 
   return (

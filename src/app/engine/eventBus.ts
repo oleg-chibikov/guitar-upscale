@@ -22,8 +22,14 @@ export type ChordWithPlayMetadata = {
   metadata: ChordMetadata;
 };
 
+type Tick = {
+  isBeat: boolean;
+  tick: number;
+};
+
 export const NotePlayEventBus = new Subject<NoteWithPlayMetadata>();
 export const ChordEventBus = new Subject<ChordWithPlayMetadata>();
+export const MetronomeEventBus = new Subject<Tick>();
 
 export const NoteToFretMarkerEventMap: Map<
   string,
