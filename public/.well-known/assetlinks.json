@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "uk.org.guitar_upscale.twa",
+        "sha256_cert_fingerprints": ["82:C2:2B:A7:E6:76:50:6A:00:9B:EF:E7:66:79:1C:FA:27:7B:65:70:0E:82:71:8F:35:87:E2:FD:7D:54:68:86"]
+      }
+    }]
