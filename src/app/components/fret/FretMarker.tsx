@@ -54,10 +54,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
   useEffect(() => {
     // Function to play note and start animation
-    const playNoteAndAnimate = () => {
+    const playNoteAndAnimate = async () => {
       if (stringOctaveNote) {
         setIsNoteClicked(false);
-        playNote(stringOctaveNote, velocityValue ?? velocity);
+        await playNote(stringOctaveNote, velocityValue ?? velocity);
         setIsNoteClicked(true);
         setTimeout(() => {
           setIsNoteClicked(false);
