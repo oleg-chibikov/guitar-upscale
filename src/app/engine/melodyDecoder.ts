@@ -2,6 +2,34 @@ import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
 import { ChordEventBus } from "./eventBus";
 import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
+const convertChord = (chord: string, note: Note): string => {
+  // Split the chord into note and alterations
+  let chordNote = chord[0];
+  let alterations = chord.substring(1);
+
+  // If the second character is '#', include it in the chord note
+  if (chord.length > 1 && chord[1] === "#") {
+    chordNote += "#";
+    alterations = chord.substring(2);
+  }
+
+  // Convert the chord note string to Note enum value
+  const baseNoteValue = Note[chordNote as keyof typeof Note];
+
+  // Calculate the difference between the provided note and the chord note
+  const newBaseNoteValue = (baseNoteValue + note) % NOTE_COUNT;
+
+  // Get the new chord note string
+  const newChordNote = Object.keys(Note).find(
+    (key) => Note[key as keyof typeof Note] === newBaseNoteValue
+  );
+
+  // Reconstruct the chord string
+  const newChord = newChordNote + alterations;
+
+  return newChord;
+};
+
 export const decodeMelody = async (
   melody: string,
   play: (note: StringOctaveNote) => void,
@@ -34,8 +62,13 @@ export const decodeMelody = async (
     const playChordAndReset = () => {
       if (immediateChord != undefined) {
         nextIsImmediateChord = false;
+        const newChord =
+          baseNote > 0
+            ? convertChord(immediateChord, baseNote)
+            : immediateChord;
+
         ChordEventBus.next({
-          chord: immediateChord,
+          chord: newChord,
           metadata: { notesToPlay: 4, strummingDelayMs: 10 }, // override default settings
         });
         immediateChord = undefined;
