@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react";
-import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
-import { initSoundfont } from "../engine/soundProvider";
-import {
-  Theme,
-  hideAlert,
-  init,
-  selectControlPanel,
-} from "../store/controlPanelSlice";
 import { AnimatedAlert } from "./AnimatedAlert";
+import { Initializer } from "./Initializer";
+import AuthPanel from "./auth/AuthPanel";
+import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
+import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
+import { SettingsView } from "./settings/SettingsView";
 
 // TODO
 // Chord finder!
@@ -25,89 +20,17 @@ import { ControlPanel } from "./settings/ControlPanel";
 // get the formula to avoid hardcoding each string height offset
 // youtube videos for each scale
 
-export const Main = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(init());
-  }, [dispatch]);
-
-  const {
-    showAlert: isAlertShown,
-    alertMessage,
-    theme,
-    fretboardScaleX,
-    fretboardScaleY,
-  } = useSelector(selectControlPanel);
-
-  const [retrigger, setRetrigger] = useState<boolean>(false);
-
-  useEffect(() => {
-    const mainBg =
-      theme === Theme.Light ? "bg-background-light" : "bg-background-dark";
-    document.body.classList.add(mainBg);
-    return () => document.body.classList.remove(mainBg);
-  }, [theme]);
-
-  useEffect(() => {
-    setRetrigger(true);
-    setTimeout(() => setRetrigger(false), 1);
-  }, [fretboardScaleX, fretboardScaleY]);
-
-  useEffect(() => {
-    initSoundfont();
-  }, []);
-
-  useEffect(() => {
-    // Multiple products (previously known as trackers)
-    ReactGA.initialize([
-      {
-        trackingId: "G-0NYT2JD8C4",
-      },
-    ]);
-    ReactGA.send({
-      hitType: "pageview",
-      page: "/",
-      title: "Main page",
-    });
-  }, []);
-
-  useEffect(() => {
-    // prevent the Google translate bottom popup from appearing on mobile screen
-    document.addEventListener(
-      "click",
-      function (event: any) {
-        if (
-          event.target.nodeName === "UL" ||
-          event.target.nodeName === "LI" ||
-          event.target.nodeName === "SPAN"
-        ) {
-          event.preventDefault();
-        }
-      },
-      true
-    );
-
-    if (typeof navigator.serviceWorker !== "undefined") {
-      navigator.serviceWorker.register("/sw.js");
-    }
-  }, []);
-
-  const handleCloseAlert = () => {
-    dispatch(hideAlert());
-  };
-
-  // retriggering is needed to refresh scrollbars, otherwise they stay not updated
-  if (retrigger) {
-    return null;
-  }
-
+export const Main: React.FC = () => {
   return (
     <main>
-      {isAlertShown && (
-        <AnimatedAlert message={alertMessage} onClose={handleCloseAlert} />
-      )}
+      <Initializer />
+      <AnimatedAlert />
       <ControlPanel />
       <Fretboard />
+      <SettingsView />
+      <ChordsView />
+      <AspectRatioControl />
+      <AuthPanel />
     </main>
   );
 };

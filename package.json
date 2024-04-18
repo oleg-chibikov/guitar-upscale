@@ -13,7 +13,8 @@
     "build-and-deploy-web-stage": "npm run build && npm run deploy-surge",
     "build-and-deploy-web-prod-1": "npm run build && npm run deploy-surge-org.uk",
     "build-and-deploy-web-prod-2": "npm run build && npm run deploy-surge-co.uk",
-    "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge"
+    "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge",
+    "update-all": "ncu --upgrade && npm install"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -21,9 +22,12 @@
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@reduxjs/toolkit": "^2.2.3",
+    "@types/next-auth": "^3.15.0",
     "@vercel/speed-insights": "^1.0.10",
+    "dotenv": "^16.4.5",
     "midi-writer-js": "^3.1.1",
-    "next": "14.2.1",
+    "next": "14.2.2",
+    "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
     "react-ga4": "^2.1.0",
@@ -32,14 +36,15 @@
     "redux-persist": "^6.0.0",
     "rxjs": "^7.8.1",
     "screenfull": "^6.0.2",
-    "smplr": "^0.12.3"
+    "server-only": "^0.0.1",
+    "smplr": "^0.13.3"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.1",
+    "eslint-config-next": "14.2.2",
     "postcss": "^8",
     "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.3",

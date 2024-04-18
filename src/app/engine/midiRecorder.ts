@@ -4,7 +4,7 @@ import { MAX_VELOCITY, OctaveNote, getNoteText } from "../data/notes";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
 
 // Define a class for MIDI recorder
-class MidiRecorder {
+export class MidiRecorder {
   private midiEvents: NoteEvent[] = [];
   private isRecording: boolean = false;
   private startTime: number | undefined;

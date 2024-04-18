@@ -1,15 +1,17 @@
-"use client";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
 import { Main } from "./components/Main";
-import { persistor, store } from "./store/store";
+import ServerActionRoot from "./components/ServerActionRoot";
+import { ContextProvider } from "./context/ContextProvider";
 
-export default function Home() {
+const Home: React.FC = async () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <Main />
-      </PersistGate>
-    </Provider>
+    <ServerActionRoot
+      renderChildren={(s) => (
+        <ContextProvider premiumFeaturesWithSession={s}>
+          <Main />
+        </ContextProvider>
+      )}
+    ></ServerActionRoot>
   );
-}
+};
+
+export default Home;

@@ -1,4 +1,3 @@
-import { imageLoader } from "@/app/imageLoader";
 import Image from "next/image";
 import React from "react";
 
@@ -16,7 +15,7 @@ export const GuitarImage: React.FC<GuitarImageProps> = ({
   return (
     <Image
       className={`origin-top-left ${className}`}
-      loader={imageLoader}
+      // loader={imageLoader}
       style={{
         maxWidth: "unset",
         width: 5504,

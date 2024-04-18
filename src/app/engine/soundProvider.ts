@@ -6,6 +6,8 @@ let soundfont: Soundfont;
 let metronomeSoundfont: Soundfont;
 
 export const initSoundfont = () => {
+  //soundProvider.ts:9 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
+
   const context = new AudioContext();
 
   soundfont = new Soundfont(context, {
@@ -29,6 +31,9 @@ export const playNote = async (
   velocity: number,
   metronome: boolean = false
 ) => {
+  if (!soundfont) {
+    initSoundfont();
+  }
   const instrument = metronome ? metronomeSoundfont : soundfont;
   await instrument.load;
   return instrument.start({
@@ -41,6 +46,9 @@ export const playMetronomeTick = async (
   isAccented: boolean,
   baseVelocity: number
 ) => {
+  if (!metronomeSoundfont) {
+    initSoundfont();
+  }
   // Adjust the note and velocity as needed for your metronome tick sound
   const metronomeTickNote: OctaveNote = {
     note: Note.C,

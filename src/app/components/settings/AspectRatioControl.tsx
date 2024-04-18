@@ -1,3 +1,4 @@
+"use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
 import { useSelector } from "react-redux";

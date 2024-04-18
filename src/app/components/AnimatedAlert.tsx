@@ -1,34 +1,36 @@
+"use client";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { hideAlert, selectControlPanel } from "../store/controlPanelSlice";
 
-interface AnimatedAlertProps {
-  message: string;
-  onClose: () => void;
-}
-export const AnimatedAlert: React.FC<AnimatedAlertProps> = ({
-  message,
-  onClose,
-}) => {
+export const AnimatedAlert: React.FC = () => {
+  const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const { showAlert, alertMessage } = useSelector(selectControlPanel);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsAnimatingOut(true);
       setTimeout(() => {
         setIsVisible(false);
-        onClose();
+        dispatch(hideAlert());
       }, 100); // Wait for the animation duration before closing
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [onClose]);
+  }, [dispatch]);
 
   const handleTransitionEnd = () => {
     if (isAnimatingOut) {
       setIsVisible(false);
-      onClose();
+      dispatch(hideAlert());
     }
   };
+
+  if (!showAlert) {
+    return null;
+  }
 
   return (
     <>
@@ -41,7 +43,7 @@ export const AnimatedAlert: React.FC<AnimatedAlertProps> = ({
           onAnimationEnd={handleTransitionEnd}
         >
           <span className="flex items-center text-base text-center text-gray-800">
-            {message}
+            {alertMessage}
           </span>
         </div>
       )}

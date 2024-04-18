@@ -1,3 +1,4 @@
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
@@ -12,6 +13,7 @@ import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
   const dispatch = useDispatch();
+  const premiumFeatures = usePremiumFeatures();
   const { isRecording, theme } = useSelector(selectControlPanel);
   return (
     <>
@@ -33,7 +35,9 @@ export const RecordButton: React.FC = (props) => {
         isActive={isRecording}
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
         activeBg="bg-red-500"
-        onPress={() => dispatch(toggleRecording(true))}
+        onPress={() =>
+          dispatch(toggleRecording(premiumFeatures?.midiRecorder === true))
+        }
       />
     </>
   );

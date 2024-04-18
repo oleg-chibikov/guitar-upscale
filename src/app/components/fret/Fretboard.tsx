@@ -1,3 +1,4 @@
+"use client";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { interpolate } from "@/app/helpers/interpolation";
 import React, { useCallback, useEffect, useState } from "react";
@@ -45,6 +46,13 @@ export const Fretboard: React.FC = () => {
   const [position, setPosition] = useState(getPositionForSkin(skin));
   const orientation = useScreenOrientation();
 
+  const [retrigger, setRetrigger] = useState<boolean>(false);
+
+  useEffect(() => {
+    setRetrigger(true);
+    setTimeout(() => setRetrigger(false), 1);
+  }, [fretboardScaleX, fretboardScaleY]);
+
   useEffect(() => {
     const handleResize = () => {
       setMaxHeight(window.innerHeight);
@@ -80,6 +88,10 @@ export const Fretboard: React.FC = () => {
   }, [skin]);
 
   if (!neck) {
+    return null;
+  }
+  // retriggering is needed to refresh scrollbars, otherwise they stay not updated
+  if (retrigger) {
     return null;
   }
 
