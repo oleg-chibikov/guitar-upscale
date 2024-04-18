@@ -109,6 +109,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
         },
       ],
       ["Locrian", [1, 3, 5, 6, 8, 10]],
+      ["Locrian Extended", [1, 3, 5, 6, 7, 8, 10]],
       [
         "Melodic",
         {
