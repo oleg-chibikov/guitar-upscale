@@ -81,7 +81,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   settingsExpanded: boolean;
   isRecording: boolean;
   chordsExpanded: boolean;
-  playIntervalBpm: number;
+  tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
   metronomeVelocity: number;
@@ -112,7 +112,7 @@ const initialState: ControlPanelState = {
   settingsExpanded: false,
   isRecording: false,
   chordsExpanded: true,
-  playIntervalBpm: 140,
+  tempoBpm: 140,
   chordStrummingDelayMs: 20,
   velocity: MAX_VELOCITY,
   metronomeVelocity: MAX_VELOCITY,
@@ -210,7 +210,7 @@ export const controlPanelSlice = createSlice({
     init: (state) => {
       onGuitarSettingsUpdate(state);
       velocityValue = state.velocity;
-      setBpm(state.playIntervalBpm);
+      setBpm(state.tempoBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
@@ -253,8 +253,8 @@ export const controlPanelSlice = createSlice({
         midiRecorder.stopRecording(action.payload);
       }
     },
-    setPlayIntervalBpm: (state, action: PayloadAction<number>) => {
-      state.playIntervalBpm = action.payload;
+    setTempoBpm: (state, action: PayloadAction<number>) => {
+      state.tempoBpm = action.payload;
       setBpm(action.payload);
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
@@ -351,7 +351,7 @@ export const {
   setChordsDisplayMode,
   setSkin,
   setSettingsExpanded,
-  setPlayIntervalBpm,
+  setTempoBpm,
   setVelocity,
   setMetronomeVelocity,
   showAlert,

@@ -2,26 +2,26 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
-  setPlayIntervalBpm,
+  setTempoBpm,
 } from "../../../store/controlPanelSlice";
 import { Slider } from "./Slider";
 
-export const PlayIntervalSlider: React.FC = () => {
-  const { playIntervalBpm } = useSelector(selectControlPanel);
+export const TempoSlider: React.FC = () => {
+  const { tempoBpm } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
-    dispatch(setPlayIntervalBpm(value));
+    dispatch(setTempoBpm(value));
   };
 
   return (
     <Slider
       onValueChange={handleSliderChange}
-      value={playIntervalBpm}
+      value={tempoBpm}
       minimumValue={50}
       maximumValue={500}
       step={1}
-      label={`${playIntervalBpm} BPM`}
+      label={`${tempoBpm} BPM`}
       labelClass="w-20"
     />
   );

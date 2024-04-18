@@ -36,7 +36,7 @@ export const decodeMelody = async (
         nextIsImmediateChord = false;
         ChordEventBus.next({
           chord: immediateChord,
-          metadata: { notesToPlay: 3, strummingDelayMs: 10 }, // override default settings
+          metadata: { notesToPlay: 4, strummingDelayMs: 10 }, // override default settings
         });
         immediateChord = undefined;
       }

@@ -85,7 +85,8 @@ export const playExample = async (
   neck: Neck,
   tuning: OctaveNote[],
   isPlayingRef: React.MutableRefObject<boolean>,
-  showAlert: (message: string) => void
+  showAlert: (message: string) => void,
+  setTempo: (tempoBpm: number) => void
 ) => {
   function getRandomRecord<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
@@ -94,6 +95,10 @@ export const playExample = async (
 
   const randomExample = getRandomRecord(examplesForScale);
   showAlert(randomExample.band + " - " + randomExample.title);
+
+  if (randomExample.tempo) {
+    setTempo(randomExample.tempo);
+  }
 
   await decodeMelody(
     randomExample.melody,

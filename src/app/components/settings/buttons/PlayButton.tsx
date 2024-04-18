@@ -11,6 +11,7 @@ import {
   examplesForScale,
   isMetronomeTicking,
   selectControlPanel,
+  setTempoBpm,
   showAlert,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
@@ -84,7 +85,8 @@ export const PlayButton: React.FC = (props) => {
           neck,
           parseStringToNotes(tuning),
           isPlayingRef,
-          dispatchAlert
+          dispatchAlert,
+          (x) => dispatch(setTempoBpm(x))
         );
       } else {
         const isFullStringScalePlayback = playbackType === fullStringScaleType;

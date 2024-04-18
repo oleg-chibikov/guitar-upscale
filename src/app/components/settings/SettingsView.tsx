@@ -19,7 +19,7 @@ import { TuningSelector } from "./selectors/TuningSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
 import { MetronomeVelocitySlider } from "./sliders/MetronomeVelocitySlider";
-import { PlayIntervalSlider } from "./sliders/PlayIntervalSlider";
+import { TempoSlider } from "./sliders/TempoSlider";
 import { VelocitySlider } from "./sliders/VelocitySlider";
 
 export const SettingsView: React.FC = () => {
@@ -109,7 +109,7 @@ export const SettingsView: React.FC = () => {
           <span>Chord play mode:</span>
           <ChordPlayModeSelector />
           <span>Playback speed:</span>
-          <PlayIntervalSlider />
+          <TempoSlider />
           <span>Chord strumming delay:</span>
           <ChordStrummingDelaySlider />
           <span>Notes to play in chord:</span>
