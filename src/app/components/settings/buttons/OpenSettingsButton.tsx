@@ -1,5 +1,6 @@
 import SettingsApplications from "@mui/icons-material/SettingsApplications";
 import React from "react";
+import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectControlPanel,
@@ -19,7 +20,13 @@ export const OpenSettingsButton: React.FC = (props) => {
         settingsExpanded ? "Close settings panel" : "Open settings panel"
       }
       isActive={settingsExpanded}
-      onPress={() => dispatch(setSettingsExpanded(!settingsExpanded))}
+      onPress={() => {
+        dispatch(setSettingsExpanded(!settingsExpanded));
+        ReactGA.event({
+          category: "Settings",
+          action: "Open settings",
+        });
+      }}
     />
   );
 };

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import { initSoundfont } from "../engine/soundProvider";
 import {
@@ -54,6 +55,20 @@ export const Main = () => {
 
   useEffect(() => {
     initSoundfont();
+  }, []);
+
+  useEffect(() => {
+    // Multiple products (previously known as trackers)
+    ReactGA.initialize([
+      {
+        trackingId: "G-0NYT2JD8C4",
+      },
+    ]);
+    ReactGA.send({
+      hitType: "pageview",
+      page: "/",
+      title: "Main page",
+    });
   }, []);
 
   useEffect(() => {

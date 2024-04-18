@@ -4,7 +4,8 @@ import { playExample, playWholeScale } from "@/app/engine/player";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PlaybackType,
@@ -15,6 +16,7 @@ import {
   showAlert,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
+
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
@@ -27,36 +29,10 @@ export const PlayButton: React.FC = (props) => {
   const isPlayingRef = useRef(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    setIsPlaying(false);
-    isPlayingRef.current = false;
-  }, [neck, tuning, baseNote, scale, playbackType]);
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.code === "Space") {
-        // Call your function here
-        handlePlay();
-      }
-    };
-
-    // Add event listener when the component mounts
-    document.addEventListener("keydown", handleKeyPress);
-
-    // Remove event listener when the component unmounts
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
-
-  if (!neck) {
-    return null;
-  }
-  if (!chordsMap) {
-    return null;
-  }
-
-  const handlePlay = async () => {
+  const handlePlay = useCallback(async () => {
+    if (!neck) {
+      return;
+    }
     if (isPlayingRef.current) {
       // If already playing, stop playback
       setIsPlaying(false);
@@ -64,6 +40,10 @@ export const PlayButton: React.FC = (props) => {
       return;
     }
 
+    ReactGA.event({
+      category: "Playback",
+      action: "Playback started",
+    });
     // Start playback
     setIsWaiting(true);
     isPlayingRef.current = true;
@@ -106,7 +86,36 @@ export const PlayButton: React.FC = (props) => {
       setIsPlaying(false);
       isPlayingRef.current = false;
     }
-  };
+  }, [baseNote, dispatch, neck, playbackType, scale, tuning]);
+
+  useEffect(() => {
+    setIsPlaying(false);
+    isPlayingRef.current = false;
+  }, [neck, tuning, baseNote, scale, playbackType]);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        // Call your function here
+        handlePlay();
+      }
+    };
+
+    // Add event listener when the component mounts
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Remove event listener when the component unmounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handlePlay]); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+
+  if (!neck) {
+    return null;
+  }
+  if (!chordsMap) {
+    return null;
+  }
 
   return (
     <IconButton
