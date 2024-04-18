@@ -61,7 +61,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         setIsNoteClicked(true);
         setTimeout(() => {
           setIsNoteClicked(false);
-        }, 300); // Adjust the duration of the animation as needed
+        }, 500); // Adjust the duration of the animation as needed
       }
     };
 
