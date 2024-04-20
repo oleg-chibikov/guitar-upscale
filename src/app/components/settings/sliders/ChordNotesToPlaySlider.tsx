@@ -15,13 +15,16 @@ export const ChordNotesToPlaySlider: React.FC = () => {
   };
 
   return (
-    <Slider
-      onValueChange={handleSliderChange}
-      value={chordNotesToPlay}
-      minimumValue={1}
-      maximumValue={6}
-      step={1}
-      label={chordNotesToPlay.toString()}
-    />
+    <>
+      <span>Notes to play in chord:</span>
+      <Slider
+        onValueChange={handleSliderChange}
+        value={chordNotesToPlay}
+        minimumValue={1}
+        maximumValue={6}
+        step={1}
+        label={chordNotesToPlay.toString()}
+      />
+    </>
   );
 };

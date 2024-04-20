@@ -12,12 +12,15 @@ export const NoteDisplayModeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <EnumSelector
-      enumObj={NoteDisplayMode}
-      selectedValue={noteDisplayMode}
-      onValueChange={(value) => {
-        dispatch(setNoteDisplayMode(value));
-      }}
-    />
+    <>
+      <span>Note Display Mode:</span>
+      <EnumSelector
+        enumObj={NoteDisplayMode}
+        selectedValue={noteDisplayMode}
+        onValueChange={(value) => {
+          dispatch(setNoteDisplayMode(value));
+        }}
+      />
+    </>
   );
 };

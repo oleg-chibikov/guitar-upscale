@@ -9,16 +9,19 @@ const TuningSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <SelectWrapper
-      value={tuning}
-      onChange={(value) => {
-        dispatch(setTuning(value as string));
-      }}
-      options={tunings.map((tuning) => ({
-        value: tuning,
-        label: tuning.split("|")[0],
-      }))}
-    />
+    <>
+      <span>Tuning:</span>
+      <SelectWrapper
+        value={tuning}
+        onChange={(value) => {
+          dispatch(setTuning(value as string));
+        }}
+        options={tunings.map((tuning) => ({
+          value: tuning,
+          label: tuning.split("|")[0],
+        }))}
+      />
+    </>
   );
 };
 

@@ -50,29 +50,18 @@ export const SettingsView = forwardRef(() => {
           gridTemplateColumns: "auto minmax(200px, auto)",
         }}
       >
-        <span>Theme:</span>
         <ThemeSelector />
-        <span>Tuning:</span>
         <TuningSelector />
-        <span>Base Note:</span>
         <BaseNoteSelector />
-        <span>Note Display Mode:</span>
         <NoteDisplayModeSelector />
-        <span>Chords Display Mode:</span>
         <ChordsDisplayModeSelector />
         <PlaybackTypeSelector />
         <SkinSelector />
-        <span>Chord play mode:</span>
         <ChordPlayModeSelector />
-        <span>Playback speed:</span>
         <TempoSlider />
-        <span>Chord strumming delay:</span>
         <ChordStrummingDelaySlider />
-        <span>Notes to play in chord:</span>
         <ChordNotesToPlaySlider />
-        <span>Playback volume:</span>
         <VelocitySlider />
-        <span>Metronome volume:</span>
         <MetronomeVelocitySlider />
       </div>
     </section>

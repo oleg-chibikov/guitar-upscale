@@ -24,12 +24,15 @@ export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <EnumSelector
-      enumObj={Theme}
-      selectedValue={theme}
-      onValueChange={(value) => {
-        dispatch(setTheme(convertOSTheme(value)));
-      }}
-    />
+    <>
+      <span>Theme:</span>
+      <EnumSelector
+        enumObj={Theme}
+        selectedValue={theme}
+        onValueChange={(value) => {
+          dispatch(setTheme(convertOSTheme(value)));
+        }}
+      />
+    </>
   );
 };

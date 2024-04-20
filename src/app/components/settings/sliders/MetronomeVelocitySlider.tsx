@@ -16,13 +16,16 @@ export const MetronomeVelocitySlider: React.FC = () => {
   };
 
   return (
-    <Slider
-      onValueChange={handleSliderChange}
-      value={metronomeVelocity}
-      minimumValue={1}
-      maximumValue={MAX_VELOCITY}
-      step={1}
-      label={metronomeVelocity.toString()}
-    />
+    <>
+      <span>Metronome volume:</span>
+      <Slider
+        onValueChange={handleSliderChange}
+        value={metronomeVelocity}
+        minimumValue={1}
+        maximumValue={MAX_VELOCITY}
+        step={1}
+        label={metronomeVelocity.toString()}
+      />
+    </>
   );
 };

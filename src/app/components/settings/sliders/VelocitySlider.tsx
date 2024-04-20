@@ -16,13 +16,16 @@ export const VelocitySlider: React.FC = () => {
   };
 
   return (
-    <Slider
-      onValueChange={handleSliderChange}
-      value={velocity}
-      minimumValue={1}
-      maximumValue={MAX_VELOCITY}
-      step={1}
-      label={velocity.toString()}
-    />
+    <>
+      <span>Playback volume:</span>
+      <Slider
+        onValueChange={handleSliderChange}
+        value={velocity}
+        minimumValue={1}
+        maximumValue={MAX_VELOCITY}
+        step={1}
+        label={velocity.toString()}
+      />
+    </>
   );
 };

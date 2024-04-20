@@ -12,15 +12,18 @@ export const BaseNoteSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <EnumSelector
-      enumObj={Note}
-      selectedValue={baseNote}
-      onValueChange={(value) => {
-        dispatch(setBaseNote(value));
-      }}
-      customLabel={(key, value) =>
-        key + "(" + (value === 0 ? "" : "+") + value + ")"
-      }
-    />
+    <>
+      <span>Base Note:</span>
+      <EnumSelector
+        enumObj={Note}
+        selectedValue={baseNote}
+        onValueChange={(value) => {
+          dispatch(setBaseNote(value));
+        }}
+        customLabel={(key, value) =>
+          key + "(" + (value === 0 ? "" : "+") + value + ")"
+        }
+      />
+    </>
   );
 };

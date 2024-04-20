@@ -12,12 +12,15 @@ export const ChordPlayModeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <EnumSelector
-      enumObj={ChordPlayMode}
-      selectedValue={chordPlayMode}
-      onValueChange={(value) => {
-        dispatch(setChordPlayMode(value));
-      }}
-    />
+    <>
+      <span>Chord play mode:</span>
+      <EnumSelector
+        enumObj={ChordPlayMode}
+        selectedValue={chordPlayMode}
+        onValueChange={(value) => {
+          dispatch(setChordPlayMode(value));
+        }}
+      />
+    </>
   );
 };

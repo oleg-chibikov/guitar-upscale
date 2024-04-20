@@ -12,12 +12,15 @@ export const ChordsDisplayModeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <EnumSelector
-      enumObj={ChordsDisplayMode}
-      selectedValue={chordsDisplayMode}
-      onValueChange={(value) => {
-        dispatch(setChordsDisplayMode(value));
-      }}
-    />
+    <>
+      <span>Chords Display Mode:</span>
+      <EnumSelector
+        enumObj={ChordsDisplayMode}
+        selectedValue={chordsDisplayMode}
+        onValueChange={(value) => {
+          dispatch(setChordsDisplayMode(value));
+        }}
+      />
+    </>
   );
 };

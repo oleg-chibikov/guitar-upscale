@@ -15,14 +15,17 @@ export const TempoSlider: React.FC = () => {
   };
 
   return (
-    <Slider
-      onValueChange={handleSliderChange}
-      value={tempoBpm}
-      minimumValue={50}
-      maximumValue={500}
-      step={1}
-      label={`${tempoBpm} BPM`}
-      labelClass="w-20"
-    />
+    <>
+      <span>Playback speed:</span>
+      <Slider
+        onValueChange={handleSliderChange}
+        value={tempoBpm}
+        minimumValue={50}
+        maximumValue={500}
+        step={1}
+        label={`${tempoBpm} BPM`}
+        labelClass="w-20"
+      />
+    </>
   );
 };

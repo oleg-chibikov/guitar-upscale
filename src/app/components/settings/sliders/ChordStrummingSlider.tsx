@@ -15,14 +15,17 @@ export const ChordStrummingDelaySlider: React.FC = () => {
   };
 
   return (
-    <Slider
-      onValueChange={handleSliderChange}
-      value={chordStrummingDelayMs}
-      minimumValue={0}
-      maximumValue={500}
-      step={1}
-      label={`${chordStrummingDelayMs}ms`}
-      labelClass="w-20"
-    />
+    <>
+      <span>Chord strumming delay:</span>
+      <Slider
+        onValueChange={handleSliderChange}
+        value={chordStrummingDelayMs}
+        minimumValue={0}
+        maximumValue={500}
+        step={1}
+        label={`${chordStrummingDelayMs}ms`}
+        labelClass="w-20"
+      />
+    </>
   );
 };
