@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: "dist",
+  // distDir: "dist",
   // output: "export",
-  trailingSlash: true,
+  // trailingSlash: true,
 };
 
 export default nextConfig;
