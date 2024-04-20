@@ -76,7 +76,6 @@ interface WithControls {
 
 interface ControlPanelState extends WithNeck, WithControls {
   isSignedIn: boolean;
-  signInCheckCount: number;
   noteDisplayMode: NoteDisplayMode;
   chordsDisplayMode: ChordsDisplayMode;
   skin: Skin;
@@ -103,7 +102,6 @@ interface ControlPanelState extends WithNeck, WithControls {
 
 const initialState: ControlPanelState = {
   isSignedIn: false,
-  signInCheckCount: 0,
   scaleGroup: "Special",
   scale: "Chromatic (All notes)",
   baseNote: Note.E,
@@ -346,9 +344,6 @@ export const controlPanelSlice = createSlice({
     setIsSignedIn(state, action: PayloadAction<boolean>) {
       state.isSignedIn = action.payload;
     },
-    setSignedInCheckCount(state, action: PayloadAction<number>) {
-      state.signInCheckCount = action.payload;
-    },
   },
 });
 
@@ -380,7 +375,6 @@ export const {
   setChordNotesToPlay,
   setTuning,
   setIsSignedIn,
-  setSignedInCheckCount,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;
