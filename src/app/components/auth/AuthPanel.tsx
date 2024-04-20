@@ -36,7 +36,7 @@ export const AuthPanel: React.FC = () => {
   useEffect(() => {
     console.log("Session status", session, isSignedIn, signInCheckCount);
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
-      if (signInCheckCount < 3) {
+      if (!signInCheckCount || signInCheckCount < 3) {
         // check to avoid endless reloads
         dispatch(setSignedInCheckCount(signInCheckCount + 1));
         location.reload();
