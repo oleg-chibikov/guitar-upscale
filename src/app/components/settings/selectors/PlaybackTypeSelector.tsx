@@ -18,12 +18,15 @@ export const PlaybackTypeSelector: React.FC = () => {
   }
 
   return (
-    <EnumSelector
-      enumObj={PlaybackType}
-      selectedValue={playbackType}
-      onValueChange={(value) => {
-        dispatch(setPlaybackType(value));
-      }}
-    />
+    <>
+      <span>Playback type:</span>
+      <EnumSelector
+        enumObj={PlaybackType}
+        selectedValue={playbackType}
+        onValueChange={(value) => {
+          dispatch(setPlaybackType(value));
+        }}
+      />
+    </>
   );
 };

@@ -60,9 +60,7 @@ export const SettingsView = forwardRef(() => {
         <NoteDisplayModeSelector />
         <span>Chords Display Mode:</span>
         <ChordsDisplayModeSelector />
-        <span>Playback type:</span>
         <PlaybackTypeSelector />
-        <span>Skin:</span>
         <SkinSelector />
         <span>Chord play mode:</span>
         <ChordPlayModeSelector />

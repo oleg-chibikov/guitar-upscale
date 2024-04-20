@@ -18,12 +18,15 @@ export const SkinSelector: React.FC = () => {
   }
 
   return (
-    <EnumSelector
-      enumObj={Skin}
-      selectedValue={skin}
-      onValueChange={(value) => {
-        dispatch(setSkin(value));
-      }}
-    />
+    <>
+      <span>Skin:</span>
+      <EnumSelector
+        enumObj={Skin}
+        selectedValue={skin}
+        onValueChange={(value) => {
+          dispatch(setSkin(value));
+        }}
+      />
+    </>
   );
 };
