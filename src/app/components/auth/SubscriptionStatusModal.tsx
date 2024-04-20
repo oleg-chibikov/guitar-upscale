@@ -1,0 +1,113 @@
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
+import {
+  Theme,
+  selectControlPanel,
+  setIsSignedIn,
+} from "@/app/store/controlPanelSlice";
+import { Avatar, Button, Modal } from "@mui/material";
+import { signOut, useSession } from "next-auth/react";
+import { FC } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+interface SubscriptionStatusModalProps {
+  openModal: boolean;
+  handleCloseModal: () => void;
+}
+
+export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
+  openModal,
+  handleCloseModal,
+}) => {
+  const premiumFeatures = usePremiumFeatures();
+  const dispatch = useDispatch();
+  const { data: session } = useSession();
+  const { chordsDisplayMode, isSignedIn, theme } =
+    useSelector(selectControlPanel);
+
+  const handleSignOut = async () => {
+    localStorage.removeItem("signInCheckCount");
+    dispatch(setIsSignedIn(false));
+    await signOut();
+  };
+
+  const premiumFeatureNames = [
+    premiumFeatures.advancedChords && "Advanced chords",
+    premiumFeatures.melodies && "Melody examples",
+    premiumFeatures.midiRecorder && "MIDI recording",
+    premiumFeatures.skinSelection && "Configurable skins",
+  ].filter((x) => x) as string[];
+
+  return (
+    <Modal
+      open={openModal}
+      onClose={handleCloseModal}
+      aria-labelledby="subscription-modal"
+    >
+      <section
+        className={`flex flex-col gap-1 border-2 ${
+          theme === Theme.Light
+            ? "bg-accented_background-light border-border-light"
+            : "bg-accented_background-dark  border-border-dark"
+        }`}
+      >
+        <div className="relative flex flex-row gap-4 items-center justify-center">
+          {session?.user?.name && session.user.image && (
+            <Avatar
+              className="left-2 top-2"
+              style={{ position: "absolute" }} // override MUI postion which is relative - can't do with tailwind
+              alt={session.user.name}
+              src={session.user.image}
+            />
+          )}
+          <div className="ml-16 mr-16 flex flex-col gap-2 items-center justify-center">
+            {session?.user && (
+              <div className="flex flex-col gap-1 items-center justify-center">
+                <strong>{session.user.name}</strong>
+                <span>{session.user.email}</span>
+              </div>
+            )}
+            {premiumFeatures.subscriptionTier && (
+              <>
+                <strong>
+                  {`Subscription level: ${premiumFeatures.subscriptionTier}`}
+                </strong>
+                <strong>Available premium features</strong>
+                {
+                  <ul>
+                    {premiumFeatureNames.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                }
+              </>
+            )}
+          </div>
+        </div>
+        <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              window.open(
+                "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
+                "_blank"
+              );
+              handleCloseModal(); // Close modal after opening link
+            }}
+          >
+            View Subscription
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </Button>
+        </div>
+      </section>
+    </Modal>
+  );
+};
