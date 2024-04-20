@@ -79,7 +79,7 @@ export const decodeMelody = async (
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
   baseNote: Note,
-  isPlayingRef: React.MutableRefObject<boolean>
+  isCurrentlyPlaying: () => boolean
 ): Promise<void> => {
   let index = 0;
   let stringNumber: number | undefined;
@@ -93,8 +93,8 @@ export const decodeMelody = async (
   let repeatCount: number | undefined;
 
   while (index < melody.length) {
-    if (isPlayingRef.current === false) {
-      return;
+    if (!isCurrentlyPlaying()) {
+      return Promise.resolve();
     }
     const char = melody[index];
     const nextChar = index !== melody.length - 1 && melody[index + 1];

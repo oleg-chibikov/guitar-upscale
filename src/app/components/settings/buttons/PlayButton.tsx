@@ -1,11 +1,12 @@
+"use client";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
+import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,13 +22,23 @@ import { IconButton } from "./IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
-export const PlayButton: React.FC<WithPremiumComponents> = () => {
+interface PlayButtonProps {
+  onPlayExample?: (params: PlayExampleParameters) => void;
+}
+
+let isCurrentlyPlaying: boolean;
+const getIsCurrentlyPlaying = () => {
+  return isCurrentlyPlaying === true;
+};
+
+export const BasePlayButton: React.FC<PlayButtonProps> = ({
+  onPlayExample,
+}) => {
   const { neck, tuning, baseNote, scale, chordsMap, playbackType } =
     useSelector(selectControlPanel);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active
-  const isPlayingRef = useRef(false);
   const dispatch = useDispatch();
   const { melodies } = usePremiumFeatures();
 
@@ -35,10 +46,10 @@ export const PlayButton: React.FC<WithPremiumComponents> = () => {
     if (!neck) {
       return;
     }
-    if (isPlayingRef.current) {
+    if (isCurrentlyPlaying) {
       // If already playing, stop playback
       setIsPlaying(false);
-      isPlayingRef.current = false;
+      isCurrentlyPlaying = false;
       return;
     }
 
@@ -46,9 +57,10 @@ export const PlayButton: React.FC<WithPremiumComponents> = () => {
       category: "Playback",
       action: "Playback started",
     });
+
     // Start playback
     setIsWaiting(true);
-    isPlayingRef.current = true;
+    isCurrentlyPlaying = true;
 
     if (isMetronomeTicking) {
       await waitForNextBeat();
@@ -59,19 +71,23 @@ export const PlayButton: React.FC<WithPremiumComponents> = () => {
     try {
       console.log("Start playing");
       const dispatchAlert = (message: string) => dispatch(showAlert(message));
-      if (melodies && playbackType === melodyType && examplesForScale) {
-        const playExample = (await import("@/app/engine/examplePlayer"))
-          .playExample;
-        await playExample(
+      if (
+        onPlayExample &&
+        melodies &&
+        playbackType === melodyType &&
+        examplesForScale
+      ) {
+        const params: PlayExampleParameters = {
           baseNote,
           examplesForScale,
-          waitForNextTick,
+          waitNote: waitForNextTick,
           neck,
-          parseStringToNotes(tuning),
-          isPlayingRef,
-          dispatchAlert,
-          (x) => dispatch(setTempoBpm(x))
-        );
+          tuning: parseStringToNotes(tuning),
+          isCurrentlyPlaying: getIsCurrentlyPlaying,
+          showAlert: dispatchAlert,
+          setTempo: (x: number) => dispatch(setTempoBpm(x)),
+        };
+        await onPlayExample(params);
       } else {
         const isFullStringScalePlayback = playbackType === fullStringScaleType;
         dispatchAlert(
@@ -84,19 +100,28 @@ export const PlayButton: React.FC<WithPremiumComponents> = () => {
         await playWholeScale(
           waitForNextTick,
           neck,
-          isPlayingRef,
+          getIsCurrentlyPlaying,
           isFullStringScalePlayback
         );
       }
     } finally {
       setIsPlaying(false);
-      isPlayingRef.current = false;
+      isCurrentlyPlaying = false;
     }
-  }, [baseNote, dispatch, melodies, neck, playbackType, scale, tuning]);
+  }, [
+    baseNote,
+    dispatch,
+    melodies,
+    neck,
+    onPlayExample,
+    playbackType,
+    scale,
+    tuning,
+  ]);
 
   useEffect(() => {
     setIsPlaying(false);
-    isPlayingRef.current = false;
+    isCurrentlyPlaying = false;
   }, [neck, tuning, baseNote, scale, playbackType]);
 
   useEffect(() => {
@@ -140,3 +165,5 @@ export const PlayButton: React.FC<WithPremiumComponents> = () => {
     />
   );
 };
+
+export const PlayButton: React.FC = () => <BasePlayButton />;

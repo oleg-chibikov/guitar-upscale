@@ -43,6 +43,11 @@ const PlaybackTypeSelector = dynamic(
     (await import("@/app/components/settings/selectors/PlaybackTypeSelector"))
       .PlaybackTypeSelector
 );
+const PremiumPlayButton = dynamic(
+  async () =>
+    (await import("@/app/components/settings/buttons/PremiumPlayButton"))
+      .PremiumPlayButton
+);
 
 export const premiumFeaturesToMap = (
   features: PremiumFeatures
@@ -56,9 +61,8 @@ export const premiumFeaturesToMap = (
         return <SkinSelector />;
       case "advancedChords":
         return <PlaybackTypeSelector />;
-      // case "melodies":
-      //   return (await import("@/app/engine/examplePlayer")).playExample;
-      // Add more cases for other keys as needed
+      case "melodies":
+        return <PremiumPlayButton />;
       default:
         return null; // Return null for keys without a mapping
     }

@@ -2,17 +2,29 @@ import { Note, OctaveNote, parseStringToNotes, tunings } from "../data/notes";
 import { Example } from "../data/scales";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
+import { decodeMelody } from "./melodyDecoder";
 
-export const playExample = async (
-  baseNote: Note,
-  examplesForScale: Example[],
-  waitNote: () => Promise<void>,
-  neck: Neck,
-  tuning: OctaveNote[],
-  isPlayingRef: React.MutableRefObject<boolean>,
-  showAlert: (message: string) => void,
-  setTempo: (tempoBpm: number) => void
-) => {
+export type PlayExampleParameters = {
+  baseNote: Note;
+  examplesForScale: Example[];
+  waitNote: () => Promise<void>;
+  neck: Neck;
+  tuning: OctaveNote[];
+  isCurrentlyPlaying: () => boolean;
+  showAlert: (message: string) => void;
+  setTempo: (tempoBpm: number) => void;
+};
+
+export const playExample = async ({
+  baseNote,
+  examplesForScale,
+  waitNote,
+  neck,
+  tuning,
+  isCurrentlyPlaying,
+  showAlert,
+  setTempo,
+}: PlayExampleParameters) => {
   function getRandomRecord<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
@@ -25,7 +37,6 @@ export const playExample = async (
     setTempo(randomExample.tempo);
   }
 
-  const decodeMelody = (await import("./melodyDecoder")).decodeMelody;
   await decodeMelody(
     randomExample.melody,
     (note) => {
@@ -39,7 +50,7 @@ export const playExample = async (
     parseStringToNotes(randomExample.tuning ?? tunings[0]),
     tuning,
     baseNote,
-    isPlayingRef
+    isCurrentlyPlaying
   );
   return;
 };

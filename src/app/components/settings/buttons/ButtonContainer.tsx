@@ -38,7 +38,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
             : "justify-start"
         }`}
       >
-        <PlayButton premiumComponents={premiumComponents} />
+        {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
         <MetronomeButton />
         {premiumComponents.get("midiRecorder") as ReactNode}
       </div>
