@@ -10,8 +10,7 @@ export const getAuthConfig = () => {
   const clientSecret = process.env.PATREON_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    console.log("No patreon keys detected. Developer to fix");
-    return undefined;
+    throw new Error("No patreon keys detected. Developer to fix");
   }
 
   const patreonProvider = PatreonProvider({
@@ -56,8 +55,5 @@ export const getAuthConfig = () => {
 // Use it in server contexts
 export function auth() {
   const config = getAuthConfig();
-  if (!config) {
-    return null;
-  }
   return getServerSession(config);
 }
