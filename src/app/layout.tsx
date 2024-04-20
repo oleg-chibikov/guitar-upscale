@@ -1,7 +1,9 @@
+import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+i;
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   console.log(SpeedInsights); // just to retain the import
+  console.log(Analytics); // just to retain the import
   return (
     <html lang="en">
       <head>
