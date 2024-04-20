@@ -1,21 +1,17 @@
 "use client";
-
 import {
   selectControlPanel,
   setSettingsExpanded,
 } from "@/app/store/controlPanelSlice";
-import dynamic from "next/dynamic";
-import { FC, useEffect, useRef } from "react";
+import React, { FC, Suspense, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // only load Settings module when expanded
-const SettingsView = dynamic(
-  async () => (await import("./SettingsView")).SettingsView
+const SettingsView = React.lazy(() =>
+  import("./SettingsView").then((module) => ({ default: module.SettingsView }))
 );
 
-interface SettingsViewWrapperProps {}
-
-export const SettingsViewWrapper: FC<SettingsViewWrapperProps> = ({}) => {
+export const SettingsViewWrapper: FC = ({}) => {
   const settingsRef = useRef<HTMLDivElement>(null);
   const { settingsExpanded } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
@@ -59,5 +55,9 @@ export const SettingsViewWrapper: FC<SettingsViewWrapperProps> = ({}) => {
     return null;
   }
 
-  return <SettingsView ref={settingsRef} />;
+  return (
+    <Suspense fallback={null}>
+      <SettingsView ref={settingsRef} />
+    </Suspense>
+  );
 };

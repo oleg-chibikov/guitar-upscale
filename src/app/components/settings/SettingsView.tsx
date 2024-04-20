@@ -1,4 +1,4 @@
-import { forwardRef, useRef } from "react";
+import { forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
@@ -18,13 +18,12 @@ import { MetronomeVelocitySlider } from "./sliders/MetronomeVelocitySlider";
 import { TempoSlider } from "./sliders/TempoSlider";
 import { VelocitySlider } from "./sliders/VelocitySlider";
 
-export const SettingsView = forwardRef(() => {
+export const SettingsView = forwardRef<HTMLDivElement>(({}, ref) => {
   const { theme, chordsDisplayMode } = useSelector(selectControlPanel);
-  const settingsRef = useRef<HTMLDivElement>(null);
 
   return (
     <section
-      ref={settingsRef}
+      ref={ref}
       className={`flex flex-col opacity-95 overflow-auto fixed ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
