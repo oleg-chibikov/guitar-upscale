@@ -53,7 +53,6 @@ const persistConfig = {
         delete newState.neck;
         delete newState.chords;
         delete newState.isRecording;
-        delete newState.signInCheckCount;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing

@@ -4,7 +4,6 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
   selectControlPanel,
   setIsSignedIn,
-  setSignedInCheckCount,
 } from "@/app/store/controlPanelSlice";
 import { Avatar, Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -18,31 +17,36 @@ export const AuthPanel: React.FC = () => {
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn, signInCheckCount } =
-    useSelector(selectControlPanel);
+  const { chordsDisplayMode, isSignedIn } = useSelector(selectControlPanel);
 
   const handleSignIn = async () => {
-    dispatch(setSignedInCheckCount(0));
+    localStorage.removeItem("signInCheckCount");
     dispatch(setIsSignedIn(true));
     await signIn("patreon");
   };
 
   const handleSignOut = async () => {
-    dispatch(setSignedInCheckCount(0));
+    localStorage.removeItem("signInCheckCount");
     dispatch(setIsSignedIn(false));
     await signOut();
   };
 
   useEffect(() => {
+    const signInCheckoutRaw = localStorage.getItem("signInCheckCount");
+    const signInCheckCount =
+      signInCheckoutRaw !== null ? parseInt(signInCheckoutRaw) : 0;
     console.log("Session status", session, isSignedIn, signInCheckCount);
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
       if (!signInCheckCount || signInCheckCount < 3) {
         // check to avoid endless reloads
-        dispatch(setSignedInCheckCount((signInCheckCount ?? 0) + 1));
+        localStorage.setItem(
+          "signInCheckCount",
+          (signInCheckCount + 1).toString()
+        );
         location.reload();
       }
     } else {
-      dispatch(setSignedInCheckCount(0));
+      localStorage.removeItem("signInCheckCount");
       dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - aeliminate the mismatch
     }
     //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically
