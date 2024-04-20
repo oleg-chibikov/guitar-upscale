@@ -38,7 +38,7 @@ export const AuthPanel: React.FC = () => {
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
       if (!signInCheckCount || signInCheckCount < 3) {
         // check to avoid endless reloads
-        dispatch(setSignedInCheckCount(signInCheckCount + 1));
+        dispatch(setSignedInCheckCount((signInCheckCount ?? 0) + 1));
         location.reload();
       }
     } else {
