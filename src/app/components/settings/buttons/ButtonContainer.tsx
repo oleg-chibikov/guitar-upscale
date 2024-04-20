@@ -1,5 +1,4 @@
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
-import dynamic from "next/dynamic";
+import { WithChildren } from "@/app/helpers/withChildren";
 import React, { CSSProperties } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
@@ -10,17 +9,15 @@ import { OpenChordsButton } from "./OpenChordsButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
 import { PlayButton } from "./PlayButton";
 
-interface ButtonContainerProps {
+interface ButtonContainerProps extends WithChildren {
   style?: CSSProperties;
 }
 
-const RecordButton = dynamic(
-  async () => (await import("./RecordButton")).RecordButton
-);
-
-export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
+export const ButtonContainer: React.FC<ButtonContainerProps> = ({
+  style,
+  children,
+}) => {
   const { chordsDisplayMode } = useSelector(selectControlPanel);
-  const premiumFeatures = usePremiumFeatures();
   return (
     <section className="flex flex-col gap-1" style={style}>
       <div
@@ -43,7 +40,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
       >
         <PlayButton />
         <MetronomeButton />
-        {premiumFeatures.midiRecorder && <RecordButton />}
+        {children}
       </div>
     </section>
   );

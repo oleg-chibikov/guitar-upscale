@@ -79,7 +79,6 @@ interface ControlPanelState extends WithNeck, WithControls {
   chordsDisplayMode: ChordsDisplayMode;
   skin: Skin;
   settingsExpanded: boolean;
-  isRecording: boolean;
   chordsExpanded: boolean;
   tempoBpm: number;
   chordStrummingDelayMs: number;
@@ -111,7 +110,6 @@ const initialState: ControlPanelState = {
   chords: null,
   chordsMap: null,
   settingsExpanded: false,
-  isRecording: false,
   chordsExpanded: true,
   tempoBpm: 140,
   chordStrummingDelayMs: 20,
@@ -245,9 +243,6 @@ export const controlPanelSlice = createSlice({
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
     },
-    setIsRecording(state, action: PayloadAction<boolean>) {
-      state.isRecording = true;
-    },
     setTempoBpm: (state, action: PayloadAction<number>) => {
       state.tempoBpm = action.payload;
       setBpm(action.payload);
@@ -361,7 +356,6 @@ export const {
   setUseAdvancedChords,
   setChordStrummingDelayMs,
   setChordPlayMode,
-  setIsRecording,
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,

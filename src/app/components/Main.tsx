@@ -1,3 +1,7 @@
+import "server-only";
+
+import dynamic from "next/dynamic";
+import { WithPremiumFeatures } from "../helpers/WithPremiumFeatures";
 import { Initializer } from "./Initializer";
 import { AnimatedAlertWrapper } from "./alert/AnimatedAlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
@@ -20,12 +24,18 @@ import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 // get the formula to avoid hardcoding each string height offset
 // youtube videos for each scale
 
-export const Main: React.FC = () => {
+const RecordButton = dynamic(
+  async () => (await import("./settings/buttons/RecordButton")).RecordButton
+);
+
+export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
   return (
     <main>
       <Initializer />
       <AnimatedAlertWrapper />
-      <ControlPanel />
+      <ControlPanel>
+        {premiumFeatures.premiumFeatures.midiRecorder && <RecordButton />}
+      </ControlPanel>
       <Fretboard />
       <SettingsViewWrapper />
       <ChordsViewWrapper />

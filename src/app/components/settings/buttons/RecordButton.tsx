@@ -1,20 +1,17 @@
+"use client";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Theme,
-  selectControlPanel,
-  setIsRecording,
-} from "../../../store/controlPanelSlice";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
-  const dispatch = useDispatch();
   const premiumFeatures = usePremiumFeatures();
-  const { isRecording, theme } = useSelector(selectControlPanel);
+  const [isRecording, setIsRecording] = useState<boolean>();
+  const { theme } = useSelector(selectControlPanel);
   return (
     <>
       {isRecording && (
@@ -30,7 +27,7 @@ export const RecordButton: React.FC = (props) => {
             const midiRecorder = (await import("@/app/engine/midiRecorder"))
               .midiRecorder;
             midiRecorder.stopRecording(false);
-            dispatch(setIsRecording(false));
+            setIsRecording(false);
           }}
         />
       )}
@@ -51,7 +48,7 @@ export const RecordButton: React.FC = (props) => {
               premiumFeatures.midiRecorder !== undefined
             );
           }
-          dispatch(setIsRecording(newValue));
+          setIsRecording(newValue);
         }}
       />
     </>
