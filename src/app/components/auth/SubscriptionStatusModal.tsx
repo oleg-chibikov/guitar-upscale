@@ -47,8 +47,8 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
         <section
           className={`flex flex-col gap-1 border-2 ${
             theme === Theme.Light
-              ? "bg-accented_background-light border-border-light"
-              : "bg-accented_background-dark  border-border-dark"
+              ? "bg-accented_background-light border-border-light text-foreground-light"
+              : "bg-accented_background-dark  border-border-dark text-foreground-dark"
           }`}
         >
           <div className="relative flex flex-row gap-4 items-center justify-center">

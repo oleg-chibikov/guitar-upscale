@@ -24,8 +24,7 @@ export const AuthPanel: React.FC = () => {
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn, theme } =
-    useSelector(selectControlPanel);
+  const { chordsDisplayMode, isSignedIn } = useSelector(selectControlPanel);
   const handleCloseModal = () => {
     setOpenModal(false);
   };
