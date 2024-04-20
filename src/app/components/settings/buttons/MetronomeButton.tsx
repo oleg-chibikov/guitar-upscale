@@ -1,5 +1,4 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
-import { playMetronomeTick } from "@/app/engine/soundProvider";
 import React, { useEffect, useState } from "react";
 import {
   metronomeVelocityValue,
@@ -29,6 +28,9 @@ export const MetronomeButton: React.FC = (props) => {
   useEffect(() => {
     setMetronomeTicking(isTicking);
     const sub = MetronomeEventBus.subscribe(async ({ isBeat, tick }) => {
+      const playMetronomeTick = (
+        await import("@/app/engine/sound/metronomeProvider")
+      ).playMetronomeTick;
       if (isTicking) {
         if (isBeat) {
           await playMetronomeTick(true, metronomeVelocityValue ?? 80);

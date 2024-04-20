@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { initSoundfont } from "../engine/soundProvider";
 import { Theme, init, selectControlPanel } from "../store/controlPanelSlice";
 
 export const Initializer: React.FC = () => {
@@ -18,10 +17,6 @@ export const Initializer: React.FC = () => {
     document.body.classList.add(mainBg);
     return () => document.body.classList.remove(mainBg);
   }, [theme]);
-
-  useEffect(() => {
-    initSoundfont();
-  }, []);
 
   useEffect(() => {
     // Multiple products (previously known as trackers)

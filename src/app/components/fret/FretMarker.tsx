@@ -11,7 +11,6 @@ import {
   NoteToFretMarkerEventMap,
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
-import { playNote } from "../../engine/soundProvider";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import {
   Theme,
@@ -57,6 +56,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const playNoteAndAnimate = async () => {
       if (stringOctaveNote) {
         setIsNoteClicked(false);
+        const playNote = (await import("@/app/engine/sound/soundProvider"))
+          .playNote;
         await playNote(stringOctaveNote, velocityValue ?? velocity);
         setIsNoteClicked(true);
         setTimeout(() => {
