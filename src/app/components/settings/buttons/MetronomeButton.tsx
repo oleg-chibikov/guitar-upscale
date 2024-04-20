@@ -28,10 +28,10 @@ export const MetronomeButton: React.FC = (props) => {
   useEffect(() => {
     setMetronomeTicking(isTicking);
     const sub = MetronomeEventBus.subscribe(async ({ isBeat, tick }) => {
-      const playMetronomeTick = (
-        await import("@/app/engine/sound/metronomeProvider")
-      ).playMetronomeTick;
       if (isTicking) {
+        const playMetronomeTick = (
+          await import("@/app/engine/sound/metronomeProvider")
+        ).playMetronomeTick;
         if (isBeat) {
           await playMetronomeTick(true, metronomeVelocityValue ?? 80);
         } else if (tick % 2 === 0) {
