@@ -1,4 +1,4 @@
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import {
   Theme,
   selectControlPanel,
@@ -21,8 +21,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn, theme } =
-    useSelector(selectControlPanel);
+  const { theme } = useSelector(selectControlPanel);
 
   const handleSignOut = async () => {
     localStorage.removeItem("signInCheckCount");

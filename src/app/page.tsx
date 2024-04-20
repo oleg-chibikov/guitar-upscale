@@ -7,7 +7,7 @@ const Home: React.FC = async () => {
     <ServerActionRoot
       renderChildren={(premiumFeaturesWithSession) => (
         <ContextProvider premiumFeatures={premiumFeaturesWithSession}>
-          <Main premiumFeatures={premiumFeaturesWithSession} />
+          <Main premiumFeatures={premiumFeaturesWithSession.premiumFeatures} />
         </ContextProvider>
       )}
     ></ServerActionRoot>

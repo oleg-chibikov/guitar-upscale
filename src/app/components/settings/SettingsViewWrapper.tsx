@@ -1,4 +1,5 @@
 "use client";
+import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import {
   selectControlPanel,
   setSettingsExpanded,
@@ -11,7 +12,9 @@ const SettingsView = React.lazy(() =>
   import("./SettingsView").then((module) => ({ default: module.SettingsView }))
 );
 
-export const SettingsViewWrapper: FC = ({}) => {
+export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
+  premiumComponents,
+}) => {
   const settingsRef = useRef<HTMLDivElement>(null);
   const { settingsExpanded } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
@@ -57,7 +60,7 @@ export const SettingsViewWrapper: FC = ({}) => {
 
   return (
     <Suspense fallback={null}>
-      <SettingsView ref={settingsRef} />
+      <SettingsView ref={settingsRef} premiumComponents={premiumComponents} />
     </Suspense>
   );
 };

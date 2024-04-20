@@ -1,5 +1,4 @@
 "use client";
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
   selectControlPanel,
@@ -21,10 +20,10 @@ const SubscriptionStatusModal = dynamic(
 export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
-  const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, isSignedIn, subscriptionTier } =
+    useSelector(selectControlPanel);
   const handleCloseModal = () => {
     setOpenModal(false);
   };
@@ -88,7 +87,7 @@ export const AuthPanel: React.FC = () => {
             title={session.user.name + ": " + session.user.email}
             onClick={handleOpenModal} // Open modal on avatar click
           >
-            {premiumFeatures.subscriptionTier ?? "Go premium"}
+            {subscriptionTier ?? "Go premium"}
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
 

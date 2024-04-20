@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { getNoteText } from "../../data/notes";
 
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import { ChordMode, getModeText } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
@@ -12,8 +11,6 @@ import { ChordButton } from "./ChordButton";
 export const ChordsView: React.FC = () => {
   const { neck, useAdvancedChords, chords, chordsDisplayMode, theme } =
     useSelector(selectControlPanel);
-  const { advancedChords } = usePremiumFeatures();
-  const hasAdvancedChords = advancedChords && useAdvancedChords;
 
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -37,7 +34,7 @@ export const ChordsView: React.FC = () => {
 
   const totalRows = chords.length;
   const totalColumns = chords[0].modes.filter((x) =>
-    hasAdvancedChords
+    useAdvancedChords
       ? true
       : x.mode === ChordMode.Major || x.mode === ChordMode.Minor
   ).length;
@@ -62,7 +59,7 @@ export const ChordsView: React.FC = () => {
       {chords.flatMap((noteChord) =>
         noteChord.modes.map((noteChordMode) => {
           const isHidden =
-            !hasAdvancedChords &&
+            !useAdvancedChords &&
             noteChordMode.mode !== ChordMode.Major &&
             noteChordMode.mode !== ChordMode.Minor;
 

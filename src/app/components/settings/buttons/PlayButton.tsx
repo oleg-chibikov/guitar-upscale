@@ -1,6 +1,7 @@
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
+import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -20,7 +21,7 @@ import { IconButton } from "./IconButton";
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
-export const PlayButton: React.FC = (props) => {
+export const PlayButton: React.FC<WithPremiumComponents> = () => {
   const { neck, tuning, baseNote, scale, chordsMap, playbackType } =
     useSelector(selectControlPanel);
 
@@ -124,7 +125,6 @@ export const PlayButton: React.FC = (props) => {
 
   return (
     <IconButton
-      {...props}
       isActive={isPlaying}
       tooltip={
         isWaiting

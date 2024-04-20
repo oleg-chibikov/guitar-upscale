@@ -1,4 +1,4 @@
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
+"use client";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,11 +11,6 @@ import { EnumSelector } from "./EnumSelector";
 export const PlaybackTypeSelector: React.FC = () => {
   const { playbackType } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
-  const { melodies } = usePremiumFeatures();
-
-  if (!melodies) {
-    return null;
-  }
 
   return (
     <>

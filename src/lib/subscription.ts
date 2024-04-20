@@ -74,6 +74,8 @@ export type PremiumFeatures = {
   melodies?: boolean;
 };
 
+export type PremiumFeatureKeys = keyof PremiumFeatures;
+
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
   "use server";
   // Determine premium status

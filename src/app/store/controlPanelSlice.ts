@@ -96,6 +96,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   lockRatio: boolean;
   chordNotesToPlay: number;
   tuning: string;
+  subscriptionTier?: string;
 }
 
 const initialState: ControlPanelState = {
@@ -332,6 +333,9 @@ export const controlPanelSlice = createSlice({
     setIsSignedIn(state, action: PayloadAction<boolean>) {
       state.isSignedIn = action.payload;
     },
+    setSubscriptionTier(state, action: PayloadAction<string | undefined>) {
+      state.subscriptionTier = action.payload;
+    },
   },
 });
 
@@ -362,6 +366,7 @@ export const {
   setChordNotesToPlay,
   setTuning,
   setIsSignedIn,
+  setSubscriptionTier,
 } = controlPanelSlice.actions;
 
 export const selectControlPanel = (state: RootState) => state.controlPanel;

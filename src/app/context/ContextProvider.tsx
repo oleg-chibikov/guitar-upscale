@@ -4,13 +4,14 @@ import { SessionProvider } from "next-auth/react";
 import { FC } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { WithPremiumFeatures } from "../helpers/WithPremiumFeatures";
+import { WithPremiumFeaturesWithSession } from "../helpers/WithPremiumFeatures";
 import { WithChildren } from "../helpers/withChildren";
 import { persistor, store } from "../store/store";
 import { MuiThemeProvider } from "./MuiThemeProvider";
-import { PremiumFeaturesProvider } from "./PremiumFeaturesContext";
+import { PremiumFeaturesProvider } from "./PremiumFeaturesProvider";
 
-type PremiumFeaturesContextProviderProps = WithChildren & WithPremiumFeatures;
+type PremiumFeaturesContextProviderProps = WithChildren &
+  WithPremiumFeaturesWithSession;
 
 export const ContextProvider: FC<PremiumFeaturesContextProviderProps> = ({
   children,

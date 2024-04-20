@@ -1,5 +1,5 @@
 "use client";
-import { WithChildren } from "@/app/helpers/withChildren";
+import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import React from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
@@ -7,7 +7,9 @@ import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ButtonContainer } from "./buttons/ButtonContainer";
 import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 
-export const ControlPanel: React.FC<WithChildren> = ({ children }) => {
+export const ControlPanel: React.FC<WithPremiumComponents> = ({
+  premiumComponents,
+}) => {
   const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
   return (
     <section
@@ -30,7 +32,7 @@ export const ControlPanel: React.FC<WithChildren> = ({ children }) => {
       }}
     >
       <ScaleAndGroupSelector />
-      <ButtonContainer>{children}</ButtonContainer>
+      <ButtonContainer premiumComponents={premiumComponents} />
     </section>
   );
 };

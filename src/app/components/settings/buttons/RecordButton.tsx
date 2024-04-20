@@ -1,5 +1,4 @@
 "use client";
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
@@ -9,7 +8,6 @@ import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
-  const premiumFeatures = usePremiumFeatures();
   const [isRecording, setIsRecording] = useState<boolean>();
   const { theme } = useSelector(selectControlPanel);
   return (
@@ -44,9 +42,7 @@ export const RecordButton: React.FC = (props) => {
           if (newValue) {
             midiRecorder.startRecording();
           } else {
-            midiRecorder.stopRecording(
-              premiumFeatures.midiRecorder !== undefined
-            );
+            midiRecorder.stopRecording(true);
           }
           setIsRecording(newValue);
         }}

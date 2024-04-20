@@ -1,5 +1,5 @@
-import { WithChildren } from "@/app/helpers/withChildren";
-import React, { CSSProperties } from "react";
+import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
 import { selectControlPanel } from "../../../store/controlPanelSlice";
@@ -9,13 +9,13 @@ import { OpenChordsButton } from "./OpenChordsButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
 import { PlayButton } from "./PlayButton";
 
-interface ButtonContainerProps extends WithChildren {
+interface ButtonContainerProps extends WithPremiumComponents {
   style?: CSSProperties;
 }
 
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({
   style,
-  children,
+  premiumComponents,
 }) => {
   const { chordsDisplayMode } = useSelector(selectControlPanel);
   return (
@@ -38,9 +38,9 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
             : "justify-start"
         }`}
       >
-        <PlayButton />
+        <PlayButton premiumComponents={premiumComponents} />
         <MetronomeButton />
-        {children}
+        {premiumComponents.get("midiRecorder") as ReactNode}
       </div>
     </section>
   );
