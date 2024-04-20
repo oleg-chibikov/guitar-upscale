@@ -36,7 +36,7 @@ export const RecordButton: React.FC = (props) => {
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
         activeBg="bg-red-500"
         onPress={() =>
-          dispatch(toggleRecording(premiumFeatures?.midiRecorder === true))
+          dispatch(toggleRecording(premiumFeatures.midiRecorder === true))
         }
       />
     </>

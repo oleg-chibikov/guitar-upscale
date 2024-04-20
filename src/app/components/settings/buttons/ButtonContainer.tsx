@@ -44,7 +44,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {
       >
         <PlayButton />
         <MetronomeButton />
-        {premiumFeatures?.midiRecorder && <RecordButton />}
+        {premiumFeatures.midiRecorder && <RecordButton />}
       </div>
     </section>
   );
