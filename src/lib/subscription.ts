@@ -62,13 +62,16 @@ async function getTierName(
 }
 
 export type PremiumFeaturesWithSession = {
-  premiumFeatures?: PremiumFeatures;
+  premiumFeatures: PremiumFeatures;
   session: Session | null;
 };
 
 export type PremiumFeatures = {
   subscriptionTier?: string;
-  midiRecorder: boolean;
+  midiRecorder?: boolean;
+  advancedChords?: boolean;
+  skinSelection?: boolean;
+  melodies?: boolean;
 };
 
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
@@ -76,7 +79,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   // Determine premium status
   const session = await auth();
   if (!session?.accessToken) {
-    return { session };
+    return { session, premiumFeatures: {} };
   }
 
   const subscriptionTier = await getTierName(
@@ -85,18 +88,32 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   );
   console.log("Subscription tier", subscriptionTier);
   // Load premium feature only if user is premium
-  if (subscriptionTier === "Explorer" || subscriptionTier === "Composer") {
+  if (subscriptionTier === "Explorer") {
     // Dynamically import premium feature
 
     return {
       session,
       premiumFeatures: {
-        midiRecorder: true,
+        melodies: true,
+        advancedChords: true,
         subscriptionTier,
       },
     };
   }
-  return { session };
+
+  if (subscriptionTier === "Composer") {
+    return {
+      session,
+      premiumFeatures: {
+        midiRecorder: true,
+        advancedChords: true,
+        skinSelection: true,
+        melodies: true,
+        subscriptionTier,
+      },
+    };
+  }
+  return { session, premiumFeatures: {} };
 }
 
 // {

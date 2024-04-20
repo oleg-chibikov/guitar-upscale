@@ -2,22 +2,32 @@
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
+  Theme,
   selectControlPanel,
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
-import { Avatar, Button } from "@mui/material";
+import { Avatar, Button, Modal } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // https://docs.patreon.com/#oauth
-// TODO: https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
-// TODO: displays as logged out after
+// https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
 export const AuthPanel: React.FC = () => {
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, isSignedIn, theme } =
+    useSelector(selectControlPanel);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleSignIn = async () => {
     localStorage.removeItem("signInCheckCount");
@@ -47,11 +57,21 @@ export const AuthPanel: React.FC = () => {
       }
     } else {
       localStorage.removeItem("signInCheckCount");
-      dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - aeliminate the mismatch
+      dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
     }
     //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  let featuresText = "";
+  const explorerFeatures = "Advanced chords, scale melody examples";
+  const composerFeatures = "MIDI recording, configurable skins";
+  switch (premiumFeatures?.subscriptionTier) {
+    case "Composer":
+      featuresText = [explorerFeatures, composerFeatures].join(", ");
+    case "Explorer":
+      featuresText = explorerFeatures;
+  }
 
   return (
     <div
@@ -61,24 +81,15 @@ export const AuthPanel: React.FC = () => {
     >
       {!session?.user?.image || !session?.user?.name ? (
         <Button
-          size={"small"}
+          size="small"
           onClick={handleSignIn}
           variant="contained"
           color="primary"
         >
-          Sign in with Patreon
+          Sign in - Patreon
         </Button>
       ) : (
-        <div
-          className={`flex items-center justify-center ${
-            chordsDisplayMode === ChordsDisplayMode.Left
-              ? "flex-row-reverse"
-              : "flex-row"
-          } gap-2`}
-        >
-          <Button onClick={handleSignOut} variant="contained" color="secondary">
-            Sign out
-          </Button>
+        <>
           <Button
             size="small"
             className={`flex  ${
@@ -87,18 +98,71 @@ export const AuthPanel: React.FC = () => {
                 : "flex-row"
             } gap-2`}
             title={session.user.name + ": " + session.user.email}
-            onClick={() => {
-              // preview https://www.patreon.com/user?u=126121181&fan_landing=true&view_as=public
-              window.open(
-                "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-                "_blank"
-              );
-            }}
+            onClick={handleOpenModal} // Open modal on avatar click
           >
             {premiumFeatures?.subscriptionTier ?? "Go premium"}
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
-        </div>
+          {/* Modal component */}
+          <Modal
+            open={openModal}
+            onClose={handleCloseModal}
+            aria-labelledby="subscription-modal"
+          >
+            <section
+              className={`flex flex-col gap-1 border-2 ${
+                theme === Theme.Light
+                  ? "bg-accented_background-light border-border-light"
+                  : "bg-accented_background-dark  border-border-dark"
+              }`}
+            >
+              <div className="relative flex flex-row gap-4 items-center justify-center">
+                <Avatar
+                  className="left-2"
+                  style={{ position: "absolute" }} // override MUI postion which is relative - can't do with tailwind
+                  alt={session.user.name}
+                  src={session.user.image}
+                />
+                <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
+                  <span>{session.user.name}</span>
+                  <span>{session.user.email}</span>
+                  {premiumFeatures?.subscriptionTier && (
+                    <>
+                      <span>
+                        {`Subscription level: ${premiumFeatures.subscriptionTier}`}
+                      </span>
+                      <span>
+                        {"Available premium features: " + featuresText}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <Button
+                size="small"
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  window.open(
+                    "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
+                    "_blank"
+                  );
+                  handleCloseModal(); // Close modal after opening link
+                }}
+              >
+                View Subscription
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                color="primary"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            </section>
+          </Modal>
+        </>
       )}
     </div>
   );

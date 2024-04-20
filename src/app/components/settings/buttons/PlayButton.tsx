@@ -1,3 +1,4 @@
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
 import { playExample, playWholeScale } from "@/app/engine/player";
@@ -28,6 +29,7 @@ export const PlayButton: React.FC = (props) => {
   const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active
   const isPlayingRef = useRef(false);
   const dispatch = useDispatch();
+  const { melodies } = usePremiumFeatures();
 
   const handlePlay = useCallback(async () => {
     if (!neck) {
@@ -57,7 +59,7 @@ export const PlayButton: React.FC = (props) => {
     try {
       console.log("Start playing");
       const dispatchAlert = (message: string) => dispatch(showAlert(message));
-      if (playbackType === melodyType && examplesForScale) {
+      if (melodies && playbackType === melodyType && examplesForScale) {
         await playExample(
           baseNote,
           examplesForScale,
@@ -86,7 +88,7 @@ export const PlayButton: React.FC = (props) => {
       setIsPlaying(false);
       isPlayingRef.current = false;
     }
-  }, [baseNote, dispatch, neck, playbackType, scale, tuning]);
+  }, [baseNote, dispatch, melodies, neck, playbackType, scale, tuning]);
 
   useEffect(() => {
     setIsPlaying(false);
