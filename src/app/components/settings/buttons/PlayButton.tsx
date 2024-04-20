@@ -1,7 +1,6 @@
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesContext";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
-import { playExample, playWholeScale } from "@/app/engine/player";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -60,6 +59,8 @@ export const PlayButton: React.FC = (props) => {
       console.log("Start playing");
       const dispatchAlert = (message: string) => dispatch(showAlert(message));
       if (melodies && playbackType === melodyType && examplesForScale) {
+        const playExample = (await import("@/app/engine/examplePlayer"))
+          .playExample;
         await playExample(
           baseNote,
           examplesForScale,
@@ -77,6 +78,8 @@ export const PlayButton: React.FC = (props) => {
             isFullStringScalePlayback ? " (full string)" : ""
           }`
         );
+        const playWholeScale = (await import("@/app/engine/player"))
+          .playWholeScale;
         await playWholeScale(
           waitForNextTick,
           neck,

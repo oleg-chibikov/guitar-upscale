@@ -3,8 +3,9 @@ import { ThemeProvider, createTheme } from "@mui/material";
 import { FC, ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { Theme, selectControlPanel } from "../store/controlPanelSlice";
+import { WithChildren } from "../helpers/withChildren";
 
-export const MuiThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   const { theme } = useSelector(selectControlPanel);
 
   const muiTheme = createTheme({

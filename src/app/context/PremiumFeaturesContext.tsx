@@ -1,5 +1,6 @@
 import { PremiumFeatures } from "@/lib/subscription";
-import React, { ReactNode, createContext, useContext } from "react";
+import React, { createContext, useContext } from "react";
+import { WithChildren } from "../helpers/withChildren";
 
 // Create a context for PremiumFeatures
 const PremiumFeaturesContext = createContext<PremiumFeatures>({});
@@ -14,10 +15,9 @@ export const usePremiumFeatures = () => {
 };
 
 // Create a provider component to wrap your app with PremiumFeatures
-export const PremiumFeaturesProvider: React.FC<{
-  premiumFeatures: PremiumFeatures;
-  children: ReactNode;
-}> = ({ premiumFeatures, children }) => {
+export const PremiumFeaturesProvider: React.FC<
+  WithChildren & { premiumFeatures: PremiumFeatures }
+> = ({ premiumFeatures, children }) => {
   return (
     <PremiumFeaturesContext.Provider value={premiumFeatures}>
       {children}

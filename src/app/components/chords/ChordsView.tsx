@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
@@ -11,7 +10,8 @@ import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ChordButton } from "./ChordButton";
 
 export const ChordsView: React.FC = () => {
-  const { neck, useAdvancedChords, chords } = useSelector(selectControlPanel);
+  const { neck, useAdvancedChords, chords, chordsDisplayMode, theme } =
+    useSelector(selectControlPanel);
   const { advancedChords } = usePremiumFeatures();
   const hasAdvancedChords = advancedChords && useAdvancedChords;
 
@@ -30,10 +30,8 @@ export const ChordsView: React.FC = () => {
 
   // it's ergonomic to display chords vertically for touch devices in order to play with right hand
   const hasTouchInput = useInputChecker();
-  const { chordsExpanded, chordsDisplayMode, theme } =
-    useSelector(selectControlPanel);
 
-  if (!chordsExpanded || !neck || !chords) {
+  if (!neck || !chords) {
     return null;
   }
 

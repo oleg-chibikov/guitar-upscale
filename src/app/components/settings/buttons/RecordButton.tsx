@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Theme,
   selectControlPanel,
-  toggleRecording,
+  setIsRecording,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
@@ -26,7 +26,12 @@ export const RecordButton: React.FC = (props) => {
           activeBg={
             theme === Theme.Light ? "bg-disabled-light" : "bg-disabled-dark"
           }
-          onPress={() => dispatch(toggleRecording(false))}
+          onPress={async () => {
+            const midiRecorder = (await import("@/app/engine/midiRecorder"))
+              .midiRecorder;
+            midiRecorder.stopRecording(false);
+            dispatch(setIsRecording(false));
+          }}
         />
       )}
       <IconButton
@@ -35,9 +40,19 @@ export const RecordButton: React.FC = (props) => {
         isActive={isRecording}
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
         activeBg="bg-red-500"
-        onPress={() =>
-          dispatch(toggleRecording(premiumFeatures.midiRecorder === true))
-        }
+        onPress={async () => {
+          const midiRecorder = (await import("@/app/engine/midiRecorder"))
+            .midiRecorder;
+          const newValue = !isRecording;
+          if (newValue) {
+            midiRecorder.startRecording();
+          } else {
+            midiRecorder.stopRecording(
+              premiumFeatures.midiRecorder !== undefined
+            );
+          }
+          dispatch(setIsRecording(newValue));
+        }}
       />
     </>
   );

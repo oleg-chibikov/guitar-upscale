@@ -29,7 +29,6 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 import { setBpm } from "../engine/mainClock";
-import { midiRecorder } from "../engine/midiRecorder";
 import { RootState } from "./store"; // Define RootState type
 
 export enum Theme {
@@ -246,14 +245,8 @@ export const controlPanelSlice = createSlice({
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
     },
-    toggleRecording(state, action: PayloadAction<boolean>) {
-      if (!state.isRecording) {
-        state.isRecording = true;
-        midiRecorder.startRecording();
-      } else {
-        state.isRecording = false;
-        midiRecorder.stopRecording(action.payload);
-      }
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      state.isRecording = true;
     },
     setTempoBpm: (state, action: PayloadAction<number>) => {
       state.tempoBpm = action.payload;
@@ -368,7 +361,7 @@ export const {
   setUseAdvancedChords,
   setChordStrummingDelayMs,
   setChordPlayMode,
-  toggleRecording,
+  setIsRecording,
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,

@@ -1,11 +1,11 @@
-import { AnimatedAlert } from "./AnimatedAlert";
 import { Initializer } from "./Initializer";
+import { AnimatedAlertWrapper } from "./alert/AnimatedAlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
-import { ChordsView } from "./chords/ChordsView";
+import { ChordsViewWrapper } from "./chords/ChordsViewWrapper";
 import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
-import { SettingsView } from "./settings/SettingsView";
+import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 
 // TODO
 // Chord finder!
@@ -24,11 +24,11 @@ export const Main: React.FC = () => {
   return (
     <main>
       <Initializer />
-      <AnimatedAlert />
+      <AnimatedAlertWrapper />
       <ControlPanel />
       <Fretboard />
-      <SettingsView />
-      <ChordsView />
+      <SettingsViewWrapper />
+      <ChordsViewWrapper />
       <AspectRatioControl />
       <AuthPanel />
     </main>

@@ -15,8 +15,7 @@ interface ButtonContainerProps {
 }
 
 const RecordButton = dynamic(
-  () => import("./RecordButton").then((module) => module.RecordButton),
-  {}
+  async () => (await import("./RecordButton")).RecordButton
 );
 
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({ style }) => {

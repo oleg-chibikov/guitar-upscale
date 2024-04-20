@@ -1,6 +1,5 @@
 import { Subject } from "rxjs";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
-import { midiRecorder } from "./midiRecorder";
 
 export type NoteMetadata = {
   fromChord?: boolean;
@@ -45,7 +44,7 @@ export const ClearChordMarkerSet: Set<string> = new Set<string>();
 
 let lastChord: string | undefined;
 
-NotePlayEventBus.subscribe((noteWithMetadata: NoteWithPlayMetadata) => {
+NotePlayEventBus.subscribe(async (noteWithMetadata: NoteWithPlayMetadata) => {
   const serialized = serializeStringOctaveNote(noteWithMetadata.note);
   console.log("EventBus: Note play requested: " + serialized);
   const playAction = NoteToFretMarkerEventMap.get(serialized);
@@ -53,6 +52,7 @@ NotePlayEventBus.subscribe((noteWithMetadata: NoteWithPlayMetadata) => {
     ClearChordMarkerSet.add(serialized);
   }
 
+  const midiRecorder = (await import("./midiRecorder")).midiRecorder;
   midiRecorder.addNoteToMidiTrack(noteWithMetadata.note);
 
   playAction?.(noteWithMetadata.metadata);

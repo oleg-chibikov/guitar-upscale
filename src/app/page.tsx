@@ -5,8 +5,8 @@ import { ContextProvider } from "./context/ContextProvider";
 const Home: React.FC = async () => {
   return (
     <ServerActionRoot
-      renderChildren={(s) => (
-        <ContextProvider premiumFeaturesWithSession={s}>
+      renderChildren={(premiumFeaturesWithSession) => (
+        <ContextProvider premiumFeatures={premiumFeaturesWithSession}>
           <Main />
         </ContextProvider>
       )}

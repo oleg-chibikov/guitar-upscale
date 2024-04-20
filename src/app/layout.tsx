@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { WithChildren } from "./helpers/withChildren";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<WithChildren>) {
   console.log(SpeedInsights); // just to retain the import
   console.log(Analytics); // just to retain the import
   return (

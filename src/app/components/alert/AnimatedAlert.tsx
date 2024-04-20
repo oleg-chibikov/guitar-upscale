@@ -1,13 +1,12 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hideAlert, selectControlPanel } from "../store/controlPanelSlice";
+import { hideAlert, selectControlPanel } from "../../store/controlPanelSlice";
 
 export const AnimatedAlert: React.FC = () => {
   const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
-  const { showAlert, alertMessage } = useSelector(selectControlPanel);
+  const { alertMessage } = useSelector(selectControlPanel);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -27,10 +26,6 @@ export const AnimatedAlert: React.FC = () => {
       dispatch(hideAlert());
     }
   };
-
-  if (!showAlert) {
-    return null;
-  }
 
   return (
     <>

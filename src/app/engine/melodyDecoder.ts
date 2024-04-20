@@ -30,6 +30,47 @@ const convertChord = (chord: string, note: Note): string => {
   return newChord;
 };
 
+const playNote = async (
+  baseNote: Note,
+  scriptTuning: OctaveNote[],
+  tuning: OctaveNote[],
+  fretNumberBuilder: string,
+  neck: Neck,
+  stringNumber: number,
+  play: (note: StringOctaveNote) => void,
+  wait?: () => Promise<void>
+) => {
+  const stringTuning = tuning[stringNumber]; // Get the custom tuning for the string
+  const scriptStringTuning = scriptTuning[stringNumber]; // Get the original tuning for the string (melody is written using this tuning)
+  let fret =
+    parseInt(fretNumberBuilder) +
+    baseNote +
+    (scriptStringTuning.note +
+      scriptStringTuning.octave * 12 -
+      (stringTuning.note + stringTuning.octave * 12)); // Adjust fret position based on tuning
+  while (fret < 0) {
+    fret = NOTE_COUNT + fret; // take similar note but one octave higher
+  }
+
+  // TODO: go to the upper string (we already do that when playing scales)
+  const string = neck[stringNumber];
+  const stringOctaveNote = string[fret];
+  if (stringOctaveNote) {
+    await playStringOctaveNote(stringOctaveNote, play, wait);
+  }
+};
+
+const playStringOctaveNote = async (
+  stringOctaveNote: StringOctaveNote,
+  play: (note: StringOctaveNote) => void,
+  wait?: () => Promise<void>
+) => {
+  play(stringOctaveNote);
+  if (wait) {
+    await wait();
+  }
+};
+
 export const decodeMelody = async (
   melody: string,
   play: (note: StringOctaveNote) => void,
@@ -169,44 +210,3 @@ export const decodeMelody = async (
     index++;
   }
 };
-
-async function playNote(
-  baseNote: Note,
-  scriptTuning: OctaveNote[],
-  tuning: OctaveNote[],
-  fretNumberBuilder: string,
-  neck: Neck,
-  stringNumber: number,
-  play: (note: StringOctaveNote) => void,
-  wait?: () => Promise<void>
-) {
-  const stringTuning = tuning[stringNumber]; // Get the custom tuning for the string
-  const scriptStringTuning = scriptTuning[stringNumber]; // Get the original tuning for the string (melody is written using this tuning)
-  let fret =
-    parseInt(fretNumberBuilder) +
-    baseNote +
-    (scriptStringTuning.note +
-      scriptStringTuning.octave * 12 -
-      (stringTuning.note + stringTuning.octave * 12)); // Adjust fret position based on tuning
-  while (fret < 0) {
-    fret = NOTE_COUNT + fret; // take similar note but one octave higher
-  }
-
-  // TODO: go to the upper string (we already do that when playing scales)
-  const string = neck[stringNumber];
-  const stringOctaveNote = string[fret];
-  if (stringOctaveNote) {
-    await playStringOctaveNote(stringOctaveNote, play, wait);
-  }
-}
-
-async function playStringOctaveNote(
-  stringOctaveNote: StringOctaveNote,
-  play: (note: StringOctaveNote) => void,
-  wait?: () => Promise<void>
-) {
-  play(stringOctaveNote);
-  if (wait) {
-    await wait();
-  }
-}

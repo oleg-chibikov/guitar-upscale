@@ -7,9 +7,14 @@ import {
 } from "@/app/store/controlPanelSlice";
 import { Avatar, Button } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SubscriptionStatusModal } from "./SubscriptionStatusModal";
+
+const SubscriptionStatusModal = dynamic(
+  async () =>
+    (await import("./SubscriptionStatusModal")).SubscriptionStatusModal
+);
 
 // https://docs.patreon.com/#oauth
 // https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
@@ -85,10 +90,12 @@ export const AuthPanel: React.FC = () => {
             {premiumFeatures.subscriptionTier ?? "Go premium"}
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
-          <SubscriptionStatusModal
-            openModal={openModal}
-            handleCloseModal={handleCloseModal}
-          />
+          {openModal && (
+            <SubscriptionStatusModal
+              openModal={openModal}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
         </>
       )}
     </div>
