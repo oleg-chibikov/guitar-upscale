@@ -4,7 +4,7 @@ import {
   selectControlPanel,
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
-import { Avatar, Button, Modal } from "@mui/material";
+import { Avatar, Button, Modal, Slide } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,74 +43,76 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
       onClose={handleCloseModal}
       aria-labelledby="subscription-modal"
     >
-      <section
-        className={`flex flex-col gap-1 border-2 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light border-border-light"
-            : "bg-accented_background-dark  border-border-dark"
-        }`}
-      >
-        <div className="relative flex flex-row gap-4 items-center justify-center">
-          {session?.user?.name && session.user.image && (
-            <Avatar
-              className="left-2 top-2"
-              style={{ position: "absolute" }} // override MUI postion which is relative - can't do with tailwind
-              alt={session.user.name}
-              src={session.user.image}
-            />
-          )}
-          <div className="ml-16 mr-16 flex flex-col gap-2 items-center justify-center">
-            {session?.user && (
-              <div className="flex flex-col gap-1 items-center justify-center">
-                <strong>{session.user.name}</strong>
-                <span>{session.user.email}</span>
-              </div>
+      <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
+        <section
+          className={`flex flex-col gap-1 border-2 ${
+            theme === Theme.Light
+              ? "bg-accented_background-light border-border-light"
+              : "bg-accented_background-dark  border-border-dark"
+          }`}
+        >
+          <div className="relative flex flex-row gap-4 items-center justify-center">
+            {session?.user?.name && session.user.image && (
+              <Avatar
+                className="left-2 top-2"
+                style={{ position: "absolute" }} // override MUI postion which is relative - can't do with tailwind
+                alt={session.user.name}
+                src={session.user.image}
+              />
             )}
-            {premiumFeatures.subscriptionTier && (
-              <>
-                <span>
-                  {"Subscription level:"}{" "}
-                  <strong>{premiumFeatures.subscriptionTier}</strong>
-                </span>
-                <strong>Available premium features:</strong>
-                {
-                  <ul className="flex flex-col items-center">
-                    {premiumFeatureNames.map((x) => (
-                      <li key={x}>
-                        <span className="text-green-500">✓</span> {x}
-                      </li>
-                    ))}
-                  </ul>
-                }
-              </>
-            )}
+            <div className="ml-16 mr-16 flex flex-col gap-2 items-center justify-center">
+              {session?.user && (
+                <div className="flex flex-col gap-1 items-center justify-center">
+                  <strong>{session.user.name}</strong>
+                  <span>{session.user.email}</span>
+                </div>
+              )}
+              {premiumFeatures.subscriptionTier && (
+                <>
+                  <span>
+                    {"Subscription level:"}{" "}
+                    <strong>{premiumFeatures.subscriptionTier}</strong>
+                  </span>
+                  <strong>Available premium features:</strong>
+                  {
+                    <ul className="flex flex-col items-center">
+                      {premiumFeatureNames.map((x) => (
+                        <li key={x}>
+                          <span className="text-green-500">✓</span> {x}
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                </>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
-          <Button
-            size="small"
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              window.open(
-                "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-                "_blank"
-              );
-              handleCloseModal(); // Close modal after opening link
-            }}
-          >
-            View Subscription
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </Button>
-        </div>
-      </section>
+          <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+            <Button
+              size="small"
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                window.open(
+                  "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
+                  "_blank"
+                );
+                handleCloseModal(); // Close modal after opening link
+              }}
+            >
+              View Subscription
+            </Button>
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </Button>
+          </div>
+        </section>
+      </Slide>
     </Modal>
   );
 };

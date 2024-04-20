@@ -20,6 +20,7 @@ const SubscriptionStatusModal = dynamic(
 // https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
 export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [modalOpened, setModalOpened] = useState(false);
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
@@ -30,6 +31,7 @@ export const AuthPanel: React.FC = () => {
   };
   const handleOpenModal = () => {
     setOpenModal(true);
+    setModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
 
   const handleSignIn = async () => {
@@ -90,7 +92,8 @@ export const AuthPanel: React.FC = () => {
             {premiumFeatures.subscriptionTier ?? "Go premium"}
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
-          {openModal && (
+
+          {modalOpened && (
             <SubscriptionStatusModal
               openModal={openModal}
               handleCloseModal={handleCloseModal}
