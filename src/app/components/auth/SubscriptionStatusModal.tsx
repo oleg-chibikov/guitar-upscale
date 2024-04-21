@@ -5,7 +5,7 @@ import {
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
 import { Avatar, Button, Modal, Slide } from "@mui/material";
-import { signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
@@ -24,10 +24,16 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   const { data: session } = useSession();
   const { theme } = useSelector(selectControlPanel);
 
-  const handleSignOut = async () => {
+  const isSignedIn = session?.user?.image && session?.user?.name;
+
+  const handleAuth = async () => {
     localStorage.removeItem("signInCheckCount");
-    dispatch(setIsSignedIn(false));
-    await signOut();
+    dispatch(setIsSignedIn(!isSignedIn));
+    if (isSignedIn) {
+      await signOut();
+    } else {
+      await signIn("patreon");
+    }
   };
 
   const premiumFeatureNames = [
@@ -75,53 +81,56 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                   <span>{session.user.email}</span>
                 </div>
               )}
-              {premiumFeatures.subscriptionTier && (
-                <>
-                  <span>
-                    {"Subscription level:"}{" "}
-                    <strong>{premiumFeatures.subscriptionTier}</strong>
-                  </span>
-                  <strong>Available premium features:</strong>
-                  {
-                    <ul className="flex flex-col items-center">
-                      {premiumFeatureNames.map((x) => (
-                        <li key={x}>
-                          <span className="text-green-500">✓</span> {x}
-                        </li>
-                      ))}
-                      {disabledFeatureNames.map((x) => (
-                        <li key={x}>
-                          <span className="text-red-500">⨯</span> {x}
-                        </li>
-                      ))}
-                    </ul>
-                  }
-                </>
-              )}
+
+              <>
+                <span>
+                  {"Subscription level:"}{" "}
+                  <strong>
+                    {premiumFeatures.subscriptionTier ?? "Not subscribed"}
+                  </strong>
+                </span>
+                <strong>Premium features:</strong>
+                {
+                  <ul className="flex flex-col items-center">
+                    {premiumFeatureNames.map((x) => (
+                      <li key={x}>
+                        <span className="text-green-500">✓</span> {x}
+                      </li>
+                    ))}
+                    {disabledFeatureNames.map((x) => (
+                      <li key={x}>
+                        <span className="text-red-500">⨯</span> {x}
+                      </li>
+                    ))}
+                  </ul>
+                }
+              </>
             </div>
           </div>
           <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
-            <Button
-              size="small"
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                window.open(
-                  "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-                  "_blank"
-                );
-                handleCloseModal(); // Close modal after opening link
-              }}
-            >
-              View Subscription
-            </Button>
+            {isSignedIn && (
+              <Button
+                size="small"
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  window.open(
+                    "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
+                    "_blank"
+                  );
+                  handleCloseModal(); // Close modal after opening link
+                }}
+              >
+                View Subscription
+              </Button>
+            )}
             <Button
               size="small"
               variant="contained"
               color="primary"
-              onClick={handleSignOut}
+              onClick={handleAuth}
             >
-              Sign Out
+              {!isSignedIn ? "Sign In with Patreon" : "Sign Out"}
             </Button>
           </div>
         </section>

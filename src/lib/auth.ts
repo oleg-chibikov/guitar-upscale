@@ -23,14 +23,6 @@ export const getAuthConfig = () => {
   // to `NextAuth` in `app/api/auth/[...nextauth]/route.ts`
   return {
     callbacks: {
-      async signIn({ user, account, profile, email, credentials }) {
-        //console.log("signin", user, account, profile, email, credentials);
-        return true;
-      },
-      async redirect({ url, baseUrl }) {
-        //console.log("redirect", url, baseUrl);
-        return baseUrl;
-      },
       async session({ session, token, user }) {
         //console.log("session", user, token);
         (session as any).user.id = token.id;

@@ -6,7 +6,7 @@ import {
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
 import { Avatar, Button } from "@mui/material";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +21,6 @@ const SubscriptionStatusModal = dynamic(
 export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
-  const [height, setHeight] = useState<number>(window.innerHeight);
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const { chordsDisplayMode, isSignedIn, subscriptionTier, theme } =
@@ -34,17 +33,17 @@ export const AuthPanel: React.FC = () => {
     setModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
 
-  const handleSignIn = async () => {
-    localStorage.removeItem("signInCheckCount");
-    dispatch(setIsSignedIn(true));
-    await signIn("patreon");
-  };
-
   useEffect(() => {
     const signInCheckoutRaw = localStorage.getItem("signInCheckCount");
     const signInCheckCount =
       signInCheckoutRaw !== null ? parseInt(signInCheckoutRaw) : 0;
     console.log("Session status", session, isSignedIn, signInCheckCount);
+    if (isSignedIn && !subscriptionTier && session) {
+      window.open(
+        "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
+        "_blank"
+      );
+    }
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
       if (!signInCheckCount || signInCheckCount < 3) {
         // check to avoid endless reloads
@@ -77,38 +76,35 @@ export const AuthPanel: React.FC = () => {
       {!session?.user?.image || !session?.user?.name ? (
         <Button
           size="small"
-          onClick={handleSignIn}
+          onClick={handleOpenModal}
           variant="contained"
           color="primary"
         >
-          Sign in - Patreon
+          Sign in
         </Button>
       ) : (
-        <>
-          <Button
-            size="small"
-            className={`flex ${
-              chordsDisplayMode === ChordsDisplayMode.Left
-                ? "flex-row-reverse"
-                : "flex-row"
-            } gap-2`}
-            style={{ minWidth: 0 }} // override MUI value
-            title={session.user.name + ": " + session.user.email}
-            onClick={handleOpenModal} // Open modal on avatar click
-          >
-            <span className="hidden md:block">
-              {subscriptionTier ?? "Go premium"}
-            </span>
-            <Avatar alt={session.user.name} src={session.user.image} />
-          </Button>
-
-          {modalOpened && (
-            <SubscriptionStatusModal
-              openModal={openModal}
-              handleCloseModal={handleCloseModal}
-            />
-          )}
-        </>
+        <Button
+          size="small"
+          className={`flex ${
+            chordsDisplayMode === ChordsDisplayMode.Left
+              ? "flex-row-reverse"
+              : "flex-row"
+          } gap-2`}
+          style={{ minWidth: 0 }} // override MUI value
+          title={session.user.name + ": " + session.user.email}
+          onClick={handleOpenModal} // Open modal on avatar click
+        >
+          <span className="hidden md:block">
+            {subscriptionTier ?? "Go premium"}
+          </span>
+          <Avatar alt={session.user.name} src={session.user.image} />
+        </Button>
+      )}
+      {modalOpened && (
+        <SubscriptionStatusModal
+          openModal={openModal}
+          handleCloseModal={handleCloseModal}
+        />
       )}
     </div>
   );
