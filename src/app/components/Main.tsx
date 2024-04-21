@@ -27,6 +27,8 @@ import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 // Feedback form
 // get the formula to avoid hardcoding each string height offset
 // youtube videos for each scale
+// High string bottom mode
+// make sure https://guitar-upscale.org.uk/api/auth/signin?error=OAuthCallback doesn't report Dangerous
 
 const RecordButton = dynamic(
   async () =>

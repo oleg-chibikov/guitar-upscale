@@ -59,7 +59,7 @@ export const ChordsView: React.FC = () => {
             : "bg-accented_background-dark"
         } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
         style={{
-          maxWidth: hasTouchInput && height < 700 ? 150 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
+          maxWidth: hasTouchInput && height < 700 ? 220 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
           maxHeight: height - authPanelHeightReserved,
           display: "grid",
           gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
