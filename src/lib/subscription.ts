@@ -17,7 +17,6 @@ async function getTierName(
   accessToken: string
 ): Promise<string | undefined> {
   if (email) {
-    console.log(email);
     if (composerWhitelist.has(email)) {
       return "Composer";
     }

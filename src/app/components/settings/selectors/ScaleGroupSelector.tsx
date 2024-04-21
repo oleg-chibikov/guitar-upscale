@@ -1,4 +1,5 @@
 import { scalesMap } from "@/app/data/scales";
+import { useExamples } from "@/app/hooks/useExamples";
 import {
   selectControlPanel,
   setScaleGroup,
@@ -9,6 +10,7 @@ import { SelectWrapper } from "./SelectWrapper";
 
 const ScaleGroupSelector: React.FC = () => {
   const { scaleGroup } = useSelector(selectControlPanel);
+  const examplesMap = useExamples();
   const dispatch = useDispatch();
 
   return (
@@ -17,10 +19,13 @@ const ScaleGroupSelector: React.FC = () => {
       onChange={(value) => {
         dispatch(setScaleGroup(value as string));
       }}
-      options={Array.from(scalesMap.entries()).map(([groupName]) => ({
-        value: groupName,
-        label: groupName,
-      }))}
+      options={Array.from(scalesMap.entries()).map(([groupName]) => {
+        const examples = examplesMap?.get(groupName);
+        return {
+          value: groupName,
+          label: groupName + (examples ? "*" : ""),
+        };
+      })}
     />
   );
 };

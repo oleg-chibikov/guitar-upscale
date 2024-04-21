@@ -7,6 +7,9 @@ import { WithChildren } from "./helpers/withChildren";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const a = SpeedInsights; // just to retain the import
+const b = Analytics; // just to retain the import
+
 export const metadata: Metadata = {
   title: "Guitar upscale",
   description: "Upscale your guitar skills",
@@ -14,11 +17,7 @@ export const metadata: Metadata = {
     "guitar, chords, scale, string, fret, skills, music, instrument, simulator, emulator",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<WithChildren>) {
-  console.log(SpeedInsights); // just to retain the import
-  console.log(Analytics); // just to retain the import
+export default function RootLayout({ children }: Readonly<WithChildren>) {
   return (
     <html lang="en">
       <head>
