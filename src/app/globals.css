@@ -45,7 +45,7 @@ main {
     opacity: 1;
   }
   50% {
-    opacity: 0.3;
+    opacity: 0.7;
     background-color: rgb(235, 188, 102); /* or any color you want */
   }
   100% {
@@ -57,23 +57,20 @@ main {
 @keyframes notePressDark {
   0% {
     background-color: inherit; /* or the original background color */
-    opacity: 1;
   }
   50% {
-    opacity: 0.3;
     background-color: rgb(99, 9, 245); /* or any color you want */
   }
   100% {
-    opacity: 1;
     background-color: inherit; /* back to original color */
   }
 }
 
 .fret-note-circle-animation-light {
-  animation: notePressLight 0.3s ease;
+  animation: notePressLight 0.5s linear;
 }
 .fret-note-circle-animation-dark {
-  animation: notePressDark 0.3s ease;
+  animation: notePressDark 0.5s linear;
 }
 
 @keyframes blast {
