@@ -96,8 +96,8 @@ interface ControlPanelState extends WithNeck, WithControls {
 
 const initialState: ControlPanelState = {
   isSignedIn: false,
-  scaleGroup: "Special",
-  scale: "Chromatic (All notes)",
+  scaleGroup: "Common Minor",
+  scale: "Aeolian / Natural",
   baseNote: Note.E,
   noteDisplayMode: NoteDisplayMode.Fret,
   chordsDisplayMode: ChordsDisplayMode.Left,
