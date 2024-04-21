@@ -1,4 +1,4 @@
-import { ScaleObject, scalesMap } from "@/app/data/scales";
+import { scalesMap } from "@/app/data/scales";
 import { selectControlPanel, setScale } from "@/app/store/controlPanelSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,11 +15,9 @@ const ScaleSelector: React.FC = () => {
   return (
     <SelectWrapper
       options={Array.from(scalesMap.get(scaleGroup)!.entries()).map(
-        ([scaleName, scaleObject]) => ({
+        ([scaleName]) => ({
           value: scaleName,
-          label: `${scaleName}${
-            (scaleObject as ScaleObject)?.examples?.length > 0 ? " *" : ""
-          }`,
+          label: `scaleName`, // TODO: asterisk with examples, but only if examples are available as a feature
         })
       )}
       value={scale}
