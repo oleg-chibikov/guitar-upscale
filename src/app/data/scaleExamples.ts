@@ -48,9 +48,8 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             band: "Two Steps From Hell",
             title: "Emerald Princess",
             tempo: 64,
-            // TODO add more notes and change 2nd part
             melody:
-              "(_*37*21-09<Dm>7__91-0_*01-0_<F>8__1-08_*11-06<C>8__*25*086*11-08<Gm>1-1__1-08_6_<A#>*27____7*15_<Dm>6_5*27<Am>5_*37_<G>1-279____ _<G>*03*45*24_)2",
+              "(_*37*21-09<Dm>7 *30*22 *291-0_*01-0_<F>8 *33*22 *01-08_*11-06<C>8 *32*20 *25*086*11-08<Gm>1-1 *45*35 *11-08_6_<A#>*27 *33*23 __*27*15_<Dm>6 *30 *15*27<Am>5 *32 *2*37_<G>1-279_____<G>*03*45*24_)2",
           },
         ],
       ],
