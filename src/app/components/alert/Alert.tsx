@@ -9,10 +9,10 @@ export const Alert: React.FC = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(hideAlert());
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timeout);
-  }, [dispatch]);
+  }, [dispatch, showAlert, alertMessage]);
 
   return (
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>
