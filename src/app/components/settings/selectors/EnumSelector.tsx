@@ -21,7 +21,9 @@ export function EnumSelector<
     .filter(([key]) => isNaN(Number(key)))
     .map(([key, value]) => ({
       value,
-      label: customLabel?.(String(key), value as T[keyof T]) ?? String(key),
+      label:
+        customLabel?.(String(key), value as T[keyof T]) ??
+        String(key.replace("_", " ")),
     }));
 
   return (
