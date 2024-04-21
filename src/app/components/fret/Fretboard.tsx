@@ -43,6 +43,7 @@ export const Fretboard: React.FC = () => {
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
   const [maxWidth, setMaxWidth] = useState(window.innerWidth);
+  const [marginTop, setMarginTop] = useState<number>(250);
   const [position, setPosition] = useState(getPositionForSkin(skin));
   const orientation = useScreenOrientation();
 
@@ -57,6 +58,9 @@ export const Fretboard: React.FC = () => {
     const handleResize = () => {
       setMaxHeight(window.innerHeight);
       setMaxWidth(window.innerWidth);
+      const newMarginTop = Math.min(250, Math.max(0, window.innerHeight - 400));
+
+      setMarginTop(newMarginTop);
     };
 
     window.addEventListener("resize", handleResize);
@@ -99,8 +103,9 @@ export const Fretboard: React.FC = () => {
 
   return (
     <section
-      className={`flex flex-col mt-24 mb-24 origin-top-left min-w-full min-h-full items-start justify-start`}
+      className={`flex flex-col mb-24 origin-top-left min-w-full min-h-full items-start justify-start`}
       style={{
+        marginTop,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
@@ -140,7 +145,7 @@ export const Fretboard: React.FC = () => {
             maxWidth:
               Math.max(maxWidth * fretboardScaleX, 2500) - position.left,
             maxHeight:
-              Math.max((maxHeight - 120) * fretboardScaleY, 400) - position.top,
+              Math.max((maxHeight - 300) * fretboardScaleY, 400) - position.top,
           }}
         >
           {/* {!highResLoaded && <GuitarImage asset={assets[0]} />} */}
