@@ -101,8 +101,9 @@ export const Fretboard: React.FC = () => {
 
   return (
     <section
-      className={`flex flex-col origin-top-left min-w-full min-h-full items-center justify-center`}
+      className={`realtive flex flex-col origin-top-left min-w-full min-h-full items-start justify-center`}
       style={{
+        left: X_SHIFT,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
