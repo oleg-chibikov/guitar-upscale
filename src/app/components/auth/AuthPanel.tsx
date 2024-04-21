@@ -61,12 +61,12 @@ export const AuthPanel: React.FC = () => {
       className={`fixed flex flex-col justify-center ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       }
-      ${`maxhmd:hmd:p-1 maxhmd:border-2 ${
-        theme === Theme.Light
-          ? "maxhmd:bg-accented_background-light maxhmd:border-border-light maxhmd:text-foreground-light"
-          : "maxhmd:bg-accented_background-dark  maxhmd:border-border-dark maxhmd:text-foreground-dark"
-      }`}
-       z-20 top-1`}
+        ${`maxhmd:hmd:p-1 maxhmd:border-2 ${
+          theme === Theme.Light
+            ? "maxhmd:bg-accented_background-light maxhmd:border-border-light maxhmd:text-foreground-light"
+            : "maxhmd:bg-accented_background-dark  maxhmd:border-border-dark maxhmd:text-foreground-dark"
+        }`}
+         z-20 top-1`}
     >
       {!session?.user?.image || !session?.user?.name ? (
         <Button
@@ -89,7 +89,13 @@ export const AuthPanel: React.FC = () => {
           title={session.user.name + ": " + session.user.email}
           onClick={handleOpenModal} // Open modal on avatar click
         >
-          <span className="hidden sm:block">
+          <span
+            className={`hidden sm:block ${
+              theme === Theme.Light
+                ? "text-foreground-light"
+                : "text-foreground-dark"
+            }`}
+          >
             {subscriptionTier ?? "Go premium"}
           </span>
           <Avatar alt={session.user.name} src={session.user.image} />

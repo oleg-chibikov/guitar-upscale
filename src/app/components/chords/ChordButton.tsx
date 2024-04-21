@@ -110,8 +110,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       className={`text-center w-16 h-6 items-center justify-center content-center ${
         disabled
           ? theme === Theme.Light
-            ? "bg-disabled-light"
-            : "bg-disabled-dark"
+            ? "bg-disabled-light text-gray-500"
+            : "bg-disabled-dark text-gray-500"
           : pressed
           ? `scale-50 ${
               theme === Theme.Light
