@@ -42,12 +42,12 @@ const noteLookup: { [key: string]: Note } = {
   "D#": Note["D#"],
 };
 
-export function parseStringToNotes(input: Tuning): OctaveNote[] {
+const OCTAVES_STING = "544433"; // octaves for notes in tuning
+
+export function parseStringToNotes(notesString: Tuning): OctaveNote[] {
   const notes: OctaveNote[] = [];
 
-  const parts = input.split("|");
-  const notesString = parts[0];
-  const octavesString = parts[1] ?? "544433"; // might be omitted and defaults to 544433
+  const octavesString = OCTAVES_STING; // might be omitted and defaults to 544433
 
   for (
     let i = 0, j = 0;
