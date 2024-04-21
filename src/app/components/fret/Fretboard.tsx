@@ -10,6 +10,8 @@ import { RootState } from "../../store/store";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
+const X_SHIFT = 456;
+
 const getPositionForSkin = (skin?: Skin) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
@@ -43,7 +45,6 @@ export const Fretboard: React.FC = () => {
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
   const [maxWidth, setMaxWidth] = useState(window.innerWidth);
-  const [marginTop, setMarginTop] = useState<number>(250);
   const [position, setPosition] = useState(getPositionForSkin(skin));
   const orientation = useScreenOrientation();
 
@@ -58,9 +59,6 @@ export const Fretboard: React.FC = () => {
     const handleResize = () => {
       setMaxHeight(window.innerHeight);
       setMaxWidth(window.innerWidth);
-      const newMarginTop = Math.min(250, Math.max(0, window.innerHeight - 400));
-
-      setMarginTop(newMarginTop);
     };
 
     window.addEventListener("resize", handleResize);
@@ -103,49 +101,28 @@ export const Fretboard: React.FC = () => {
 
   return (
     <section
-      className={`flex flex-col mb-24 origin-top-left min-w-full min-h-full items-start justify-start`}
+      className={`flex flex-col origin-top-left min-w-full min-h-full items-center justify-center`}
       style={{
-        marginTop,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
       }}
     >
-      <>
+      <div
+        className={"flex relative flex-col items-start z-10"}
+        style={{
+          left: X_SHIFT,
+        }}
+      >
         <div
-          className={"flex relative flex-col items-start z-10"}
-          style={{
-            left: 456,
-          }}
-        >
-          {/* Header */}
-          <Fretline
-            isHeader
-            elements={Array.from(
-              { length: NOTE_COUNT * 2 + 1 },
-              (_, index) => ({
-                note: index,
-                octave: 4,
-                string: 0,
-                fret: index,
-              })
-            )}
-          />
-          {/* Notes */}
-          <div className="mt-10">
-            {neck.map((row, rowIndex) => (
-              <Fretline string={rowIndex} key={rowIndex} elements={row} />
-            ))}
-          </div>
-        </div>
-        <div
-          className={`absolute overflow-hidden`}
+          className={`absolute overflow-hidden origin-top-left`}
           style={{
             ...position,
+            left: position.left - X_SHIFT,
             maxWidth:
               Math.max(maxWidth * fretboardScaleX, 2500) - position.left,
             maxHeight:
-              Math.max((maxHeight - 300) * fretboardScaleY, 400) - position.top,
+              Math.max((maxHeight - 425) * fretboardScaleY, 400) - position.top,
           }}
         >
           {/* {!highResLoaded && <GuitarImage asset={assets[0]} />} */}
@@ -160,7 +137,23 @@ export const Fretboard: React.FC = () => {
             // }}
           />
         </div>
-      </>
+        {/* Header */}
+        <Fretline
+          isHeader
+          elements={Array.from({ length: NOTE_COUNT * 2 + 1 }, (_, index) => ({
+            note: index,
+            octave: 4,
+            string: 0,
+            fret: index,
+          }))}
+        />
+        {/* Notes */}
+        <div className="mt-10">
+          {neck.map((row, rowIndex) => (
+            <Fretline string={rowIndex} key={rowIndex} elements={row} />
+          ))}
+        </div>
+      </div>
     </section>
   );
 };
