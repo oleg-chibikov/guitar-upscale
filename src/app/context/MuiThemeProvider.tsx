@@ -9,6 +9,9 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   const { theme } = useSelector(selectControlPanel);
 
   const muiTheme = createTheme({
+    shape: {
+      borderRadius: 0,
+    },
     palette: {
       mode: theme === Theme.Light ? "light" : "dark",
       primary: {

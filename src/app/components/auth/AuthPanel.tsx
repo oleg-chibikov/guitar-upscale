@@ -1,6 +1,7 @@
 "use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
+  Theme,
   selectControlPanel,
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
@@ -20,9 +21,11 @@ const SubscriptionStatusModal = dynamic(
 export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
+  const [height, setHeight] = useState<number>(window.innerHeight);
+  const [width, setWidth] = useState<number>(window.innerWidth);
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn, subscriptionTier } =
+  const { chordsDisplayMode, isSignedIn, subscriptionTier, theme } =
     useSelector(selectControlPanel);
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -37,6 +40,18 @@ export const AuthPanel: React.FC = () => {
     dispatch(setIsSignedIn(true));
     await signIn("patreon");
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setHeight(window.innerHeight);
+      setWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const signInCheckoutRaw = localStorage.getItem("signInCheckCount");
@@ -62,9 +77,18 @@ export const AuthPanel: React.FC = () => {
 
   return (
     <div
-      className={`fixed h-10 flex flex-col justify-center ${
+      className={`fixed flex flex-col justify-center ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } z-20 top-1`}
+      }
+      ${
+        height < 600 &&
+        `p-1 border-2 ${
+          theme === Theme.Light
+            ? "bg-accented_background-light border-border-light text-foreground-light"
+            : "bg-accented_background-dark  border-border-dark text-foreground-dark"
+        }`
+      }
+       z-20 top-1`}
     >
       {!session?.user?.image || !session?.user?.name ? (
         <Button
@@ -79,15 +103,16 @@ export const AuthPanel: React.FC = () => {
         <>
           <Button
             size="small"
-            className={`flex  ${
+            className={`flex ${
               chordsDisplayMode === ChordsDisplayMode.Left
                 ? "flex-row-reverse"
                 : "flex-row"
             } gap-2`}
+            style={{ minWidth: 0 }} // override MUI value
             title={session.user.name + ": " + session.user.email}
             onClick={handleOpenModal} // Open modal on avatar click
           >
-            {subscriptionTier ?? "Go premium"}
+            {width > 600 && (subscriptionTier ?? "Go premium")}
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
 
