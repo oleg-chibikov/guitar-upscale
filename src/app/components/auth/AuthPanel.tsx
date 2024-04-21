@@ -38,12 +38,7 @@ export const AuthPanel: React.FC = () => {
     const signInCheckCount =
       signInCheckoutRaw !== null ? parseInt(signInCheckoutRaw) : 0;
     console.log("Session status", session, isSignedIn, signInCheckCount);
-    if (isSignedIn && !subscriptionTier && session) {
-      window.open(
-        "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-        "_blank"
-      );
-    }
+
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
       if (!signInCheckCount || signInCheckCount < 3) {
         // check to avoid endless reloads
@@ -94,7 +89,7 @@ export const AuthPanel: React.FC = () => {
           title={session.user.name + ": " + session.user.email}
           onClick={handleOpenModal} // Open modal on avatar click
         >
-          <span className="hidden md:block">
+          <span className="hidden sm:block">
             {subscriptionTier ?? "Go premium"}
           </span>
           <Avatar alt={session.user.name} src={session.user.image} />

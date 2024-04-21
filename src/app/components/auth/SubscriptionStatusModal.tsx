@@ -121,7 +121,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                   handleCloseModal(); // Close modal after opening link
                 }}
               >
-                View Subscription
+                Change Membership
               </Button>
             )}
             <Button

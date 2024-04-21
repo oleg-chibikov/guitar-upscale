@@ -16,7 +16,9 @@ export const getAuthConfig = () => {
   const patreonProvider = PatreonProvider({
     clientId,
     clientSecret,
-    authorization: { params: { scope: "identity" } }, // as a fallback we can ask for identity.memberships which is all the memberships of the user
+    authorization: {
+      params: {}, // setting a scope to identity here leads to 403 from Patreon in some cases
+    },
   });
 
   // You'll need to import and pass this
