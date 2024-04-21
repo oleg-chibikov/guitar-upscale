@@ -58,7 +58,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`flex flex-col gap-1 border-2 ${
+          className={`flex flex-col gap-1 border-2 p-1 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
@@ -74,7 +74,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
               />
             )}
             <CloseIcon onPress={handleCloseModal} />
-            <div className="ml-16 mr-16 flex flex-col gap-2 items-center justify-center">
+            <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
               {session?.user && (
                 <div className="flex flex-col gap-1 items-center justify-center">
                   <strong>{session.user.name}</strong>
@@ -107,7 +107,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
               </>
             </div>
           </div>
-          <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+          <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
             {isSignedIn && (
               <Button
                 size="small"
