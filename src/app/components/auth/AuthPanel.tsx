@@ -22,7 +22,6 @@ export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
   const [height, setHeight] = useState<number>(window.innerHeight);
-  const [width, setWidth] = useState<number>(window.innerWidth);
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const { chordsDisplayMode, isSignedIn, subscriptionTier, theme } =
@@ -40,18 +39,6 @@ export const AuthPanel: React.FC = () => {
     dispatch(setIsSignedIn(true));
     await signIn("patreon");
   };
-
-  useEffect(() => {
-    const handleResize = () => {
-      setHeight(window.innerHeight);
-      setWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     const signInCheckoutRaw = localStorage.getItem("signInCheckCount");
@@ -80,14 +67,11 @@ export const AuthPanel: React.FC = () => {
       className={`fixed flex flex-col justify-center ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       }
-      ${
-        height < 600 &&
-        `p-1 border-2 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light border-border-light text-foreground-light"
-            : "bg-accented_background-dark  border-border-dark text-foreground-dark"
-        }`
-      }
+      ${`maxhmd:hmd:p-1 maxhmd:border-2 ${
+        theme === Theme.Light
+          ? "maxhmd:bg-accented_background-light maxhmd:border-border-light maxhmd:text-foreground-light"
+          : "maxhmd:bg-accented_background-dark  maxhmd:border-border-dark maxhmd:text-foreground-dark"
+      }`}
        z-20 top-1`}
     >
       {!session?.user?.image || !session?.user?.name ? (
@@ -112,7 +96,9 @@ export const AuthPanel: React.FC = () => {
             title={session.user.name + ": " + session.user.email}
             onClick={handleOpenModal} // Open modal on avatar click
           >
-            {width > 600 && (subscriptionTier ?? "Go premium")}
+            <span className="hidden md:block">
+              {subscriptionTier ?? "Go premium"}
+            </span>
             <Avatar alt={session.user.name} src={session.user.image} />
           </Button>
 

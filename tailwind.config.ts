@@ -9,6 +9,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        maxhmd: { raw: "(max-height: 600px)" },
+        maxhlg: { raw: "(max-height: 800px)" },
+        // => @media (min-height: 800px) { ... }
+      },
       //https://paperheartdesign.com/blog/color-palette-dark-moody
       colors: {
         primary: {
