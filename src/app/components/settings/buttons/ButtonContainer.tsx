@@ -1,4 +1,5 @@
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
@@ -12,6 +13,11 @@ import { PlayButton } from "./PlayButton";
 interface ButtonContainerProps extends WithPremiumComponents {
   style?: CSSProperties;
 }
+const DisabledRecordButton = dynamic(
+  async () =>
+    (await import("@/app/components/settings/buttons/DisabledRecordButton"))
+      .DisabledRecordButton
+);
 
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({
   style,
@@ -40,7 +46,9 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
         <MetronomeButton />
-        {premiumComponents.get("midiRecorder") as ReactNode}
+        {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
+          <DisabledRecordButton />
+        )}
       </div>
     </section>
   );

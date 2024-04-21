@@ -36,6 +36,13 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     premiumFeatures.skinSelection && "Configurable skins",
   ].filter((x) => x) as string[];
 
+  const disabledFeatureNames = [
+    !premiumFeatures.advancedChords && "Advanced chords",
+    !premiumFeatures.melodies && "Melody examples",
+    !premiumFeatures.midiRecorder && "MIDI recording",
+    !premiumFeatures.skinSelection && "Configurable skins",
+  ].filter((x) => x) as string[];
+
   return (
     <Modal
       open={openModal}
@@ -78,6 +85,11 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                       {premiumFeatureNames.map((x) => (
                         <li key={x}>
                           <span className="text-green-500">✓</span> {x}
+                        </li>
+                      ))}
+                      {disabledFeatureNames.map((x) => (
+                        <li key={x}>
+                          <span className="text-red-500">⨯</span> {x}
                         </li>
                       ))}
                     </ul>
