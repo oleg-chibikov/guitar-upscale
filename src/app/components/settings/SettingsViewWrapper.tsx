@@ -4,7 +4,7 @@ import {
   selectControlPanel,
   setSettingsExpanded,
 } from "@/app/store/controlPanelSlice";
-import React, { FC, Suspense, useEffect, useRef } from "react";
+import React, { FC, Suspense, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // only load Settings module when expanded
@@ -15,8 +15,14 @@ const SettingsView = React.lazy(() =>
 export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
+  const [opened, setOpened] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
   const { settingsExpanded } = useSelector(selectControlPanel);
+  useEffect(() => {
+    if (settingsExpanded) {
+      setOpened(true);
+    }
+  }, [settingsExpanded]);
   const dispatch = useDispatch();
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,7 +60,7 @@ export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
     };
   }, [dispatch, settingsExpanded]);
 
-  if (!settingsExpanded) {
+  if (!opened) {
     return null;
   }
 

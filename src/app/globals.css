@@ -69,32 +69,6 @@ body {
   animation: notePressDark 0.3s ease;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideOut {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-100%);
-  }
-}
-
-.animate-slideIn {
-  animation: slideIn 0.3s ease forwards;
-}
-
-.animate-slideOut {
-  animation: slideOut 0.1s linear forwards;
-}
-
 @keyframes blast {
   0% {
     transform: scale(0);

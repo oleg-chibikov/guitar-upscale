@@ -8,6 +8,7 @@ import { Avatar, Button, Modal, Slide } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { CloseIcon } from "../CloseIcon";
 
 interface SubscriptionStatusModalProps {
   openModal: boolean;
@@ -66,6 +67,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                 src={session.user.image}
               />
             )}
+            <CloseIcon onPress={handleCloseModal} />
             <div className="ml-16 mr-16 flex flex-col gap-2 items-center justify-center">
               {session?.user && (
                 <div className="flex flex-col gap-1 items-center justify-center">

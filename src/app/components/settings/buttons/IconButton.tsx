@@ -10,6 +10,7 @@ export interface IconButtonProps {
   inactiveBg?: string;
   tooltip: string;
   id?: string;
+  className?: string;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -20,6 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   inactiveBg,
   tooltip,
   id,
+  className,
   ...rest
 }) => {
   const { theme } = useSelector(selectControlPanel);
@@ -28,7 +30,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     <button
       id={id}
       title={tooltip}
-      className={`${
+      className={`${className} ${
         isActive
           ? activeBg ??
             (theme === Theme.Light ? "bg-button-light" : "bg-button-dark")

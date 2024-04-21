@@ -7,7 +7,7 @@ import {
   WithPremiumFeatures,
 } from "../helpers/WithPremiumFeatures";
 import { Initializer } from "./Initializer";
-import { AnimatedAlertWrapper } from "./alert/AnimatedAlertWrapper";
+import { AlertWrapper } from "./alert/AlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
 import { ChordsViewWrapper } from "./chords/ChordsViewWrapper";
 import { Fretboard } from "./fret/Fretboard";
@@ -89,7 +89,7 @@ export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
   return (
     <main>
       <Initializer />
-      <AnimatedAlertWrapper />
+      <AlertWrapper />
       <ControlPanel premiumComponents={premiumComponents} />
       <Fretboard />
       <SettingsViewWrapper premiumComponents={premiumComponents} />

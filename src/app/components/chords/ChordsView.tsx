@@ -3,14 +3,23 @@ import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { getNoteText } from "../../data/notes";
 
+import { Slide } from "@mui/material";
 import { ChordMode, getModeText } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ChordButton } from "./ChordButton";
 
+const authPanelHeightReserved = 80;
+
 export const ChordsView: React.FC = () => {
-  const { neck, useAdvancedChords, chords, chordsDisplayMode, theme } =
-    useSelector(selectControlPanel);
+  const {
+    neck,
+    useAdvancedChords,
+    chords,
+    chordsDisplayMode,
+    theme,
+    chordsExpanded,
+  } = useSelector(selectControlPanel);
 
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -40,42 +49,44 @@ export const ChordsView: React.FC = () => {
   ).length;
 
   return (
-    <section
-      className={`opacity-95 overflow-auto fixed ${
-        chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } z-20 bottom-1 ${
-        theme === Theme.Light
-          ? "bg-accented_background-light"
-          : "bg-accented_background-dark"
-      } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
-      style={{
-        maxWidth: hasTouchInput && height < 700 ? 150 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
-        maxHeight: hasTouchInput ? "70vh" : 450,
-        display: "grid",
-        gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-        gridTemplateRows: `repeat(${totalRows}, 1fr)`,
-      }}
-    >
-      {chords.flatMap((noteChord) =>
-        noteChord.modes.map((noteChordMode) => {
-          const isHidden =
-            !useAdvancedChords &&
-            noteChordMode.mode !== ChordMode.Major &&
-            noteChordMode.mode !== ChordMode.Minor;
+    <Slide direction="up" in={chordsExpanded} mountOnEnter unmountOnExit>
+      <section
+        className={`opacity-95 overflow-auto fixed ${
+          chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
+        } z-20 bottom-1 ${
+          theme === Theme.Light
+            ? "bg-accented_background-light"
+            : "bg-accented_background-dark"
+        } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
+        style={{
+          maxWidth: hasTouchInput && height < 700 ? 150 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
+          maxHeight: height - authPanelHeightReserved,
+          display: "grid",
+          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+          gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+        }}
+      >
+        {chords.flatMap((noteChord) =>
+          noteChord.modes.map((noteChordMode) => {
+            const isHidden =
+              !useAdvancedChords &&
+              noteChordMode.mode !== ChordMode.Major &&
+              noteChordMode.mode !== ChordMode.Minor;
 
-          const title =
-            getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
+            const title =
+              getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
 
-          return (
-            <ChordButton
-              key={title}
-              isHidden={isHidden}
-              noteChordMode={noteChordMode}
-              chordName={title}
-            />
-          );
-        })
-      )}
-    </section>
+            return (
+              <ChordButton
+                key={title}
+                isHidden={isHidden}
+                noteChordMode={noteChordMode}
+                chordName={title}
+              />
+            );
+          })
+        )}
+      </section>
+    </Slide>
   );
 };
