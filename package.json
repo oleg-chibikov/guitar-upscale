@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rimraf dist && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
@@ -47,7 +47,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.2",
     "postcss": "^8",
-    "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.3",
     "typescript": "^5"
   }

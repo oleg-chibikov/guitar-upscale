@@ -17,7 +17,7 @@ const ScaleSelector: React.FC = () => {
       options={Array.from(scalesMap.get(scaleGroup)!.entries()).map(
         ([scaleName]) => ({
           value: scaleName,
-          label: `scaleName`, // TODO: asterisk with examples, but only if examples are available as a feature
+          label: scaleName, // TODO: asterisk with examples, but only if examples are available as a feature
         })
       )}
       value={scale}
