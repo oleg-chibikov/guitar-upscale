@@ -1,6 +1,8 @@
 // import { ImageLoaderProps } from "next/image";
 
-// // TODO: try deploying to vercel and see if this is still needed
+// Not needed on Vercel, but needed on Surge along with
+// distDir: "dist",
+// output: "export",
 // export const imageLoader = ({ src, width, quality }: ImageLoaderProps) =>
 //   `${window.location.href}/${src}?w=${width}&q=${quality || 100}`;
 

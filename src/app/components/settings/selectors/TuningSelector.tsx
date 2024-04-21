@@ -1,4 +1,4 @@
-import { tunings } from "@/app/data/notes";
+import { Tuning, tunings } from "@/app/data/notes";
 import { selectControlPanel, setTuning } from "@/app/store/controlPanelSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,12 +14,15 @@ const TuningSelector: React.FC = () => {
       <SelectWrapper
         value={tuning}
         onChange={(value) => {
-          dispatch(setTuning(value as string));
+          dispatch(setTuning(value as Tuning));
         }}
-        options={tunings.map((tuning) => ({
-          value: tuning,
-          label: tuning.split("|")[0],
-        }))}
+        options={Object.entries(tunings).map(([key, value]) => {
+          const tuningWithoutOctaves = key.split("|")[0];
+          return {
+            value: tuningWithoutOctaves,
+            label: `${value} (${tuningWithoutOctaves})`,
+          };
+        })}
       />
     </>
   );

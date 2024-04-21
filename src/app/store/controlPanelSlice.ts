@@ -9,7 +9,7 @@ import {
   MAX_VELOCITY,
   Note,
   parseStringToNotes,
-  tunings,
+  Tuning,
 } from "../data/notes";
 import { scalesMap } from "../data/scales";
 import {
@@ -65,7 +65,7 @@ interface WithControls {
   scaleGroup: string;
   scale: string;
   baseNote: Note;
-  tuning: string;
+  tuning: Tuning;
 }
 
 interface ControlPanelState extends WithNeck, WithControls {
@@ -90,7 +90,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   fretboardScaleY: number;
   lockRatio: boolean;
   chordNotesToPlay: number;
-  tuning: string;
+  tuning: Tuning;
   subscriptionTier?: string;
 }
 
@@ -122,7 +122,7 @@ const initialState: ControlPanelState = {
   fretboardScaleY: 1,
   lockRatio: false,
   chordNotesToPlay: 6,
-  tuning: tunings[0],
+  tuning: "EBGDAE",
 };
 
 // A value that changes immediately without the need for rerender
@@ -213,7 +213,7 @@ export const controlPanelSlice = createSlice({
       state.baseNote = action.payload;
       onGuitarSettingsUpdate(state);
     },
-    setTuning(state, action: PayloadAction<string>) {
+    setTuning(state, action: PayloadAction<Tuning>) {
       state.tuning = action.payload;
       onGuitarSettingsUpdate(state);
     },

@@ -1,4 +1,4 @@
-import { Note, OctaveNote, parseStringToNotes, tunings } from "../data/notes";
+import { Note, OctaveNote, parseStringToNotes } from "../data/notes";
 import { getScaleExamples } from "../data/scaleExamples";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
@@ -54,7 +54,7 @@ export const playExample = async ({
     },
     waitNote,
     neck,
-    parseStringToNotes(randomExample.tuning ?? tunings[0]),
+    parseStringToNotes(randomExample.tuning ?? "EBGDAE"),
     tuning,
     baseNote,
     isCurrentlyPlaying

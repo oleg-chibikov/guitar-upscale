@@ -42,12 +42,12 @@ const noteLookup: { [key: string]: Note } = {
   "D#": Note["D#"],
 };
 
-export function parseStringToNotes(input: string): OctaveNote[] {
+export function parseStringToNotes(input: Tuning): OctaveNote[] {
   const notes: OctaveNote[] = [];
 
   const parts = input.split("|");
   const notesString = parts[0];
-  const octavesString = parts[1];
+  const octavesString = parts[1] ?? "544433"; // might be omitted and defaults to 544433
 
   for (
     let i = 0, j = 0;
@@ -92,11 +92,16 @@ export interface OctaveNote {
 }
 
 // TODO: Add enum with Tuning names
-export const tunings: string[] = [
-  "EBGDAE|544433",
-  "EBGDAD|544433",
-  "DAGDAD|544433",
-];
+export const tunings = {
+  EBGDAE: "Standard E",
+  EBGDAD: "Drop E",
+  "EBEG#BE": "Open E",
+  DADGAD: "Celtic",
+  DADDAD: "Folk",
+  EBEGBE: "Cross note E",
+};
+
+export type Tuning = keyof typeof tunings;
 
 export const serializeOctaveNote = (note: OctaveNote) =>
   [note.octave, note.note].join("_");
