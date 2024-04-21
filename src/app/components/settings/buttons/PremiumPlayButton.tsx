@@ -6,7 +6,7 @@ export const PremiumPlayButton: React.FC = () => (
     onPlayExample={async (props) => {
       const playExample = (await import("@/app/engine/examplePlayer"))
         .playExample;
-      await playExample(props);
+      return await playExample(props);
     }}
   />
 );

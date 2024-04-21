@@ -11,12 +11,7 @@ import {
   parseStringToNotes,
   tunings,
 } from "../data/notes";
-import {
-  Example,
-  getScaleExamples,
-  getScaleNotes,
-  scalesMap,
-} from "../data/scales";
+import { scalesMap } from "../data/scales";
 import {
   generateAllChords,
   getClosestVariation,
@@ -133,21 +128,14 @@ const initialState: ControlPanelState = {
 // A value that changes immediately without the need for rerender
 export let velocityValue: number | undefined = undefined;
 export let metronomeVelocityValue: number | undefined = undefined;
-export let examplesForScale: Example[] | undefined = undefined;
 export let isMetronomeTicking = false;
 
 export const setMetronomeTicking = (value: boolean) => {
   isMetronomeTicking = value;
 };
 
-export const setExamples = (examples?: Example[]) => {
-  examplesForScale = examples;
-};
-
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
-  const scaleObject = scalesMap.get(state.scaleGroup)!.get(state.scale);
-  setExamples(getScaleExamples(scaleObject));
-  let scaleNotes = getScaleNotes(scaleObject);
+  const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
   const scalePattern = new Set(scaleNotes?.concat([0]));
 
   // Just for debug

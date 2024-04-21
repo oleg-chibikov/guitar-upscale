@@ -1,5 +1,4 @@
 "use client";
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
@@ -11,7 +10,6 @@ import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PlaybackType,
-  examplesForScale,
   isMetronomeTicking,
   selectControlPanel,
   setTempoBpm,
@@ -23,7 +21,7 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
 interface PlayButtonProps {
-  onPlayExample?: (params: PlayExampleParameters) => void;
+  onPlayExample?: (params: PlayExampleParameters) => Promise<boolean>;
 }
 
 let isCurrentlyPlaying: boolean;
@@ -34,13 +32,12 @@ const getIsCurrentlyPlaying = () => {
 export const BasePlayButton: React.FC<PlayButtonProps> = ({
   onPlayExample,
 }) => {
-  const { neck, tuning, baseNote, scale, chordsMap, playbackType } =
+  const { neck, tuning, baseNote, scale, scaleGroup, chordsMap, playbackType } =
     useSelector(selectControlPanel);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active
   const dispatch = useDispatch();
-  const { melodies } = usePremiumFeatures();
 
   const handlePlay = useCallback(async () => {
     if (!neck) {
@@ -71,15 +68,12 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     try {
       console.log("Start playing");
       const dispatchAlert = (message: string) => dispatch(showAlert(message));
-      if (
-        onPlayExample &&
-        melodies &&
-        playbackType === melodyType &&
-        examplesForScale
-      ) {
+      let examplePlayed: boolean = false;
+      if (onPlayExample && playbackType === melodyType) {
         const params: PlayExampleParameters = {
           baseNote,
-          examplesForScale,
+          scaleGroup,
+          scale,
           waitNote: waitForNextTick,
           neck,
           tuning: parseStringToNotes(tuning),
@@ -87,8 +81,10 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
           showAlert: dispatchAlert,
           setTempo: (x: number) => dispatch(setTempoBpm(x)),
         };
-        await onPlayExample(params);
-      } else {
+        examplePlayed = await onPlayExample(params);
+      }
+
+      if (!examplePlayed) {
         const isFullStringScalePlayback = playbackType === fullStringScaleType;
         dispatchAlert(
           `${getNoteText(baseNote)} ${scale} ${
@@ -111,11 +107,11 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
   }, [
     baseNote,
     dispatch,
-    melodies,
     neck,
     onPlayExample,
     playbackType,
     scale,
+    scaleGroup,
     tuning,
   ]);
 

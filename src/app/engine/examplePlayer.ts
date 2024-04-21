@@ -1,12 +1,13 @@
 import { Note, OctaveNote, parseStringToNotes, tunings } from "../data/notes";
-import { Example } from "../data/scales";
+import { getScaleExamples } from "../data/scaleExamples";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
 
 export type PlayExampleParameters = {
   baseNote: Note;
-  examplesForScale: Example[];
+  scaleGroup: string;
+  scale: string;
   waitNote: () => Promise<void>;
   neck: Neck;
   tuning: OctaveNote[];
@@ -17,7 +18,8 @@ export type PlayExampleParameters = {
 
 export const playExample = async ({
   baseNote,
-  examplesForScale,
+  scaleGroup,
+  scale,
   waitNote,
   neck,
   tuning,
@@ -28,6 +30,11 @@ export const playExample = async ({
   function getRandomRecord<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
+  }
+
+  const examplesForScale = getScaleExamples(scaleGroup, scale);
+  if (!examplesForScale) {
+    return false;
   }
 
   const randomExample = getRandomRecord(examplesForScale);
@@ -52,5 +59,5 @@ export const playExample = async ({
     baseNote,
     isCurrentlyPlaying
   );
-  return;
+  return true;
 };
