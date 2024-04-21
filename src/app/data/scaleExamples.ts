@@ -1,8 +1,10 @@
+import { Tuning } from "./notes";
+
 export type Example = {
   band: string;
   title: string;
   melody: string;
-  tuning?: string;
+  tuning?: Tuning;
   tempo?: number;
 };
 
