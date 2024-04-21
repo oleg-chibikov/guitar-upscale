@@ -50,7 +50,7 @@ export const ChordsView: React.FC = () => {
       } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
       style={{
         maxWidth: hasTouchInput && height < 700 ? 150 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
-        maxHeight: hasTouchInput ? "95vh" : 450,
+        maxHeight: hasTouchInput ? "70vh" : 450,
         display: "grid",
         gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
         gridTemplateRows: `repeat(${totalRows}, 1fr)`,
