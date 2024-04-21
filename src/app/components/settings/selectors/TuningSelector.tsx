@@ -16,13 +16,10 @@ const TuningSelector: React.FC = () => {
         onChange={(value) => {
           dispatch(setTuning(value as Tuning));
         }}
-        options={Object.entries(tunings).map(([key, value]) => {
-          const tuningWithoutOctaves = key.split("|")[0];
-          return {
-            value: tuningWithoutOctaves,
-            label: `${value} (${tuningWithoutOctaves})`,
-          };
-        })}
+        options={Object.entries(tunings).map(([tuning, value]) => ({
+          value: tuning,
+          label: `${value} (${tuning})`,
+        }))}
       />
     </>
   );
