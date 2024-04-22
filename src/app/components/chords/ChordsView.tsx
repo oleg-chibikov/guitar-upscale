@@ -112,16 +112,12 @@ export const ChordsView: React.FC = () => {
         >
           {chords.flatMap((noteChord) =>
             noteChord.modes.map((noteChordMode) => {
-              const isHidden =
-                !hasAdvancedChords &&
-                noteChordMode.mode !== ChordMode.Major &&
-                noteChordMode.mode !== ChordMode.Minor;
-
               const text = getNoteText(noteChord.note);
-
-              if (!useSharpChords && text.endsWith("#")) {
-                return null;
-              }
+              const isHidden =
+                (useSharpChords && text.endsWith("#")) ||
+                (!hasAdvancedChords &&
+                  noteChordMode.mode !== ChordMode.Major &&
+                  noteChordMode.mode !== ChordMode.Minor);
 
               const title = text + getModeText(noteChordMode.mode);
 
