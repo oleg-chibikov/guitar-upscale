@@ -261,8 +261,11 @@ export const controlPanelSlice = createSlice({
     },
     hideAlert(state) {
       state.showAlert = false;
-      state.alertMessage = "";
-      state.alertIsError = false;
+      // Allow animation to finish first
+      setTimeout(() => {
+        state.alertMessage = "";
+        state.alertIsError = false;
+      }, 300);
     },
     setPlaybackType(state, action: PayloadAction<PlaybackType>) {
       state.playbackType = action.payload;
