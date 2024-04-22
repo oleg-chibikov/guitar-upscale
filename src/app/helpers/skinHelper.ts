@@ -1,4 +1,4 @@
-import { Skin } from "../store/settingsSlice";
+import { Skin } from "@/app/data/skin";
 
 export const getAssetsForSkin = (skin?: Skin) => {
   switch (skin) {
