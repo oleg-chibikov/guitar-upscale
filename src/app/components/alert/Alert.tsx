@@ -5,7 +5,8 @@ import { hideAlert, selectControlPanel } from "../../store/controlPanelSlice";
 
 export const Alert: React.FC = () => {
   const dispatch = useDispatch();
-  const { alertMessage, showAlert } = useSelector(selectControlPanel);
+  const { alertMessage, showAlert, alertIsError } =
+    useSelector(selectControlPanel);
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(hideAlert());
@@ -18,7 +19,9 @@ export const Alert: React.FC = () => {
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>
       <div
         onClick={() => dispatch(hideAlert())}
-        className={`fixed cursor-pointer top-3 left-0 right-0 m-auto z-50 flex items-center justify-center w-56 p-4 bg-green-300 opacity-90`}
+        className={`fixed cursor-pointer top-3 left-0 right-0 m-auto z-50 flex items-center justify-center w-56 p-4 ${
+          alertIsError ? "bg-red-500" : "bg-green-300"
+        } opacity-90`}
       >
         <span className="flex items-center text-base text-center text-gray-800">
           {alertMessage}

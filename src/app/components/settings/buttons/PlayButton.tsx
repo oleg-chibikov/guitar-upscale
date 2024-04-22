@@ -12,8 +12,8 @@ import {
   PlaybackType,
   isMetronomeTicking,
   selectControlPanel,
+  setAndShowAlert,
   setTempoBpm,
-  showAlert,
 } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
@@ -67,7 +67,8 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     setIsPlaying(true);
     try {
       console.log("Start playing");
-      const dispatchAlert = (message: string) => dispatch(showAlert(message));
+      const dispatchAlert = (message: string) =>
+        dispatch(setAndShowAlert({ message, isError: false }));
       let examplePlayed: boolean = false;
       if (onPlayExample && playbackType === melodyType) {
         const params: PlayExampleParameters = {

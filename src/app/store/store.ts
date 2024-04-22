@@ -54,6 +54,7 @@ const persistConfig = {
         delete newState.chords;
         delete newState.showAlert;
         delete newState.alertMessage;
+        delete newState.alertIsError;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing

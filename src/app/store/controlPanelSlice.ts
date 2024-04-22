@@ -80,6 +80,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   velocity: number;
   metronomeVelocity: number;
   showAlert: boolean;
+  alertIsError: boolean;
   alertMessage: string;
   playbackType: PlaybackType;
   theme: Theme;
@@ -112,6 +113,7 @@ const initialState: ControlPanelState = {
   chordStrummingDelayMs: 20,
   velocity: MAX_VELOCITY,
   metronomeVelocity: MAX_VELOCITY,
+  alertIsError: false,
   showAlert: false,
   alertMessage: "",
   playbackType: PlaybackType.Melody,
@@ -249,13 +251,18 @@ export const controlPanelSlice = createSlice({
       state.metronomeVelocity = action.payload;
       metronomeVelocityValue = action.payload;
     },
-    showAlert(state, action: PayloadAction<string>) {
+    setAndShowAlert(
+      state,
+      action: PayloadAction<{ message: string; isError: boolean }>
+    ) {
       state.showAlert = true;
-      state.alertMessage = action.payload;
+      state.alertMessage = action.payload.message;
+      state.alertIsError = action.payload.isError;
     },
     hideAlert(state) {
       state.showAlert = false;
       state.alertMessage = "";
+      state.alertIsError = false;
     },
     setPlaybackType(state, action: PayloadAction<PlaybackType>) {
       state.playbackType = action.payload;
@@ -344,7 +351,7 @@ export const {
   setTempoBpm,
   setVelocity,
   setMetronomeVelocity,
-  showAlert,
+  setAndShowAlert,
   hideAlert,
   setPlaybackType,
   setTheme,

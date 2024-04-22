@@ -3,6 +3,7 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
   Theme,
   selectControlPanel,
+  setAndShowAlert,
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
 import Login from "@mui/icons-material/Login";
@@ -48,10 +49,23 @@ export const AuthPanel: React.FC = () => {
           (signInCheckCount + 1).toString()
         );
         location.reload();
+      } else {
+        localStorage.removeItem("signInCheckCount");
+        dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
       }
     } else {
+      // sign in status in state matches session
       localStorage.removeItem("signInCheckCount");
-      dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorParam = urlParams.get("auth-error");
+
+      if (errorParam) {
+        dispatch(
+          setAndShowAlert({ message: "Authentication error", isError: true })
+        ); // Assuming you have an action to show the alert with a message
+        const newUrl = window.location.pathname; // Assuming you want to keep the same path but update the query string
+        window.history.replaceState(null, "", newUrl); // Change the URL without reloading
+      }
     }
     //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically
     // eslint-disable-next-line react-hooks/exhaustive-deps
