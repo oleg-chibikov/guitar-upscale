@@ -16,7 +16,7 @@ import {
 } from "../../store/controlPanelSlice";
 import { ChordButton } from "./ChordButton";
 
-const authPanelHeightReserved = 150;
+const authPanelHeightReserved = 130;
 
 export const ChordsView: React.FC = () => {
   const {
