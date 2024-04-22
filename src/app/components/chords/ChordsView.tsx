@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getNoteText } from "../../data/notes";
 
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { ChordMode, getModeText } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
@@ -83,7 +83,7 @@ export const ChordsView: React.FC = () => {
         disableGutters
       >
         <AccordionSummary
-          expandIcon={<ExpandMore />}
+          expandIcon={<ExpandLess />}
           style={{
             minHeight: 0,
           }}
