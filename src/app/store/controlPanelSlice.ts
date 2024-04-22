@@ -85,6 +85,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   theme: Theme;
   switchToChromaticScale: boolean;
   useAdvancedChords: boolean;
+  useSharpChords: boolean;
   chordPlayMode: ChordPlayMode;
   fretboardScaleX: number;
   fretboardScaleY: number;
@@ -117,6 +118,7 @@ const initialState: ControlPanelState = {
   theme: initialTheme,
   switchToChromaticScale: true,
   useAdvancedChords: true,
+  useSharpChords: true,
   chordPlayMode: ChordPlayMode.ClosestVariation,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
@@ -267,6 +269,9 @@ export const controlPanelSlice = createSlice({
     setUseAdvancedChords(state, action: PayloadAction<boolean>) {
       state.useAdvancedChords = action.payload;
     },
+    setUseSharpChords(state, action: PayloadAction<boolean>) {
+      state.useSharpChords = action.payload;
+    },
     setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
       state.chordPlayMode = action.payload;
     },
@@ -346,6 +351,7 @@ export const {
   setChordsExpanded,
   setSwitchToChromaticScale,
   setUseAdvancedChords,
+  setUseSharpChords,
   setChordStrummingDelayMs,
   setChordPlayMode,
   setFretboardScaleX,

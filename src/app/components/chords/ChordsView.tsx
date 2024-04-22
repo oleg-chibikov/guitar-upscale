@@ -23,6 +23,7 @@ export const ChordsView: React.FC = () => {
   const {
     neck,
     useAdvancedChords,
+    useSharpChords,
     chordsExpanded,
     chords,
     chordsDisplayMode,
@@ -116,8 +117,13 @@ export const ChordsView: React.FC = () => {
                 noteChordMode.mode !== ChordMode.Major &&
                 noteChordMode.mode !== ChordMode.Minor;
 
-              const title =
-                getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
+              const text = getNoteText(noteChord.note);
+
+              if (!useSharpChords && text.endsWith("#")) {
+                return null;
+              }
+
+              const title = text + getModeText(noteChordMode.mode);
 
               return (
                 <ChordButton
