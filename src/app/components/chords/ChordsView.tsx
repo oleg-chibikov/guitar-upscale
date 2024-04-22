@@ -98,7 +98,6 @@ export const ChordsView: React.FC = () => {
           }`}
           style={{
             padding: 4,
-            paddingTop: 0, // compensated by margin of the header
             maxWidth: hasTouchInput && height < 700 ? 220 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
             maxHeight: height - authPanelHeightReserved,
             gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
