@@ -117,7 +117,7 @@ const initialState: ControlPanelState = {
   theme: initialTheme,
   switchToChromaticScale: true,
   useAdvancedChords: false,
-  chordPlayMode: ChordPlayMode.RoundRobin,
+  chordPlayMode: ChordPlayMode.ClosestVariation,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
