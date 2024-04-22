@@ -1,18 +1,17 @@
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store"; // Define RootState type
 
-interface ControlPanelState {
+interface AuthState {
   isSignedIn: boolean;
   subscriptionTier?: string;
 }
 
-const initialState: ControlPanelState = {
+const initialState: AuthState = {
   isSignedIn: false,
 };
 
 export const authSlice = createSlice({
-  name: "controlPanel",
+  name: "auth",
   initialState,
   reducers: {
     setIsSignedIn(state, action: PayloadAction<boolean>) {

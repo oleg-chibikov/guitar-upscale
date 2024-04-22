@@ -45,7 +45,7 @@ interface WithControls {
   tuning: Tuning;
 }
 
-interface ControlPanelState extends WithNeck, WithControls {
+interface SettingsState extends WithNeck, WithControls {
   tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
@@ -59,7 +59,7 @@ interface ControlPanelState extends WithNeck, WithControls {
   tuning: Tuning;
 }
 
-const initialState: ControlPanelState = {
+const initialState: SettingsState = {
   scaleGroup: "Common Minor",
   scale: "Aeolian / Natural",
   baseNote: Note.E,
@@ -126,7 +126,7 @@ const setChords = (state: WithNeck) => {
 };
 
 export const settingsSlice = createSlice({
-  name: "controlPanel",
+  name: "settings",
   initialState,
   reducers: {
     init: (state) => {

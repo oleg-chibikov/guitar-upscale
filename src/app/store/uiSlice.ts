@@ -62,8 +62,8 @@ const getValueFromPercentage = (
   return valueInRange;
 };
 
-export const UiSlice = createSlice({
-  name: "Ui",
+export const uiSlice = createSlice({
+  name: "ui",
   initialState,
   reducers: {
     setNoteDisplayMode: (state, action: PayloadAction<NoteDisplayMode>) => {
@@ -160,8 +160,8 @@ export const {
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,
-} = UiSlice.actions;
+} = uiSlice.actions;
 
 export const selectUi = (state: RootState) => state.ui;
 
-export default UiSlice.reducer;
+export default uiSlice.reducer;
