@@ -1,3 +1,5 @@
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../data/noteDisplayMode";
@@ -12,11 +14,7 @@ import {
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import {
-  Theme,
-  selectControlPanel,
-  velocityValue,
-} from "../../store/controlPanelSlice";
+import { selectSettings, velocityValue } from "../../store/settingsSlice";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
@@ -35,16 +33,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const {
-    velocity,
-    noteDisplayMode,
-    neck,
-    chordStrummingDelayMs,
-    fretboardScaleX,
-    fretboardScaleY,
-    baseNote,
-    theme,
-  } = useSelector(selectControlPanel);
+  const { velocity, neck, chordStrummingDelayMs, baseNote } =
+    useSelector(selectSettings);
+  const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
+    useSelector(selectUi);
 
   const hasTouchInput = useInputChecker();
   const [isFromPreviousChord, setIsFromPreviousChord] =

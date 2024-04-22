@@ -1,12 +1,11 @@
+import { hideAlert, selectUi } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hideAlert, selectControlPanel } from "../../store/controlPanelSlice";
 
 export const Alert: React.FC = () => {
   const dispatch = useDispatch();
-  const { alertMessage, showAlert, alertIsError } =
-    useSelector(selectControlPanel);
+  const { alertMessage, showAlert, alertIsError } = useSelector(selectUi);
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(hideAlert());

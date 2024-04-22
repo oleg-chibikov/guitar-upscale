@@ -1,12 +1,13 @@
 "use client";
+import { Theme } from "@/app/data/theme";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { WithChildren } from "../helpers/withChildren";
-import { Theme, selectControlPanel } from "../store/controlPanelSlice";
+import { selectUi } from "../store/uiSlice";
 
 export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
 
   const muiTheme = createTheme({
     shape: {

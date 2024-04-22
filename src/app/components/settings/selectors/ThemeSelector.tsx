@@ -1,10 +1,7 @@
+import { Theme } from "@/app/data/theme";
+import { selectUi, setTheme } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Theme,
-  selectControlPanel,
-  setTheme,
-} from "../../../store/controlPanelSlice";
 import { EnumSelector } from "./EnumSelector";
 
 const convertOSTheme = (theme: Theme) => {
@@ -20,7 +17,7 @@ const convertOSTheme = (theme: Theme) => {
 };
 
 export const ThemeSelector: React.FC = () => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
 
   return (

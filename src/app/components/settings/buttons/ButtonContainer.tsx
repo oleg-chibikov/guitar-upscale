@@ -1,9 +1,9 @@
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
-import { selectControlPanel } from "../../../store/controlPanelSlice";
 import { FullscreenButton } from "./FullscreenButton";
 import { MetronomeButton } from "./MetronomeButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
@@ -22,7 +22,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
   style,
   premiumComponents,
 }) => {
-  const { chordsDisplayMode } = useSelector(selectControlPanel);
+  const { chordsDisplayMode } = useSelector(selectUi);
   return (
     <section className="flex flex-col gap-1" style={style}>
       <div

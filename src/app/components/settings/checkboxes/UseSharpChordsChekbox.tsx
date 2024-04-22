@@ -3,13 +3,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setUseSharpChords,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { CheckBox } from "./CheckBox";
 
 export const UseSharpChordsCheckbox: React.FC = (props) => {
-  const { useSharpChords } = useSelector(selectControlPanel);
+  const { useSharpChords } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

@@ -1,4 +1,4 @@
-import { Skin } from "../store/controlPanelSlice";
+import { Skin } from "../store/settingsSlice";
 
 export const getAssetsForSkin = (skin?: Skin) => {
   switch (skin) {

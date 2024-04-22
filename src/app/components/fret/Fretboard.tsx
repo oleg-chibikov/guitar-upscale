@@ -1,12 +1,13 @@
 "use client";
+import { Skin } from "@/app/data/skin";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { interpolate } from "@/app/helpers/interpolation";
+import { selectSettings } from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
 import { getAssetsForSkin } from "../../helpers/skinHelper";
-import { Skin } from "../../store/controlPanelSlice";
-import { RootState } from "../../store/store";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
@@ -39,9 +40,8 @@ const getPositionForSkin = (skin?: Skin) => {
 };
 
 export const Fretboard: React.FC = () => {
-  const { skin, neck, fretboardScaleX, fretboardScaleY } = useSelector(
-    (state: RootState) => state.controlPanel
-  );
+  const { skin, fretboardScaleX, fretboardScaleY } = useSelector(selectUi);
+  const { neck } = useSelector(selectSettings);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
   const [maxWidth, setMaxWidth] = useState(window.innerWidth);

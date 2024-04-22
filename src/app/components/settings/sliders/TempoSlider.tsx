@@ -1,13 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectControlPanel,
-  setTempoBpm,
-} from "../../../store/controlPanelSlice";
+import { selectSettings, setTempoBpm } from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const TempoSlider: React.FC = () => {
-  const { tempoBpm } = useSelector(selectControlPanel);
+  const { tempoBpm } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

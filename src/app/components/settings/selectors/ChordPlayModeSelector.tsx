@@ -1,14 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordPlayMode } from "../../../data/chordPlayMode";
-import {
-  selectControlPanel,
-  setChordPlayMode,
-} from "../../../store/controlPanelSlice";
+import { selectSettings, setChordPlayMode } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const ChordPlayModeSelector: React.FC = () => {
-  const { chordPlayMode } = useSelector(selectControlPanel);
+  const { chordPlayMode } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

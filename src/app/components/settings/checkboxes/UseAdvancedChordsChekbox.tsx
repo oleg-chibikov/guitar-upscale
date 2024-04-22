@@ -3,13 +3,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setUseAdvancedChords,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { CheckBox } from "./CheckBox";
 
 export const UseAdvancedChordsCheckbox: React.FC = (props) => {
-  const { useAdvancedChords } = useSelector(selectControlPanel);
+  const { useAdvancedChords } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

@@ -1,5 +1,6 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -28,7 +29,7 @@ const Slider: React.FC<SliderProps> = ({
   label,
   labelClass,
 }) => {
-  const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <div
       className={`items-center flex ${

@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setChordStrummingDelayMs,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
-  const { chordStrummingDelayMs } = useSelector(selectControlPanel);
+  const { chordStrummingDelayMs } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

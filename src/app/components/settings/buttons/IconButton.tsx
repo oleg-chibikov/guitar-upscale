@@ -1,6 +1,7 @@
+import { Theme } from "@/app/data/theme";
 import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
+import { selectUi } from "@/app/store/uiSlice";
 
 export interface IconButtonProps {
   onPress: () => void;
@@ -24,7 +25,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   className,
   ...rest
 }) => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
 
   return (
     <button

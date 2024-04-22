@@ -1,13 +1,14 @@
 "use client";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import React from "react";
 import { useSelector } from "react-redux";
-import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
 const noPremiumWarning = "Please subscribe to a Composer plan to record MIDI";
 export const DisabledRecordButton: React.FC = (props) => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
   return (
     <IconButton
       {...props}

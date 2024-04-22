@@ -1,13 +1,14 @@
 "use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import { useSelector } from "react-redux";
 import { LockRatioButton } from "./buttons/LockRatioButton";
 import { FretboardScaleXSlider } from "./sliders/FretboardScaleXSlider";
 import { FretboardScaleYSlider } from "./sliders/FretboardScaleYSlider";
 
 export const AspectRatioControl: React.FC = () => {
-  const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <>
       <div

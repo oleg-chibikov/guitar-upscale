@@ -1,11 +1,8 @@
 "use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import {
-  Theme,
-  selectControlPanel,
-  setAndShowAlert,
-  setIsSignedIn,
-} from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectSettings, setIsSignedIn } from "@/app/store/settingsSlice";
+import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import Login from "@mui/icons-material/Login";
 import { Avatar, Button } from "@mui/material";
 import { useSession } from "next-auth/react";
@@ -25,8 +22,8 @@ export const AuthPanel: React.FC = () => {
   const [modalOpened, setModalOpened] = useState(false);
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { chordsDisplayMode, isSignedIn, subscriptionTier, theme } =
-    useSelector(selectControlPanel);
+  const { isSignedIn, subscriptionTier } = useSelector(selectSettings);
+  const { chordsDisplayMode, theme } = useSelector(selectUi);
   const handleCloseModal = () => {
     setOpenModal(false);
   };

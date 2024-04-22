@@ -1,4 +1,5 @@
-import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -17,7 +18,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
     onValueChange(event.target.checked);
   };
 
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
   return (
     <div>
       <input

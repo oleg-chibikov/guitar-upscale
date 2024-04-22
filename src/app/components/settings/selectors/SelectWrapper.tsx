@@ -1,4 +1,6 @@
-import { Theme, selectControlPanel } from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectSettings } from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -15,7 +17,7 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
   onChange,
   className,
 }) => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
 
   return (
     <select

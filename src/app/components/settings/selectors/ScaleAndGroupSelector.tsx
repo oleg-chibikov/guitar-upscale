@@ -1,12 +1,15 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
+import { selectSettings } from "../../../store/settingsSlice";
 import { ScaleGroupSelector } from "./ScaleGroupSelector";
 import { ScaleSelector } from "./ScaleSelector";
 
 export const ScaleAndGroupSelector: React.FC = () => {
-  const { scaleGroup, theme } = useSelector(selectControlPanel);
+  const { scaleGroup } = useSelector(selectSettings);
+  const { theme } = useSelector(selectUi);
 
   return (
     <section

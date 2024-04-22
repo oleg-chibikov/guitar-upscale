@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setSwitchToChromaticScale,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { CheckBox } from "./CheckBox";
 
 export const SwitchToChromaticScaleCheckbox: React.FC = (props) => {
-  const { switchToChromaticScale } = useSelector(selectControlPanel);
+  const { switchToChromaticScale } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

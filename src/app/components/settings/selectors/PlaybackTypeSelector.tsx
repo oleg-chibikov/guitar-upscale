@@ -3,13 +3,13 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PlaybackType,
-  selectControlPanel,
+  selectSettings,
   setPlaybackType,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const PlaybackTypeSelector: React.FC = () => {
-  const { playbackType } = useSelector(selectControlPanel);
+  const { playbackType } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

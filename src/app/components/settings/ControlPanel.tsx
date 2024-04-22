@@ -1,16 +1,17 @@
 "use client";
+import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
-import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
 import { ButtonContainer } from "./buttons/ButtonContainer";
 import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 
 export const ControlPanel: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { chordsDisplayMode, theme } = useSelector(selectControlPanel);
+  const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <section
       className={`z-30 p-1 overflow-auto fixed top-1 border-2 ${

@@ -4,10 +4,14 @@ import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import controlPanelReducer from "./controlPanelSlice";
+import authReducer from "./authSlice";
+import settingsReducer from "./settingsSlice";
+import uiReducer from "./uiSlice";
 
 const rootReducer = combineReducers({
-  controlPanel: controlPanelReducer,
+  settings: settingsReducer,
+  ui: uiReducer,
+  auth: authReducer,
 });
 
 const VERSION = 2;

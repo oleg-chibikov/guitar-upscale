@@ -11,11 +11,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   PlaybackType,
   isMetronomeTicking,
-  selectControlPanel,
-  setAndShowAlert,
+  selectSettings,
   setTempoBpm,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
+import { setAndShowAlert } from "@/app/store/uiSlice";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
@@ -33,7 +33,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
   onPlayExample,
 }) => {
   const { neck, tuning, baseNote, scale, scaleGroup, chordsMap, playbackType } =
-    useSelector(selectControlPanel);
+    useSelector(selectSettings);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active

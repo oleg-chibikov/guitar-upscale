@@ -1,11 +1,11 @@
 import { Tuning, tunings } from "@/app/data/notes";
-import { selectControlPanel, setTuning } from "@/app/store/controlPanelSlice";
+import { selectSettings, setTuning } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SelectWrapper } from "./SelectWrapper";
 
 const TuningSelector: React.FC = () => {
-  const { tuning } = useSelector(selectControlPanel);
+  const { tuning } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

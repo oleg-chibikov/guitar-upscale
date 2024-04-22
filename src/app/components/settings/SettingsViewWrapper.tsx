@@ -1,9 +1,6 @@
 "use client";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
-import {
-  selectControlPanel,
-  setSettingsExpanded,
-} from "@/app/store/controlPanelSlice";
+import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import React, { FC, Suspense, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,7 +14,7 @@ export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
 }) => {
   const [opened, setOpened] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
-  const { settingsExpanded } = useSelector(selectControlPanel);
+  const { settingsExpanded } = useSelector(selectUi);
   useEffect(() => {
     if (settingsExpanded) {
       setOpened(true);

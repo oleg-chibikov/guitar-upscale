@@ -1,3 +1,5 @@
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
@@ -15,7 +17,7 @@ import {
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
+import { selectSettings } from "../../store/settingsSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -28,8 +30,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
-  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay, theme } =
-    useSelector(selectControlPanel);
+  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
+    useSelector(selectSettings);
+  const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
 

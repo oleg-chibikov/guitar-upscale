@@ -1,13 +1,10 @@
+import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import { ReactNode, forwardRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
-import {
-  Theme,
-  selectControlPanel,
-  setSettingsExpanded,
-} from "../../store/controlPanelSlice";
 import { CloseIcon } from "../CloseIcon";
 import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
@@ -26,7 +23,7 @@ import { VelocitySlider } from "./sliders/VelocitySlider";
 export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
   ({ premiumComponents }, ref) => {
     const { theme, chordsDisplayMode, settingsExpanded } =
-      useSelector(selectControlPanel);
+      useSelector(selectUi);
     const dispatch = useDispatch();
     return (
       <Slide direction="down" in={settingsExpanded} mountOnEnter unmountOnExit>

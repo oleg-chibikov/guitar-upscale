@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setChordNotesToPlay,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const ChordNotesToPlaySlider: React.FC = () => {
-  const { chordNotesToPlay } = useSelector(selectControlPanel);
+  const { chordNotesToPlay } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

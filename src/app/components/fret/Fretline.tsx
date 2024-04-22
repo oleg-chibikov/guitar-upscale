@@ -1,8 +1,9 @@
+import { Skin } from "@/app/data/skin";
+import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 import { StringOctaveNote } from "../../data/notes";
 import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
-import { Skin, selectControlPanel } from "../../store/controlPanelSlice";
 import { FretMarker } from "./FretMarker";
 
 export interface FretlineProps {
@@ -65,7 +66,7 @@ export const Fretline: React.FC<FretlineProps> = ({
   string,
   isHeader,
 }) => {
-  const { skin } = useSelector(selectControlPanel);
+  const { skin } = useSelector(selectUi);
 
   const { widthStep, height, stringTiltModifiers } = getParametersForSkin(skin);
   const widthFactor = 1.06;

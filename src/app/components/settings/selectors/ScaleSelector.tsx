@@ -1,12 +1,12 @@
 import { scalesMap } from "@/app/data/scales";
 import { useExamples } from "@/app/hooks/useExamples";
-import { selectControlPanel, setScale } from "@/app/store/controlPanelSlice";
+import { selectSettings, setScale } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SelectWrapper } from "./SelectWrapper";
 
 const ScaleSelector: React.FC = () => {
-  const { scale, scaleGroup } = useSelector(selectControlPanel);
+  const { scale, scaleGroup } = useSelector(selectSettings);
   const dispatch = useDispatch();
   const examplesMap = useExamples();
 

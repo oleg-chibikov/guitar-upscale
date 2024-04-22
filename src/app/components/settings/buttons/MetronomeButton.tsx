@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   metronomeVelocityValue,
   setMetronomeTicking,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
 function MdiMetronome() {

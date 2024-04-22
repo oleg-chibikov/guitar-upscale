@@ -1,9 +1,7 @@
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import {
-  Theme,
-  selectControlPanel,
-  setIsSignedIn,
-} from "@/app/store/controlPanelSlice";
+import { Theme } from "@/app/data/theme";
+import { setIsSignedIn } from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import { Avatar, Button, Modal, Slide } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { FC } from "react";
@@ -22,7 +20,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   const premiumFeatures = usePremiumFeatures();
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
 
   const isSignedIn = session?.user?.image && session?.user?.name;
 

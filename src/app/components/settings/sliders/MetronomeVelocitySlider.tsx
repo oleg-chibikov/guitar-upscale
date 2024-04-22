@@ -2,13 +2,13 @@ import { MAX_VELOCITY } from "@/app/data/notes";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectControlPanel,
+  selectSettings,
   setMetronomeVelocity,
-} from "../../../store/controlPanelSlice";
+} from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const MetronomeVelocitySlider: React.FC = () => {
-  const { metronomeVelocity } = useSelector(selectControlPanel);
+  const { metronomeVelocity } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

@@ -1,15 +1,16 @@
 "use client";
+import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Theme, selectControlPanel } from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
   const [isRecording, setIsRecording] = useState<boolean>();
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
   return (
     <>
       {isRecording && (

@@ -1,14 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Note } from "../../../data/notes";
-import {
-  selectControlPanel,
-  setBaseNote,
-} from "../../../store/controlPanelSlice";
+import { selectSettings, setBaseNote } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const BaseNoteSelector: React.FC = () => {
-  const { baseNote } = useSelector(selectControlPanel);
+  const { baseNote } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (

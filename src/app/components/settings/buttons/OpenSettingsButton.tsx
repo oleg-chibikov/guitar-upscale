@@ -1,16 +1,13 @@
+import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import SettingsApplications from "@mui/icons-material/SettingsApplications";
 import React from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectControlPanel,
-  setSettingsExpanded,
-} from "../../../store/controlPanelSlice";
 import { IconButton } from "./IconButton";
 
 export const OpenSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { settingsExpanded } = useSelector(selectControlPanel);
+  const { settingsExpanded } = useSelector(selectUi);
   return (
     <IconButton
       {...props}

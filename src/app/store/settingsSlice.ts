@@ -1,8 +1,6 @@
-// controlPanelSlice.ts
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordPlayMode } from "../data/chordPlayMode";
-import { ChordsDisplayMode } from "../data/chordsDisplayMode";
-import { NoteDisplayMode } from "../data/noteDisplayMode";
 import {
   Chord,
   getNoteText,
@@ -26,34 +24,14 @@ import {
 import { setBpm } from "../engine/mainClock";
 import { RootState } from "./store"; // Define RootState type
 
-export enum Theme {
-  Dark,
-  Light,
-  MatchOS,
-}
-
 export enum PlaybackType {
   Melody,
   Scale,
   FullStringScale,
 }
 
-export enum Skin {
-  PRS_SE_AX20E,
-  Ibanez_AE140_WKH,
-  Yamaha_CSF3M,
-  Yamaha_SLG200NW,
-}
-
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;
-
-const initialTheme = Theme.Dark;
-
-export const minXZoom = 1;
-export const maxXZoom = 3;
-export const minYZoom = 0.7;
-export const maxYZoom = 1;
 
 interface WithNeck {
   neck: Neck | null;
@@ -70,27 +48,15 @@ interface WithControls {
 
 interface ControlPanelState extends WithNeck, WithControls {
   isSignedIn: boolean;
-  noteDisplayMode: NoteDisplayMode;
-  chordsDisplayMode: ChordsDisplayMode;
-  skin: Skin;
-  settingsExpanded: boolean;
-  chordsExpanded: boolean;
   tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
   metronomeVelocity: number;
-  showAlert: boolean;
-  alertIsError: boolean;
-  alertMessage: string;
   playbackType: PlaybackType;
-  theme: Theme;
   switchToChromaticScale: boolean;
   useAdvancedChords: boolean;
   useSharpChords: boolean;
   chordPlayMode: ChordPlayMode;
-  fretboardScaleX: number;
-  fretboardScaleY: number;
-  lockRatio: boolean;
   chordNotesToPlay: number;
   tuning: Tuning;
   subscriptionTier?: string;
@@ -101,30 +67,18 @@ const initialState: ControlPanelState = {
   scaleGroup: "Common Minor",
   scale: "Aeolian / Natural",
   baseNote: Note.E,
-  noteDisplayMode: NoteDisplayMode.Fret,
-  chordsDisplayMode: ChordsDisplayMode.Left,
-  skin: Skin.Yamaha_SLG200NW,
   neck: null,
   chords: null,
   chordsMap: null,
-  settingsExpanded: false,
-  chordsExpanded: true,
   tempoBpm: 140,
   chordStrummingDelayMs: 20,
   velocity: MAX_VELOCITY,
   metronomeVelocity: MAX_VELOCITY,
-  alertIsError: false,
-  showAlert: false,
-  alertMessage: "",
   playbackType: PlaybackType.Melody,
-  theme: initialTheme,
   switchToChromaticScale: true,
   useAdvancedChords: true,
   useSharpChords: true,
   chordPlayMode: ChordPlayMode.ClosestVariation,
-  fretboardScaleX: 1,
-  fretboardScaleY: 1,
-  lockRatio: false,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
 };
@@ -175,27 +129,7 @@ const setChords = (state: WithNeck) => {
   }
 };
 
-const calculatePercentage = (
-  minimum: number,
-  maximum: number,
-  currentPosition: number
-): number => {
-  const percentage: number =
-    ((currentPosition - minimum) / (maximum - minimum)) * 100;
-  return percentage;
-};
-
-const getValueFromPercentage = (
-  minimum: number,
-  maximum: number,
-  percentage: number
-): number => {
-  const range = maximum - minimum;
-  const valueInRange = (percentage / 100) * range + minimum;
-  return valueInRange;
-};
-
-export const controlPanelSlice = createSlice({
+export const settingsSlice = createSlice({
   name: "controlPanel",
   initialState,
   reducers: {
@@ -221,21 +155,6 @@ export const controlPanelSlice = createSlice({
       state.tuning = action.payload;
       onGuitarSettingsUpdate(state);
     },
-    setNoteDisplayMode: (state, action: PayloadAction<NoteDisplayMode>) => {
-      state.noteDisplayMode = action.payload;
-    },
-    setChordsDisplayMode: (state, action: PayloadAction<ChordsDisplayMode>) => {
-      state.chordsDisplayMode = action.payload;
-    },
-    setSkin(state, action: PayloadAction<Skin>) {
-      state.skin = action.payload;
-    },
-    setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
-      state.settingsExpanded = action.payload;
-    },
-    setChordsExpanded: (state, action: PayloadAction<boolean>) => {
-      state.chordsExpanded = action.payload;
-    },
     setTempoBpm: (state, action: PayloadAction<number>) => {
       state.tempoBpm = action.payload;
       setBpm(action.payload);
@@ -251,27 +170,8 @@ export const controlPanelSlice = createSlice({
       state.metronomeVelocity = action.payload;
       metronomeVelocityValue = action.payload;
     },
-    setAndShowAlert(
-      state,
-      action: PayloadAction<{ message: string; isError: boolean }>
-    ) {
-      state.showAlert = true;
-      state.alertMessage = action.payload.message;
-      state.alertIsError = action.payload.isError;
-    },
-    hideAlert(state) {
-      state.showAlert = false;
-      // Allow animation to finish first
-      setTimeout(() => {
-        state.alertMessage = "";
-        state.alertIsError = false;
-      }, 300);
-    },
     setPlaybackType(state, action: PayloadAction<PlaybackType>) {
       state.playbackType = action.payload;
-    },
-    setTheme(state, action: PayloadAction<Theme>) {
-      state.theme = action.payload;
     },
     setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
       state.switchToChromaticScale = action.payload;
@@ -284,51 +184,6 @@ export const controlPanelSlice = createSlice({
     },
     setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
       state.chordPlayMode = action.payload;
-    },
-    setFretboardScaleX(state, action: PayloadAction<number>) {
-      state.fretboardScaleX = action.payload;
-      if (state.lockRatio) {
-        const relativePosition = calculatePercentage(
-          minXZoom,
-          maxXZoom,
-          action.payload
-        );
-        state.fretboardScaleY = getValueFromPercentage(
-          minYZoom,
-          maxYZoom,
-          100 - relativePosition
-        );
-      }
-    },
-    setFretboardScaleY(state, action: PayloadAction<number>) {
-      state.fretboardScaleY = action.payload;
-      if (state.lockRatio) {
-        const relativePosition = calculatePercentage(
-          minYZoom,
-          maxYZoom,
-          action.payload
-        );
-        state.fretboardScaleX = getValueFromPercentage(
-          minXZoom,
-          maxXZoom,
-          100 - relativePosition
-        );
-      }
-    },
-    setLockRatio(state, action: PayloadAction<boolean>) {
-      state.lockRatio = action.payload;
-      if (state.lockRatio) {
-        const relativePositionY = calculatePercentage(
-          minYZoom,
-          maxYZoom,
-          state.fretboardScaleY
-        );
-        state.fretboardScaleX = getValueFromPercentage(
-          minXZoom,
-          maxXZoom,
-          100 - relativePositionY
-        );
-      }
     },
     setChordNotesToPlay(state, action: PayloadAction<number>) {
       state.chordNotesToPlay = action.payload;
@@ -347,32 +202,21 @@ export const {
   setScale,
   setScaleGroup,
   setBaseNote,
-  setNoteDisplayMode,
-  setChordsDisplayMode,
-  setSkin,
-  setSettingsExpanded,
   setTempoBpm,
   setVelocity,
   setMetronomeVelocity,
-  setAndShowAlert,
-  hideAlert,
   setPlaybackType,
-  setTheme,
-  setChordsExpanded,
   setSwitchToChromaticScale,
   setUseAdvancedChords,
   setUseSharpChords,
   setChordStrummingDelayMs,
   setChordPlayMode,
-  setFretboardScaleX,
-  setFretboardScaleY,
-  setLockRatio,
   setChordNotesToPlay,
   setTuning,
   setIsSignedIn,
   setSubscriptionTier,
-} = controlPanelSlice.actions;
+} = settingsSlice.actions;
 
-export const selectControlPanel = (state: RootState) => state.controlPanel;
+export const selectSettings = (state: RootState) => state.settings;
 
-export default controlPanelSlice.reducer;
+export default settingsSlice.reducer;

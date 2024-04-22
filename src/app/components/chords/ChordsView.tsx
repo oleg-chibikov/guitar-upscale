@@ -6,6 +6,8 @@ import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import { Theme } from "@/app/data/theme";
+import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import {
@@ -14,25 +16,15 @@ import {
   getModeText,
 } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import {
-  Theme,
-  selectControlPanel,
-  setChordsExpanded,
-} from "../../store/controlPanelSlice";
+import { selectSettings } from "../../store/settingsSlice";
 import { ChordButton } from "./ChordButton";
 
 const authPanelHeightReserved = 110;
 
 export const ChordsView: React.FC = () => {
-  const {
-    neck,
-    useAdvancedChords,
-    useSharpChords,
-    chordsExpanded,
-    chords,
-    chordsDisplayMode,
-    theme,
-  } = useSelector(selectControlPanel);
+  const { neck, useAdvancedChords, useSharpChords, chords } =
+    useSelector(selectSettings);
+  const { theme, chordsExpanded, chordsDisplayMode } = useSelector(selectUi);
   const dispatch = useDispatch();
   const premiumFeatures = usePremiumFeatures();
   const handleExpansion = () => {

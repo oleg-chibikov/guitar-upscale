@@ -1,11 +1,13 @@
 "use client";
+import { Theme } from "@/app/data/theme";
 import { useEffect } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { Theme, init, selectControlPanel } from "../store/controlPanelSlice";
+import { init } from "../store/settingsSlice";
+import { selectUi } from "../store/uiSlice";
 
 export const Initializer: React.FC = () => {
-  const { theme } = useSelector(selectControlPanel);
+  const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(init());

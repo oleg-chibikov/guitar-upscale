@@ -1,5 +1,5 @@
 "use client";
-import { selectControlPanel } from "@/app/store/controlPanelSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -11,7 +11,7 @@ interface AlertWrapperProps {}
 
 export const AlertWrapper: FC<AlertWrapperProps> = ({}) => {
   const [opened, setOpened] = useState(false);
-  const { showAlert } = useSelector(selectControlPanel);
+  const { showAlert } = useSelector(selectUi);
   useEffect(() => {
     if (showAlert) {
       setOpened(true);
