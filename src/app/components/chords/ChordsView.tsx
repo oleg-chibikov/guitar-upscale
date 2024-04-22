@@ -1,25 +1,36 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
+import { useDispatch, useSelector } from "react-redux";
 import { getNoteText } from "../../data/notes";
 
-import { Slide } from "@mui/material";
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { ChordMode, getModeText } from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { Theme, selectControlPanel } from "../../store/controlPanelSlice";
+import {
+  Theme,
+  selectControlPanel,
+  setChordsExpanded,
+} from "../../store/controlPanelSlice";
 import { ChordButton } from "./ChordButton";
 
-const authPanelHeightReserved = 80;
+const authPanelHeightReserved = 150;
 
 export const ChordsView: React.FC = () => {
   const {
     neck,
     useAdvancedChords,
+    chordsExpanded,
     chords,
     chordsDisplayMode,
     theme,
-    chordsExpanded,
   } = useSelector(selectControlPanel);
+  const dispatch = useDispatch();
+  const handleExpansion = () => {
+    dispatch(setChordsExpanded(!chordsExpanded));
+  };
 
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -49,44 +60,73 @@ export const ChordsView: React.FC = () => {
   ).length;
 
   return (
-    <Slide direction="up" in={chordsExpanded} mountOnEnter unmountOnExit>
-      <section
-        className={`opacity-95 overflow-auto fixed ${
-          chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-        } z-20 bottom-1 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light"
-            : "bg-accented_background-dark"
-        } p-1 gap-1 ${!hasTouchInput ? "grid-cols-2" : "grid-rows-2"}`}
-        style={{
-          maxWidth: hasTouchInput && height < 700 ? 220 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
-          maxHeight: height - authPanelHeightReserved,
-          display: "grid",
-          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-          gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+    <section
+      className={`opacity-95 fixed ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
+      } z-20 bottom-1 ${
+        theme === Theme.Light
+          ? "bg-accented_background-light"
+          : "bg-accented_background-dark"
+      } p-1`}
+    >
+      <Accordion
+        expanded={chordsExpanded}
+        onChange={handleExpansion}
+        // slots={{ transition: Fade as AccordionSlots["transition"] }}
+        // slotProps={{ transition: { timeout: 400 } }}
+        sx={{
+          "& .MuiAccordionSummary-content": {
+            margin: 0,
+            marginY: 0.5,
+          },
         }}
+        disableGutters
       >
-        {chords.flatMap((noteChord) =>
-          noteChord.modes.map((noteChordMode) => {
-            const isHidden =
-              !useAdvancedChords &&
-              noteChordMode.mode !== ChordMode.Major &&
-              noteChordMode.mode !== ChordMode.Minor;
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          style={{
+            minHeight: 0,
+          }}
+          id="panel-header"
+          aria-controls="panel-content"
+        >
+          Chords
+        </AccordionSummary>
+        <AccordionDetails
+          className={`grid gap-1 overflow-auto ${
+            !hasTouchInput ? "grid-cols-2" : "grid-rows-2"
+          }`}
+          style={{
+            padding: 4,
+            paddingTop: 0, // compensated by margin of the header
+            maxWidth: hasTouchInput && height < 700 ? 220 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
+            maxHeight: height - authPanelHeightReserved,
+            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+          }}
+        >
+          {chords.flatMap((noteChord) =>
+            noteChord.modes.map((noteChordMode) => {
+              const isHidden =
+                !useAdvancedChords &&
+                noteChordMode.mode !== ChordMode.Major &&
+                noteChordMode.mode !== ChordMode.Minor;
 
-            const title =
-              getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
+              const title =
+                getNoteText(noteChord.note) + getModeText(noteChordMode.mode);
 
-            return (
-              <ChordButton
-                key={title}
-                isHidden={isHidden}
-                noteChordMode={noteChordMode}
-                chordName={title}
-              />
-            );
-          })
-        )}
-      </section>
-    </Slide>
+              return (
+                <ChordButton
+                  key={title}
+                  isHidden={isHidden}
+                  noteChordMode={noteChordMode}
+                  chordName={title}
+                />
+              );
+            })
+          )}
+        </AccordionDetails>
+      </Accordion>
+    </section>
   );
 };

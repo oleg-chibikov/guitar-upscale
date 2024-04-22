@@ -6,7 +6,6 @@ import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
 import { selectControlPanel } from "../../../store/controlPanelSlice";
 import { FullscreenButton } from "./FullscreenButton";
 import { MetronomeButton } from "./MetronomeButton";
-import { OpenChordsButton } from "./OpenChordsButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
 import { PlayButton } from "./PlayButton";
 
@@ -34,7 +33,6 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         }`}
       >
         <OpenSettingsButton />
-        <OpenChordsButton />
         <FullscreenButton />
       </div>
       <div

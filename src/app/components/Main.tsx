@@ -9,7 +9,7 @@ import {
 import { Initializer } from "./Initializer";
 import { AlertWrapper } from "./alert/AlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
-import { ChordsViewWrapper } from "./chords/ChordsViewWrapper";
+import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
@@ -95,7 +95,7 @@ export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
       <ControlPanel premiumComponents={premiumComponents} />
       <Fretboard />
       <SettingsViewWrapper premiumComponents={premiumComponents} />
-      <ChordsViewWrapper />
+      <ChordsView />
       <AspectRatioControl />
       <AuthPanel />
     </main>
