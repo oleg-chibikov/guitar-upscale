@@ -1,4 +1,4 @@
-import { Tuning } from "./notes";
+import { Tuning } from "./tunings";
 
 export type Example = {
   band: string;
