@@ -93,7 +93,7 @@ export const ChordsView: React.FC = () => {
           Chords
         </AccordionSummary>
         <AccordionDetails
-          className={`grid gap-1 overflow-auto ${
+          className={`grid gap-0.5 overflow-auto ${
             !hasTouchInput ? "grid-cols-2" : "grid-rows-2"
           }`}
           style={{
