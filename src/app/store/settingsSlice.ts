@@ -1,4 +1,3 @@
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordPlayMode } from "../data/chordPlayMode";
 import {
@@ -47,7 +46,6 @@ interface WithControls {
 }
 
 interface ControlPanelState extends WithNeck, WithControls {
-  isSignedIn: boolean;
   tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
@@ -59,11 +57,9 @@ interface ControlPanelState extends WithNeck, WithControls {
   chordPlayMode: ChordPlayMode;
   chordNotesToPlay: number;
   tuning: Tuning;
-  subscriptionTier?: string;
 }
 
 const initialState: ControlPanelState = {
-  isSignedIn: false,
   scaleGroup: "Common Minor",
   scale: "Aeolian / Natural",
   baseNote: Note.E,
@@ -188,12 +184,6 @@ export const settingsSlice = createSlice({
     setChordNotesToPlay(state, action: PayloadAction<number>) {
       state.chordNotesToPlay = action.payload;
     },
-    setIsSignedIn(state, action: PayloadAction<boolean>) {
-      state.isSignedIn = action.payload;
-    },
-    setSubscriptionTier(state, action: PayloadAction<string | undefined>) {
-      state.subscriptionTier = action.payload;
-    },
   },
 });
 
@@ -213,8 +203,6 @@ export const {
   setChordPlayMode,
   setChordNotesToPlay,
   setTuning,
-  setIsSignedIn,
-  setSubscriptionTier,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

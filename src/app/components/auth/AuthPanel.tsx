@@ -1,7 +1,7 @@
 "use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { selectSettings, setIsSignedIn } from "@/app/store/settingsSlice";
+import { selectAuth, setIsSignedIn } from "@/app/store/authSlice";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import Login from "@mui/icons-material/Login";
 import { Avatar, Button } from "@mui/material";
@@ -22,7 +22,7 @@ export const AuthPanel: React.FC = () => {
   const [modalOpened, setModalOpened] = useState(false);
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { isSignedIn, subscriptionTier } = useSelector(selectSettings);
+  const { isSignedIn, subscriptionTier } = useSelector(selectAuth);
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   const handleCloseModal = () => {
     setOpenModal(false);

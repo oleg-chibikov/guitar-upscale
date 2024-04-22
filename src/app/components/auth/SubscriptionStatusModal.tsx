@@ -1,12 +1,12 @@
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
-import { setIsSignedIn } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { Avatar, Button, Modal, Slide } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
+import { setIsSignedIn } from "@/app/store/authSlice";
 
 interface SubscriptionStatusModalProps {
   openModal: boolean;

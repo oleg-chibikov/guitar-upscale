@@ -3,7 +3,7 @@ import { PremiumFeatures } from "@/lib/subscription";
 import React, { createContext, useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { WithChildren } from "../helpers/withChildren";
-import { setSubscriptionTier } from "../store/settingsSlice";
+import { setSubscriptionTier } from "../store/authSlice";
 
 // Create a context for PremiumFeatures
 const PremiumFeaturesContext = createContext<PremiumFeatures>({});
