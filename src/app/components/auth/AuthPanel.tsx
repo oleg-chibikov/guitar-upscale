@@ -5,6 +5,7 @@ import {
   selectControlPanel,
   setIsSignedIn,
 } from "@/app/store/controlPanelSlice";
+import Login from "@mui/icons-material/Login";
 import { Avatar, Button } from "@mui/material";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -74,8 +75,24 @@ export const AuthPanel: React.FC = () => {
           onClick={handleOpenModal}
           variant="contained"
           color="primary"
+          title="Sign in"
+          style={{ minWidth: 0, padding: 4 }} // override MUI value
+          className={`flex ${
+            chordsDisplayMode === ChordsDisplayMode.Left
+              ? "flex-row-reverse"
+              : "flex-row"
+          } gap-2`}
         >
-          Sign in
+          <Login />
+          <span
+            className={`hidden sm:block ${
+              theme === Theme.Light
+                ? "text-foreground-light"
+                : "text-foreground-dark"
+            }`}
+          >
+            Sign in
+          </span>
         </Button>
       ) : (
         <Button
@@ -85,7 +102,7 @@ export const AuthPanel: React.FC = () => {
               ? "flex-row-reverse"
               : "flex-row"
           } gap-2`}
-          style={{ minWidth: 0 }} // override MUI value
+          style={{ minWidth: 0, padding: 4 }} // override MUI value
           title={session.user.name + ": " + session.user.email}
           onClick={handleOpenModal} // Open modal on avatar click
         >
