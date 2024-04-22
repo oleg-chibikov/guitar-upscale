@@ -14,6 +14,7 @@ import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
+import { UseAdvancedChordsCheckbox } from "./settings/checkboxes/UseAdvancedChordsChekbox";
 
 // TODO
 // Chord finder!
@@ -61,8 +62,10 @@ export const premiumFeaturesToMap = (
         return <RecordButton />;
       case "skinSelection":
         return <SkinSelector />;
-      case "advancedChords":
+      case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
+      case "advancedChords":
+        return <UseAdvancedChordsCheckbox />;
       case "melodies":
         return <PremiumPlayButton />;
       default:

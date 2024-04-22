@@ -10,7 +10,6 @@ import {
 } from "../../store/controlPanelSlice";
 import { CloseIcon } from "../CloseIcon";
 import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
-import { UseAdvancedChordsCheckbox } from "./checkboxes/UseAdvancedChordsChekbox";
 import { BaseNoteSelector } from "./selectors/BaseNoteSelector";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
 import { ChordsDisplayModeSelector } from "./selectors/ChordsDisplayModeSelector";
@@ -50,7 +49,7 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
               dispatch(setSettingsExpanded(false));
             }}
           />
-          <UseAdvancedChordsCheckbox />
+          {premiumComponents.get("advancedChords") as ReactNode}
           <SwitchToChromaticScaleCheckbox />
           <div
             className={`grid gap-2 ${
@@ -69,7 +68,7 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
             <ChordsDisplayModeSelector />
             <ChordPlayModeSelector />
             {premiumComponents.get("skinSelection") as ReactNode}
-            {premiumComponents.get("advancedChords") as ReactNode}
+            {premiumComponents.get("playbackTypeSelection") as ReactNode}
             <TempoSlider />
             <ChordStrummingDelaySlider />
             <ChordNotesToPlaySlider />

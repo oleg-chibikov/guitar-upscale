@@ -1,6 +1,5 @@
 import { OctaveNote } from "@/app/data/notes";
 import { Reverb, Soundfont } from "smplr";
-import { isMobileDevice } from "../../helpers/deviceHelper";
 import { playSound } from "./soundHelper";
 
 let soundfont: Soundfont;
@@ -13,10 +12,10 @@ export const initSoundfont = () => {
     kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
   });
 
-  if (!isMobileDevice()) {
-    // very glitchy on the phone but works fine on web
-    soundfont.output.addEffect("reverb", new Reverb(context), 0.5);
-  }
+  // if (!isMobileDevice()) {
+  // very glitchy on the phone but works fine on web
+  soundfont.output.addEffect("reverb", new Reverb(context), 0.5);
+  // }
 };
 
 export const playNote = async (note: OctaveNote, velocity: number) => {

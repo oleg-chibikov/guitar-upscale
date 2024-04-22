@@ -68,6 +68,7 @@ export type PremiumFeaturesWithSession = {
 export type PremiumFeatures = {
   subscriptionTier?: string;
   midiRecorder?: boolean;
+  playbackTypeSelection?: boolean;
   advancedChords?: boolean;
   skinSelection?: boolean;
   melodies?: boolean;
@@ -97,6 +98,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
       premiumFeatures: {
         melodies: true,
         advancedChords: true,
+        playbackTypeSelection: true,
         subscriptionTier,
       },
     };

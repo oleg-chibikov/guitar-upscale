@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getNoteText } from "../../data/notes";
 
+import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
@@ -28,6 +29,7 @@ export const ChordsView: React.FC = () => {
     theme,
   } = useSelector(selectControlPanel);
   const dispatch = useDispatch();
+  const premiumFeatures = usePremiumFeatures();
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
@@ -52,9 +54,11 @@ export const ChordsView: React.FC = () => {
     return null;
   }
 
+  const hasAdvancedChords = useAdvancedChords && premiumFeatures.advancedChords; // TODO: so-so protection:)
+
   const totalRows = chords.length;
   const totalColumns = chords[0].modes.filter((x) =>
-    useAdvancedChords
+    hasAdvancedChords
       ? true
       : x.mode === ChordMode.Major || x.mode === ChordMode.Minor
   ).length;
@@ -108,7 +112,7 @@ export const ChordsView: React.FC = () => {
           {chords.flatMap((noteChord) =>
             noteChord.modes.map((noteChordMode) => {
               const isHidden =
-                !useAdvancedChords &&
+                !hasAdvancedChords &&
                 noteChordMode.mode !== ChordMode.Major &&
                 noteChordMode.mode !== ChordMode.Minor;
 

@@ -116,7 +116,7 @@ const initialState: ControlPanelState = {
   playbackType: PlaybackType.Melody,
   theme: initialTheme,
   switchToChromaticScale: true,
-  useAdvancedChords: false,
+  useAdvancedChords: true,
   chordPlayMode: ChordPlayMode.ClosestVariation,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
