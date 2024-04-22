@@ -1,4 +1,4 @@
-import { Tuning, tunings } from "@/app/data/notes";
+import { Tuning, tunings } from "@/app/data/tunings";
 import { selectSettings, setTuning } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";

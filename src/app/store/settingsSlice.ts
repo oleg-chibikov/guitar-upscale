@@ -1,15 +1,9 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  Chord,
-  getNoteText,
-  MAX_VELOCITY,
-  Note,
-  parseStringToNotes,
-  Tuning,
-} from "../data/notes";
+import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
+import { parseStringToNotes, Tuning } from "../data/tunings";
 import {
   generateAllChords,
   getClosestVariation,

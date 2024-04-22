@@ -1,5 +1,6 @@
-import { Note, OctaveNote, parseStringToNotes } from "../data/notes";
+import { Note, OctaveNote } from "../data/notes";
 import { getScaleExamples } from "../data/scaleExamples";
+import { parseStringToNotes } from "../data/tunings";
 import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";

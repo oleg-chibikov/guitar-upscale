@@ -1,5 +1,5 @@
 "use client";
-import { getNoteText, parseStringToNotes } from "@/app/data/notes";
+import { getNoteText } from "@/app/data/notes";
 import { PlaybackType } from "@/app/data/playbackType";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
@@ -16,6 +16,7 @@ import {
   setTempoBpm,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
+import { parseStringToNotes } from "@/app/data/tunings";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
