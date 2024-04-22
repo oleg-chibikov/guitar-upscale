@@ -81,12 +81,23 @@ export class MidiRecorder {
     return new Blob([byteArray], { type: "audio/midi" });
   }
 
+  private getFormattedDateTime() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    const hours = String(currentDate.getHours()).padStart(2, "0");
+    const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}-${minutes}`;
+  }
+
   private downloadMidiFile(midiFile: Blob) {
     // Download MIDI file
     const url = URL.createObjectURL(midiFile);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "Guitar upscale.mid";
+    link.download = `Guitar upscale ${this.getFormattedDateTime()}.mid`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
