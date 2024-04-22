@@ -114,7 +114,7 @@ export const ChordsView: React.FC = () => {
             noteChord.modes.map((noteChordMode) => {
               const text = getNoteText(noteChord.note);
               const isHidden =
-                (useSharpChords && text.endsWith("#")) ||
+                (!useSharpChords && text.endsWith("#")) ||
                 (!hasAdvancedChords &&
                   noteChordMode.mode !== ChordMode.Major &&
                   noteChordMode.mode !== ChordMode.Minor);
