@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNoteText } from "../../data/notes";
+import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
-import { ChordMode, getModeText } from "../../engine/chordsGenerator";
+import {
+  ChordMode,
+  NoteChordMode,
+  getModeText,
+} from "../../engine/chordsGenerator";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import {
   Theme,
@@ -57,11 +61,14 @@ export const ChordsView: React.FC = () => {
 
   const hasAdvancedChords = useAdvancedChords && premiumFeatures.advancedChords; // TODO: so-so protection:)
 
-  const totalRows = chords.length;
-  const totalColumns = chords[0].modes.filter((x) =>
-    hasAdvancedChords
-      ? true
-      : x.mode === ChordMode.Major || x.mode === ChordMode.Minor
+  const checkIsHiddenMode = (noteChordMode: NoteChordMode) =>
+    !hasAdvancedChords &&
+    noteChordMode.mode !== ChordMode.Major &&
+    noteChordMode.mode !== ChordMode.Minor;
+
+  const totalRows = chords.length - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
+  const totalColumns = chords[0].modes.filter(
+    (x) => !checkIsHiddenMode(x)
   ).length;
 
   return (
@@ -114,11 +121,8 @@ export const ChordsView: React.FC = () => {
             noteChord.modes.map((noteChordMode) => {
               const text = getNoteText(noteChord.note);
               const isHidden =
-                (!useSharpChords && text.endsWith("#")) ||
-                (!hasAdvancedChords &&
-                  noteChordMode.mode !== ChordMode.Major &&
-                  noteChordMode.mode !== ChordMode.Minor);
-
+                checkIsHiddenMode(noteChordMode) ||
+                (!useSharpChords && text.endsWith("#"));
               const title = text + getModeText(noteChordMode.mode);
 
               return (

@@ -27,6 +27,8 @@ Object.keys(Note)
     }
   });
 
+export const SHARP_NOTE_COUNT = 5;
+
 const noteLookup: { [key: string]: Note } = {
   E: Note.E,
   F: Note.F,
