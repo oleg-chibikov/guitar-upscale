@@ -91,7 +91,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                 </span>
                 <strong>Premium features:</strong>
                 {
-                  <ul className="flex flex-col items-center">
+                  <ul className="flex flex-col items-start">
                     {premiumFeatureNames.map((x) => (
                       <li key={x}>
                         <span className="text-green-500">✓</span> {x}
