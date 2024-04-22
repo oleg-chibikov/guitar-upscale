@@ -100,7 +100,7 @@ export const AuthPanel: React.FC = () => {
           variant="contained"
           color="primary"
           title="Sign in"
-          style={{ minWidth: 0 }} // override MUI value
+          style={{ minWidth: 0, padding: 6 }} // override MUI value
           className={`flex ${
             chordsDisplayMode === ChordsDisplayMode.Left
               ? "flex-row-reverse"
