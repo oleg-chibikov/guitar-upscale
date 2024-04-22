@@ -1,5 +1,10 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  Instrument,
+  InstrumentGroup,
+  instrumentGroups,
+} from "../data/instruments";
 import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
@@ -46,6 +51,9 @@ interface SettingsState extends WithNeck, WithControls {
   chordPlayMode: ChordPlayMode;
   chordNotesToPlay: number;
   tuning: Tuning;
+  instrument: Instrument;
+  instrumentGroup: InstrumentGroup;
+  reverbStrength: number;
 }
 
 const initialState: SettingsState = {
@@ -66,6 +74,9 @@ const initialState: SettingsState = {
   chordPlayMode: ChordPlayMode.ClosestVariation,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
+  instrument: "acoustic_guitar_nylon",
+  instrumentGroup: "Guitar",
+  reverbStrength: 0.2,
 };
 
 // A value that changes immediately without the need for rerender
@@ -173,6 +184,22 @@ export const settingsSlice = createSlice({
     setChordNotesToPlay(state, action: PayloadAction<number>) {
       state.chordNotesToPlay = action.payload;
     },
+    setInstrument(state, action: PayloadAction<Instrument>) {
+      state.instrument = action.payload;
+    },
+    setInstrumentGroup: (state, action: PayloadAction<InstrumentGroup>) => {
+      // TODO: lazy load instruments.ts if permissions allow
+      const group = action.payload;
+      state.instrumentGroup = group;
+      // Select the first instrument from the group
+      const instrumentsInGroup = instrumentGroups[group];
+      if (instrumentsInGroup && instrumentsInGroup.length > 0) {
+        state.instrument = instrumentsInGroup[0];
+      }
+    },
+    setReverbStrength(state, action: PayloadAction<number>) {
+      state.reverbStrength = action.payload;
+    },
   },
 });
 
@@ -192,6 +219,9 @@ export const {
   setChordPlayMode,
   setChordNotesToPlay,
   setTuning,
+  setInstrument,
+  setInstrumentGroup,
+  setReverbStrength,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

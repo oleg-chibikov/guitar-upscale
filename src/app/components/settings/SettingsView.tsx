@@ -1,5 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { isMobileDevice } from "@/app/helpers/deviceHelper";
 import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import { ReactNode, forwardRef } from "react";
@@ -48,6 +49,7 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
             }}
           />
           {premiumComponents.get("advancedChords") as ReactNode}
+          {premiumComponents.get("instruments") as ReactNode}
           <SwitchToChromaticScaleCheckbox />
           <UseSharpChordsCheckbox />
           <div
@@ -73,6 +75,8 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
             <ChordNotesToPlaySlider />
             <VelocitySlider />
             <MetronomeVelocitySlider />
+            {!isMobileDevice() &&
+              (premiumComponents.get("reverbStrength") as ReactNode)}
           </div>
         </section>
       </Slide>

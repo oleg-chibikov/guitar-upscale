@@ -33,8 +33,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { velocity, neck, chordStrummingDelayMs, baseNote } =
-    useSelector(selectSettings);
+  const {
+    velocity,
+    neck,
+    chordStrummingDelayMs,
+    baseNote,
+    instrument,
+    reverbStrength,
+  } = useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
 
@@ -50,7 +56,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         setIsNoteClicked(false);
         const playNote = (await import("@/app/engine/sound/soundProvider"))
           .playNote;
-        await playNote(stringOctaveNote, velocityValue ?? velocity);
+        await playNote(
+          stringOctaveNote,
+          velocityValue ?? velocity,
+          instrument,
+          reverbStrength
+        );
         setIsNoteClicked(true);
         setTimeout(() => {
           setIsNoteClicked(false);
@@ -75,7 +86,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [stringOctaveNote, velocity]);
+  }, [stringOctaveNote, velocity, instrument, reverbStrength]);
 
   const isColored =
     (isHeader &&

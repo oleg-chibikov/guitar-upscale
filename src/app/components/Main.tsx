@@ -14,14 +14,12 @@ import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
-import { UseAdvancedChordsCheckbox } from "./settings/checkboxes/UseAdvancedChordsChekbox";
 
 // TODO
 // Chord finder!
 // Reverb toggle
 // Better animation on play
 // More chords
-// more instruments + dropdown
 // Ads
 // more examples
 // 7,8 string guitars
@@ -51,6 +49,24 @@ const PremiumPlayButton = dynamic(
     (await import("@/app/components/settings/buttons/PremiumPlayButton"))
       .PremiumPlayButton
 );
+const UseAdvancedChordsCheckbox = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/checkboxes/UseAdvancedChordsCheckbox"
+      )
+    ).UseAdvancedChordsCheckbox
+);
+const InstrumentSelector = dynamic(
+  async () =>
+    (await import("@/app/components/settings/selectors/InstrumentSelector"))
+      .InstrumentSelector
+);
+const ReverbStrengthSlider = dynamic(
+  async () =>
+    (await import("@/app/components/settings/sliders/ReverbStrengthSlider"))
+      .ReverbStrengthSlider
+);
 
 export const premiumFeaturesToMap = (
   features: PremiumFeatures
@@ -66,6 +82,10 @@ export const premiumFeaturesToMap = (
         return <PlaybackTypeSelector />;
       case "advancedChords":
         return <UseAdvancedChordsCheckbox />;
+      case "instruments":
+        return <InstrumentSelector />;
+      case "reverbStrength":
+        return <ReverbStrengthSlider />;
       case "melodies":
         return <PremiumPlayButton />;
       default:

@@ -70,6 +70,8 @@ export type PremiumFeatures = {
   midiRecorder?: boolean;
   playbackTypeSelection?: boolean;
   advancedChords?: boolean;
+  instruments?: boolean;
+  reverbStrength?: boolean;
   skinSelection?: boolean;
   melodies?: boolean;
 };
@@ -90,29 +92,30 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   );
   console.log("Subscription tier", subscriptionTier);
   // Load premium feature only if user is premium
+  const settings = {
+    session,
+    premiumFeatures: {
+      melodies: true,
+      advancedChords: true,
+      instruments: true,
+      reverbStrength: true,
+      playbackTypeSelection: true,
+      subscriptionTier,
+    } as PremiumFeatures,
+  };
   if (subscriptionTier === "Explorer") {
     // Dynamically import premium feature
 
-    return {
-      session,
-      premiumFeatures: {
-        melodies: true,
-        advancedChords: true,
-        playbackTypeSelection: true,
-        subscriptionTier,
-      },
-    };
+    return settings;
   }
 
   if (subscriptionTier === "Composer") {
     return {
-      session,
+      ...settings,
       premiumFeatures: {
+        ...settings.premiumFeatures,
         midiRecorder: true,
-        advancedChords: true,
         skinSelection: true,
-        melodies: true,
-        subscriptionTier,
       },
     };
   }

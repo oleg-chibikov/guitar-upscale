@@ -54,7 +54,7 @@ export const AuthPanel: React.FC = () => {
 
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
       console.log("Signin status mismatch");
-      if (!signInCheckCount || signInCheckCount < 2) {
+      if (signInCheckCount < 2) {
         console.log("Reloading page");
         // check to avoid endless reloads
         localStorage.setItem(
@@ -64,7 +64,7 @@ export const AuthPanel: React.FC = () => {
         location.reload();
       } else {
         console.log("Reload attempts exceeded");
-        localStorage.removeItem("signInCheckCount");
+        //localStorage.removeItem("signInCheckCount");
         dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
         checkError();
       }

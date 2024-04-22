@@ -39,6 +39,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     premiumFeatures.melodies && "Melody examples",
     premiumFeatures.midiRecorder && "MIDI recording",
     premiumFeatures.skinSelection && "Configurable skins",
+    premiumFeatures.instruments && "Configurable instruments",
   ].filter((x) => x) as string[];
 
   const disabledFeatureNames = [
@@ -46,6 +47,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     !premiumFeatures.melodies && "Melody examples",
     !premiumFeatures.midiRecorder && "MIDI recording",
     !premiumFeatures.skinSelection && "Configurable skins",
+    !premiumFeatures.instruments && "Configurable instruments",
   ].filter((x) => x) as string[];
 
   return (
