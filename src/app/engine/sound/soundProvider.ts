@@ -14,7 +14,7 @@ export const initSoundfont = () => {
 
   // if (!isMobileDevice()) {
   // very glitchy on the phone but works fine on web
-  soundfont.output.addEffect("reverb", new Reverb(context), 0.5);
+  soundfont.output.addEffect("reverb", new Reverb(context), 4);
   // }
 };
 
