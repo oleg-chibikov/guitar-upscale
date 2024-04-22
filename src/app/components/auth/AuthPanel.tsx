@@ -42,7 +42,9 @@ export const AuthPanel: React.FC = () => {
     console.log("Session status", session, isSignedIn, signInCheckCount);
 
     if ((isSignedIn && !session) || (session && !isSignedIn)) {
+      console.log("Signin status mismatch");
       if (!signInCheckCount || signInCheckCount < 3) {
+        console.log("Reloading page");
         // check to avoid endless reloads
         localStorage.setItem(
           "signInCheckCount",
@@ -54,12 +56,14 @@ export const AuthPanel: React.FC = () => {
         dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
       }
     } else {
+      console.log("Signin status matched");
       // sign in status in state matches session
       localStorage.removeItem("signInCheckCount");
       const urlParams = new URLSearchParams(window.location.search);
       const errorParam = urlParams.get("auth-error");
 
       if (errorParam) {
+        console.log("Query string container error");
         dispatch(
           setAndShowAlert({ message: "Authentication error", isError: true })
         ); // Assuming you have an action to show the alert with a message
