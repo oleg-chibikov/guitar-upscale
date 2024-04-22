@@ -90,11 +90,11 @@ export function getModeText(mode: ChordMode): string {
     case ChordMode.EleventhMinorMajor:
       return "mM11";
     case ChordMode.Add2:
-      return "add2";
+      return "/2";
     case ChordMode.Add9:
-      return "add9";
+      return "/9";
     case ChordMode.MinorAdd9:
-      return "madd9";
+      return "m/9";
     case ChordMode.Hendrix:
       return "7#9";
   }
