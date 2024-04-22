@@ -1,7 +1,9 @@
 "use client";
 import { getNoteText, parseStringToNotes } from "@/app/data/notes";
+import { PlaybackType } from "@/app/data/playbackType";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
+import { setAndShowAlert } from "@/app/store/uiSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -9,13 +11,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  PlaybackType,
   isMetronomeTicking,
   selectSettings,
   setTempoBpm,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
-import { setAndShowAlert } from "@/app/store/uiSlice";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;

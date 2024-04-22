@@ -1,5 +1,5 @@
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChordPlayMode } from "../data/chordPlayMode";
 import {
   Chord,
   getNoteText,
@@ -8,6 +8,7 @@ import {
   parseStringToNotes,
   Tuning,
 } from "../data/notes";
+import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import {
   generateAllChords,
@@ -22,12 +23,6 @@ import {
 } from "../engine/generateNeckRepresentation";
 import { setBpm } from "../engine/mainClock";
 import { RootState } from "./store"; // Define RootState type
-
-export enum PlaybackType {
-  Melody,
-  Scale,
-  FullStringScale,
-}
 
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;

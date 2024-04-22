@@ -1,11 +1,8 @@
 "use client";
+import { PlaybackType } from "@/app/data/playbackType";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  PlaybackType,
-  selectSettings,
-  setPlaybackType,
-} from "../../../store/settingsSlice";
+import { selectSettings, setPlaybackType } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const PlaybackTypeSelector: React.FC = () => {
