@@ -76,7 +76,7 @@ export const AuthPanel: React.FC = () => {
           variant="contained"
           color="primary"
           title="Sign in"
-          style={{ minWidth: 0, padding: 4 }} // override MUI value
+          style={{ minWidth: 0 }} // override MUI value
           className={`flex ${
             chordsDisplayMode === ChordsDisplayMode.Left
               ? "flex-row-reverse"
@@ -101,13 +101,13 @@ export const AuthPanel: React.FC = () => {
             chordsDisplayMode === ChordsDisplayMode.Left
               ? "flex-row-reverse"
               : "flex-row"
-          } gap-2`}
+          } gap-0`}
           style={{ minWidth: 0, padding: 4 }} // override MUI value
           title={session.user.name + ": " + session.user.email}
           onClick={handleOpenModal} // Open modal on avatar click
         >
           <span
-            className={`hidden sm:block ${
+            className={`hidden px-2 sm:block ${
               theme === Theme.Light
                 ? "text-foreground-light"
                 : "text-foreground-dark"
