@@ -108,7 +108,9 @@ export const Fretboard: React.FC = () => {
     <section
       className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
-        height: maxHeight * fretboardScaleY - 100,
+        height:
+          maxHeight * fretboardScaleY +
+          (maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? -100 : 100),
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
