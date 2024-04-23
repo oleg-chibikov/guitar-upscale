@@ -4,6 +4,8 @@ import {
   InstrumentGroup,
   instrumentGroups,
 } from "@/app/data/instruments";
+import { MAX_VELOCITY, Note } from "@/app/data/notes";
+import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   selectSettings,
@@ -22,8 +24,9 @@ const InstrumentSelector: React.FC = () => {
     dispatch(setInstrumentGroup(group));
   };
 
-  const handleInstrumentChange = (value: string) => {
+  const handleInstrumentChange = async (value: string) => {
     dispatch(setInstrument(value as Instrument));
+    await playNote({ note: Note.E, octave: 5 }, MAX_VELOCITY, instrument, 0);
   };
 
   const group: Instrument[] = instrumentGroups[instrumentGroup];
