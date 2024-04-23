@@ -28,19 +28,22 @@ export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
         !settingsRef.current.contains(event.target as Node)
       ) {
         let target = event.target as Node | null;
-        let isInsideOpenSettingsButton = false;
+        let isInsideButton = false;
 
-        // make sure we don't click on the open-settings-button too as it opens the view back
+        // if the user clicks on any button or on chords - don't hide the settings, use standard action for this button
         while (target && target !== document) {
-          if (target === document.getElementById("open-settings-button")) {
-            isInsideOpenSettingsButton = true;
+          if (
+            target.nodeName === "BUTTON" ||
+            (target as HTMLElement)?.getAttribute("id") === "chords-view"
+          ) {
+            isInsideButton = true;
             break;
           }
           target = target.parentNode;
         }
 
-        if (!isInsideOpenSettingsButton) {
-          // Clicked outside of settings and not on or within the open-settings-button, hide the settings
+        if (!isInsideButton) {
+          // Clicked outside of settings and not on or within the button, hide the settings
           dispatch(setSettingsExpanded(false));
         }
       }

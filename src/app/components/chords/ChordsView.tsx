@@ -68,6 +68,7 @@ export const ChordsView: React.FC = () => {
 
   return (
     <section
+      id="chords-view"
       className={`opacity-95 fixed ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } z-20 bottom-1 ${
