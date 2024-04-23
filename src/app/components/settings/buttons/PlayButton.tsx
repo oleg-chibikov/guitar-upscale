@@ -4,6 +4,7 @@ import { PlaybackType } from "@/app/data/playbackType";
 import { parseStringToNotes } from "@/app/data/tunings";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
+import { playWholeScale } from "@/app/engine/player";
 import { initSoundfont } from "@/app/engine/sound/soundHelper";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
@@ -112,8 +113,9 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
             isFullStringScalePlayback ? " (full string)" : ""
           }`
         );
-        const playWholeScale = (await import("@/app/engine/player"))
-          .playWholeScale;
+        // it's easier to just preload this module straight away given that we might need it when there is no example
+        // const playWholeScale = (await import("@/app/engine/player"))
+        //   .playWholeScale;
         await playWholeScale(
           waitForNextTick,
           neck,
