@@ -4,20 +4,21 @@ import {
   InstrumentGroup,
   instrumentGroups,
 } from "@/app/data/instruments";
-import { MAX_VELOCITY, Note } from "@/app/data/notes";
+import { Note } from "@/app/data/notes";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   selectSettings,
   setInstrument,
   setInstrumentGroup,
+  velocityValue,
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SelectWrapper } from "./SelectWrapper";
 
 const InstrumentSelector: React.FC = () => {
-  const { instrument, instrumentGroup, reverbStrength } =
+  const { instrument, instrumentGroup, reverbStrength, velocity } =
     useSelector(selectSettings);
   const dispatch = useDispatch();
 
@@ -29,8 +30,8 @@ const InstrumentSelector: React.FC = () => {
     dispatch(setInstrument(value as Instrument));
     await playNote(
       { note: Note.E, octave: 5 },
-      MAX_VELOCITY,
-      instrument,
+      velocityValue ?? velocity,
+      value,
       reverbStrength
     );
   };
