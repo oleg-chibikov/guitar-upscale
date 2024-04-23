@@ -1,25 +1,37 @@
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
+import { quarterBeatToMilliseconds } from "./mainClock";
+import { playNote } from "./sound/soundProvider";
+
+export type PlayNoteParams = PlayParams & {
+  stringOctaveNote: StringOctaveNote;
+};
+
+export type PlayParams = {
+  instrument: Instrument;
+  velocity: number;
+  reverbStrength: number;
+  tempoBpm: number;
+};
 
 export type TrackMetadata = {
   trackNumber?: number;
   instrument?: Instrument;
 };
 
-export type NoteMetadata = TrackMetadata & {
-  fromChord?: boolean;
+export type ClearNoteMetadata = {
   clearChordMarker?: boolean;
 };
+
+export type NoteMetadata = TrackMetadata &
+  PlayNoteParams & {
+    fromChord?: boolean;
+  };
 
 export type ChordMetadata = TrackMetadata & {
   notesToPlay?: number;
   strummingDelayMs?: number;
-};
-
-export type NoteWithPlayMetadata = {
-  note: StringOctaveNote;
-  metadata: NoteMetadata;
 };
 
 export type ChordWithPlayMetadata = {
@@ -32,13 +44,13 @@ type Tick = {
   tick: number;
 };
 
-export const NotePlayEventBus = new Subject<NoteWithPlayMetadata>();
+export const NotePlayEventBus = new Subject<NoteMetadata>();
 export const ChordEventBus = new Subject<ChordWithPlayMetadata>();
 export const MetronomeEventBus = new Subject<Tick>();
 
 export const NoteToFretMarkerEventMap: Map<
   string,
-  (metadata: NoteMetadata) => void
+  (metadata: NoteMetadata | ClearNoteMetadata) => void
 > = new Map<string, () => void>();
 
 export const ChordToChordButtonEventMap: Map<
@@ -50,18 +62,39 @@ export const ClearChordMarkerSet: Set<string> = new Set<string>();
 
 let lastChord: string | undefined;
 
-NotePlayEventBus.subscribe(async (noteWithMetadata: NoteWithPlayMetadata) => {
-  const serialized = serializeStringOctaveNote(noteWithMetadata.note);
+const play = async ({
+  stringOctaveNote,
+  instrument,
+  velocity,
+  reverbStrength,
+  tempoBpm,
+}: PlayNoteParams) => {
+  // This module is essential and should be loaded asap, so I commented out lazy loading here
+  // const playNote = (await import("@/app/engine/sound/soundProvider"))
+  //   .playNote;
+  await playNote(
+    stringOctaveNote,
+    velocity,
+    instrument,
+    // instrumentRef.current ?? instrument,
+    reverbStrength,
+    quarterBeatToMilliseconds(tempoBpm)
+  );
+};
+
+NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
+  const serialized = serializeStringOctaveNote(noteMetadata.stringOctaveNote);
+  play(noteMetadata);
   console.log("EventBus: Note play requested: " + serialized);
-  const playAction = NoteToFretMarkerEventMap.get(serialized);
-  if (noteWithMetadata.metadata.fromChord && playAction) {
+  const animateAction = NoteToFretMarkerEventMap.get(serialized);
+  if (noteMetadata.fromChord && animateAction) {
     ClearChordMarkerSet.add(serialized);
   }
 
   const midiRecorder = (await import("./midiRecorder")).midiRecorder;
-  midiRecorder.addNoteToMidiTrack(noteWithMetadata.note);
+  midiRecorder.addNoteToMidiTrack(noteMetadata.stringOctaveNote);
 
-  playAction?.(noteWithMetadata.metadata);
+  animateAction?.(noteMetadata);
 });
 
 export const clearPreviousChords = () => {
@@ -69,7 +102,6 @@ export const clearPreviousChords = () => {
     const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
     noteFromThePreviousChordAction?.({
       clearChordMarker: true,
-      trackNumber: 0,
     });
   }
   ClearChordMarkerSet.clear(); // clear previous chord;

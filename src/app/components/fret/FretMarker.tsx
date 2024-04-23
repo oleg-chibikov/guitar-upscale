@@ -1,7 +1,4 @@
-import { Instrument } from "@/app/data/instruments";
 import { Theme } from "@/app/data/theme";
-import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
-import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -12,8 +9,11 @@ import {
   serializeStringOctaveNote,
 } from "../../data/notes";
 import {
+  ClearNoteMetadata,
+  NoteMetadata,
   NotePlayEventBus,
   NoteToFretMarkerEventMap,
+  PlayNoteParams,
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
@@ -77,25 +77,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
-  const instrumentRef = useRef<Instrument>();
 
   useEffect(() => {
     // Function to play note and start animation
-    const playNoteAndAnimate = async () => {
+    const animate = () => {
       if (stringOctaveNote) {
-        setIsNoteClicked(false);
-
-        // This module is essential and should be loaded asap, so I commented out lazy loading here
-        // const playNote = (await import("@/app/engine/sound/soundProvider"))
-        //   .playNote;
-        await playNote(
-          stringOctaveNote,
-          velocityValue ?? velocity,
-          instrument,
-          // instrumentRef.current ?? instrument,
-          reverbStrength,
-          quarterBeatToMilliseconds(tempoBpm)
-        );
         setIsNoteClicked(true);
         setTimeout(() => {
           setIsNoteClicked(false);
@@ -106,17 +92,16 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
       NoteToFretMarkerEventMap.set(key, (metadata) => {
-        if (metadata.trackNumber) {
-          trackNumberRef.current = metadata.trackNumber;
-        }
-        if (metadata.instrument) {
-          instrumentRef.current = metadata.instrument;
-        }
-        if (metadata.clearChordMarker) {
+        if ((metadata as ClearNoteMetadata).clearChordMarker) {
           setIsFromPreviousChord(false);
         } else {
-          playNoteAndAnimate();
-          if (metadata.fromChord) {
+          const noteMetadata = metadata as NoteMetadata;
+
+          // it may come from several tracks for the same note simutaneously
+          trackNumberRef.current = noteMetadata.trackNumber;
+
+          animate();
+          if (noteMetadata.fromChord) {
             setIsFromPreviousChord(true);
           }
         }
@@ -134,6 +119,16 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       coloredHeaders.has(stringOctaveNote?.fret)) ||
     stringOctaveNote?.note === baseNote;
 
+  const getPlayParams = (
+    stringOctaveNote: StringOctaveNote
+  ): PlayNoteParams => ({
+    stringOctaveNote,
+    instrument,
+    reverbStrength,
+    tempoBpm,
+    velocity: velocityValue ?? velocity,
+  });
+
   const handlePress = async () => {
     if (isHeader) {
       if (!neck) {
@@ -144,7 +139,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         const string = neck[stringIndex];
         const note = string[fret];
         if (note) {
-          NotePlayEventBus.next({ note, metadata: { fromChord: false } });
+          NotePlayEventBus.next({
+            ...getPlayParams(note),
+            fromChord: false,
+          });
           await sleep(chordStrummingDelayMs);
         }
       }
@@ -153,8 +151,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
     if (stringOctaveNote) {
       NotePlayEventBus.next({
-        note: stringOctaveNote,
-        metadata: { fromChord: false },
+        ...getPlayParams(stringOctaveNote),
+        fromChord: false,
       });
     }
   };

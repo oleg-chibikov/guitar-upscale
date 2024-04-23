@@ -1,6 +1,6 @@
-import { Example } from "@/app/data/scaleExamples";
 import { useEffect, useState } from "react";
 import { usePremiumFeatures } from "../context/PremiumFeaturesProvider";
+import { Example } from "../data/example";
 
 export const useExamples = () => {
   const premiumFeatures = usePremiumFeatures();

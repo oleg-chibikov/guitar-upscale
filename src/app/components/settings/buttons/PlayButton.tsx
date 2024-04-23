@@ -1,10 +1,11 @@
 "use client";
+import { Example } from "@/app/data/example";
 import { getNoteText } from "@/app/data/notes";
 import { PlaybackType } from "@/app/data/playbackType";
 import { parseStringToNotes } from "@/app/data/tunings";
+import { PlayParams } from "@/app/engine/eventBus";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
-import { playWholeScale } from "@/app/engine/player";
 import { initMetronome } from "@/app/engine/sound/metronomeProvider";
 import { initSoundfont } from "@/app/engine/sound/soundHelper";
 import { setAndShowAlert } from "@/app/store/uiSlice";
@@ -18,6 +19,7 @@ import {
   isMetronomeTicking,
   selectSettings,
   setTempoBpm,
+  velocityValue,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
@@ -25,7 +27,7 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
 interface PlayButtonProps {
-  onPlayExample?: (params: PlayExampleParameters) => Promise<boolean>;
+  onPlayExample?: (params: PlayExampleParameters) => Promise<void>;
 }
 
 let isCurrentlyPlaying: boolean;
@@ -46,6 +48,8 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     playbackType,
     instrument,
     reverbStrength,
+    velocity,
+    tempoBpm,
   } = useSelector(selectSettings);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
@@ -53,9 +57,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
   const dispatch = useDispatch();
 
   const waitForProperStartTime = async () => {
-    setIsWaiting(true);
-    isCurrentlyPlaying = true;
-
     if (isMetronomeTicking) {
       console.log("Waiting for the next beat");
       await waitForNextBeat();
@@ -68,6 +69,16 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     setIsPlaying(true);
   };
 
+  const getPlayParams = useCallback(
+    (): PlayParams => ({
+      instrument,
+      reverbStrength,
+      tempoBpm,
+      velocity: velocityValue ?? velocity,
+    }),
+    [instrument, reverbStrength, tempoBpm, velocity]
+  );
+
   const handlePlay = useCallback(async () => {
     if (!neck) {
       return;
@@ -78,6 +89,18 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
       isCurrentlyPlaying = false;
       return;
     }
+    setIsWaiting(true);
+    isCurrentlyPlaying = true;
+
+    let examples: Example[] | undefined;
+    let playWholeScale;
+    if (onPlayExample) {
+      const { getScaleExamples } = await import("@/app/data/scaleExamples");
+      examples = await getScaleExamples(scaleGroup, scale, reverbStrength);
+    } else {
+      await import("@/app/engine/player");
+    }
+
     // the instrument should be initialized before waiting for the first note
     await initSoundfont(instrument, reverbStrength);
     // init metronome here as we don't want to get glitches if it gets turned on during playing
@@ -93,35 +116,31 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
       console.log("Start playing");
       const dispatchAlert = (message: string) =>
         dispatch(setAndShowAlert({ message, isError: false }));
-      let examplePlayed: boolean = false;
-      if (onPlayExample && playbackType === melodyType) {
-        const params: PlayExampleParameters = {
+      if (onPlayExample && examples && playbackType === melodyType) {
+        await onPlayExample({
           baseNote,
-          scaleGroup,
-          scale,
+          examples,
           waitNote: waitForNextTick,
+          playParams: getPlayParams(),
           neck,
           tuning: parseStringToNotes(tuning),
           isCurrentlyPlaying: getIsCurrentlyPlaying,
           showAlert: dispatchAlert,
           setTempo: (x: number) => dispatch(setTempoBpm(x)),
-        };
-        examplePlayed = await onPlayExample(params);
-      }
-
-      if (!examplePlayed) {
+        });
+      } else {
         const isFullStringScalePlayback = playbackType === fullStringScaleType;
         dispatchAlert(
           `${getNoteText(baseNote)} ${scale} ${
             isFullStringScalePlayback ? " (full string)" : ""
           }`
         );
-        // it's easier to just preload this module straight away given that we might need it when there is no example
-        // const playWholeScale = (await import("@/app/engine/player"))
-        //   .playWholeScale;
+
+        const { playWholeScale } = await import("@/app/engine/player");
         await playWholeScale(
           waitForNextTick,
           neck,
+          getPlayParams(),
           getIsCurrentlyPlaying,
           isFullStringScalePlayback
         );
@@ -136,6 +155,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     instrument,
     neck,
     onPlayExample,
+    getPlayParams,
     playbackType,
     reverbStrength,
     scale,

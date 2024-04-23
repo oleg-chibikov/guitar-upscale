@@ -1,17 +1,17 @@
+import { Example } from "../data/example";
 import { Note, OctaveNote } from "../data/notes";
-import { getScaleExamples } from "../data/scaleExamples";
 import { parseStringToNotes } from "../data/tunings";
-import { ChordEventBus, NotePlayEventBus } from "./eventBus";
+import { ChordEventBus, NotePlayEventBus, PlayParams } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
 
 export type PlayExampleParameters = {
   baseNote: Note;
-  scaleGroup: string;
-  scale: string;
+  examples: Example[];
   waitNote: () => Promise<void>;
   neck: Neck;
   tuning: OctaveNote[];
+  playParams: PlayParams;
   isCurrentlyPlaying: () => boolean;
   showAlert: (message: string) => void;
   setTempo: (tempoBpm: number) => void;
@@ -19,11 +19,11 @@ export type PlayExampleParameters = {
 
 export const playExample = async ({
   baseNote,
-  scaleGroup,
-  scale,
+  examples,
   waitNote,
   neck,
   tuning,
+  playParams,
   isCurrentlyPlaying,
   showAlert,
   setTempo,
@@ -33,12 +33,7 @@ export const playExample = async ({
     return array[randomIndex];
   }
 
-  const examplesForScale = getScaleExamples(scaleGroup, scale);
-  if (!examplesForScale) {
-    return false;
-  }
-
-  const randomExample = getRandomRecord(examplesForScale);
+  const randomExample = getRandomRecord(examples);
   showAlert(randomExample.band + " - " + randomExample.title);
 
   if (randomExample.tempo) {
@@ -53,12 +48,11 @@ export const playExample = async ({
           "Requesting auto play note in a melody: " + JSON.stringify(note)
         );
         NotePlayEventBus.next({
-          note,
-          metadata: {
-            fromChord: false,
-            trackNumber,
-            instrument: track.instrument,
-          },
+          ...playParams,
+          fromChord: false,
+          trackNumber,
+          instrument: track.instrument ?? playParams.instrument,
+          stringOctaveNote: note,
         });
       },
       (chordToPlay) => {
@@ -81,6 +75,4 @@ export const playExample = async ({
     )
   );
   await Promise.all(trackPromises);
-
-  return true;
 };

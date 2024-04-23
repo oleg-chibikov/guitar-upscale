@@ -1,6 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
@@ -16,9 +16,10 @@ import {
   ChordEventBus,
   ChordMetadata,
   ChordToChordButtonEventMap,
+  PlayParams,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectSettings } from "../../store/settingsSlice";
+import { selectSettings, velocityValue } from "../../store/settingsSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -31,12 +32,29 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
-  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
-    useSelector(selectSettings);
+  const {
+    chordPlayMode,
+    chordStrummingDelayMs,
+    chordNotesToPlay,
+    instrument,
+    reverbStrength,
+    velocity,
+    tempoBpm,
+  } = useSelector(selectSettings);
   const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
   const [pressed, setPressed] = useState(false);
+
+  const getPlayParams = useCallback(
+    (): PlayParams => ({
+      instrument,
+      reverbStrength,
+      tempoBpm,
+      velocity: velocityValue ?? velocity,
+    }),
+    [instrument, reverbStrength, tempoBpm, velocity]
+  );
 
   useEffect(() => {
     const handleChordEvent = async (metadata: ChordMetadata) => {
@@ -56,6 +74,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         chordName,
         noteChordMode,
         delayMs,
+        playParams: getPlayParams(),
         notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
         trackNumber: metadata.trackNumber,
         instrument: metadata.instrument,
@@ -94,6 +113,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     chordNotesToPlay,
     disabled,
     noteChordMode,
+    getPlayParams,
   ]);
 
   if (isHidden) {

@@ -1,5 +1,5 @@
+import { Track } from "../data/example";
 import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
-import { Track } from "../data/scaleExamples";
 import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 const convertChord = (chord: string, note: Note): string => {
