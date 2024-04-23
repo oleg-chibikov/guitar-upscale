@@ -5,6 +5,7 @@ import { parseStringToNotes } from "@/app/data/tunings";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
 import { playWholeScale } from "@/app/engine/player";
+import { initMetronome } from "@/app/engine/sound/metronomeProvider";
 import { initSoundfont } from "@/app/engine/sound/soundHelper";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
@@ -79,6 +80,8 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     }
     // the instrument should be initialized before waiting for the first note
     await initSoundfont(instrument, reverbStrength);
+    // init metronome here as we don't want to get glitches if it gets turned on during playing
+    await initMetronome();
     ReactGA.event({
       category: "Playback",
       action: "Playback started",

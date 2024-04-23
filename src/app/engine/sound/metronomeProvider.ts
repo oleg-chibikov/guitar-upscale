@@ -1,6 +1,10 @@
 import { MAX_VELOCITY, Note, OctaveNote } from "../../data/notes";
 import { initSoundfont, playSound } from "./soundHelper";
 
+export const initMetronome = async () => {
+  return await initSoundfont("woodblock", 0);
+};
+
 export const playMetronomeTick = async (
   isAccented: boolean,
   baseVelocity: number
@@ -13,7 +17,7 @@ export const playMetronomeTick = async (
   playSound(
     metronomeTickNote,
     Math.min(baseVelocity + (isAccented ? 20 : 0), MAX_VELOCITY),
-    await initSoundfont("woodblock", 0),
+    await initMetronome(),
     1000
   );
 };
