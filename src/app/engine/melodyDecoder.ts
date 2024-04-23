@@ -106,6 +106,8 @@ export const decodeMelody = async (
     }
     const char = melody[index];
     const nextChar = index !== melody.length - 1 && melody[index + 1];
+    const nextSecondChar = index !== melody.length - 2 && melody[index + 2];
+    const nextThirdChar = index !== melody.length - 3 && melody[index + 3];
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
     const playChordAndReset = () => {
@@ -202,7 +204,15 @@ export const decodeMelody = async (
             index = indexToRepeat; // returning to the beginning of the pattern
           }
         } else {
-          repeatCount = nextChar ? parseInt(nextChar) - 1 : 0;
+          if (!nextChar) {
+            repeatCount = 0;
+          } else {
+            repeatCount =
+              nextSecondChar === "-" && nextThirdChar //support repetition > 10 and < 100
+                ? parseInt(nextChar + nextThirdChar) - 1
+                : parseInt(nextChar) - 1;
+          }
+
           repeatCount--;
           index = indexToRepeat; // returning to the beginning of the pattern
         }
