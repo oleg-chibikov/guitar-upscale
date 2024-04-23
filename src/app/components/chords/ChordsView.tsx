@@ -101,7 +101,7 @@ export const ChordsView: React.FC = () => {
             padding: 4,
             paddingTop: 10, // give area to tap top chords
             maxWidth: height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? 220 : "100vw", // when height is large there's enough space under the guitar to show full chords
-            maxHeight: Math.min(300, height - authPanelHeightReserved),
+            maxHeight: Math.min(310, height - authPanelHeightReserved),
             gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
             gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
