@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run open-browser && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "open-browser": "start http://localhost:3000",
     "deploy-surge": "surge --domain https://guitar-upscale.surge.sh dist/",
     "deploy-surge-org.uk": "surge --domain guitar-upscale.org.uk dist/",
     "deploy-surge-co.uk": "surge --domain guitar-upscale.co.uk dist/",

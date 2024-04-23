@@ -6,11 +6,13 @@ import { Reverb, Soundfont } from "smplr";
 export const playSound = (
   note: OctaveNote,
   velocity: number,
-  soundfont: Soundfont
+  soundfont: Soundfont,
+  durationMs: number
 ) => {
   return soundfont.start({
     note: getNoteText(note.note) + note.octave,
     velocity: velocity,
+    duration: durationMs / 1000,
   });
 };
 

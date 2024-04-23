@@ -91,11 +91,6 @@ export const uiSlice = createSlice({
     },
     hideAlert(state) {
       state.showAlert = false;
-      // Allow animation to finish first
-      setTimeout(() => {
-        state.alertMessage = "";
-        state.alertIsError = false;
-      }, 300);
     },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;

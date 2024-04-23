@@ -5,6 +5,7 @@ import {
   instrumentGroups,
 } from "@/app/data/instruments";
 import { Note } from "@/app/data/notes";
+import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
@@ -18,12 +19,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { SelectWrapper } from "./SelectWrapper";
 
 const InstrumentSelector: React.FC = () => {
-  const { instrument, instrumentGroup, reverbStrength, velocity } =
+  const { instrument, instrumentGroup, reverbStrength, velocity, tempoBpm } =
     useSelector(selectSettings);
   const dispatch = useDispatch();
 
-  const handleGroupChange = (group: InstrumentGroup) => {
+  const handleGroupChange = async (group: InstrumentGroup) => {
     dispatch(setInstrumentGroup(group));
+
+    // Select the first instrument from the group
+    const instrumentsInGroup = instrumentGroups[group];
+    if (instrumentsInGroup && instrumentsInGroup.length > 0) {
+      await handleInstrumentChange(instrumentsInGroup[0]);
+    }
   };
 
   const handleInstrumentChange = async (value: string) => {
@@ -32,7 +39,8 @@ const InstrumentSelector: React.FC = () => {
       { note: Note.E, octave: 5 },
       velocityValue ?? velocity,
       value,
-      reverbStrength
+      reverbStrength,
+      quarterBeatToMilliseconds(tempoBpm)
     );
   };
 

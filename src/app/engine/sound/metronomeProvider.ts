@@ -13,6 +13,7 @@ export const playMetronomeTick = async (
   playSound(
     metronomeTickNote,
     Math.min(baseVelocity + (isAccented ? 20 : 0), MAX_VELOCITY),
-    await initSoundfont("woodblock", 0)
+    await initSoundfont("woodblock", 0),
+    1000
   );
 };

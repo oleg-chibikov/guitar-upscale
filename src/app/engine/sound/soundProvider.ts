@@ -6,7 +6,13 @@ export const playNote = async (
   note: OctaveNote,
   velocity: number,
   instrument: Instrument,
-  reverbStrength: number
+  reverbStrength: number,
+  durationMs: number
 ) => {
-  playSound(note, velocity, await initSoundfont(instrument, reverbStrength));
+  playSound(
+    note,
+    velocity,
+    await initSoundfont(instrument, reverbStrength),
+    durationMs
+  );
 };

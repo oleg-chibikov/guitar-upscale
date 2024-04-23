@@ -1,4 +1,5 @@
 import { Theme } from "@/app/data/theme";
+import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useState } from "react";
@@ -41,6 +42,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     baseNote,
     instrument,
     reverbStrength,
+    tempoBpm,
   } = useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
@@ -63,7 +65,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           stringOctaveNote,
           velocityValue ?? velocity,
           instrument,
-          reverbStrength
+          reverbStrength,
+          quarterBeatToMilliseconds(tempoBpm)
         );
         setIsNoteClicked(true);
         setTimeout(() => {
@@ -89,7 +92,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [stringOctaveNote, velocity, instrument, reverbStrength]);
+  }, [stringOctaveNote, velocity, instrument, reverbStrength, tempoBpm]);
 
   const isColored =
     (isHeader &&

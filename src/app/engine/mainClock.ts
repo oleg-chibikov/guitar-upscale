@@ -1,7 +1,11 @@
 import { MetronomeEventBus } from "./eventBus";
 
-const bpmToMilliseconds = (bpm: number): number => {
+export const bpmToMilliseconds = (bpm: number): number => {
   return 60000 / bpm / 2;
+};
+
+export const quarterBeatToMilliseconds = (bpm: number): number => {
+  return bpmToMilliseconds(bpm) * 4;
 };
 
 let resolveCurrentPromiseForNextTick: (value: void | PromiseLike<void>) => void;

@@ -1,10 +1,6 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  Instrument,
-  InstrumentGroup,
-  instrumentGroups,
-} from "../data/instruments";
+import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
@@ -191,11 +187,6 @@ export const settingsSlice = createSlice({
       // TODO: lazy load instruments.ts if permissions allow
       const group = action.payload;
       state.instrumentGroup = group;
-      // Select the first instrument from the group
-      const instrumentsInGroup = instrumentGroups[group];
-      if (instrumentsInGroup && instrumentsInGroup.length > 0) {
-        state.instrument = instrumentsInGroup[0];
-      }
     },
     setReverbStrength(state, action: PayloadAction<number>) {
       state.reverbStrength = action.payload;
