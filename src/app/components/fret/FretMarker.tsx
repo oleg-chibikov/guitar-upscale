@@ -1,4 +1,5 @@
 import { Theme } from "@/app/data/theme";
+import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -54,8 +55,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const playNoteAndAnimate = async () => {
       if (stringOctaveNote) {
         setIsNoteClicked(false);
-        const playNote = (await import("@/app/engine/sound/soundProvider"))
-          .playNote;
+
+        // This module is essential and should be loaded asap, so I commented out lazy loading here
+        // const playNote = (await import("@/app/engine/sound/soundProvider"))
+        //   .playNote;
         await playNote(
           stringOctaveNote,
           velocityValue ?? velocity,

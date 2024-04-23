@@ -11,8 +11,12 @@ export const MetronomeVelocitySlider: React.FC = () => {
   const { metronomeVelocity } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
-  const handleSliderChange = (value: number) => {
+  const handleSliderChange = async (value: number) => {
     dispatch(setMetronomeVelocity(value));
+    const playMetronomeTick = (
+      await import("@/app/engine/sound/metronomeProvider")
+    ).playMetronomeTick;
+    await playMetronomeTick(true, value);
   };
 
   return (
