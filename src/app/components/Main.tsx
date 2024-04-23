@@ -17,7 +17,8 @@ import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 
 // TODO
 // Chord finder!
-// Reverb toggle
+// Several tracks for examples - highlight with different colors
+// Midi upload and play
 // Better animation on play
 // More chords
 // Ads
@@ -26,8 +27,7 @@ import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 // Feedback form
 // get the formula to avoid hardcoding each string height offset
 // youtube videos for each scale
-// High string bottom mode
-// make sure https://guitar-upscale.org.uk/api/auth/signin?error=OAuthCallback doesn't report Dangerous
+// High string at the bottom mode
 
 const RecordButton = dynamic(
   async () =>

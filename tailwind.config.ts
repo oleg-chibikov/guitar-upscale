@@ -80,10 +80,6 @@ const config: Config = {
           light: "#dadada",
           dark: "#8c8c8c",
         },
-        animation_blast: {
-          light: "#e6cc5c",
-          dark: "#547fc4",
-        },
       },
       fontFamily: {
         mono: [

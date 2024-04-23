@@ -1,12 +1,16 @@
 import { Subject } from "rxjs";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
 
-export type NoteMetadata = {
+export type WithTrackNumber = {
+  trackNumber?: number;
+};
+
+export type NoteMetadata = WithTrackNumber & {
   fromChord?: boolean;
   clearChordMarker?: boolean;
 };
 
-export type ChordMetadata = {
+export type ChordMetadata = WithTrackNumber & {
   notesToPlay?: number;
   strummingDelayMs?: number;
 };
@@ -61,7 +65,10 @@ NotePlayEventBus.subscribe(async (noteWithMetadata: NoteWithPlayMetadata) => {
 export const clearPreviousChords = () => {
   for (const note of Array.from(ClearChordMarkerSet)) {
     const noteFromThePreviousChordAction = NoteToFretMarkerEventMap.get(note);
-    noteFromThePreviousChordAction?.({ clearChordMarker: true });
+    noteFromThePreviousChordAction?.({
+      clearChordMarker: true,
+      trackNumber: 0,
+    });
   }
   ClearChordMarkerSet.clear(); // clear previous chord;
 };

@@ -2,7 +2,7 @@ import { Theme } from "@/app/data/theme";
 import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../data/noteDisplayMode";
 import {
@@ -28,6 +28,30 @@ interface FretMarkerProps {
   isHeader?: boolean;
 }
 
+const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
+  const lightColors = [
+    "bg-amber-400",
+    "bg-green-400",
+    "bg-cyan-400",
+    "bg-blue-400",
+    "bg-violet-400",
+    "bg-pink-400",
+  ];
+  const darkColors = [
+    "bg-sky-600",
+    "bg-fuchsia-600",
+    "bg-rose-600",
+    "bg-indigo-600",
+    "bg-emerald-600",
+    "bg-lime-600",
+  ];
+
+  const colorIndex = (trackNumber ?? 0) % lightColors.length; // Map trackNumber to index in the colors array
+  const colorClass =
+    theme === Theme.Light ? lightColors[colorIndex] : darkColors[colorIndex];
+  return colorClass;
+};
+
 export const FretMarker: React.FC<FretMarkerProps> = ({
   fret,
   width,
@@ -51,6 +75,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const [isFromPreviousChord, setIsFromPreviousChord] =
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
+  const trackNumberRef = useRef<number>();
 
   useEffect(() => {
     // Function to play note and start animation
@@ -78,6 +103,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
       NoteToFretMarkerEventMap.set(key, (metadata) => {
+        if (metadata.trackNumber) {
+          trackNumberRef.current = metadata.trackNumber;
+        }
         if (metadata.clearChordMarker) {
           setIsFromPreviousChord(false);
         } else {
@@ -241,11 +269,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 width: `${5 * fretboardScaleX}px`, // Set width based on fretboard scaling
                 height: `${5 * fretboardScaleY}px`, // Set height based on fretboard scaling
               }}
-              className={`${
-                theme === Theme.Light
-                  ? "bg-animation_blast-light"
-                  : "bg-animation_blast-dark"
-              } animate-blast absolute z-10 rounded-3xl`}
+              className={`${getColorClass(
+                trackNumberRef.current,
+                theme
+              )} animate-blast absolute z-10 rounded-3xl`}
             />
           )}
         </>

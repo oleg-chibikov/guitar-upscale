@@ -30,14 +30,20 @@ const convertChord = (chord: string, note: Note): string => {
   return newChord;
 };
 
+export type PlayNoteCallback = (
+  note: StringOctaveNote,
+  trackNumber: number
+) => void;
+
 const playNote = async (
   baseNote: Note,
+  trackNumber: number,
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
   fretNumberBuilder: string,
   neck: Neck,
   stringNumber: number,
-  play: (note: StringOctaveNote) => void,
+  play: PlayNoteCallback,
   wait?: () => Promise<void>
 ) => {
   const stringTuning = tuning[stringNumber]; // Get the custom tuning for the string
@@ -56,16 +62,17 @@ const playNote = async (
   const string = neck[stringNumber];
   const stringOctaveNote = string[fret];
   if (stringOctaveNote) {
-    await playStringOctaveNote(stringOctaveNote, play, wait);
+    await playStringOctaveNote(stringOctaveNote, trackNumber, play, wait);
   }
 };
 
 const playStringOctaveNote = async (
   stringOctaveNote: StringOctaveNote,
-  play: (note: StringOctaveNote) => void,
+  trackNumber: number,
+  play: PlayNoteCallback,
   wait?: () => Promise<void>
 ) => {
-  play(stringOctaveNote);
+  play(stringOctaveNote, trackNumber);
   if (wait) {
     await wait();
   }
@@ -73,7 +80,8 @@ const playStringOctaveNote = async (
 
 export const decodeMelody = async (
   melody: string,
-  play: (note: StringOctaveNote) => void,
+  trackNumber: number,
+  play: PlayNoteCallback,
   waitNote: () => Promise<void>,
   neck: Neck,
   scriptTuning: OctaveNote[],
@@ -110,7 +118,11 @@ export const decodeMelody = async (
 
         ChordEventBus.next({
           chord: newChord,
-          metadata: { notesToPlay: 4, strummingDelayMs: 10 }, // override default settings
+          metadata: {
+            trackNumber: trackNumber,
+            notesToPlay: 4,
+            strummingDelayMs: 10,
+          }, // override default settings
         });
         immediateChord = undefined;
       }
@@ -145,6 +157,7 @@ export const decodeMelody = async (
             // Note is fully read - we can play it
             await playNote(
               baseNote,
+              trackNumber,
               scriptTuning,
               tuning,
               fretNumberBuilder,
@@ -159,6 +172,7 @@ export const decodeMelody = async (
           // Note is fully read - we can play it
           await playNote(
             baseNote,
+            trackNumber,
             scriptTuning,
             tuning,
             fretNumberBuilder,

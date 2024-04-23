@@ -14,6 +14,7 @@ import {
 import { NoteChordMode } from "../../engine/chordsGenerator";
 import {
   ChordEventBus,
+  ChordMetadata,
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
@@ -35,11 +36,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
-
   const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
-    const handleChordEvent = async (metadata: any) => {
+    const handleChordEvent = async (metadata: ChordMetadata) => {
       if (disabled) {
         console.log("Chord not enabled: " + chordName);
         return;
@@ -51,12 +51,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       setPressed(true);
       setTimeout(() => setPressed(false), 150);
 
+      const trackNumber = metadata.trackNumber;
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
       const params: ChordPlayParameters = {
         chordName,
         noteChordMode,
         delayMs,
         notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
+        trackNumber: trackNumber,
       };
 
       switch (chordPlayMode) {

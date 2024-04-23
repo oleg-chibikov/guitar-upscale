@@ -1,9 +1,9 @@
 import { Chord } from "../data/notes";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
-import { NotePlayEventBus } from "./eventBus";
+import { NotePlayEventBus, WithTrackNumber } from "./eventBus";
 import { sleep } from "./sleep";
 
-export type ChordPlayParameters = {
+export type ChordPlayParameters = WithTrackNumber & {
   chordName: string;
   noteChordMode: NoteChordMode;
   delayMs?: number;
@@ -20,12 +20,12 @@ const selectRandomVariation = (variations: Chord[]) => {
 const playVariation = async (
   variation: Chord,
   variationKey: string,
-  { chordName, delayMs, notesToPlay }: ChordPlayParameters
+  { chordName, delayMs, notesToPlay, trackNumber }: ChordPlayParameters
 ) => {
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
   for (const note of variation) {
-    NotePlayEventBus.next({ note, metadata: { fromChord: true } });
+    NotePlayEventBus.next({ note, metadata: { fromChord: true, trackNumber } });
     if (notesToPlay && ++i >= notesToPlay) {
       break;
     }

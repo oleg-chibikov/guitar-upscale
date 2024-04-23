@@ -45,20 +45,28 @@ export const playExample = async ({
     setTempo(randomExample.tempo);
   }
 
-  await decodeMelody(
-    randomExample.melody,
-    (note) => {
-      console.log(
-        "Requesting auto play note in a melody: " + JSON.stringify(note)
-      );
-      NotePlayEventBus.next({ note, metadata: { fromChord: false } });
-    },
-    waitNote,
-    neck,
-    parseStringToNotes(randomExample.tuning ?? "EBGDAE"),
-    tuning,
-    baseNote,
-    isCurrentlyPlaying
+  const trackPromises = randomExample.melodyTracks.map((track, trackNumber) =>
+    decodeMelody(
+      track,
+      trackNumber,
+      (note, trackNumber) => {
+        console.log(
+          "Requesting auto play note in a melody: " + JSON.stringify(note)
+        );
+        NotePlayEventBus.next({
+          note,
+          metadata: { fromChord: false, trackNumber: trackNumber },
+        });
+      },
+      waitNote,
+      neck,
+      parseStringToNotes(randomExample.tuning ?? "EBGDAE"),
+      tuning,
+      baseNote,
+      isCurrentlyPlaying
+    )
   );
+  await Promise.all(trackPromises);
+
   return true;
 };
