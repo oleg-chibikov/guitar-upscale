@@ -129,7 +129,9 @@ export const Fretboard: React.FC = () => {
             maxWidth:
               Math.max(maxWidth * fretboardScaleX, 2500) - position.left,
             maxHeight:
-              Math.max((maxHeight - 425) * fretboardScaleY, 400) - position.top,
+              Math.max((maxHeight - 380) * fretboardScaleY, 400) -
+              position.top +
+              (needYShift ? 160 : 0),
           }}
         >
           {/* {!highResLoaded && <GuitarImage asset={assets[0]} />} */}
