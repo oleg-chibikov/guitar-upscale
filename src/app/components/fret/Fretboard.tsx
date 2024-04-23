@@ -108,7 +108,7 @@ export const Fretboard: React.FC = () => {
         height:
           chordsExpanded && maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
             ? 500
-            : maxHeight,
+            : maxHeight * fretboardScaleY,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
