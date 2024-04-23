@@ -1,4 +1,5 @@
 "use client";
+import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { Skin } from "@/app/data/skin";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { interpolate } from "@/app/helpers/interpolation";
@@ -101,8 +102,9 @@ export const Fretboard: React.FC = () => {
 
   return (
     <section
-      className={`flex flex-col origin-top-left min-w-full min-h-full items-start justify-center`}
+      className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
+        height: maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? 500 : maxHeight,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,

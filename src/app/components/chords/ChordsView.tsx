@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import {
+  ChordsDisplayMode,
+  MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
+} from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -15,7 +18,6 @@ import {
   NoteChordMode,
   getModeText,
 } from "../../engine/chordsGenerator";
-import { useInputChecker } from "../../helpers/useInputChecker";
 import { selectSettings } from "../../store/settingsSlice";
 import { ChordButton } from "./ChordButton";
 
@@ -43,9 +45,6 @@ export const ChordsView: React.FC = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  // it's ergonomic to display chords vertically for touch devices in order to play with right hand
-  const hasTouchInput = useInputChecker();
 
   if (!neck || !chords) {
     return null;
@@ -97,14 +96,12 @@ export const ChordsView: React.FC = () => {
           Chords
         </AccordionSummary>
         <AccordionDetails
-          className={`grid gap-0.5 overflow-auto ${
-            !hasTouchInput ? "grid-cols-2" : "grid-rows-2"
-          }`}
+          className={`grid gap-0.5 overflow-auto grid-cols-2`}
           style={{
             padding: 4,
             paddingTop: 10, // give area to tap top chords
-            maxWidth: hasTouchInput && height < 700 ? 220 : "100vw", // when height is 700+ there's enough space under the guitar to show full chords
-            maxHeight: height - authPanelHeightReserved,
+            maxWidth: height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? 220 : "100vw", // when height is large there's enough space under the guitar to show full chords
+            maxHeight: Math.min(300, height - authPanelHeightReserved),
             gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
             gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
