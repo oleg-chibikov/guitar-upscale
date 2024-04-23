@@ -130,9 +130,11 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
   }, [
     baseNote,
     dispatch,
+    instrument,
     neck,
     onPlayExample,
     playbackType,
+    reverbStrength,
     scale,
     scaleGroup,
     tuning,
