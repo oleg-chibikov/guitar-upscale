@@ -1,8 +1,10 @@
 "use client";
 import { getNoteText } from "@/app/data/notes";
 import { PlaybackType } from "@/app/data/playbackType";
+import { parseStringToNotes } from "@/app/data/tunings";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
+import { initSoundfont } from "@/app/engine/sound/soundHelper";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
@@ -16,7 +18,6 @@ import {
   setTempoBpm,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
-import { parseStringToNotes } from "@/app/data/tunings";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
@@ -33,12 +34,37 @@ const getIsCurrentlyPlaying = () => {
 export const BasePlayButton: React.FC<PlayButtonProps> = ({
   onPlayExample,
 }) => {
-  const { neck, tuning, baseNote, scale, scaleGroup, chordsMap, playbackType } =
-    useSelector(selectSettings);
+  const {
+    neck,
+    tuning,
+    baseNote,
+    scale,
+    scaleGroup,
+    chordsMap,
+    playbackType,
+    instrument,
+    reverbStrength,
+  } = useSelector(selectSettings);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
   const [isWaiting, setIsWaiting] = useState(false); // State to track if playback is active
   const dispatch = useDispatch();
+
+  const waitForProperStartTime = async () => {
+    setIsWaiting(true);
+    isCurrentlyPlaying = true;
+
+    if (isMetronomeTicking) {
+      console.log("Waiting for the next beat");
+      await waitForNextBeat();
+    } else {
+      console.log("Waiting for the next tick");
+      await waitForNextTick();
+    }
+
+    setIsWaiting(false);
+    setIsPlaying(true);
+  };
 
   const handlePlay = useCallback(async () => {
     if (!neck) {
@@ -50,22 +76,15 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
       isCurrentlyPlaying = false;
       return;
     }
-
+    // the instrument should be initialized before waiting for the first note
+    await initSoundfont(instrument, reverbStrength);
     ReactGA.event({
       category: "Playback",
       action: "Playback started",
     });
 
     // Start playback
-    setIsWaiting(true);
-    isCurrentlyPlaying = true;
-
-    if (isMetronomeTicking) {
-      await waitForNextBeat();
-    }
-
-    setIsWaiting(false);
-    setIsPlaying(true);
+    await waitForProperStartTime();
     try {
       console.log("Start playing");
       const dispatchAlert = (message: string) =>
