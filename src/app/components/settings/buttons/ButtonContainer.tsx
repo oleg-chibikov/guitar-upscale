@@ -34,6 +34,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenSettingsButton />
         <FullscreenButton />
+        {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       </div>
       <div
         className={`flex flex-row gap-1 ${
@@ -42,7 +43,6 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
             : "justify-start"
         }`}
       >
-        {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
         <MetronomeButton />
         {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
           <DisabledRecordButton />
