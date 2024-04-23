@@ -127,7 +127,9 @@ export const Fretboard: React.FC = () => {
             ...position,
             left: position.left - X_SHIFT,
             maxWidth:
-              Math.max(maxWidth * fretboardScaleX, 2500) - position.left,
+              Math.max(maxWidth * fretboardScaleX, 2500) -
+              position.left -
+              12 * fretboardScaleX,
             maxHeight:
               Math.max((maxHeight - 380) * fretboardScaleY, 400) -
               position.top +
