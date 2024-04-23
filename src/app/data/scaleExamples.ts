@@ -83,7 +83,7 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
                   "_(*37*21-097 __ *291-0 _ *01-0_8 __ *01-08 _ *11-068 __ *25*086*11-081-1 __ *11-08*53*16_*27 ____ *27*15_6 _ *15*275 _ *2*37_1-279_____*03*45*24__)2",
               },
               {
-                instrument: "acoustic_guitar_nylon",
+                instrument: "orchestral_harp",
                 melody:
                   "____(<Dm>________<F>________<C>________<Gm>______<Am>__<A#>________<Dm>____<Am>____<G>________<G>________)2",
               },
