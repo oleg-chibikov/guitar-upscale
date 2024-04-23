@@ -101,14 +101,14 @@ export const Fretboard: React.FC = () => {
 
   const assets = getAssetsForSkin(skin);
 
+  const needYShift =
+    chordsExpanded && maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS;
+
   return (
     <section
       className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
-        height:
-          chordsExpanded && maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
-            ? 500
-            : maxHeight * fretboardScaleY,
+        height: maxHeight * fretboardScaleY,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
@@ -118,6 +118,7 @@ export const Fretboard: React.FC = () => {
         className={"flex relative flex-col items-start z-10"}
         style={{
           left: X_SHIFT,
+          top: needYShift ? -100 : 0,
         }}
       >
         <div
