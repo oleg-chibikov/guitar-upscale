@@ -21,7 +21,9 @@ import {
 import { selectSettings } from "../../store/settingsSlice";
 import { ChordButton } from "./ChordButton";
 
-const authPanelHeightReserved = 110;
+const AUTH_PANEL_RESERVED_HEIGHT = 110;
+const ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH = 230;
+const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
   const { neck, useAdvancedChords, useSharpChords, chords } =
@@ -34,10 +36,12 @@ export const ChordsView: React.FC = () => {
   };
 
   const [height, setHeight] = useState(window.innerHeight);
+  const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight);
+      setWidth(window.innerWidth);
     };
 
     window.addEventListener("resize", handleResize);
@@ -100,8 +104,11 @@ export const ChordsView: React.FC = () => {
           style={{
             padding: 4,
             paddingTop: 10, // give area to tap top chords
-            maxWidth: height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? 220 : "100vw", // when height is large there's enough space under the guitar to show full chords
-            maxHeight: Math.min(310, height - authPanelHeightReserved),
+            maxWidth:
+              height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+                ? COMPACT_CHORDS_WIDTH
+                : width - ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH, // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
+            maxHeight: Math.min(330, height - AUTH_PANEL_RESERVED_HEIGHT),
             gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
             gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
