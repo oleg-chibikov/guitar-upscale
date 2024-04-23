@@ -1,12 +1,11 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote, getNoteText } from "@/app/data/notes";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
-import { Reverb, Soundfont } from "smplr";
 
 export const playSound = (
   note: OctaveNote,
   velocity: number,
-  soundfont: Soundfont,
+  soundfont: any,
   durationMs: number
 ) => {
   return soundfont.start({
@@ -16,7 +15,7 @@ export const playSound = (
   });
 };
 
-const soundfountMap = new Map<string, Soundfont>();
+const soundfountMap = new Map<string, any>();
 
 export const initSoundfont = async (
   instrument: Instrument,
@@ -29,12 +28,19 @@ export const initSoundfont = async (
   }
   const context = new AudioContext();
 
-  soundfont = new Soundfont(context, {
-    instrument: instrument,
-    // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
-  });
+  if (instrument === "sampled_piano") {
+    const SplendidGrandPiano = (await import("smplr")).SplendidGrandPiano;
+    soundfont = new SplendidGrandPiano(context);
+  } else {
+    const Soundfont = (await import("smplr")).Soundfont;
+    soundfont = new Soundfont(context, {
+      instrument: instrument,
+      // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
+    });
+  }
 
   if (reverbStrength && !isMobileDevice()) {
+    const Reverb = (await import("smplr")).Reverb;
     // very glitchy on the phone but works fine on web
     soundfont.output.addEffect("reverb", new Reverb(context), reverbStrength);
   }

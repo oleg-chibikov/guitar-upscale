@@ -1,6 +1,7 @@
 // http://dev.music.free.fr/editors/abc_ui/tutos/soundfont.html
 export const instrumentGroups = {
   Piano: [
+    "sampled_piano",
     "acoustic_grand_piano",
     "bright_acoustic_piano",
     "electric_grand_piano",
