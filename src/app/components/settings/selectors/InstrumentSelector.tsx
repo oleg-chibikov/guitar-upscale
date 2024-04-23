@@ -17,7 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { SelectWrapper } from "./SelectWrapper";
 
 const InstrumentSelector: React.FC = () => {
-  const { instrument, instrumentGroup } = useSelector(selectSettings);
+  const { instrument, instrumentGroup, reverbStrength } =
+    useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleGroupChange = (group: InstrumentGroup) => {
@@ -26,7 +27,12 @@ const InstrumentSelector: React.FC = () => {
 
   const handleInstrumentChange = async (value: string) => {
     dispatch(setInstrument(value as Instrument));
-    await playNote({ note: Note.E, octave: 5 }, MAX_VELOCITY, instrument, 0);
+    await playNote(
+      { note: Note.E, octave: 5 },
+      MAX_VELOCITY,
+      instrument,
+      reverbStrength
+    );
   };
 
   const group: Instrument[] = instrumentGroups[instrumentGroup];
