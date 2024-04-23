@@ -41,7 +41,8 @@ const getPositionForSkin = (skin?: Skin) => {
 };
 
 export const Fretboard: React.FC = () => {
-  const { skin, fretboardScaleX, fretboardScaleY } = useSelector(selectUi);
+  const { skin, fretboardScaleX, fretboardScaleY, chordsExpanded } =
+    useSelector(selectUi);
   const { neck } = useSelector(selectSettings);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
@@ -104,7 +105,10 @@ export const Fretboard: React.FC = () => {
     <section
       className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
-        height: maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? 500 : maxHeight,
+        height:
+          chordsExpanded && maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+            ? 500
+            : maxHeight,
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
