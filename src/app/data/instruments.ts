@@ -1,7 +1,16 @@
 // http://dev.music.free.fr/editors/abc_ui/tutos/soundfont.html
 export const instrumentGroups = {
+  Guitar: [
+    "acoustic_guitar_nylon",
+    "acoustic_guitar_steel",
+    "electric_guitar_jazz",
+    "electric_guitar_clean",
+    "electric_guitar_muted",
+    "overdriven_guitar",
+    "distortion_guitar",
+    "guitar_harmonics",
+  ],
   Piano: [
-    "sampled_piano",
     "acoustic_grand_piano",
     "bright_acoustic_piano",
     "electric_grand_piano",
@@ -10,6 +19,7 @@ export const instrumentGroups = {
     "electric_piano_2",
     "harpsichord",
     "clavinet",
+    "sampled_piano",
   ],
   "Chromatic Percussion": [
     "celesta",
@@ -30,16 +40,6 @@ export const instrumentGroups = {
     "accordion",
     "harmonica",
     "tango_accordion",
-  ],
-  Guitar: [
-    "acoustic_guitar_nylon",
-    "acoustic_guitar_steel",
-    "electric_guitar_jazz",
-    "electric_guitar_clean",
-    "electric_guitar_muted",
-    "overdriven_guitar",
-    "distortion_guitar",
-    "guitar_harmonics",
   ],
   Bass: [
     "acoustic_bass",
