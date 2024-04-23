@@ -91,7 +91,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         await playNote(
           stringOctaveNote,
           velocityValue ?? velocity,
-          instrumentRef.current ?? instrument,
+          instrument,
+          // instrumentRef.current ?? instrument,
           reverbStrength,
           quarterBeatToMilliseconds(tempoBpm)
         );
