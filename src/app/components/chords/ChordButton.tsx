@@ -51,14 +51,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       setPressed(true);
       setTimeout(() => setPressed(false), 150);
 
-      const trackNumber = metadata.trackNumber;
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
       const params: ChordPlayParameters = {
         chordName,
         noteChordMode,
         delayMs,
         notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
-        trackNumber: trackNumber,
+        trackNumber: metadata.trackNumber,
+        instrument: metadata.instrument,
       };
 
       switch (chordPlayMode) {

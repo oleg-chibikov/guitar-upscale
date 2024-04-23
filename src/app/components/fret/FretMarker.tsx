@@ -1,3 +1,4 @@
+import { Instrument } from "@/app/data/instruments";
 import { Theme } from "@/app/data/theme";
 import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
@@ -76,6 +77,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
+  const instrumentRef = useRef<Instrument>();
 
   useEffect(() => {
     // Function to play note and start animation
@@ -89,7 +91,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         await playNote(
           stringOctaveNote,
           velocityValue ?? velocity,
-          instrument,
+          instrumentRef.current ?? instrument,
           reverbStrength,
           quarterBeatToMilliseconds(tempoBpm)
         );
@@ -105,6 +107,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       NoteToFretMarkerEventMap.set(key, (metadata) => {
         if (metadata.trackNumber) {
           trackNumberRef.current = metadata.trackNumber;
+        }
+        if (metadata.instrument) {
+          instrumentRef.current = metadata.instrument;
         }
         if (metadata.clearChordMarker) {
           setIsFromPreviousChord(false);

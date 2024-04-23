@@ -1,9 +1,9 @@
 import { Chord } from "../data/notes";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
-import { NotePlayEventBus, WithTrackNumber } from "./eventBus";
+import { NotePlayEventBus, TrackMetadata } from "./eventBus";
 import { sleep } from "./sleep";
 
-export type ChordPlayParameters = WithTrackNumber & {
+export type ChordPlayParameters = TrackMetadata & {
   chordName: string;
   noteChordMode: NoteChordMode;
   delayMs?: number;

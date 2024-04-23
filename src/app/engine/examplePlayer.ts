@@ -1,7 +1,7 @@
 import { Note, OctaveNote } from "../data/notes";
 import { getScaleExamples } from "../data/scaleExamples";
 import { parseStringToNotes } from "../data/tunings";
-import { NotePlayEventBus } from "./eventBus";
+import { ChordEventBus, NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
 
@@ -45,17 +45,31 @@ export const playExample = async ({
     setTempo(randomExample.tempo);
   }
 
-  const trackPromises = randomExample.melodyTracks.map((track, trackNumber) =>
+  const trackPromises = randomExample.tracks.map((track, trackNumber) =>
     decodeMelody(
       track,
-      trackNumber,
-      (note, trackNumber) => {
+      (note) => {
         console.log(
           "Requesting auto play note in a melody: " + JSON.stringify(note)
         );
         NotePlayEventBus.next({
           note,
-          metadata: { fromChord: false, trackNumber: trackNumber },
+          metadata: {
+            fromChord: false,
+            trackNumber,
+            instrument: track.instrument,
+          },
+        });
+      },
+      (chordToPlay) => {
+        ChordEventBus.next({
+          chord: chordToPlay,
+          metadata: {
+            trackNumber,
+            notesToPlay: 4,
+            strummingDelayMs: 10,
+            instrument: track.instrument,
+          }, // override default settings
         });
       },
       waitNote,

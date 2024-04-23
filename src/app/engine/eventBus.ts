@@ -1,16 +1,18 @@
 import { Subject } from "rxjs";
+import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
 
-export type WithTrackNumber = {
+export type TrackMetadata = {
   trackNumber?: number;
+  instrument?: Instrument;
 };
 
-export type NoteMetadata = WithTrackNumber & {
+export type NoteMetadata = TrackMetadata & {
   fromChord?: boolean;
   clearChordMarker?: boolean;
 };
 
-export type ChordMetadata = WithTrackNumber & {
+export type ChordMetadata = TrackMetadata & {
   notesToPlay?: number;
   strummingDelayMs?: number;
 };

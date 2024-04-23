@@ -1,5 +1,5 @@
 import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
-import { ChordEventBus } from "./eventBus";
+import { Track } from "../data/scaleExamples";
 import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 const convertChord = (chord: string, note: Note): string => {
@@ -30,14 +30,10 @@ const convertChord = (chord: string, note: Note): string => {
   return newChord;
 };
 
-export type PlayNoteCallback = (
-  note: StringOctaveNote,
-  trackNumber: number
-) => void;
+export type PlayNoteCallback = (note: StringOctaveNote) => void;
 
 const playNote = async (
   baseNote: Note,
-  trackNumber: number,
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
   fretNumberBuilder: string,
@@ -62,26 +58,25 @@ const playNote = async (
   const string = neck[stringNumber];
   const stringOctaveNote = string[fret];
   if (stringOctaveNote) {
-    await playStringOctaveNote(stringOctaveNote, trackNumber, play, wait);
+    await playStringOctaveNote(stringOctaveNote, play, wait);
   }
 };
 
 const playStringOctaveNote = async (
   stringOctaveNote: StringOctaveNote,
-  trackNumber: number,
   play: PlayNoteCallback,
   wait?: () => Promise<void>
 ) => {
-  play(stringOctaveNote, trackNumber);
+  play(stringOctaveNote);
   if (wait) {
     await wait();
   }
 };
 
 export const decodeMelody = async (
-  melody: string,
-  trackNumber: number,
+  track: Track,
   play: PlayNoteCallback,
+  playChord: (chord: string) => void,
   waitNote: () => Promise<void>,
   neck: Neck,
   scriptTuning: OctaveNote[],
@@ -99,6 +94,7 @@ export const decodeMelody = async (
   let immediateChord: string | undefined;
   let indexToRepeat: number | undefined;
   let repeatCount: number | undefined;
+  const melody = track.melody;
 
   while (index < melody.length) {
     if (!isCurrentlyPlaying()) {
@@ -118,14 +114,7 @@ export const decodeMelody = async (
             ? convertChord(immediateChord, baseNote)
             : immediateChord;
 
-        ChordEventBus.next({
-          chord: newChord,
-          metadata: {
-            trackNumber: trackNumber,
-            notesToPlay: 4,
-            strummingDelayMs: 10,
-          }, // override default settings
-        });
+        playChord(newChord);
         immediateChord = undefined;
       }
     };
@@ -159,7 +148,6 @@ export const decodeMelody = async (
             // Note is fully read - we can play it
             await playNote(
               baseNote,
-              trackNumber,
               scriptTuning,
               tuning,
               fretNumberBuilder,
@@ -174,7 +162,6 @@ export const decodeMelody = async (
           // Note is fully read - we can play it
           await playNote(
             baseNote,
-            trackNumber,
             scriptTuning,
             tuning,
             fretNumberBuilder,

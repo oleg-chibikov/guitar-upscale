@@ -18,7 +18,7 @@ export const ReverbStrengthSlider: React.FC = () => {
 
   return (
     <>
-      <span>Reverb strenght:</span>
+      <span>Reverb strength:</span>
       <Slider
         onValueChange={handleSliderChange}
         value={reverbStrength * 10}
