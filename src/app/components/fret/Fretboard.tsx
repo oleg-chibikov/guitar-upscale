@@ -12,7 +12,7 @@ import { getAssetsForSkin } from "../../helpers/skinHelper";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
-const X_SHIFT = 456;
+const X_SHIFT = 756;
 
 const getPositionForSkin = (skin?: Skin) => {
   switch (skin) {
@@ -20,22 +20,22 @@ const getPositionForSkin = (skin?: Skin) => {
     case undefined:
       return {
         top: -583,
-        left: 0,
+        left: -455,
       };
     case Skin.Ibanez_AE140_WKH:
       return {
         top: -589,
-        left: -88,
+        left: -544,
       };
     case Skin.Yamaha_CSF3M:
       return {
         top: -573,
-        left: -9,
+        left: -465,
       };
     case Skin.Yamaha_SLG200NW:
       return {
         top: -567,
-        left: -65,
+        left: -520,
       };
   }
 };
@@ -74,10 +74,13 @@ export const Fretboard: React.FC = () => {
   }, []);
 
   const repostion = useCallback(() => {
-    const scrollX = interpolate(fretboardScaleX, 1, 2, 300, 0); // max value is 3 but setting 2 gives better outcome
-    const scrollY = interpolate(fretboardScaleY, 0.7, 1, 100, 0);
-    // scroll a bit right to see the notes straight away
-    window.scrollTo(scrollX, scrollY); // values are x,y-offset
+    const scrollX = interpolate(fretboardScaleX, 1, 2.2, 500, 0); // max value is 3 but setting 2 gives better outcome
+    const scrollY = interpolate(fretboardScaleY, 0.7, 1, 100, 40);
+    // scroll a bit right and up to see the notes straight away
+    setTimeout(() => {
+      // doesn't apply well without timeout
+      window.scrollTo(scrollX, scrollY);
+    }, 100);
   }, [fretboardScaleX, fretboardScaleY]);
 
   useEffect(repostion, [repostion, orientation]);
@@ -127,7 +130,6 @@ export const Fretboard: React.FC = () => {
           className={`absolute overflow-hidden origin-top-left`}
           style={{
             ...position,
-            left: position.left - X_SHIFT,
             maxWidth:
               Math.max(maxWidth * fretboardScaleX, 2500) -
               position.left -
