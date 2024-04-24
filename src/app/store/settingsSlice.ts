@@ -75,9 +75,13 @@ const initialState: SettingsState = {
   reverbStrength: 0.2,
 };
 
-// A value that changes immediately without the need for rerender
-export let velocityValue: number | undefined = undefined;
-export let metronomeVelocityValue: number | undefined = undefined;
+// A values that changes immediately without the need for rerender
+// Consider them as a global refs
+export let velocityValue: number = initialState.velocity;
+export let metronomeVelocityValue: number = initialState.metronomeVelocity;
+export let tempoBpmValue: number = initialState.tempoBpm;
+export let instrumentValue: Instrument = initialState.instrument;
+export let reverbStrengthValue: number = initialState.reverbStrength;
 export let isMetronomeTicking = false;
 
 export const setMetronomeTicking = (value: boolean) => {
@@ -127,7 +131,12 @@ export const settingsSlice = createSlice({
   reducers: {
     init: (state) => {
       onGuitarSettingsUpdate(state);
+      // update initial settings after they got loaded from redux persist
       velocityValue = state.velocity;
+      metronomeVelocityValue = state.metronomeVelocity;
+      tempoBpmValue = state.tempoBpm;
+      instrumentValue = state.instrument;
+      reverbStrengthValue = state.reverbStrength;
       setBpm(state.tempoBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
@@ -149,6 +158,7 @@ export const settingsSlice = createSlice({
     },
     setTempoBpm: (state, action: PayloadAction<number>) => {
       state.tempoBpm = action.payload;
+      tempoBpmValue = action.payload;
       setBpm(action.payload);
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
@@ -182,14 +192,15 @@ export const settingsSlice = createSlice({
     },
     setInstrument(state, action: PayloadAction<Instrument>) {
       state.instrument = action.payload;
+      instrumentValue = action.payload;
     },
     setInstrumentGroup: (state, action: PayloadAction<InstrumentGroup>) => {
       // TODO: lazy load instruments.ts if permissions allow
-      const group = action.payload;
-      state.instrumentGroup = group;
+      state.instrumentGroup = action.payload;
     },
     setReverbStrength(state, action: PayloadAction<number>) {
       state.reverbStrength = action.payload;
+      reverbStrengthValue = action.payload;
     },
   },
 });

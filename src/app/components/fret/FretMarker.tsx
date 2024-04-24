@@ -1,6 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../data/noteDisplayMode";
 import {
@@ -17,7 +17,13 @@ import {
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectSettings, velocityValue } from "../../store/settingsSlice";
+import {
+  instrumentValue,
+  reverbStrengthValue,
+  selectSettings,
+  tempoBpmValue,
+  velocityValue,
+} from "../../store/settingsSlice";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
@@ -60,15 +66,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const {
-    velocity,
-    neck,
-    chordStrummingDelayMs,
-    baseNote,
-    instrument,
-    reverbStrength,
-    tempoBpm,
-  } = useSelector(selectSettings);
+  const { neck, chordStrummingDelayMs, baseNote } = useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
 
@@ -111,7 +109,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [stringOctaveNote, velocity, instrument, reverbStrength, tempoBpm]);
+  }, [stringOctaveNote]);
 
   const isColored =
     (isHeader &&
@@ -119,15 +117,16 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       coloredHeaders.has(stringOctaveNote?.fret)) ||
     stringOctaveNote?.note === baseNote;
 
-  const getPlayParams = (
-    stringOctaveNote: StringOctaveNote
-  ): PlayNoteParams => ({
-    stringOctaveNote,
-    instrument,
-    reverbStrength,
-    tempoBpm,
-    velocity: velocityValue ?? velocity,
-  });
+  const getPlayParams = useCallback(
+    (stringOctaveNote: StringOctaveNote): PlayNoteParams => ({
+      stringOctaveNote,
+      instrument: instrumentValue,
+      reverbStrength: reverbStrengthValue,
+      tempoBpm: tempoBpmValue,
+      velocity: velocityValue,
+    }),
+    []
+  );
 
   const handlePress = async () => {
     if (isHeader) {

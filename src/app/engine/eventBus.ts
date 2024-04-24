@@ -17,7 +17,7 @@ export type PlayParams = {
 
 export type TrackMetadata = {
   trackNumber?: number;
-  instrument?: Instrument;
+  trackInstrument?: Instrument;
 };
 
 export type ClearNoteMetadata = {
@@ -60,22 +60,21 @@ export const ChordToChordButtonEventMap: Map<
 
 export const ClearChordMarkerSet: Set<string> = new Set<string>();
 
-let lastChord: string | undefined;
-
 const play = async ({
   stringOctaveNote,
   instrument,
+  trackInstrument,
   velocity,
   reverbStrength,
   tempoBpm,
-}: PlayNoteParams) => {
+}: NoteMetadata) => {
   // This module is essential and should be loaded asap, so I commented out lazy loading here
   // const playNote = (await import("@/app/engine/sound/soundProvider"))
   //   .playNote;
   await playNote(
     stringOctaveNote,
     velocity,
-    instrument,
+    trackInstrument ?? instrument,
     // instrumentRef.current ?? instrument,
     reverbStrength,
     quarterBeatToMilliseconds(tempoBpm)
@@ -114,5 +113,4 @@ ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
   const playAction = ChordToChordButtonEventMap.get(chord.chord);
 
   playAction?.(chord.metadata);
-  lastChord = chord.chord;
 });

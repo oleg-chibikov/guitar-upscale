@@ -88,7 +88,7 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
                   "____(<Dm>________<F>________<C>________<Gm>______<Am>__<A#>________<Dm>____<Am>____<G>________<G>________)2",
               },
               {
-                instrument: "glockenspiel",
+                instrument: "kalimba",
                 melody:
                   "_(____ *30*22 __*30 ___ *33*22 __ *43 ___ *32*20 ______ *45*35 ______ *33*23*13*11-5 ____ *30 ___ *32 _____*53*45*35*24*13___*42*30)2",
               },

@@ -19,7 +19,13 @@ import {
   PlayParams,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectSettings, velocityValue } from "../../store/settingsSlice";
+import {
+  instrumentValue,
+  reverbStrengthValue,
+  selectSettings,
+  tempoBpmValue,
+  velocityValue,
+} from "../../store/settingsSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -32,15 +38,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
-  const {
-    chordPlayMode,
-    chordStrummingDelayMs,
-    chordNotesToPlay,
-    instrument,
-    reverbStrength,
-    velocity,
-    tempoBpm,
-  } = useSelector(selectSettings);
+  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
+    useSelector(selectSettings);
   const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
   const hasTouchInput = useInputChecker();
@@ -48,12 +47,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const getPlayParams = useCallback(
     (): PlayParams => ({
-      instrument,
-      reverbStrength,
-      tempoBpm,
-      velocity: velocityValue ?? velocity,
+      instrument: instrumentValue,
+      reverbStrength: reverbStrengthValue,
+      tempoBpm: tempoBpmValue,
+      velocity: velocityValue,
     }),
-    [instrument, reverbStrength, tempoBpm, velocity]
+    []
   );
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         playParams: getPlayParams(),
         notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
         trackNumber: metadata.trackNumber,
-        instrument: metadata.instrument,
+        trackInstrument: metadata.trackInstrument,
       };
 
       switch (chordPlayMode) {

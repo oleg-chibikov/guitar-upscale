@@ -9,6 +9,7 @@ import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
+  reverbStrengthValue,
   selectSettings,
   setInstrument,
   setInstrumentGroup,
@@ -37,9 +38,9 @@ const InstrumentSelector: React.FC = () => {
     dispatch(setInstrument(value as Instrument));
     await playNote(
       { note: Note.E, octave: 5 },
-      velocityValue ?? velocity,
+      velocityValue,
       value,
-      reverbStrength,
+      reverbStrengthValue,
       quarterBeatToMilliseconds(tempoBpm)
     );
   };

@@ -26,6 +26,7 @@ const playVariation = async (
     delayMs,
     notesToPlay,
     trackNumber,
+    trackInstrument,
     playParams,
   }: ChordPlayParameters
 ) => {
@@ -34,6 +35,7 @@ const playVariation = async (
   for (const note of variation) {
     NotePlayEventBus.next({
       ...playParams,
+      instrument: trackInstrument ?? playParams.instrument,
       stringOctaveNote: note,
       fromChord: true,
       trackNumber,

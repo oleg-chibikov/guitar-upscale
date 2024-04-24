@@ -16,9 +16,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  instrumentValue,
   isMetronomeTicking,
+  reverbStrengthValue,
   selectSettings,
   setTempoBpm,
+  tempoBpmValue,
   velocityValue,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
@@ -48,8 +51,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     playbackType,
     instrument,
     reverbStrength,
-    velocity,
-    tempoBpm,
   } = useSelector(selectSettings);
 
   const [isPlaying, setIsPlaying] = useState(false); // State to track if playback is active
@@ -71,12 +72,12 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
 
   const getPlayParams = useCallback(
     (): PlayParams => ({
-      instrument,
-      reverbStrength,
-      tempoBpm,
-      velocity: velocityValue ?? velocity,
+      instrument: instrumentValue,
+      reverbStrength: reverbStrengthValue,
+      tempoBpm: tempoBpmValue,
+      velocity: velocityValue,
     }),
-    [instrument, reverbStrength, tempoBpm, velocity]
+    []
   );
 
   const handlePlay = useCallback(async () => {
@@ -121,7 +122,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
           baseNote,
           examples,
           waitNote: waitForNextTick,
-          playParams: getPlayParams(),
+          getPlayParams,
           neck,
           tuning: parseStringToNotes(tuning),
           isCurrentlyPlaying: getIsCurrentlyPlaying,
@@ -140,7 +141,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
         await playWholeScale(
           waitForNextTick,
           neck,
-          getPlayParams(),
+          getPlayParams,
           getIsCurrentlyPlaying,
           isFullStringScalePlayback
         );

@@ -33,9 +33,9 @@ export const MetronomeButton: React.FC = (props) => {
           await import("@/app/engine/sound/metronomeProvider")
         ).playMetronomeTick;
         if (isBeat) {
-          await playMetronomeTick(true, metronomeVelocityValue ?? 80);
+          await playMetronomeTick(true, metronomeVelocityValue);
         } else if (tick % 2 === 0) {
-          await playMetronomeTick(false, metronomeVelocityValue ?? 80);
+          await playMetronomeTick(false, metronomeVelocityValue);
         }
       }
     });

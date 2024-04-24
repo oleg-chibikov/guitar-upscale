@@ -11,7 +11,7 @@ export type PlayExampleParameters = {
   waitNote: () => Promise<void>;
   neck: Neck;
   tuning: OctaveNote[];
-  playParams: PlayParams;
+  getPlayParams: () => PlayParams;
   isCurrentlyPlaying: () => boolean;
   showAlert: (message: string) => void;
   setTempo: (tempoBpm: number) => void;
@@ -23,7 +23,7 @@ export const playExample = async ({
   waitNote,
   neck,
   tuning,
-  playParams,
+  getPlayParams,
   isCurrentlyPlaying,
   showAlert,
   setTempo,
@@ -47,11 +47,12 @@ export const playExample = async ({
         console.log(
           "Requesting auto play note in a melody: " + JSON.stringify(note)
         );
+        const playParams = getPlayParams();
         NotePlayEventBus.next({
           ...playParams,
           fromChord: false,
           trackNumber,
-          instrument: track.instrument ?? playParams.instrument,
+          trackInstrument: track.instrument,
           stringOctaveNote: note,
         });
       },
@@ -62,7 +63,7 @@ export const playExample = async ({
             trackNumber,
             notesToPlay: 4,
             strummingDelayMs: 10,
-            instrument: track.instrument,
+            trackInstrument: track.instrument,
           }, // override default settings
         });
       },

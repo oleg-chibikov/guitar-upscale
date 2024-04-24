@@ -5,7 +5,7 @@ import { Neck } from "./generateNeckRepresentation";
 export const playWholeScale = async (
   wait: () => Promise<void>,
   neck: Neck,
-  playParams: PlayParams,
+  getPlayParams: () => PlayParams,
   isCurrentlyPlaying: () => boolean,
   playFullString: boolean
 ) => {
@@ -64,7 +64,7 @@ export const playWholeScale = async (
       }
 
       console.log("Requesting auto play note: " + JSON.stringify(note));
-      NotePlayEventBus.next({ ...playParams, stringOctaveNote: note });
+      NotePlayEventBus.next({ ...getPlayParams(), stringOctaveNote: note });
       await wait();
     }
   }
