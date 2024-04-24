@@ -35,8 +35,8 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
             chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
           } z-40 top-24 border-2 ${
             theme === Theme.Light
-              ? "bg-accented_background-light border-border-light"
-              : "bg-accented_background-dark border-border-dark"
+              ? "bg-accented_background-light border-border-light text-foreground-light"
+              : "bg-accented_background-dark border-border-dark text-foreground-dark"
           } p-4 gap-2`}
           style={{
             maxWidth: "80vw",
