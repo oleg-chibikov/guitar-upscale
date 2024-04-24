@@ -3,7 +3,6 @@ import { Example } from "@/app/data/example";
 import { getNoteText } from "@/app/data/notes";
 import { PlaybackType } from "@/app/data/playbackType";
 import { parseStringToNotes } from "@/app/data/tunings";
-import { PlayParams } from "@/app/engine/eventBus";
 import { PlayExampleParameters } from "@/app/engine/examplePlayer";
 import { waitForNextBeat, waitForNextTick } from "@/app/engine/mainClock";
 import { initMetronome } from "@/app/engine/sound/metronomeProvider";
@@ -16,13 +15,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  instrumentValue,
   isMetronomeTicking,
-  reverbStrengthValue,
   selectSettings,
   setTempoBpm,
-  tempoBpmValue,
-  velocityValue,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
@@ -70,16 +65,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     setIsPlaying(true);
   };
 
-  const getPlayParams = useCallback(
-    (): PlayParams => ({
-      instrument: instrumentValue,
-      reverbStrength: reverbStrengthValue,
-      tempoBpm: tempoBpmValue,
-      velocity: velocityValue,
-    }),
-    []
-  );
-
   const handlePlay = useCallback(async () => {
     if (!neck) {
       return;
@@ -122,7 +107,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
           baseNote,
           examples,
           waitNote: waitForNextTick,
-          getPlayParams,
           neck,
           tuning: parseStringToNotes(tuning),
           isCurrentlyPlaying: getIsCurrentlyPlaying,
@@ -141,7 +125,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
         await playWholeScale(
           waitForNextTick,
           neck,
-          getPlayParams,
           getIsCurrentlyPlaying,
           isFullStringScalePlayback
         );
@@ -156,7 +139,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     instrument,
     neck,
     onPlayExample,
-    getPlayParams,
     playbackType,
     reverbStrength,
     scale,

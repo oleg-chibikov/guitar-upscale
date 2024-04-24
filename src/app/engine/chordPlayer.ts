@@ -1,6 +1,6 @@
 import { Chord } from "../data/notes";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
-import { NotePlayEventBus, PlayParams, TrackMetadata } from "./eventBus";
+import { NotePlayEventBus, TrackMetadata } from "./eventBus";
 import { sleep } from "./sleep";
 
 export type ChordPlayParameters = TrackMetadata & {
@@ -8,7 +8,6 @@ export type ChordPlayParameters = TrackMetadata & {
   noteChordMode: NoteChordMode;
   delayMs?: number;
   notesToPlay?: number;
-  playParams: PlayParams;
 };
 
 const chordRoundRobinMap = new Map<string, number>();
@@ -27,15 +26,13 @@ const playVariation = async (
     notesToPlay,
     trackNumber,
     trackInstrument,
-    playParams,
   }: ChordPlayParameters
 ) => {
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
   for (const note of variation) {
     NotePlayEventBus.next({
-      ...playParams,
-      instrument: trackInstrument ?? playParams.instrument,
+      trackInstrument,
       stringOctaveNote: note,
       fromChord: true,
       trackNumber,

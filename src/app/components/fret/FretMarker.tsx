@@ -1,6 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../data/noteDisplayMode";
 import {
@@ -13,17 +13,10 @@ import {
   NoteMetadata,
   NotePlayEventBus,
   NoteToFretMarkerEventMap,
-  PlayNoteParams,
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import {
-  instrumentValue,
-  reverbStrengthValue,
-  selectSettings,
-  tempoBpmValue,
-  velocityValue,
-} from "../../store/settingsSlice";
+import { selectSettings } from "../../store/settingsSlice";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
@@ -117,17 +110,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       coloredHeaders.has(stringOctaveNote?.fret)) ||
     stringOctaveNote?.note === baseNote;
 
-  const getPlayParams = useCallback(
-    (stringOctaveNote: StringOctaveNote): PlayNoteParams => ({
-      stringOctaveNote,
-      instrument: instrumentValue,
-      reverbStrength: reverbStrengthValue,
-      tempoBpm: tempoBpmValue,
-      velocity: velocityValue,
-    }),
-    []
-  );
-
   const handlePress = async () => {
     if (isHeader) {
       if (!neck) {
@@ -136,10 +118,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       console.log("Playing all the notes on fret " + fret);
       for (let stringIndex = 0; stringIndex < neck.length; stringIndex++) {
         const string = neck[stringIndex];
-        const note = string[fret];
-        if (note) {
+        const stringOctaveNote = string[fret];
+        if (stringOctaveNote) {
           NotePlayEventBus.next({
-            ...getPlayParams(note),
+            stringOctaveNote,
             fromChord: false,
           });
           await sleep(chordStrummingDelayMs);
@@ -150,7 +132,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     console.log("Playing note (manual): " + JSON.stringify(stringOctaveNote));
     if (stringOctaveNote) {
       NotePlayEventBus.next({
-        ...getPlayParams(stringOctaveNote),
+        stringOctaveNote,
         fromChord: false,
       });
     }

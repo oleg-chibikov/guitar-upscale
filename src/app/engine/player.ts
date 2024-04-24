@@ -1,11 +1,10 @@
 import { Chord, OctaveNote, serializeOctaveNote } from "../data/notes";
-import { NotePlayEventBus, PlayParams } from "./eventBus";
+import { NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 
 export const playWholeScale = async (
   wait: () => Promise<void>,
   neck: Neck,
-  getPlayParams: () => PlayParams,
   isCurrentlyPlaying: () => boolean,
   playFullString: boolean
 ) => {
@@ -64,7 +63,7 @@ export const playWholeScale = async (
       }
 
       console.log("Requesting auto play note: " + JSON.stringify(note));
-      NotePlayEventBus.next({ ...getPlayParams(), stringOctaveNote: note });
+      NotePlayEventBus.next({ stringOctaveNote: note });
       await wait();
     }
   }

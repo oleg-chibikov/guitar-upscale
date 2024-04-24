@@ -1,18 +1,18 @@
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
+import {
+  instrumentValue,
+  reverbStrengthValue,
+  tempoBpmValue,
+  velocityValue,
+} from "../store/settingsSlice";
 import { quarterBeatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
-export type PlayNoteParams = PlayParams & {
+export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
-};
-
-export type PlayParams = {
-  instrument: Instrument;
-  velocity: number;
-  reverbStrength: number;
-  tempoBpm: number;
+  velocity?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note
 };
 
 export type TrackMetadata = {
@@ -62,22 +62,19 @@ export const ClearChordMarkerSet: Set<string> = new Set<string>();
 
 const play = async ({
   stringOctaveNote,
-  instrument,
   trackInstrument,
   velocity,
-  reverbStrength,
-  tempoBpm,
 }: NoteMetadata) => {
   // This module is essential and should be loaded asap, so I commented out lazy loading here
   // const playNote = (await import("@/app/engine/sound/soundProvider"))
   //   .playNote;
   await playNote(
     stringOctaveNote,
-    velocity,
-    trackInstrument ?? instrument,
+    velocity ?? velocityValue,
+    trackInstrument ?? instrumentValue,
     // instrumentRef.current ?? instrument,
-    reverbStrength,
-    quarterBeatToMilliseconds(tempoBpm)
+    reverbStrengthValue,
+    quarterBeatToMilliseconds(tempoBpmValue)
   );
 };
 

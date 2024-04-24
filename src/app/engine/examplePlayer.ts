@@ -1,7 +1,7 @@
 import { Example } from "../data/example";
 import { Note, OctaveNote } from "../data/notes";
 import { parseStringToNotes } from "../data/tunings";
-import { ChordEventBus, NotePlayEventBus, PlayParams } from "./eventBus";
+import { ChordEventBus, NotePlayEventBus } from "./eventBus";
 import { Neck } from "./generateNeckRepresentation";
 import { decodeMelody } from "./melodyDecoder";
 
@@ -11,7 +11,6 @@ export type PlayExampleParameters = {
   waitNote: () => Promise<void>;
   neck: Neck;
   tuning: OctaveNote[];
-  getPlayParams: () => PlayParams;
   isCurrentlyPlaying: () => boolean;
   showAlert: (message: string) => void;
   setTempo: (tempoBpm: number) => void;
@@ -23,7 +22,6 @@ export const playExample = async ({
   waitNote,
   neck,
   tuning,
-  getPlayParams,
   isCurrentlyPlaying,
   showAlert,
   setTempo,
@@ -47,9 +45,7 @@ export const playExample = async ({
         console.log(
           "Requesting auto play note in a melody: " + JSON.stringify(note)
         );
-        const playParams = getPlayParams();
         NotePlayEventBus.next({
-          ...playParams,
           fromChord: false,
           trackNumber,
           trackInstrument: track.instrument,
