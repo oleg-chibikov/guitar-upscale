@@ -8,6 +8,7 @@ export type ChordPlayParameters = TrackMetadata & {
   noteChordMode: NoteChordMode;
   delayMs?: number;
   notesToPlay?: number;
+  reverse: boolean;
 };
 
 const chordRoundRobinMap = new Map<string, number>();
@@ -26,11 +27,13 @@ const playVariation = async (
     notesToPlay,
     trackNumber,
     trackInstrument,
+    reverse,
   }: ChordPlayParameters
 ) => {
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
-  for (const note of variation) {
+  const toPlay = reverse ? [...variation].reverse() : variation;
+  for (const note of toPlay) {
     NotePlayEventBus.next({
       trackInstrument,
       stringOctaveNote: note,

@@ -1,7 +1,7 @@
 import { Theme } from "@/app/data/theme";
 import { waitForNextTick } from "@/app/engine/mainClock";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
@@ -32,9 +32,21 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   noteChordMode,
   isHidden,
 }) => {
+  const isClickedRef = useRef<boolean>(false);
+  const isPlayingRef = useRef<boolean>(false);
+  const isAlternateRef = useRef<boolean>(false);
+
   const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
     useSelector(selectSettings);
+
   const hasTouchInput = useInputChecker();
+
+  const play = useCallback(() => {
+    ChordEventBus.next({ chord: chordName, metadata: {} });
+    // every second chord plays reverse
+    isAlternateRef.current = !isAlternateRef.current;
+  }, [chordName]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (!isClickedRef.current) {
@@ -60,7 +72,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       if (!isPlayingRef.current) {
         // there was not enough time to start strumming - play chord immediately
-        ChordEventBus.next({ chord: chordName, metadata: {} });
+        play();
       } else {
         // stop strumming without playing the chord immediately
         isPlayingRef.current = false;
@@ -77,9 +89,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       hasTouchInput &&
         document.removeEventListener("touchend", handleClickOutside);
     };
-  }, [chordName, hasTouchInput]);
-  const isClickedRef = useRef<boolean>();
-  const isPlayingRef = useRef<boolean>();
+  }, [chordName, hasTouchInput, play]);
+
   const startStrumming = async () => {
     isClickedRef.current = true;
     await waitForNextTick();
@@ -89,10 +100,11 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     }
     isPlayingRef.current = true;
     while (isPlayingRef.current) {
-      ChordEventBus.next({ chord: chordName, metadata: {} });
+      play();
       await waitForNextTick();
     }
   };
+
   const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
   const [pressed, setPressed] = useState(false);
@@ -118,6 +130,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
         trackNumber: metadata.trackNumber,
         trackInstrument: metadata.trackInstrument,
+        reverse: isAlternateRef.current,
       };
 
       switch (chordPlayMode) {
