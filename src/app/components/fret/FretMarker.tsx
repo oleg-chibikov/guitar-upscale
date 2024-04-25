@@ -154,7 +154,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale
     <div
-      className={`
+      className={`fret-marker
             flex relative justify-center items-center h-5 pt-1 pb-1
             ${
               fret > 0 &&

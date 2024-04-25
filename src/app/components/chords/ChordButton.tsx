@@ -1,6 +1,7 @@
 import { Theme } from "@/app/data/theme";
+import { waitForNextTick } from "@/app/engine/mainClock";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
@@ -33,9 +34,65 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 }) => {
   const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
     useSelector(selectSettings);
+  const hasTouchInput = useInputChecker();
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (!isClickedRef.current) {
+        return;
+      }
+      let target = event.target as Node | null;
+      let isInsideFretMarker = false;
+
+      // if the user clicks on any button or on chords - don't hide the settings, use standard action for this button
+      while (target && target !== document) {
+        if ((target as HTMLElement)?.classList.contains("fret-marker")) {
+          isInsideFretMarker = true;
+          break;
+        }
+        target = target.parentNode;
+      }
+
+      if (isInsideFretMarker) {
+        return;
+      }
+
+      if (!isPlayingRef.current) {
+        // there was not enough time to start strumming - play chord immediately
+        ChordEventBus.next({ chord: chordName, metadata: {} });
+      } else {
+        // stop strumming without playing the chord immediately
+        isPlayingRef.current = false;
+      }
+      isClickedRef.current = false;
+    };
+
+    !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
+    hasTouchInput && document.addEventListener("touchend", handleClickOutside);
+
+    return () => {
+      !hasTouchInput &&
+        document.removeEventListener("mouseup", handleClickOutside);
+      hasTouchInput &&
+        document.removeEventListener("touchend", handleClickOutside);
+    };
+  }, [chordName, hasTouchInput]);
+  const isClickedRef = useRef<boolean>();
+  const isPlayingRef = useRef<boolean>();
+  const startStrumming = async () => {
+    isClickedRef.current = true;
+    await waitForNextTick();
+    if (!isClickedRef.current) {
+      // already released mouse/touch - don't play the strumming
+      return;
+    }
+    isPlayingRef.current = true;
+    while (isPlayingRef.current) {
+      ChordEventBus.next({ chord: chordName, metadata: {} });
+      await waitForNextTick();
+    }
+  };
   const { theme } = useSelector(selectUi);
   const disabled = !noteChordMode.variations.length;
-  const hasTouchInput = useInputChecker();
   const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
@@ -102,16 +159,20 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   return (
     <ul
-      onTouchStart={() => {
-        if (hasTouchInput) {
-          ChordEventBus.next({ chord: chordName, metadata: {} });
-        }
-      }}
-      onMouseDown={() => {
-        if (!hasTouchInput) {
-          ChordEventBus.next({ chord: chordName, metadata: {} });
-        }
-      }}
+      onTouchStart={
+        hasTouchInput
+          ? () => {
+              startStrumming();
+            }
+          : undefined
+      }
+      onMouseDown={
+        !hasTouchInput
+          ? () => {
+              startStrumming();
+            }
+          : undefined
+      }
       className={`text-center w-16 h-10 items-center justify-center content-center ${
         disabled
           ? theme === Theme.Light
