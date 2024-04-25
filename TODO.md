@@ -1,5 +1,6 @@
 TODO
 Logarithmic sliders
+Different instrument for chords
 Strumming patterns
 Chord finder!
 Several tracks for examples - highlight with different colors

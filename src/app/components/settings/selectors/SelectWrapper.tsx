@@ -1,5 +1,4 @@
 import { Theme } from "@/app/data/theme";
-import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";

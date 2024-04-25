@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
 });
 
-const VERSION = 3;
+const VERSION = 1;
 
 const persistConfig = {
   key: "root",
@@ -59,6 +59,7 @@ const persistConfig = {
         delete newState.showAlert;
         delete newState.alertMessage;
         delete newState.alertIsError;
+        delete newState.isStrumming;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing

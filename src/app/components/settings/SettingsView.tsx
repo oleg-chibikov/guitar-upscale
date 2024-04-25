@@ -30,7 +30,7 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
       <Slide direction="down" in={settingsExpanded} mountOnEnter unmountOnExit>
         <section
           ref={ref}
-          className={`flex flex-col opacity-95 overflow-auto fixed ${
+          className={`flex flex-col opacity-95 overflow-auto overscroll-contain fixed ${
             // it should be on the opposite side of chords to avoid overlapping
             chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
           } z-40 top-24 border-2 ${
@@ -49,9 +49,9 @@ export const SettingsView = forwardRef<HTMLDivElement, WithPremiumComponents>(
             }}
           />
           {premiumComponents.get("advancedChords") as ReactNode}
-          {premiumComponents.get("instruments") as ReactNode}
           <SwitchToChromaticScaleCheckbox />
           <UseSharpChordsCheckbox />
+          {premiumComponents.get("instruments") as ReactNode}
           <div
             className={`grid gap-2 ${
               theme === Theme.Light

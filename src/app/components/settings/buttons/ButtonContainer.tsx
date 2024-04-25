@@ -7,6 +7,7 @@ import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
 import { FullscreenButton } from "./FullscreenButton";
 import { MetronomeButton } from "./MetronomeButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
+import { OpenStrummingSettingsButton } from "./OpenStrummingSettingsButton";
 import { PlayButton } from "./PlayButton";
 
 interface ButtonContainerProps extends WithPremiumComponents {
@@ -47,6 +48,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
           <DisabledRecordButton />
         )}
+        <OpenStrummingSettingsButton />
       </div>
     </section>
   );

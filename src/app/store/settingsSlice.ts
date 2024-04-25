@@ -1,5 +1,7 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ChordStrummingMode } from "../data/chordStrummingMode";
+import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
@@ -50,6 +52,10 @@ interface SettingsState extends WithNeck, WithControls {
   instrument: Instrument;
   instrumentGroup: InstrumentGroup;
   reverbStrength: number;
+  chordStrummingMode: ChordStrummingMode;
+  useChordAlteration: boolean;
+  chordCustomStrummingPattern: string;
+  chordCustomStrummingWaitForPatternFinish: boolean;
 }
 
 const initialState: SettingsState = {
@@ -67,12 +73,16 @@ const initialState: SettingsState = {
   switchToChromaticScale: true,
   useAdvancedChords: true,
   useSharpChords: true,
-  chordPlayMode: ChordPlayMode.ClosestVariation,
+  chordPlayMode: ChordPlayMode.Closest_Variation,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
   instrument: "acoustic_guitar_nylon",
   instrumentGroup: "Guitar",
   reverbStrength: 0.2,
+  chordStrummingMode: ChordStrummingMode.QuarterBeat,
+  useChordAlteration: false,
+  chordCustomStrummingPattern: chordStrummingPatterns[0],
+  chordCustomStrummingWaitForPatternFinish: true,
 };
 
 // A values that changes immediately without the need for rerender
@@ -82,6 +92,13 @@ export let metronomeVelocityValue: number = initialState.metronomeVelocity;
 export let tempoBpmValue: number = initialState.tempoBpm;
 export let instrumentValue: Instrument = initialState.instrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
+export let chordStrummingModeValue: ChordStrummingMode =
+  initialState.chordStrummingMode;
+export let useChordAlterationValue: boolean = initialState.useChordAlteration;
+export let chordCustomStrummingPatternValue: string =
+  initialState.chordCustomStrummingPattern;
+export let chordCustomStrummingWaitForPatternFinishValue: boolean =
+  initialState.chordCustomStrummingWaitForPatternFinish;
 export let isMetronomeTicking = false;
 
 export const setMetronomeTicking = (value: boolean) => {
@@ -137,6 +154,11 @@ export const settingsSlice = createSlice({
       tempoBpmValue = state.tempoBpm;
       instrumentValue = state.instrument;
       reverbStrengthValue = state.reverbStrength;
+      chordStrummingModeValue = state.chordStrummingMode;
+      useChordAlterationValue = state.useChordAlteration;
+      chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
+      chordCustomStrummingWaitForPatternFinishValue =
+        state.chordCustomStrummingWaitForPatternFinish;
       setBpm(state.tempoBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
@@ -202,6 +224,25 @@ export const settingsSlice = createSlice({
       state.reverbStrength = action.payload;
       reverbStrengthValue = action.payload;
     },
+    setChordStrummingMode(state, action: PayloadAction<ChordStrummingMode>) {
+      state.chordStrummingMode = action.payload;
+      chordStrummingModeValue = action.payload;
+    },
+    setUseChordAlteration(state, action: PayloadAction<boolean>) {
+      state.useChordAlteration = action.payload;
+      useChordAlterationValue = action.payload;
+    },
+    setChordCustomStrummingPattern(state, action: PayloadAction<string>) {
+      state.chordCustomStrummingPattern = action.payload;
+      chordCustomStrummingPatternValue = action.payload;
+    },
+    setChordCustomStrummingWaitForPatternFinish(
+      state,
+      action: PayloadAction<boolean>
+    ) {
+      state.chordCustomStrummingWaitForPatternFinish = action.payload;
+      chordCustomStrummingWaitForPatternFinishValue = action.payload;
+    },
   },
 });
 
@@ -224,6 +265,10 @@ export const {
   setInstrument,
   setInstrumentGroup,
   setReverbStrength,
+  setChordStrummingMode,
+  setUseChordAlteration,
+  setChordCustomStrummingPattern,
+  setChordCustomStrummingWaitForPatternFinish,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

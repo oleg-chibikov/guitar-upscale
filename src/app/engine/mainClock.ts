@@ -8,51 +8,70 @@ export const quarterBeatToMilliseconds = (bpm: number): number => {
   return bpmToMilliseconds(bpm) * 4;
 };
 
-let resolveCurrentPromiseForNextTick: (value: void | PromiseLike<void>) => void;
-let waitForNextTickPromise: Promise<void>;
-const recreatePromiseForNextTick = () => {
-  waitForNextTickPromise = new Promise<void>((resolve) => {
-    resolveCurrentPromiseForNextTick = resolve;
-  });
+const createPromise = () => {
+  let resolveCurrentPromise: (value: void | PromiseLike<void>) => void;
+  let waitForNextTickPromise: Promise<void>;
+  const recreatePromise = () => {
+    waitForNextTickPromise = new Promise<void>((resolve) => {
+      resolveCurrentPromise = resolve;
+    });
+  };
+
+  recreatePromise();
+
+  const waitForNext = async () => {
+    await waitForNextTickPromise;
+  };
+
+  return {
+    waitForNext,
+    recreate: () => {
+      resolveCurrentPromise();
+      recreatePromise();
+    },
+  };
 };
 
-recreatePromiseForNextTick();
+const { waitForNext: waitForNextTick, recreate: recreateNextTick } =
+  createPromise();
+const {
+  waitForNext: waitForNextQuarterBeat,
+  recreate: recreateNextQuarterBeat,
+} = createPromise();
+const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
+  createPromise();
+const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
+  createPromise();
 
-export const waitForNextTick = async () => {
-  await waitForNextTickPromise;
-};
-
-let resolveCurrentPromiseForNextBeat: (value: void | PromiseLike<void>) => void;
-let waitForNextBeatPromise: Promise<void>;
-const recreatePromiseForNextBeat = () => {
-  waitForNextBeatPromise = new Promise<void>((resolve) => {
-    resolveCurrentPromiseForNextBeat = resolve;
-  });
-};
-
-recreatePromiseForNextBeat();
-
-export const waitForNextBeat = async () => {
-  await waitForNextBeatPromise;
+export {
+  waitForNextBeat,
+  waitForNextHalfBeat,
+  waitForNextQuarterBeat,
+  waitForNextTick,
 };
 
 let timer: NodeJS.Timeout | undefined;
-let tick = 15;
+const MAX_TICKS = 16;
+let tick = MAX_TICKS - 1;
 export const setBpm = (bpm: number) => {
   timer && clearInterval(timer);
   timer = setInterval(() => {
-    if (++tick === 16) {
+    if (++tick === MAX_TICKS) {
       tick = 0;
     }
-    const isBeat = tick === 0 || tick === 8;
+    const isBeat = tick % 8 === 0;
+    const isHalfBeat = tick % 4 === 0;
+    const isQuarterBeat = tick % 2 === 0;
     if (isBeat) {
-      // console.log("Accented Tick!");
-      resolveCurrentPromiseForNextBeat();
-      recreatePromiseForNextBeat();
+      recreateNextBeat();
     }
+    if (isHalfBeat) {
+      recreateNextHalfBeat();
+    }
+    if (isQuarterBeat) {
+      recreateNextQuarterBeat();
+    }
+    recreateNextTick();
     MetronomeEventBus.next({ isBeat, tick });
-    // console.log("TICK!");
-    resolveCurrentPromiseForNextTick();
-    recreatePromiseForNextTick();
   }, bpmToMilliseconds(bpm));
 };

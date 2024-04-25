@@ -25,6 +25,7 @@ interface UiState {
   fretboardScaleX: number;
   fretboardScaleY: number;
   lockRatio: boolean;
+  strummingSettingsExpanded: boolean;
 }
 
 const initialState: UiState = {
@@ -40,6 +41,7 @@ const initialState: UiState = {
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
+  strummingSettingsExpanded: false,
 };
 
 const calculatePercentage = (
@@ -140,6 +142,9 @@ export const uiSlice = createSlice({
         );
       }
     },
+    setStrummingSettingsExpanded(state, action: PayloadAction<boolean>) {
+      state.strummingSettingsExpanded = action.payload;
+    },
   },
 });
 
@@ -155,6 +160,7 @@ export const {
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,
+  setStrummingSettingsExpanded,
 } = uiSlice.actions;
 
 export const selectUi = (state: RootState) => state.ui;

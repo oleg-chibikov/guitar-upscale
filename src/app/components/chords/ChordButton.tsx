@@ -1,5 +1,11 @@
+import { ChordStrummingMode } from "@/app/data/chordStrummingMode";
 import { Theme } from "@/app/data/theme";
-import { waitForNextTick } from "@/app/engine/mainClock";
+import {
+  waitForNextBeat,
+  waitForNextHalfBeat,
+  waitForNextQuarterBeat,
+  waitForNextTick,
+} from "@/app/engine/mainClock";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -19,7 +25,13 @@ import {
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectSettings } from "../../store/settingsSlice";
+import {
+  chordCustomStrummingPatternValue,
+  chordCustomStrummingWaitForPatternFinishValue,
+  chordStrummingModeValue,
+  selectSettings,
+  useChordAlterationValue,
+} from "../../store/settingsSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -43,9 +55,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const play = useCallback(() => {
     ChordEventBus.next({ chord: chordName, metadata: {} });
-    // every second chord plays reverse
-    isAlternateRef.current = !isAlternateRef.current;
   }, [chordName]);
+
+  const playWithPossibleAlteration = useCallback(() => {
+    play();
+    if (useChordAlterationValue) {
+      isAlternateRef.current = !isAlternateRef.current;
+    }
+  }, [play]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -55,7 +72,6 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       let target = event.target as Node | null;
       let isInsideFretMarker = false;
 
-      // if the user clicks on any button or on chords - don't hide the settings, use standard action for this button
       while (target && target !== document) {
         const id = (target as HTMLElement)?.id;
         // keep playing chord when clicking notes simultaneously
@@ -72,7 +88,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       if (!isPlayingRef.current) {
         // there was not enough time to start strumming - play chord immediately
-        play();
+        playWithPossibleAlteration();
       } else {
         // stop strumming without playing the chord immediately
         isPlayingRef.current = false;
@@ -89,19 +105,69 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       hasTouchInput &&
         document.removeEventListener("touchend", handleClickOutside);
     };
-  }, [chordName, hasTouchInput, play]);
+  }, [chordName, hasTouchInput, playWithPossibleAlteration]);
 
   const startStrumming = async () => {
     isClickedRef.current = true;
-    await waitForNextTick();
+    let wait: () => Promise<void>;
+    switch (chordStrummingModeValue) {
+      case ChordStrummingMode.Beat:
+        wait = waitForNextBeat;
+        break;
+      case ChordStrummingMode.HalfBeat:
+        wait = waitForNextHalfBeat;
+        break;
+      case ChordStrummingMode.QuarterBeat:
+        wait = waitForNextQuarterBeat;
+        break;
+      case ChordStrummingMode.Custom: {
+        if (chordCustomStrummingWaitForPatternFinishValue) {
+          // if the pattern should be played fully then start it at the beat beginning, otherwise it's fine to start at the next tick
+          await waitForNextBeat();
+        } else {
+          await waitForNextTick();
+        }
+        isPlayingRef.current = true;
+        while (isClickedRef.current) {
+          const currentPattern = chordCustomStrummingPatternValue;
+
+          for (const char of currentPattern) {
+            if (!chordCustomStrummingWaitForPatternFinishValue) {
+              // early break pattern only when the checkbox is off
+              if (!isClickedRef.current) {
+                // already released mouse/touch - don't play the strumming
+                return;
+              }
+            }
+            switch (char) {
+              case "↑":
+                isAlternateRef.current = false;
+                play();
+                break;
+              case "↓":
+                isAlternateRef.current = true;
+                play();
+                break;
+              case "_":
+                break;
+            }
+            await waitForNextTick();
+          }
+        }
+        return;
+      }
+      default:
+        wait = waitForNextTick;
+    }
+    await wait();
     if (!isClickedRef.current) {
       // already released mouse/touch - don't play the strumming
       return;
     }
     isPlayingRef.current = true;
     while (isPlayingRef.current) {
-      play();
-      await waitForNextTick();
+      playWithPossibleAlteration();
+      await wait();
     }
   };
 
@@ -134,19 +200,19 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       };
 
       switch (chordPlayMode) {
-        case ChordPlayMode.RoundRobin:
+        case ChordPlayMode.Round_Robin:
           await playRoundRobin(params);
           break;
-        case ChordPlayMode.AllVariations:
+        case ChordPlayMode.All_Variations:
           await playAllVariations(params);
           break;
-        case ChordPlayMode.FirstVariation:
+        case ChordPlayMode.First_Variation:
           await playFirstChordVariation(params);
           break;
-        case ChordPlayMode.ClosestVariation:
+        case ChordPlayMode.Closest_Variation:
           await playClosestChordVariation(params);
           break;
-        case ChordPlayMode.RandomVariation:
+        case ChordPlayMode.Random_Variation:
           await playRandomChordVariation(params);
           break;
         default:

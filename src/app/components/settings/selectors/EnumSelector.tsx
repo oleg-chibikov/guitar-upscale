@@ -23,7 +23,7 @@ export function EnumSelector<
       value,
       label:
         customLabel?.(String(key), value as T[keyof T]) ??
-        String(key.replace("_", " ")),
+        String(key.replace(/_/g, " ")),
     }));
 
   return (

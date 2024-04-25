@@ -14,6 +14,7 @@ import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
+import { StrummingSettings } from "./settings/StrummingSettings";
 
 const RecordButton = dynamic(
   async () =>
@@ -107,6 +108,7 @@ export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
       <ChordsView />
       <AspectRatioControl />
       <AuthPanel />
+      <StrummingSettings />
     </main>
   );
 };

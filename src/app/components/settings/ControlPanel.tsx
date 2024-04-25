@@ -14,7 +14,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <section
-      className={`z-30 p-1 overflow-auto fixed top-1 border-2 ${
+      className={`z-30 p-1 overflow-auto overscroll-contain fixed top-1 border-2 ${
         theme === Theme.Light
           ? "bg-panel-light border-border-light"
           : "bg-panel-dark border-border-dark"

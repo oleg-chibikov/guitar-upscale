@@ -127,7 +127,7 @@ export const Fretboard: React.FC = () => {
         }}
       >
         <div
-          className={`absolute overflow-hidden origin-top-left`}
+          className={`absolute overflow-hidden overscroll-contain origin-top-left`}
           style={{
             ...position,
             maxWidth:

@@ -101,7 +101,7 @@ export const ChordsView: React.FC = () => {
           Chords
         </AccordionSummary>
         <AccordionDetails
-          className={`grid gap-0.5 overflow-auto grid-cols-2`}
+          className={`grid gap-0.5 overflow-auto overscroll-contain grid-cols-2`}
           style={{
             padding: 4,
             paddingTop: 10, // give area to tap top chords
