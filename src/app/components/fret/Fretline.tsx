@@ -74,6 +74,7 @@ export const Fretline: React.FC<FretlineProps> = ({
 
   return (
     <div
+      id={isHeader ? "fret-header" : undefined}
       className={`flex flex-row justify-between items-center`}
       style={{ height }}
     >

@@ -45,7 +45,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       // if the user clicks on any button or on chords - don't hide the settings, use standard action for this button
       while (target && target !== document) {
-        if ((target as HTMLElement)?.classList.contains("fret-marker")) {
+        const id = (target as HTMLElement)?.id;
+        // keep playing chord when clicking notes simultaneously
+        if (id === "fret-header" || id === "fret-notes") {
           isInsideFretMarker = true;
           break;
         }

@@ -32,18 +32,18 @@ const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
   const lightColors = [
     "bg-amber-400",
     "bg-green-400",
-    "bg-cyan-400",
+    "bg-lime-400",
     "bg-blue-400",
     "bg-violet-400",
     "bg-pink-400",
   ];
   const darkColors = [
     "bg-sky-600",
-    "bg-fuchsia-600",
     "bg-rose-600",
     "bg-indigo-600",
+    "bg-fuchsia-600",
+    "bg-cyan-600",
     "bg-emerald-600",
-    "bg-lime-600",
   ];
 
   const colorIndex = (trackNumber ?? 0) % lightColors.length; // Map trackNumber to index in the colors array
@@ -89,7 +89,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           const noteMetadata = metadata as NoteMetadata;
 
           // it may come from several tracks for the same note simutaneously
-          trackNumberRef.current = noteMetadata.trackNumber;
+          if (noteMetadata.trackInstrument) {
+            trackNumberRef.current = noteMetadata.trackNumber;
+          } else if (noteMetadata.fromChord) {
+            trackNumberRef.current = 5; // another color for chords
+          }
 
           animate();
           if (noteMetadata.fromChord) {
@@ -154,7 +158,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale
     <div
-      className={`fret-marker
+      className={`
             flex relative justify-center items-center h-5 pt-1 pb-1
             ${
               fret > 0 &&

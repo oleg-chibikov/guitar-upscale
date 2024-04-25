@@ -40,7 +40,7 @@ export function parseStringToNotes(notesString: Tuning): OctaveNote[] {
 
   return notes;
 }
-// TODO: Add enum with Tuning names
+
 export const tunings = {
   EBGDAE: "Standard E",
   EBGDAD: "Drop E",
