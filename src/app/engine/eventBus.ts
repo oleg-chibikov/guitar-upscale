@@ -12,7 +12,7 @@ import { playNote } from "./sound/soundProvider";
 
 export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
-  velocity?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note
+  velocity?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
 };
 
 export type TrackMetadata = {

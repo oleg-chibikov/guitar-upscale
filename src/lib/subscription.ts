@@ -11,7 +11,6 @@ const explorerWhitelist = new Set<string>(
   process.env.EXPLORER_WHITELIST?.split(",")
 );
 
-// TODO: include email and unblock Sepcial accounts
 async function getTierName(
   email: string | null,
   accessToken: string
