@@ -58,6 +58,8 @@ interface SettingsState extends WithNeck, WithControls {
   useChordAlteration: boolean;
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
+  isMetronomeTicking: boolean;
+  isStrumming: boolean;
 }
 
 const initialState: SettingsState = {
@@ -83,10 +85,12 @@ const initialState: SettingsState = {
   chordInstrumentGroup: "Strings Orchestra",
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
-  chordStrummingMode: ChordStrummingMode.QuarterBeat,
+  chordStrummingMode: ChordStrummingMode.Custom,
   useChordAlteration: false,
   chordCustomStrummingPattern: chordStrummingPatterns[0],
   chordCustomStrummingWaitForPatternFinish: true,
+  isMetronomeTicking: false,
+  isStrumming: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -104,11 +108,8 @@ export let chordCustomStrummingPatternValue: string =
   initialState.chordCustomStrummingPattern;
 export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
-export let isMetronomeTicking = false;
-
-export const setMetronomeTicking = (value: boolean) => {
-  isMetronomeTicking = value;
-};
+export let isMetronomeTickingValue = initialState.isMetronomeTicking;
+export let isStrummingValue = initialState.isStrumming;
 
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
@@ -165,6 +166,8 @@ export const settingsSlice = createSlice({
       chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
+      isMetronomeTickingValue = state.isMetronomeTicking;
+      isStrummingValue = state.isStrumming;
       setBpm(state.tempoBpm);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
@@ -259,6 +262,14 @@ export const settingsSlice = createSlice({
       state.chordCustomStrummingWaitForPatternFinish = action.payload;
       chordCustomStrummingWaitForPatternFinishValue = action.payload;
     },
+    setIsMetronomeTicking(state, action: PayloadAction<boolean>) {
+      state.isMetronomeTicking = action.payload;
+      isMetronomeTickingValue = action.payload;
+    },
+    setIsStrumming(state, action: PayloadAction<boolean>) {
+      state.isStrumming = action.payload;
+      isStrummingValue = action.payload;
+    },
   },
 });
 
@@ -287,6 +298,8 @@ export const {
   setUseChordAlteration,
   setChordCustomStrummingPattern,
   setChordCustomStrummingWaitForPatternFinish,
+  setIsMetronomeTicking,
+  setIsStrumming,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

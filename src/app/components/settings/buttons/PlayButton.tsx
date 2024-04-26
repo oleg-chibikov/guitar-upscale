@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  isMetronomeTicking,
+  isMetronomeTickingValue,
   selectSettings,
   setTempoBpm,
 } from "../../../store/settingsSlice";
@@ -55,7 +55,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
   const dispatch = useDispatch();
 
   const waitForProperStartTime = async () => {
-    if (isMetronomeTicking) {
+    if (isMetronomeTickingValue) {
       console.log("Waiting for the next beat");
       await waitForNextBeat();
     } else {

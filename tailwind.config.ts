@@ -65,8 +65,12 @@ const config: Config = {
           dark: "#999999",
         },
         border_accent: {
-          light: "#bf5337", // Red
-          dark: "#65a300", // Green
+          light: "#bf5337",
+          dark: "#65a300",
+        },
+        border_accent_stronger: {
+          light: "#ff7300",
+          dark: "#00ff08",
         },
         select_background: {
           light: "#F2F2F2",

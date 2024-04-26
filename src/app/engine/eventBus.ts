@@ -106,7 +106,7 @@ export const clearPreviousChords = () => {
 };
 
 ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
-  console.log("EventBus: chord play requested: " + chord);
+  console.log("EventBus: chord play requested", chord);
   clearPreviousChords();
 
   const playAction = ChordToChordButtonEventMap.get(chord.chord);

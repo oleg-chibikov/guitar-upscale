@@ -1,8 +1,10 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   metronomeVelocityValue,
-  setMetronomeTicking,
+  selectSettings,
+  setIsMetronomeTicking,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
@@ -23,12 +25,12 @@ function MdiMetronome() {
 }
 
 export const MetronomeButton: React.FC = (props) => {
-  const [isTicking, setIsTicking] = useState(false);
+  const dispatch = useDispatch();
+  const { isMetronomeTicking } = useSelector(selectSettings);
 
   useEffect(() => {
-    setMetronomeTicking(isTicking);
     const sub = MetronomeEventBus.subscribe(async ({ isBeat, tick }) => {
-      if (isTicking) {
+      if (isMetronomeTicking) {
         const playMetronomeTick = (
           await import("@/app/engine/sound/metronomeProvider")
         ).playMetronomeTick;
@@ -42,17 +44,17 @@ export const MetronomeButton: React.FC = (props) => {
     return () => {
       sub.unsubscribe();
     };
-  }, [isTicking]);
+  }, [isMetronomeTicking]);
 
   const handleTogglePlay = () => {
-    setIsTicking((prevState) => !prevState);
+    dispatch(setIsMetronomeTicking(!isMetronomeTicking));
   };
 
   return (
     <IconButton
       {...props}
-      tooltip={isTicking ? "Stop metronome" : "Start metronome"}
-      isActive={isTicking}
+      tooltip={isMetronomeTicking ? "Stop metronome" : "Start metronome"}
+      isActive={isMetronomeTicking}
       onPress={handleTogglePlay}
       icon={<MdiMetronome />}
     />
