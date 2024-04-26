@@ -30,6 +30,7 @@ export interface UsePlayParams {
   onPlayExample?: (params: PlayExampleParameters) => Promise<void>;
 }
 
+// TODO: when playing 2sfh (melody with tickShift) and then enable metronome it ticks off beat
 export const usePlay = ({ onPlayExample }: UsePlayParams) => {
   const {
     neck,
