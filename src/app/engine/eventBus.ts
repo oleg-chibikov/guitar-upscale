@@ -83,9 +83,9 @@ const play = async ({
 };
 
 NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
-  const serialized = serializeStringOctaveNote(noteMetadata.stringOctaveNote);
   play(noteMetadata);
-  console.log("EventBus: Note play requested: " + serialized);
+  console.log("EventBus: Note play requested", noteMetadata.stringOctaveNote);
+  const serialized = serializeStringOctaveNote(noteMetadata.stringOctaveNote);
   const animateAction = NoteToFretMarkerEventMap.get(serialized);
   if (noteMetadata.fromChord && animateAction) {
     fretMarkersFromPreviousChord.add(serialized);
@@ -114,7 +114,7 @@ export const clearPreviousChords = () => {
 };
 
 ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
-  console.log("EventBus: chord play requested", chord);
+  console.log("EventBus: Chord play requested", chord);
   clearPreviousChords();
   previousChord = chord.chord;
 

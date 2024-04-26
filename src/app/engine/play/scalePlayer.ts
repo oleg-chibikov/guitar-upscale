@@ -1,11 +1,11 @@
-import { Chord, OctaveNote, serializeOctaveNote } from "../data/notes";
-import { NotePlayEventBus } from "./eventBus";
-import { Neck } from "./generateNeckRepresentation";
+import { Chord, OctaveNote, serializeOctaveNote } from "../../data/notes";
+import { isPlayingValue } from "../../store/settingsSlice";
+import { NotePlayEventBus } from "../eventBus";
+import { Neck } from "../generateNeckRepresentation";
 
 export const playWholeScale = async (
   wait: () => Promise<void>,
   neck: Neck,
-  isCurrentlyPlaying: () => boolean,
   playFullString: boolean
 ) => {
   const reverse = Math.random() < 0.5;
@@ -19,7 +19,7 @@ export const playWholeScale = async (
   let orderedStringIndex = 0;
   for (const string of neckCopy) {
     // Check if playback should be stopped
-    if (!isCurrentlyPlaying()) {
+    if (!isPlayingValue) {
       break;
     }
     const stringCopy = [...string].filter((x) => x) as Chord;
@@ -49,7 +49,7 @@ export const playWholeScale = async (
 
     for (const note of stringCopy) {
       // Check if playback should be stopped
-      if (!isCurrentlyPlaying()) {
+      if (!isPlayingValue) {
         break;
       }
 

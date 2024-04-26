@@ -1,6 +1,7 @@
-import { Track } from "../data/example";
-import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
-import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
+import { Track } from "../../data/example";
+import { Note, OctaveNote, StringOctaveNote } from "../../data/notes";
+import { isPlayingValue } from "../../store/settingsSlice";
+import { NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
 const convertChord = (chord: string, note: Note): string => {
   // Split the chord into note and alterations
@@ -81,8 +82,7 @@ export const decodeMelody = async (
   neck: Neck,
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
-  baseNote: Note,
-  isCurrentlyPlaying: () => boolean
+  baseNote: Note
 ): Promise<void> => {
   let index = 0;
   let stringNumber: number | undefined;
@@ -97,7 +97,7 @@ export const decodeMelody = async (
   const melody = track.melody;
 
   while (index < melody.length) {
-    if (!isCurrentlyPlaying()) {
+    if (!isPlayingValue) {
       return Promise.resolve();
     }
     const char = melody[index];

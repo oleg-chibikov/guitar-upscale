@@ -18,7 +18,11 @@ import {
   generateNeckRepresentation,
   Neck,
 } from "../engine/generateNeckRepresentation";
-import { setBpm } from "../engine/mainClock";
+import {
+  isIntervalSet,
+  startInterval,
+  stopInterval,
+} from "../engine/mainClock";
 import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>
@@ -60,6 +64,7 @@ interface SettingsState extends WithNeck, WithControls {
   chordCustomStrummingWaitForPatternFinish: boolean;
   isMetronomeTicking: boolean;
   isStrumming: boolean;
+  isPlaying: boolean;
 }
 
 const initialState: SettingsState = {
@@ -91,6 +96,7 @@ const initialState: SettingsState = {
   chordCustomStrummingWaitForPatternFinish: true,
   isMetronomeTicking: false,
   isStrumming: false,
+  isPlaying: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -110,6 +116,7 @@ export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
 export let isMetronomeTickingValue = initialState.isMetronomeTicking;
 export let isStrummingValue = initialState.isStrumming;
+export let isPlayingValue: boolean = initialState.isPlaying;
 
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
@@ -148,6 +155,20 @@ const setChords = (state: WithNeck) => {
   }
 };
 
+const toggleInterval = (toggle: boolean) => {
+  if (toggle) {
+    // starting time-based activity
+    if (!isIntervalSet()) {
+      startInterval();
+    }
+  } else {
+    // stopping clock is nothing is playing
+    if (!isMetronomeTickingValue && !isStrummingValue && !isPlayingValue) {
+      stopInterval(true);
+    }
+  }
+};
+
 export const settingsSlice = createSlice({
   name: "settings",
   initialState,
@@ -168,7 +189,7 @@ export const settingsSlice = createSlice({
         state.chordCustomStrummingWaitForPatternFinish;
       isMetronomeTickingValue = state.isMetronomeTicking;
       isStrummingValue = state.isStrumming;
-      setBpm(state.tempoBpm);
+      isPlayingValue = state.isPlaying;
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
@@ -188,9 +209,13 @@ export const settingsSlice = createSlice({
       onGuitarSettingsUpdate(state);
     },
     setTempoBpm: (state, action: PayloadAction<number>) => {
+      if (tempoBpmValue === action.payload) {
+        return;
+      }
       state.tempoBpm = action.payload;
       tempoBpmValue = action.payload;
-      setBpm(action.payload);
+      stopInterval(false);
+      startInterval(false); // afresh is set to false to maintain current tick/beat position
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;
@@ -265,10 +290,17 @@ export const settingsSlice = createSlice({
     setIsMetronomeTicking(state, action: PayloadAction<boolean>) {
       state.isMetronomeTicking = action.payload;
       isMetronomeTickingValue = action.payload;
+      toggleInterval(action.payload);
     },
     setIsStrumming(state, action: PayloadAction<boolean>) {
       state.isStrumming = action.payload;
       isStrummingValue = action.payload;
+      toggleInterval(action.payload);
+    },
+    setIsPlaying(state, action: PayloadAction<boolean>) {
+      state.isPlaying = action.payload;
+      isPlayingValue = action.payload;
+      toggleInterval(action.payload);
     },
   },
 });
@@ -300,6 +332,7 @@ export const {
   setChordCustomStrummingWaitForPatternFinish,
   setIsMetronomeTicking,
   setIsStrumming,
+  setIsPlaying,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

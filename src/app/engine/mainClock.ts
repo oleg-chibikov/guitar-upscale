@@ -1,3 +1,4 @@
+import { tempoBpmValue } from "../store/settingsSlice";
 import { MetronomeEventBus } from "./eventBus";
 
 export const bpmToMilliseconds = (bpm: number): number => {
@@ -10,9 +11,9 @@ export const quarterBeatToMilliseconds = (bpm: number): number => {
 
 const createPromise = () => {
   let resolveCurrentPromise: (value: void | PromiseLike<void>) => void;
-  let waitForNextTickPromise: Promise<void>;
+  let promise: Promise<void>;
   const recreatePromise = () => {
-    waitForNextTickPromise = new Promise<void>((resolve) => {
+    promise = new Promise<void>((resolve) => {
       resolveCurrentPromise = resolve;
     });
   };
@@ -20,14 +21,16 @@ const createPromise = () => {
   recreatePromise();
 
   const waitForNext = async () => {
-    await waitForNextTickPromise;
+    await promise;
   };
 
   return {
     waitForNext,
-    recreate: () => {
+    recreate: (stopOnly: boolean = false) => {
       resolveCurrentPromise();
-      recreatePromise();
+      if (!stopOnly) {
+        recreatePromise();
+      }
     },
   };
 };
@@ -43,6 +46,13 @@ const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
 const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
   createPromise();
 
+const resolveAll = () => {
+  recreateNextTick(true);
+  recreateNextBeat(true);
+  recreateNextHalfBeat(true);
+  recreateNextQuarterBeat(true);
+};
+
 export {
   waitForNextBeat,
   waitForNextHalfBeat,
@@ -51,17 +61,37 @@ export {
 };
 
 let timer: NodeJS.Timeout | undefined;
-const MAX_TICKS = 16;
-let tick = MAX_TICKS - 1;
-export const setBpm = (bpm: number) => {
-  timer && clearInterval(timer);
-  timer = setInterval(() => {
-    if (++tick === MAX_TICKS) {
-      tick = 0;
+export const MAX_TICKS = 8;
+export let currentTick = 0;
+
+export const isIntervalSet = () => {
+  return timer !== undefined;
+};
+
+export const stopInterval = (resolvePreviousPromises: boolean) => {
+  if (timer) {
+    clearInterval(timer);
+    timer = undefined;
+    if (resolvePreviousPromises) {
+      // any wait will for the next tick will finish straight away
+      resolveAll();
     }
-    const isBeat = tick % 8 === 0;
-    const isHalfBeat = tick % 4 === 0;
-    const isQuarterBeat = tick % 2 === 0;
+  }
+};
+
+export const startInterval = (afresh: boolean = true) => {
+  if (afresh) {
+    currentTick = 0; // reset tick to 0
+  }
+
+  const onTick = () => {
+    if (currentTick === MAX_TICKS) {
+      currentTick = 0;
+    }
+    console.log("Tick " + currentTick);
+    const isBeat = currentTick % 8 === 0; // Beat is every 8 ticks
+    const isHalfBeat = currentTick % 4 === 0;
+    const isQuarterBeat = currentTick % 2 === 0;
     if (isBeat) {
       recreateNextBeat();
     }
@@ -72,6 +102,9 @@ export const setBpm = (bpm: number) => {
       recreateNextQuarterBeat();
     }
     recreateNextTick();
-    MetronomeEventBus.next({ isBeat, tick });
-  }, bpmToMilliseconds(bpm));
+    MetronomeEventBus.next({ isBeat, tick: currentTick });
+    currentTick++;
+  };
+  onTick(); // first tick starts immediately
+  timer = setInterval(onTick, bpmToMilliseconds(tempoBpmValue));
 };

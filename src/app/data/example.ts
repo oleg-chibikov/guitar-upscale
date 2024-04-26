@@ -7,6 +7,7 @@ export type Example = {
   tracks: Track[];
   tuning?: Tuning;
   tempo?: number;
+  tickShift?: number;
 };
 
 export type Track = {

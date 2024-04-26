@@ -12,17 +12,18 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             band: "Linkin Park",
             title: "Numb",
             tempo: 110,
+            tickShift: 3,
             tracks: [
               {
-                melody: "_*1030(*00__3__2______*1030*03__2*1__3______*1030)3",
+                melody: "*1030(*00__3__2______*1030*03__2*1__3______*1030)3",
               },
               {
-                melody: "____(<Em>________<C>________<G>________<D>________)3",
+                melody: "___(<Em>________<C>________<G>________<D>________)3",
               },
               {
                 instrument: "acoustic_guitar_nylon",
                 melody:
-                  "____(________)4(*5__00_000*4__33_333*5__33_333*3__00_000)2",
+                  "___(________)4(*5__00_000*4__33_333*5__33_333*3__00_000)2",
               },
             ],
           },
@@ -74,19 +75,20 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             band: "Two Steps From Hell",
             title: "Emerald Princess",
             tempo: 64,
+            tickShift: 3,
             tracks: [
               {
                 melody:
-                  "_(*37*21-097 __ *291-0 _ *01-0_8 __ *01-08 _ *11-068 __ *25*086*11-081-1 __ *11-08*53*16_*27 ____ *27*15_6 _ *15*275 _ *2*37_1-279_____*03*45*24__)2",
+                  "(*37*21-097 __ *291-0 _ *01-0_8 __ *01-08 _ *11-068 __ *25*086*11-081-1 __ *11-08*53*16_*27 ____ *27*15_6 _ *15*275 _ *2*37_1-279_____*03*45*24__)2",
               },
               {
                 melody:
-                  "____(<Dm>________<F>________<C>________<Gm>______<Am>__<A#>________<Dm>____<Am>____<G>________<G>________)2",
+                  "___(<Dm>________<F>________<C>________<Gm>______<Am>__<A#>________<Dm>____<Am>____<G>________<G>________)2",
               },
               {
                 instrument: "xylophone",
                 melody:
-                  "_(____ *30*22 __*30 ___ *33*22 __ *43 ___ *32*20 ______ *45*35 ______ *33*23*13*11-5 ____ *30 ___ *32 _____*53*45*35*24*13___*42*30)2",
+                  "(____ *30*22 __*30 ___ *33*22 __ *43 ___ *32*20 ______ *45*35 ______ *33*23*13*11-5 ____ *30 ___ *32 _____*53*45*35*24*13___*42*30)2",
               },
             ],
           },
@@ -169,11 +171,16 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
   ],
 ]);
 
-export const getScaleExamples = async (
+const getRandomRecord = <T>(array: T[]): T => {
+  const randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+};
+
+export const getRandomScaleExample = async (
   group: string,
   scale: string,
   reverbStrength: number
-): Promise<Example[] | undefined> => {
+): Promise<Example | undefined> => {
   const groupScales = examplesMap.get(group);
   const examples = groupScales?.get(scale);
   if (!examples) {
@@ -188,5 +195,5 @@ export const getScaleExamples = async (
     })
   );
   await Promise.all(instrumentLoadPromises);
-  return examples;
+  return getRandomRecord(examples);
 };
