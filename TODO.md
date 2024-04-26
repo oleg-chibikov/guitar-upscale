@@ -1,6 +1,5 @@
 TODO
 Logarithmic sliders
-Different instrument for chords
 Chord finder!
 Midi upload and play
 Better animation on play
