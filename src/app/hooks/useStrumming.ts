@@ -123,34 +123,37 @@ export const useStrumming = (
         : waitForNextTick
     );
 
-    setPlaying(true);
-    while (isClickedRef.current) {
-      const currentPattern = chordCustomStrummingPatternValue;
+    try {
+      setPlaying(true);
+      while (isClickedRef.current) {
+        const currentPattern = chordCustomStrummingPatternValue;
 
-      for (const char of currentPattern) {
-        if (!chordCustomStrummingWaitForPatternFinishValue) {
-          // early break pattern only when the checkbox is off
-          if (!isClickedRef.current) {
-            // already released mouse/touch - don't play the strumming
-            return;
+        for (const char of currentPattern) {
+          if (!chordCustomStrummingWaitForPatternFinishValue) {
+            // early break pattern only when the checkbox is off
+            if (!isClickedRef.current) {
+              // already released mouse/touch - don't play the strumming
+              return;
+            }
           }
+          switch (char) {
+            case "↑":
+              isAlternateRef.current = false;
+              play();
+              break;
+            case "↓":
+              isAlternateRef.current = true;
+              play();
+              break;
+            case "_":
+              break;
+          }
+          await waitForNextTick();
         }
-        switch (char) {
-          case "↑":
-            isAlternateRef.current = false;
-            play();
-            break;
-          case "↓":
-            isAlternateRef.current = true;
-            play();
-            break;
-          case "_":
-            break;
-        }
-        await waitForNextTick();
       }
+    } finally {
+      setPlaying(false);
     }
-    setPlaying(false);
   };
 
   const strumStandard = async (wait: () => Promise<void>) => {
