@@ -2,6 +2,7 @@ import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
 import {
+  chordInstrumentValue,
   instrumentValue,
   reverbStrengthValue,
   tempoBpmValue,
@@ -64,6 +65,7 @@ const play = async ({
   stringOctaveNote,
   trackInstrument,
   velocity,
+  fromChord,
 }: NoteMetadata) => {
   // This module is essential and should be loaded asap, so I commented out lazy loading here
   // const playNote = (await import("@/app/engine/sound/soundProvider"))
@@ -71,7 +73,7 @@ const play = async ({
   await playNote(
     stringOctaveNote,
     velocity ?? velocityValue,
-    trackInstrument ?? instrumentValue,
+    trackInstrument ?? (fromChord ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,
     reverbStrengthValue,
     quarterBeatToMilliseconds(tempoBpmValue)

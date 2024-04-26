@@ -1,9 +1,7 @@
 TODO
 Logarithmic sliders
 Different instrument for chords
-Strumming patterns
 Chord finder!
-Several tracks for examples - highlight with different colors
 Midi upload and play
 Better animation on play
 More chords

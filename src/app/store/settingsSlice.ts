@@ -49,8 +49,10 @@ interface SettingsState extends WithNeck, WithControls {
   chordPlayMode: ChordPlayMode;
   chordNotesToPlay: number;
   tuning: Tuning;
-  instrument: Instrument;
   instrumentGroup: InstrumentGroup;
+  instrument: Instrument;
+  chordInstrumentGroup: InstrumentGroup;
+  chordInstrument: Instrument;
   reverbStrength: number;
   chordStrummingMode: ChordStrummingMode;
   useChordAlteration: boolean;
@@ -76,8 +78,10 @@ const initialState: SettingsState = {
   chordPlayMode: ChordPlayMode.Closest_Variation,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
-  instrument: "acoustic_guitar_nylon",
   instrumentGroup: "Guitar",
+  instrument: "acoustic_guitar_nylon",
+  chordInstrumentGroup: "Strings Orchestra",
+  chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
   chordStrummingMode: ChordStrummingMode.QuarterBeat,
   useChordAlteration: false,
@@ -91,6 +95,7 @@ export let velocityValue: number = initialState.velocity;
 export let metronomeVelocityValue: number = initialState.metronomeVelocity;
 export let tempoBpmValue: number = initialState.tempoBpm;
 export let instrumentValue: Instrument = initialState.instrument;
+export let chordInstrumentValue: Instrument = initialState.chordInstrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
 export let chordStrummingModeValue: ChordStrummingMode =
   initialState.chordStrummingMode;
@@ -153,6 +158,7 @@ export const settingsSlice = createSlice({
       metronomeVelocityValue = state.metronomeVelocity;
       tempoBpmValue = state.tempoBpm;
       instrumentValue = state.instrument;
+      chordInstrumentValue = state.chordInstrument;
       reverbStrengthValue = state.reverbStrength;
       chordStrummingModeValue = state.chordStrummingMode;
       useChordAlterationValue = state.useChordAlteration;
@@ -220,6 +226,16 @@ export const settingsSlice = createSlice({
       // TODO: lazy load instruments.ts if permissions allow
       state.instrumentGroup = action.payload;
     },
+    setChordInstrument(state, action: PayloadAction<Instrument>) {
+      state.chordInstrument = action.payload;
+      chordInstrumentValue = action.payload;
+    },
+    setChordInstrumentGroup: (
+      state,
+      action: PayloadAction<InstrumentGroup>
+    ) => {
+      state.chordInstrumentGroup = action.payload;
+    },
     setReverbStrength(state, action: PayloadAction<number>) {
       state.reverbStrength = action.payload;
       reverbStrengthValue = action.payload;
@@ -264,6 +280,8 @@ export const {
   setTuning,
   setInstrument,
   setInstrumentGroup,
+  setChordInstrument,
+  setChordInstrumentGroup,
   setReverbStrength,
   setChordStrummingMode,
   setUseChordAlteration,

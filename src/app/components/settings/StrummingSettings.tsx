@@ -27,7 +27,10 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
       mountOnEnter
       unmountOnExit
     >
-      <div id="strumming-settings" className={"z-20 fixed bottom-1 left-1/2"}>
+      <section
+        id="strumming-settings"
+        className={"z-20 fixed bottom-1 left-1/2"}
+      >
         <div
           className={`flex flex-col gap-2 translate-x-[-50%] p-4 border-2  ${
             theme === Theme.Light
@@ -54,7 +57,7 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
             <ChordStrummingModeSelector />
           </div>
         </div>
-      </div>
+      </section>
     </Slide>
   );
 };

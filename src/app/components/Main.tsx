@@ -7,6 +7,7 @@ import {
   WithPremiumFeatures,
 } from "../helpers/WithPremiumFeatures";
 import { Initializer } from "./Initializer";
+import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
 import { AlertWrapper } from "./alert/AlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
@@ -46,8 +47,19 @@ const UseAdvancedChordsCheckbox = dynamic(
 );
 const InstrumentSelector = dynamic(
   async () =>
-    (await import("@/app/components/settings/selectors/InstrumentSelector"))
-      .InstrumentSelector
+    (
+      await import(
+        "@/app/components/settings/selectors/instrument/InstrumentSelector"
+      )
+    ).InstrumentSelector
+);
+const ChordInstrumentSelector = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/selectors/instrument/ChordInstrumentSelector"
+      )
+    ).InstrumentSelector
 );
 const ReverbStrengthSlider = dynamic(
   async () =>
@@ -70,7 +82,12 @@ export const premiumFeaturesToMap = (
       case "advancedChords":
         return <UseAdvancedChordsCheckbox />;
       case "instruments":
-        return <InstrumentSelector />;
+        return (
+          <>
+            <InstrumentSelector />
+            <ChordInstrumentSelector />
+          </>
+        );
       case "reverbStrength":
         return <ReverbStrengthSlider />;
       case "melodies":
@@ -98,6 +115,7 @@ export const premiumFeaturesToMap = (
 
 export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
   const premiumComponents = premiumFeaturesToMap(premiumFeatures);
+
   return (
     <main>
       <Initializer />
@@ -109,6 +127,7 @@ export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
       <AspectRatioControl />
       <AuthPanel />
       <StrummingSettings />
+      <MenuOutsideClickHandler />
     </main>
   );
 };

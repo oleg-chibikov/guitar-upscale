@@ -11,21 +11,31 @@ import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   reverbStrengthValue,
   selectSettings,
-  setInstrument,
-  setInstrumentGroup,
   velocityValue,
 } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { SelectWrapper } from "./SelectWrapper";
+import { useSelector } from "react-redux";
+import { SelectWrapper } from "../SelectWrapper";
 
-const InstrumentSelector: React.FC = () => {
-  const { instrument, instrumentGroup, reverbStrength, velocity, tempoBpm } =
-    useSelector(selectSettings);
-  const dispatch = useDispatch();
+interface BaseInstrumentSelectorProps {
+  label: string;
+  instrumentGroup: InstrumentGroup;
+  instrument: Instrument;
+  setInstrumentGroup: (value: InstrumentGroup) => void;
+  setInstrument: (value: Instrument) => void;
+}
+
+const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
+  label,
+  instrument,
+  instrumentGroup,
+  setInstrumentGroup,
+  setInstrument,
+}) => {
+  const { tempoBpm } = useSelector(selectSettings);
 
   const handleGroupChange = async (group: InstrumentGroup) => {
-    dispatch(setInstrumentGroup(group));
+    setInstrumentGroup(group);
 
     // Select the first instrument from the group
     const instrumentsInGroup = instrumentGroups[group];
@@ -35,7 +45,7 @@ const InstrumentSelector: React.FC = () => {
   };
 
   const handleInstrumentChange = async (value: string) => {
-    dispatch(setInstrument(value as Instrument));
+    setInstrument(value as Instrument);
     await playNote(
       { note: Note.E, octave: 5 },
       velocityValue,
@@ -48,7 +58,7 @@ const InstrumentSelector: React.FC = () => {
   const group: Instrument[] = instrumentGroups[instrumentGroup];
   return (
     <>
-      <span>Instrument:</span>
+      <span>{label}:</span>
       <SelectWrapper
         value={instrumentGroup}
         onChange={(value) => handleGroupChange(value as InstrumentGroup)}
@@ -73,4 +83,4 @@ const InstrumentSelector: React.FC = () => {
   );
 };
 
-export { InstrumentSelector };
+export { BaseInstrumentSelector };

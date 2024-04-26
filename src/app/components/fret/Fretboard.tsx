@@ -80,7 +80,7 @@ export const Fretboard: React.FC = () => {
     setTimeout(() => {
       // doesn't apply well without timeout
       window.scrollTo(scrollX, scrollY);
-    }, 100);
+    }, 200);
   }, [fretboardScaleX, fretboardScaleY]);
 
   useEffect(repostion, [repostion, orientation]);

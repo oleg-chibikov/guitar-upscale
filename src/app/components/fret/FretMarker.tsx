@@ -40,8 +40,8 @@ const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
   const darkColors = [
     "bg-sky-600",
     "bg-rose-600",
-    "bg-indigo-600",
     "bg-fuchsia-600",
+    "bg-indigo-600",
     "bg-cyan-600",
     "bg-emerald-600",
   ];

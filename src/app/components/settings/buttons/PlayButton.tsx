@@ -1,5 +1,6 @@
 "use client";
 import { Example } from "@/app/data/example";
+import { Instrument } from "@/app/data/instruments";
 import { getNoteText } from "@/app/data/notes";
 import { PlaybackType } from "@/app/data/playbackType";
 import { parseStringToNotes } from "@/app/data/tunings";
@@ -45,6 +46,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     chordsMap,
     playbackType,
     instrument,
+    chordInstrument,
     reverbStrength,
   } = useSelector(selectSettings);
 
@@ -79,7 +81,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     isCurrentlyPlaying = true;
 
     let examples: Example[] | undefined;
-    let playWholeScale;
     if (onPlayExample) {
       const { getScaleExamples } = await import("@/app/data/scaleExamples");
       examples = await getScaleExamples(scaleGroup, scale, reverbStrength);
@@ -88,9 +89,23 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     }
 
     // the instrument should be initialized before waiting for the first note
-    await initSoundfont(instrument, reverbStrength);
     // init metronome here as we don't want to get glitches if it gets turned on during playing
-    await initMetronome();
+    const trackInstrumentPromises =
+      examples
+        ?.flatMap((example) => example.tracks.map((track) => track.instrument))
+        .filter((x) => x)
+        .map((instrument) =>
+          initSoundfont(instrument as Instrument, reverbStrength)
+        ) ?? [];
+    const loadInstrumentPromises = [
+      ...trackInstrumentPromises,
+      initSoundfont(instrument, reverbStrength),
+      initSoundfont(chordInstrument, reverbStrength),
+      initMetronome(),
+    ];
+
+    await Promise.all(loadInstrumentPromises);
+
     ReactGA.event({
       category: "Playback",
       action: "Playback started",
@@ -135,6 +150,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = ({
     }
   }, [
     baseNote,
+    chordInstrument,
     dispatch,
     instrument,
     neck,
