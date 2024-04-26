@@ -40,6 +40,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   }, [chordName]);
   const isDisabled = !noteChordMode.variations.length;
 
+  const [wasPlayedLast, setWasPlayedLast] = useState<boolean>(false);
+  const [animate, setAnimate] = useState(false);
   const { startStrumming, isPlaying, isClicked, isAlternateRef } = useStrumming(
     play,
     isDisabled,
@@ -47,7 +49,6 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   );
 
   const { theme } = useSelector(selectUi);
-  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     const handleChordEvent = async (metadata: ChordMetadata) => {
@@ -55,11 +56,18 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         return;
       }
 
+      if (metadata.clear) {
+        console.log("Clear previous chord marker: " + chordName);
+        setWasPlayedLast(false);
+        return;
+      }
+
       console.log("Playing chord: " + chordName);
 
+      setWasPlayedLast(true);
       // Start the animation sequence
-      setPressed(true);
-      setTimeout(() => setPressed(false), 150);
+      setAnimate(true);
+      setTimeout(() => setAnimate(false), 150);
 
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
       const params: ChordPlayParameters = {
@@ -143,7 +151,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           ? theme === Theme.Light
             ? "bg-disabled-light text-gray-500"
             : "bg-disabled-dark text-gray-500"
-          : pressed
+          : animate
           ? `scale-50 ${
               theme === Theme.Light
                 ? "bg-button_pressed-light"
@@ -155,7 +163,15 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
                 : isPlaying || (!isDisabled && !isClicked)
                 ? " cursor-pointer"
                 : undefined
-            } ${theme === Theme.Light ? "bg-button-light" : "bg-button-dark"}`
+            } ${
+              theme === Theme.Light
+                ? wasPlayedLast
+                  ? "bg-previous_chord-light"
+                  : "bg-button-light"
+                : wasPlayedLast
+                ? "bg-previous_chord-dark"
+                : "bg-button-dark"
+            }`
       } font-mono select-none ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       } transition-transform transform origin-center`}

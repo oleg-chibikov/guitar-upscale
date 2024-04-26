@@ -20,6 +20,10 @@ const config: Config = {
           light: "#E6B39A", // Mocha
           dark: "#b3cde4",
         },
+        previous_chord: {
+          light: "#F6E7D2", // Cappuccino
+          dark: "#1d3f58",
+        },
         previous_fret_marker: {
           light: "#333333", // Cappuccino
           dark: "#b3cde4",
