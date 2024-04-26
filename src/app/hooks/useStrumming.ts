@@ -163,11 +163,14 @@ export const useStrumming = (
       return;
     }
     setPlaying(true);
-    while (isClickedRef.current) {
-      playWithPossibleAlteration();
-      await wait();
+    try {
+      while (isClickedRef.current) {
+        playWithPossibleAlteration();
+        await wait();
+      }
+    } finally {
+      setPlaying(false);
     }
-    setPlaying(false);
   };
 
   const startStrumming = async () => {
