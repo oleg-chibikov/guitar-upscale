@@ -1,8 +1,7 @@
 import { useCallback, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { ChordStrummingMode } from "../data/chordStrummingMode";
+import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import {
-  isIntervalSet,
+  isMainClockTicking,
   waitForNextBeat,
   waitForNextHalfBeat,
   waitForNextQuarterBeat,
@@ -14,13 +13,27 @@ import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
   chordInstrumentValue,
-  chordStrummingModeValue,
+  chordStrummingIntervalValue,
   reverbStrengthValue,
   setIsStrumming,
   useChordAlterationValue,
 } from "../store/settingsSlice";
 
+const getWaitBetweenFunc = () => {
+  switch (chordStrummingIntervalValue) {
+    case ChordStrummingInterval.Beat:
+      return waitForNextBeat;
+    case ChordStrummingInterval.HalfBeat:
+      return waitForNextHalfBeat;
+    case ChordStrummingInterval.QuarterBeat:
+      return waitForNextQuarterBeat;
+    default:
+      return waitForNextTick;
+  }
+};
+
 export const useStrumming = (
+  chordName: string,
   play: () => void,
   isDisabled: boolean,
   hasTouchInput: boolean
@@ -31,17 +44,18 @@ export const useStrumming = (
   const isPlayingRef = useRef<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
 
-  const dispatch = useDispatch();
-
   const playWithPossibleAlteration = useCallback(() => {
+    console.log("Playing", chordName);
     play();
     if (useChordAlterationValue) {
       isAlternateRef.current = !isAlternateRef.current;
     }
-  }, [play]);
+  }, [chordName, play]);
 
   const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    console.log("Clicked outside", chordName);
     if (!isClickedRef.current || isDisabled) {
+      console.log("Chord not clicked yet - ignoring", chordName);
       return;
     }
     let target = event.target as Node | null;
@@ -58,12 +72,17 @@ export const useStrumming = (
     }
 
     if (isInsideFretMarker) {
+      console.log("Clicked on fretboard - ignoring", chordName);
       return;
     }
 
     if (!isPlayingRef.current) {
-      // there was not enough time to start strumming - play chord immediately
-      playWithPossibleAlteration();
+      console.log(
+        "Not playing when clicked outside - stop strumming",
+        chordName
+      );
+      // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
+      setIsStrumming(chordName, false);
     }
     setClicked(false);
   };
@@ -76,122 +95,115 @@ export const useStrumming = (
   const setPlaying = (value: boolean) => {
     setIsPlaying(value);
     isPlayingRef.current = value;
-    dispatch(setIsStrumming(value));
-  };
-
-  const wait = async () => {
-    if (isIntervalSet()) {
-      // wait to sync with metronome/melody if playing, otherwise start straight away
-      const waitFunc = chordCustomStrummingWaitForPatternFinishValue
-        ? waitForNextBeat
-        : waitForNextTick;
-      await waitFunc();
-    }
-  };
-
-  const strumCustom = async () => {
-    await wait();
-
-    try {
-      setPlaying(true);
-      while (isClickedRef.current) {
-        const currentPattern = chordCustomStrummingPatternValue;
-
-        for (const char of currentPattern) {
-          if (!chordCustomStrummingWaitForPatternFinishValue) {
-            // early break pattern only when the checkbox is off
-            if (!isClickedRef.current) {
-              // already released mouse/touch - don't play the strumming
-              return;
-            }
-          }
-          switch (char) {
-            case "↑":
-              isAlternateRef.current = false;
-              play();
-              break;
-            case "↓":
-              isAlternateRef.current = true;
-              play();
-              break;
-            case "_":
-              break;
-          }
-          await waitForNextTick();
-        }
-      }
-    } finally {
-      setPlaying(false);
-    }
-  };
-
-  const strumStandard = async (waitBetweenChords: () => Promise<void>) => {
-    await wait();
-    if (!isClickedRef.current) {
-      // already released mouse/touch - don't play the strumming
-      return;
-    }
-    setPlaying(true);
-    try {
-      while (isClickedRef.current) {
-        playWithPossibleAlteration();
-        await waitBetweenChords();
-      }
-    } finally {
-      setPlaying(false);
-    }
   };
 
   const startStrumming = async () => {
-    //TODO: play first chord immediately on mousedown, only then wait to continue
-
     if (isDisabled) {
       return;
     }
 
     setClicked(true);
-
     !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
     hasTouchInput && document.addEventListener("touchend", handleClickOutside);
+    try {
+      await Promise.all([
+        initSoundfont(chordInstrumentValue, reverbStrengthValue),
+        initMetronome(),
+      ]);
 
-    await Promise.all([
-      initSoundfont(chordInstrumentValue, reverbStrengthValue),
-      initMetronome(),
-    ]);
+      const wasClockTickingAtStrummingStart = isMainClockTicking();
 
-    setTimeout(async () => {
-      try {
-        // the chord button must be still pressed to start strumming
-        if (!isClickedRef.current) {
-          return;
-        }
-        if (chordStrummingModeValue === ChordStrummingMode.Custom) {
-          await strumCustom();
-          return;
-        }
-        // timeout is needed to avoid strumming when the intention is to play single chord (happens in rare case when click is very close to the beat time - easy to rerpoduce on high bpm)
-        let waitBetweenChords: () => Promise<void>;
-        switch (chordStrummingModeValue) {
-          case ChordStrummingMode.Beat:
-            waitBetweenChords = waitForNextBeat;
-            break;
-          case ChordStrummingMode.HalfBeat:
-            waitBetweenChords = waitForNextHalfBeat;
-            break;
-          case ChordStrummingMode.QuarterBeat:
-            waitBetweenChords = waitForNextQuarterBeat;
-            break;
-          default:
-            waitBetweenChords = waitForNextTick;
-        }
-        await strumStandard(waitBetweenChords);
-      } finally {
-        !hasTouchInput &&
-          document.removeEventListener("mouseup", handleClickOutside);
-        hasTouchInput &&
-          document.removeEventListener("touchend", handleClickOutside);
+      if (isClickedRef.current) {
+        console.log("Mark as strumming", chordName);
+        setIsStrumming(chordName, true);
+      } else {
+        console.log(
+          "Already released mouse/touch after immediate chord. Don't start strumming",
+          chordName
+        );
+        return;
       }
-    }, 250);
+
+      if (!wasClockTickingAtStrummingStart) {
+        // Play first chord straight away
+        playWithPossibleAlteration();
+      }
+
+      const waitBetween = getWaitBetweenFunc();
+
+      if (wasClockTickingAtStrummingStart) {
+        // TODO: We need to wait for the current pattern to finish - it might be something other than next beat if pattern is longer or chord interval is not a Tick
+        // for that we'll need to store
+        // 1. current pattern (done)
+        // 2. tick when the current pattern started - to get the difference for waiting
+        // 3. info if the pattern has been started - if not - just wait for beat as now (semi done)
+        console.log("Waiting for next beat for strumming to begin", chordName);
+        await waitForNextBeat();
+      } else {
+        console.log("Waiting for next tick for strumming to begin", chordName);
+        await waitBetween();
+      }
+
+      if (!isClickedRef.current) {
+        console.log(
+          "Already released mouse/touch after wait. Stop strumming and return",
+          chordName
+        );
+        setIsStrumming(chordName, false);
+        return;
+      }
+
+      console.log("Starting strumming", chordName);
+      setPlaying(true);
+      try {
+        // skip first chord if it was played immediately
+        await strum(wasClockTickingAtStrummingStart ? 0 : 1, waitBetween);
+      } finally {
+        console.log("Strum finished - stop strumming", chordName);
+        setPlaying(false);
+        setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
+      }
+    } finally {
+      !hasTouchInput &&
+        document.removeEventListener("mouseup", handleClickOutside);
+      hasTouchInput &&
+        document.removeEventListener("touchend", handleClickOutside);
+    }
+  };
+
+  const strum = async (
+    startIndex: number,
+    waitBetweenChords: () => Promise<void>
+  ) => {
+    let i = startIndex; // skip first as it was played already
+    while (isClickedRef.current) {
+      const currentPattern = chordCustomStrummingPatternValue;
+
+      for (; i < currentPattern.length; i++) {
+        const char = currentPattern[i];
+        if (!chordCustomStrummingWaitForPatternFinishValue) {
+          // early break pattern only when the checkbox is off
+          if (!isClickedRef.current) {
+            // already released mouse/touch - don't play the strumming
+            return;
+          }
+        }
+        switch (char) {
+          case "↑":
+            isAlternateRef.current = false;
+            play();
+            break;
+          case "↓":
+            isAlternateRef.current = true;
+            play();
+            break;
+          case "_":
+            break;
+        }
+        await waitBetweenChords();
+      }
+      i = 0; // reset  to start pattern afresh
+    }
   };
 
   return { startStrumming, isPlaying, isClicked, isAlternateRef };

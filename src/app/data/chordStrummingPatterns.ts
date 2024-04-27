@@ -2,6 +2,7 @@
 
 // Note: Updating this requires dropping the persisted store, otherwise it will use previous values
 export const chordStrummingPatterns = [
+  "↑_↓_↑_↓_",
   "↑↓_↑↓↑__",
   "↑__↓↑__↓",
   "↑_↑↓_↓↑↓",

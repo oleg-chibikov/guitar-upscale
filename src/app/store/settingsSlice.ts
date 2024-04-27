@@ -1,6 +1,6 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChordStrummingMode } from "../data/chordStrummingMode";
+import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
@@ -19,7 +19,7 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 import {
-  isIntervalSet,
+  isMainClockTicking,
   startInterval,
   stopInterval,
 } from "../engine/mainClock";
@@ -58,12 +58,11 @@ interface SettingsState extends WithNeck, WithControls {
   chordInstrumentGroup: InstrumentGroup;
   chordInstrument: Instrument;
   reverbStrength: number;
-  chordStrummingMode: ChordStrummingMode;
+  chordStrummingInterval: ChordStrummingInterval;
   useChordAlteration: boolean;
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
   isMetronomeTicking: boolean;
-  isStrumming: boolean;
   isPlaying: boolean;
 }
 
@@ -90,12 +89,11 @@ const initialState: SettingsState = {
   chordInstrumentGroup: "Strings Orchestra",
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
-  chordStrummingMode: ChordStrummingMode.Custom,
+  chordStrummingInterval: ChordStrummingInterval.Tick,
   useChordAlteration: false,
   chordCustomStrummingPattern: chordStrummingPatterns[0],
   chordCustomStrummingWaitForPatternFinish: true,
   isMetronomeTicking: false,
-  isStrumming: false,
   isPlaying: false,
 };
 
@@ -107,16 +105,26 @@ export let tempoBpmValue: number = initialState.tempoBpm;
 export let instrumentValue: Instrument = initialState.instrument;
 export let chordInstrumentValue: Instrument = initialState.chordInstrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
-export let chordStrummingModeValue: ChordStrummingMode =
-  initialState.chordStrummingMode;
+export let chordStrummingIntervalValue: ChordStrummingInterval =
+  initialState.chordStrummingInterval;
 export let useChordAlterationValue: boolean = initialState.useChordAlteration;
 export let chordCustomStrummingPatternValue: string =
   initialState.chordCustomStrummingPattern;
 export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
 export let isMetronomeTickingValue = initialState.isMetronomeTicking;
-export let isStrummingValue = initialState.isStrumming;
 export let isPlayingValue: boolean = initialState.isPlaying;
+
+export let strummingChordsMap = new Set<string>();
+
+export const setIsStrumming = (chordName: string, value: boolean) => {
+  if (value) {
+    strummingChordsMap.add(chordName);
+  } else {
+    strummingChordsMap.delete(chordName);
+  }
+  toggleInterval(value);
+};
 
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
@@ -158,12 +166,18 @@ const setChords = (state: WithNeck) => {
 const toggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
-    if (!isIntervalSet()) {
+    if (!isMainClockTicking()) {
+      console.log("Clock not ticking - starting it");
       startInterval();
     }
   } else {
     // stopping clock is nothing is playing
-    if (!isMetronomeTickingValue && !isStrummingValue && !isPlayingValue) {
+    if (
+      !isMetronomeTickingValue &&
+      strummingChordsMap.size === 0 &&
+      !isPlayingValue
+    ) {
+      console.log("Nothing playing - stopping clock");
       stopInterval(true);
     }
   }
@@ -182,13 +196,12 @@ export const settingsSlice = createSlice({
       instrumentValue = state.instrument;
       chordInstrumentValue = state.chordInstrument;
       reverbStrengthValue = state.reverbStrength;
-      chordStrummingModeValue = state.chordStrummingMode;
+      chordStrummingIntervalValue = state.chordStrummingInterval;
       useChordAlterationValue = state.useChordAlteration;
       chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
       isMetronomeTickingValue = state.isMetronomeTicking;
-      isStrummingValue = state.isStrumming;
       isPlayingValue = state.isPlaying;
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
@@ -268,9 +281,12 @@ export const settingsSlice = createSlice({
       state.reverbStrength = action.payload;
       reverbStrengthValue = action.payload;
     },
-    setChordStrummingMode(state, action: PayloadAction<ChordStrummingMode>) {
-      state.chordStrummingMode = action.payload;
-      chordStrummingModeValue = action.payload;
+    setChordStrummingInterval(
+      state,
+      action: PayloadAction<ChordStrummingInterval>
+    ) {
+      state.chordStrummingInterval = action.payload;
+      chordStrummingIntervalValue = action.payload;
     },
     setUseChordAlteration(state, action: PayloadAction<boolean>) {
       state.useChordAlteration = action.payload;
@@ -290,11 +306,6 @@ export const settingsSlice = createSlice({
     setIsMetronomeTicking(state, action: PayloadAction<boolean>) {
       state.isMetronomeTicking = action.payload;
       isMetronomeTickingValue = action.payload;
-      toggleInterval(action.payload);
-    },
-    setIsStrumming(state, action: PayloadAction<boolean>) {
-      state.isStrumming = action.payload;
-      isStrummingValue = action.payload;
       toggleInterval(action.payload);
     },
     setIsPlaying(state, action: PayloadAction<boolean>) {
@@ -326,12 +337,11 @@ export const {
   setChordInstrument,
   setChordInstrumentGroup,
   setReverbStrength,
-  setChordStrummingMode,
+  setChordStrummingInterval,
   setUseChordAlteration,
   setChordCustomStrummingPattern,
   setChordCustomStrummingWaitForPatternFinish,
   setIsMetronomeTicking,
-  setIsStrumming,
   setIsPlaying,
 } = settingsSlice.actions;
 

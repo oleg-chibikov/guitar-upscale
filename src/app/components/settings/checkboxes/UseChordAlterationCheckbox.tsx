@@ -13,7 +13,7 @@ export const UseChordAlterationCheckbox: React.FC = (props) => {
   return (
     <CheckBox
       {...props}
-      label="Alteration"
+      label="Alternate chords (↑↓)"
       value={useChordAlteration}
       onValueChange={(value: boolean) => dispatch(setUseChordAlteration(value))}
     />

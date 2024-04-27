@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { CloseIcon } from "../CloseIcon";
 import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
+import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
 import { BaseNoteSelector } from "./selectors/BaseNoteSelector";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
@@ -51,6 +52,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         {premiumComponents.get("advancedChords") as ReactNode}
         <SwitchToChromaticScaleCheckbox />
         <UseSharpChordsCheckbox />
+        <UseChordAlterationCheckbox />
         {premiumComponents.get("instruments") as ReactNode}
         <div
           className={`grid gap-2 ${

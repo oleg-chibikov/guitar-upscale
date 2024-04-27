@@ -59,9 +59,7 @@ const persistConfig = {
         delete newState.showAlert;
         delete newState.alertMessage;
         delete newState.alertIsError;
-        delete newState.isStrumming;
         delete newState.isMetronomeTicking;
-        delete newState.isStrumming;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing

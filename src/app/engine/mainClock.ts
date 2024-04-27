@@ -64,7 +64,7 @@ let timer: NodeJS.Timeout | undefined;
 export const MAX_TICKS = 8;
 export let currentTick = 0;
 
-export const isIntervalSet = () => {
+export const isMainClockTicking = () => {
   return timer !== undefined;
 };
 

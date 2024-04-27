@@ -43,6 +43,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const [wasPlayedLast, setWasPlayedLast] = useState<boolean>(false);
   const [animate, setAnimate] = useState(false);
   const { startStrumming, isPlaying, isClicked, isAlternateRef } = useStrumming(
+    chordName,
     play,
     isDisabled,
     hasTouchInput

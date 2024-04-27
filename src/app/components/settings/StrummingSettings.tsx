@@ -1,16 +1,13 @@
 "use client";
 
-import { ChordStrummingMode } from "@/app/data/chordStrummingMode";
 import { Theme } from "@/app/data/theme";
-import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "./checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
-import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
-import { ChordStrummingModeSelector } from "./selectors/ChordStrummingModeSelector";
+import { ChordStrummingIntervalSelector } from "./selectors/ChordStrummingIntervalSelector";
 import { StrummingPatternSelector } from "./selectors/StrummingPatternSelector";
 
 interface StrummingSettingsProps {}
@@ -18,7 +15,6 @@ interface StrummingSettingsProps {}
 export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
   const dispatch = useDispatch();
   const { theme, strummingSettingsExpanded } = useSelector(selectUi);
-  const { chordStrummingMode } = useSelector(selectSettings);
 
   return (
     <Slide
@@ -44,18 +40,9 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
             }}
           />
           Long press the chord to strum
-          {chordStrummingMode !== ChordStrummingMode.Custom && (
-            <UseChordAlterationCheckbox />
-          )}
-          {chordStrummingMode === ChordStrummingMode.Custom && (
-            <>
-              <ChordCustomStrummingWaitForPatternFinishCheckbox />
-              <StrummingPatternSelector />
-            </>
-          )}
-          <div className="flex flex-row gap-2">
-            <ChordStrummingModeSelector />
-          </div>
+          <ChordCustomStrummingWaitForPatternFinishCheckbox />
+          <StrummingPatternSelector />
+          <ChordStrummingIntervalSelector />
         </div>
       </section>
     </Slide>

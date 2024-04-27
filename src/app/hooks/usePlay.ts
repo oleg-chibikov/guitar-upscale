@@ -9,7 +9,7 @@ import { parseStringToNotes } from "../data/tunings";
 import {
   MAX_TICKS,
   currentTick,
-  isIntervalSet,
+  isMainClockTicking,
   waitForNextBeat,
   waitForNextTick,
 } from "../engine/mainClock";
@@ -89,7 +89,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     });
 
     // Start playback
-    if (isIntervalSet()) {
+    if (isMainClockTicking()) {
       setIsWaiting(true);
       // if metronome or chord strumming is already playing then wait for the beat, other
       console.log("Waiting for the next beat");
