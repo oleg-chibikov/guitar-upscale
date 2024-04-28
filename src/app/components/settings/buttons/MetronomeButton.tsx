@@ -1,5 +1,4 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
-import { initMetronome } from "@/app/engine/sound/metronomeProvider";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -50,10 +49,6 @@ export const MetronomeButton: React.FC = (props) => {
   }, []);
 
   const handleTogglePlay = async () => {
-    if (!isMetronomeTickingValue) {
-      // make sure metronome is loaded before we start the interval
-      await initMetronome();
-    }
     dispatch(setIsMetronomeTicking(!isMetronomeTickingValue));
   };
 

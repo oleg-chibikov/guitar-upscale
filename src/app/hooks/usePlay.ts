@@ -13,8 +13,7 @@ import {
   waitForNextBeat,
   waitForNextTick,
 } from "../engine/mainClock";
-import { initMetronome } from "../engine/sound/metronomeProvider";
-import { initSoundfont } from "../engine/sound/soundHelper";
+import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   isPlayingValue,
   selectSettings,
@@ -72,14 +71,9 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     const trackInstrumentPromises =
       example?.tracks.map(
         (track) =>
-          track.instrument && initSoundfont(track.instrument, reverbStrength)
+          track.instrument && loadInstrument(track.instrument, reverbStrength)
       ) ?? [];
-    const loadInstrumentPromises = [
-      ...trackInstrumentPromises,
-      initSoundfont(instrument, reverbStrength),
-      initSoundfont(chordInstrument, reverbStrength),
-      initMetronome(),
-    ];
+    const loadInstrumentPromises = [...trackInstrumentPromises];
 
     await Promise.all(loadInstrumentPromises);
 

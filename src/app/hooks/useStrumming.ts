@@ -7,14 +7,10 @@ import {
   waitForNextQuarterBeat,
   waitForNextTick,
 } from "../engine/mainClock";
-import { initMetronome } from "../engine/sound/metronomeProvider";
-import { initSoundfont } from "../engine/sound/soundHelper";
 import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
-  chordInstrumentValue,
   chordStrummingIntervalValue,
-  reverbStrengthValue,
   setIsStrumming,
   useChordAlterationValue,
 } from "../store/settingsSlice";
@@ -106,11 +102,6 @@ export const useStrumming = (
     !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
     hasTouchInput && document.addEventListener("touchend", handleClickOutside);
     try {
-      await Promise.all([
-        initSoundfont(chordInstrumentValue, reverbStrengthValue),
-        initMetronome(),
-      ]);
-
       const wasClockTickingAtStrummingStart = isMainClockTicking();
 
       if (isClickedRef.current) {

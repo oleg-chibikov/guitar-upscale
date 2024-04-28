@@ -1,6 +1,6 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote } from "@/app/data/notes";
-import { initSoundfont, playSound } from "./soundHelper";
+import { loadInstrument, playSound } from "./soundHelper";
 
 export const playNote = async (
   note: OctaveNote,
@@ -12,7 +12,7 @@ export const playNote = async (
   playSound(
     note,
     velocity,
-    await initSoundfont(instrument, reverbStrength),
+    await loadInstrument(instrument, reverbStrength),
     durationMs
   );
 };

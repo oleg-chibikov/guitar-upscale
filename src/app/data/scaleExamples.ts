@@ -1,4 +1,4 @@
-import { initSoundfont } from "../engine/sound/soundHelper";
+import { loadInstrument } from "../engine/sound/soundHelper";
 import { Example } from "./example";
 
 export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
@@ -190,7 +190,7 @@ export const getRandomScaleExample = async (
   const instrumentLoadPromises = examples?.flatMap((example) =>
     example.tracks.map(async (track) => {
       if (track.instrument) {
-        await initSoundfont(track.instrument, reverbStrength);
+        await loadInstrument(track.instrument, reverbStrength);
       }
     })
   );

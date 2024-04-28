@@ -23,6 +23,8 @@ import {
   startInterval,
   stopInterval,
 } from "../engine/mainClock";
+import { loadMetronome } from "../engine/sound/metronomeProvider";
+import { loadInstrument } from "../engine/sound/soundHelper";
 import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>
@@ -203,6 +205,9 @@ export const settingsSlice = createSlice({
         state.chordCustomStrummingWaitForPatternFinish;
       isMetronomeTickingValue = state.isMetronomeTicking;
       isPlayingValue = state.isPlaying;
+      loadInstrument(instrumentValue, reverbStrengthValue);
+      loadInstrument(chordInstrumentValue, reverbStrengthValue);
+      loadMetronome();
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;

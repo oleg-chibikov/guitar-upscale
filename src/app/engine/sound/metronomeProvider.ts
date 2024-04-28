@@ -1,8 +1,8 @@
 import { MAX_VELOCITY, Note, OctaveNote } from "../../data/notes";
-import { initSoundfont, playSound } from "./soundHelper";
+import { loadInstrument, playSound } from "./soundHelper";
 
-export const initMetronome = async () => {
-  return await initSoundfont("woodblock", 0);
+export const loadMetronome = async () => {
+  return await loadInstrument("woodblock", 0);
 };
 
 export const playMetronomeTick = async (
@@ -17,7 +17,7 @@ export const playMetronomeTick = async (
   playSound(
     metronomeTickNote,
     Math.min(baseVelocity + (isAccented ? 20 : 0), MAX_VELOCITY),
-    await initMetronome(),
+    await loadMetronome(),
     1000
   );
 };

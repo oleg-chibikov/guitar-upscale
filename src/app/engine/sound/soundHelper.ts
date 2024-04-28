@@ -17,7 +17,7 @@ export const playSound = (
 
 const soundfountMap = new Map<string, any>();
 
-export const initSoundfont = async (
+export const loadInstrument = async (
   instrument: Instrument,
   reverbStrength: number
 ) => {
