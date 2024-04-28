@@ -3,8 +3,13 @@ import { Theme } from "@/app/data/theme";
 import { useEffect } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { loadMetronome } from "../engine/sound/metronomeProvider";
+import { Note } from "../data/notes";
+import {
+  loadMetronome,
+  playMetronomeTick,
+} from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
+import { playNote } from "../engine/sound/soundProvider";
 import {
   chordInstrumentValue,
   init,
@@ -29,12 +34,32 @@ export const Initializer: React.FC = () => {
     };
 
     const handleFirstInteraction = async () => {
-      console.log("Preloading sounds");
-      // first click anywhere loads instruments
-      loadInstrument(instrumentValue, reverbStrengthValue);
-      loadInstrument(chordInstrumentValue, reverbStrengthValue);
-      loadMetronome();
       remove();
+      console.log("Preloading sounds...");
+      // first click anywhere loads instruments
+      await Promise.all([
+        loadInstrument(instrumentValue, reverbStrengthValue),
+        loadInstrument(chordInstrumentValue, reverbStrengthValue),
+        loadMetronome(),
+      ]);
+      await Promise.all([
+        playNote(
+          { note: Note.E, octave: 1 },
+          0,
+          instrumentValue,
+          reverbStrengthValue,
+          1
+        ),
+        playNote(
+          { note: Note.E, octave: 1 },
+          0,
+          chordInstrumentValue,
+          reverbStrengthValue,
+          1
+        ),
+        playMetronomeTick(false, 0),
+      ]);
+      console.log("Loaded sounds");
     };
 
     document.body.addEventListener("scroll", handleFirstInteraction);
