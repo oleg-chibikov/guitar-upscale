@@ -35,6 +35,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenSettingsButton />
         <FullscreenButton />
+        {premiumComponents.get("chordDetection") as ReactNode}
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       </div>
       <div

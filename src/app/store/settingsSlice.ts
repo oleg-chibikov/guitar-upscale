@@ -8,6 +8,10 @@ import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import { parseStringToNotes, Tuning } from "../data/tunings";
 import {
+  addChordToLookup,
+  createChordDetectorLookup,
+} from "../engine/chordDetector";
+import {
   generateAllChords,
   getClosestVariation,
   getModeText,
@@ -33,7 +37,6 @@ const getFirstScaleForGroup = (groupKey: string) =>
 interface WithNeck {
   neck: Neck | null;
   chords: NoteChords[] | null;
-  chordsMap: Map<string, Chord> | null;
 }
 
 interface WithControls {
@@ -66,6 +69,7 @@ interface SettingsState extends WithNeck, WithControls {
   chordCustomStrummingWaitForPatternFinish: boolean;
   isMetronomeTicking: boolean;
   isPlaying: boolean;
+  chordIsBeingDetected: boolean;
 }
 
 const initialState: SettingsState = {
@@ -74,7 +78,6 @@ const initialState: SettingsState = {
   baseNote: Note.E,
   neck: null,
   chords: null,
-  chordsMap: null,
   tempoBpm: 140,
   chordStrummingDelayMs: 20,
   velocity: MAX_VELOCITY,
@@ -97,6 +100,7 @@ const initialState: SettingsState = {
   chordCustomStrummingWaitForPatternFinish: true,
   isMetronomeTicking: false,
   isPlaying: false,
+  chordIsBeingDetected: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -118,6 +122,7 @@ export let isMetronomeTickingValue = initialState.isMetronomeTicking;
 export let isPlayingValue: boolean = initialState.isPlaying;
 
 export let strummingChordsMap = new Set<string>();
+export let chordsMap = new Map<string, Chord>();
 
 export const setIsStrumming = (chordName: string, value: boolean) => {
   if (value) {
@@ -148,20 +153,28 @@ const setChords = (state: WithNeck) => {
   if (state.neck) {
     const chordsForNeck = generateAllChords(state.neck, true);
     state.chords = chordsForNeck;
-    const map = new Map<string, Chord>();
-    state.chordsMap = new Map();
+
+    // TODO: only do that if chordDetector feature is enabled
+    createChordDetectorLookup();
+    chordsMap = new Map<string, Chord>(); // name to chord (notes)
     for (const chord of chordsForNeck) {
       const key = getNoteText(chord.note);
       for (const mode of chord.modes) {
         const modeKey = getModeText(mode.mode);
         const fullKey = key + modeKey;
         const closestVariation = getClosestVariation(mode);
+        // TODO: only do that if chordDetector feature is enabled
+        mode.variations.map((variation) => {
+          // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
+          //   debugger;
+          // }
+          addChordToLookup(variation, fullKey);
+        });
         if (closestVariation) {
-          map.set(fullKey, closestVariation);
+          chordsMap.set(fullKey, closestVariation);
         }
       }
     }
-    state.chordsMap = map;
   }
 };
 
@@ -318,6 +331,9 @@ export const settingsSlice = createSlice({
       isPlayingValue = action.payload;
       toggleInterval(action.payload);
     },
+    setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
+      state.chordIsBeingDetected = action.payload;
+    },
   },
 });
 
@@ -348,6 +364,7 @@ export const {
   setChordCustomStrummingWaitForPatternFinish,
   setIsMetronomeTicking,
   setIsPlaying,
+  setChordIsBeingDetected,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

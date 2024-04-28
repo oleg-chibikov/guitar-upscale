@@ -85,11 +85,11 @@ export const uiSlice = createSlice({
     },
     setAndShowAlert(
       state,
-      action: PayloadAction<{ message: string; isError: boolean }>
+      action: PayloadAction<{ message: string; isError?: boolean }>
     ) {
       state.showAlert = true;
       state.alertMessage = action.payload.message;
-      state.alertIsError = action.payload.isError;
+      state.alertIsError = action.payload.isError ?? false;
     },
     hideAlert(state) {
       state.showAlert = false;

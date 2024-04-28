@@ -16,6 +16,7 @@ import { AspectRatioControl } from "./settings/AspectRatioControl";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 import { StrummingSettings } from "./settings/StrummingSettings";
+import { DetectChordButton } from "./settings/buttons/DetectChordButton";
 
 const RecordButton = dynamic(
   async () =>
@@ -77,6 +78,8 @@ export const premiumFeaturesToMap = (
         return <RecordButton />;
       case "skinSelection":
         return <SkinSelector />;
+      case "chordDetection":
+        return <DetectChordButton />;
       case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
       case "advancedChords":

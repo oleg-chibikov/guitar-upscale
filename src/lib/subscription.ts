@@ -73,6 +73,7 @@ export type PremiumFeatures = {
   reverbStrength?: boolean;
   skinSelection?: boolean;
   melodies?: boolean;
+  chordDetection?: boolean;
 };
 
 export type PremiumFeatureKeys = keyof PremiumFeatures;
@@ -99,6 +100,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
       instruments: true,
       reverbStrength: true,
       playbackTypeSelection: true,
+      chordDetection: true,
       subscriptionTier,
     } as PremiumFeatures,
   };

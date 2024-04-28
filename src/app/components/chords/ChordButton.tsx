@@ -33,8 +33,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   isHidden,
 }) => {
   const hasTouchInput = useInputChecker();
-  const { chordPlayMode, chordStrummingDelayMs, chordNotesToPlay } =
-    useSelector(selectSettings);
+  const {
+    chordPlayMode,
+    chordStrummingDelayMs,
+    chordNotesToPlay,
+    chordIsBeingDetected,
+  } = useSelector(selectSettings);
   const play = useCallback(() => {
     ChordEventBus.next({ chord: chordName, metadata: {} });
   }, [chordName]);
@@ -61,6 +65,13 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         console.log("Clear previous chord marker: " + chordName);
         setWasPlayedLast(false);
         return;
+      }
+
+      if (chordIsBeingDetected) {
+        const { clearDetector } = await import("../../engine/chordDetector");
+        // to make sure chords are always detected when played
+        //TODO am/9 and other /9 instead of am etc
+        clearDetector();
       }
 
       console.log("Playing chord: " + chordName);

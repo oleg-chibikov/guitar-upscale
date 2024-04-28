@@ -138,9 +138,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     }
   }, [
     baseNote,
-    chordInstrument,
     dispatch,
-    instrument,
     neck,
     onPlayExample,
     playbackType,

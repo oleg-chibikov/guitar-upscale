@@ -60,6 +60,7 @@ const persistConfig = {
         delete newState.alertMessage;
         delete newState.alertIsError;
         delete newState.isMetronomeTicking;
+        delete newState.chordIsBeingDetected;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing

@@ -402,6 +402,7 @@ export const getClosestVariation = (mode: NoteChordMode) => {
   const variationAvgDistances = mode.variations.map((variation) => {
     const distances = variation.map(
       // lower strings get more priority
+      // TODO: Hardcoded string count
       (note) => note.fret + (6 - note.string * 0.5)
     );
     const avgDistance = calculateAverage(distances);

@@ -5,13 +5,13 @@ import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectSettings } from "../../../store/settingsSlice";
+import { chordsMap, selectSettings } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
 type PlayButtonProps = UsePlayParams;
 
 export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
-  const { neck, chordsMap, isPlaying } = useSelector(selectSettings);
+  const { neck, isPlaying } = useSelector(selectSettings);
 
   const { isWaiting, handlePlay } = usePlay(params);
 

@@ -1,7 +1,7 @@
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NoteDisplayMode } from "../../data/noteDisplayMode";
 import {
   StringOctaveNote,
@@ -59,7 +59,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { neck, chordStrummingDelayMs, baseNote } = useSelector(selectSettings);
+  const { neck, chordStrummingDelayMs, baseNote, chordIsBeingDetected } =
+    useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
 
@@ -68,6 +69,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
+  const [isBeingDetected, setIsBeingDetected] = useState<boolean>();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Function to play note and start animation
@@ -82,11 +86,33 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
-      NoteToFretMarkerEventMap.set(key, (metadata) => {
+      NoteToFretMarkerEventMap.set(key, async (metadata) => {
         if ((metadata as ClearNoteMetadata).clearChordMarker) {
           setIsFromPreviousChord(false);
         } else {
           const noteMetadata = metadata as NoteMetadata;
+          if (chordIsBeingDetected && stringOctaveNote) {
+            const { addNoteToDetector } = await import(
+              "../../engine/chordDetector"
+            );
+            setIsBeingDetected(true);
+            addNoteToDetector(
+              {
+                stringOctaveNote: stringOctaveNote,
+                clear: () => {
+                  setIsBeingDetected(false);
+                },
+              },
+              (chordNames) => {
+                dispatch(
+                  setAndShowAlert({
+                    message: chordNames || "No matching chords",
+                    isError: !chordNames,
+                  })
+                );
+              }
+            );
+          }
 
           // it may come from several tracks for the same note simutaneously
           if (noteMetadata.trackInstrument) {
@@ -106,7 +132,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [stringOctaveNote]);
+  }, [chordIsBeingDetected, dispatch, stringOctaveNote]);
 
   const isColored =
     (isHeader &&
@@ -188,6 +214,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           <span
             className={`flex justify-center items-center select-none font-mono
                     ${!isHeader && "rounded-full w-7 h-7"}
+                    ${isBeingDetected && `border-4 border-purple-600`}
                     ${
                       !isHeader &&
                       (isFromPreviousChord
@@ -252,6 +279,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             {...clickAttrs}
           />
           {isNoteClicked && (
+            // Blast animation element
             <div
               key={Date.now()} // Use a unique key to trigger re-render and start animation
               style={{
