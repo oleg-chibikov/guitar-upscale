@@ -14,6 +14,7 @@ export const GuitarImage: React.FC<GuitarImageProps> = ({
 }) => {
   return (
     <Image
+      priority
       className={`origin-top-left ${className}`}
       // loader={imageLoader}
       style={{
