@@ -1,11 +1,12 @@
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
+import { Instrument } from "../data/instruments";
 import { MAX_VELOCITY, OctaveNote, getNoteText } from "../data/notes";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
 
 // Define a class for MIDI recorder
 export class MidiRecorder {
-  private midiEvents: NoteEvent[] = [];
+  private midiEvents: Map<string, NoteEvent[]> | undefined;
   private isRecording: boolean = false;
   private startTime: number | undefined;
   private noteShift = 4; // Shift from the programs 0 note (E) to midi-writer-js zero nopte which is C
@@ -13,17 +14,17 @@ export class MidiRecorder {
   private msInTick = 4; // Assuming each tick is 4 ms at 120BPM - no math here. It just produces very similar timings.
 
   startRecording() {
-    this.midiEvents = [];
+    this.midiEvents = new Map<string, NoteEvent[]>();
     this.isRecording = true;
   }
 
   stopRecording(save: boolean) {
     this.isRecording = false;
-    if (save) {
-      const midiData = this.generateMidiData();
+    if (save && this.midiEvents) {
+      const midiData = this.generateMidiData(this.midiEvents);
       this.downloadMidiFile(midiData);
     }
-    this.midiEvents = [];
+    this.midiEvents = undefined;
     this.startTime = undefined;
   }
 
@@ -34,7 +35,11 @@ export class MidiRecorder {
     return Math.round(milliseconds / tickDuration);
   }
 
-  addNoteToMidiTrack(note: OctaveNote) {
+  addNoteToMidiTrack(
+    note: OctaveNote,
+    trackNumber: number,
+    instrument: Instrument
+  ) {
     if (this.isRecording) {
       const currentTime = performance.now();
       if (this.startTime === undefined) {
@@ -50,7 +55,21 @@ export class MidiRecorder {
           note.octave
         }; delta: ${playAtTick} ticks (${deltaTime} ms)`
       );
-      this.midiEvents.push(
+      if (!this.midiEvents) {
+        return;
+      }
+
+      const trackKey = instrument + "|" + trackNumber;
+
+      let noteEventsForTrack = this.midiEvents.get(trackKey);
+
+      if (!noteEventsForTrack) {
+        noteEventsForTrack = [];
+
+        this.midiEvents.set(trackKey, noteEventsForTrack);
+      }
+
+      noteEventsForTrack.push(
         new Midi.NoteEvent({
           pitch: [
             note.note +
@@ -67,16 +86,24 @@ export class MidiRecorder {
     }
   }
 
-  private generateMidiData(): Blob {
-    // Create a track with MIDI events
-    const track = new Midi.Track();
-    track.setTempo(120);
-    track.addInstrumentName("Acoustic guitar");
-    track.addTrackName("Acoustic guitar");
-    track.addEvent(this.midiEvents);
+  private generateMidiData(midiEvents: Map<string, NoteEvent[]>): Blob {
+    const tracks = Array.from(midiEvents).map(([trackKey, notes]) => {
+      // Create a track with MIDI events
+      const track = new Midi.Track();
+      // Define an instrument (optional):
+      const parts = trackKey.split("|");
+      const instrument = parts[0] as Instrument;
+      const trackNumber = parseInt(parts[1]);
+      track.addEvent(new Midi.ProgramChangeEvent({ instrument: trackNumber }));
+      track.setTempo(120);
+      track.addInstrumentName(instrument);
+      track.addTrackName(instrument);
+      track.addEvent(notes);
+      return track;
+    });
 
     // Create a new MIDI file with the track
-    const write = new Midi.Writer([track]);
+    const write = new Midi.Writer(tracks);
     const byteArray = write.buildFile();
     return new Blob([byteArray], { type: "audio/midi" });
   }

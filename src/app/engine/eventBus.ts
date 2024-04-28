@@ -92,7 +92,16 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   }
 
   const midiRecorder = (await import("./midiRecorder")).midiRecorder;
-  midiRecorder.addNoteToMidiTrack(noteMetadata.stringOctaveNote);
+  const trackNumber =
+    noteMetadata.trackNumber ?? (noteMetadata.fromChord ? 1 : 0);
+  const trackInstrument =
+    noteMetadata.trackInstrument ??
+    (noteMetadata.fromChord ? chordInstrumentValue : instrumentValue);
+  midiRecorder.addNoteToMidiTrack(
+    noteMetadata.stringOctaveNote,
+    trackNumber,
+    trackInstrument
+  );
 
   animateAction?.(noteMetadata);
 });

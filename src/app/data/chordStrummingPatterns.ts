@@ -9,4 +9,5 @@ export const chordStrummingPatterns = [
   "↑_↑↓_↓_↓",
   "↑↓↑↓_↓↑↓",
   "↑↓↑↓_↓_↓",
+  "↑__↓__↑_",
 ];
