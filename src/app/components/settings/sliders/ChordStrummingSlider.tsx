@@ -4,7 +4,7 @@ import {
   selectSettings,
   setChordStrummingDelayMs,
 } from "../../../store/settingsSlice";
-import { StepSlider } from "./ExpoStepSlider";
+import { StepSlider } from "./StepSlider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
   const { chordStrummingDelayMs } = useSelector(selectSettings);
