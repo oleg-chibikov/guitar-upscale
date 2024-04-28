@@ -7,6 +7,7 @@ import {
   waitForNextQuarterBeat,
   waitForNextTick,
 } from "../engine/mainClock";
+import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
@@ -113,6 +114,7 @@ export const useStrumming = (
       return;
     }
 
+    console.log("Registering mouseup/touchend", chordName);
     !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
     hasTouchInput && document.addEventListener("touchend", handleClickOutside);
     try {
@@ -134,43 +136,53 @@ export const useStrumming = (
         playWithPossibleAlteration();
       }
 
-      const waitBetween = getWaitBetweenFunc();
+      // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
+      await asyncTimeout(async () => {
+        const waitBetween = getWaitBetweenFunc();
 
-      if (wasClockTickingAtStrummingStart) {
-        // TODO: We need to wait for the current pattern to finish - it might be something other than next beat if pattern is longer or chord interval is not a Tick
-        // for that we'll need to store
-        // 1. current pattern (done)
-        // 2. tick when the current pattern started - to get the difference for waiting
-        // 3. info if the pattern has been started - if not - just wait for beat as now (semi done)
+        if (wasClockTickingAtStrummingStart) {
+          // TODO: We need to wait for the current pattern to finish - it might be something other than next beat if pattern is longer or chord interval is not a Tick
+          // for that we'll need to store
+          // 1. current pattern (done)
+          // 2. tick when the current pattern started - to get the difference for waiting
+          // 3. info if the pattern has been started - if not - just wait for beat as now (semi done)
 
-        // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
-        console.log("Waiting for next beat for strumming to begin", chordName);
-        await waitForNextBeat();
-      } else {
-        console.log("Waiting for next tick for strumming to begin", chordName);
-        await waitBetween();
-      }
+          // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
+          console.log(
+            "Waiting for next beat for strumming to begin",
+            chordName
+          );
+          await waitForNextBeat();
+        } else {
+          console.log(
+            "Waiting for next tick for strumming to begin",
+            chordName
+          );
+          await waitBetween();
+        }
 
-      if (!isClickedRef.current) {
-        console.log(
-          "Already released mouse/touch after wait. Stop strumming and return",
-          chordName
-        );
-        setIsStrumming(chordName, false);
-        return;
-      }
+        if (!isClickedRef.current) {
+          console.log(
+            "Already released mouse/touch after wait. Stop strumming and return",
+            chordName
+          );
+          setIsStrumming(chordName, false);
+          return;
+        }
 
-      console.log("Starting strumming", chordName);
-      setPlaying(true);
-      try {
-        // skip first chord if it was played immediately
-        await strum(wasClockTickingAtStrummingStart ? 0 : 1, waitBetween);
-      } finally {
-        console.log("Strum finished - stop strumming", chordName);
-        setPlaying(false);
-        setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
-      }
+        console.log("Starting strumming", chordName);
+        setPlaying(true);
+        try {
+          // skip first chord if it was played immediately
+          await strum(wasClockTickingAtStrummingStart ? 0 : 1, waitBetween);
+        } finally {
+          console.log("Strum finished - stop strumming", chordName);
+          setPlaying(false);
+          setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
+        }
+      }, 250);
     } finally {
+      console.log("Unregistering mouseup/touchend", chordName);
       !hasTouchInput &&
         document.removeEventListener("mouseup", handleClickOutside);
       hasTouchInput &&
