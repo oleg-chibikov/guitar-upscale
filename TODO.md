@@ -1,5 +1,4 @@
 Looper - 4 buttons to assign last non looped melody. The ones already assigned shouldn't repeat
-Bug - releasinflg and pressing the same chord againn doubles it
 Record in separate channels
 Chord finder!
 Midi upload and play

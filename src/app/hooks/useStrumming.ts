@@ -99,6 +99,14 @@ export const useStrumming = (
     }
 
     setClicked(true);
+
+    if (isPlayingRef.current) {
+      // Avoid starting new strumming the same chord while it is still playing.
+      // Please note that setClicked should be set to true before returning to repeat the previous strumming
+      // Without that it would double
+      return;
+    }
+
     !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
     hasTouchInput && document.addEventListener("touchend", handleClickOutside);
     try {
