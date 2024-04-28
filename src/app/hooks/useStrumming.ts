@@ -83,6 +83,12 @@ export const useStrumming = (
       );
       // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
       setIsStrumming(chordName, false);
+      if (isMainClockTicking()) {
+        console.log(
+          "Releasing button before started playing but timer is on - play the chord now as it was not played immediately"
+        );
+        playWithPossibleAlteration();
+      }
     }
     setClicked(false);
   };
