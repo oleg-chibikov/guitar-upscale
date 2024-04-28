@@ -100,38 +100,42 @@ export const ChordsView: React.FC = () => {
         >
           Chords
         </AccordionSummary>
-        <AccordionDetails
-          className={`grid gap-0.5 overflow-auto overscroll-contain grid-cols-2`}
-          style={{
-            padding: 4,
-            paddingTop: 10, // give area to tap top chords
-            maxWidth:
-              height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
-                ? COMPACT_CHORDS_WIDTH
-                : width - ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH, // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
-            maxHeight: Math.min(330, height - AUTH_PANEL_RESERVED_HEIGHT),
-            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
-          }}
-        >
-          {chords.flatMap((noteChord) =>
-            noteChord.modes.map((noteChordMode) => {
-              const text = getNoteText(noteChord.note);
-              const isHidden =
-                checkIsHiddenMode(noteChordMode) ||
-                (!useSharpChords && text.endsWith("#"));
-              const title = text + getModeText(noteChordMode.mode);
+        <AccordionDetails className="flex flex-col gap-2">
+          {/* TODO: Uncomment when implemented */}
+          {/* <LooperPanel /> */}
+          <section
+            className={`grid gap-0.5 overflow-auto overscroll-contain grid-cols-2`}
+            style={{
+              padding: 4,
+              paddingTop: 10, // give area to tap top chords
+              maxWidth:
+                height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+                  ? COMPACT_CHORDS_WIDTH
+                  : width - ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH, // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
+              maxHeight: Math.min(330, height - AUTH_PANEL_RESERVED_HEIGHT),
+              gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+              gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+            }}
+          >
+            {chords.flatMap((noteChord) =>
+              noteChord.modes.map((noteChordMode) => {
+                const text = getNoteText(noteChord.note);
+                const isHidden =
+                  checkIsHiddenMode(noteChordMode) ||
+                  (!useSharpChords && text.endsWith("#"));
+                const title = text + getModeText(noteChordMode.mode);
 
-              return (
-                <ChordButton
-                  key={title}
-                  isHidden={isHidden}
-                  noteChordMode={noteChordMode}
-                  chordName={title}
-                />
-              );
-            })
-          )}
+                return (
+                  <ChordButton
+                    key={title}
+                    isHidden={isHidden}
+                    noteChordMode={noteChordMode}
+                    chordName={title}
+                  />
+                );
+              })
+            )}
+          </section>
         </AccordionDetails>
       </Accordion>
     </section>
