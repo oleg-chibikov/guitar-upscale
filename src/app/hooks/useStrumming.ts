@@ -136,8 +136,7 @@ export const useStrumming = (
         playWithPossibleAlteration();
       }
 
-      // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
-      await asyncTimeout(async () => {
+      const waitAndStrum = async () => {
         const waitBetween = getWaitBetweenFunc();
 
         if (wasClockTickingAtStrummingStart) {
@@ -180,7 +179,16 @@ export const useStrumming = (
           setPlaying(false);
           setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
         }
-      }, 70);
+      };
+
+      if (!isPlayingRef.current) {
+        // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
+        // this time should be as little as needed for a click/tap
+        await asyncTimeout(waitAndStrum, 100);
+      } else {
+        // if currently strumming there is usually no need to play additional chords, so it's better to not add additional wait time - it's good for smoother switch between strumming chords
+        await waitAndStrum();
+      }
     } finally {
       console.log("Unregistering mouseup/touchend", chordName);
       !hasTouchInput &&
