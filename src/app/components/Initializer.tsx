@@ -3,7 +3,14 @@ import { Theme } from "@/app/data/theme";
 import { useEffect } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { init } from "../store/settingsSlice";
+import { loadMetronome } from "../engine/sound/metronomeProvider";
+import { loadInstrument } from "../engine/sound/soundHelper";
+import {
+  chordInstrumentValue,
+  init,
+  instrumentValue,
+  reverbStrengthValue,
+} from "../store/settingsSlice";
 import { selectUi } from "../store/uiSlice";
 
 export const Initializer: React.FC = () => {
@@ -12,6 +19,33 @@ export const Initializer: React.FC = () => {
   useEffect(() => {
     dispatch(init());
   }, [dispatch]);
+
+  useEffect(() => {
+    const remove = () => {
+      document.body.removeEventListener("scroll", handleFirstInteraction);
+      document.body.removeEventListener("keydown", handleFirstInteraction);
+      document.body.removeEventListener("click", handleFirstInteraction);
+      document.body.removeEventListener("touchstart", handleFirstInteraction);
+    };
+
+    const handleFirstInteraction = async () => {
+      console.log("Preloading sounds");
+      // first click anywhere loads instruments
+      loadInstrument(instrumentValue, reverbStrengthValue);
+      loadInstrument(chordInstrumentValue, reverbStrengthValue);
+      loadMetronome();
+      remove();
+    };
+
+    document.body.addEventListener("scroll", handleFirstInteraction);
+    document.body.addEventListener("keydown", handleFirstInteraction);
+    document.body.addEventListener("click", handleFirstInteraction);
+    document.body.addEventListener("touchstart", handleFirstInteraction);
+
+    return () => {
+      remove();
+    };
+  }, []);
 
   useEffect(() => {
     const mainBg =
