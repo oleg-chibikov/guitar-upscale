@@ -13,7 +13,6 @@ import {
   waitForNextBeat,
   waitForNextTick,
 } from "../engine/mainClock";
-import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   isPlayingValue,
@@ -74,14 +73,8 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         (track) =>
           track.instrument && loadInstrument(track.instrument, reverbStrength)
       ) ?? [];
-    const loadInstrumentPromises = [
-      ...trackInstrumentPromises,
-      loadInstrument(instrument, reverbStrength),
-      loadInstrument(chordInstrument, reverbStrength),
-      loadMetronome(),
-    ];
 
-    await Promise.all(loadInstrumentPromises);
+    await Promise.all(trackInstrumentPromises);
 
     ReactGA.event({
       category: "Playback",
