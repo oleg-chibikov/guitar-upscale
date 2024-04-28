@@ -4,7 +4,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
-interface SliderProps {
+export interface SliderProps {
   onValueChange: (value: number) => void;
   value: number;
   minimumValue: number;
@@ -18,7 +18,7 @@ interface SliderProps {
   labelClass?: string;
 }
 
-const Slider: React.FC<SliderProps> = ({
+export const Slider: React.FC<SliderProps> = ({
   onValueChange,
   value,
   minimumValue,
@@ -80,5 +80,3 @@ const Slider: React.FC<SliderProps> = ({
     </div>
   );
 };
-
-export { Slider };
