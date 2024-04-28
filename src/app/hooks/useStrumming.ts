@@ -180,7 +180,7 @@ export const useStrumming = (
           setPlaying(false);
           setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
         }
-      }, 30);
+      }, 70);
     } finally {
       console.log("Unregistering mouseup/touchend", chordName);
       !hasTouchInput &&
