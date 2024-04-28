@@ -152,21 +152,26 @@ export const Fretboard: React.FC = () => {
             // }}
           />
         </div>
-        {/* Header */}
-        <Fretline
-          isHeader
-          elements={Array.from({ length: NOTE_COUNT * 2 + 1 }, (_, index) => ({
-            note: index,
-            octave: 4,
-            string: 0,
-            fret: index,
-          }))}
-        />
-        {/* Notes */}
-        <div className="mt-10" id="fret-notes">
-          {neck.map((row, rowIndex) => (
-            <Fretline string={rowIndex} key={rowIndex} elements={row} />
-          ))}
+        <div id="fretboard">
+          {/* Header */}
+          <Fretline
+            isHeader
+            elements={Array.from(
+              { length: NOTE_COUNT * 2 + 1 },
+              (_, index) => ({
+                note: index,
+                octave: 4,
+                string: 0,
+                fret: index,
+              })
+            )}
+          />
+          {/* Notes */}
+          <div className="mt-10">
+            {neck.map((row, rowIndex) => (
+              <Fretline string={rowIndex} key={rowIndex} elements={row} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

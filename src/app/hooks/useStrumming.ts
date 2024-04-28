@@ -59,19 +59,19 @@ export const useStrumming = (
       return;
     }
     let target = event.target as Node | null;
-    let isInsideFretMarker = false;
+    let clickIgnored = false;
 
     while (target && target !== document) {
       const id = (target as HTMLElement)?.id;
       // keep playing chord when clicking notes simultaneously
-      if (id === "fret-header" || id === "fret-notes") {
-        isInsideFretMarker = true;
+      if (id === "fretboard") {
+        clickIgnored = true;
         break;
       }
       target = target.parentNode;
     }
 
-    if (isInsideFretMarker) {
+    if (clickIgnored) {
       console.log("Clicked on fretboard - ignoring", chordName);
       return;
     }
@@ -137,6 +137,8 @@ export const useStrumming = (
         // 1. current pattern (done)
         // 2. tick when the current pattern started - to get the difference for waiting
         // 3. info if the pattern has been started - if not - just wait for beat as now (semi done)
+
+        // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
         console.log("Waiting for next beat for strumming to begin", chordName);
         await waitForNextBeat();
       } else {
