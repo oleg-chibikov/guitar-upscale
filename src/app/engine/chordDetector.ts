@@ -1,4 +1,5 @@
 import { Chord, StringOctaveNote } from "../data/notes";
+import { trailingDebounce } from "../helpers/debounce";
 import { Trie } from "../helpers/trie";
 
 type NoteWithClearCallback = {
@@ -38,6 +39,23 @@ const serializeChord = (chord: Chord, missingChar: MissingChar) => {
     .join("");
 };
 
+const findMatches = (showChord: (name: string) => void) => {
+  console.log("Detecting chord");
+  const serializedChord = serializeChord(
+    stringNotes
+      .filter((x) => x)
+      .map((x) => (x as NoteWithClearCallback).stringOctaveNote),
+    "?" // wildcard - any char
+  );
+  const matchedValues = trie.wildcardMatches(serializedChord);
+  const chordNames = Array.from(matchedValues).map((x) =>
+    reverseChordsMap.get(x)
+  );
+  showChord(chordNames.join(", "));
+};
+
+const debouncedFindMatches = trailingDebounce(findMatches, 300);
+
 export const addChordToLookup = (chord: Chord, fullKey: string) => {
   const serializedChord = serializeChord(chord, "x");
   trie.add(serializedChord);
@@ -48,6 +66,7 @@ export const addNoteToDetector = (
   note: NoteWithClearCallback,
   showChord: (name: string) => void
 ) => {
+  console.log("Adding note to chordDetector", note);
   // index in this array corresponds to the string of the note
   const index = note.stringOctaveNote.string;
   const existing = stringNotes[index];
@@ -63,25 +82,12 @@ export const addNoteToDetector = (
     notesLength++;
   }
   if (notesLength > 2) {
-    const findMatches = () => {
-      //TODO Throttle - only play last in 100 ms. Try playing chord and play it once more - it clears but displays the weird chords
-      const serializedChord = serializeChord(
-        stringNotes
-          .filter((x) => x)
-          .map((x) => (x as NoteWithClearCallback).stringOctaveNote),
-        "?" // wildcard - any char
-      );
-      const matchedValues = trie.wildcardMatches(serializedChord);
-      const chordNames = Array.from(matchedValues).map((x) =>
-        reverseChordsMap.get(x)
-      );
-      showChord(chordNames.join(", "));
-    };
-    findMatches();
+    debouncedFindMatches(showChord);
   }
 };
 
 export const clearDetector = () => {
+  console.log("Clearing note detector");
   stringNotes.forEach((note) => note?.clear());
   stringNotes = [];
   notesLength = 0;

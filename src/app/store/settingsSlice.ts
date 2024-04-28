@@ -120,6 +120,12 @@ export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
 export let isMetronomeTickingValue = initialState.isMetronomeTicking;
 export let isPlayingValue: boolean = initialState.isPlaying;
+export let chordStrummingDelayMsValue: number =
+  initialState.chordStrummingDelayMs;
+export let chordIsBeingDetectedValue: boolean =
+  initialState.chordIsBeingDetected;
+export let chordPlayModeValue: ChordPlayMode = initialState.chordPlayMode;
+export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 
 export let strummingChordsMap = new Set<string>();
 export let chordsMap = new Map<string, Chord>();
@@ -217,6 +223,10 @@ export const settingsSlice = createSlice({
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
       isMetronomeTickingValue = state.isMetronomeTicking;
+      chordStrummingDelayMsValue = state.chordStrummingDelayMs;
+      chordIsBeingDetectedValue = state.chordIsBeingDetected;
+      chordPlayModeValue = state.chordPlayMode;
+      chordNotesToPlayValue = state.chordNotesToPlay;
       isPlayingValue = state.isPlaying;
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -250,6 +260,7 @@ export const settingsSlice = createSlice({
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;
+      chordStrummingDelayMsValue = action.payload;
     },
     setVelocity: (state, action: PayloadAction<number>) => {
       state.velocity = action.payload;
@@ -273,9 +284,11 @@ export const settingsSlice = createSlice({
     },
     setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
       state.chordPlayMode = action.payload;
+      chordPlayModeValue = action.payload;
     },
     setChordNotesToPlay(state, action: PayloadAction<number>) {
       state.chordNotesToPlay = action.payload;
+      chordNotesToPlayValue = action.payload;
     },
     setInstrument(state, action: PayloadAction<Instrument>) {
       state.instrument = action.payload;
@@ -333,6 +346,7 @@ export const settingsSlice = createSlice({
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
+      chordIsBeingDetectedValue = action.payload;
     },
   },
 });

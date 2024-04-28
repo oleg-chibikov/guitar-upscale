@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { trailingDebounce } from "../helpers/debounce";
 
 export const useScreenOrientation = () => {
   const [orientation, setOrientation] = useState(
@@ -15,12 +16,13 @@ export const useScreenOrientation = () => {
     const handleResize = () => {
       checkOrientation();
     };
-
-    window.addEventListener("resize", handleResize);
     checkOrientation(); // Initial check
 
+    const debouncedHandeResize = trailingDebounce(handleResize, 200);
+
+    window.addEventListener("resize", debouncedHandeResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedHandeResize);
     };
   }, []);
 

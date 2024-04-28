@@ -10,6 +10,7 @@ import {
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
+import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
@@ -43,10 +44,11 @@ export const ChordsView: React.FC = () => {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
     };
+    const debouncedHandeResize = trailingDebounce(handleResize, 200);
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", debouncedHandeResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedHandeResize);
     };
   }, []);
 

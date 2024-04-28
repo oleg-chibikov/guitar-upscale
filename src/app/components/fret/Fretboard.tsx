@@ -2,6 +2,7 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { Skin } from "@/app/data/skin";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
+import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
@@ -63,13 +64,11 @@ export const Fretboard: React.FC = () => {
       setMaxWidth(window.innerWidth);
     };
 
-    window.addEventListener("resize", handleResize);
+    const debouncedHandeResize = trailingDebounce(handleResize, 200);
 
-    // Call handleResize initially to calculate scaleFactor
-    handleResize();
-
+    window.addEventListener("resize", debouncedHandeResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedHandeResize);
     };
   }, []);
 

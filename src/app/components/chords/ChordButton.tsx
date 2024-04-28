@@ -19,7 +19,12 @@ import {
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
-import { selectSettings } from "../../store/settingsSlice";
+import {
+  chordIsBeingDetectedValue,
+  chordNotesToPlayValue,
+  chordPlayModeValue,
+  chordStrummingDelayMsValue,
+} from "../../store/settingsSlice";
 
 interface ChordButtonProps {
   chordName: string;
@@ -33,12 +38,6 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   isHidden,
 }) => {
   const hasTouchInput = useInputChecker();
-  const {
-    chordPlayMode,
-    chordStrummingDelayMs,
-    chordNotesToPlay,
-    chordIsBeingDetected,
-  } = useSelector(selectSettings);
   const play = useCallback(() => {
     ChordEventBus.next({ chord: chordName, metadata: {} });
   }, [chordName]);
@@ -67,7 +66,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         return;
       }
 
-      if (chordIsBeingDetected) {
+      if (chordIsBeingDetectedValue) {
         const { clearDetector } = await import("../../engine/chordDetector");
         // to make sure chords are always detected when played
         //TODO am/9 and other /9 instead of am etc
@@ -81,18 +80,18 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       setAnimate(true);
       setTimeout(() => setAnimate(false), 150);
 
-      const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMs;
+      const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
       const params: ChordPlayParameters = {
         chordName,
         noteChordMode,
         delayMs,
-        notesToPlay: metadata.notesToPlay ?? chordNotesToPlay,
+        notesToPlay: metadata.notesToPlay ?? chordNotesToPlayValue,
         trackNumber: metadata.trackNumber,
         trackInstrument: metadata.trackInstrument,
         reverse: isAlternateRef.current,
       };
 
-      switch (chordPlayMode) {
+      switch (chordPlayModeValue) {
         case ChordPlayMode.Round_Robin:
           await playRoundRobin(params);
           break;
@@ -118,15 +117,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     return () => {
       ChordToChordButtonEventMap.delete(chordName);
     };
-  }, [
-    chordName,
-    chordPlayMode,
-    chordStrummingDelayMs,
-    chordNotesToPlay,
-    isDisabled,
-    noteChordMode,
-    isAlternateRef,
-  ]);
+  }, [chordName, isDisabled, noteChordMode, isAlternateRef]);
 
   if (isHidden) {
     return null;
