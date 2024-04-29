@@ -102,14 +102,18 @@ export const ChordsView: React.FC = () => {
         >
           Chords
         </AccordionSummary>
-        <AccordionDetails className="flex flex-col gap-2">
+        <AccordionDetails
+          className="flex flex-col gap-2"
+          style={{
+            padding: 0,
+            paddingTop: 10, // give area to tap top chords
+          }}
+        >
           {/* TODO: Uncomment when implemented */}
           {/* <LooperPanel /> */}
           <section
             className={`grid gap-0.5 overflow-auto overscroll-contain grid-cols-2`}
             style={{
-              padding: 4,
-              paddingTop: 10, // give area to tap top chords
               maxWidth:
                 height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
                   ? COMPACT_CHORDS_WIDTH
