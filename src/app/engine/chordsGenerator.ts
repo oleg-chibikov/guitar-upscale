@@ -152,7 +152,14 @@ const chordModes = new Map<ChordMode, number[][]>([
       [0, 7, 0, 4, 10, 0],
     ],
   ],
-  [ChordMode.SeventhMajor, [[0, 7, 11, 4, 7, 0]]],
+  [
+    ChordMode.SeventhMajor,
+    [
+      [0, 7, 11, 4, 7, 0],
+      [0, 7, 0, 7, 11, 4],
+      [0, 8, 0, 3, 7, 0],
+    ],
+  ],
   [ChordMode.SeventhMinor, [[0, 7, 10, 3, 7, 0]]],
   [ChordMode.SeventhMinorMajor, [[0, 7, 11, 3, 7, 0]]],
   [
@@ -316,9 +323,27 @@ const generateChordVariations = (
   baseNote: Note,
   interval: number[], // Notes that constitute the chord
   neck: Neck, // Representation of the guitar neck
-  _mode: ChordMode // needed here for debugging only
+  mode: ChordMode
 ): Chord[] => {
-  const minConsecutiveNotesInValidChord = 4;
+  // TODO: each variation should specify X notes - and this number should be adjusted to use NON-x chars
+  const getMinNotesInChord = () => {
+    switch (mode) {
+      case ChordMode.Add9:
+      case ChordMode.MinorAdd9:
+      case ChordMode.SixthAdd9:
+      case ChordMode.SixthMinorAdd9:
+      case ChordMode.NinthMajor:
+      case ChordMode.NinthMinor:
+      case ChordMode.NinthMinorMajor:
+        return 6;
+      case ChordMode.Suspended2:
+      case ChordMode.SixthMinorMajor:
+        return 5;
+    }
+    return 4;
+  };
+
+  const minConsecutiveNotesInValidChord = getMinNotesInChord();
   const chordNotes = generateChord(baseNote, interval);
   const chordVariations: Chord[] = [];
 

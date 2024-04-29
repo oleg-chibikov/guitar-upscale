@@ -3,4 +3,4 @@ export enum ChordsDisplayMode {
   Right = 1,
 }
 
-export const MIN_HEIGHT_TO_SHOW_LARGE_CHORDS = 800;
+export const MIN_HEIGHT_TO_SHOW_LARGE_CHORDS = 700;

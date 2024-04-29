@@ -63,7 +63,10 @@ export const playWholeScale = async (
       }
 
       console.log("Requesting auto play note: " + JSON.stringify(note));
-      NotePlayEventBus.next({ stringOctaveNote: note });
+      NotePlayEventBus.next({
+        stringOctaveNote: note,
+        skipChordDetection: true,
+      });
       await wait();
     }
   }

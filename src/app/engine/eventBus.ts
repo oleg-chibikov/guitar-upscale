@@ -28,6 +28,7 @@ export type ClearNoteMetadata = {
 export type NoteMetadata = TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
+    skipChordDetection?: boolean;
   };
 
 export type ChordMetadata = TrackMetadata & {

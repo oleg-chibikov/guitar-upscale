@@ -16,7 +16,10 @@ import {
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
-import { selectSettings } from "../../store/settingsSlice";
+import {
+  chordIsBeingDetectedValue,
+  selectSettings,
+} from "../../store/settingsSlice";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
@@ -91,7 +94,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           setIsFromPreviousChord(false);
         } else {
           const noteMetadata = metadata as NoteMetadata;
-          if (chordIsBeingDetected && stringOctaveNote) {
+          if (
+            chordIsBeingDetectedValue &&
+            stringOctaveNote &&
+            !noteMetadata.skipChordDetection
+          ) {
             const { addNoteToDetector } = await import(
               "../../engine/chordDetector"
             );
@@ -132,7 +139,21 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [chordIsBeingDetected, dispatch, stringOctaveNote]);
+  }, [dispatch, stringOctaveNote]);
+
+  const getMarkerText = (stringOctaveNote: StringOctaveNote) => {
+    if (isHeader) {
+      return stringOctaveNote.note;
+    }
+    switch (noteDisplayMode) {
+      case NoteDisplayMode.Note:
+        return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
+      case NoteDisplayMode.Note_Shift:
+        return stringOctaveNote.note;
+      default:
+        return fret;
+    }
+  };
 
   const isColored =
     (isHeader &&
@@ -266,11 +287,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
             }}
           >
-            {isHeader
-              ? stringOctaveNote.note
-              : noteDisplayMode === NoteDisplayMode.Note
-              ? getNoteText(stringOctaveNote.note) + stringOctaveNote.octave
-              : fret}
+            {getMarkerText(stringOctaveNote)}
           </span>
           {/* Clickable area */}
           <div

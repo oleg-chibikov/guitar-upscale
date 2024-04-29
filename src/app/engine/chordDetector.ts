@@ -11,8 +11,6 @@ let stringNotes: (NoteWithClearCallback | null)[] = [];
 let trie: Trie;
 let reverseChordsMap: Map<string, string>;
 
-let notesLength = 0;
-
 export const createChordDetectorLookup = () => {
   trie = new Trie();
   reverseChordsMap = new Map<string, string>();
@@ -41,20 +39,24 @@ const serializeChord = (chord: Chord, missingChar: MissingChar) => {
 
 const findMatches = (showChord: (name: string) => void) => {
   console.log("Detecting chord");
+  const usedNotes = stringNotes.filter((x) => x);
+  if (usedNotes.length <= 2) {
+    return;
+  }
   const serializedChord = serializeChord(
-    stringNotes
-      .filter((x) => x)
-      .map((x) => (x as NoteWithClearCallback).stringOctaveNote),
+    usedNotes.map((x) => (x as NoteWithClearCallback).stringOctaveNote),
     "?" // wildcard - any char
   );
   const matchedValues = trie.wildcardMatches(serializedChord);
+  console.log("Matched values from trie", matchedValues);
   const chordNames = Array.from(matchedValues).map((x) =>
     reverseChordsMap.get(x)
   );
+  console.log("Matched chord names", chordNames);
   showChord(chordNames.join(", "));
 };
 
-const debouncedFindMatches = trailingDebounce(findMatches, 300);
+const debouncedFindMatches = trailingDebounce(findMatches, 200);
 
 export const addChordToLookup = (chord: Chord, fullKey: string) => {
   const serializedChord = serializeChord(chord, "x");
@@ -76,19 +78,15 @@ export const addNoteToDetector = (
   // clicked on the marked note
   if (existing?.stringOctaveNote.fret === note.stringOctaveNote.fret) {
     stringNotes[index] = null;
-    notesLength--;
   } else {
     stringNotes[index] = note;
-    notesLength++;
   }
-  if (notesLength > 2) {
-    debouncedFindMatches(showChord);
-  }
+
+  debouncedFindMatches(showChord);
 };
 
 export const clearDetector = () => {
   console.log("Clearing note detector");
   stringNotes.forEach((note) => note?.clear());
   stringNotes = [];
-  notesLength = 0;
 };

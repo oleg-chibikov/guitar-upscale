@@ -30,6 +30,7 @@ export const playExample = async ({
           trackNumber,
           trackInstrument: track.instrument,
           stringOctaveNote: note,
+          skipChordDetection: true,
         });
       },
       (chordToPlay) => {
