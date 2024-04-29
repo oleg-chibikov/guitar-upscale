@@ -130,11 +130,29 @@ export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let strummingChordsMap = new Set<string>();
 export let chordsMap = new Map<string, Chord>();
 
+export let waitForStrummingToFinish: (() => void) | undefined;
+let finishStrumming: (() => void) | undefined;
+
+const createStrummingPromise = () => {
+  let promise: Promise<void>;
+  promise = new Promise<void>((resolve) => {
+    finishStrumming = resolve;
+  });
+
+  waitForStrummingToFinish = async () => {
+    await promise;
+  };
+};
+
 export const setIsStrumming = (chordName: string, value: boolean) => {
   if (value) {
     strummingChordsMap.add(chordName);
+    createStrummingPromise();
   } else {
     strummingChordsMap.delete(chordName);
+    finishStrumming?.();
+    waitForStrummingToFinish = undefined;
+    finishStrumming = undefined;
   }
   toggleInterval(value);
 };

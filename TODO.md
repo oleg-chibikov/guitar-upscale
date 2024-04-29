@@ -9,3 +9,4 @@ Feedback form
 get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
 High string at the bottom mode
+If switched chord while strumming - finish current pattern with different notes starting from the next tick (or another granularity - there's a selector already)

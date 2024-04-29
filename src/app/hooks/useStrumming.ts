@@ -14,6 +14,7 @@ import {
   chordStrummingIntervalValue,
   setIsStrumming,
   useChordAlterationValue,
+  waitForStrummingToFinish,
 } from "../store/settingsSlice";
 
 const getWaitBetweenFunc = () => {
@@ -140,18 +141,14 @@ export const useStrumming = (
         const waitBetween = getWaitBetweenFunc();
 
         if (wasClockTickingAtStrummingStart) {
-          // TODO: We need to wait for the current pattern to finish - it might be something other than next beat if pattern is longer or chord interval is not a Tick
-          // for that we'll need to store
-          // 1. current pattern (done)
-          // 2. tick when the current pattern started - to get the difference for waiting
-          // 3. info if the pattern has been started - if not - just wait for beat as now (semi done)
-
           // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
           console.log(
             "Waiting for next beat for strumming to begin",
             chordName
           );
-          await waitForNextBeat();
+          // either wait for the current strumming to finish or if nothing is strumming - then for the next beat
+          const initialWait = waitForStrummingToFinish ?? waitForNextBeat;
+          await initialWait();
         } else {
           console.log(
             "Waiting for next tick for strumming to begin",
