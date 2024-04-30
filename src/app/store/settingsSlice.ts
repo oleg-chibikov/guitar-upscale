@@ -98,7 +98,7 @@ const initialState: SettingsState = {
   reverbStrength: 0.2,
   chordStrummingInterval: ChordStrummingInterval.Tick,
   useChordAlteration: false,
-  chordCustomStrummingPattern: chordStrummingPatterns[0],
+  chordCustomStrummingPattern: chordStrummingPatterns[5], // 5 is a pattern of a medium difficulty - not that simple as 0
   chordCustomStrummingWaitForPatternFinish: true,
   seamlessChordSwitching: true,
   isMetronomeTicking: false,
