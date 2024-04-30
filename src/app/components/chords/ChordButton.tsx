@@ -57,7 +57,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     hasTouchInput
   );
 
-  const { theme } = useSelector(selectUi);
+  const { theme, useSharpChords } = useSelector(selectUi);
 
   useEffect(() => {
     const handleChordEvent = async (metadata: ChordMetadata) => {
@@ -143,7 +143,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             }
           : undefined
       }
-      className={`text-center w-16 h-10 items-center justify-center content-center ${
+      className={`text-center w-16 ${
+        useSharpChords ? "h-6" : "h-10"
+      } items-center justify-center content-center ${
         isPlaying
           ? theme === Theme.Light
             ? "border-border_accent_stronger-light"

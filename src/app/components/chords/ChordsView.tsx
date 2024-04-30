@@ -27,9 +27,14 @@ const ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH = 230;
 const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
-  const { neck, useAdvancedChords, useSharpChords, chords } =
-    useSelector(selectSettings);
-  const { theme, chordsExpanded, chordsDisplayMode } = useSelector(selectUi);
+  const { neck, chords } = useSelector(selectSettings);
+  const {
+    theme,
+    chordsExpanded,
+    chordsDisplayMode,
+    useAdvancedChords,
+    useSharpChords,
+  } = useSelector(selectUi);
   const dispatch = useDispatch();
   const premiumFeatures = usePremiumFeatures();
   const handleExpansion = () => {

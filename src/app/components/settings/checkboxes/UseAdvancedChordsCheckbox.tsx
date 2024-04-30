@@ -1,15 +1,12 @@
 "use client";
 
+import { selectUi, setUseAdvancedChords } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectSettings,
-  setUseAdvancedChords,
-} from "../../../store/settingsSlice";
 import { CheckBox } from "./CheckBox";
 
 export const UseAdvancedChordsCheckbox: React.FC = (props) => {
-  const { useAdvancedChords } = useSelector(selectSettings);
+  const { useAdvancedChords } = useSelector(selectUi);
   const dispatch = useDispatch();
 
   return (

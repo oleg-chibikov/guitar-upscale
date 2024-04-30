@@ -26,6 +26,8 @@ interface UiState {
   fretboardScaleY: number;
   lockRatio: boolean;
   strummingSettingsExpanded: boolean;
+  useAdvancedChords: boolean;
+  useSharpChords: boolean;
 }
 
 const initialState: UiState = {
@@ -42,6 +44,8 @@ const initialState: UiState = {
   fretboardScaleY: 1,
   lockRatio: false,
   strummingSettingsExpanded: false,
+  useAdvancedChords: true,
+  useSharpChords: true,
 };
 
 const calculatePercentage = (
@@ -145,6 +149,12 @@ export const uiSlice = createSlice({
     setStrummingSettingsExpanded(state, action: PayloadAction<boolean>) {
       state.strummingSettingsExpanded = action.payload;
     },
+    setUseAdvancedChords(state, action: PayloadAction<boolean>) {
+      state.useAdvancedChords = action.payload;
+    },
+    setUseSharpChords(state, action: PayloadAction<boolean>) {
+      state.useSharpChords = action.payload;
+    },
   },
 });
 
@@ -161,6 +171,8 @@ export const {
   setFretboardScaleY,
   setLockRatio,
   setStrummingSettingsExpanded,
+  setUseAdvancedChords,
+  setUseSharpChords,
 } = uiSlice.actions;
 
 export const selectUi = (state: RootState) => state.ui;
