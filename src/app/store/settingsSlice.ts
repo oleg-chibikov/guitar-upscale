@@ -130,6 +130,11 @@ export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let strummingChordsMap = new Set<string>();
 export let chordsMap = new Map<string, Chord>();
 
+export let currentChord: string | undefined;
+export const setCurrentChord = (chordName: string) => {
+  currentChord = chordName;
+};
+
 export let waitForStrummingToFinish: (() => void) | undefined;
 let finishStrumming: (() => void) | undefined;
 
@@ -155,6 +160,7 @@ export const setIsStrumming = (chordName: string, value: boolean) => {
     finishStrumming = undefined;
   }
   toggleInterval(value);
+  return strummingChordsMap.size > 0;
 };
 
 const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {

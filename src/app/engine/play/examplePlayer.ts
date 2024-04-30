@@ -1,3 +1,4 @@
+import { setCurrentChord } from "@/app/store/settingsSlice";
 import { PlayExampleParameters } from "../../data/playExampleParameters";
 import { parseStringToNotes } from "../../data/tunings";
 import { ChordEventBus, NotePlayEventBus } from "../eventBus";
@@ -34,6 +35,7 @@ export const playExample = async ({
         });
       },
       (chordToPlay) => {
+        setCurrentChord(chordToPlay);
         ChordEventBus.next({
           chord: chordToPlay,
           metadata: {

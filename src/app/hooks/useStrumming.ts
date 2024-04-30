@@ -12,6 +12,7 @@ import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
   chordStrummingIntervalValue,
+  setCurrentChord,
   setIsStrumming,
   useChordAlterationValue,
   waitForStrummingToFinish,
@@ -80,8 +81,8 @@ export const useStrumming = (
         chordName
       );
       // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
-      setIsStrumming(chordName, false);
-      if (isMainClockTicking()) {
+      const isStrumming = setIsStrumming(chordName, false);
+      if (isMainClockTicking() && !isStrumming) {
         console.log(
           "Releasing button before started playing but timer is on - play the chord now as it was not played immediately"
         );
@@ -107,6 +108,7 @@ export const useStrumming = (
     }
 
     setClicked(true);
+    setCurrentChord(chordName);
 
     if (isPlayingRef.current) {
       // Avoid starting new strumming the same chord while it is still playing.

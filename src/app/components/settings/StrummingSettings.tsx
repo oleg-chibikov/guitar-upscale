@@ -25,10 +25,10 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
     >
       <section
         id="strumming-settings"
-        className={"z-20 fixed bottom-1 left-1/2"}
+        className={"z-40 fixed bottom-1 left-1/2 pointer-events-none"}
       >
         <div
-          className={`flex flex-col gap-2 translate-x-[-50%] p-4 border-2  ${
+          className={`flex flex-col gap-2 translate-x-[-50%] p-4 border-2 pointer-events-auto ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
@@ -39,7 +39,7 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
               dispatch(setStrummingSettingsExpanded(false));
             }}
           />
-          Long press the chord to strum
+          <span>Long press the chord to strum</span>
           <ChordCustomStrummingWaitForPatternFinishCheckbox />
           <StrummingPatternSelector />
           <ChordStrummingIntervalSelector />
