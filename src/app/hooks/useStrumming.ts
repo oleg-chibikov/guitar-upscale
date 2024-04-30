@@ -14,6 +14,8 @@ import {
   chordCustomStrummingWaitForPatternFinishValue,
   chordStrummingIntervalValue,
   getOtherStrummingChordPromises,
+  isMetronomeTickingValue,
+  isPlayingValue,
   markStrummingAsPendingFinishing,
   setCurrentChord,
   setIsStrumming,
@@ -174,12 +176,18 @@ export const useStrumming = (
                 chordName
               );
               initialWait = waitBetween;
-            } else {
+            } else if (isMetronomeTickingValue || isPlayingValue) {
               console.log(
-                "Clock ticking but no strumming - waiting for the next beat for strumming to begin",
+                "Metronome/play active but no strumming - waiting for the next beat for strumming to begin",
                 chordName
               );
               initialWait = waitForNextBeat;
+            } else {
+              console.log(
+                "Clock ticking but the only activity is strumming from this chord - waiting for the next interval for strumming to begin",
+                chordName
+              );
+              initialWait = waitBetween;
             }
           }
 
