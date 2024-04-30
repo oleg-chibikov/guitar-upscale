@@ -7,18 +7,21 @@ import {
   waitForNextQuarterBeat,
   waitForNextTick,
 } from "../engine/mainClock";
-import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
   areOtherChordsStrumming,
-  chordCustomStrummingPatternValue,
-  chordCustomStrummingWaitForPatternFinishValue,
-  chordStrummingIntervalValue,
   getOtherStrummingChordPromises,
-  isMetronomeTickingValue,
-  isPlayingValue,
+  isThisChordStrumming,
   markStrummingAsPendingFinishing,
   setCurrentChord,
   setIsStrumming,
+} from "../engine/strummingState";
+import { asyncTimeout } from "../helpers/asyncTimeout";
+import {
+  chordCustomStrummingPatternValue,
+  chordCustomStrummingWaitForPatternFinishValue,
+  chordStrummingIntervalValue,
+  isMetronomeTickingValue,
+  isPlayingValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
 
@@ -43,6 +46,12 @@ export const useStrumming = (
 ) => {
   const [isClicked, setIsClicked] = useState<boolean>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
+
+  //TODO: it's overly complicated - we have these states:
+  // isClicked - when button is being pressed
+  // isPlaying - when the wait time is over and actual strumming starts including grace period
+  // state - map has record regardless of whether value is defined or not - starts at click (after some checks) and ends when strumming grace period is over (setStrumming(true/false))
+  // state - map has a record with a value - starts at click and ends just before grace period (markStrummingAsPendingFinishing)
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
@@ -117,7 +126,7 @@ export const useStrumming = (
     setClicked(true);
     setCurrentChord(chordName);
 
-    if (isPlayingRef.current) {
+    if (isPlayingRef.current || isThisChordStrumming(chordName)) {
       // Avoid starting new strumming the same chord while it is still playing.
       // Please note that setClicked should be set to true before returning to repeat the previous strumming
       // Without that it would double
@@ -155,12 +164,12 @@ export const useStrumming = (
 
       const waitAndStrum = async () => {
         let intervalsToSkip = clickedInGracePeriod ? 1 : 0;
-
+        let initialWait: () => Promise<any>;
         if (wasClockTickingWhenChordPressed) {
           console.log("Clock was ticking when clicked", chordName);
 
           // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
-          let initialWait: () => Promise<any>;
+
           if (otherStrummingPromises.length) {
             console.log(
               "Waiting for current strumming pattern to finish before beginning strumming new chord",
@@ -170,35 +179,35 @@ export const useStrumming = (
           } else {
             if (wasStrummingWhenChordPressed) {
               console.log(
-                "Strumming not over - waiting for 1 interval for strumming to begin",
+                "Strumming not over - waiting for the next interval to strum",
                 chordName
               );
               initialWait = waitBetween;
             } else if (isMetronomeTickingValue || isPlayingValue) {
               console.log(
-                "Metronome/play active but no strumming - waiting for the next beat for strumming to begin",
+                "Metronome/play active but no strumming - waiting for the next beat to strum",
                 chordName
               );
               initialWait = waitForNextBeat;
             } else {
               console.log(
-                "Clock ticking but the only activity is strumming from this chord - waiting for the next interval for strumming to begin",
+                "Clock ticking but the only activity is strumming from this chord - waiting for the next interval to strum",
                 chordName
               );
               initialWait = waitBetween;
             }
           }
-
-          // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next beat
-          await initialWait();
         } else {
           intervalsToSkip = 1; // already played it immediately
           console.log(
-            "Clock not ticking - waiting for next tick for strumming to begin",
+            "Clock not ticking - waiting for next interval to strum",
             chordName
           );
-          await waitBetween();
+          initialWait = waitBetween;
         }
+
+        // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next interval (or beat if clock is ticking)
+        await initialWait();
 
         if (!isClickedRef.current) {
           console.log(
@@ -208,7 +217,6 @@ export const useStrumming = (
           setIsStrumming(chordName, false);
           return;
         }
-        setPlaying(true);
         try {
           // skip first chord if it was played immediately
           await strum(intervalsToSkip, waitBetween);
@@ -243,6 +251,8 @@ export const useStrumming = (
     startIndex: number,
     waitBetweenChords: () => Promise<void>
   ) => {
+    console.log("----> Started actual strumming", chordName);
+    setPlaying(true);
     let i = startIndex; // skip first as it was played already
     while (isClickedRef.current) {
       const currentPattern = chordCustomStrummingPatternValue;
@@ -272,6 +282,7 @@ export const useStrumming = (
       }
       i = 0; // reset  to start pattern afresh
     }
+
     markStrummingAsPendingFinishing(chordName);
     if (!areOtherChordsStrumming(chordName)) {
       console.log(
