@@ -61,6 +61,8 @@ export const ChordsView: React.FC = () => {
     }, 1);
   };
 
+  useEffect(setupScrollbar, [useAdvancedChords, useSharpChords])
+
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight);
