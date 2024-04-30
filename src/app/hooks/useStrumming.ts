@@ -12,10 +12,11 @@ import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
   chordStrummingIntervalValue,
+  markStrummingAsPendingFinishing,
   setCurrentChord,
   setIsStrumming,
   useChordAlterationValue,
-  waitForStrummingToFinish,
+  waitForStrummingToBecomePendingFinishing,
 } from "../store/settingsSlice";
 
 const getWaitBetweenFunc = () => {
@@ -149,7 +150,8 @@ export const useStrumming = (
             chordName
           );
           // either wait for the current strumming to finish or if nothing is strumming - then for the next beat
-          const initialWait = waitForStrummingToFinish ?? waitForNextBeat;
+          const initialWait =
+            waitForStrummingToBecomePendingFinishing ?? waitForNextBeat;
           await initialWait();
         } else {
           console.log(
@@ -230,6 +232,9 @@ export const useStrumming = (
       }
       i = 0; // reset  to start pattern afresh
     }
+    markStrummingAsPendingFinishing();
+    // This gives additional opportunity to press another chord and repeat the pattern
+    await waitBetweenChords();
   };
 
   return { startStrumming, isPlaying, isClicked, isAlternateRef };

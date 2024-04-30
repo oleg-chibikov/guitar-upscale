@@ -144,18 +144,27 @@ export const setCurrentChord = (chordName: string) => {
   currentChord = chordName;
 };
 
-export let waitForStrummingToFinish: (() => void) | undefined;
-let finishStrumming: (() => void) | undefined;
+export let waitForStrummingToBecomePendingFinishing: (() => void) | undefined;
+let resolveFinishingStrumming: (() => void) | undefined;
 
 const createStrummingPromise = () => {
   let promise: Promise<void>;
   promise = new Promise<void>((resolve) => {
-    finishStrumming = resolve;
+    resolveFinishingStrumming = resolve;
   });
 
-  waitForStrummingToFinish = async () => {
+  waitForStrummingToBecomePendingFinishing = async () => {
     await promise;
   };
+};
+
+// After calling this method strumming is allowed to continue for one more tick/beat (depends on the settings).
+// It is needed to allow switching between chords immediately after the pattern is finished to repeat it instead of starting afresh
+// Strumming is totally finished for the chord when setIsStrumming is called with the false value
+export const markStrummingAsPendingFinishing = () => {
+  resolveFinishingStrumming?.();
+  resolveFinishingStrumming = undefined;
+  waitForStrummingToBecomePendingFinishing = undefined;
 };
 
 export const setIsStrumming = (chordName: string, value: boolean) => {
@@ -164,9 +173,7 @@ export const setIsStrumming = (chordName: string, value: boolean) => {
     createStrummingPromise();
   } else {
     strummingChordsMap.delete(chordName);
-    finishStrumming?.();
-    waitForStrummingToFinish = undefined;
-    finishStrumming = undefined;
+    markStrummingAsPendingFinishing();
   }
   toggleInterval(value);
   return strummingChordsMap.size > 0;
