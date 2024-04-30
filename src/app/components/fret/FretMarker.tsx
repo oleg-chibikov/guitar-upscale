@@ -204,6 +204,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     },
   };
 
+  const isBehindCapo = fret < baseNote;
+
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale
     <div
@@ -221,9 +223,17 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               isHeader &&
               "h-9 " +
                 (isColored
-                  ? theme === Theme.Light
+                  ? isBehindCapo
+                    ? theme === Theme.Light
+                      ? "bg-disabled_match-light"
+                      : "bg-disabled_match-dark"
+                    : theme === Theme.Light
                     ? "bg-fret_marker_match-light"
                     : "bg-fret_marker_match-dark"
+                  : isBehindCapo
+                  ? theme === Theme.Light
+                    ? "bg-disabled-light"
+                    : "bg-disabled-dark"
                   : theme === Theme.Light
                   ? "bg-fret_marker-light"
                   : "bg-fret_marker-dark")
@@ -264,9 +274,17 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                               : "text-foreground-dark"
                           } ${
                             isColored
-                              ? theme === Theme.Light
+                              ? isBehindCapo
+                                ? theme === Theme.Light
+                                  ? "bg-disabled_match-light"
+                                  : "bg-disabled_match-dark"
+                                : theme === Theme.Light
                                 ? "bg-fret_marker_match-light"
                                 : "bg-fret_marker_match-dark"
+                              : isBehindCapo
+                              ? theme === Theme.Light
+                                ? "bg-disabled-light"
+                                : "bg-disabled-dark"
                               : theme === Theme.Light
                               ? "bg-fret_marker-light"
                               : "bg-fret_marker-dark"

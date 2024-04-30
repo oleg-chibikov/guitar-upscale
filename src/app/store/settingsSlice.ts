@@ -37,6 +37,7 @@ const getFirstScaleForGroup = (groupKey: string) =>
 interface WithNeck {
   neck: Neck | null;
   chords: NoteChords[] | null;
+  baseNote: Note;
 }
 
 interface WithControls {
@@ -189,7 +190,8 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
 
 const setChords = (state: WithNeck) => {
   if (state.neck) {
-    const chordsForNeck = generateAllChords(state.neck, true);
+    // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
+    const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
     state.chords = chordsForNeck;
 
     // TODO: only do that if chordDetector feature is enabled

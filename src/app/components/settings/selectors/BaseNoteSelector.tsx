@@ -10,7 +10,7 @@ export const BaseNoteSelector: React.FC = () => {
 
   return (
     <>
-      <span>Base Note:</span>
+      <span>Base Note / Capo:</span>
       <EnumSelector
         enumObj={Note}
         selectedValue={baseNote}

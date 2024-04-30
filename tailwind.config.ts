@@ -88,6 +88,10 @@ const config: Config = {
           light: "#dadada",
           dark: "#8c8c8c",
         },
+        disabled_match: {
+          light: "#8a8888",
+          dark: "#5c5c5c",
+        },
       },
       fontFamily: {
         mono: [

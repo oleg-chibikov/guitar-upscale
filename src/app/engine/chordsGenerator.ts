@@ -247,21 +247,24 @@ const findNextNotesInChord = (
   baseFretIndex: number, // we allow not more than maxFretDistance distance from this fret in any direction unless it's 0 (then any can suit)
   noteToFind: Note,
   neck: Neck,
-  maxFretDistance: number
+  maxFretDistance: number,
+  capo: number
 ): StringOctaveNote[] => {
   const notes = [];
 
+  const openStringFretIndex = capo;
+
   // Always take the open note into account
-  const note = neck[stringIndex][0];
+  const note = neck[stringIndex][openStringFretIndex];
   if (note?.note === noteToFind) {
     notes.push(note);
   }
 
   for (
-    let j = Math.max(1, baseFretIndex - maxFretDistance);
+    let j = Math.max(openStringFretIndex + 1, baseFretIndex - maxFretDistance);
     j <=
     Math.min(
-      baseFretIndex === 0 ? NOTE_COUNT - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
+      baseFretIndex === 0 ? NOTE_COUNT - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index === 0) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
       neck[stringIndex].length - 1
     );
     j++
@@ -276,7 +279,8 @@ const findNextNotesInChord = (
 
 export const generateAllChords = (
   neck: Neck,
-  useAdvancedChords: boolean
+  useAdvancedChords: boolean,
+  capo: number
 ): NoteChords[] => {
   const allChords: NoteChords[] = [];
 
@@ -291,7 +295,7 @@ export const generateAllChords = (
       }
 
       const chordVariations = intervals.flatMap((interval) =>
-        generateChordVariations(note, interval, neck, mode)
+        generateChordVariations(capo, note, interval, neck, mode)
       );
       noteChords.push({ mode, variations: chordVariations });
     }
@@ -320,6 +324,7 @@ const cartesian = <T>(...args: T[][]): (T | null)[][] =>
 
 // Function to generate all the variations of a chord on the guitar neck
 const generateChordVariations = (
+  capo: number, // chords cannot got below this index
   baseNote: Note,
   interval: number[], // Notes that constitute the chord
   neck: Neck, // Representation of the guitar neck
@@ -351,8 +356,11 @@ const generateChordVariations = (
   for (let stringIndex = neck.length - 1; stringIndex >= 0; stringIndex--) {
     const string = neck[stringIndex];
 
-    // Find the first note in the chord on current string - limit at 12 to avoid unrealistic chords
-    for (let fretIndex = 0; fretIndex < NOTE_COUNT; fretIndex++) {
+    // Find the first note in the chord on the current string - limit at 12 to avoid unrealistic chords
+
+    const endFretForLookup = Math.min(capo + NOTE_COUNT, NOTE_COUNT * 2);
+
+    for (let fretIndex = capo; fretIndex < endFretForLookup; fretIndex++) {
       const stringOctaveNote = string[fretIndex];
       if (stringOctaveNote !== null && stringOctaveNote.note === baseNote) {
         const possibleNotesForThisBaseNote: StringOctaveNote[][] = [];
@@ -362,7 +370,7 @@ const generateChordVariations = (
 
         // Find the next notes in the chord on the upper strings
 
-        // if (chordNotes[0] === Note.E && _mode === ChordMode.Major) {
+        // if (chordNotes[0] === Note["G#"] && mode === ChordMode.Major) {
         //   debugger;
         // }
         for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
@@ -371,16 +379,17 @@ const generateChordVariations = (
             baseFretIndex,
             chordNotes[i],
             neck,
-            4
+            4,
+            capo
           );
 
           // If the previous fret index was an open string (0) then we need to set a new base fret index on a higher string to arrange fingers
           // Once the index is found - it remains base for the whole chord
           // Without this it's not possible to arrange fingers for a Hendrix chord whic is 0 on last string and 7 on last but one
 
-          if (baseFretIndex === 0) {
+          if (baseFretIndex === capo) {
             for (const note of notesOnHigherString) {
-              if (note.fret > 0 && note.fret < NOTE_COUNT) {
+              if (note.fret > capo && note.fret < endFretForLookup) {
                 baseFretIndex = note.fret;
                 break;
               }
