@@ -2,11 +2,12 @@
 
 import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
-import { Slide } from "@mui/material";
+import { Alert, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "./checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
+import { SeamlessChordSwitchingCheckbox } from "./checkboxes/SeamlessChordSwitchingCheckbox";
 import { ChordStrummingIntervalSelector } from "./selectors/ChordStrummingIntervalSelector";
 import { StrummingPatternSelector } from "./selectors/StrummingPatternSelector";
 
@@ -39,8 +40,9 @@ export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
               dispatch(setStrummingSettingsExpanded(false));
             }}
           />
-          <span>Long press the chord to strum</span>
           <ChordCustomStrummingWaitForPatternFinishCheckbox />
+          <SeamlessChordSwitchingCheckbox />
+          <Alert severity="info">Long press the chord to strum</Alert>
           <StrummingPatternSelector />
           <ChordStrummingIntervalSelector />
         </div>

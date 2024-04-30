@@ -25,6 +25,7 @@ import {
   chordPlayModeValue,
   chordStrummingDelayMsValue,
   currentChord,
+  seamlessChordSwitchingValue,
 } from "../../store/settingsSlice";
 
 interface ChordButtonProps {
@@ -40,8 +41,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 }) => {
   const hasTouchInput = useInputChecker();
   const play = useCallback(() => {
+    const chordToPlay =
+      seamlessChordSwitchingValue && currentChord ? currentChord : chordName;
     // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
-    ChordEventBus.next({ chord: currentChord ?? chordName, metadata: {} });
+    ChordEventBus.next({ chord: chordToPlay, metadata: {} });
   }, [chordName]);
   const isDisabled = !noteChordMode.variations.length;
 

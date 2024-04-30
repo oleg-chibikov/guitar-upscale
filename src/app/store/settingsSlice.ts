@@ -67,6 +67,7 @@ interface SettingsState extends WithNeck, WithControls {
   useChordAlteration: boolean;
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
+  seamlessChordSwitching: boolean;
   isMetronomeTicking: boolean;
   isPlaying: boolean;
   chordIsBeingDetected: boolean;
@@ -98,6 +99,7 @@ const initialState: SettingsState = {
   useChordAlteration: false,
   chordCustomStrummingPattern: chordStrummingPatterns[0],
   chordCustomStrummingWaitForPatternFinish: true,
+  seamlessChordSwitching: true,
   isMetronomeTicking: false,
   isPlaying: false,
   chordIsBeingDetected: false,
@@ -118,6 +120,8 @@ export let chordCustomStrummingPatternValue: string =
   initialState.chordCustomStrummingPattern;
 export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
+export let seamlessChordSwitchingValue: boolean =
+  initialState.seamlessChordSwitching;
 export let isMetronomeTickingValue = initialState.isMetronomeTicking;
 export let isPlayingValue: boolean = initialState.isPlaying;
 export let chordStrummingDelayMsValue: number =
@@ -131,6 +135,7 @@ export let strummingChordsMap = new Set<string>();
 export let chordsMap = new Map<string, Chord>();
 
 export let currentChord: string | undefined;
+
 export const setCurrentChord = (chordName: string) => {
   currentChord = chordName;
 };
@@ -246,6 +251,7 @@ export const settingsSlice = createSlice({
       chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
+      seamlessChordSwitchingValue = state.seamlessChordSwitching;
       isMetronomeTickingValue = state.isMetronomeTicking;
       chordStrummingDelayMsValue = state.chordStrummingDelayMs;
       chordIsBeingDetectedValue = state.chordIsBeingDetected;
@@ -358,6 +364,10 @@ export const settingsSlice = createSlice({
       state.chordCustomStrummingWaitForPatternFinish = action.payload;
       chordCustomStrummingWaitForPatternFinishValue = action.payload;
     },
+    setSeamlessChordSwitching(state, action: PayloadAction<boolean>) {
+      state.seamlessChordSwitching = action.payload;
+      seamlessChordSwitchingValue = action.payload;
+    },
     setIsMetronomeTicking(state, action: PayloadAction<boolean>) {
       state.isMetronomeTicking = action.payload;
       isMetronomeTickingValue = action.payload;
@@ -400,6 +410,7 @@ export const {
   setUseChordAlteration,
   setChordCustomStrummingPattern,
   setChordCustomStrummingWaitForPatternFinish,
+  setSeamlessChordSwitching,
   setIsMetronomeTicking,
   setIsPlaying,
   setChordIsBeingDetected,
