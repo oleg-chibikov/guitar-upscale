@@ -107,6 +107,9 @@ const initialState: SettingsState = {
 
 // A values that changes immediately without the need for rerender
 // Consider them as a global refs
+// They are controlling how it behaves - NOT how it looks like
+// For settings affecting the UI use the state values, not these. State values are triggering rerender when changing
+
 export let velocityValue: number = initialState.velocity;
 export let metronomeVelocityValue: number = initialState.metronomeVelocity;
 export let tempoBpmValue: number = initialState.tempoBpm;
