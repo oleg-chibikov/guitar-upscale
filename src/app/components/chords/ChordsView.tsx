@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 
@@ -43,13 +43,32 @@ export const ChordsView: React.FC = () => {
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
+  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>();
+  const ref = useRef<HTMLDivElement>(null);
+
+  const getScrollbarVisible = () => {
+    const el = ref.current;
+
+    return el
+      ? el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
+      : false;
+  };
+
+  const setupScrollbar = () => {
+    // I have no idea why it works only with setTimeout. Without it it gives the previous values of dimensions
+    setTimeout(() => {
+      setScrollBarVisible(getScrollbarVisible());
+    }, 1);
+  };
 
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
+      setupScrollbar();
     };
     const debouncedHandeResize = trailingDebounce(handleResize, 200);
+    setupScrollbar();
 
     window.addEventListener("resize", debouncedHandeResize);
     return () => {
@@ -76,7 +95,7 @@ export const ChordsView: React.FC = () => {
   return (
     <section
       id="chords-view"
-      className={`opacity-95 fixed ${
+      className={`opacity-95 fixed touch-none ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } z-20 bottom-1 ${
         theme === Theme.Light
@@ -117,7 +136,10 @@ export const ChordsView: React.FC = () => {
           {/* TODO: Uncomment when implemented */}
           {/* <LooperPanel /> */}
           <section
-            className={`grid gap-0.5 overflow-auto overscroll-contain grid-cols-2`}
+            ref={ref}
+            className={`grid ${
+              scrollBarVisible ? "overscroll-contain" : "touch-none"
+            } gap-0.5 overflow-auto grid-cols-2`}
             style={{
               maxWidth:
                 height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
