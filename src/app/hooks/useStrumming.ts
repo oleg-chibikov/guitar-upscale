@@ -145,17 +145,15 @@ export const useStrumming = (
         // Play first chord straight away
         playWithPossibleAlteration();
       }
+      const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
+      const otherStrummingPromises = getOtherStrummingChordPromises(chordName);
+      const waitBetween = getWaitBetweenFunc();
+
+      let clickedInGracePeriod =
+        wasStrummingWhenChordPressed && !otherStrummingPromises.length; //TODO: get promises for OTHER chords (except this one)
+      console.log("Is in grace period", chordName, clickedInGracePeriod);
 
       const waitAndStrum = async () => {
-        const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
-        const otherStrummingPromises =
-          getOtherStrummingChordPromises(chordName);
-        const waitBetween = getWaitBetweenFunc();
-
-        let clickedInGracePeriod =
-          wasStrummingWhenChordPressed && !otherStrummingPromises.length; //TODO: get promises for OTHER chords (except this one)
-        console.log("Is in grace period", chordName, clickedInGracePeriod);
-
         let intervalsToSkip = clickedInGracePeriod ? 1 : 0;
 
         if (wasClockTickingWhenChordPressed) {
@@ -224,7 +222,7 @@ export const useStrumming = (
         }
       };
 
-      if (!isPlayingRef.current) {
+      if (!isPlayingRef.current && !wasStrummingWhenChordPressed) {
         // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
         // this time should be as little as needed for a click/tap
         await asyncTimeout(waitAndStrum, 100);
@@ -275,6 +273,13 @@ export const useStrumming = (
       i = 0; // reset  to start pattern afresh
     }
     markStrummingAsPendingFinishing(chordName);
+    if (!areOtherChordsStrumming(chordName)) {
+      console.log(
+        "Other chords are not strumming - playing one chord at the end of the pattern to avoid off beat",
+        chordName
+      );
+      play();
+    }
     // This gives additional opportunity to press another chord and repeat the pattern
     await waitBetweenChords();
   };
