@@ -1,4 +1,5 @@
 import { Theme } from "@/app/data/theme";
+import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -149,7 +150,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       case NoteDisplayMode.Note:
         return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
       case NoteDisplayMode.Note_Shift:
-        return stringOctaveNote.note;
+        const result = (stringOctaveNote.note - baseNote) % NOTE_COUNT;
+        return result >= 0 ? result : result + NOTE_COUNT;
       default:
         return fret;
     }
