@@ -76,6 +76,7 @@ export const ChordsView: React.FC = () => {
     return () => {
       window.removeEventListener("resize", debouncedHandeResize);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!neck || !chords) {
