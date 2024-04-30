@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 
@@ -54,14 +54,14 @@ export const ChordsView: React.FC = () => {
       : false;
   };
 
-  const setupScrollbar = () => {
+  const setupScrollbar = useCallback(() => {
     // I have no idea why it works only with setTimeout. Without it it gives the previous values of dimensions
     setTimeout(() => {
       setScrollBarVisible(getScrollbarVisible());
     }, 1);
-  };
+  }, []);
 
-  useEffect(setupScrollbar, [useAdvancedChords, useSharpChords])
+  useEffect(setupScrollbar, [setupScrollbar]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,7 +76,7 @@ export const ChordsView: React.FC = () => {
     return () => {
       window.removeEventListener("resize", debouncedHandeResize);
     };
-  }, []);
+  }, [setupScrollbar]);
 
   if (!neck || !chords) {
     return null;
