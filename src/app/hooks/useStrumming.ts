@@ -9,14 +9,15 @@ import {
 } from "../engine/mainClock";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
+  areOtherChordsStrumming,
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
   chordStrummingIntervalValue,
+  getOtherStrummingChordPromises,
   markStrummingAsPendingFinishing,
   setCurrentChord,
   setIsStrumming,
   useChordAlterationValue,
-  waitForStrummingToBecomePendingFinishing,
 } from "../store/settingsSlice";
 
 const getWaitBetweenFunc = () => {
@@ -82,8 +83,9 @@ export const useStrumming = (
         chordName
       );
       // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
-      const isStrumming = setIsStrumming(chordName, false);
-      if (isMainClockTicking() && !isStrumming) {
+      setIsStrumming(chordName, false);
+
+      if (isMainClockTicking() && !areOtherChordsStrumming(chordName)) {
         console.log(
           "Releasing button before started playing but timer is on - play the chord now as it was not played immediately"
         );
@@ -103,10 +105,12 @@ export const useStrumming = (
     isPlayingRef.current = value;
   };
 
-  const startStrumming = async () => {
+  const onChordPress = async () => {
     if (isDisabled) {
       return;
     }
+
+    console.log("Pressed chord", chordName);
 
     setClicked(true);
     setCurrentChord(chordName);
@@ -122,7 +126,7 @@ export const useStrumming = (
     !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
     hasTouchInput && document.addEventListener("touchend", handleClickOutside);
     try {
-      const wasClockTickingAtStrummingStart = isMainClockTicking();
+      const wasClockTickingWhenChordPressed = isMainClockTicking();
 
       if (isClickedRef.current) {
         console.log("Mark as strumming", chordName);
@@ -135,27 +139,56 @@ export const useStrumming = (
         return;
       }
 
-      if (!wasClockTickingAtStrummingStart) {
+      if (!wasClockTickingWhenChordPressed) {
         // Play first chord straight away
         playWithPossibleAlteration();
       }
 
       const waitAndStrum = async () => {
+        const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
+        const otherStrummingPromises =
+          getOtherStrummingChordPromises(chordName);
         const waitBetween = getWaitBetweenFunc();
 
-        if (wasClockTickingAtStrummingStart) {
+        let clickedInGracePeriod =
+          wasStrummingWhenChordPressed && !otherStrummingPromises.length; //TODO: get promises for OTHER chords (except this one)
+        console.log("Is in grace period", chordName, clickedInGracePeriod);
+
+        let intervalsToSkip = clickedInGracePeriod ? 1 : 0;
+
+        if (wasClockTickingWhenChordPressed) {
+          console.log("Clock was ticking when clicked", chordName);
+
           // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
-          console.log(
-            "Waiting for next beat for strumming to begin",
-            chordName
-          );
-          // either wait for the current strumming to finish or if nothing is strumming - then for the next beat
-          const initialWait =
-            waitForStrummingToBecomePendingFinishing ?? waitForNextBeat;
+          let initialWait: () => Promise<any>;
+          if (otherStrummingPromises.length) {
+            console.log(
+              "Waiting for current strumming pattern to finish before beginning strumming new chord",
+              chordName
+            );
+            initialWait = () => Promise.all(otherStrummingPromises);
+          } else {
+            if (wasStrummingWhenChordPressed) {
+              console.log(
+                "Strumming not over - waiting for 1 interval for strumming to begin",
+                chordName
+              );
+              initialWait = waitBetween;
+            } else {
+              console.log(
+                "Clock ticking but no strumming - waiting for the next beat for strumming to begin",
+                chordName
+              );
+              initialWait = waitForNextBeat;
+            }
+          }
+
+          // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next beat
           await initialWait();
         } else {
+          intervalsToSkip = 1; // already played it immediately
           console.log(
-            "Waiting for next tick for strumming to begin",
+            "Clock not ticking - waiting for next tick for strumming to begin",
             chordName
           );
           await waitBetween();
@@ -163,20 +196,21 @@ export const useStrumming = (
 
         if (!isClickedRef.current) {
           console.log(
-            "Already released mouse/touch after wait. Stop strumming and return",
+            "Already released mouse/touch after wait. Stop strumming and don't continue",
             chordName
           );
           setIsStrumming(chordName, false);
           return;
         }
-
-        console.log("Starting strumming", chordName);
         setPlaying(true);
         try {
           // skip first chord if it was played immediately
-          await strum(wasClockTickingAtStrummingStart ? 0 : 1, waitBetween);
+          await strum(intervalsToSkip, waitBetween);
         } finally {
-          console.log("Strum finished - stop strumming", chordName);
+          console.log(
+            "Strumming finished - setting isPlaying to false",
+            chordName
+          );
           setPlaying(false);
           setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
         }
@@ -232,10 +266,10 @@ export const useStrumming = (
       }
       i = 0; // reset  to start pattern afresh
     }
-    markStrummingAsPendingFinishing();
+    markStrummingAsPendingFinishing(chordName);
     // This gives additional opportunity to press another chord and repeat the pattern
     await waitBetweenChords();
   };
 
-  return { startStrumming, isPlaying, isClicked, isAlternateRef };
+  return { onChordPress, isPlaying, isClicked, isAlternateRef };
 };
