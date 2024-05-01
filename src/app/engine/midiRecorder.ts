@@ -9,7 +9,7 @@ import {
   tempoBpmValue,
 } from "../store/settingsSlice";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
-import { globalCurrentTick } from "./mainClock";
+import { TICKS_IN_BEAT, globalCurrentTick } from "./mainClock";
 
 // Define a class for MIDI recorder
 export class MidiRecorder {
@@ -18,7 +18,7 @@ export class MidiRecorder {
   private startTick: number | undefined;
   private noteShift = 4; // Shift from the program's 0 note (E) to midi-writer-js zero note which is C
   private octaveShift = 0;
-  private TICK_SHIFT = 4; // Gap till next bar as starting from 0 for some reason gives corrupted melody
+  private HALF_BEAT_SHIFT = 4; // Gap till next bar as starting from 0 for some reason gives corrupted melody
 
   startRecording() {
     this.midiEvents = new Map<string, NoteEvent[]>();
@@ -83,7 +83,7 @@ export class MidiRecorder {
           duration: "4",
           channel: 1,
           sequential: false,
-          tick: (playAtTick + this.TICK_SHIFT) * (64 / this.TICK_SHIFT),
+          tick: (playAtTick + this.HALF_BEAT_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
         })
       );
     }
