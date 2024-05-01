@@ -1,7 +1,7 @@
-import { setCurrentChord } from "@/app/store/settingsSlice";
 import { PlayExampleParameters } from "../../data/playExampleParameters";
 import { parseStringToNotes } from "../../data/tunings";
 import { ChordEventBus, NotePlayEventBus } from "../eventBus";
+import { setCurrentChord } from "../strummingState";
 import { decodeMelody } from "./melodyDecoder";
 
 export const playExample = async ({

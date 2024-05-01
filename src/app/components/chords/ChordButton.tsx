@@ -1,4 +1,5 @@
 import { Theme } from "@/app/data/theme";
+import { currentChord } from "@/app/engine/strummingState";
 import { useInputChecker } from "@/app/helpers/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import { selectUi } from "@/app/store/uiSlice";
@@ -24,7 +25,6 @@ import {
   chordNotesToPlayValue,
   chordPlayModeValue,
   chordStrummingDelayMsValue,
-  currentChord,
   seamlessChordSwitchingValue,
 } from "../../store/settingsSlice";
 
