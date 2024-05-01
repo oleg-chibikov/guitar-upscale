@@ -238,16 +238,7 @@ export const useStrumming = (
           setPlaying(false);
           return;
         }
-        try {
-          // skip first chord if it was played immediately
-          await strum(intervalsToSkip, waitBetween);
-        } finally {
-          console.log(
-            "Strumming finished - setting isPlaying to false",
-            chordName
-          );
-          setPlaying(false);
-        }
+        await strum(intervalsToSkip, waitBetween);
       };
 
       if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
@@ -268,51 +259,56 @@ export const useStrumming = (
   };
 
   const strum = async (
-    startIndex: number,
+    startIndex: number, // skip first chord if it was played immediately
     waitBetweenChords: () => Promise<void>
   ) => {
-    console.log("----> Started actual strumming", chordName);
-    setPlaying(true);
-    let i = startIndex; // skip first as it was played already
-    while (isChordClicked(chordName)) {
-      const currentPattern = chordCustomStrummingPatternValue;
+    try {
+      console.log("----> Started actual strumming", chordName);
+      setPlaying(true);
+      let i = startIndex; // skip first as it was played already
+      while (isChordClicked(chordName)) {
+        const currentPattern = chordCustomStrummingPatternValue;
 
-      for (; i < currentPattern.length; i++) {
-        const char = currentPattern[i];
-        if (!chordCustomStrummingWaitForPatternFinishValue) {
-          // early break pattern only when the checkbox is off
-          if (!isChordClicked(chordName)) {
-            // already released mouse/touch - don't play the strumming
-            return;
+        for (; i < currentPattern.length; i++) {
+          const char = currentPattern[i];
+          if (!chordCustomStrummingWaitForPatternFinishValue) {
+            // early break pattern only when the checkbox is off
+            if (!isChordClicked(chordName)) {
+              // already released mouse/touch - don't play the strumming
+              return;
+            }
           }
+          switch (char) {
+            case "↑":
+              isAlternateRef.current = false;
+              play();
+              break;
+            case "↓":
+              isAlternateRef.current = true;
+              play();
+              break;
+            case "_":
+              break;
+          }
+          await waitBetweenChords();
         }
-        switch (char) {
-          case "↑":
-            isAlternateRef.current = false;
-            play();
-            break;
-          case "↓":
-            isAlternateRef.current = true;
-            play();
-            break;
-          case "_":
-            break;
-        }
-        await waitBetweenChords();
+        i = 0; // reset  to start pattern afresh
       }
-      i = 0; // reset  to start pattern afresh
-    }
 
-    markChordAsPendingStrummingFinishing(chordName);
-    if (!areOtherChordsStrumming(chordName)) {
-      console.log(
-        "Other chords are not strumming - playing one chord at the end of the pattern to avoid off beat",
-        chordName
-      );
-      play();
+      markChordAsPendingStrummingFinishing(chordName);
+      if (!areOtherChordsStrumming(chordName)) {
+        console.log(
+          "Other chords are not strumming - playing one chord at the end of the pattern to avoid off beat",
+          chordName
+        );
+        play();
+      }
+      // This gives additional opportunity to press another chord and repeat the pattern
+      await waitBetweenChords();
+    } finally {
+      console.log("Strumming finished - setting isPlaying to false", chordName);
+      setPlaying(false);
     }
-    // This gives additional opportunity to press another chord and repeat the pattern
-    await waitBetweenChords();
   };
 
   return { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef };
