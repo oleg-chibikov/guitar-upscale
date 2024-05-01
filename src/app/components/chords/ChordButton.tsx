@@ -50,12 +50,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const [wasPlayedLast, setWasPlayedLast] = useState<boolean>(false);
   const [animate, setAnimate] = useState(false);
-  const { onChordPress, isPlaying, isClicked, isAlternateRef } = useStrumming(
-    chordName,
-    play,
-    isDisabled,
-    hasTouchInput
-  );
+  const { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef } =
+    useStrumming(chordName, play, isDisabled, hasTouchInput);
 
   const { theme, useSharpChords } = useSelector(selectUi);
 
@@ -143,17 +139,21 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             }
           : undefined
       }
-      className={`text-center w-16 ${
-        useSharpChords ? "h-6" : "h-10"
+      className={`text-center w-16 ${useSharpChords ? "h-6" : "h-10"} ${
+        (isPlaying || isGracePeriod || isClicked) && "border-2"
       } items-center justify-center content-center ${
-        isPlaying
+        isGracePeriod
           ? theme === Theme.Light
             ? "border-border_accent_stronger-light"
-            : "border-2 border-border_accent_stronger-dark"
+            : " border-border_accent_stronger-dark"
+          : isPlaying
+          ? theme === Theme.Light
+            ? "border-border_accent_strongest-light"
+            : " border-border_accent_strongest-dark"
           : isClicked
           ? theme === Theme.Light
-            ? "border-2 border-border_accent-light"
-            : "border-2 border-border_accent-dark"
+            ? "border-border_accent-light"
+            : "border-border_accent-dark"
           : undefined
       } ${
         isDisabled
