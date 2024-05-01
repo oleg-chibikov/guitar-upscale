@@ -185,10 +185,10 @@ export const useStrumming = (
       } else {
         // if clock is active - verify that it's a long press (and if not - play immediately)
         setTimeout(() => {
-          if (isChordClicked(chordName)) {
+          if (!isChordClicked(chordName)) {
             playWithPossibleAlteration();
           }
-        }, 70);
+        }, 75);
       }
       const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
       const otherChordsStrummingPromises =
