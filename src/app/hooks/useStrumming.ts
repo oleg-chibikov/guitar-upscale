@@ -50,8 +50,9 @@ export const useStrumming = (
   isDisabled: boolean,
   hasTouchInput: boolean
 ) => {
-  const [isClicked, setIsClicked] = useState<boolean>();
-  const [isPlaying, setIsPlaying] = useState<boolean>();
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
 
   const playWithPossibleAlteration = useCallback(() => {
@@ -314,5 +315,5 @@ export const useStrumming = (
     await waitBetweenChords();
   };
 
-  return { onChordPress, isPlaying, isClicked, isAlternateRef };
+  return { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef };
 };
