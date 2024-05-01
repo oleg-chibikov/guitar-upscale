@@ -20,9 +20,10 @@ type PromiseAndResolve = {
 
 type StrummingData = {
   isClicked: boolean;
-  clickPromiseAndResolve?: PromiseAndResolve;
   state: StrummingState;
-  promiseAndResolve?: PromiseAndResolve;
+  clickPromiseAndResolve?: PromiseAndResolve;
+  strummingPromiseAndResolve?: PromiseAndResolve;
+  gracePeriodPromiseAndResolve?: PromiseAndResolve;
 };
 
 export let strummingChordsMap = new Map<string, StrummingData>();
@@ -47,42 +48,30 @@ export const isThisChordStrummingOrPendingStrumming = (
 export const areOtherChordsStrumming = (chordName: string): boolean =>
   Array.from(strummingChordsMap).filter((x) => x[0] !== chordName).length > 0;
 
-export const getOtherStrummingChordPromises = (
+export const getOtherChordsStrummingPromises = (
   chordName: string
 ): Promise<void>[] => {
   const promises = Array.from(strummingChordsMap)
     .map(([name, data]) => {
       if (name !== chordName) {
-        return data.promiseAndResolve?.promise; // There are other chords strumming
+        return data.strummingPromiseAndResolve?.promise; // There are other chords strumming
       }
     })
     .filter((x) => x) as Promise<void>[];
   return promises;
 };
 
-// After calling this method strumming is allowed to continue for one more tick/beat (depends on the settings).
-// It is needed to allow switching between chords immediately after the pattern is finished to repeat it instead of starting afresh
-// Strumming is totally finished for the chord when setIsStrumming is called with the false value
-export const markChordAsPendingStrummingFinishing = (chordName: string) => {
-  const { promiseAndResolve, isClicked } =
-    strummingChordsMap.get(chordName) ??
-    (() => {
-      throw new Error("No record for strumming");
-    })();
-
-  if (!promiseAndResolve) {
-    throw new Error("No record for strumming promise");
-  }
-
-  promiseAndResolve.resolve();
-  strummingChordsMap.set(chordName, {
-    state: StrummingState.GracePeriod,
-    isClicked: isClicked,
-  });
-  console.log(
-    "---> Strumming peniding finishing. Grace period started",
-    chordName
-  );
+export const getOtherChordsGracePeriodPromises = (
+  chordName: string
+): Promise<void>[] => {
+  const promises = Array.from(strummingChordsMap)
+    .map(([name, data]) => {
+      if (name !== chordName) {
+        return data.gracePeriodPromiseAndResolve?.promise; // There are other chords strumming
+      }
+    })
+    .filter((x) => x) as Promise<void>[];
+  return promises;
 };
 
 export const isChordClicked = (chordName: string) =>
@@ -102,8 +91,9 @@ export const registerChordClick = (chordName: string) => {
   // might be clicked when already in another state
   strummingChordsMap.set(chordName, {
     state: data ? data.state : StrummingState.Clicked,
-    promiseAndResolve: data?.promiseAndResolve,
+    strummingPromiseAndResolve: data?.strummingPromiseAndResolve,
     clickPromiseAndResolve: clickPromiseAndResolve,
+    gracePeriodPromiseAndResolve: data?.gracePeriodPromiseAndResolve,
     isClicked: true,
   });
 
@@ -117,13 +107,12 @@ export const releaseChordClick = (chordName: string) => {
     return;
   }
 
-  if (data.clickPromiseAndResolve) {
-    data.clickPromiseAndResolve.resolve();
-  }
+  data.clickPromiseAndResolve?.resolve();
 
   strummingChordsMap.set(chordName, {
     ...data,
     isClicked: false,
+    clickPromiseAndResolve: undefined,
   });
 
   console.log("---> Strumming click released", chordName);
@@ -137,14 +126,14 @@ export const markChordAsPendingStrumming = (chordName: string) => {
     })();
   setCurrentChord(chordName);
   strummingChordsMap.set(chordName, {
+    ...data,
     state: StrummingState.PendingStrummingStart,
-    promiseAndResolve: createStrummingPromise(),
+    strummingPromiseAndResolve: createStrummingPromise(),
     isClicked: true,
-    clickPromiseAndResolve: data.clickPromiseAndResolve,
   });
 
   toggleInterval(true);
-  console.log("---> Strumming pending starting", chordName);
+  console.log("---> Chord pending strumming start", chordName);
 };
 
 export const markChordAsStrumming = (chordName: string) => {
@@ -154,18 +143,43 @@ export const markChordAsStrumming = (chordName: string) => {
       throw new Error("No record for strumming");
     })();
   strummingChordsMap.set(chordName, {
+    ...data,
     state: StrummingState.Strumming,
-    promiseAndResolve: data.promiseAndResolve,
-    isClicked: data.isClicked ?? false,
-    clickPromiseAndResolve: data.clickPromiseAndResolve,
   });
   console.log("---> Started strumming", chordName);
 };
 
-export const finishStrumming = (chordName: string) => {
-  const promiseAndResolve =
-    strummingChordsMap.get(chordName)?.promiseAndResolve;
-  promiseAndResolve?.resolve();
+// After calling this method strumming is allowed to continue for one more tick/beat (depends on the settings).
+// It is needed to allow switching between chords immediately after the pattern is finished to repeat it instead of starting afresh
+// Strumming is totally finished for the chord when setIsStrumming is called with the false value
+export const startChordGracePeriod = (chordName: string) => {
+  const data =
+    strummingChordsMap.get(chordName) ??
+    (() => {
+      throw new Error("No record for strumming");
+    })();
+
+  if (!data.strummingPromiseAndResolve) {
+    throw new Error("No record for strumming promise");
+  }
+
+  data.strummingPromiseAndResolve.resolve();
+  strummingChordsMap.set(chordName, {
+    ...data,
+    state: StrummingState.GracePeriod,
+    strummingPromiseAndResolve: undefined,
+    gracePeriodPromiseAndResolve: createStrummingPromise(),
+  });
+  console.log(
+    "---> Strumming peniding finishing. Grace period started",
+    chordName
+  );
+};
+
+export const finishChordGracePeriod = (chordName: string) => {
+  const gracePeriodPromiseAndResolve =
+    strummingChordsMap.get(chordName)?.gracePeriodPromiseAndResolve;
+  gracePeriodPromiseAndResolve?.resolve();
   strummingChordsMap.delete(chordName);
   toggleInterval(false);
   console.log("---> Strumming finished. Grace period ended", chordName);

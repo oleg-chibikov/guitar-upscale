@@ -9,17 +9,18 @@ import {
 } from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
-  finishStrumming,
+  finishChordGracePeriod,
   getChordClickedPromise,
-  getOtherStrummingChordPromises,
+  getOtherChordsGracePeriodPromises,
+  getOtherChordsStrummingPromises,
   isChordClicked,
   isChordPlaying,
   isThisChordStrummingOrPendingStrumming,
   markChordAsPendingStrumming,
-  markChordAsPendingStrummingFinishing,
   markChordAsStrumming,
   registerChordClick,
   releaseChordClick,
+  startChordGracePeriod,
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
@@ -30,6 +31,8 @@ import {
   isPlayingValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
+
+const GRACE_INTERVALS = 2;
 
 const getWaitBetweenFunc = () => {
   switch (chordStrummingIntervalValue) {
@@ -119,12 +122,13 @@ export const useStrumming = (
   };
 
   const setPlaying = (value: boolean) => {
-    setIsPlaying(value);
     if (value) {
       markChordAsStrumming(chordName);
     } else {
-      finishStrumming(chordName);
+      finishChordGracePeriod(chordName);
+      setIsGracePeriod(false);
     }
+    setIsPlaying(value);
   };
 
   const onChordPress = async () => {
@@ -169,27 +173,33 @@ export const useStrumming = (
         playWithPossibleAlteration();
       }
       const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
-      const otherStrummingPromises = getOtherStrummingChordPromises(chordName);
+      const otherChordsStrummingPromises =
+        getOtherChordsStrummingPromises(chordName);
+      const otherChordsGracePeriodPromises =
+        getOtherChordsGracePeriodPromises(chordName);
       const waitBetween = getWaitBetweenFunc();
 
-      let clickedInGracePeriod =
-        wasStrummingWhenChordPressed && !otherStrummingPromises.length; //TODO: get promises for OTHER chords (except this one)
-      console.log("Is in grace period", chordName, clickedInGracePeriod);
+      let clickedInGracePeriod = otherChordsGracePeriodPromises.length; //TODO: get promises for OTHER chords (except this one)
 
       const waitAndStrum = async () => {
-        let intervalsToSkip = clickedInGracePeriod ? 1 : 0;
+        let intervalsToSkip = clickedInGracePeriod ? GRACE_INTERVALS : 0;
         let initialWait: () => Promise<void | void[]>;
         if (wasClockTickingWhenChordPressed) {
           console.log("Clock was ticking when clicked", chordName);
 
-          // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
-
-          if (otherStrummingPromises.length) {
+          if (clickedInGracePeriod) {
+            console.log(
+              "Clicked in grace period. Waiting for it to finish to start strumming",
+              chordName
+            );
+            initialWait = () => Promise.all(otherChordsGracePeriodPromises);
+          } else if (otherChordsStrummingPromises.length) {
+            // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
             console.log(
               "Waiting for current strumming pattern to finish before beginning strumming new chord",
               chordName
             );
-            initialWait = () => Promise.all(otherStrummingPromises);
+            initialWait = () => Promise.all(otherChordsStrummingPromises);
           } else {
             if (wasStrummingWhenChordPressed) {
               console.log(
@@ -238,6 +248,7 @@ export const useStrumming = (
           setPlaying(false);
           return;
         }
+        // skip first chord if it was played immediately
         await strum(intervalsToSkip, waitBetween);
       };
 
@@ -259,18 +270,37 @@ export const useStrumming = (
   };
 
   const strum = async (
-    startIndex: number, // skip first chord if it was played immediately
+    startIndex: number,
     waitBetweenChords: () => Promise<void>
-  ) => {
+  ): Promise<void> => {
+    console.log("----> Started actual strumming", chordName);
+    setPlaying(true);
     try {
-      console.log("----> Started actual strumming", chordName);
-      setPlaying(true);
-      let i = startIndex; // skip first as it was played already
+      let currentIndex = startIndex; // skip first as it was played already
+      const currentPattern = chordCustomStrummingPatternValue;
+
+      const playChordOnce = async () => {
+        const char = currentPattern[currentIndex];
+        switch (char) {
+          case "↑":
+            isAlternateRef.current = false;
+            play();
+            break;
+          case "↓":
+            isAlternateRef.current = true;
+            play();
+            break;
+          case "_":
+            break;
+        }
+
+        await waitBetweenChords();
+      };
+
       while (isChordClicked(chordName)) {
         const currentPattern = chordCustomStrummingPatternValue;
 
-        for (; i < currentPattern.length; i++) {
-          const char = currentPattern[i];
+        for (; currentIndex < currentPattern.length; currentIndex++) {
           if (!chordCustomStrummingWaitForPatternFinishValue) {
             // early break pattern only when the checkbox is off
             if (!isChordClicked(chordName)) {
@@ -278,33 +308,36 @@ export const useStrumming = (
               return;
             }
           }
-          switch (char) {
-            case "↑":
-              isAlternateRef.current = false;
-              play();
-              break;
-            case "↓":
-              isAlternateRef.current = true;
-              play();
-              break;
-            case "_":
-              break;
-          }
-          await waitBetweenChords();
+          await playChordOnce();
         }
-        i = 0; // reset  to start pattern afresh
+        currentIndex = 0; // reset to start pattern afresh
       }
 
-      markChordAsPendingStrummingFinishing(chordName);
-      if (!areOtherChordsStrumming(chordName)) {
-        console.log(
-          "Other chords are not strumming - playing one chord at the end of the pattern to avoid off beat",
-          chordName
-        );
-        play();
+      if (chordCustomStrummingWaitForPatternFinishValue) {
+        setIsGracePeriod(true);
+        startChordGracePeriod(chordName);
+        // Wait 2 intervals - This gives additional opportunity to press another chord and repeat the pattern
+        // TODO: Leave waiting promise until this ends. Create new promise for grace period - wait for it in other chords if clicked within grace period
+        if (!areOtherChordsStrumming(chordName)) {
+          console.log(
+            "Other chords are not strumming - play grace chords",
+            chordName
+          );
+          await playChordOnce(); // play first chord once every time during grace period
+
+          for (let i = 1; i < GRACE_INTERVALS; i++) {
+            if (areOtherChordsStrumming(chordName)) {
+              await playChordOnce(); // play subsequent chords only if there are other chords pending, otherwise just wait for grace period end
+            } else {
+              await waitBetweenChords();
+            }
+            currentIndex++;
+            if (currentIndex == currentPattern.length) {
+              currentIndex = 0;
+            }
+          }
+        }
       }
-      // This gives additional opportunity to press another chord and repeat the pattern
-      await waitBetweenChords();
     } finally {
       console.log("Strumming finished - setting isPlaying to false", chordName);
       setPlaying(false);
