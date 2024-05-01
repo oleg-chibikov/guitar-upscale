@@ -18,7 +18,7 @@ export class MidiRecorder {
   private startTick: number | undefined;
   private noteShift = 4; // Shift from the program's 0 note (E) to midi-writer-js zero note which is C
   private octaveShift = 0;
-  private HALF_BEAT_SHIFT = 4; // Gap till next bar as starting from 0 for some reason gives corrupted melody
+  private TICK_SHIFT = 16; // Gap till next bar as starting from 0 for some reason gives corrupted melody
 
   startRecording() {
     this.midiEvents = new Map<string, NoteEvent[]>();
@@ -80,10 +80,10 @@ export class MidiRecorder {
               (this.octaveShift + note.octave) * NOTE_COUNT,
           ],
           velocity: MAX_VELOCITY,
-          duration: "4",
+          duration: "8",
           channel: 1,
           sequential: false,
-          tick: (playAtTick + this.HALF_BEAT_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
+          tick: (playAtTick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
         })
       );
     }
