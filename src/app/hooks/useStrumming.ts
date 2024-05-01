@@ -7,6 +7,7 @@ import {
   waitForNextBeat,
   waitForNextHalfBar,
   waitForNextHalfBeat,
+  waitForNextTick,
 } from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
@@ -48,7 +49,7 @@ const getWaitBetweenFunc = () => {
     case ChordStrummingInterval.HalfBeat:
       return waitForNextHalfBeat;
     default:
-      return waitForNextBeat;
+      return waitForNextTick;
   }
 };
 
