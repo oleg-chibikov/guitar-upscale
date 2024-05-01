@@ -35,19 +35,19 @@ interface FretMarkerProps {
 const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
   const lightColors = [
     "bg-amber-400",
-    "bg-green-400",
-    "bg-lime-400",
-    "bg-blue-400",
+    "bg-slate-400",
     "bg-violet-400",
+    "bg-fuchsia-400",
     "bg-pink-400",
+    "bg-rose-400",
   ];
   const darkColors = [
     "bg-sky-600",
-    "bg-rose-600",
-    "bg-fuchsia-600",
+    "bg-teal-600",
+    "bg-emerald-600",
     "bg-indigo-600",
     "bg-cyan-600",
-    "bg-emerald-600",
+    "bg-purple-600",
   ];
 
   const colorIndex = (trackNumber ?? 0) % lightColors.length; // Map trackNumber to index in the colors array
@@ -74,7 +74,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
   const [isBeingDetected, setIsBeingDetected] = useState<boolean>();
-  const timeout = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
 
@@ -82,16 +81,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     // Function to play note and start animation
     const animate = () => {
       if (stringOctaveNote) {
-        if (timeout.current !== undefined) {
-          // TODO: Why is it not resetting when playing strumming? doing the same manually shows different aniumation (resets properly)
-          setIsNoteClicked(false);
-          clearTimeout(timeout.current);
-        }
-
         setIsNoteClicked(true);
-        timeout.current = setTimeout(() => {
-          setIsNoteClicked(false);
-        }, 300); // Adjust the duration of the animation as needed
       }
     };
 
@@ -330,10 +320,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 width: `${5 * fretboardScaleX}px`, // Set width based on fretboard scaling
                 height: `${5 * fretboardScaleY}px`, // Set height based on fretboard scaling
               }}
+              onAnimationEnd={() => {
+                setIsNoteClicked(false);
+                trackNumberRef.current = undefined; // reset color after the note has finished animation
+              }}
               className={`${getColorClass(
                 trackNumberRef.current,
                 theme
-              )} animate-blast absolute z-10 rounded-3xl`}
+              )} opacity-0 animate-blast absolute z-10 rounded-full`}
             />
           )}
         </>

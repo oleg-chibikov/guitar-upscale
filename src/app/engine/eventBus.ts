@@ -124,12 +124,14 @@ export const clearPreviousChords = () => {
   fretMarkersFromPreviousChord.clear(); // clear previous chord;
 };
 
-ChordEventBus.subscribe((chord: ChordWithPlayMetadata) => {
-  console.log("EventBus: Chord play requested", chord);
-  clearPreviousChords();
-  previousChord = chord.chord;
+ChordEventBus.subscribe((chordWithMetadata: ChordWithPlayMetadata) => {
+  console.log("EventBus: Chord play requested", chordWithMetadata);
+  if (chordWithMetadata.chord !== previousChord) {
+    clearPreviousChords();
+    previousChord = chordWithMetadata.chord;
+  }
 
-  const playAction = ChordToChordButtonEventMap.get(chord.chord);
+  const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
 
-  playAction?.(chord.metadata);
+  playAction?.(chordWithMetadata.metadata);
 });
