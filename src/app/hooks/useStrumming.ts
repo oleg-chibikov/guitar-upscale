@@ -9,11 +9,17 @@ import {
 } from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
+  finishStrumming,
+  getChordClickedPromise,
   getOtherStrummingChordPromises,
-  isThisChordStrumming,
-  markStrummingAsPendingFinishing,
-  setCurrentChord,
-  setIsStrumming,
+  isChordClicked,
+  isChordPlaying,
+  isThisChordStrummingOrPendingStrumming,
+  markChordAsPendingStrumming,
+  markChordAsPendingStrummingFinishing,
+  markChordAsStrumming,
+  registerChordClick,
+  releaseChordClick,
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
@@ -46,14 +52,6 @@ export const useStrumming = (
 ) => {
   const [isClicked, setIsClicked] = useState<boolean>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
-
-  //TODO: it's overly complicated - we have these states:
-  // isClicked - when button is being pressed
-  // isPlaying - when the wait time is over and actual strumming starts including grace period
-  // state - map has record regardless of whether value is defined or not - starts at click (after some checks) and ends when strumming grace period is over (setStrumming(true/false))
-  // state - map has a record with a value - starts at click and ends just before grace period (markStrummingAsPendingFinishing)
-  const isClickedRef = useRef<boolean>(false);
-  const isPlayingRef = useRef<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
 
   const playWithPossibleAlteration = useCallback(() => {
@@ -66,7 +64,7 @@ export const useStrumming = (
 
   const handleClickOutside = (event: MouseEvent | TouchEvent) => {
     console.log("Clicked outside", chordName);
-    if (!isClickedRef.current || isDisabled) {
+    if (!isChordClicked(chordName) || isDisabled) {
       console.log("Chord not clicked yet - ignoring", chordName);
       return;
     }
@@ -88,13 +86,16 @@ export const useStrumming = (
       return;
     }
 
-    if (!isPlayingRef.current) {
+    if (!isChordPlaying(chordName)) {
       console.log(
         "Not playing when clicked outside - stop strumming",
         chordName
       );
+
+      // release clicked promise before removing chord data
+      setClicked(false);
       // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
-      setIsStrumming(chordName, false);
+      setPlaying(false);
 
       if (isMainClockTicking() && !areOtherChordsStrumming(chordName)) {
         console.log(
@@ -102,18 +103,27 @@ export const useStrumming = (
         );
         playWithPossibleAlteration();
       }
+    } else {
+      setClicked(false);
     }
-    setClicked(false);
   };
 
   const setClicked = (value: boolean) => {
     setIsClicked(value);
-    isClickedRef.current = value;
+    if (value) {
+      registerChordClick(chordName);
+    } else {
+      releaseChordClick(chordName);
+    }
   };
 
   const setPlaying = (value: boolean) => {
     setIsPlaying(value);
-    isPlayingRef.current = value;
+    if (value) {
+      markChordAsStrumming(chordName);
+    } else {
+      finishStrumming(chordName);
+    }
   };
 
   const onChordPress = async () => {
@@ -122,26 +132,29 @@ export const useStrumming = (
     }
 
     console.log("Pressed chord", chordName);
-
     setClicked(true);
-    setCurrentChord(chordName);
 
-    if (isPlayingRef.current || isThisChordStrumming(chordName)) {
+    console.log("Registering mouseup/touchend", chordName);
+    !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
+    hasTouchInput && document.addEventListener("touchend", handleClickOutside);
+
+    if (isThisChordStrummingOrPendingStrumming(chordName)) {
+      console.log(
+        "This chord is already strumming or pending strumming, ignoring",
+        chordName
+      );
       // Avoid starting new strumming the same chord while it is still playing.
       // Please note that setClicked should be set to true before returning to repeat the previous strumming
       // Without that it would double
       return;
     }
 
-    console.log("Registering mouseup/touchend", chordName);
-    !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
-    hasTouchInput && document.addEventListener("touchend", handleClickOutside);
     try {
       const wasClockTickingWhenChordPressed = isMainClockTicking();
 
-      if (isClickedRef.current) {
+      if (isChordClicked(chordName)) {
         console.log("Mark as strumming", chordName);
-        setIsStrumming(chordName, true);
+        markChordAsPendingStrumming(chordName);
       } else {
         console.log(
           "Already released mouse/touch after immediate chord. Don't start strumming",
@@ -164,7 +177,7 @@ export const useStrumming = (
 
       const waitAndStrum = async () => {
         let intervalsToSkip = clickedInGracePeriod ? 1 : 0;
-        let initialWait: () => Promise<any>;
+        let initialWait: () => Promise<void | void[]>;
         if (wasClockTickingWhenChordPressed) {
           console.log("Clock was ticking when clicked", chordName);
 
@@ -206,15 +219,22 @@ export const useStrumming = (
           initialWait = waitBetween;
         }
 
+        const currentClickPromise = getChordClickedPromise(chordName);
         // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next interval (or beat if clock is ticking)
-        await initialWait();
+        const waitForAny = [initialWait()];
+        // click might get released before the actual wait time - in this case we need to release the wait and stop processing this event
+        if (currentClickPromise) {
+          waitForAny.push(currentClickPromise);
+        }
 
-        if (!isClickedRef.current) {
+        await Promise.any(waitForAny);
+
+        if (!isChordClicked(chordName)) {
           console.log(
             "Already released mouse/touch after wait. Stop strumming and don't continue",
             chordName
           );
-          setIsStrumming(chordName, false);
+          setPlaying(false);
           return;
         }
         try {
@@ -226,11 +246,10 @@ export const useStrumming = (
             chordName
           );
           setPlaying(false);
-          setIsStrumming(chordName, false); // don't stop ticking if there is another chord playing
         }
       };
 
-      if (!isPlayingRef.current && !wasStrummingWhenChordPressed) {
+      if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
         // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
         // this time should be as little as needed for a click/tap
         await asyncTimeout(waitAndStrum, 100);
@@ -254,14 +273,14 @@ export const useStrumming = (
     console.log("----> Started actual strumming", chordName);
     setPlaying(true);
     let i = startIndex; // skip first as it was played already
-    while (isClickedRef.current) {
+    while (isChordClicked(chordName)) {
       const currentPattern = chordCustomStrummingPatternValue;
 
       for (; i < currentPattern.length; i++) {
         const char = currentPattern[i];
         if (!chordCustomStrummingWaitForPatternFinishValue) {
           // early break pattern only when the checkbox is off
-          if (!isClickedRef.current) {
+          if (!isChordClicked(chordName)) {
             // already released mouse/touch - don't play the strumming
             return;
           }
@@ -283,7 +302,7 @@ export const useStrumming = (
       i = 0; // reset  to start pattern afresh
     }
 
-    markStrummingAsPendingFinishing(chordName);
+    markChordAsPendingStrummingFinishing(chordName);
     if (!areOtherChordsStrumming(chordName)) {
       console.log(
         "Other chords are not strumming - playing one chord at the end of the pattern to avoid off beat",
