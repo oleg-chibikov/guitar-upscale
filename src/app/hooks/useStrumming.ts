@@ -188,7 +188,7 @@ export const useStrumming = (
           if (!isChordClicked(chordName)) {
             playWithPossibleAlteration();
           }
-        }, 75);
+        }, 125);
       }
       const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
       const otherChordsStrummingPromises =
