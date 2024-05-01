@@ -131,6 +131,9 @@ export let chordIsBeingDetectedValue: boolean =
   initialState.chordIsBeingDetected;
 export let chordPlayModeValue: ChordPlayMode = initialState.chordPlayMode;
 export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
+export let scaleGroupValue: string = initialState.scaleGroup;
+export let scaleValue: string = initialState.scale;
+export let baseNoteValue: Note = initialState.baseNote;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -225,6 +228,9 @@ export const settingsSlice = createSlice({
       chordPlayModeValue = state.chordPlayMode;
       chordNotesToPlayValue = state.chordNotesToPlay;
       isPlayingValue = state.isPlaying;
+      scaleGroupValue = state.scaleGroup;
+      scaleValue = state.scale;
+      baseNoteValue = state.baseNote;
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
       loadMetronome();
@@ -233,14 +239,18 @@ export const settingsSlice = createSlice({
       state.scaleGroup = action.payload;
       state.scale = getFirstScaleForGroup(action.payload);
       onGuitarSettingsUpdate(state);
+      scaleGroupValue = state.scaleGroup;
+      scaleValue = state.scale;
     },
     setScale: (state, action: PayloadAction<string>) => {
       state.scale = action.payload;
       onGuitarSettingsUpdate(state);
+      scaleValue = state.scale;
     },
     setBaseNote: (state, action: PayloadAction<Note>) => {
       state.baseNote = action.payload;
       onGuitarSettingsUpdate(state);
+      baseNoteValue = action.payload;
     },
     setTuning(state, action: PayloadAction<Tuning>) {
       state.tuning = action.payload;

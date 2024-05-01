@@ -2,6 +2,12 @@ import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../data/instruments";
 import { MAX_VELOCITY, OctaveNote, getNoteText } from "../data/notes";
+import {
+  baseNoteValue,
+  scaleGroupValue,
+  scaleValue,
+  tempoBpmValue,
+} from "../store/settingsSlice";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
 
 // Define a class for MIDI recorder
@@ -11,7 +17,10 @@ export class MidiRecorder {
   private startTime: number | undefined;
   private noteShift = 4; // Shift from the programs 0 note (E) to midi-writer-js zero nopte which is C
   private octaveShift = 0;
-  private msInTick = 4; // Assuming each tick is 4 ms at 120BPM - no math here. It just produces very similar timings.
+
+  calculateMsInTick(tempo: number): number {
+    return (4 * tempo) / 120; // Assuming each tick is 4 ms at 120BPM - naive math here. It just produces very similar timings.
+  }
 
   startRecording() {
     this.midiEvents = new Map<string, NoteEvent[]>();
@@ -48,7 +57,7 @@ export class MidiRecorder {
       const deltaTime = currentTime - this.startTime;
       const playAtTick = this.convertMillisecondsToTicks(
         deltaTime,
-        this.msInTick
+        this.calculateMsInTick(tempoBpmValue)
       );
       console.log(
         `Recording ${getNoteText(note.note)}${
@@ -95,7 +104,7 @@ export class MidiRecorder {
       const instrument = parts[0] as Instrument;
       const trackNumber = parseInt(parts[1]);
       track.addEvent(new Midi.ProgramChangeEvent({ instrument: trackNumber }));
-      track.setTempo(120);
+      track.setTempo(tempoBpmValue);
       track.addInstrumentName(instrument);
       track.addTrackName(instrument);
       track.addEvent(notes);
@@ -124,7 +133,9 @@ export class MidiRecorder {
     const url = URL.createObjectURL(midiFile);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Guitar upscale ${this.getFormattedDateTime()}.mid`;
+    link.download = `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
+      baseNoteValue
+    )} | ${this.getFormattedDateTime()}.mid`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

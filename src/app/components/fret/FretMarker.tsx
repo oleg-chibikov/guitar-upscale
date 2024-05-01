@@ -83,6 +83,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const animate = () => {
       if (stringOctaveNote) {
         if (timeout.current !== undefined) {
+          // TODO: Why is it not resetting when playing strumming? doing the same manually shows different aniumation (resets properly)
           setIsNoteClicked(false);
           clearTimeout(timeout.current);
         }
