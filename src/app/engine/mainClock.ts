@@ -63,12 +63,14 @@ export {
 };
 
 let timer: NodeJS.Timeout | undefined;
-export const TICKS_IN_HALF_BEAT = 4;
-export const TICKS_IN_BEAT = TICKS_IN_HALF_BEAT * 2;
 export const BEATS_IN_BAR = 4;
+export const TICKS_IN_HALF_BEAT = 8; // main setting affecting granularity (how many ticks in beat/bar etc) // 8 means 64 ticks in a bar
+export const TICKS_IN_BEAT = TICKS_IN_HALF_BEAT * 2;
 export const HALF_BEATS_IN_BAR = BEATS_IN_BAR * 2;
 export const TICKS_IN_BAR = BEATS_IN_BAR * TICKS_IN_BEAT;
 export const TICKS_IN_HALF_BAR = TICKS_IN_BAR / 2;
+
+console.log("Ticks in bar", TICKS_IN_BAR);
 
 export let currentTick = 0; // this tick is reset on every MAX_TICKS
 export let globalCurrentTick = 0; // this tick keeps incrementing while clock is active
@@ -111,7 +113,15 @@ export const startInterval = (afresh: boolean = true) => {
     if (isBar) {
       reset();
     }
-    //console.log("Tick ", currentTick, globalCurrentTick, getCurrentHalfBeat());
+    // console.log(
+    //   "Tick ",
+    //   currentTick,
+    //   globalCurrentTick,
+    //   currentBar,
+    //   currentHalfBar,
+    //   currentBeat,
+    //   currentHalfBeat
+    // );
     const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
     const isBeat = currentTick % TICKS_IN_BEAT === 0;
     const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
