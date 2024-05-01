@@ -74,6 +74,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
   const [isBeingDetected, setIsBeingDetected] = useState<boolean>();
+  const timeout = useRef<NodeJS.Timeout>();
 
   const dispatch = useDispatch();
 
@@ -81,8 +82,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     // Function to play note and start animation
     const animate = () => {
       if (stringOctaveNote) {
+        if (timeout.current !== undefined) {
+          setIsNoteClicked(false);
+          clearTimeout(timeout.current);
+        }
+
         setIsNoteClicked(true);
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
           setIsNoteClicked(false);
         }, 300); // Adjust the duration of the animation as needed
       }
