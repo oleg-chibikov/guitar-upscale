@@ -1,9 +1,8 @@
 import { Theme } from "@/app/data/theme";
-import { currentChord } from "@/app/engine/strummingState";
 import { useInputChecker } from "@/app/helpers/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
@@ -16,7 +15,6 @@ import {
 } from "../../engine/chordPlayer";
 import { NoteChordMode } from "../../engine/chordsGenerator";
 import {
-  ChordEventBus,
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "../../engine/eventBus";
@@ -25,7 +23,6 @@ import {
   chordNotesToPlayValue,
   chordPlayModeValue,
   chordStrummingDelayMsValue,
-  seamlessChordSwitchingValue,
 } from "../../store/settingsSlice";
 
 interface ChordButtonProps {
@@ -40,18 +37,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   isHidden,
 }) => {
   const hasTouchInput = useInputChecker();
-  const play = useCallback(() => {
-    const chordToPlay =
-      seamlessChordSwitchingValue && currentChord ? currentChord : chordName;
-    // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
-    ChordEventBus.next({ chord: chordToPlay, metadata: {} });
-  }, [chordName]);
   const isDisabled = !noteChordMode.variations.length;
 
   const [wasPlayedLast, setWasPlayedLast] = useState<boolean>(false);
   const [animate, setAnimate] = useState(false);
   const { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef } =
-    useStrumming(chordName, play, isDisabled, hasTouchInput);
+    useStrumming(chordName, isDisabled, hasTouchInput);
 
   const { theme, useSharpChords } = useSelector(selectUi);
 

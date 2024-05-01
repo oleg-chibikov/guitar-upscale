@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
+import { ChordEventBus } from "../engine/eventBus";
 import {
   isMainClockTicking,
   waitForNextBeat,
@@ -9,6 +10,7 @@ import {
 } from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
+  currentChord,
   finishChordGracePeriod,
   getChordClickedPromise,
   getOtherChordsGracePeriodPromises,
@@ -29,6 +31,7 @@ import {
   chordStrummingIntervalValue,
   isMetronomeTickingValue,
   isPlayingValue,
+  seamlessChordSwitchingValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
 
@@ -49,7 +52,6 @@ const getWaitBetweenFunc = () => {
 
 export const useStrumming = (
   chordName: string,
-  play: () => void,
   isDisabled: boolean,
   hasTouchInput: boolean
 ) => {
@@ -58,9 +60,22 @@ export const useStrumming = (
   const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
 
+  const play = useCallback(
+    (isPlayedWithinGracePeriod: boolean) => {
+      const chordToPlay =
+        (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
+        currentChord
+          ? currentChord
+          : chordName;
+      // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
+      ChordEventBus.next({ chord: chordToPlay, metadata: {} });
+    },
+    [chordName]
+  );
+
   const playWithPossibleAlteration = useCallback(() => {
     console.log("Playing", chordName);
-    play();
+    play(false);
     if (useChordAlterationValue) {
       isAlternateRef.current = !isAlternateRef.current;
     }
@@ -179,7 +194,7 @@ export const useStrumming = (
         getOtherChordsGracePeriodPromises(chordName);
       const waitBetween = getWaitBetweenFunc();
 
-      let clickedInGracePeriod = otherChordsGracePeriodPromises.length; //TODO: get promises for OTHER chords (except this one)
+      let clickedInGracePeriod = otherChordsGracePeriodPromises.length > 0;
 
       const waitAndStrum = async () => {
         let intervalsToSkip = clickedInGracePeriod ? GRACE_INTERVALS : 0;
@@ -249,7 +264,7 @@ export const useStrumming = (
           return;
         }
         // skip first chord if it was played immediately
-        await strum(intervalsToSkip, waitBetween);
+        await strum(intervalsToSkip, waitBetween, clickedInGracePeriod);
       };
 
       if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
@@ -271,7 +286,8 @@ export const useStrumming = (
 
   const strum = async (
     startIndex: number,
-    waitBetweenChords: () => Promise<void>
+    waitBetweenChords: () => Promise<void>,
+    clickedInGracePeriod: boolean
   ): Promise<void> => {
     console.log("----> Started actual strumming", chordName);
     setPlaying(true);
@@ -284,11 +300,11 @@ export const useStrumming = (
         switch (char) {
           case "↑":
             isAlternateRef.current = false;
-            play();
+            play(clickedInGracePeriod);
             break;
           case "↓":
             isAlternateRef.current = true;
-            play();
+            play(clickedInGracePeriod);
             break;
           case "_":
             break;
@@ -316,8 +332,7 @@ export const useStrumming = (
       if (chordCustomStrummingWaitForPatternFinishValue) {
         setIsGracePeriod(true);
         startChordGracePeriod(chordName);
-        // Wait 2 intervals - This gives additional opportunity to press another chord and repeat the pattern
-        // TODO: Leave waiting promise until this ends. Create new promise for grace period - wait for it in other chords if clicked within grace period
+        // Wait GRACE_INTERVALS intervals - This gives additional opportunity to press another chord and repeat the pattern
         if (!areOtherChordsStrumming(chordName)) {
           console.log(
             "Other chords are not strumming - play grace chords",
