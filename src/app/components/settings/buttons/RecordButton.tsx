@@ -1,16 +1,18 @@
 "use client";
 import { Theme } from "@/app/data/theme";
+import { selectSettings, setIsRecording } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "./IconButton";
 
 export const RecordButton: React.FC = (props) => {
-  const [isRecording, setIsRecording] = useState<boolean>();
   const { theme } = useSelector(selectUi);
+  const { isRecording } = useSelector(selectSettings);
+  const dispatch = useDispatch();
   return (
     <>
       {isRecording && (
@@ -26,7 +28,7 @@ export const RecordButton: React.FC = (props) => {
             const midiRecorder = (await import("@/app/engine/midiRecorder"))
               .midiRecorder;
             midiRecorder.stopRecording(false);
-            setIsRecording(false);
+            dispatch(setIsRecording(false));
           }}
         />
       )}
@@ -37,15 +39,15 @@ export const RecordButton: React.FC = (props) => {
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
         activeBg="bg-red-500"
         onPress={async () => {
+          const newValue = !isRecording;
           const midiRecorder = (await import("@/app/engine/midiRecorder"))
             .midiRecorder;
-          const newValue = !isRecording;
           if (newValue) {
             midiRecorder.startRecording();
           } else {
             midiRecorder.stopRecording(true);
           }
-          setIsRecording(newValue);
+          dispatch(setIsRecording(newValue));
         }}
       />
     </>

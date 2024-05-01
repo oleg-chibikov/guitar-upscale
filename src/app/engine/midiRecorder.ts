@@ -9,18 +9,16 @@ import {
   tempoBpmValue,
 } from "../store/settingsSlice";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
+import { globalCurrentTick } from "./mainClock";
 
 // Define a class for MIDI recorder
 export class MidiRecorder {
   private midiEvents: Map<string, NoteEvent[]> | undefined;
   private isRecording: boolean = false;
-  private startTime: number | undefined;
-  private noteShift = 4; // Shift from the programs 0 note (E) to midi-writer-js zero nopte which is C
+  private startTick: number | undefined;
+  private noteShift = 4; // Shift from the program's 0 note (E) to midi-writer-js zero note which is C
   private octaveShift = 0;
-
-  calculateMsInTick(tempo: number): number {
-    return (4 * tempo) / 120; // Assuming each tick is 4 ms at 120BPM - naive math here. It just produces very similar timings.
-  }
+  private TICK_SHIFT = 4; // Gap till next bar as starting from 0 for some reason gives corrupted melody
 
   startRecording() {
     this.midiEvents = new Map<string, NoteEvent[]>();
@@ -29,12 +27,12 @@ export class MidiRecorder {
 
   stopRecording(save: boolean) {
     this.isRecording = false;
-    if (save && this.midiEvents) {
+    if (save && this.midiEvents?.size) {
       const midiData = this.generateMidiData(this.midiEvents);
       this.downloadMidiFile(midiData);
     }
     this.midiEvents = undefined;
-    this.startTime = undefined;
+    this.startTick = undefined;
   }
 
   convertMillisecondsToTicks(
@@ -50,19 +48,15 @@ export class MidiRecorder {
     instrument: Instrument
   ) {
     if (this.isRecording) {
-      const currentTime = performance.now();
-      if (this.startTime === undefined) {
-        this.startTime = currentTime; // start recording from the first actual note, not from the Record button hit
+      const currentTick = globalCurrentTick;
+      if (this.startTick === undefined) {
+        this.startTick = currentTick; // start recording from the first actual note, not from the Record button hit
       }
-      const deltaTime = currentTime - this.startTime;
-      const playAtTick = this.convertMillisecondsToTicks(
-        deltaTime,
-        this.calculateMsInTick(tempoBpmValue)
-      );
+      const playAtTick = currentTick - this.startTick;
       console.log(
         `Recording ${getNoteText(note.note)}${
           note.octave
-        }; delta: ${playAtTick} ticks (${deltaTime} ms)`
+        }; delta: ${playAtTick} ticks`
       );
       if (!this.midiEvents) {
         return;
@@ -89,7 +83,7 @@ export class MidiRecorder {
           duration: "4",
           channel: 1,
           sequential: false,
-          tick: playAtTick,
+          tick: (playAtTick + this.TICK_SHIFT) * (64 / this.TICK_SHIFT),
         })
       );
     }

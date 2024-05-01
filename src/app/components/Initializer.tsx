@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Note } from "../data/notes";
 import {
   loadMetronome,
-  playMetronomeTick,
+  playMetronomeBeat,
 } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import { playNote } from "../engine/sound/soundProvider";
@@ -57,7 +57,7 @@ export const Initializer: React.FC = () => {
           reverbStrengthValue,
           1
         ),
-        playMetronomeTick(false, 0),
+        playMetronomeBeat(false, 0),
       ]);
       console.log("Loaded sounds");
     };

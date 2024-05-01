@@ -2,11 +2,11 @@ import { useCallback, useRef, useState } from "react";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { ChordEventBus } from "../engine/eventBus";
 import {
-  isMainClockTicking,
+  isMainClockActive,
+  waitForNextBar,
   waitForNextBeat,
+  waitForNextHalfBar,
   waitForNextHalfBeat,
-  waitForNextQuarterBeat,
-  waitForNextTick,
 } from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
@@ -23,14 +23,14 @@ import {
   registerChordClick,
   releaseChordClick,
   startChordGracePeriod,
+  strummingChordsMap,
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
   chordStrummingIntervalValue,
-  isMetronomeTickingValue,
-  isPlayingValue,
+  isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
@@ -39,14 +39,16 @@ const GRACE_INTERVALS = 2;
 
 const getWaitBetweenFunc = () => {
   switch (chordStrummingIntervalValue) {
+    case ChordStrummingInterval.Bar:
+      return waitForNextBar;
+    case ChordStrummingInterval.HalfBar:
+      return waitForNextHalfBar;
     case ChordStrummingInterval.Beat:
       return waitForNextBeat;
     case ChordStrummingInterval.HalfBeat:
       return waitForNextHalfBeat;
-    case ChordStrummingInterval.QuarterBeat:
-      return waitForNextQuarterBeat;
     default:
-      return waitForNextTick;
+      return waitForNextBeat;
   }
 };
 
@@ -113,10 +115,10 @@ export const useStrumming = (
 
       // release clicked promise before removing chord data
       setClicked(false);
-      // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
+      // stop active if not yet playing - otherwise wait for the pattern to finish - it will stop active itself
       setPlaying(false);
 
-      if (isMainClockTicking() && !areOtherChordsStrumming(chordName)) {
+      if (isMainClockActive() && !areOtherChordsStrumming(chordName)) {
         console.log(
           "Releasing button before started playing but timer is on - play the chord now as it was not played immediately"
         );
@@ -170,7 +172,7 @@ export const useStrumming = (
     }
 
     try {
-      const wasClockTickingWhenChordPressed = isMainClockTicking();
+      const wasClockActiveWhenChordPressed = isMainClockActive();
 
       if (isChordClicked(chordName)) {
         console.log("Mark as strumming", chordName);
@@ -183,7 +185,7 @@ export const useStrumming = (
         return;
       }
 
-      if (!wasClockTickingWhenChordPressed) {
+      if (!wasClockActiveWhenChordPressed) {
         // Play first chord straight away
         playWithPossibleAlteration();
       }
@@ -199,8 +201,8 @@ export const useStrumming = (
       const waitAndStrum = async () => {
         let intervalsToSkip = clickedInGracePeriod ? GRACE_INTERVALS : 0;
         let initialWait: () => Promise<void | void[]>;
-        if (wasClockTickingWhenChordPressed) {
-          console.log("Clock was ticking when clicked", chordName);
+        if (wasClockActiveWhenChordPressed) {
+          console.log("Clock was active when clicked", chordName);
 
           if (clickedInGracePeriod) {
             console.log(
@@ -209,7 +211,8 @@ export const useStrumming = (
             );
             initialWait = () => Promise.all(otherChordsGracePeriodPromises);
           } else if (otherChordsStrummingPromises.length) {
-            // TODO: If there is NO strumming currently - play the pattern from the next tick (but not from the beginning - see how much needed to skip)
+            // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
+
             console.log(
               "Waiting for current strumming pattern to finish before beginning strumming new chord",
               chordName
@@ -222,15 +225,18 @@ export const useStrumming = (
                 chordName
               );
               initialWait = waitBetween;
-            } else if (isMetronomeTickingValue || isPlayingValue) {
+            } else if (
+              isAnyTimerSpecificActivityRunning() &&
+              !strummingChordsMap.size
+            ) {
               console.log(
-                "Metronome/play active but no strumming - waiting for the next beat to strum",
+                "Metronome/play/recording active but no strumming - waiting for the next bar to strum",
                 chordName
               );
-              initialWait = waitForNextBeat;
+              initialWait = waitForNextBar;
             } else {
               console.log(
-                "Clock ticking but the only activity is strumming from this chord - waiting for the next interval to strum",
+                "Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
                 chordName
               );
               initialWait = waitBetween;
@@ -239,14 +245,14 @@ export const useStrumming = (
         } else {
           intervalsToSkip = 1; // already played it immediately
           console.log(
-            "Clock not ticking - waiting for next interval to strum",
+            "Clock not active - waiting for next interval to strum",
             chordName
           );
           initialWait = waitBetween;
         }
 
         const currentClickPromise = getChordClickedPromise(chordName);
-        // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next interval (or beat if clock is ticking)
+        // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next interval (or bar if clock is active)
         const waitForAny = [initialWait()];
         // click might get released before the actual wait time - in this case we need to release the wait and stop processing this event
         if (currentClickPromise) {
@@ -268,7 +274,7 @@ export const useStrumming = (
       };
 
       if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
-        // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the beat
+        // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the bar
         // this time should be as little as needed for a click/tap
         await asyncTimeout(waitAndStrum, 100);
       } else {

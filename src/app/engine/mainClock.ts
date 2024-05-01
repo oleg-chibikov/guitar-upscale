@@ -5,7 +5,7 @@ export const bpmToMilliseconds = (bpm: number): number => {
   return 60000 / bpm / 2;
 };
 
-export const quarterBeatToMilliseconds = (bpm: number): number => {
+export const beatToMilliseconds = (bpm: number): number => {
   return bpmToMilliseconds(bpm) * 4;
 };
 
@@ -37,34 +37,47 @@ const createPromise = () => {
 
 const { waitForNext: waitForNextTick, recreate: recreateNextTick } =
   createPromise();
-const {
-  waitForNext: waitForNextQuarterBeat,
-  recreate: recreateNextQuarterBeat,
-} = createPromise();
 const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
   createPromise();
 const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
   createPromise();
+const { waitForNext: waitForNextHalfBar, recreate: recreateNextHalfBar } =
+  createPromise();
+const { waitForNext: waitForNextBar, recreate: recreateNextBar } =
+  createPromise();
 
 const resolveAll = () => {
   recreateNextTick(true);
+  recreateNextBar(true);
+  recreateNextHalfBar(true);
   recreateNextBeat(true);
   recreateNextHalfBeat(true);
-  recreateNextQuarterBeat(true);
 };
 
 export {
+  waitForNextBar,
   waitForNextBeat,
+  waitForNextHalfBar,
   waitForNextHalfBeat,
-  waitForNextQuarterBeat,
   waitForNextTick,
 };
 
 let timer: NodeJS.Timeout | undefined;
-export const MAX_TICKS = 8;
-export let currentTick = 0;
+export const TICKS_IN_HALF_BEAT = 4;
+export const TICKS_IN_BEAT = TICKS_IN_HALF_BEAT * 2;
+export const BEATS_IN_BAR = 4;
+export const HALF_BEATS_IN_BAR = BEATS_IN_BAR * 2;
+export const TICKS_IN_BAR = BEATS_IN_BAR * TICKS_IN_BEAT;
+export const TICKS_IN_HALF_BAR = TICKS_IN_BAR / 2;
 
-export const isMainClockTicking = () => {
+export let currentTick = 0; // this tick is reset on every MAX_TICKS
+export let globalCurrentTick = 0; // this tick keeps incrementing while clock is active
+export let currentHalfBeat = 0;
+export let currentBeat = 0;
+export let currentHalfBar = 0;
+export let currentBar = 0;
+
+export const isMainClockActive = () => {
   return timer !== undefined;
 };
 
@@ -73,38 +86,59 @@ export const stopInterval = (resolvePreviousPromises: boolean) => {
     clearInterval(timer);
     timer = undefined;
     if (resolvePreviousPromises) {
-      // any wait will for the next tick will finish straight away
+      // any wait for the next interval will finish straight away
       resolveAll();
     }
   }
 };
 
+const reset = () => {
+  currentTick = 0;
+  currentHalfBeat = 0;
+  currentBeat = 0;
+  currentHalfBar = 0;
+  currentBar = 0;
+};
+
 export const startInterval = (afresh: boolean = true) => {
   if (afresh) {
-    currentTick = 0; // reset tick to 0
+    globalCurrentTick = 0;
+    reset();
   }
 
   const onTick = () => {
-    if (currentTick === MAX_TICKS) {
-      currentTick = 0;
+    const isBar = currentTick === TICKS_IN_BAR; // Bar is every 8 * BPM_MODIFIER ticks
+    if (isBar) {
+      reset();
     }
-    console.log("Tick " + currentTick);
-    const isBeat = currentTick % 8 === 0; // Beat is every 8 ticks
-    const isHalfBeat = currentTick % 4 === 0;
-    const isQuarterBeat = currentTick % 2 === 0;
+    //console.log("Tick ", currentTick, globalCurrentTick, getCurrentHalfBeat());
+    const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
+    const isBeat = currentTick % TICKS_IN_BEAT === 0;
+    const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
+    if (isBar) {
+      recreateNextBar();
+      currentBar++;
+    }
+    if (isHalfBar) {
+      recreateNextHalfBar();
+      currentHalfBar++;
+    }
     if (isBeat) {
       recreateNextBeat();
+      currentBeat++;
     }
     if (isHalfBeat) {
       recreateNextHalfBeat();
-    }
-    if (isQuarterBeat) {
-      recreateNextQuarterBeat();
+      currentHalfBeat++;
     }
     recreateNextTick();
-    MetronomeEventBus.next({ isBeat, tick: currentTick });
+    MetronomeEventBus.next({ isBar, isBeat, tick: currentTick });
     currentTick++;
+    globalCurrentTick++;
   };
   onTick(); // first tick starts immediately
-  timer = setInterval(onTick, bpmToMilliseconds(tempoBpmValue));
+  timer = setInterval(
+    onTick,
+    bpmToMilliseconds(tempoBpmValue) / TICKS_IN_HALF_BEAT
+  );
 };

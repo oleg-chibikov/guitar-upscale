@@ -5,7 +5,7 @@ import {
   instrumentGroups,
 } from "@/app/data/instruments";
 import { Note } from "@/app/data/notes";
-import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
+import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
@@ -51,7 +51,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
       velocityValue,
       value,
       reverbStrengthValue,
-      quarterBeatToMilliseconds(tempoBpm)
+      beatToMilliseconds(tempoBpm)
     );
   };
 

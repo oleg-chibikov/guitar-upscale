@@ -1,6 +1,7 @@
 export enum ChordStrummingInterval {
   Tick,
-  QuarterBeat,
   HalfBeat,
   Beat,
+  HalfBar,
+  Bar,
 }

@@ -27,7 +27,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
       isActive={isPlaying}
       tooltip={
         isWaiting
-          ? "Waiting for the next beat..."
+          ? "Waiting for the next bar..."
           : isPlaying
           ? "Stop playing scale"
           : "Play scale"

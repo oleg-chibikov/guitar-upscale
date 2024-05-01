@@ -7,11 +7,11 @@ import { PlayExampleParameters } from "../data/playExampleParameters";
 import { PlaybackType } from "../data/playbackType";
 import { parseStringToNotes } from "../data/tunings";
 import {
-  MAX_TICKS,
-  currentTick,
-  isMainClockTicking,
-  waitForNextBeat,
-  waitForNextTick,
+  HALF_BEATS_IN_BAR,
+  currentHalfBeat,
+  isMainClockActive,
+  waitForNextBar,
+  waitForNextHalfBeat,
 } from "../engine/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
@@ -38,8 +38,6 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     scale,
     scaleGroup,
     playbackType,
-    instrument,
-    chordInstrument,
     reverbStrength,
   } = useSelector(selectSettings);
   const [isWaiting, setIsWaiting] = useState(false);
@@ -62,6 +60,10 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         "@/app/data/scaleExamples"
       );
       example = await getRandomScaleExample(scaleGroup, scale, reverbStrength);
+      const tempo = example?.tempo;
+      if (tempo) {
+        dispatch(setTempoBpm(tempo));
+      }
     } else {
       await import("@/app/engine/play/scalePlayer");
     }
@@ -82,24 +84,27 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     });
 
     // Start playback
-    if (isMainClockTicking()) {
+    if (isMainClockActive()) {
       setIsWaiting(true);
-      // if metronome or chord strumming is already playing then wait for the beat, other
-      console.log("Waiting for the next beat");
-      if (example?.tickShift) {
-        // wait for the remainder of the ticks till desired value
-        const desiredTick = MAX_TICKS - example.tickShift + 1;
-        const tick = currentTick;
-        let ticksToWait = desiredTick - tick;
-        if (ticksToWait < 0) {
-          // If play starts too close (less than tickShift ticks) to the next beat - wait for the beat after
-          ticksToWait = MAX_TICKS + ticksToWait;
+      // if metronome or chord strumming is already playing then wait for the bar, other
+      console.log("Waiting for the next bar");
+      if (example?.halfBeatShift) {
+        //TODO - shift seems to be working incorrectly for LP!
+        // wait for the remainder of the beats till desired value
+        const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
+        let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;
+        if (halfBeatsToWait < 0) {
+          // If play starts too close (less than tickShift ticks) to the next bar - wait for the bar after
+          halfBeatsToWait = HALF_BEATS_IN_BAR + halfBeatsToWait;
         }
-        for (var i = 0; i < ticksToWait; i++) {
-          await waitForNextTick();
+        console.log(
+          `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
+        );
+        for (var i = 0; i < halfBeatsToWait; i++) {
+          await waitForNextHalfBeat();
         }
       } else {
-        await waitForNextBeat();
+        await waitForNextBar();
       }
 
       setIsWaiting(false);
@@ -114,11 +119,10 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         await onPlayExample({
           baseNote,
           example,
-          waitNote: waitForNextTick,
+          waitNote: waitForNextHalfBeat,
           neck,
           tuning: parseStringToNotes(tuning),
           showAlert: dispatchAlert,
-          setTempo: (x: number) => dispatch(setTempoBpm(x)),
         });
       } else {
         const isFullStringScalePlayback = playbackType === fullStringScaleType;
@@ -131,7 +135,11 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         const { playWholeScale } = await import(
           "@/app/engine/play/scalePlayer"
         );
-        await playWholeScale(waitForNextTick, neck, isFullStringScalePlayback);
+        await playWholeScale(
+          waitForNextHalfBeat,
+          neck,
+          isFullStringScalePlayback
+        );
       }
     } finally {
       dispatch(setIsPlaying(false));

@@ -2,10 +2,10 @@ import { MetronomeEventBus } from "@/app/engine/eventBus";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  isMetronomeTickingValue,
+  isMetronomeActiveValue,
   metronomeVelocityValue,
   selectSettings,
-  setIsMetronomeTicking,
+  setIsMetronomeActive,
 } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
@@ -27,19 +27,19 @@ function MdiMetronome() {
 
 export const MetronomeButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { isMetronomeTicking } = useSelector(selectSettings);
+  const { isMetronomeActive } = useSelector(selectSettings);
 
   useEffect(() => {
-    const sub = MetronomeEventBus.subscribe(async ({ isBeat, tick }) => {
-      if (isMetronomeTickingValue) {
-        console.log("Metronome sound", tick, isBeat);
-        const playMetronomeTick = (
+    const sub = MetronomeEventBus.subscribe(async ({ isBar, isBeat }) => {
+      if (isMetronomeActiveValue) {
+        // console.log("Metronome sound", isBeat, isBar);
+        const playMetronomeBeat = (
           await import("@/app/engine/sound/metronomeProvider")
-        ).playMetronomeTick;
-        if (isBeat) {
-          await playMetronomeTick(true, metronomeVelocityValue);
-        } else if (tick % 2 === 0) {
-          await playMetronomeTick(false, metronomeVelocityValue);
+        ).playMetronomeBeat;
+        if (isBar) {
+          await playMetronomeBeat(true, metronomeVelocityValue);
+        } else if (isBeat) {
+          await playMetronomeBeat(false, metronomeVelocityValue);
         }
       }
     });
@@ -49,14 +49,14 @@ export const MetronomeButton: React.FC = (props) => {
   }, []);
 
   const handleTogglePlay = async () => {
-    dispatch(setIsMetronomeTicking(!isMetronomeTickingValue));
+    dispatch(setIsMetronomeActive(!isMetronomeActiveValue));
   };
 
   return (
     <IconButton
       {...props}
-      tooltip={isMetronomeTicking ? "Stop metronome" : "Start metronome"}
-      isActive={isMetronomeTicking}
+      tooltip={isMetronomeActive ? "Stop metronome" : "Start metronome"}
+      isActive={isMetronomeActive}
       onPress={handleTogglePlay}
       icon={<MdiMetronome />}
     />

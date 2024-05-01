@@ -2,7 +2,7 @@
 
 // Note: Updating this requires dropping the persisted store, otherwise it will use previous values
 export const chordStrummingPatterns = [
-  "↑", // this and the next few patterns are needed to play a single chord with proper snapping to ticks/beats
+  "↑", // this and the next few patterns are needed to play a single chord with proper snapping to beats/bars
   "↑_",
   "↑↓",
   "↑_↓_",

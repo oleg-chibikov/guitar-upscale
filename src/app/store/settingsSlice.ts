@@ -23,7 +23,7 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 import {
-  isMainClockTicking,
+  isMainClockActive,
   startInterval,
   stopInterval,
 } from "../engine/mainClock";
@@ -68,9 +68,10 @@ interface SettingsState extends WithNeck, WithControls {
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
-  isMetronomeTicking: boolean;
+  isMetronomeActive: boolean;
   isPlaying: boolean;
   chordIsBeingDetected: boolean;
+  isRecording: boolean;
 }
 
 const initialState: SettingsState = {
@@ -93,14 +94,15 @@ const initialState: SettingsState = {
   chordInstrumentGroup: "Strings Orchestra",
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
-  chordStrummingInterval: ChordStrummingInterval.Tick,
+  chordStrummingInterval: ChordStrummingInterval.HalfBeat,
   useChordAlteration: false,
   chordCustomStrummingPattern: chordStrummingPatterns[5], // 5 is a pattern of a medium difficulty - not that simple as 0
   chordCustomStrummingWaitForPatternFinish: true,
   seamlessChordSwitching: true,
-  isMetronomeTicking: false,
+  isMetronomeActive: false,
   isPlaying: false,
   chordIsBeingDetected: false,
+  isRecording: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -123,7 +125,7 @@ export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
 export let seamlessChordSwitchingValue: boolean =
   initialState.seamlessChordSwitching;
-export let isMetronomeTickingValue = initialState.isMetronomeTicking;
+export let isMetronomeActiveValue = initialState.isMetronomeActive;
 export let isPlayingValue: boolean = initialState.isPlaying;
 export let chordStrummingDelayMsValue: number =
   initialState.chordStrummingDelayMs;
@@ -134,6 +136,7 @@ export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let scaleGroupValue: string = initialState.scaleGroup;
 export let scaleValue: string = initialState.scale;
 export let baseNoteValue: Note = initialState.baseNote;
+export let isRecordingValue: boolean = initialState.isRecording;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -183,20 +186,22 @@ const setChords = (state: WithNeck) => {
   }
 };
 
+export const isAnyTimerSpecificActivityRunning = () =>
+  isMetronomeActiveValue ||
+  strummingChordsMap.size > 0 ||
+  isPlayingValue ||
+  isRecordingValue;
+
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
-    if (!isMainClockTicking()) {
-      console.log("Clock not ticking - starting it");
+    if (!isMainClockActive()) {
+      console.log("Clock not active - starting it");
       startInterval();
     }
   } else {
-    // stopping clock is nothing is playing
-    if (
-      !isMetronomeTickingValue &&
-      strummingChordsMap.size === 0 &&
-      !isPlayingValue
-    ) {
+    // stopping clock if nothing is playing
+    if (!isAnyTimerSpecificActivityRunning()) {
       console.log("Nothing playing - stopping clock");
       stopInterval(true);
     }
@@ -222,7 +227,7 @@ export const settingsSlice = createSlice({
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
       seamlessChordSwitchingValue = state.seamlessChordSwitching;
-      isMetronomeTickingValue = state.isMetronomeTicking;
+      isMetronomeActiveValue = state.isMetronomeActive;
       chordStrummingDelayMsValue = state.chordStrummingDelayMs;
       chordIsBeingDetectedValue = state.chordIsBeingDetected;
       chordPlayModeValue = state.chordPlayMode;
@@ -231,6 +236,7 @@ export const settingsSlice = createSlice({
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
       baseNoteValue = state.baseNote;
+      isRecordingValue = state.isRecording;
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
       loadMetronome();
@@ -263,7 +269,7 @@ export const settingsSlice = createSlice({
       state.tempoBpm = action.payload;
       tempoBpmValue = action.payload;
       stopInterval(false);
-      startInterval(false); // afresh is set to false to maintain current tick/beat position
+      startInterval(false); // afresh is set to false to maintain current beat/bar position
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;
@@ -339,9 +345,9 @@ export const settingsSlice = createSlice({
       state.seamlessChordSwitching = action.payload;
       seamlessChordSwitchingValue = action.payload;
     },
-    setIsMetronomeTicking(state, action: PayloadAction<boolean>) {
-      state.isMetronomeTicking = action.payload;
-      isMetronomeTickingValue = action.payload;
+    setIsMetronomeActive(state, action: PayloadAction<boolean>) {
+      state.isMetronomeActive = action.payload;
+      isMetronomeActiveValue = action.payload;
       toggleInterval(action.payload);
     },
     setIsPlaying(state, action: PayloadAction<boolean>) {
@@ -352,6 +358,11 @@ export const settingsSlice = createSlice({
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
       chordIsBeingDetectedValue = action.payload;
+    },
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      state.isRecording = action.payload;
+      isRecordingValue = action.payload;
+      toggleInterval(action.payload);
     },
   },
 });
@@ -380,9 +391,10 @@ export const {
   setChordCustomStrummingPattern,
   setChordCustomStrummingWaitForPatternFinish,
   setSeamlessChordSwitching,
-  setIsMetronomeTicking,
+  setIsMetronomeActive,
   setIsPlaying,
   setChordIsBeingDetected,
+  setIsRecording,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

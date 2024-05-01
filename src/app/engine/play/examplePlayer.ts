@@ -11,13 +11,8 @@ export const playExample = async ({
   neck,
   tuning,
   showAlert,
-  setTempo,
 }: PlayExampleParameters) => {
   showAlert(example.band + " - " + example.title);
-
-  if (example.tempo) {
-    setTempo(example.tempo);
-  }
 
   const trackPromises = example.tracks.map((track, trackNumber) =>
     decodeMelody(

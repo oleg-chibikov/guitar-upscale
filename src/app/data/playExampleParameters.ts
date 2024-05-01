@@ -9,5 +9,4 @@ export type PlayExampleParameters = {
   neck: Neck;
   tuning: OctaveNote[];
   showAlert: (message: string) => void;
-  setTempo: (tempoBpm: number) => void;
 };

@@ -12,7 +12,7 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             band: "Linkin Park",
             title: "Numb",
             tempo: 110,
-            tickShift: 3,
+            halfBeatShift: 3,
             tracks: [
               {
                 melody: "*1030(*00__3__2______*1030*03__2*1__3______*1030)3",
@@ -75,7 +75,7 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             band: "Two Steps From Hell",
             title: "Emerald Princess",
             tempo: 64,
-            tickShift: 3,
+            halfBeatShift: 3,
             tracks: [
               {
                 melody:

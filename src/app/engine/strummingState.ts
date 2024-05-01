@@ -8,7 +8,7 @@ export const setCurrentChord = (chordName: string) => {
 
 export enum StrummingState {
   Clicked, // when chord button is being pressed for the first time
-  PendingStrummingStart, // wait for the next interval/beat/other strumming to finish
+  PendingStrummingStart, // wait for the next interval/bar/other strumming to finish
   Strumming, // when the wait time is over and actual strumming starts
   GracePeriod, // one interval after strumming to allow switching between chords and keep playing
 }
@@ -149,7 +149,7 @@ export const markChordAsStrumming = (chordName: string) => {
   console.log("---> Started strumming", chordName);
 };
 
-// After calling this method strumming is allowed to continue for one more tick/beat (depends on the settings).
+// After calling this method strumming is allowed to continue for one more beat/bar (depends on the settings).
 // It is needed to allow switching between chords immediately after the pattern is finished to repeat it instead of starting afresh
 // Strumming is totally finished for the chord when setIsStrumming is called with the false value
 export const startChordGracePeriod = (chordName: string) => {

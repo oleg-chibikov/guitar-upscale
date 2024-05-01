@@ -1,5 +1,5 @@
 import { MAX_VELOCITY, Note } from "@/app/data/notes";
-import { quarterBeatToMilliseconds } from "@/app/engine/mainClock";
+import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +18,7 @@ export const VelocitySlider: React.FC = () => {
       value,
       instrument,
       reverbStrength,
-      quarterBeatToMilliseconds(tempoBpm)
+      beatToMilliseconds(tempoBpm)
     );
   };
 

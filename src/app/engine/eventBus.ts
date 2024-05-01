@@ -8,7 +8,7 @@ import {
   tempoBpmValue,
   velocityValue,
 } from "../store/settingsSlice";
-import { quarterBeatToMilliseconds } from "./mainClock";
+import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
 export type PlayNoteParams = {
@@ -42,14 +42,15 @@ export type ChordWithPlayMetadata = {
   metadata: ChordMetadata;
 };
 
-type Tick = {
+type TickInfo = {
+  isBar: boolean;
   isBeat: boolean;
   tick: number;
 };
 
 export const NotePlayEventBus = new Subject<NoteMetadata>();
 export const ChordEventBus = new Subject<ChordWithPlayMetadata>();
-export const MetronomeEventBus = new Subject<Tick>();
+export const MetronomeEventBus = new Subject<TickInfo>();
 
 export const NoteToFretMarkerEventMap: Map<
   string,
@@ -79,7 +80,7 @@ const play = async ({
     trackInstrument ?? (fromChord ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,
     reverbStrengthValue,
-    quarterBeatToMilliseconds(tempoBpmValue)
+    beatToMilliseconds(tempoBpmValue)
   );
 };
 
