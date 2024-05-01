@@ -84,8 +84,8 @@ export const useStrumming = (
     }
   }, [chordName, play]);
 
-  const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-    console.log("Clicked outside", chordName);
+  const handlePressReleased = (event: MouseEvent | TouchEvent) => {
+    console.log("Chord press released", chordName);
     if (!isChordClicked(chordName) || isDisabled) {
       console.log("Chord not clicked yet - ignoring", chordName);
       return;
@@ -116,15 +116,8 @@ export const useStrumming = (
 
       // release clicked promise before removing chord data
       setClicked(false);
-      // stop active if not yet playing - otherwise wait for the pattern to finish - it will stop active itself
+      // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
       setPlaying(false);
-
-      if (isMainClockActive() && !areOtherChordsStrumming(chordName)) {
-        console.log(
-          "Releasing button before started playing but timer is on - play the chord now as it was not played immediately"
-        );
-        playWithPossibleAlteration();
-      }
     } else {
       setClicked(false);
     }
@@ -158,8 +151,8 @@ export const useStrumming = (
     setClicked(true);
 
     console.log("Registering mouseup/touchend", chordName);
-    !hasTouchInput && document.addEventListener("mouseup", handleClickOutside);
-    hasTouchInput && document.addEventListener("touchend", handleClickOutside);
+    !hasTouchInput && document.addEventListener("mouseup", handlePressReleased);
+    hasTouchInput && document.addEventListener("touchend", handlePressReleased);
 
     if (isThisChordStrummingOrPendingStrumming(chordName)) {
       console.log(
@@ -189,6 +182,13 @@ export const useStrumming = (
       if (!wasClockActiveWhenChordPressed) {
         // Play first chord straight away
         playWithPossibleAlteration();
+      } else {
+        // if clock is active - verify that it's a long press (and if not - play immediately)
+        setTimeout(() => {
+          if (isChordClicked(chordName)) {
+            playWithPossibleAlteration();
+          }
+        }, 70);
       }
       const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
       const otherChordsStrummingPromises =
@@ -285,9 +285,9 @@ export const useStrumming = (
     } finally {
       console.log("Unregistering mouseup/touchend", chordName);
       !hasTouchInput &&
-        document.removeEventListener("mouseup", handleClickOutside);
+        document.removeEventListener("mouseup", handlePressReleased);
       hasTouchInput &&
-        document.removeEventListener("touchend", handleClickOutside);
+        document.removeEventListener("touchend", handlePressReleased);
     }
   };
 

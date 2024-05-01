@@ -80,7 +80,7 @@ export class MidiRecorder {
               (this.octaveShift + note.octave) * NOTE_COUNT,
           ],
           velocity: MAX_VELOCITY,
-          duration: "8",
+          duration: "8", // the bigger the value - the shorter the note
           channel: 1,
           sequential: false,
           tick: (playAtTick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
