@@ -211,7 +211,7 @@ export const useStrumming = (
 
           if (clickedInOtherChordGracePeriod) {
             console.log(
-              "Clicked in grace period. Waiting for it to finish to start strumming",
+              "WAITING - Clicked in grace period. Waiting for it to finish to start strumming",
               chordName
             );
             initialWait = () => Promise.all(otherChordsGracePeriodPromises);
@@ -219,13 +219,13 @@ export const useStrumming = (
             // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
 
             console.log(
-              "Waiting for current strumming pattern to finish before beginning strumming new chord",
+              "WAITING - Waiting for current strumming pattern to finish before beginning strumming new chord",
               chordName
             );
             initialWait = () => Promise.all(otherChordsStrummingPromises);
           } else if (wasStrummingWhenChordPressed) {
             console.log(
-              "Strumming not over - waiting for the next interval to strum",
+              "WAITING - Strumming not over - waiting for the next interval to strum",
               chordName
             );
             initialWait = waitBetween;
@@ -234,21 +234,20 @@ export const useStrumming = (
             !isOtherChordStrumming
           ) {
             console.log(
-              "Metronome/play/recording active but no strumming - waiting for the next bar to strum",
+              "WAITING - Metronome/play/recording active but no strumming - waiting for the next bar to strum",
               chordName
             );
             initialWait = waitForNextBar;
           } else {
             console.log(
-              "Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
+              "WAITING - Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
               chordName
             );
             initialWait = waitBetween;
           }
         } else {
-          intervalsToSkip = 1; // already played it immediately
           console.log(
-            "Clock not active - waiting for next interval to strum",
+            "WAITING - Clock not active - waiting for the next interval to strum",
             chordName
           );
           initialWait = waitBetween;
