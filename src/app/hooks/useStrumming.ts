@@ -281,7 +281,7 @@ export const useStrumming = (
       if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
         // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the bar
         // this time should be as little as needed for a click/tap
-        await asyncTimeout(waitAndStrum, 100);
+        await asyncTimeout(waitAndStrum, 200);
       } else {
         // if currently strumming there is usually no need to play additional chords, so it's better to not add additional wait time - it's good for smoother switch between strumming chords
         await waitAndStrum();
