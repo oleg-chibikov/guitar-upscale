@@ -24,7 +24,6 @@ import {
   registerChordClick,
   releaseChordClick,
   startChordGracePeriod,
-  strummingChordsMap,
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
@@ -195,23 +194,28 @@ export const useStrumming = (
         getOtherChordsStrummingPromises(chordName);
       const otherChordsGracePeriodPromises =
         getOtherChordsGracePeriodPromises(chordName);
+
       const waitBetween = getWaitBetweenFunc();
 
-      let clickedInGracePeriod = otherChordsGracePeriodPromises.length > 0;
+      const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
+      const clickedInOtherChordGracePeriod =
+        otherChordsGracePeriodPromises.length > 0;
 
       const waitAndStrum = async () => {
-        let intervalsToSkip = clickedInGracePeriod ? GRACE_INTERVALS : 0;
+        let intervalsToSkip = clickedInOtherChordGracePeriod
+          ? GRACE_INTERVALS
+          : 0;
         let initialWait: () => Promise<void | void[]>;
         if (wasClockActiveWhenChordPressed) {
           console.log("Clock was active when clicked", chordName);
 
-          if (clickedInGracePeriod) {
+          if (clickedInOtherChordGracePeriod) {
             console.log(
               "Clicked in grace period. Waiting for it to finish to start strumming",
               chordName
             );
             initialWait = () => Promise.all(otherChordsGracePeriodPromises);
-          } else if (otherChordsStrummingPromises.length) {
+          } else if (isOtherChordStrumming) {
             // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
 
             console.log(
@@ -219,29 +223,27 @@ export const useStrumming = (
               chordName
             );
             initialWait = () => Promise.all(otherChordsStrummingPromises);
+          } else if (wasStrummingWhenChordPressed) {
+            console.log(
+              "Strumming not over - waiting for the next interval to strum",
+              chordName
+            );
+            initialWait = waitBetween;
+          } else if (
+            isAnyTimerSpecificActivityRunning() &&
+            !isOtherChordStrumming
+          ) {
+            console.log(
+              "Metronome/play/recording active but no strumming - waiting for the next bar to strum",
+              chordName
+            );
+            initialWait = waitForNextBar;
           } else {
-            if (wasStrummingWhenChordPressed) {
-              console.log(
-                "Strumming not over - waiting for the next interval to strum",
-                chordName
-              );
-              initialWait = waitBetween;
-            } else if (
-              isAnyTimerSpecificActivityRunning() &&
-              !strummingChordsMap.size
-            ) {
-              console.log(
-                "Metronome/play/recording active but no strumming - waiting for the next bar to strum",
-                chordName
-              );
-              initialWait = waitForNextBar;
-            } else {
-              console.log(
-                "Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
-                chordName
-              );
-              initialWait = waitBetween;
-            }
+            console.log(
+              "Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
+              chordName
+            );
+            initialWait = waitBetween;
           }
         } else {
           intervalsToSkip = 1; // already played it immediately
@@ -271,7 +273,11 @@ export const useStrumming = (
           return;
         }
         // skip first chord if it was played immediately
-        await strum(intervalsToSkip, waitBetween, clickedInGracePeriod);
+        await strum(
+          intervalsToSkip,
+          waitBetween,
+          clickedInOtherChordGracePeriod
+        );
       };
 
       if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
