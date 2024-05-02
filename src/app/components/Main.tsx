@@ -17,6 +17,7 @@ import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 import { StrummingSettings } from "./settings/StrummingSettings";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
+import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox";
 
 const RecordButton = dynamic(
   async () =>
@@ -76,6 +77,8 @@ export const premiumFeaturesToMap = (
     switch (key) {
       case "midiRecorder":
         return <RecordButton />;
+      case "toggleMetronomeWhenRecordingCheckbox":
+        return <ToggleMetronomeWhenRecordingCheckbox />;
       case "skinSelection":
         return <SkinSelector />;
       case "chordDetection":

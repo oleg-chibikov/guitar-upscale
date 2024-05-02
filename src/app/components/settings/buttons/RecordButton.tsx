@@ -1,6 +1,11 @@
 "use client";
 import { Theme } from "@/app/data/theme";
-import { selectSettings, setIsRecording } from "@/app/store/settingsSlice";
+import {
+  selectSettings,
+  setIsMetronomeActive,
+  setIsRecording,
+  toggleMetronomeWhenRecordingValue,
+} from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
@@ -46,6 +51,9 @@ export const RecordButton: React.FC = (props) => {
             midiRecorder.startRecording();
           } else {
             midiRecorder.stopRecording(true);
+          }
+          if (toggleMetronomeWhenRecordingValue) {
+            dispatch(setIsMetronomeActive(newValue));
           }
           dispatch(setIsRecording(newValue));
         }}

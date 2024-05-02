@@ -53,6 +53,11 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         <SwitchToChromaticScaleCheckbox />
         <UseSharpChordsCheckbox />
         <UseChordAlterationCheckbox />
+        {
+          premiumComponents.get(
+            "toggleMetronomeWhenRecordingCheckbox"
+          ) as ReactNode
+        }
         {premiumComponents.get("instruments") as ReactNode}
         <div
           className={`grid gap-2 ${

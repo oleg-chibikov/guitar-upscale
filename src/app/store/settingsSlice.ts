@@ -72,6 +72,7 @@ interface SettingsState extends WithNeck, WithControls {
   isPlaying: boolean;
   chordIsBeingDetected: boolean;
   isRecording: boolean;
+  toggleMetronomeWhenRecording: boolean;
 }
 
 const initialState: SettingsState = {
@@ -103,6 +104,7 @@ const initialState: SettingsState = {
   isPlaying: false,
   chordIsBeingDetected: false,
   isRecording: false,
+  toggleMetronomeWhenRecording: true,
 };
 
 // A values that changes immediately without the need for rerender
@@ -137,6 +139,8 @@ export let scaleGroupValue: string = initialState.scaleGroup;
 export let scaleValue: string = initialState.scale;
 export let baseNoteValue: Note = initialState.baseNote;
 export let isRecordingValue: boolean = initialState.isRecording;
+export let toggleMetronomeWhenRecordingValue: boolean =
+  initialState.toggleMetronomeWhenRecording;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -237,6 +241,7 @@ export const settingsSlice = createSlice({
       scaleValue = state.scale;
       baseNoteValue = state.baseNote;
       isRecordingValue = state.isRecording;
+      toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
       loadMetronome();
@@ -359,6 +364,10 @@ export const settingsSlice = createSlice({
       state.chordIsBeingDetected = action.payload;
       chordIsBeingDetectedValue = action.payload;
     },
+    setToggleMetronomeWhenRecording(state, action: PayloadAction<boolean>) {
+      state.toggleMetronomeWhenRecording = action.payload;
+      toggleMetronomeWhenRecordingValue = action.payload;
+    },
     setIsRecording(state, action: PayloadAction<boolean>) {
       state.isRecording = action.payload;
       isRecordingValue = action.payload;
@@ -395,6 +404,7 @@ export const {
   setIsPlaying,
   setChordIsBeingDetected,
   setIsRecording,
+  setToggleMetronomeWhenRecording,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

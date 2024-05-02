@@ -74,6 +74,7 @@ export type PremiumFeatures = {
   skinSelection?: boolean;
   melodies?: boolean;
   chordDetection?: boolean;
+  toggleMetronomeWhenRecordingCheckbox?: boolean;
 };
 
 export type PremiumFeatureKeys = keyof PremiumFeatures;
@@ -116,6 +117,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
       premiumFeatures: {
         ...settings.premiumFeatures,
         midiRecorder: true,
+        toggleMetronomeWhenRecordingCheckbox: true,
         skinSelection: true,
       },
     };
