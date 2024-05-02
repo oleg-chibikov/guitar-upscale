@@ -106,12 +106,23 @@ export const startInterval = (afresh: boolean = true) => {
   if (afresh) {
     globalCurrentTick = 0;
     reset();
+    recreateNextBar();
+    recreateNextHalfBar();
+    recreateNextBeat();
+    recreateNextHalfBeat();
+    recreateNextTick();
   }
 
   const onTick = () => {
     const isBar = currentTick === TICKS_IN_BAR; // Bar is every 8 * BPM_MODIFIER ticks
+    const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
+    const isBeat = currentTick % TICKS_IN_BEAT === 0;
+    const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
+
     if (isBar) {
       reset();
+      recreateNextBar();
+      currentBar++;
     }
     // console.log(
     //   "Tick ",
@@ -122,13 +133,7 @@ export const startInterval = (afresh: boolean = true) => {
     //   currentBeat,
     //   currentHalfBeat
     // );
-    const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
-    const isBeat = currentTick % TICKS_IN_BEAT === 0;
-    const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
-    if (isBar) {
-      recreateNextBar();
-      currentBar++;
-    }
+
     if (isHalfBar) {
       recreateNextHalfBar();
       currentHalfBar++;

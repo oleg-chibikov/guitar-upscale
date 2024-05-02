@@ -190,11 +190,7 @@ export const useStrumming = (
       const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
       const clickedInOtherChordGracePeriod =
         otherChordsGracePeriodPromises.length > 0;
-      let intervalsToSkip = clickedInOtherChordGracePeriod
-        ? GRACE_INTERVALS
-        : wasClockActiveWhenChordPressed
-        ? 0
-        : 1;
+      let intervalsToSkip = 0;
       if (!wasStrummingWhenChordPressed) {
         console.log(
           "Playing chord immediately - no strumming happening now",
@@ -212,10 +208,11 @@ export const useStrumming = (
 
           if (clickedInOtherChordGracePeriod) {
             console.log(
-              "WAITING - Clicked in grace period. Waiting for it to finish to start strumming",
+              `WAITING - Clicked in grace period. Waiting for it to finish to start strumming. Skipping ${GRACE_INTERVALS} intervals`,
               chordName
             );
             initialWait = () => Promise.all(otherChordsGracePeriodPromises);
+            intervalsToSkip = GRACE_INTERVALS;
           } else if (isOtherChordStrumming) {
             // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
 
@@ -248,10 +245,11 @@ export const useStrumming = (
           }
         } else {
           console.log(
-            "WAITING - Clock not active - waiting for the next interval to strum",
+            "WAITING - Clock not active - waiting for the next interval to strum and skip one interval",
             chordName
           );
           initialWait = waitBetween;
+          intervalsToSkip = 1;
         }
 
         const currentClickPromise = getChordClickedPromise(chordName);
