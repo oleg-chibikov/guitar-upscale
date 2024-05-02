@@ -29,7 +29,6 @@ export interface UsePlayParams {
   onPlayExample?: (params: PlayExampleParameters) => Promise<void>;
 }
 
-// TODO: when playing 2sfh (melody with tickShift) and then enable metronome it ticks off beat
 export const usePlay = ({ onPlayExample }: UsePlayParams) => {
   const {
     neck,
@@ -89,7 +88,6 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       // if metronome or chord strumming is already playing then wait for the bar, other
       console.log("Waiting for the next bar");
       if (example?.halfBeatShift) {
-        //TODO - shift seems to be working incorrectly for LP!
         // wait for the remainder of the beats till desired value
         const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
         let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;

@@ -8,10 +8,6 @@ import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import { parseStringToNotes, Tuning } from "../data/tunings";
 import {
-  addChordToLookup,
-  createChordDetectorLookup,
-} from "../engine/chordDetector";
-import {
   generateAllChords,
   getClosestVariation,
   getModeText,
@@ -160,14 +156,26 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   clearPreviousChords();
 };
 
+export const setChordDetectorFunctions = (
+  addChord: (chord: Chord, fullKey: string) => void,
+  createLookup: () => void
+) => {
+  addChordToDetectorLookup = addChord;
+  createChordDetectorLookup = createLookup;
+};
+
+let addChordToDetectorLookup:
+  | ((chord: Chord, fullKey: string) => void)
+  | undefined;
+let createChordDetectorLookup: (() => void) | undefined;
+
 const setChords = (state: WithNeck) => {
   if (state.neck) {
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
     const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
     state.chords = chordsForNeck;
 
-    // TODO: only do that if chordDetector feature is enabled
-    createChordDetectorLookup();
+    createChordDetectorLookup?.();
     chordsMap = new Map<string, Chord>(); // name to chord (notes)
     for (const chord of chordsForNeck) {
       const key = getNoteText(chord.note);
@@ -175,12 +183,11 @@ const setChords = (state: WithNeck) => {
         const modeKey = getModeText(mode.mode);
         const fullKey = key + modeKey;
         const closestVariation = getClosestVariation(mode);
-        // TODO: only do that if chordDetector feature is enabled
         mode.variations.map((variation) => {
           // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
           //   debugger;
           // }
-          addChordToLookup(variation, fullKey);
+          addChordToDetectorLookup?.(variation, fullKey);
         });
         if (closestVariation) {
           chordsMap.set(fullKey, closestVariation);
@@ -245,6 +252,9 @@ export const settingsSlice = createSlice({
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
       loadMetronome();
+    },
+    refreshSettings: (state) => {
+      onGuitarSettingsUpdate(state);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
@@ -405,6 +415,7 @@ export const {
   setChordIsBeingDetected,
   setIsRecording,
   setToggleMetronomeWhenRecording,
+  refreshSettings,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

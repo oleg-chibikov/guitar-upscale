@@ -59,9 +59,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       }
 
       if (chordIsBeingDetectedValue) {
-        const { clearDetector } = await import("../../engine/chordDetector");
+        const { clearDetector } = await import("@/app/engine/chordDetector");
         // to make sure chords are always detected when played
-        //TODO am/9 and other /9 instead of am etc
         clearDetector();
       }
 

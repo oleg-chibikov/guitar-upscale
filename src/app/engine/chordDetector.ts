@@ -58,7 +58,7 @@ const findMatches = (showChord: (name: string) => void) => {
 
 const debouncedFindMatches = trailingDebounce(findMatches, 200);
 
-export const addChordToLookup = (chord: Chord, fullKey: string) => {
+export const addChordToDetectorLookup = (chord: Chord, fullKey: string) => {
   const serializedChord = serializeChord(chord, "x");
   trie.add(serializedChord);
   reverseChordsMap.set(serializedChord, fullKey);
