@@ -17,7 +17,7 @@ import {
   getOtherChordsGracePeriodPromises,
   getOtherChordsStrummingPromises,
   isChordClicked,
-  isChordPlaying,
+  isChordStrumming,
   isThisChordStrummingOrPendingStrumming,
   markChordAsPendingStrumming,
   markChordAsStrumming,
@@ -107,7 +107,7 @@ export const useStrumming = (
       return;
     }
 
-    if (!isChordPlaying(chordName)) {
+    if (!isChordStrumming(chordName)) {
       console.log(
         "Not playing when clicked outside - stop strumming",
         chordName
@@ -278,7 +278,7 @@ export const useStrumming = (
         );
       };
 
-      if (!isChordPlaying(chordName) && !wasStrummingWhenChordPressed) {
+      if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
         // Add small timeout in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the bar
         // this time should be as little as needed for a click/tap
         await asyncTimeout(waitAndStrum, 100);

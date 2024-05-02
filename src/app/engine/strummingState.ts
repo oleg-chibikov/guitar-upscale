@@ -80,7 +80,7 @@ export const isChordClicked = (chordName: string) =>
 export const getChordClickedPromise = (chordName: string) =>
   strummingChordsMap.get(chordName)?.clickPromiseAndResolve?.promise;
 
-export const isChordPlaying = (chordName: string) =>
+export const isChordStrumming = (chordName: string) =>
   strummingChordsMap.get(chordName)?.state === StrummingState.Strumming;
 
 export const registerChordClick = (chordName: string) => {
