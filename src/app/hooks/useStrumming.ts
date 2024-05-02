@@ -178,18 +178,8 @@ export const useStrumming = (
         return;
       }
 
-      if (!wasClockActiveWhenChordPressed) {
-        // Play first chord straight away
-        playWithPossibleAlteration();
-      } else {
-        // if clock is active - verify that it's a long press (and if not - play immediately)
-        setTimeout(() => {
-          if (!isChordClicked(chordName)) {
-            playWithPossibleAlteration();
-          }
-        }, 125);
-      }
       const wasStrummingWhenChordPressed = areOtherChordsStrumming(chordName);
+
       const otherChordsStrummingPromises =
         getOtherChordsStrummingPromises(chordName);
       const otherChordsGracePeriodPromises =
@@ -200,11 +190,22 @@ export const useStrumming = (
       const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
       const clickedInOtherChordGracePeriod =
         otherChordsGracePeriodPromises.length > 0;
+      let intervalsToSkip = clickedInOtherChordGracePeriod
+        ? GRACE_INTERVALS
+        : wasClockActiveWhenChordPressed
+        ? 0
+        : 1;
+      if (!wasStrummingWhenChordPressed) {
+        console.log(
+          "Playing chord immediately - no strumming happening now",
+          chordName
+        );
+        playWithPossibleAlteration();
+      } else {
+        console.log("Skip playing chord immediately - strumming happening now");
+      }
 
       const waitAndStrum = async () => {
-        let intervalsToSkip = clickedInOtherChordGracePeriod
-          ? GRACE_INTERVALS
-          : 0;
         let initialWait: () => Promise<void | void[]>;
         if (wasClockActiveWhenChordPressed) {
           console.log("Clock was active when clicked", chordName);
