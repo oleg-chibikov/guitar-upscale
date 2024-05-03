@@ -34,6 +34,7 @@ export const RecordButton: React.FC = (props) => {
               .midiRecorder;
             midiRecorder.stopRecording(false);
             dispatch(setIsRecording(false));
+            dispatch(setIsMetronomeActive(false));
           }}
         />
       )}
