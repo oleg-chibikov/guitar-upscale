@@ -246,6 +246,15 @@ export const useStrumming = (
 
     const waitAndStrum = async () => {
       let initialWait: () => Promise<void | void[]>;
+
+      if (!isChordClicked(chordName)) {
+        console.log(
+          "WAITING - not clicked at the moment of waiting. Don't wait and don't strum",
+          chordName,
+          clickNumber
+        );
+        return;
+      }
       if (wasClockActiveWhenChordPressed) {
         console.log("Clock was active when clicked", chordName, clickNumber);
 
