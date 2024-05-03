@@ -106,32 +106,35 @@ export const useStrumming = (
     };
 
     const handlePressReleased = (event: MouseEvent | TouchEvent) => {
+      let target = event.target as Node | null;
+      let clickIgnored = false;
+
+      while (target && target !== document) {
+        const id = (target as HTMLElement)?.id;
+        // keep playing chord when clicking notes simultaneously
+        if (id === "fretboard") {
+          clickIgnored = true;
+          break;
+        }
+        target = target.parentNode;
+      }
+
+      if (clickIgnored) {
+        console.log(
+          "Clicked on fretboard - ignoring press release",
+          chordName,
+          clickNumber
+        );
+
+        // don't unregister the handler in this case
+        return;
+      }
+
       try {
         console.log("Chord press released", chordName, clickNumber);
         if (!isChordClicked(chordName) || isDisabled) {
           console.log(
             "Chord not clicked yet - ignoring",
-            chordName,
-            clickNumber
-          );
-          return;
-        }
-        let target = event.target as Node | null;
-        let clickIgnored = false;
-
-        while (target && target !== document) {
-          const id = (target as HTMLElement)?.id;
-          // keep playing chord when clicking notes simultaneously
-          if (id === "fretboard") {
-            clickIgnored = true;
-            break;
-          }
-          target = target.parentNode;
-        }
-
-        if (clickIgnored) {
-          console.log(
-            "Clicked on fretboard - ignoring press release",
             chordName,
             clickNumber
           );
