@@ -1,35 +1,41 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Slider, SliderProps } from "./Slider";
 
-export interface StepSliderProps extends Omit<SliderProps, "step"> {
+export interface StepSliderProps
+  extends Omit<SliderProps, "step" | "minimumValue" | "maximumValue"> {
   steps: number[];
 }
 
 export const StepSlider: React.FC<StepSliderProps> = ({
-  minimumValue,
-  maximumValue,
   steps,
   value,
   onValueChange,
   ...rest
 }) => {
+  // Calculate the value-to-position map only when steps change
+  const valueToPositionMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    steps.forEach((step, index) => {
+      map[step] = index;
+    });
+    return map;
+  }, [steps]);
+
   const positionToValue = (position: number) => {
     return steps[position];
   };
 
   const valueToPosition = (value: number) => {
-    return steps.indexOf(value);
+    return valueToPositionMap[value];
   };
 
   const position = valueToPosition(value);
-  console.log(position);
 
   return (
     <Slider
       {...rest}
-      onValueChange={(value) => {
-        const result = onValueChange(positionToValue(value));
-        console.log(result);
+      onValueChange={(newValue) => {
+        const result = onValueChange(positionToValue(newValue));
         return result;
       }}
       value={position}
