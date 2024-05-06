@@ -113,5 +113,9 @@ export const Initializer: React.FC = () => {
       navigator.serviceWorker.register("/sw.js");
     }
   }, []);
+
+  useEffect(() => {
+    alert("getDigitalGoodsService" in window);
+  }, []);
   return null;
 };
