@@ -210,7 +210,7 @@ export const toggleInterval = (toggle: boolean) => {
     // starting time-based activity
     if (!isMainClockActive()) {
       console.log("Clock not active - starting it");
-      startInterval();
+      startInterval(true);
     }
   } else {
     // stopping clock if nothing is playing
@@ -282,14 +282,20 @@ export const settingsSlice = createSlice({
       tuningValue = action.payload;
       onGuitarSettingsUpdate(state);
     },
-    setTempoBpm: (state, action: PayloadAction<number>) => {
-      if (tempoBpmValue === action.payload) {
+    setTempoBpm: (
+      state,
+      action: PayloadAction<{ tempo: number; updateInteval: boolean }>
+    ) => {
+      if (tempoBpmValue === action.payload.tempo) {
         return;
       }
-      state.tempoBpm = action.payload;
-      tempoBpmValue = action.payload;
-      stopInterval(false);
-      startInterval(false); // afresh is set to false to maintain current beat/bar position
+      state.tempoBpm = action.payload.tempo;
+      tempoBpmValue = action.payload.tempo;
+
+      if (action.payload.updateInteval) {
+        stopInterval(false);
+        startInterval(false); // afresh is set to false to maintain current beat/bar position
+      }
     },
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;

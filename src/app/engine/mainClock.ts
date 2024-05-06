@@ -102,7 +102,7 @@ const reset = () => {
   currentBar = 0;
 };
 
-export const startInterval = (afresh: boolean = true) => {
+export const startInterval = (afresh: boolean) => {
   if (afresh) {
     globalCurrentTick = 0;
     reset();

@@ -22,6 +22,7 @@ import {
   selectSettings,
   setIsPlaying,
   setTempoBpm,
+  tempoBpmValue,
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
@@ -55,8 +56,8 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       );
       example = await getRandomScaleExample();
       const tempo = example?.tempo;
-      if (tempo) {
-        dispatch(setTempoBpm(tempo));
+      if (tempo && tempo !== tempoBpmValue) {
+        dispatch(setTempoBpm({ tempo: tempo, updateInteval: false }));
       }
     } else {
       await import("@/app/engine/play/scalePlayer");
