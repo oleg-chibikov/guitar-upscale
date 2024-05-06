@@ -1,4 +1,4 @@
-import { parseStringToNotes } from "@/app/data/tunings";
+import { parseStringToNotes, tunings } from "@/app/data/tunings";
 import { Track } from "../../data/example";
 import { Note, OctaveNote, StringOctaveNote } from "../../data/notes";
 import {
@@ -6,9 +6,14 @@ import {
   isPlayingValue,
   tuningValue,
 } from "../../store/settingsSlice";
-import { NOTE_COUNT, Neck } from "../generateNeckRepresentation";
+import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
-const convertChord = (chord: string, note: Note): string => {
+const convertChord = (chord: string, tuningShift: number): string => {
+  const baseNote = baseNoteValue;
+  if (!baseNote && !tuningShift) {
+    return chord;
+  }
+
   // Split the chord into note and alterations
   let chordNote = chord[0];
   let alterations = chord.substring(1);
@@ -20,14 +25,15 @@ const convertChord = (chord: string, note: Note): string => {
   }
 
   // Convert the chord note string to Note enum value
-  const baseNoteValue = Note[chordNote as keyof typeof Note];
+  const chordBaseNote = Note[chordNote as keyof typeof Note];
 
   // Calculate the difference between the provided note and the chord note
-  const newBaseNoteValue = (baseNoteValue + note) % NOTE_COUNT;
+  const newBaseNote =
+    (NOTE_COUNT + chordBaseNote + baseNote + tuningShift) % NOTE_COUNT;
 
   // Get the new chord note string
   const newChordNote = Object.keys(Note).find(
-    (key) => Note[key as keyof typeof Note] === newBaseNoteValue
+    (key) => Note[key as keyof typeof Note] === newBaseNote
   );
 
   // Reconstruct the chord string
@@ -39,25 +45,24 @@ const convertChord = (chord: string, note: Note): string => {
 export type PlayNoteCallback = (note: StringOctaveNote) => void;
 
 const playNote = async (
-  note: Note,
+  fretNumberBuilder: string,
+  stringNumber: number,
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
-  fretNumberBuilder: string,
   neck: Neck,
-  stringNumber: number,
+  tuningShift: number,
   play: PlayNoteCallback,
   wait?: () => Promise<void>
 ) => {
   const stringTuning = tuning[stringNumber]; // Get the custom tuning for the string
   const scriptStringTuning = scriptTuning[stringNumber]; // Get the original tuning for the string (melody is written using this tuning)
-  let fret =
-    parseInt(fretNumberBuilder) +
-    note +
-    (scriptStringTuning.note +
-      scriptStringTuning.octave * 12 -
-      (stringTuning.note + stringTuning.octave * 12)); // Adjust fret position based on tuning
-  while (fret < 0) {
-    fret = NOTE_COUNT + fret; // take similar note but one octave higher
+  const tuningDifference =
+    (NOTE_COUNT + scriptStringTuning.note - stringTuning.note) % NOTE_COUNT;
+  const shiftedBaseNote = baseNoteValue + tuningShift;
+
+  let fret = parseInt(fretNumberBuilder) + shiftedBaseNote + tuningDifference; // Adjust fret position based on tuning
+  if (fret > FRET_COUNT) {
+    fret = NOTE_COUNT + (fret % FRET_COUNT);
   }
 
   // TODO: go to the upper string (we already do that when playing scales)
@@ -99,6 +104,7 @@ export const decodeMelody = async (
   let repeatCount: number | undefined;
   const melody = track.melody;
   const currentTuning = parseStringToNotes(tuningValue);
+  const tuningShift = tunings[tuningValue].shift ?? 0;
 
   while (index < melody.length) {
     if (!isPlayingValue) {
@@ -113,10 +119,7 @@ export const decodeMelody = async (
     const playChordAndReset = () => {
       if (immediateChord != undefined) {
         nextIsImmediateChord = false;
-        const newChord =
-          baseNoteValue > 0
-            ? convertChord(immediateChord, baseNoteValue)
-            : immediateChord;
+        const newChord = convertChord(immediateChord, tuningShift);
 
         playChord(newChord);
         immediateChord = undefined;
@@ -151,12 +154,12 @@ export const decodeMelody = async (
           if (fretNumberBuilder !== "") {
             // Note is fully read - we can play it
             await playNote(
-              baseNoteValue,
+              fretNumberBuilder,
+              immediateStringNumber,
               scriptTuning,
               currentTuning,
-              fretNumberBuilder,
               neck,
-              immediateStringNumber,
+              tuningShift,
               play
             );
             fretNumberBuilder = "";
@@ -165,12 +168,12 @@ export const decodeMelody = async (
         } else if (fretNumberBuilder !== "" && stringNumber !== undefined) {
           // Note is fully read - we can play it
           await playNote(
-            baseNoteValue,
+            fretNumberBuilder,
+            stringNumber,
             scriptTuning,
             currentTuning,
-            fretNumberBuilder,
             neck,
-            stringNumber,
+            tuningShift,
             play,
             waitNote
           );

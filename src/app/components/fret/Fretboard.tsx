@@ -8,7 +8,7 @@ import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { NOTE_COUNT } from "../../engine/generateNeckRepresentation";
+import { FRET_COUNT } from "../../engine/generateNeckRepresentation";
 import { getAssetsForSkin } from "../../helpers/skinHelper";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
@@ -155,15 +155,12 @@ export const Fretboard: React.FC = () => {
           {/* Header */}
           <Fretline
             isHeader
-            elements={Array.from(
-              { length: NOTE_COUNT * 2 + 1 },
-              (_, index) => ({
-                note: index,
-                octave: 4,
-                string: 0,
-                fret: index,
-              })
-            )}
+            elements={Array.from({ length: FRET_COUNT + 1 }, (_, index) => ({
+              note: index,
+              octave: 4,
+              string: 0,
+              fret: index,
+            }))}
           />
           {/* Notes */}
           <div className="mt-10">

@@ -2,6 +2,7 @@ import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
 
 export type Neck = (StringOctaveNote | null)[][];
 export const NOTE_COUNT: number = 12;
+export const FRET_COUNT: number = NOTE_COUNT * 2;
 
 export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
@@ -16,7 +17,7 @@ export const generateNeckRepresentation = (
     neck[i] = [];
     let octave = octaveNoteForString.octave;
 
-    for (let j = 0; j <= NOTE_COUNT * 2; j++) {
+    for (let j = 0; j <= FRET_COUNT; j++) {
       // Calculate the position on the neck for the current fret and string
       let position = (j + stringModifier - baseNote) % NOTE_COUNT;
 

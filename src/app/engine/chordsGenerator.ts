@@ -3,7 +3,7 @@ import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../helpers/arrayHelper";
-import { NOTE_COUNT, Neck } from "./generateNeckRepresentation";
+import { FRET_COUNT, NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 export enum ChordMode {
   Major,
@@ -358,7 +358,7 @@ const generateChordVariations = (
 
     // Find the first note in the chord on the current string - limit at 12 to avoid unrealistic chords
 
-    const endFretForLookup = Math.min(capo + NOTE_COUNT, NOTE_COUNT * 2);
+    const endFretForLookup = Math.min(capo + NOTE_COUNT, FRET_COUNT);
 
     for (let fretIndex = capo; fretIndex < endFretForLookup; fretIndex++) {
       const stringOctaveNote = string[fretIndex];
