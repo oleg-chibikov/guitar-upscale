@@ -18,7 +18,6 @@ import {
   isPlayingValue,
   playbackTypeValue,
   reverbStrengthValue,
-  scaleGroupValue,
   scaleValue,
   selectSettings,
   setIsPlaying,
@@ -54,11 +53,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       const { getRandomScaleExample } = await import(
         "@/app/data/scaleExamples"
       );
-      example = await getRandomScaleExample(
-        scaleGroupValue,
-        scaleGroupValue,
-        reverbStrengthValue
-      );
+      example = await getRandomScaleExample();
       const tempo = example?.tempo;
       if (tempo) {
         dispatch(setTempoBpm(tempo));

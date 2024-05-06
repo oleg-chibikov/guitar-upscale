@@ -1,4 +1,9 @@
 import { loadInstrument } from "../engine/sound/soundHelper";
+import {
+  reverbStrengthValue,
+  scaleGroupValue,
+  scaleValue,
+} from "../store/settingsSlice";
 import { Example } from "./example";
 
 export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
@@ -180,13 +185,9 @@ const getRandomRecord = <T>(array: T[]): T => {
   return array[randomIndex];
 };
 
-export const getRandomScaleExample = async (
-  group: string,
-  scale: string,
-  reverbStrength: number
-): Promise<Example | undefined> => {
-  const groupScales = examplesMap.get(group);
-  const examples = groupScales?.get(scale);
+export const getRandomScaleExample = async (): Promise<Example | undefined> => {
+  const groupScales = examplesMap.get(scaleGroupValue);
+  const examples = groupScales?.get(scaleValue);
   if (!examples) {
     return;
   }
@@ -194,7 +195,7 @@ export const getRandomScaleExample = async (
   const instrumentLoadPromises = examples?.flatMap((example) =>
     example.tracks.map(async (track) => {
       if (track.instrument) {
-        await loadInstrument(track.instrument, reverbStrength);
+        await loadInstrument(track.instrument, reverbStrengthValue);
       }
     })
   );
