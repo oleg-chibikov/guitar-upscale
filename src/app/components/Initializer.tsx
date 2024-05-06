@@ -115,7 +115,8 @@ export const Initializer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    alert("getDigitalGoodsService" in window);
+    // TODO: IT'S FOR TESTING
+    console.log("DIGITAL GOODS", "getDigitalGoodsService" in window);
   }, []);
   return null;
 };
