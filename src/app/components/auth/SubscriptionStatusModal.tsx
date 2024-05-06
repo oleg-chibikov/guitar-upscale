@@ -30,7 +30,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     if (isSignedIn) {
       await signOut();
     } else {
-      await signIn("patreon");
+      await signIn();
     }
   };
 
@@ -110,29 +110,13 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
             </div>
           </div>
           <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
-            {isSignedIn && (
-              <Button
-                size="small"
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  window.open(
-                    "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-                    "_blank"
-                  );
-                  handleCloseModal(); // Close modal after opening link
-                }}
-              >
-                Change membership plan
-              </Button>
-            )}
             <Button
               size="small"
               variant="contained"
               color="primary"
               onClick={handleAuth}
             >
-              {!isSignedIn ? "Sign In with Patreon" : "Sign Out"}
+              {!isSignedIn ? "Sign In" : "Sign Out"}
             </Button>
           </div>
         </section>

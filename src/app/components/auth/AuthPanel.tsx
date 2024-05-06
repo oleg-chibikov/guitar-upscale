@@ -15,8 +15,6 @@ const SubscriptionStatusModal = dynamic(
     (await import("./SubscriptionStatusModal")).SubscriptionStatusModal
 );
 
-// https://docs.patreon.com/#oauth
-// https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
 export const AuthPanel: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
@@ -74,7 +72,7 @@ export const AuthPanel: React.FC = () => {
       localStorage.removeItem("signInCheckCount");
       checkError();
     }
-    //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically
+    //Dependencies should be empty to avoid endless reload - checking the session after redirect callback - it doesn't refresh automatically
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
