@@ -18,7 +18,7 @@ const TuningSelector: React.FC = () => {
         }}
         options={Object.entries(tunings).map(([tuning, value]) => ({
           value: tuning,
-          label: `${value} (${tuning})`,
+          label: `${value.name} (${tuning})`,
         }))}
       />
     </>

@@ -5,11 +5,9 @@ import { setCurrentChord } from "../strummingState";
 import { decodeMelody } from "./melodyDecoder";
 
 export const playExample = async ({
-  baseNote,
   example,
   waitNote,
   neck,
-  tuning,
   showAlert,
 }: PlayExampleParameters) => {
   showAlert(example.band + " - " + example.title);
@@ -43,9 +41,7 @@ export const playExample = async ({
       },
       waitNote,
       neck,
-      parseStringToNotes(example.tuning ?? "EBGDAE"),
-      tuning,
-      baseNote
+      parseStringToNotes(example.tuning ?? "EBGDAE")
     )
   );
   await Promise.all(trackPromises);

@@ -18,7 +18,9 @@ import {
 import { sleep } from "../../engine/sleep";
 import { useInputChecker } from "../../helpers/useInputChecker";
 import {
+  baseNoteValue,
   chordIsBeingDetectedValue,
+  chordStrummingDelayMsValue,
   selectSettings,
 } from "../../store/settingsSlice";
 
@@ -63,8 +65,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
-  const { neck, chordStrummingDelayMs, baseNote, chordIsBeingDetected } =
-    useSelector(selectSettings);
+  const { neck } = useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
 
@@ -147,7 +148,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       case NoteDisplayMode.Note:
         return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
       case NoteDisplayMode.Note_Shift:
-        const result = (stringOctaveNote.note - baseNote) % NOTE_COUNT;
+        const result = (stringOctaveNote.note - baseNoteValue) % NOTE_COUNT;
         return result >= 0 ? result : result + NOTE_COUNT;
       default:
         return fret;
@@ -158,7 +159,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     (isHeader &&
       stringOctaveNote &&
       coloredHeaders.has(stringOctaveNote?.fret)) ||
-    stringOctaveNote?.note === baseNote;
+    stringOctaveNote?.note === baseNoteValue;
 
   const handlePress = async () => {
     if (isHeader) {
@@ -174,7 +175,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             stringOctaveNote,
             fromChord: false,
           });
-          await sleep(chordStrummingDelayMs);
+          await sleep(chordStrummingDelayMsValue);
         }
       }
       return;
@@ -201,7 +202,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     },
   };
 
-  const isBehindCapo = fret < baseNote;
+  const isBehindCapo = fret < baseNoteValue;
 
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale

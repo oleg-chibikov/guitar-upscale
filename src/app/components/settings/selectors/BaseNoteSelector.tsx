@@ -1,6 +1,7 @@
+import { getShiftedNote } from "@/app/data/tunings";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Note } from "../../../data/notes";
+import { Note, getNoteText } from "../../../data/notes";
 import { selectSettings, setBaseNote } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
@@ -17,9 +18,12 @@ export const BaseNoteSelector: React.FC = () => {
         onValueChange={(value) => {
           dispatch(setBaseNote(value));
         }}
-        customLabel={(key, value) =>
-          key + "(" + (value === 0 ? "" : "+") + value + ")"
-        }
+        customLabel={(_, value) => {
+          const note = getShiftedNote(value);
+          return (
+            getNoteText(note) + "(" + (value === 0 ? "" : "+") + value + ")"
+          );
+        }}
       />
     </>
   );

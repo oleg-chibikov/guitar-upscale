@@ -6,7 +6,7 @@ import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
-import { parseStringToNotes, Tuning } from "../data/tunings";
+import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
 import {
   generateAllChords,
   getClosestVariation,
@@ -134,6 +134,8 @@ export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let scaleGroupValue: string = initialState.scaleGroup;
 export let scaleValue: string = initialState.scale;
 export let baseNoteValue: Note = initialState.baseNote;
+export let playbackTypeValue: PlaybackType = initialState.playbackType;
+export let tuningValue: Tuning = initialState.tuning;
 export let isRecordingValue: boolean = initialState.isRecording;
 export let toggleMetronomeWhenRecordingValue: boolean =
   initialState.toggleMetronomeWhenRecording;
@@ -148,8 +150,8 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   // checkDuplicateScales(scalesMap);
   const neck = generateNeckRepresentation(
     scalePattern,
-    parseStringToNotes(state.tuning),
-    state.baseNote
+    parseStringToNotes(tuningValue),
+    getShiftedNote(state.baseNote)
   );
   state.neck = neck;
   setChords(state);
@@ -248,6 +250,8 @@ export const settingsSlice = createSlice({
       scaleValue = state.scale;
       baseNoteValue = state.baseNote;
       isRecordingValue = state.isRecording;
+      playbackTypeValue = state.playbackType;
+      tuningValue = state.tuning;
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       loadInstrument(instrumentValue, reverbStrengthValue);
       loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -275,6 +279,7 @@ export const settingsSlice = createSlice({
     },
     setTuning(state, action: PayloadAction<Tuning>) {
       state.tuning = action.payload;
+      tuningValue = action.payload;
       onGuitarSettingsUpdate(state);
     },
     setTempoBpm: (state, action: PayloadAction<number>) => {
@@ -300,6 +305,7 @@ export const settingsSlice = createSlice({
     },
     setPlaybackType(state, action: PayloadAction<PlaybackType>) {
       state.playbackType = action.payload;
+      playbackTypeValue = action.payload;
     },
     setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
       state.switchToChromaticScale = action.payload;

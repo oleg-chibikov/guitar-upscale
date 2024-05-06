@@ -5,7 +5,6 @@ import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlayExampleParameters } from "../data/playExampleParameters";
 import { PlaybackType } from "../data/playbackType";
-import { parseStringToNotes } from "../data/tunings";
 import {
   HALF_BEATS_IN_BAR,
   currentHalfBeat,
@@ -15,7 +14,12 @@ import {
 } from "../engine/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
+  baseNoteValue,
   isPlayingValue,
+  playbackTypeValue,
+  reverbStrengthValue,
+  scaleGroupValue,
+  scaleValue,
   selectSettings,
   setIsPlaying,
   setTempoBpm,
@@ -30,15 +34,7 @@ export interface UsePlayParams {
 }
 
 export const usePlay = ({ onPlayExample }: UsePlayParams) => {
-  const {
-    neck,
-    tuning,
-    baseNote,
-    scale,
-    scaleGroup,
-    playbackType,
-    reverbStrength,
-  } = useSelector(selectSettings);
+  const { neck } = useSelector(selectSettings);
   const [isWaiting, setIsWaiting] = useState(false);
   const dispatch = useDispatch();
 
@@ -58,7 +54,11 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       const { getRandomScaleExample } = await import(
         "@/app/data/scaleExamples"
       );
-      example = await getRandomScaleExample(scaleGroup, scale, reverbStrength);
+      example = await getRandomScaleExample(
+        scaleGroupValue,
+        scaleGroupValue,
+        reverbStrengthValue
+      );
       const tempo = example?.tempo;
       if (tempo) {
         dispatch(setTempoBpm(tempo));
@@ -72,7 +72,8 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     const trackInstrumentPromises =
       example?.tracks.map(
         (track) =>
-          track.instrument && loadInstrument(track.instrument, reverbStrength)
+          track.instrument &&
+          loadInstrument(track.instrument, reverbStrengthValue)
       ) ?? [];
 
     await Promise.all(trackInstrumentPromises);
@@ -113,19 +114,18 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       dispatch(setIsPlaying(true));
       const dispatchAlert = (message: string) =>
         dispatch(setAndShowAlert({ message, isError: false }));
-      if (onPlayExample && example && playbackType === melodyType) {
+      if (onPlayExample && example && playbackTypeValue === melodyType) {
         await onPlayExample({
-          baseNote,
           example,
           waitNote: waitForNextHalfBeat,
           neck,
-          tuning: parseStringToNotes(tuning),
           showAlert: dispatchAlert,
         });
       } else {
-        const isFullStringScalePlayback = playbackType === fullStringScaleType;
+        const isFullStringScalePlayback =
+          playbackTypeValue === fullStringScaleType;
         dispatchAlert(
-          `${getNoteText(baseNote)} ${scale} ${
+          `${getNoteText(baseNoteValue)} ${scaleValue} ${
             isFullStringScalePlayback ? " (full string)" : ""
           }`
         );
@@ -142,22 +142,12 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     } finally {
       dispatch(setIsPlaying(false));
     }
-  }, [
-    baseNote,
-    dispatch,
-    neck,
-    onPlayExample,
-    playbackType,
-    reverbStrength,
-    scale,
-    scaleGroup,
-    tuning,
-  ]);
+  }, [dispatch, neck, onPlayExample]);
 
   useEffect(() => {
     // stop playing when any of dependencies changes
     dispatch(setIsPlaying(false));
-  }, [neck, tuning, baseNote, scale, playbackType, dispatch]);
+  }, [neck, dispatch]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {

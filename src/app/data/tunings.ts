@@ -1,3 +1,5 @@
+import { NOTE_COUNT } from "../engine/generateNeckRepresentation";
+import { tuningValue } from "../store/settingsSlice";
 import { Note, OctaveNote } from "./notes";
 
 const OCTAVES_STING = "544433"; // octaves for notes in tuning
@@ -17,18 +19,19 @@ const noteLookup: { [key: string]: Note } = {
   "D#": Note["D#"],
 };
 
-export function parseStringToNotes(notesString: Tuning): OctaveNote[] {
+export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
   const notes: OctaveNote[] = [];
 
-  const octavesString = OCTAVES_STING; // might be omitted and defaults to 544433
+  const data = tunings[tuningKey];
+  const octavesString = data.shift == -2 ? "544333" : OCTAVES_STING;
 
   for (
     let i = 0, j = 0;
-    i < notesString.length, j < octavesString.length;
+    i < tuningKey.length, j < octavesString.length;
     i++, j++
   ) {
-    const thisChar = notesString[i];
-    const nextChar = notesString[i + 1];
+    const thisChar = tuningKey[i];
+    const nextChar = tuningKey[i + 1];
     const isSharp = nextChar === "#";
     const note = noteLookup[thisChar + (isSharp ? "#" : "")];
     if (isSharp) {
@@ -41,13 +44,28 @@ export function parseStringToNotes(notesString: Tuning): OctaveNote[] {
   return notes;
 }
 
-export const tunings = {
-  EBGDAE: "Standard E",
-  EBGDAD: "Drop E",
-  "EBEG#BE": "Open E",
-  DADGAD: "Celtic",
-  DADDAD: "Folk",
-  EBEGBE: "Cross note E",
+export const getShiftedNote = (note: Note) => {
+  const tuningData = tunings[tuningValue];
+
+  return tuningData.shift
+    ? (NOTE_COUNT + note + tuningData.shift) % NOTE_COUNT
+    : note;
 };
 
-export type Tuning = keyof typeof tunings;
+interface TuningData {
+  name: string;
+  shift?: number;
+}
+
+export const tunings: { [key: string]: TuningData } = {
+  EBGDAE: { name: "Standard E" },
+  EBGDAD: { name: "Drop E" },
+  "EBEG#BE": { name: "Open E" },
+  DADGAD: { name: "Celtic E" },
+  DADDAD: { name: "Folk E" },
+  EBEGBE: { name: "Cross note E" },
+  DAFCGD: { name: "Standard D", shift: -2 },
+  DAFCGC: { name: "Drop D", shift: -2 },
+};
+
+export type Tuning = Extract<keyof typeof tunings, string>;
