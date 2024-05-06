@@ -9,7 +9,6 @@ import {
 import { Initializer } from "./Initializer";
 import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
 import { AlertWrapper } from "./alert/AlertWrapper";
-import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
 import { AspectRatioControl } from "./settings/AspectRatioControl";
@@ -131,7 +130,6 @@ export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
       <SettingsViewWrapper premiumComponents={premiumComponents} />
       <ChordsView />
       <AspectRatioControl />
-      <AuthPanel />
       <StrummingSettings />
       <MenuOutsideClickHandler />
     </main>
