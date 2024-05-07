@@ -132,7 +132,7 @@ export const Initializer: React.FC = () => {
           return;
         }
         try {
-          const details = service.getDetails(["guitar_upscale"]);
+          const details = await service.getDetails(["guitar_upscale"]);
           alert(details);
         } catch {
           alert("Cannot get Subscription Tier details from billing service");
