@@ -115,7 +115,7 @@ export const Initializer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const getDDigitalGoodService = async () => {
+    const getDigitalGoodService = async () => {
       // TODO: IT'S FOR TESTING
       if ("getDigitalGoodsService" in window) {
         const getDigitalGoodsService = window.getDigitalGoodsService;
@@ -138,8 +138,11 @@ export const Initializer: React.FC = () => {
           alert("Cannot get Subscription Tier details from billing service");
           return;
         }
+      } else {
+        alert("No digital goods service");
       }
     };
+    getDigitalGoodService();
   }, []);
   return null;
 };
