@@ -115,8 +115,31 @@ export const Initializer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // TODO: IT'S FOR TESTING
-    alert("getDigitalGoodsService" in window);
+    const getDDigitalGoodService = async () => {
+      // TODO: IT'S FOR TESTING
+      if ("getDigitalGoodsService" in window) {
+        const getDigitalGoodsService = window.getDigitalGoodsService;
+        // Digital Goods API is supported!
+        let service: DigitalGoodsService;
+        try {
+          service = await getDigitalGoodsService(
+            "https://play.google.com/billing"
+          );
+          // Google Play Billing is supported!
+        } catch (error) {
+          // Google Play Billing is not available. Use another payment flow.
+          alert("Cannot get Billing service");
+          return;
+        }
+        try {
+          const details = service.getDetails(["guitar_upscale"]);
+          alert(details);
+        } catch {
+          alert("Cannot get Subscription Tier details from billing service");
+          return;
+        }
+      }
+    };
   }, []);
   return null;
 };
