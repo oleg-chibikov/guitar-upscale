@@ -115,7 +115,7 @@ export const Initializer: React.FC = () => {
     }
   }, []);
 
-  const [textBoxValue, setTextBoxValue] = useState("");
+  const [textBoxValue, setTextBoxValue] = useState("guitar_upscale.composer");
   const [value, setValue] = useState("the result will be here");
 
   const getDetailsOnClick = async () => {
