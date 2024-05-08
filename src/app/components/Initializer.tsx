@@ -1,5 +1,6 @@
 "use client";
 import { Theme } from "@/app/data/theme";
+import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
@@ -115,6 +116,7 @@ export const Initializer: React.FC = () => {
   }, []);
 
   const [textBoxValue, setTextBoxValue] = useState("");
+  const [value, setValue] = useState("the result will be here");
 
   const getDetailsOnClick = async () => {
     // TODO: IT'S FOR TESTING
@@ -129,7 +131,7 @@ export const Initializer: React.FC = () => {
         // Google Play Billing is supported!
       } catch (error) {
         // Google Play Billing is not available. Use another payment flow.
-        alert("Cannot get Billing service");
+        setValue("Cannot get Billing service");
         return;
       }
       try {
@@ -142,7 +144,7 @@ export const Initializer: React.FC = () => {
           }).format(parseFloat(item.price.value));
 
           // Render the price to the UI.
-          alert(
+          setValue(
             [
               item.itemId,
               item.title,
@@ -153,11 +155,11 @@ export const Initializer: React.FC = () => {
           );
         }
       } catch (ex: any) {
-        alert("Cannot get " + textBoxValue + " " + ex);
+        setValue("Cannot get " + textBoxValue + " " + ex);
         return;
       }
     } else {
-      alert("No digital goods service");
+      setValue("No digital goods service");
     }
   };
 
@@ -168,7 +170,8 @@ export const Initializer: React.FC = () => {
         value={textBoxValue}
         onChange={(e) => setTextBoxValue(e.target.value)}
       />
-      <button onClick={getDetailsOnClick}>Get Details</button>
+      <Button onClick={getDetailsOnClick}>Get Details</Button>
+      <span>{value}</span>
     </div>
   );
 };
