@@ -163,7 +163,7 @@ export const Initializer: React.FC = () => {
     } catch (e) {
       // The purchase failed, and we can handle the failure here.
       // AbortError usually means a user cancellation
-      setValue("Aborted");
+      setValue("Aborted " + e);
     }
   }
 
