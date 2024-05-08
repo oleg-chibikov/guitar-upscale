@@ -115,6 +115,58 @@ export const Initializer: React.FC = () => {
     }
   }, []);
 
+  async function makePurchase(service: DigitalGoodsService, sku: string) {
+    // Define the preferred payment method and item ID
+    const paymentMethods = [
+      {
+        supportedMethods: "https://play.google.com/billing",
+        data: {
+          sku: sku,
+        },
+      },
+    ];
+
+    // The "total" member of the paymentDetails is required by the Payment
+    // Request API, but is not used when using Google Play Billing. We can
+    // set it up with bogus details.
+    const paymentDetails = {
+      total: {
+        label: `Total`,
+        amount: { currency: `USD`, value: `0` },
+      },
+    };
+
+    const request = new PaymentRequest(paymentMethods, paymentDetails);
+    try {
+      const paymentResponse = await request.show();
+      const { purchaseToken } = paymentResponse.details;
+
+      // Call backend to validate and acknowledge the purchase.
+      const isAcknowledged = true; // await acknowledgePurchaseOnBackend(purchaseToken, sku);
+
+      if (isAcknowledged) {
+        // Optional: consume the purchase, allowing the user to purchase
+        // the same item again.
+        service.consume(purchaseToken);
+
+        // Optional: tell the PaymentRequest API the validation was
+        // successful. The user-agent may show a "payment successful"
+        // message to the user.
+        const paymentComplete = await paymentResponse.complete("success");
+        setValue("Success");
+      } else {
+        // Optional: tell the PaymentRequest API the validation failed.
+        // The user agent may show a message to the user.
+        const paymentComplete = await paymentResponse.complete("fail");
+        setValue("Cancelled");
+      }
+    } catch (e) {
+      // The purchase failed, and we can handle the failure here.
+      // AbortError usually means a user cancellation
+      setValue("Aborted");
+    }
+  }
+
   const [textBoxValue, setTextBoxValue] = useState("guitar_upscale.composer");
   const [value, setValue] = useState("the result will be here");
 
@@ -154,6 +206,8 @@ export const Initializer: React.FC = () => {
               item.description,
             ].join("|")
           );
+
+          await makePurchase(service, "guitar_upscale.composer");
         }
       } catch (ex: any) {
         setValue("Cannot get " + textBoxValue + " " + ex);
