@@ -117,35 +117,52 @@ export const Initializer: React.FC = () => {
   const [textBoxValue, setTextBoxValue] = useState("");
 
   const getDetailsOnClick = async () => {
-    try {
-      const service = await window.getDigitalGoodsService(
-        "https://play.google.com/billing"
-      );
-      const details = await service.getDetails([textBoxValue]);
-      alert(JSON.stringify(details));
-      for (const item of details) {
-        const localizedPrice = new Intl.NumberFormat(navigator.language, {
-          style: "currency",
-          currency: item.price.currency,
-        }).format(parseFloat(item.price.value));
-
-        alert(
-          [
-            item.itemId,
-            item.title,
-            JSON.stringify(item.price),
-            localizedPrice,
-            item.description,
-          ].join("|")
+    // TODO: IT'S FOR TESTING
+    if ("getDigitalGoodsService" in window) {
+      const getDigitalGoodsService = window.getDigitalGoodsService;
+      // Digital Goods API is supported!
+      let service: DigitalGoodsService;
+      try {
+        service = await getDigitalGoodsService(
+          "https://play.google.com/billing"
         );
+        // Google Play Billing is supported!
+      } catch (error) {
+        // Google Play Billing is not available. Use another payment flow.
+        alert("Cannot get Billing service");
+        return;
       }
-    } catch {
-      alert("Cannot get Subscription Tier details from billing service");
+      try {
+        const details = await service.getDetails([textBoxValue]);
+        for (const item of details) {
+          // Format the price according to the user locale.
+          const localizedPrice = new Intl.NumberFormat(navigator.language, {
+            style: "currency",
+            currency: item.price.currency,
+          }).format(parseFloat(item.price.value));
+
+          // Render the price to the UI.
+          alert(
+            [
+              item.itemId,
+              item.title,
+              JSON.stringify(item.price),
+              localizedPrice,
+              item.description,
+            ].join("|")
+          );
+        }
+      } catch {
+        alert("Cannot get Subscription Tier details from billing service");
+        return;
+      }
+    } else {
+      alert("No digital goods service");
     }
   };
 
   return (
-    <div>
+    <div className="absolute z-50 top-5 bg-slate-200">
       <input
         type="text"
         value={textBoxValue}
