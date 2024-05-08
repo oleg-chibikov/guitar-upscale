@@ -1,8 +1,12 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "uk.co.guitar_upscale.twa",
-        "sha256_cert_fingerprints": ["3F:CE:D7:A7:1E:69:8B:BC:08:7F:7D:65:CC:4B:AC:40:E0:7D:F8:C5:E9:6B:46:27:30:88:C9:03:59:B1:9F:51"]
-      }
-    }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "uk.org.guitar_upscale.twa",
+      "sha256_cert_fingerprints": [
+        "6D:63:74:27:FF:4B:34:37:A6:56:C1:C2:97:30:65:C1:96:98:99:E4:0B:BA:C0:F0:BF:89:21:A9:52:97:CB:6B"
+      ]
+    }
+  }
+]
