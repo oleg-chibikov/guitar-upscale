@@ -34,7 +34,14 @@
   "orientation": "landscape",
   "categories": ["lifestyle", "music", "productivity"],
   "display_override": ["fullscreen", "window-controls-overlay"],
-  "prefer_related_applications": false,
+  "android_package_name": "uk.org.guitar_upscale.twa",
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "id": "uk.org.guitar_upscale.twa",
+      "platform": "chromeos_play"
+    }
+  ],
   "screenshots": [
     {
       "src": "screenshots/Guitar upscale - Light.webp",
