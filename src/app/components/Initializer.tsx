@@ -133,7 +133,24 @@ export const Initializer: React.FC = () => {
         }
         try {
           const details = await service.getDetails(["guitar_upscale.composer"]);
-          alert(details);
+          for (const item of details) {
+            // Format the price according to the user locale.
+            const localizedPrice = new Intl.NumberFormat(navigator.language, {
+              style: "currency",
+              currency: item.price.currency,
+            }).format(parseFloat(item.price.value));
+
+            // Render the price to the UI.
+            alert(
+              [
+                item.itemId,
+                item.title,
+                JSON.stringify(item.price),
+                localizedPrice,
+                item.description,
+              ].join("|")
+            );
+          }
         } catch {
           alert("Cannot get Subscription Tier details from billing service");
           return;
