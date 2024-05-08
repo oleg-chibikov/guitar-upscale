@@ -136,6 +136,7 @@ export const Initializer: React.FC = () => {
       }
       try {
         const details = await service.getDetails([textBoxValue]);
+        setValue(JSON.stringify(details));
         for (const item of details) {
           // Format the price according to the user locale.
           const localizedPrice = new Intl.NumberFormat(navigator.language, {
