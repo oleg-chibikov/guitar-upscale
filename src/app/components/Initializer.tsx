@@ -152,8 +152,8 @@ export const Initializer: React.FC = () => {
             ].join("|")
           );
         }
-      } catch {
-        alert("Cannot get Subscription Tier details from billing service");
+      } catch (ex: any) {
+        alert("Cannot get " + textBoxValue + " " + ex);
         return;
       }
     } else {
