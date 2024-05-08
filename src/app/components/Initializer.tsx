@@ -1,6 +1,6 @@
 "use client";
 import { Theme } from "@/app/data/theme";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import { Note } from "../data/notes";
@@ -114,53 +114,44 @@ export const Initializer: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const getDigitalGoodService = async () => {
-      // TODO: IT'S FOR TESTING
-      if ("getDigitalGoodsService" in window) {
-        const getDigitalGoodsService = window.getDigitalGoodsService;
-        // Digital Goods API is supported!
-        let service: DigitalGoodsService;
-        try {
-          service = await getDigitalGoodsService(
-            "https://play.google.com/billing"
-          );
-          // Google Play Billing is supported!
-        } catch (error) {
-          // Google Play Billing is not available. Use another payment flow.
-          alert("Cannot get Billing service");
-          return;
-        }
-        try {
-          const details = await service.getDetails(["guitar_upscale.composer"]);
-          alert(JSON.stringify(details));
-          for (const item of details) {
-            // Format the price according to the user locale.
-            const localizedPrice = new Intl.NumberFormat(navigator.language, {
-              style: "currency",
-              currency: item.price.currency,
-            }).format(parseFloat(item.price.value));
+  const [textBoxValue, setTextBoxValue] = useState("");
 
-            // Render the price to the UI.
-            alert(
-              [
-                item.itemId,
-                item.title,
-                JSON.stringify(item.price),
-                localizedPrice,
-                item.description,
-              ].join("|")
-            );
-          }
-        } catch {
-          alert("Cannot get Subscription Tier details from billing service");
-          return;
-        }
-      } else {
-        alert("No digital goods service");
+  const getDetailsOnClick = async () => {
+    try {
+      const service = await window.getDigitalGoodsService(
+        "https://play.google.com/billing"
+      );
+      const details = await service.getDetails([textBoxValue]);
+      alert(JSON.stringify(details));
+      for (const item of details) {
+        const localizedPrice = new Intl.NumberFormat(navigator.language, {
+          style: "currency",
+          currency: item.price.currency,
+        }).format(parseFloat(item.price.value));
+
+        alert(
+          [
+            item.itemId,
+            item.title,
+            JSON.stringify(item.price),
+            localizedPrice,
+            item.description,
+          ].join("|")
+        );
       }
-    };
-    getDigitalGoodService();
-  }, []);
-  return null;
+    } catch {
+      alert("Cannot get Subscription Tier details from billing service");
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={textBoxValue}
+        onChange={(e) => setTextBoxValue(e.target.value)}
+      />
+      <button onClick={getDetailsOnClick}>Get Details</button>
+    </div>
+  );
 };
