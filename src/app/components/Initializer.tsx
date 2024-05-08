@@ -162,7 +162,7 @@ export const Initializer: React.FC = () => {
   };
 
   return (
-    <div className="absolute z-50 top-5 bg-slate-200">
+    <div className="fixed p-10 z-50 top-5 bg-slate-200">
       <input
         type="text"
         value={textBoxValue}
