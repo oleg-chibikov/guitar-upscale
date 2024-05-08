@@ -25,7 +25,7 @@
   ],
   "start_url": ".",
   "display": "fullscreen",
-  "theme_color": "#e6b39a",
+  "theme_color": "#1d3f58",
   "background_color": "#333333",
   "id": "guitar-upscale",
   "description": "A guitar simulator that supports chords, scales and MIDI recording - a great way to learn guitar and have fun.\n\nIdeal for\n* people who want to learn scales and chords\n* composers who want to quickly play a melody in a selected scale and save the results to later process it in DAW\n* relaxing and strumming",
