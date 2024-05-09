@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
+import { acknowldegeSubscriptionOnBackend } from "../apiClient";
 import { Note } from "../data/notes";
 import {
   loadMetronome,
@@ -125,6 +126,7 @@ export const Initializer: React.FC = () => {
     setValue(
       existingPurchases.map((x) => x.itemId + "..." + x.purchaseToken).join(" ")
     );
+    setTextBoxTokenValue(existingPurchases[0].purchaseToken);
   };
 
   async function makePurchase(service: DigitalGoodsService, sku: string) {
@@ -180,7 +182,17 @@ export const Initializer: React.FC = () => {
   }
 
   const [textBoxValue, setTextBoxValue] = useState("guitar_upscale.composer");
+  const [textBoxTokenValue, setTextBoxTokenValue] = useState(
+    "hlmmlnmfgapmkjbefcffpbok.AO-J1OwOdgtrZe-ebXU3T-0C7oEAxoTi-QAg7zCIiTLrx4JrmLvPtAbBTKFOf0rQJGTB_7IpwjEpZtm2E5cfUfZlKF4211ndm8cke0IjyIemyBzx3-vHdxU"
+  );
   const [value, setValue] = useState("the result will be here");
+
+  const ack = async () => {
+    await acknowldegeSubscriptionOnBackend({
+      itemId: value,
+      purchaseToken: textBoxTokenValue,
+    });
+  };
 
   const list = async () => {
     // TODO: IT'S FOR TESTING
@@ -263,8 +275,14 @@ export const Initializer: React.FC = () => {
         value={textBoxValue}
         onChange={(e) => setTextBoxValue(e.target.value)}
       />
+      <input
+        type="text"
+        value={textBoxTokenValue}
+        onChange={(e) => setTextBoxTokenValue(e.target.value)}
+      />
       <Button onClick={getDetailsOnClick}>Get Details</Button>
       <Button onClick={list}>List</Button>
+      <Button onClick={ack}>Ack</Button>
       <span>{value}</span>
     </div>
   );
