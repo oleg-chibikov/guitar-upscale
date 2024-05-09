@@ -115,9 +115,21 @@ export const Initializer: React.FC = () => {
     }
   }, []);
 
+  const listPurchases = async (service: DigitalGoodsService) => {
+    const existingPurchases = await service.listPurchases();
+    for (const p of existingPurchases) {
+      // await verifyOrAcknowledgePurchaseOnBackend(p.purchaseToken, p.itemId);
+      // Update the UI with items the user is already entitled to.
+      console.log(`Users has entitlement for ${p.itemId}`);
+    }
+    setValue(
+      existingPurchases.map((x) => x.itemId + "..." + x.purchaseToken).join(" ")
+    );
+  };
+
   async function makePurchase(service: DigitalGoodsService, sku: string) {
     // Define the preferred payment method and item ID
-    const paymentMethods = [
+    const paymentMethods: PaymentMethodData[] = [
       {
         supportedMethods: "https://play.google.com/billing",
         data: {
@@ -131,7 +143,7 @@ export const Initializer: React.FC = () => {
     // set it up with bogus details.
     const paymentDetails = {
       total: {
-        label: `Total`,
+        label: `Dummy`,
         amount: { currency: `USD`, value: `0` },
       },
     };
@@ -170,6 +182,31 @@ export const Initializer: React.FC = () => {
   const [textBoxValue, setTextBoxValue] = useState("guitar_upscale.composer");
   const [value, setValue] = useState("the result will be here");
 
+  const list = async () => {
+    // TODO: IT'S FOR TESTING
+    if ("getDigitalGoodsService" in window) {
+      const getDigitalGoodsService = window.getDigitalGoodsService;
+      // Digital Goods API is supported!
+      let service: DigitalGoodsService;
+      try {
+        service = await getDigitalGoodsService(
+          "https://play.google.com/billing"
+        );
+        // Google Play Billing is supported!
+      } catch (error) {
+        // Google Play Billing is not available. Use another payment flow.
+        setValue("Cannot get Billing service");
+        return;
+      }
+      try {
+        await listPurchases(service);
+      } catch (ex: any) {
+        setValue("Cannot get " + textBoxValue + " " + ex);
+        return;
+      }
+    }
+  };
+
   const getDetailsOnClick = async () => {
     // TODO: IT'S FOR TESTING
     if ("getDigitalGoodsService" in window) {
@@ -187,6 +224,7 @@ export const Initializer: React.FC = () => {
         return;
       }
       try {
+        await listPurchases(service);
         const details = await service.getDetails([textBoxValue]);
         setValue(JSON.stringify(details));
         for (const item of details) {
@@ -226,6 +264,7 @@ export const Initializer: React.FC = () => {
         onChange={(e) => setTextBoxValue(e.target.value)}
       />
       <Button onClick={getDetailsOnClick}>Get Details</Button>
+      <Button onClick={list}>List</Button>
       <span>{value}</span>
     </div>
   );
