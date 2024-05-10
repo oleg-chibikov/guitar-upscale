@@ -119,25 +119,28 @@ export const Initializer: React.FC = () => {
   const listPurchases = async (service: DigitalGoodsService) => {
     const existingPurchases = await service.listPurchases();
     for (const p of existingPurchases) {
-      // await verifyOrAcknowledgePurchaseOnBackend(p.purchaseToken, p.itemId);
+      const data = await acknowldegeSubscriptionOnBackend({
+        itemId: value,
+        purchaseToken: textBoxTokenValue,
+      });
+      if (data.error) {
+        setValue(data.error);
+        return;
+      } else {
+        setValue(data.result);
+      }
       // Update the UI with items the user is already entitled to.
       console.log(`Users has entitlement for ${p.itemId}`);
     }
-    setValue(
-      existingPurchases.map((x) => x.itemId + "..." + x.purchaseToken).join(" ")
-    );
-    if (existingPurchases.length) {
-      setTextBoxTokenValue(existingPurchases[0].purchaseToken);
-    }
   };
 
-  async function makePurchase(service: DigitalGoodsService, sku: string) {
+  async function makePurchase(service: DigitalGoodsService, itemId: string) {
     // Define the preferred payment method and item ID
     const paymentMethods: PaymentMethodData[] = [
       {
         supportedMethods: "https://play.google.com/billing",
         data: {
-          sku: sku,
+          sku: itemId,
         },
       },
     ];
@@ -157,10 +160,15 @@ export const Initializer: React.FC = () => {
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      // Call backend to validate and acknowledge the purchase.
-      const isAcknowledged = true; // await acknowledgePurchaseOnBackend(purchaseToken, sku);
-
-      if (isAcknowledged) {
+      const data = await acknowldegeSubscriptionOnBackend({
+        itemId: value,
+        purchaseToken,
+      });
+      if (data.error) {
+        const paymentComplete = await paymentResponse.complete("fail");
+        setValue(data.error);
+        return;
+      } else {
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
         service.consume(purchaseToken);
@@ -169,12 +177,7 @@ export const Initializer: React.FC = () => {
         // successful. The user-agent may show a "payment successful"
         // message to the user.
         const paymentComplete = await paymentResponse.complete("success");
-        setValue("Success");
-      } else {
-        // Optional: tell the PaymentRequest API the validation failed.
-        // The user agent may show a message to the user.
-        const paymentComplete = await paymentResponse.complete("fail");
-        setValue("Cancelled");
+        setValue(data.result);
       }
     } catch (e) {
       // The purchase failed, and we can handle the failure here.
@@ -190,10 +193,15 @@ export const Initializer: React.FC = () => {
   const [value, setValue] = useState("the result will be here");
 
   const ack = async () => {
-    await acknowldegeSubscriptionOnBackend({
+    const data = await acknowldegeSubscriptionOnBackend({
       itemId: value,
       purchaseToken: textBoxTokenValue,
     });
+    if (data.error) {
+      setValue(data.error);
+    } else {
+      setValue(data.result);
+    }
   };
 
   const list = async () => {

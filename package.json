@@ -28,9 +28,11 @@
     "@types/next-auth": "^3.15.0",
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
+    "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "google-auth-library": "^9.9.0",
     "googleapis": "^137.1.0",
+    "http-errors": "^2.0.0",
     "midi-writer-js": "^3.1.1",
     "next": "14.2.2",
     "next-auth": "^4.24.7",
@@ -43,9 +45,11 @@
     "rxjs": "^7.8.1",
     "screenfull": "^6.0.2",
     "server-only": "^0.0.1",
-    "smplr": "^0.13.3"
+    "smplr": "^0.13.3",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",

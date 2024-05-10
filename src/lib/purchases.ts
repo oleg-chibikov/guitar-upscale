@@ -1,9 +1,9 @@
-"use server";
-const { google } = require("googleapis");
-const androidpublisher = google.androidpublisher("v3");
 import { GoogleAuth } from "google-auth-library";
 import * as billing from "./billing";
 import { PurchaseParams } from "./subscriptionTypes";
+
+const { google } = require("googleapis");
+const androidpublisher = google.androidpublisher("v3");
 
 //https://developers.google.com/android-publisher/api-ref/rest
 //https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest

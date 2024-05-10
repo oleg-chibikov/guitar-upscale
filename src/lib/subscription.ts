@@ -1,6 +1,3 @@
-"use server";
-import "server-only";
-
 import { Session } from "next-auth";
 import { auth } from "./auth";
 

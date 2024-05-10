@@ -1,8 +1,10 @@
 import { PurchaseParams } from "@/lib/subscriptionTypes";
+
 export async function acknowldegeSubscriptionOnBackend(
   params: PurchaseParams
 ): Promise<any> {
   const { itemId, purchaseToken } = params;
+
   try {
     const response = await fetch(
       `/api/googlePlayBillingSubscription?itemId=${itemId}&purchaseToken=${purchaseToken}`,
@@ -13,13 +15,21 @@ export async function acknowldegeSubscriptionOnBackend(
         },
       }
     );
+
+    const responseData = await response.json(); // Extract error message from response
+    const responseAsString = JSON.stringify(responseData);
+
     if (!response.ok) {
-      throw new Error("Failed to fetch subscription purchase");
+      return {
+        error: responseAsString,
+      };
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    return null;
+
+    return { result: responseAsString };
+  } catch (error: any) {
+    // Construct a custom error message
+    return {
+      error: JSON.stringify(error),
+    };
   }
 }

@@ -1,10 +1,10 @@
-"use server";
+import { apiHandler } from "@/lib/apiHelper";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
-} from "./purchases";
-import { PurchaseParams } from "./subscriptionTypes";
+} from "../../lib/purchases";
+import { PurchaseParams } from "../../lib/subscriptionTypes";
 
 type ResponseData = {
   message?: string;
@@ -49,14 +49,14 @@ const handle = async (
 
   // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
 
-  if (req.method === "POST") {
-    console.log("Acknowledging subscription");
-    await acknowledgeSubscriptionPurchase(params);
-    console.log("Acknowledged subscription");
-  }
+  console.log("Acknowledging subscription");
+  await acknowledgeSubscriptionPurchase(params);
+  console.log("Acknowledged subscription");
 
   res.status(200).json({ message: subscription?.productId });
   res.end(); // End the response
 };
 
-export default handle;
+export default apiHandler({
+  POST: handle,
+});
