@@ -126,7 +126,9 @@ export const Initializer: React.FC = () => {
     setValue(
       existingPurchases.map((x) => x.itemId + "..." + x.purchaseToken).join(" ")
     );
-    setTextBoxTokenValue(existingPurchases[0].purchaseToken);
+    if (existingPurchases.length) {
+      setTextBoxTokenValue(existingPurchases[0].purchaseToken);
+    }
   };
 
   async function makePurchase(service: DigitalGoodsService, sku: string) {
