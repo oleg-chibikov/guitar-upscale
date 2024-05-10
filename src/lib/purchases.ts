@@ -1,4 +1,3 @@
-import { GoogleAuth } from "google-auth-library";
 import * as billing from "./billing";
 import { PurchaseParams } from "./subscriptionTypes";
 
@@ -15,23 +14,21 @@ const androidpublisher = google.androidpublisher("v3");
 
 const setupClient = async () => {
   console.log("Setting up client");
-  const auth = new GoogleAuth({
-    credentials: {
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      project_id: process.env.GOOGLE_PROJECT_ID,
-      private_key: process.env
-        .GOOGLE_PRIVATE_KEY!.split(String.raw`\n`)
-        .join("\n"),
-    },
-    scopes: ["https://www.googleapis.com/auth/androidpublisher"],
-  });
+
+  const jwtClient = new google.auth.JWT(
+    process.env.GOOGLE_CLIENT_EMAIL,
+    undefined,
+    process.env.GOOGLE_PRIVATE_KEY!.split(String.raw`\n`).join("\n"),
+    ["https://www.googleapis.com/auth/androidpublisher"]
+  );
 
   // Connect to the Google Play Developer API with JWT Client
-  return androidpublisher({
+  const playApi = google.androidpublisher({
     version: "v3",
-    auth,
+    auth: jwtClient,
   });
+
+  return playApi;
 };
 
 /**
