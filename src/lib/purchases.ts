@@ -26,12 +26,6 @@ const setupClient = async () => {
     },
     scopes: ["https://www.googleapis.com/auth/androidpublisher"],
   });
-  const client = await auth.getClient();
-  const projectId = await auth.getProjectId();
-  const url = `https://dns.googleapis.com/dns/v1/projects/${projectId}`;
-  console.log("Requesting", url);
-  const res = await client.request({ url });
-  console.log(res.data);
 
   // Connect to the Google Play Developer API with JWT Client
   return androidpublisher({
