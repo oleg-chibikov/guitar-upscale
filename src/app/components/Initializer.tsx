@@ -119,10 +119,7 @@ export const Initializer: React.FC = () => {
   const listPurchases = async (service: DigitalGoodsService) => {
     const existingPurchases = await service.listPurchases();
     for (const p of existingPurchases) {
-      const data = await acknowldegeSubscriptionOnBackend({
-        itemId: value,
-        purchaseToken: textBoxTokenValue,
-      });
+      const data = await acknowldegeSubscriptionOnBackend({ ...p });
       if (data.error) {
         setValue(data.error);
         return;
@@ -161,7 +158,7 @@ export const Initializer: React.FC = () => {
       const { purchaseToken } = paymentResponse.details;
 
       const data = await acknowldegeSubscriptionOnBackend({
-        itemId: value,
+        itemId,
         purchaseToken,
       });
       if (data.error) {
