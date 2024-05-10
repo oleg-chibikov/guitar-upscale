@@ -1,4 +1,5 @@
 import { apiHandler } from "@/lib/apiHelper";
+import { SubscriptionPurchase } from "@/lib/billing";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   acknowledgeSubscriptionPurchase,
@@ -7,7 +8,7 @@ import {
 import { PurchaseParams } from "../../lib/subscriptionTypes";
 
 type ResponseData = {
-  message?: string;
+  subscription?: SubscriptionPurchase;
   error?: string;
 };
 
@@ -53,7 +54,7 @@ const handle = async (
   await acknowledgeSubscriptionPurchase(params);
   console.log("Acknowledged subscription");
 
-  res.status(200).json({ message: subscription?.productId });
+  res.status(200).json({ subscription: subscription ?? undefined });
   res.end(); // End the response
 };
 
