@@ -24,7 +24,7 @@ const setupClient = async () => {
         .GOOGLE_PRIVATE_KEY!.split(String.raw`\n`)
         .join("\n"),
     },
-    scopes: "https://www.googleapis.com/auth/androidpublisher",
+    scopes: ["https://www.googleapis.com/auth/androidpublisher"],
   });
   const client = await auth.getClient();
   const projectId = await auth.getProjectId();
@@ -112,7 +112,9 @@ export async function fetchPurchase(
         token: params.purchaseToken,
       })
     )?.data;
-    console.log(`PlayAPI Response : ${JSON.stringify(apiResponse)}`);
+    console.log(
+      `PlayAPI Response : ${JSON.stringify(apiResponse, undefined, 2)}`
+    );
     return billing.Purchase.fromApiResponse(
       apiResponse,
       params.purchaseToken,
@@ -140,7 +142,9 @@ export async function fetchSubscriptionPurchase(
         token: params.purchaseToken,
       })
     )?.data;
-    console.log(`PlayAPI Response : ${JSON.stringify(apiResponse)}`);
+    console.log(
+      `PlayAPI Response : ${JSON.stringify(apiResponse, undefined, 2)}`
+    );
     return billing.SubscriptionPurchase.fromApiResponse(
       apiResponse,
       params.purchaseToken

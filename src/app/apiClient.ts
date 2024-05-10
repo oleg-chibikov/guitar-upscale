@@ -17,7 +17,7 @@ export async function acknowldegeSubscriptionOnBackend(
     );
 
     const responseData = await response.json(); // Extract error message from response
-    const responseAsString = JSON.stringify(responseData);
+    const responseAsString = JSON.stringify(responseData, undefined, 2);
 
     if (!response.ok) {
       return {

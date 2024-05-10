@@ -248,7 +248,7 @@ export const Initializer: React.FC = () => {
       try {
         await listPurchases(service);
         const details = await service.getDetails([textBoxValue]);
-        setValue(JSON.stringify(details));
+        setValue(JSON.stringify(details, undefined, 2));
         for (const item of details) {
           // Format the price according to the user locale.
           const localizedPrice = new Intl.NumberFormat(navigator.language, {
@@ -261,7 +261,7 @@ export const Initializer: React.FC = () => {
             [
               item.itemId,
               item.title,
-              JSON.stringify(item.price),
+              JSON.stringify(item.price, undefined, 2),
               localizedPrice,
               item.description,
             ].join("|")
@@ -279,7 +279,7 @@ export const Initializer: React.FC = () => {
   };
 
   return (
-    <div className="fixed p-10 z-50 top-5 bg-slate-200">
+    <div className="fixed flex flex-col gap-2 p-10 z-50 top-5 bg-slate-200">
       <input
         type="text"
         value={textBoxValue}
@@ -290,10 +290,12 @@ export const Initializer: React.FC = () => {
         value={textBoxTokenValue}
         onChange={(e) => setTextBoxTokenValue(e.target.value)}
       />
-      <Button onClick={getDetailsOnClick}>Get Details</Button>
-      <Button onClick={list}>List</Button>
-      <Button onClick={ack}>Ack</Button>
-      <span>{value}</span>
+      <div className="flex flex-row gap 2">
+        <Button onClick={getDetailsOnClick}>Get Details</Button>
+        <Button onClick={list}>List</Button>
+        <Button onClick={ack}>Ack</Button>
+      </div>
+      <pre className="overflow-auto h-96">{value}</pre>
     </div>
   );
 };
