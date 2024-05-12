@@ -26,6 +26,7 @@ export const GooglePlaySubscribeButton: FC<
       alert("No service!");
       return;
     }
+
     const getSubscriptionOptions = async () => {
       try {
         const getDigitalGoodsService = window.getDigitalGoodsService;
