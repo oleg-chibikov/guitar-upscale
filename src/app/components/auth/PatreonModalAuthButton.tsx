@@ -2,8 +2,9 @@ import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvide
 import { setIsSignedIn } from "@/app/store/authSlice";
 import { Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
-import React, { FC, Fragment } from "react";
+import React, { FC, Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { CheckBox } from "../settings/checkboxes/CheckBox";
 import { ModalAuthButtonProps } from "./AuthButtonProps";
 
 const PatreonSubscribeButton = React.lazy(() =>
@@ -19,6 +20,11 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
   const { data: session } = useSession();
   const isSignedIn = session?.user?.image && session?.user?.name;
   const digitalGoodsService = useDigitalGoodsService();
+  const [userWantsToSignInWithPatreon, setUserWantsToSignInWithPatreon] =
+    useState<boolean>(false);
+  useEffect(() => {
+    setUserWantsToSignInWithPatreon(!digitalGoodsService); // set to true when the service is not active
+  }, [digitalGoodsService]);
 
   const handleAuth = async () => {
     localStorage.removeItem("signInCheckCount");
@@ -35,15 +41,24 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
       {isSignedIn && !digitalGoodsService && (
         <PatreonSubscribeButton closeModal={closeModal} />
       )}
-      {/* This button should be visible always */}
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        onClick={handleAuth}
-      >
-        {!isSignedIn ? "Sign In with Patreon" : "Sign Out"}
-      </Button>
+      {!isSignedIn && !userWantsToSignInWithPatreon && (
+        <CheckBox
+          label="I subscribed on Web, let me use my subscription"
+          value={userWantsToSignInWithPatreon}
+          onValueChange={setUserWantsToSignInWithPatreon}
+        />
+      )}
+      {(isSignedIn || userWantsToSignInWithPatreon) && (
+        /* This button should be visible always */
+        <Button
+          size="small"
+          variant="contained"
+          color="primary"
+          onClick={handleAuth}
+        >
+          {!isSignedIn ? "Sign In with Patreon" : "Sign Out"}
+        </Button>
+      )}
     </Fragment>
   );
 };

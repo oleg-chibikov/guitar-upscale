@@ -33,16 +33,16 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   openModal,
   handleCloseModal,
 }) => {
-  const premiumFeatures = usePremiumFeatures();
+  const premiumFeatures = usePremiumFeatures() as { [key: string]: string };
   const { data: session } = useSession();
   const { theme } = useSelector(selectUi);
   const digitalGoodsService = useDigitalGoodsService();
   const premiumFeatureNames: string[] = [];
   const disabledFeatureNames: string[] = [];
 
-  Object.entries(premiumFeatures).forEach(([key, value]) => {
-    const featureName = featureNames[key];
-    if (value) {
+  Object.entries(featureNames).forEach(([key, featureName]) => {
+    const premiumFeature = premiumFeatures[key];
+    if (premiumFeature) {
       premiumFeatureNames.push(featureName);
     } else {
       disabledFeatureNames.push(featureName);
