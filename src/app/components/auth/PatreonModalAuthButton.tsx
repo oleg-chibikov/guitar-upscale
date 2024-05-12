@@ -19,13 +19,13 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const isSignedIn = session?.user?.image && session?.user?.name;
-  const digitalGoodsService = useDigitalGoodsService();
-  alert("HasService: " + digitalGoodsService);
+  const hasDigitalGoodsService = useDigitalGoodsService();
+  alert("HasService: " + hasDigitalGoodsService);
   const [userWantsToSignInWithPatreon, setUserWantsToSignInWithPatreon] =
-    useState<boolean>(!digitalGoodsService);
+    useState<boolean>(!hasDigitalGoodsService);
   useEffect(() => {
-    setUserWantsToSignInWithPatreon(!digitalGoodsService); // set to true when the service is not active
-  }, [digitalGoodsService]);
+    setUserWantsToSignInWithPatreon(!hasDigitalGoodsService); // set to true when the service is not active
+  }, [hasDigitalGoodsService]);
 
   const handleAuth = async () => {
     localStorage.removeItem("signInCheckCount");
@@ -40,7 +40,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
   return (
     // This button should not be visible on Android due to Google play billing policy (only Google play Billing is allowed)
     <Fragment>
-      {isSignedIn && !digitalGoodsService && (
+      {isSignedIn && !hasDigitalGoodsService && (
         <PatreonSubscribeButton closeModal={closeModal} />
       )}
       {!isSignedIn && !userWantsToSignInWithPatreon && (

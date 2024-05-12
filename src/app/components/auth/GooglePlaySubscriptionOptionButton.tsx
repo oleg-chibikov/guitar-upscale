@@ -13,12 +13,12 @@ interface GooglePlaySubscriptionOptionButtonProps {
 export const GooglePlaySubscriptionOptionButton: FC<
   GooglePlaySubscriptionOptionButtonProps
 > = ({ subscriptionOption }) => {
-  const digitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
 
   async function makePurchase(itemId: string) {
-    if (!digitalGoodsService) {
+    if (!hasDigitalGoodsService) {
       return;
     }
     // Define the preferred payment method and item ID
@@ -57,6 +57,10 @@ export const GooglePlaySubscriptionOptionButton: FC<
       } else {
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
+        const getDigitalGoodsService = window.getDigitalGoodsService;
+        const digitalGoodsService = await getDigitalGoodsService(
+          "https://play.google.com/billing"
+        );
         digitalGoodsService.consume(purchaseToken);
 
         // Optional: tell the PaymentRequest API the validation was

@@ -16,17 +16,21 @@ export const GooglePlaySubscribeButton: FC<
   GooglePlaySubscribeButtonProps
 > = ({}) => {
   const dispatch = useDispatch();
-  const digitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsService();
   const [subscriptionOptions, setSubscriptionOptions] = useState<
     DigitalGoodsProductDetails[]
   >([]);
 
   useEffect(() => {
-    if (!digitalGoodsService) {
+    if (!hasDigitalGoodsService) {
       return;
     }
     const getSubscriptionOptions = async () => {
       try {
+        const getDigitalGoodsService = window.getDigitalGoodsService;
+        const digitalGoodsService = await getDigitalGoodsService(
+          "https://play.google.com/billing"
+        );
         const details = await digitalGoodsService.getDetails(
           subscriptionItemIds
         );
@@ -41,9 +45,9 @@ export const GooglePlaySubscribeButton: FC<
       }
     };
     getSubscriptionOptions();
-  }, [digitalGoodsService, dispatch]);
+  }, [hasDigitalGoodsService, dispatch]);
 
-  if (!digitalGoodsService) {
+  if (!hasDigitalGoodsService) {
     return null;
   }
 

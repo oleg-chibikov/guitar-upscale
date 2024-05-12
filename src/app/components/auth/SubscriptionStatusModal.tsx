@@ -36,7 +36,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   const premiumFeatures = usePremiumFeatures() as { [key: string]: string };
   const { data: session } = useSession();
   const { theme } = useSelector(selectUi);
-  const digitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsService();
   const premiumFeatureNames: string[] = [];
   const disabledFeatureNames: string[] = [];
 
@@ -108,7 +108,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
           </div>
           <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
             {/* This button is visible only on Android. The user can subscribe or change subscription there */}
-            {digitalGoodsService && <GooglePlaySubscribeButton />}
+            {hasDigitalGoodsService && <GooglePlaySubscribeButton />}
             {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
             <PatreonModalAuthButton closeModal={handleCloseModal} />
