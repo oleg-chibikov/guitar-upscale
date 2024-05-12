@@ -23,6 +23,7 @@ export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
   const [service, setService] = useState<DigitalGoodsService>();
   useEffect(() => {
     const checkAndSetService = async () => {
+      alert("Service: " + ("getDigitalGoodsService" in window));
       if ("getDigitalGoodsService" in window) {
         const getDigitalGoodsService = window.getDigitalGoodsService;
         // Digital Goods API is supported!
