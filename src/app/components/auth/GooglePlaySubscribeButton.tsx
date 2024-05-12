@@ -64,7 +64,6 @@ export const GooglePlaySubscribeButton: FC<
     }
   };
 
-  // TODO: Should list details
   return (
     <ul className="flex flex-col gap-2">
       {subscriptionOptions.map((subscriptionOption) => (

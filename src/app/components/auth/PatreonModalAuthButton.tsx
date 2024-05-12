@@ -21,9 +21,11 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
   const isSignedIn = session?.user?.image && session?.user?.name;
   const digitalGoodsService = useDigitalGoodsService();
   const [userWantsToSignInWithPatreon, setUserWantsToSignInWithPatreon] =
-    useState<boolean>(false);
+    useState<boolean>(!digitalGoodsService);
   useEffect(() => {
     setUserWantsToSignInWithPatreon(!digitalGoodsService); // set to true when the service is not active
+    // TODO
+    alert(digitalGoodsService);
   }, [digitalGoodsService]);
 
   const handleAuth = async () => {
@@ -35,6 +37,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
       await signIn("patreon");
     }
   };
+
   return (
     // This button should not be visible on Android due to Google play billing policy (only Google play Billing is allowed)
     <Fragment>
@@ -43,7 +46,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
       )}
       {!isSignedIn && !userWantsToSignInWithPatreon && (
         <CheckBox
-          label="I subscribed on Web, let me use my subscription"
+          label="I have subscribed on the website, let me use my subscription"
           value={userWantsToSignInWithPatreon}
           onValueChange={setUserWantsToSignInWithPatreon}
         />
