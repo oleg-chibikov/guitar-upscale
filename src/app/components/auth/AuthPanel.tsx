@@ -1,9 +1,7 @@
 "use client";
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { useSessionAuth } from "@/app/hooks/useSessionAuth";
-import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";

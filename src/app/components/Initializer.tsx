@@ -26,6 +26,17 @@ export const Initializer: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    var src = "node_modules/eruda/eruda.js";
+    if (
+      !/eruda=true/.test(window.location.href) &&
+      localStorage.getItem("active-eruda") != "true"
+    )
+      return;
+    document.write("<scr" + 'ipt src="' + src + '"></scr' + "ipt>");
+    document.write("<scr" + "ipt>eruda.init();</scr" + "ipt>");
+  }, []);
+
+  useEffect(() => {
     const remove = () => {
       document.body.removeEventListener("scroll", handleFirstInteraction);
       document.body.removeEventListener("keydown", handleFirstInteraction);
