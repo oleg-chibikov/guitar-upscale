@@ -1,6 +1,8 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { WithChildren } from "../helpers/withChildren";
+import { setAndShowAlert } from "../store/uiSlice";
 
 // Create a context for DigitalGoodsService
 const DigitalGoodsServiceContext = createContext<
@@ -17,6 +19,7 @@ export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
   children,
 }) => {
   const [service, setService] = useState<DigitalGoodsService>();
+  const dispatch = useDispatch();
   useEffect(() => {
     const checkAndSetService = async () => {
       if ("getDigitalGoodsService" in window) {
@@ -28,9 +31,19 @@ export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
             "https://play.google.com/billing"
           );
           setService(service);
+          setAndShowAlert({
+            message: "Got service DigitalGoodsService" + service,
+            isError: false,
+          });
           // Google Play Billing is supported!
         } catch (error) {
-          console.error("Cannot get DigitalGoodsService not available");
+          dispatch(
+            setAndShowAlert({
+              message: "Cannot get DigitalGoodsService",
+              isError: true,
+            })
+          );
+          console.error("Cannot get DigitalGoodsService");
         }
       } else {
         console.log("DigitalGoodsService not available in the current context");
