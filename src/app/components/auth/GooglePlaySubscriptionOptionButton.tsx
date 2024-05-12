@@ -1,9 +1,10 @@
 import { acknowldegeSubscriptionOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
-import { setAndShowAlert } from "@/app/store/uiSlice";
+import { Theme } from "@/app/data/theme";
+import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { Button } from "@mui/material";
 import { FC } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface GooglePlaySubscriptionOptionButtonProps {
   subscriptionOption: DigitalGoodsProductDetails;
@@ -14,6 +15,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
 > = ({ subscriptionOption }) => {
   const digitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
+  const { theme } = useSelector(selectUi);
 
   async function makePurchase(itemId: string) {
     if (!digitalGoodsService) {
@@ -82,15 +84,22 @@ export const GooglePlaySubscriptionOptionButton: FC<
 
   // TODO: UI
   return (
-    <div>
-      {[
-        subscriptionOption.itemId,
-        subscriptionOption.title,
-        JSON.stringify(subscriptionOption.price, undefined, 2),
-        localizedPrice,
-        subscriptionOption.description,
-      ].join("; ")}
-      <Button onClick={() => makePurchase(subscriptionOption.itemId)} />
+    <div
+      className={`flex flex-row gap 2 p-4 ${
+        theme === Theme.Light
+          ? "bg-border_accent-light"
+          : "bg-border_accent-dark"
+      }`}
+    >
+      <p className="text-lg font-semibold mb-2">{subscriptionOption.title}</p>
+      <p className="text-sm text-gray-600 mb-2">
+        {subscriptionOption.description}
+      </p>
+      <p className="text-sm mb-2">Item ID: {subscriptionOption.itemId}</p>
+      <p className="text-sm mb-2">Price: {localizedPrice}</p>
+      <Button onClick={() => makePurchase(subscriptionOption.itemId)}>
+        Purchase
+      </Button>
     </div>
   );
 };
