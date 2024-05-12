@@ -70,6 +70,7 @@ export const GooglePlaySubscribeButton: FC<
 
   return (
     <ul className="flex flex-col gap-2">
+      <strong>Google Play Subscriptions:</strong>
       {subscriptionOptions.map((subscriptionOption) => (
         <GooglePlaySubscriptionOptionButton
           key={subscriptionOption.itemId}
