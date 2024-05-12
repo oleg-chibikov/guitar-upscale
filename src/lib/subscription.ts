@@ -1,6 +1,3 @@
-"use server";
-import "server-only";
-
 import { Session } from "next-auth";
 import { auth } from "./auth";
 
@@ -15,6 +12,7 @@ async function getTierName(
   email: string | null,
   accessToken: string
 ): Promise<string | undefined> {
+  // Checking whitelists
   if (email) {
     if (composerWhitelist.has(email)) {
       return "Composer";
@@ -23,14 +21,17 @@ async function getTierName(
       return "Explorer";
     }
   }
-  const url =
-    "https://www.patreon.com/api/oauth2/v2/identity?include=memberships.currently_entitled_tiers&fields%5Btier%5D=title";
+
+  // TODO: Check google play billing
+
+  // Getting tier name from patreon API
 
   // tiers by priority asc
   const orderedTargetTierIds = ["22790257", "22790278"];
   let tierName: string | undefined;
 
   try {
+    const url = "TODO";
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // accessToken is appended to session using a callback defined in auth.ts
@@ -124,48 +125,3 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   }
   return { session, premiumFeatures: {} };
 }
-
-// {
-//     "data": {
-//         "attributes": {},
-//         "id": "126151233",
-//         "relationships": {
-//             "memberships": {
-//                 "data": [
-//                     {
-//                         "id": "f9a3863d-8a76-42cd-a550-65c6072fc4ca",
-//                         "type": "member"
-//                     }
-//                 ]
-//             }
-//         },
-//         "type": "user"
-//     },
-//     "included": [
-//         {
-//             "attributes": {},
-//             "id": "f9a3863d-8a76-42cd-a550-65c6072fc4ca",
-//             "relationships": {
-//                 "currently_entitled_tiers": {
-//                     "data": [
-//                         {
-//                             "id": "22790257",
-//                             "type": "tier"
-//                         }
-//                     ]
-//                 }
-//             },
-//             "type": "member"
-//         },
-//         {
-//             "attributes": {
-//                 "title": "Explorer"
-//             },
-//             "id": "22790257",
-//             "type": "tier"
-//         }
-//     ],
-//     "links": {
-//         "self": "https://www.patreon.com/api/oauth2/v2/user/126151233"
-//     }
-// }

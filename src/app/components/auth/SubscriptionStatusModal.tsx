@@ -1,12 +1,28 @@
+import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
-import { setIsSignedIn } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import { Avatar, Button, Modal, Slide } from "@mui/material";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Avatar, Modal, Slide } from "@mui/material";
+import { useSession } from "next-auth/react";
+import React, { FC } from "react";
+import { useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
+import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
+
+const GooglePlaySubscribeButton = React.lazy(() =>
+  import("./GooglePlaySubscribeButton").then((module) => ({
+    default: module.GooglePlaySubscribeButton,
+  }))
+);
+
+const featureNames: { [key: string]: string } = {
+  advancedChords: "Advanced chords",
+  melodies: "Melody examples",
+  midiRecorder: "MIDI recording",
+  skinSelection: "Configurable skins",
+  chordDetection: "Chord detection",
+  instruments: "Configurable instruments",
+};
 
 interface SubscriptionStatusModalProps {
   openModal: boolean;
@@ -18,39 +34,20 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   handleCloseModal,
 }) => {
   const premiumFeatures = usePremiumFeatures();
-  const dispatch = useDispatch();
   const { data: session } = useSession();
   const { theme } = useSelector(selectUi);
+  const digitalGoodsService = useDigitalGoodsService();
+  const premiumFeatureNames: string[] = [];
+  const disabledFeatureNames: string[] = [];
 
-  const isSignedIn = session?.user?.image && session?.user?.name;
-
-  const handleAuth = async () => {
-    localStorage.removeItem("signInCheckCount");
-    dispatch(setIsSignedIn(!isSignedIn));
-    if (isSignedIn) {
-      await signOut();
+  Object.entries(premiumFeatures).forEach(([key, value]) => {
+    const featureName = featureNames[key];
+    if (value) {
+      premiumFeatureNames.push(featureName);
     } else {
-      await signIn("patreon");
+      disabledFeatureNames.push(featureName);
     }
-  };
-
-  const premiumFeatureNames = [
-    premiumFeatures.advancedChords && "Advanced chords",
-    premiumFeatures.melodies && "Melody examples",
-    premiumFeatures.midiRecorder && "MIDI recording",
-    premiumFeatures.skinSelection && "Configurable skins",
-    premiumFeatures.chordDetection && "Chord detection",
-    premiumFeatures.instruments && "Configurable instruments",
-  ].filter((x) => x) as string[];
-
-  const disabledFeatureNames = [
-    !premiumFeatures.advancedChords && "Advanced chords",
-    !premiumFeatures.melodies && "Melody examples",
-    !premiumFeatures.midiRecorder && "MIDI recording",
-    !premiumFeatures.skinSelection && "Configurable skins",
-    !premiumFeatures.chordDetection && "Chord detection",
-    !premiumFeatures.instruments && "Configurable instruments",
-  ].filter((x) => x) as string[];
+  });
 
   return (
     <Modal
@@ -110,30 +107,11 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
             </div>
           </div>
           <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
-            {isSignedIn && (
-              <Button
-                size="small"
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  window.open(
-                    "https://patreon.com/guitar_upscale?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink",
-                    "_blank"
-                  );
-                  handleCloseModal(); // Close modal after opening link
-                }}
-              >
-                Change membership plan
-              </Button>
-            )}
-            <Button
-              size="small"
-              variant="contained"
-              color="primary"
-              onClick={handleAuth}
-            >
-              {!isSignedIn ? "Sign In with Patreon" : "Sign Out"}
-            </Button>
+            {/* This button is visible only on Android. The user can subscribe or change subscription there */}
+            {digitalGoodsService && <GooglePlaySubscribeButton />}
+            {/* There should be a way for users to sign in to Patreon if they are
+            already subscribed (they can do it on the Website) */}
+            <PatreonModalAuthButton closeModal={handleCloseModal} />
           </div>
         </section>
       </Slide>
