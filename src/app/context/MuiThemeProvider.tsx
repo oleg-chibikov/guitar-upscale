@@ -25,5 +25,6 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
       },
     },
   });
+
   return <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>;
 };

@@ -25,6 +25,7 @@ export const PremiumFeaturesProvider: React.FC<
   useEffect(() => {
     dispatch(setSubscriptionTier(premiumFeatures.subscriptionTier));
   }, [dispatch, premiumFeatures.subscriptionTier]);
+
   return (
     <PremiumFeaturesContext.Provider value={premiumFeatures}>
       {children}

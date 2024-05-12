@@ -9,11 +9,7 @@ const DigitalGoodsServiceContext = createContext<
 
 // Create a custom hook to access DigitalGoodsService
 export const useDigitalGoodsService = () => {
-  const context = useContext(DigitalGoodsServiceContext);
-  if (!context) {
-    return undefined;
-  }
-  return context;
+  return useContext(DigitalGoodsServiceContext);
 };
 
 // Create a provider component to wrap your app with DigitalGoodsService
@@ -23,7 +19,6 @@ export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
   const [service, setService] = useState<DigitalGoodsService>();
   useEffect(() => {
     const checkAndSetService = async () => {
-      alert("Service: " + ("getDigitalGoodsService" in window));
       if ("getDigitalGoodsService" in window) {
         const getDigitalGoodsService = window.getDigitalGoodsService;
         // Digital Goods API is supported!
@@ -44,6 +39,7 @@ export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
 
     checkAndSetService();
   }, []);
+
   return (
     <DigitalGoodsServiceContext.Provider value={service}>
       {children}
