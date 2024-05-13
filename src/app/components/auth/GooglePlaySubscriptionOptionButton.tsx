@@ -85,7 +85,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         await paymentResponse.complete("success");
         dispatch(
           setAndShowAlert({
-            message: `Payment successful! Subscribed to ${title}`,
+            message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
       }
