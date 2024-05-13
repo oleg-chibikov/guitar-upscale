@@ -12,7 +12,7 @@ const tierMap = new Map<string, Tier>([
 ]);
 
 interface GooglePlaySubscribeSectionProps {
-  onOptionSelected: (option: Tier) => void;
+  onOptionSelected: (option?: Tier) => void;
 }
 
 export const GooglePlaySubscribeSection: FC<
@@ -63,8 +63,13 @@ export const GooglePlaySubscribeSection: FC<
         <GooglePlaySubscriptionOptionButton
           isSelected={selectedOption === subscriptionOption}
           onClick={(subscriptionOption) => {
-            setSelectedOption(subscriptionOption);
-            onOptionSelected(tierMap.get(subscriptionOption.itemId)!);
+            if (subscriptionOption === selectedOption) {
+              setSelectedOption(undefined);
+              onOptionSelected(undefined);
+            } else {
+              setSelectedOption(subscriptionOption);
+              onOptionSelected(tierMap.get(subscriptionOption.itemId)!);
+            }
           }}
           key={subscriptionOption.itemId}
           subscriptionOption={subscriptionOption}
