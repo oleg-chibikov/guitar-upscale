@@ -2,6 +2,7 @@ import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvide
 import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Tier } from "@/lib/tiers";
+import { LinearProgress } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
@@ -21,6 +22,7 @@ export const GooglePlaySubscribeSection: FC<
   const dispatch = useDispatch();
   const [selectedOption, setSelectedOption] =
     useState<DigitalGoodsProductDetails>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const hasDigitalGoodsService = useDigitalGoodsService();
   const [subscriptionOptions, setSubscriptionOptions] = useState<
     DigitalGoodsProductDetails[]
@@ -32,6 +34,7 @@ export const GooglePlaySubscribeSection: FC<
     }
 
     const getSubscriptionOptions = async () => {
+      setIsLoading(true);
       try {
         const getDigitalGoodsService = window.getDigitalGoodsService;
         const digitalGoodsService = await getDigitalGoodsService(
@@ -48,6 +51,8 @@ export const GooglePlaySubscribeSection: FC<
             alertType: AlertType.Error,
           })
         );
+      } finally {
+        setIsLoading(false);
       }
     };
     getSubscriptionOptions();
@@ -55,6 +60,10 @@ export const GooglePlaySubscribeSection: FC<
 
   if (!hasDigitalGoodsService) {
     return null;
+  }
+
+  if (isLoading) {
+    return <LinearProgress />;
   }
 
   return (

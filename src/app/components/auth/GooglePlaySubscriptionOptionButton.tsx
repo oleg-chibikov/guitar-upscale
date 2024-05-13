@@ -1,6 +1,6 @@
 import {
   AcknowledgeResult,
-  acknowldegeSubscriptionOnBackend,
+  acknowledgePurchasesOnBackend,
 } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
@@ -56,16 +56,18 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const acknowledgeResult = await acknowldegeSubscriptionOnBackend({
-        itemId: subscriptionOption.itemId,
-        purchaseToken,
-      });
+      const acknowledgeResult = await acknowledgePurchasesOnBackend([
+        {
+          itemId: subscriptionOption.itemId,
+          purchaseToken,
+        },
+      ]);
       if (acknowledgeResult === AcknowledgeResult.Error) {
         await paymentResponse.complete("fail");
         dispatch(
           setAndShowAlert({
             message:
-              "Cannot acknowledge subscription. It will be auto refunded in 3 days by Google",
+              "Cannot acknowledge the purchase. It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)",
             alertType: AlertType.Error,
           })
         );

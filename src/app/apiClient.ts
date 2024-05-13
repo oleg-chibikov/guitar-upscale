@@ -5,32 +5,27 @@ export enum AcknowledgeResult {
   Error,
 }
 
-export async function acknowldegeSubscriptionOnBackend(
-  params: PurchaseParams
+export async function acknowledgePurchasesOnBackend(
+  paramsList: PurchaseParams[]
 ): Promise<AcknowledgeResult> {
-  const { itemId, purchaseToken } = params;
-
   try {
-    const response = await fetch(
-      `/api/googlePlayBillingSubscription?itemId=${itemId}&purchaseToken=${purchaseToken}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`/api/purchases/acknowledge`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ paramsList }),
+    });
 
     if (!response.ok) {
       const responseData = await response.json(); // Extract error message from response
-      console.log("Error while purchasing", responseData);
+      console.log("Error while acknowledging subscriptions", responseData);
       return AcknowledgeResult.Error;
     }
 
     return AcknowledgeResult.Success;
   } catch (error: any) {
-    console.log("Error while purchasing", error);
-    // Construct a custom error message
+    console.log("Error while acknowledging subscriptions", error);
     return AcknowledgeResult.Error;
   }
 }
