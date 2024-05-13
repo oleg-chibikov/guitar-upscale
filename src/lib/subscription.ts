@@ -23,8 +23,6 @@ async function getTierName(
     }
   }
 
-  // TODO: Check google play billing
-
   // Getting tier name from patreon API
 
   // tiers by priority asc
@@ -83,26 +81,46 @@ export type PremiumFeatures = {
 
 export type PremiumFeatureKeys = keyof PremiumFeatures;
 
+const explorerPremiumFeatures: PremiumFeatures = {
+  melodies: true,
+  advancedChords: true,
+  instruments: true,
+  reverbStrength: true,
+  playbackTypeSelection: true,
+  chordDetection: true,
+};
+
+const composerPremiumFeatures: PremiumFeatures = {
+  ...explorerPremiumFeatures,
+  midiRecorder: true,
+  toggleMetronomeWhenRecordingCheckbox: true,
+  skinSelection: true,
+};
+
+export const applyTierToResult = (result: any, subscriptionTier?: Tier) => {
+  if (subscriptionTier === "Explorer") {
+    return {
+      ...result,
+      premiumFeatures: explorerPremiumFeatures,
+      subscriptionTier,
+    };
+  }
+
+  if (subscriptionTier === "Composer") {
+    return {
+      ...result,
+      premiumFeatures: composerPremiumFeatures,
+      subscriptionTier,
+    };
+  }
+
+  return result;
+};
+
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
   "use server";
   // Determine premium status
   const session = await auth();
-
-  const explorerPremiumFeatures: PremiumFeatures = {
-    melodies: true,
-    advancedChords: true,
-    instruments: true,
-    reverbStrength: true,
-    playbackTypeSelection: true,
-    chordDetection: true,
-  };
-
-  const composerPremiumFeatures: PremiumFeatures = {
-    ...explorerPremiumFeatures,
-    midiRecorder: true,
-    toggleMetronomeWhenRecordingCheckbox: true,
-    skinSelection: true,
-  };
 
   const result: PremiumFeaturesWithSession = {
     session,
@@ -119,22 +137,8 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
     session.user?.email ?? null,
     session.accessToken
   );
+
   console.log("Subscription tier", subscriptionTier);
 
-  if (subscriptionTier === "Explorer") {
-    return {
-      ...result,
-      premiumFeatures: explorerPremiumFeatures,
-      subscriptionTier,
-    };
-  }
-
-  if (subscriptionTier === "Composer") {
-    return {
-      ...result,
-      premiumFeatures: composerPremiumFeatures,
-      subscriptionTier,
-    };
-  }
-  return result;
+  return applyTierToResult(result, subscriptionTier);
 }

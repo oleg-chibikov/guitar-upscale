@@ -31,11 +31,9 @@ const handle = async (
   const { items } = req.body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
-    res
-      .status(400)
-      .json({
-        error: "Invalid request body. 'items' array is missing or empty.",
-      });
+    res.status(400).json({
+      error: "Invalid request body. 'items' array is missing or empty.",
+    });
     return;
   }
 
@@ -75,7 +73,7 @@ const handle = async (
 
   console.log("Acknowledged subscriptions");
 
-  res.status(200).json({ subscriptions });
+  res.status(200);
 };
 
 export default apiHandler({
