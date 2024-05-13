@@ -2,7 +2,7 @@ import { selectAuth } from "@/app/store/authSlice";
 import { TierKey } from "@/lib/tiers";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { acknowledgePurchaseOnBackend } from "../apiClient";
+import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 
@@ -30,6 +30,8 @@ export const useGooglePlayAuth = () => {
         return;
       }
       if (subscriptionTier) {
+        // TODO: We need to check google play purchases anyway and if there is no subscription anymore - remove the cookie and reload
+        // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
         console.log(
           "Subscription tier available, no need to list purchases",
           subscriptionTier
@@ -56,17 +58,20 @@ export const useGooglePlayAuth = () => {
       const existingPurchases = await digitalGoodsService.listPurchases();
       if (existingPurchases.length) {
         const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
-        await acknowledgePurchaseOnBackend({
+        const acknowledgeResult = await acknowledgePurchaseOnBackend({
           itemId: purchaseToProcess.itemId as TierKey,
           purchaseToken: purchaseToProcess.purchaseToken,
         });
-        console.log("Reloading page");
-        // check to avoid endless reloads
-        localStorage.setItem(
-          "googlePlaySignInCheckCount",
-          (signInCheckCount + 1).toString()
-        );
-        location.reload(); // this should take the subscriptionTier from cookie and reload page
+
+        if (acknowledgeResult === AcknowledgeResult.Success) {
+          console.log("Reloading page");
+          // check to avoid endless reloads
+          localStorage.setItem(
+            "googlePlaySignInCheckCount",
+            (signInCheckCount + 1).toString()
+          );
+          location.reload(); // this should take the subscriptionTier from cookie and reload page
+        }
       }
     };
     listGooglePlayPurchases();

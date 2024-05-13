@@ -87,6 +87,10 @@ export const GooglePlaySubscriptionOptionButton: FC<
             message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
+        console.log("Reloading page");
+        // check to avoid endless reloads
+        localStorage.setItem("googlePlaySignInCheckCount", (1).toString());
+        location.reload(); // this should take the subscriptionTier from cookie and reload page
       }
     } catch (e) {
       // The purchase failed, and we can handle the failure here.
