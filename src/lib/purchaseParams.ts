@@ -11,7 +11,8 @@ export const setSubscriptionCookie = (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  setCookie("subscriptionData", params.itemId + "|" + params.purchaseToken, {
+  const value = params.itemId + "|" + params.purchaseToken;
+  setCookie("subscriptionData", value, {
     req,
     res,
     maxAge: 60 * 60 * 24,
@@ -19,13 +20,16 @@ export const setSubscriptionCookie = (
     secure: true,
     httpOnly: true,
   });
+  console.log("Subscription cookie set", value);
 };
 
 export const getDataFromSubscriptionCookie = () => {
   const value = getCookie("subscriptionData");
   if (!value) {
+    console.log("No value in subscription cookie");
     return undefined;
   }
+  console.log("Value in subscription cookie", value);
   const parts = value.split("|");
   return { itemId: parts[0], purchaseToken: parts[1] } as PurchaseParams;
 };

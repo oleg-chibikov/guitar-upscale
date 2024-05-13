@@ -30,7 +30,8 @@ const getTierFromPatreonApi = async (accessToken: string) => {
   let tierName: Tier | undefined;
 
   try {
-    const url = "TODO";
+    const url =
+      "https://www.patreon.com/api/oauth2/v2/identity?include=memberships.currently_entitled_tiers&fields%5Btier%5D=title";
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // accessToken is appended to session using a callback defined in auth.ts
@@ -42,7 +43,9 @@ const getTierFromPatreonApi = async (accessToken: string) => {
     }
 
     const responseData = await response.json();
-    //console.log(responseData);
+
+    console.log("Patreon API result", responseData);
+
     const includedTiers = responseData.included?.filter(
       (item: any) =>
         item.type === "tier" && orderedTargetTierIds.includes(item.id)
@@ -80,17 +83,22 @@ async function getTierName(
   tier = getTierFromWhitelist(email);
 
   if (tier) {
+    console.log("Got tier from whitelist", tier);
     return tier;
   }
 
   tier = await getGooglePlaySubscriptionTierFromCookie();
   if (tier) {
+    console.log("Got tier from subscription cookie", tier);
     return tier;
   }
 
   tier = await getTierFromPatreonApi(accessToken);
 
-  return tier;
+  if (tier) {
+    console.log("Got tier from patreon API", tier);
+    return tier;
+  }
 }
 
 export type PremiumFeaturesWithSession = {
@@ -151,9 +159,7 @@ export const applyTierToResult = (result: any, subscriptionTier?: Tier) => {
   return result;
 };
 
-export async function getPremiumFeatures(
-  purchaseToken?: string
-): Promise<PremiumFeaturesWithSession> {
+export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
   "use server";
   // Determine premium status
   const session = await auth();
@@ -165,13 +171,9 @@ export async function getPremiumFeatures(
     composerPremiumFeatures,
   };
 
-  if (!session?.accessToken) {
-    return result;
-  }
-
   const subscriptionTier = await getTierName(
-    session.user?.email ?? null,
-    session.accessToken
+    session?.user?.email ?? null,
+    session?.accessToken
   );
 
   console.log("Subscription tier", subscriptionTier);
