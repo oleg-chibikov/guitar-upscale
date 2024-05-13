@@ -5,27 +5,30 @@ export enum AcknowledgeResult {
   Error,
 }
 
-export async function acknowledgePurchasesOnBackend(
-  paramsList: PurchaseParams[]
+export async function acknowledgePurchaseOnBackend(
+  params: PurchaseParams
 ): Promise<AcknowledgeResult> {
+  const { itemId, purchaseToken } = params;
   try {
-    const response = await fetch(`/api/purchases/acknowledge`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ paramsList }),
-    });
+    const response = await fetch(
+      `/api/purchases/acknowledge?itemId=${itemId}&purchaseToken=${purchaseToken}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const responseData = await response.json(); // Extract error message from response
-      console.log("Error while acknowledging subscriptions", responseData);
+      console.error("Error while acknowledging purchase", responseData);
       return AcknowledgeResult.Error;
     }
 
     return AcknowledgeResult.Success;
   } catch (error: any) {
-    console.log("Error while acknowledging subscriptions", error);
+    console.error("Error while acknowledging purchase", error);
     return AcknowledgeResult.Error;
   }
 }

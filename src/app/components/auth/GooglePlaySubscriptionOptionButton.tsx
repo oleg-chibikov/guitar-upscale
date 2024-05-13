@@ -1,6 +1,6 @@
 import {
   AcknowledgeResult,
-  acknowledgePurchasesOnBackend,
+  acknowledgePurchaseOnBackend,
 } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
@@ -56,7 +56,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const acknowledgeResult = await acknowledgePurchasesOnBackend([
+      const acknowledgeResult = await acknowledgePurchaseOnBackend([
         {
           itemId: subscriptionOption.itemId,
           purchaseToken,

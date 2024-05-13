@@ -1,11 +1,11 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionPurchase } from "@/lib/billing";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { PurchaseParams } from "../../../lib/purchaseParams";
+import { PurchaseParams } from "@/lib/purchaseParams";
 import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
-} from "../../../lib/purchases";
+} from "@/lib/purchases";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 type ResponseData = {
   subscription?: SubscriptionPurchase;
@@ -28,52 +28,41 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const { items } = req.body;
+  try {
+    const itemId = validateParameter(req.query.itemId, "itemId", res);
 
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    res.status(400).json({
-      error: "Invalid request body. 'items' array is missing or empty.",
-    });
-    return;
-  }
-
-  const purchaseParamsList: PurchaseParams[] = [];
-
-  for (const item of items) {
-    const itemId = validateParameter(item.itemId, "itemId", res);
     const purchaseToken = validateParameter(
-      item.purchaseToken,
+      req.query.purchaseToken,
       "purchaseToken",
       res
     );
 
     if (itemId === null || purchaseToken === null) {
-      return; // Exit early if validation fails for any item
+      return; // Exit early if validation fails
     }
 
     const params: PurchaseParams = { itemId, purchaseToken };
-    purchaseParamsList.push(params);
+
+    console.log("Getting subscription");
+
+    const subscription = await fetchSubscriptionPurchase(params);
+
+    console.log("Got subscription", subscription);
+
+    // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
+
+    console.log("Acknowledging subscription");
+    await acknowledgeSubscriptionPurchase(params);
+
+    // TODO: After sub is acknowledged we need to grant the necessary permissions (set the subscription tier like Patreon does). Can we make sure sub belongs to the user without storing the users here?
+    // We need to add some state to make sure subscription.ts / getTierName uses it. This state should be also set when the app loads
+
+    console.log("Acknowledged subscription");
+
+    res.status(200);
+  } finally {
+    res.end(); // End the response
   }
-
-  console.log("Getting subscription");
-
-  const subscriptionPromises = purchaseParamsList.map(
-    fetchSubscriptionPurchase
-  );
-  const subscriptions = await Promise.all(subscriptionPromises);
-
-  console.log("Got subscriptions", subscriptions);
-
-  // Assuming acknowledgeSubscriptionPurchase can handle multiple subscriptions at once
-  console.log("Acknowledging subscriptions");
-  const acknowledgePromises = purchaseParamsList.map(
-    acknowledgeSubscriptionPurchase
-  );
-  await Promise.all(acknowledgePromises);
-
-  console.log("Acknowledged subscriptions");
-
-  res.status(200);
 };
 
 export default apiHandler({
