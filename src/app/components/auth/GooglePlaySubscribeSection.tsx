@@ -10,6 +10,7 @@ const tierMap = new Map<string, Tier>([
   ["guitar_upscale.composer", "Composer"],
   ["guitar_upscale.explorer", "Explorer"],
 ]);
+
 interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option: Tier) => void;
 }

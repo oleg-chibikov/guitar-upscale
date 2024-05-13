@@ -18,13 +18,13 @@ const GooglePlaySubscribeSection = React.lazy(() =>
   }))
 );
 
-const featureNames: { [key: string]: string } = {
+const featureNames = {
   advancedChords: "Advanced chords",
   melodies: "Melody examples",
-  midiRecorder: "MIDI recording",
-  skinSelection: "Configurable skins",
   chordDetection: "Chord detection",
   instruments: "Configurable instruments",
+  midiRecorder: "MIDI recording",
+  skinSelection: "Configurable skins",
 };
 
 interface SubscriptionStatusModalProps {
@@ -49,18 +49,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   const { theme } = useSelector(selectUi);
   const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const premiumFeatureNames: string[] = [];
-  const disabledFeatureNames: string[] = [];
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
-
-  Object.entries(featureNames).forEach(([key, featureName]) => {
-    const premiumFeature = keyValueCurrentFeatures[key];
-    if (premiumFeature) {
-      premiumFeatureNames.push(featureName);
-    } else {
-      disabledFeatureNames.push(featureName);
-    }
-  });
 
   const renderPossibleFeature = (x: PremiumFeatureKeys) => {
     if (
@@ -71,6 +60,14 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     }
     return null;
   };
+
+  const renderCurrentFeature = (x: PremiumFeatureKeys) => (
+    <span
+      className={keyValueCurrentFeatures[x] ? "text-green-500" : "text-red-500"}
+    >
+      {keyValueCurrentFeatures[x] ? "✓" : "⨯"}
+    </span>
+  );
 
   return (
     <Modal
@@ -112,16 +109,11 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                 <strong>Premium features:</strong>
                 {
                   <ul className="flex flex-col items-start">
-                    {premiumFeatureNames.map((x) => (
-                      <li key={x}>
-                        <span className="text-green-500">✓</span> {x}
-                        {renderPossibleFeature(x as PremiumFeatureKeys)}
-                      </li>
-                    ))}
-                    {disabledFeatureNames.map((x) => (
-                      <li key={x}>
-                        <span className="text-red-500">⨯</span> {x}
-                        {renderPossibleFeature(x as PremiumFeatureKeys)}
+                    {Object.entries(featureNames).map(([key, value]) => (
+                      <li key={key} className="flex flex-row gap-2">
+                        {renderCurrentFeature(key as PremiumFeatureKeys)}
+                        {value}
+                        {renderPossibleFeature(key as PremiumFeatureKeys)}
                       </li>
                     ))}
                   </ul>
