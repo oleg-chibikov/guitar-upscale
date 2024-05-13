@@ -56,12 +56,10 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const acknowledgeResult = await acknowledgePurchaseOnBackend([
-        {
-          itemId: subscriptionOption.itemId,
-          purchaseToken,
-        },
-      ]);
+      const acknowledgeResult = await acknowledgePurchaseOnBackend({
+        itemId: subscriptionOption.itemId,
+        purchaseToken,
+      });
       if (acknowledgeResult === AcknowledgeResult.Error) {
         await paymentResponse.complete("fail");
         dispatch(
