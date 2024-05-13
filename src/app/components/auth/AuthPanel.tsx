@@ -3,6 +3,7 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { useGooglePlayAuth } from "@/app/hooks/useGooglePlayAuth";
 import { useSessionAuth } from "@/app/hooks/useSessionAuth";
+import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -23,6 +24,8 @@ export const AuthPanel: React.FC = () => {
   const [modalOpened, setModalOpened] = useState(false);
   const { data: session } = useSession();
   const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const { subscriptionTier } = useSelector(selectAuth);
+
   useSessionAuth();
   useGooglePlayAuth();
 
@@ -47,10 +50,10 @@ export const AuthPanel: React.FC = () => {
         }`}
          z-20 top-1`}
     >
-      {!session?.user ? (
-        <OpenAuthModalButton openModal={handleOpenModal} />
+      {session?.user || subscriptionTier ? (
+        <SignedInButton openModal={handleOpenModal} user={session?.user} />
       ) : (
-        <SignedInButton openModal={handleOpenModal} user={session.user} />
+        <OpenAuthModalButton openModal={handleOpenModal} />
       )}
 
       {modalOpened && (

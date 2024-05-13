@@ -64,17 +64,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         itemId: subscriptionOption.itemId as TierKey,
         purchaseToken,
       });
-      if (acknowledgeResult === AcknowledgeResult.Error) {
-        await paymentResponse.complete("fail");
-        dispatch(
-          setAndShowAlert({
-            message:
-              "Cannot acknowledge the purchase. It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)",
-            alertType: AlertType.Error,
-          })
-        );
-        return;
-      } else {
+      if (acknowledgeResult === AcknowledgeResult.Success) {
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
         const digitalGoodsService = await buildDigitalGoodsService();
@@ -91,6 +81,16 @@ export const GooglePlaySubscriptionOptionButton: FC<
         );
         console.log("Reloading page");
         reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+      } else {
+        await paymentResponse.complete("fail");
+        dispatch(
+          setAndShowAlert({
+            message:
+              "Cannot acknowledge the purchase. It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)",
+            alertType: AlertType.Error,
+          })
+        );
+        return;
       }
     } catch (e) {
       // The purchase failed, and we can handle the failure here.

@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { AuthButtonProps } from "./AuthButtonProps";
 
 export const SignedInButton: FC<
-  AuthButtonProps & { user: Session["user"] }
+  AuthButtonProps & { user?: Session["user"] }
 > = ({ openModal, user }) => {
   const { subscriptionTier } = useSelector(selectAuth);
   const { chordsDisplayMode, theme } = useSelector(selectUi);
@@ -22,9 +22,7 @@ export const SignedInButton: FC<
           : "flex-row"
       } gap-0`}
       style={{ minWidth: 0, padding: 4 }} // override MUI value
-      title={
-        (user ? `${user.name}: ${user.email} - ` : "") + subscriptionTier
-      }
+      title={(user ? `${user.name}: ${user.email} - ` : "") + subscriptionTier}
       onClick={openModal} // Open modal on avatar click
     >
       <span
