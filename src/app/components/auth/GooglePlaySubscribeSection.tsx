@@ -1,7 +1,8 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
+import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { Tier, tierMap } from "@/lib/tiers";
+import { Tier, TierKey, tierMap } from "@/lib/tiers";
 import { LinearProgress } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -31,10 +32,7 @@ export const GooglePlaySubscribeSection: FC<
     const getSubscriptionOptions = async () => {
       setIsLoading(true);
       try {
-        const getDigitalGoodsService = window.getDigitalGoodsService;
-        const digitalGoodsService = await getDigitalGoodsService(
-          "https://play.google.com/billing"
-        );
+        const digitalGoodsService = await buildDigitalGoodsService();
         const details = await digitalGoodsService.getDetails(
           Array.from(tierMap.keys())
         );
@@ -72,7 +70,9 @@ export const GooglePlaySubscribeSection: FC<
               onOptionSelected(undefined);
             } else {
               setSelectedOption(subscriptionOption);
-              onOptionSelected(tierMap.get(subscriptionOption.itemId)!);
+              onOptionSelected(
+                tierMap.get(subscriptionOption.itemId as TierKey)
+              );
             }
           }}
           key={subscriptionOption.itemId}

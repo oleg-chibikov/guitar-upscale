@@ -1,8 +1,9 @@
 import { getCookie, setCookie } from "cookies-next";
 import { NextApiRequest, NextApiResponse } from "next/types";
+import { TierKey } from "./tiers";
 
 export interface PurchaseParams {
-  itemId: string; // sku
+  itemId: TierKey; // sku
   purchaseToken: string;
 }
 

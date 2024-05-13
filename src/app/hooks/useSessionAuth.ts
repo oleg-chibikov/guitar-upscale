@@ -12,9 +12,9 @@ export const useSessionAuth = () => {
   const { isSignedIn } = useSelector(selectAuth);
 
   useEffect(() => {
-    const signInCheckoutRaw = localStorage.getItem("signInCheckCount");
+    const signInCheckCountRaw = localStorage.getItem("signInCheckCount");
     const signInCheckCount =
-      signInCheckoutRaw !== null ? parseInt(signInCheckoutRaw) : 0;
+      signInCheckCountRaw !== null ? parseInt(signInCheckCountRaw) : 0;
     console.log("Session status", session, isSignedIn, signInCheckCount);
 
     const checkError = () => {

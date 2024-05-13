@@ -22,25 +22,6 @@ export const Initializer: React.FC = () => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
 
-  // // TODO: This should be done in a Root context in order to set the right permissions straight away
-  // const listPurchases = async (service: DigitalGoodsService) => {
-  //   const existingPurchases = await service.listPurchases();
-  //   for (const p of existingPurchases) {
-  //     const data = await acknowldegeSubscriptionOnBackend({ ...p });
-  //     if (data.error) {
-  //       dispatch(
-  //         setAndShowAlert({ message: data.error, alertType: AlertType.Error })
-  //       );
-  //       return;
-  //     } else {
-  //       console.log(`Users has entitlement for ${p.itemId}`);
-  //       // TODO: WE NEED TO GET SUBSCRIPTION STATUS ON BACKEND WITHOUT STORING THE USER. BUT HOW TO DO THAT AS DigitalGoodsService is only available on frontend?
-  //     }
-  //     // Update the UI with items the user is already entitled to.
-  //     console.log(`Users has entitlement for ${p.itemId}`);
-  //   }
-  // };
-
   useEffect(() => {
     dispatch(init());
   }, [dispatch]);

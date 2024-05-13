@@ -1,6 +1,7 @@
 "use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
+import { useGooglePlayAuth } from "@/app/hooks/useGooglePlayAuth";
 import { useSessionAuth } from "@/app/hooks/useSessionAuth";
 import { selectUi } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
@@ -23,6 +24,7 @@ export const AuthPanel: React.FC = () => {
   const { data: session } = useSession();
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   useSessionAuth();
+  useGooglePlayAuth();
 
   const handleCloseModal = () => {
     setOpenModal(false);

@@ -73,10 +73,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       } else {
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
-        const getDigitalGoodsService = window.getDigitalGoodsService;
-        const digitalGoodsService = await getDigitalGoodsService(
-          "https://play.google.com/billing"
-        );
+        const digitalGoodsService = await buildDigitalGoodsService();
         digitalGoodsService.consume(purchaseToken);
 
         // Optional: tell the PaymentRequest API the validation was

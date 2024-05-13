@@ -10,7 +10,7 @@ export const getAuthConfig = () => {
   const clientSecret = process.env.PATREON_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error("No patreon keys detected. Developer to fix");
+    throw new Error("No Patreon keys detected. Developer to fix");
   }
 
   const patreonProvider = PatreonProvider({
