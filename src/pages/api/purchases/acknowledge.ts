@@ -5,6 +5,7 @@ import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
 } from "@/lib/purchases";
+import { TierKey } from "@/lib/tiers";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type ResponseData = {
@@ -12,16 +13,16 @@ type ResponseData = {
   error?: string;
 };
 
-function validateParameter(
+function validateParameter<T>(
   param: unknown,
   paramName: string,
   res: NextApiResponse
-): string | null {
+): T | null {
   if (typeof param !== "string") {
     res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
     return null; // Validation failed
   }
-  return param as string; // Validation passed
+  return param as T; // Validation passed
 }
 
 const handle = async (
@@ -29,9 +30,9 @@ const handle = async (
   res: NextApiResponse<ResponseData>
 ) => {
   try {
-    const itemId = validateParameter(req.query.itemId, "itemId", res);
+    const itemId = validateParameter<TierKey>(req.query.itemId, "itemId", res);
 
-    const purchaseToken = validateParameter(
+    const purchaseToken = validateParameter<string>(
       req.query.purchaseToken,
       "purchaseToken",
       res
