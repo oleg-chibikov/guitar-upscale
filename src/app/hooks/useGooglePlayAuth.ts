@@ -1,9 +1,7 @@
-import { selectAuth } from "@/app/store/authSlice";
 import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
 import { TierKey } from "@/lib/tiers";
 import { deleteCookie } from "cookies-next";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
@@ -32,7 +30,6 @@ const clearSubscriptionCookie = () => {
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const { subscriptionTier } = useSelector(selectAuth);
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
 
   useEffect(() => {
