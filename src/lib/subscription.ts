@@ -25,6 +25,8 @@ const getGooglePlaySubscriptionTierFromCookie = async () => {
 const getTierFromPatreonApi = async (accessToken: string) => {
   // Getting tier name from patreon API
 
+  console.log("Getting tier from Patreon api using token", accessToken);
+
   // tiers by priority asc
   const orderedTargetTierIds = ["22790257", "22790278"];
   let tierName: Tier | undefined;
@@ -62,7 +64,7 @@ const getTierFromPatreonApi = async (accessToken: string) => {
   }
 };
 
-const getTierFromWhitelist = (email: string | null) => {
+const getTierFromWhitelist = (email?: string) => {
   if (email) {
     if (composerWhitelist.has(email)) {
       return "Composer";
@@ -74,8 +76,8 @@ const getTierFromWhitelist = (email: string | null) => {
 };
 
 async function getTierName(
-  email: string | null,
-  accessToken: string
+  email?: string,
+  accessToken?: string
 ): Promise<Tier | undefined> {
   // Checking whitelists
   let tier: Tier | undefined;
@@ -93,12 +95,18 @@ async function getTierName(
     return tier;
   }
 
+  if (!accessToken) {
+    return undefined;
+  }
+
   tier = await getTierFromPatreonApi(accessToken);
 
   if (tier) {
     console.log("Got tier from patreon API", tier);
     return tier;
   }
+
+  return undefined;
 }
 
 export type PremiumFeaturesWithSession = {
@@ -172,7 +180,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   };
 
   const subscriptionTier = await getTierName(
-    session?.user?.email ?? null,
+    session?.user?.email ?? undefined,
     session?.accessToken
   );
 

@@ -1,13 +1,25 @@
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
+import PatreonProvider from "next-auth/providers/patreon";
+
+// https://www.patreon.com/portal/registration/register-clients
+// set the callback uris to http://localhost:3000/api/auth/callback/patreon https://guitar-upscale.org.uk/api/auth/callback/patreon
 
 export const getAuthConfig = () => {
-  const clientId = "TODO";
-  const clientSecret = "TODO";
+  const clientId = process.env.PATREON_CLIENT_ID;
+  const clientSecret = process.env.PATREON_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error("No keys detected. Developer to fix");
+    throw new Error("No patreon keys detected. Developer to fix");
   }
+
+  const patreonProvider = PatreonProvider({
+    clientId,
+    clientSecret,
+    authorization: {
+      params: {}, // setting a scope to identity here leads to 403 from Patreon in some cases
+    },
+  });
 
   // You'll need to import and pass this
   // to `NextAuth` in `app/api/auth/[...nextauth]/route.ts`
@@ -30,7 +42,7 @@ export const getAuthConfig = () => {
         return token;
       },
     },
-    providers: [],
+    providers: [patreonProvider], // rest of your config
   } satisfies NextAuthOptions;
 };
 
