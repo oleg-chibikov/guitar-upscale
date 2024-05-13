@@ -1,5 +1,6 @@
 import { acknowldegeSubscriptionOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { Button } from "@mui/material";
@@ -54,7 +55,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
       });
       if (data.error) {
         await paymentResponse.complete("fail");
-        dispatch(setAndShowAlert({ message: data.error, isError: true }));
+        dispatch(
+          setAndShowAlert({ message: data.error, alertType: AlertType.Error })
+        );
         return;
       } else {
         // Optional: consume the purchase, allowing the user to purchase
@@ -78,7 +81,14 @@ export const GooglePlaySubscriptionOptionButton: FC<
     } catch (e) {
       // The purchase failed, and we can handle the failure here.
       // AbortError usually means a user cancellation
-      dispatch(setAndShowAlert({ message: "Aborted " + e, isError: true }));
+
+      console.log(e);
+      dispatch(
+        setAndShowAlert({
+          message: "Subscribe cancelled",
+          alertType: AlertType.Warning,
+        })
+      );
     }
   }
 
@@ -108,7 +118,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           subscriptionOption.title.indexOf(" (")
         )}
       </p>
-      <p className="text-sm">{subscriptionOption.description}</p>
+      <p className="text-sm grow">{subscriptionOption.description}</p>
       <p className="text-sm">{localizedPrice}</p>
       <Button
         size="small"

@@ -1,3 +1,4 @@
+import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
@@ -113,7 +114,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                 dispatch(
                   setAndShowAlert({
                     message: chordNames || "No matching chords",
-                    isError: !chordNames,
+                    alertType: !chordNames
+                      ? AlertType.Warning
+                      : AlertType.Success,
                   })
                 );
               }

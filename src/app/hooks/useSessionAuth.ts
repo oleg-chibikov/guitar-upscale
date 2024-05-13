@@ -3,6 +3,7 @@ import { setAndShowAlert } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { AlertType } from "../data/alertType";
 
 // This hook reloads the page if the session status mismatches with the state
 export const useSessionAuth = () => {
@@ -23,7 +24,10 @@ export const useSessionAuth = () => {
       if (errorParam) {
         console.log("Query string container error");
         dispatch(
-          setAndShowAlert({ message: "Authentication error", isError: true })
+          setAndShowAlert({
+            message: "Authentication error",
+            alertType: AlertType.Error,
+          })
         ); // Assuming you have an action to show the alert with a message
         const newUrl = window.location.pathname; // Assuming you want to keep the same path but update the query string
         window.history.replaceState(null, "", newUrl); // Change the URL without reloading

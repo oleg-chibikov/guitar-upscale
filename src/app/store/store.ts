@@ -58,7 +58,7 @@ const persistConfig = {
         delete newState.chords;
         delete newState.showAlert;
         delete newState.alertMessage;
-        delete newState.alertIsError;
+        delete newState.alertType;
         delete newState.isMetronomeActive;
         delete newState.chordIsBeingDetected;
         delete newState.isRecording;

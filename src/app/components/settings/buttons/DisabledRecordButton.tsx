@@ -1,4 +1,5 @@
 "use client";
+import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
@@ -19,7 +20,12 @@ export const DisabledRecordButton: React.FC = (props) => {
       }
       tooltip={noPremiumWarning}
       onPress={() =>
-        dispatch(setAndShowAlert({ message: noPremiumWarning, isError: true }))
+        dispatch(
+          setAndShowAlert({
+            message: noPremiumWarning,
+            alertType: AlertType.Warning,
+          })
+        )
       }
     />
   );

@@ -1,3 +1,4 @@
+import { AlertType } from "@/app/data/alertType";
 import { hideAlert, selectUi } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import React, { useEffect } from "react";
@@ -5,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 export const Alert: React.FC = () => {
   const dispatch = useDispatch();
-  const { alertMessage, showAlert, alertIsError } = useSelector(selectUi);
+  const { alertMessage, showAlert, alertType } = useSelector(selectUi);
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(hideAlert());
@@ -19,7 +20,13 @@ export const Alert: React.FC = () => {
       <div
         onClick={() => dispatch(hideAlert())}
         className={`fixed cursor-pointer top-3 left-0 right-0 m-auto flex items-center justify-center w-56 p-4 ${
-          alertIsError ? "bg-red-500" : "bg-green-300"
+          alertType === AlertType.Error
+            ? "bg-red-500"
+            : alertType === AlertType.Warning
+            ? "bg-yellow-400"
+            : alertType === AlertType.Success
+            ? "bg-green-400"
+            : "bg-teal-500"
         } opacity-90`}
         style={{ zIndex: 9999 }}
       >

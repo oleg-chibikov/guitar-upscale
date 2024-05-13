@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
+import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlayExampleParameters } from "../data/playExampleParameters";
@@ -109,7 +110,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       console.log("Start playing");
       dispatch(setIsPlaying(true));
       const dispatchAlert = (message: string) =>
-        dispatch(setAndShowAlert({ message, isError: false }));
+        dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
       if (onPlayExample && example && playbackTypeValue === melodyType) {
         await onPlayExample({
           example,

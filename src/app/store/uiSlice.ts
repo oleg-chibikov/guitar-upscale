@@ -1,3 +1,4 @@
+import { AlertType } from "@/app/data/alertType";
 import { Skin } from "@/app/data/skin";
 import { Theme } from "@/app/data/theme";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -19,7 +20,7 @@ interface UiState {
   settingsExpanded: boolean;
   chordsExpanded: boolean;
   showAlert: boolean;
-  alertIsError: boolean;
+  alertType: AlertType;
   alertMessage: string;
   theme: Theme;
   fretboardScaleX: number;
@@ -37,7 +38,7 @@ const initialState: UiState = {
   settingsExpanded: false,
   chordsExpanded: true,
   showAlert: false,
-  alertIsError: false,
+  alertType: AlertType.Neutral,
   alertMessage: "",
   theme: initialTheme,
   fretboardScaleX: 1,
@@ -89,11 +90,11 @@ export const uiSlice = createSlice({
     },
     setAndShowAlert(
       state,
-      action: PayloadAction<{ message: string; isError?: boolean }>
+      action: PayloadAction<{ message: string; alertType?: AlertType }>
     ) {
       state.showAlert = true;
       state.alertMessage = action.payload.message;
-      state.alertIsError = action.payload.isError ?? false;
+      state.alertType = action.payload.alertType ?? AlertType.Neutral;
     },
     hideAlert(state) {
       state.showAlert = false;

@@ -1,5 +1,6 @@
 import { acknowldegeSubscriptionOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -42,7 +43,7 @@ export const GooglePlaySubscribeSection: FC<
         dispatch(
           setAndShowAlert({
             message: "Cannot get supscription options " + ex,
-            isError: true,
+            alertType: AlertType.Error,
           })
         );
       }
@@ -60,7 +61,9 @@ export const GooglePlaySubscribeSection: FC<
     for (const p of existingPurchases) {
       const data = await acknowldegeSubscriptionOnBackend({ ...p });
       if (data.error) {
-        dispatch(setAndShowAlert({ message: data.error, isError: true }));
+        dispatch(
+          setAndShowAlert({ message: data.error, alertType: AlertType.Error })
+        );
         return;
       } else {
         console.log(`Users has entitlement for ${p.itemId}`);
