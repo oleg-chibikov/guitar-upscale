@@ -5,7 +5,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY);
+    deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
+      req,
+      res,
+    });
     console.log("Subscription cookie cleared");
 
     res.status(200);
