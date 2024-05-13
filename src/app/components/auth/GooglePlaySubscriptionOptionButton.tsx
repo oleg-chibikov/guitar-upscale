@@ -83,7 +83,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
             message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
-        console.log("Reloading page");
         reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
       } else {
         await paymentResponse.complete("fail");

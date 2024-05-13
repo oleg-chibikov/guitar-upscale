@@ -28,11 +28,7 @@ export const Initializer: React.FC = () => {
 
   useEffect(() => {
     const loadErudaDevTools = async () => {
-      if (
-        !/eruda=true/.test(window.location.href as unknown as string) &&
-        localStorage.getItem("active-eruda") != "true"
-      )
-        return;
+      // TODO: Check if available in a server function
       const eruda = (await import("eruda")).default;
       eruda.init();
     };

@@ -5,7 +5,11 @@ import { useEffect } from "react";
 import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
-import { hasQueryParam, reloadPageWithQueryParam } from "../helpers/urlHelper";
+import {
+  hasQueryParam,
+  reloadPageWithQueryParam,
+  removeParamsFromQuery,
+} from "../helpers/urlHelper";
 
 export const GOOGLE_PLAY_AUTH_QUERY_PARAM = "noReload";
 
@@ -38,6 +42,13 @@ export const useGooglePlayAuth = () => {
         return;
       }
 
+      if (hasQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM)) {
+        removeParamsFromQuery();
+        // It's just been reloaded - no need to reload further
+        return;
+      }
+
+      // It takes the purchased subscription from DigitalGoodsService and sends it to backend for validation. Backend sets the cookie with permissions. Then location is reloaded
       const digitalGoodsService = await buildDigitalGoodsService();
       const existingPurchases = await digitalGoodsService.listPurchases();
       if (existingPurchases.length) {
@@ -49,13 +60,11 @@ export const useGooglePlayAuth = () => {
 
         if (acknowledgeResult === AcknowledgeResult.Success) {
           // adding a query param to avoid endless reloads
-          if (!hasQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM)) {
-            console.log("Reloading page");
-            reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
-          }
+          reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
         }
       } else {
         clearSubscriptionCookie();
+        reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
       }
     };
     listGooglePlayPurchases();

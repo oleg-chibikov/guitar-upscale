@@ -3,6 +3,7 @@ export const reloadPageWithQueryParam = (
   paramName: string,
   paramValue: string
 ) => {
+  console.log("Reloading page");
   // Get the current URL
   let currentUrl = new URL(window.location.href);
 
@@ -23,4 +24,9 @@ export const hasQueryParam = (paramName: string) => {
 
   // Check if the parameter exists
   return params.has(paramName);
+};
+
+export const removeParamsFromQuery = () => {
+  const newUrl = window.location.pathname;
+  window.history.replaceState(null, "", newUrl); // Change the URL without reloading
 };
