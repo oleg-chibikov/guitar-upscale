@@ -1,6 +1,9 @@
-import { getCookie, setCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
+import { cookies } from "next/headers";
 import { NextApiRequest, NextApiResponse } from "next/types";
 import { TierKey } from "./tiers";
+
+const COOKIE_KEY = "subscriptionData";
 
 export interface PurchaseParams {
   itemId: TierKey; // sku
@@ -13,7 +16,7 @@ export const setSubscriptionCookie = (
   res: NextApiResponse
 ) => {
   const value = params.itemId + "|" + params.purchaseToken;
-  setCookie("subscriptionData", value, {
+  setCookie(COOKIE_KEY, value, {
     req,
     res,
     maxAge: 60 * 60 * 24,
@@ -25,7 +28,7 @@ export const setSubscriptionCookie = (
 };
 
 export const getDataFromSubscriptionCookie = () => {
-  const value = getCookie("subscriptionData");
+  const value = cookies().get(COOKIE_KEY)?.value;
   if (!value) {
     console.log("No value in subscription cookie");
     return undefined;
