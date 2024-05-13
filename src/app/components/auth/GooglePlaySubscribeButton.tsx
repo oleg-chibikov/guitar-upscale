@@ -23,7 +23,6 @@ export const GooglePlaySubscribeButton: FC<
 
   useEffect(() => {
     if (!hasDigitalGoodsService) {
-      alert("No service!");
       return;
     }
 
@@ -36,7 +35,6 @@ export const GooglePlaySubscribeButton: FC<
         const details = await digitalGoodsService.getDetails(
           subscriptionItemIds
         );
-        alert(JSON.stringify(details));
         setSubscriptionOptions(details);
       } catch (ex: any) {
         dispatch(

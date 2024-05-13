@@ -95,13 +95,20 @@ export const GooglePlaySubscriptionOptionButton: FC<
           : "bg-border_accent-dark"
       }`}
     >
-      <p className="text-lg font-semibold mb-2">{subscriptionOption.title}</p>
-      <p className="text-sm text-gray-600 mb-2">
-        {subscriptionOption.description}
+      <p className="text-lg font-semibold">
+        {subscriptionOption.title.substring(
+          0,
+          subscriptionOption.title.indexOf(" (")
+        )}
       </p>
-      <p className="text-sm mb-2">Item ID: {subscriptionOption.itemId}</p>
-      <p className="text-sm mb-2">Price: {localizedPrice}</p>
-      <Button onClick={() => makePurchase(subscriptionOption.itemId)}>
+      <p className="text-sm">{subscriptionOption.description}</p>
+      <p className="text-sm">{localizedPrice}</p>
+      <Button
+        size="small"
+        variant="contained"
+        color="primary"
+        onClick={() => makePurchase(subscriptionOption.itemId)}
+      >
         Purchase
       </Button>
     </div>
