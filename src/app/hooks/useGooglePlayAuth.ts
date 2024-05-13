@@ -11,7 +11,10 @@ import {
   removeParamsFromQuery,
 } from "../helpers/urlHelper";
 
-export const GOOGLE_PLAY_AUTH_QUERY_PARAM = "noReload";
+const NO_RELOAD_QUERY_PARAM = "noReload";
+
+export const reloadOnce = () =>
+  reloadPageWithQueryParam(NO_RELOAD_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
 
 function sortByItemId(
   itemA: { itemId: string },
@@ -42,7 +45,7 @@ export const useGooglePlayAuth = () => {
         return;
       }
 
-      if (hasQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM)) {
+      if (hasQueryParam(NO_RELOAD_QUERY_PARAM)) {
         removeParamsFromQuery();
         // It's just been reloaded - no need to reload further
         return;
@@ -58,13 +61,17 @@ export const useGooglePlayAuth = () => {
           purchaseToken: purchaseToProcess.purchaseToken,
         });
 
+        alert(JSON.stringify(existingPurchases));
+        alert(JSON.stringify(purchaseToProcess));
+        alert(JSON.stringify(acknowledgeResult));
+
         if (acknowledgeResult === AcknowledgeResult.Success) {
           // adding a query param to avoid endless reloads
-          reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+          reloadOnce();
         }
       } else {
         clearSubscriptionCookie();
-        reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+        reloadOnce();
       }
     };
     listGooglePlayPurchases();

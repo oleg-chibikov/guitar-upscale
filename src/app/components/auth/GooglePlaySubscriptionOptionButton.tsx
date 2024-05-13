@@ -6,8 +6,7 @@ import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvide
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { reloadPageWithQueryParam } from "@/app/helpers/urlHelper";
-import { GOOGLE_PLAY_AUTH_QUERY_PARAM } from "@/app/hooks/useGooglePlayAuth";
+import { reloadOnce } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
 import { Button } from "@mui/material";
@@ -83,7 +82,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
             message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
-        reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+        reloadOnce();
       } else {
         await paymentResponse.complete("fail");
         dispatch(
