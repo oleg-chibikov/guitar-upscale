@@ -16,6 +16,8 @@ export const GooglePlaySubscribeSection: FC<
   GooglePlaySubscribeSectionProps
 > = ({}) => {
   const dispatch = useDispatch();
+  const [selectedOption, setSelectedOption] =
+    useState<DigitalGoodsProductDetails>();
   const hasDigitalGoodsService = useDigitalGoodsService();
   const [subscriptionOptions, setSubscriptionOptions] = useState<
     DigitalGoodsProductDetails[]
@@ -73,6 +75,10 @@ export const GooglePlaySubscribeSection: FC<
     <ul className="flex flex-col gap-2">
       {subscriptionOptions.map((subscriptionOption) => (
         <GooglePlaySubscriptionOptionButton
+          isSelected={selectedOption === subscriptionOption}
+          onClick={(subscriptionOption) => {
+            setSelectedOption(subscriptionOption);
+          }}
           key={subscriptionOption.itemId}
           subscriptionOption={subscriptionOption}
         />

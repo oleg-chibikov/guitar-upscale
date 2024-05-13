@@ -8,11 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 interface GooglePlaySubscriptionOptionButtonProps {
   subscriptionOption: DigitalGoodsProductDetails;
+  onClick: (option: DigitalGoodsProductDetails) => void;
+  isSelected: boolean;
 }
 
 export const GooglePlaySubscriptionOptionButton: FC<
   GooglePlaySubscriptionOptionButtonProps
-> = ({ subscriptionOption }) => {
+> = ({ subscriptionOption, onClick, isSelected }) => {
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
@@ -89,10 +91,15 @@ export const GooglePlaySubscriptionOptionButton: FC<
   // TODO: UI
   return (
     <div
+      onClick={() => onClick(subscriptionOption)}
       className={`flex justify-between align-middle items-center flex-row gap 2 p-2 gap 2 ${
-        theme === Theme.Light
-          ? "bg-border_accent-light"
-          : "bg-border_accent-dark"
+        isSelected
+          ? theme === Theme.Light
+            ? "bg-accented_background-light"
+            : "bg-accented_background-dark"
+          : theme === Theme.Light
+          ? "bg-panel-light"
+          : "bg-panel-dark"
       }`}
     >
       <p className="text-lg font-semibold">
