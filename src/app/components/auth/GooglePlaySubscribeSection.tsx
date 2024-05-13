@@ -1,11 +1,12 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { selectAuth } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Tier, TierKey, tierMap } from "@/lib/tiers";
 import { LinearProgress } from "@mui/material";
 import { FC, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
 
 interface GooglePlaySubscribeSectionProps {
@@ -23,6 +24,7 @@ export const GooglePlaySubscribeSection: FC<
   const [subscriptionOptions, setSubscriptionOptions] = useState<
     DigitalGoodsProductDetails[]
   >([]);
+  const { subscriptionTier } = useSelector(selectAuth);
 
   useEffect(() => {
     if (!hasDigitalGoodsService) {
@@ -61,25 +63,31 @@ export const GooglePlaySubscribeSection: FC<
 
   return (
     <ul className="flex flex-col gap-2">
-      {subscriptionOptions.map((subscriptionOption) => (
-        <GooglePlaySubscriptionOptionButton
-          isSelected={selectedOption === subscriptionOption}
-          onClick={(subscriptionOption) => {
-            if (subscriptionOption === selectedOption) {
-              setSelectedOption(undefined);
-              onOptionSelected(undefined);
-            } else {
-              setSelectedOption(subscriptionOption);
-              onOptionSelected(
-                tierMap.get(subscriptionOption.itemId as TierKey)
-              );
-            }
-          }}
-          key={subscriptionOption.itemId}
-          subscriptionOption={subscriptionOption}
-          setIsLoading={setIsLoading}
-        />
-      ))}
+      {subscriptionOptions
+        .filter(
+          (subscriptionOption) =>
+            tierMap.get(subscriptionOption.itemId as TierKey) !==
+            subscriptionTier
+        )
+        .map((subscriptionOption) => (
+          <GooglePlaySubscriptionOptionButton
+            isSelected={selectedOption === subscriptionOption}
+            onClick={(subscriptionOption) => {
+              if (subscriptionOption === selectedOption) {
+                setSelectedOption(undefined);
+                onOptionSelected(undefined);
+              } else {
+                setSelectedOption(subscriptionOption);
+                onOptionSelected(
+                  tierMap.get(subscriptionOption.itemId as TierKey)
+                );
+              }
+            }}
+            key={subscriptionOption.itemId}
+            subscriptionOption={subscriptionOption}
+            setIsLoading={setIsLoading}
+          />
+        ))}
     </ul>
   );
 };
