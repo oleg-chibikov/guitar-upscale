@@ -41,6 +41,8 @@ const apiHandler = (handler: ApiMethodHandlers) => {
     } catch (err) {
       // global error handler
       errorHandler(err, res);
+    } finally {
+      res.end(); // End the response
     }
   };
 };

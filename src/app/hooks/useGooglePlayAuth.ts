@@ -1,7 +1,6 @@
-import { selectAuth } from "@/app/store/authSlice";
+import { clearSubscriptionCookie } from "@/lib/purchaseParams";
 import { TierKey } from "@/lib/tiers";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
@@ -22,21 +21,11 @@ function sortByItemId(
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const { subscriptionTier } = useSelector(selectAuth);
 
+  // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
   useEffect(() => {
     const listGooglePlayPurchases = async () => {
       if (!hasDigitalGoodsService) {
-        return;
-      }
-      if (subscriptionTier) {
-        // TODO: We need to check google play purchases anyway and if there is no subscription anymore - remove the cookie and reload
-        // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
-        console.log(
-          "Subscription tier available, no need to list purchases",
-          subscriptionTier
-        );
-        localStorage.removeItem("googlePlaySignInCheckCount");
         return;
       }
 
@@ -47,7 +36,7 @@ export const useGooglePlayAuth = () => {
         signInCheckCountRaw !== null ? parseInt(signInCheckCountRaw) : 0;
       console.log("Google Play session reload count", signInCheckCount);
 
-      if (signInCheckCount > 1) {
+      if (signInCheckCount > 0) {
         console.log(
           "Google Play session check reload count exceeded limit. Avoid further reload"
         );
@@ -72,6 +61,8 @@ export const useGooglePlayAuth = () => {
           );
           location.reload(); // this should take the subscriptionTier from cookie and reload page
         }
+      } else {
+        clearSubscriptionCookie();
       }
     };
     listGooglePlayPurchases();

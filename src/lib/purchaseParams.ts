@@ -1,4 +1,4 @@
-import { setCookie } from "cookies-next";
+import { deleteCookie, setCookie } from "cookies-next";
 import { cookies } from "next/headers";
 import { NextApiRequest, NextApiResponse } from "next/types";
 import { TierKey } from "./tiers";
@@ -25,6 +25,11 @@ export const setSubscriptionCookie = (
     httpOnly: true,
   });
   console.log("Subscription cookie set", value);
+};
+
+export const clearSubscriptionCookie = () => {
+  deleteCookie(COOKIE_KEY);
+  console.log("Subscription cookie cleared");
 };
 
 export const getDataFromSubscriptionCookie = () => {
