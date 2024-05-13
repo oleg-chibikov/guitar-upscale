@@ -4,6 +4,7 @@ import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/subscription";
+import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tiers";
 import { Avatar, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
@@ -104,7 +105,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
               <>
                 <span>
                   {"Subscription level:"}{" "}
-                  <strong>{subscriptionTier ?? "Not subscribed"}</strong>
+                  <strong>{subscriptionTier?.tier ?? "Not subscribed"}</strong>
                 </span>
                 {
                   <ul className="flex flex-col items-start">
@@ -121,14 +122,17 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
             </div>
           </div>
           <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
-            {/* This button is visible only on Android. The user can subscribe or change subscription there */}
-            {hasDigitalGoodsService && (
-              <GooglePlaySubscribeSection
-                onOptionSelected={(tier) => {
-                  setHighlightedOption(tier);
-                }}
-              />
-            )}
+            {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
+            {hasDigitalGoodsService &&
+              (!subscriptionTier ||
+                subscriptionTier.provider ===
+                  SubscriptionProvider.GooglePlay) && (
+                <GooglePlaySubscribeSection
+                  onOptionSelected={(tier) => {
+                    setHighlightedOption(tier);
+                  }}
+                />
+              )}
             {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
             <PatreonModalAuthButton closeModal={handleCloseModal} />

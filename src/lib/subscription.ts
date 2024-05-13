@@ -6,6 +6,7 @@ import {
   getDataFromCookieValue,
 } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
+import { SubscriptionProvider, TierInfo } from "./subscriptionProvider";
 import { Tier, tierMap } from "./tiers";
 
 const composerWhitelist = new Set<string>(
@@ -92,7 +93,7 @@ const getTierFromWhitelist = (email?: string) => {
 async function getTierName(
   email?: string,
   accessToken?: string
-): Promise<Tier | undefined> {
+): Promise<TierInfo | undefined> {
   // Checking whitelists
   let tier: Tier | undefined;
 
@@ -100,13 +101,13 @@ async function getTierName(
 
   if (tier) {
     console.log("Got tier from whitelist", tier);
-    return tier;
+    return { tier, provider: SubscriptionProvider.Patreon };
   }
 
   tier = await getGooglePlaySubscriptionTierFromCookie();
   if (tier) {
     console.log("Got tier from subscription cookie", tier);
-    return tier;
+    return { tier, provider: SubscriptionProvider.GooglePlay };
   }
 
   if (!accessToken) {
@@ -117,7 +118,7 @@ async function getTierName(
 
   if (tier) {
     console.log("Got tier from patreon API", tier);
-    return tier;
+    return { tier, provider: SubscriptionProvider.Patreon };
   }
 
   return undefined;
@@ -128,7 +129,7 @@ export type PremiumFeaturesWithSession = {
   explorerPremiumFeatures: PremiumFeatures;
   composerPremiumFeatures: PremiumFeatures;
   session: Session | null;
-  subscriptionTier?: string;
+  subscriptionTier?: TierInfo;
 };
 
 export type PremiumFeatures = {
@@ -161,8 +162,12 @@ const composerPremiumFeatures: PremiumFeatures = {
   skinSelection: true,
 };
 
-export const applyTierToResult = (result: any, subscriptionTier?: Tier) => {
-  if (subscriptionTier === "Explorer") {
+export const applyTierToResult = (result: any, subscriptionTier?: TierInfo) => {
+  if (!subscriptionTier) {
+    return result;
+  }
+
+  if (subscriptionTier.tier === "Explorer") {
     return {
       ...result,
       premiumFeatures: explorerPremiumFeatures,
@@ -170,7 +175,7 @@ export const applyTierToResult = (result: any, subscriptionTier?: Tier) => {
     };
   }
 
-  if (subscriptionTier === "Composer") {
+  if (subscriptionTier.tier === "Composer") {
     return {
       ...result,
       premiumFeatures: composerPremiumFeatures,
@@ -193,12 +198,12 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
     composerPremiumFeatures,
   };
 
-  const subscriptionTier = await getTierName(
+  const tierInfo = await getTierName(
     session?.user?.email ?? undefined,
     session?.accessToken
   );
 
-  console.log("Subscription tier", subscriptionTier);
+  console.log("Subscription tier", tierInfo);
 
-  return applyTierToResult(result, subscriptionTier);
+  return applyTierToResult(result, tierInfo);
 }

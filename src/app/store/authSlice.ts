@@ -1,9 +1,10 @@
+import { TierInfo } from "@/lib/subscriptionProvider";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store"; // Define RootState type
 
 interface AuthState {
   isSignedIn: boolean;
-  subscriptionTier?: string;
+  subscriptionTier?: TierInfo;
 }
 
 const initialState: AuthState = {
@@ -17,7 +18,7 @@ export const authSlice = createSlice({
     setIsSignedIn(state, action: PayloadAction<boolean>) {
       state.isSignedIn = action.payload;
     },
-    setSubscriptionTier(state, action: PayloadAction<string | undefined>) {
+    setSubscriptionTier(state, action: PayloadAction<TierInfo | undefined>) {
       state.subscriptionTier = action.payload;
     },
   },

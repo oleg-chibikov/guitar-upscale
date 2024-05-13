@@ -61,13 +61,14 @@ export const GooglePlaySubscribeSection: FC<
     return <LinearProgress />;
   }
 
+  // TODO: Get the provider of current subscription and hide stuff based on it
   return (
     <ul className="flex flex-col gap-2">
       {subscriptionOptions
         .filter(
           (subscriptionOption) =>
             tierMap.get(subscriptionOption.itemId as TierKey) !==
-            subscriptionTier
+            subscriptionTier?.tier
         )
         .map((subscriptionOption) => (
           <GooglePlaySubscriptionOptionButton

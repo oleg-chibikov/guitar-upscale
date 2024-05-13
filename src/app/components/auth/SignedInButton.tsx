@@ -22,7 +22,9 @@ export const SignedInButton: FC<
           : "flex-row"
       } gap-0`}
       style={{ minWidth: 0, padding: 4 }} // override MUI value
-      title={(user ? `${user.name}: ${user.email} - ` : "") + subscriptionTier}
+      title={
+        (user ? `${user.name}: ${user.email} - ` : "") + subscriptionTier?.tier
+      }
       onClick={openModal} // Open modal on avatar click
     >
       <span
@@ -32,7 +34,7 @@ export const SignedInButton: FC<
             : "text-foreground-dark"
         }`}
       >
-        {subscriptionTier ?? "Go premium"}
+        {subscriptionTier?.tier ?? "Go premium"}
       </span>
       {user?.image && (
         <Avatar alt={user.name ?? "User avatar"} src={user.image} />
