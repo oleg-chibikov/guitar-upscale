@@ -77,6 +77,7 @@ export const GooglePlaySubscribeSection: FC<
           }}
           key={subscriptionOption.itemId}
           subscriptionOption={subscriptionOption}
+          setIsLoading={setIsLoading}
         />
       ))}
     </ul>

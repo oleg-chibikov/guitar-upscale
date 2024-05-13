@@ -18,11 +18,12 @@ interface GooglePlaySubscriptionOptionButtonProps {
   subscriptionOption: DigitalGoodsProductDetails;
   onClick: (option: DigitalGoodsProductDetails) => void;
   isSelected: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export const GooglePlaySubscriptionOptionButton: FC<
   GooglePlaySubscriptionOptionButtonProps
-> = ({ subscriptionOption, onClick, isSelected }) => {
+> = ({ subscriptionOption, onClick, isSelected, setIsLoading }) => {
   const title = subscriptionOption.title.substring(
     0,
     subscriptionOption.title.indexOf(" (")
@@ -56,6 +57,8 @@ export const GooglePlaySubscriptionOptionButton: FC<
     };
 
     const request = new PaymentRequest(paymentMethods, paymentDetails);
+
+    setIsLoading(true);
     try {
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
@@ -64,6 +67,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         itemId: subscriptionOption.itemId as TierKey,
         purchaseToken,
       });
+
       if (acknowledgeResult === AcknowledgeResult.Success) {
         const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
@@ -103,6 +107,8 @@ export const GooglePlaySubscriptionOptionButton: FC<
           alertType: AlertType.Warning,
         })
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
