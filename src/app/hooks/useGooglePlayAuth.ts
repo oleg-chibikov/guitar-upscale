@@ -55,16 +55,12 @@ export const useGooglePlayAuth = () => {
       // It takes the purchased subscription from DigitalGoodsService and sends it to backend for validation. Backend sets the cookie with permissions. Then location is reloaded
       const digitalGoodsService = await buildDigitalGoodsService();
       const existingPurchases = await digitalGoodsService.listPurchases();
-      alert(JSON.stringify(existingPurchases));
       if (existingPurchases.length) {
         const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
         const result = await acknowledgePurchaseOnBackend({
           itemId: purchaseToProcess.itemId as TierKey,
           purchaseToken: purchaseToProcess.purchaseToken,
         });
-
-        alert(JSON.stringify(purchaseToProcess));
-        alert(JSON.stringify(result));
 
         if (result === ApiCallResult.Success) {
           // adding a query param to avoid endless reloads
