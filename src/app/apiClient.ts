@@ -14,9 +14,6 @@ export async function acknowledgePurchaseOnBackend(
       `/api/purchases/acknowledge?itemId=${itemId}&purchaseToken=${purchaseToken}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }
     );
 

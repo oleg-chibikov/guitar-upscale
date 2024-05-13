@@ -1,44 +1,16 @@
-import { deleteCookie, setCookie } from "cookies-next";
-import { cookies } from "next/headers";
-import { NextApiRequest, NextApiResponse } from "next/types";
 import { TierKey } from "./tiers";
 
-const COOKIE_KEY = "subscriptionData";
+export const GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY = "subscriptionData";
+
+export const getCookieValue = (params: PurchaseParams) =>
+  params.itemId + "|" + params.purchaseToken;
+
+export const getDataFromCookieValue = (cookieValue: string) => {
+  const parts = cookieValue.split("|");
+  return { itemId: parts[0], purchaseToken: parts[1] } as PurchaseParams;
+};
 
 export interface PurchaseParams {
   itemId: TierKey; // sku
   purchaseToken: string;
 }
-
-export const setSubscriptionCookie = (
-  params: PurchaseParams,
-  req: NextApiRequest,
-  res: NextApiResponse
-) => {
-  const value = params.itemId + "|" + params.purchaseToken;
-  setCookie(COOKIE_KEY, value, {
-    req,
-    res,
-    maxAge: 60 * 60 * 24,
-    sameSite: true,
-    secure: true,
-    httpOnly: true,
-  });
-  console.log("Subscription cookie set", value);
-};
-
-export const clearSubscriptionCookie = () => {
-  deleteCookie(COOKIE_KEY);
-  console.log("Subscription cookie cleared");
-};
-
-export const getDataFromSubscriptionCookie = () => {
-  const value = cookies().get(COOKIE_KEY)?.value;
-  if (!value) {
-    console.log("No value in subscription cookie");
-    return undefined;
-  }
-  console.log("Value in subscription cookie", value);
-  const parts = value.split("|");
-  return { itemId: parts[0], purchaseToken: parts[1] } as PurchaseParams;
-};

@@ -14,7 +14,7 @@ export const reloadPageWithQueryParam = (
 };
 
 // Function to check if a query string parameter exists
-const hasQueryParam = (paramName: string) => {
+export const hasQueryParam = (paramName: string) => {
   // Get the current URL
   let currentUrl = new URL(window.location.href);
 

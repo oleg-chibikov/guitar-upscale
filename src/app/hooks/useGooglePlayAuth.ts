@@ -1,6 +1,7 @@
 import { selectAuth } from "@/app/store/authSlice";
-import { clearSubscriptionCookie } from "@/lib/purchaseParams";
+import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
 import { TierKey } from "@/lib/tiers";
+import { deleteCookie } from "cookies-next";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
@@ -8,7 +9,7 @@ import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 import { hasQueryParam, reloadPageWithQueryParam } from "../helpers/urlHelper";
 
-const QUERY_PARAM = "noReload";
+export const GOOGLE_PLAY_AUTH_QUERY_PARAM = "noReload";
 
 function sortByItemId(
   itemA: { itemId: string },
@@ -22,6 +23,11 @@ function sortByItemId(
   }
   return 0; // No change in order
 }
+
+const clearSubscriptionCookie = () => {
+  deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY);
+  console.log("Subscription cookie cleared");
+};
 
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
@@ -46,9 +52,9 @@ export const useGooglePlayAuth = () => {
 
         if (acknowledgeResult === AcknowledgeResult.Success) {
           // adding a query param to avoid endless reloads
-          if (!hasQueryParam(QUERY_PARAM)) {
+          if (!hasQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM)) {
             console.log("Reloading page");
-            reloadPageWithQueryParam(QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+            reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
           }
         }
       } else {

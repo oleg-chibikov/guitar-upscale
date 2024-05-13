@@ -65,9 +65,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
         purchaseToken,
       });
       if (acknowledgeResult === AcknowledgeResult.Success) {
+        const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
-        const digitalGoodsService = await buildDigitalGoodsService();
         digitalGoodsService.consume(purchaseToken);
 
         // Optional: tell the PaymentRequest API the validation was

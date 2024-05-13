@@ -1,6 +1,10 @@
 import { Session } from "next-auth";
+import { cookies } from "next/headers";
 import { auth } from "./auth";
-import { getDataFromSubscriptionCookie } from "./purchaseParams";
+import {
+  GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
+  getDataFromCookieValue,
+} from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { Tier, tierMap } from "./tiers";
 
@@ -11,6 +15,16 @@ const composerWhitelist = new Set<string>(
 const explorerWhitelist = new Set<string>(
   process.env.EXPLORER_WHITELIST?.split(",")
 );
+
+const getDataFromSubscriptionCookie = () => {
+  const value = cookies().get(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY)?.value;
+  if (!value) {
+    console.log("No value in subscription cookie");
+    return undefined;
+  }
+  console.log("Value in subscription cookie", value);
+  return getDataFromCookieValue(value);
+};
 
 const getGooglePlaySubscriptionTierFromCookie = async () => {
   const subscriptionData = getDataFromSubscriptionCookie();
