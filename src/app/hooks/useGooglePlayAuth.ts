@@ -1,15 +1,20 @@
-import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
 import { TierKey } from "@/lib/tiers";
-import { deleteCookie } from "cookies-next";
 import { useEffect } from "react";
-import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
+import { useDispatch } from "react-redux";
+import {
+  ApiCallResult,
+  acknowledgePurchaseOnBackend,
+  clearSubscriptionCookieOnBackend,
+} from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
+import { AlertType } from "../data/alertType";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 import {
   hasQueryParam,
   reloadPageWithQueryParam,
   removeParamsFromQuery,
 } from "../helpers/urlHelper";
+import { setAndShowAlert } from "../store/uiSlice";
 
 const NO_RELOAD_QUERY_PARAM = "noReload";
 
@@ -29,16 +34,12 @@ function sortByItemId(
   return 0; // No change in order
 }
 
-const clearSubscriptionCookie = () => {
-  deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY);
-  console.log("Subscription cookie cleared");
-};
-
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
   const hasDigitalGoodsService = useDigitalGoodsService();
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
 
+  const dispatch = useDispatch();
   useEffect(() => {
     const listGooglePlayPurchases = async () => {
       if (!hasDigitalGoodsService) {
@@ -57,21 +58,40 @@ export const useGooglePlayAuth = () => {
       alert(JSON.stringify(existingPurchases));
       if (existingPurchases.length) {
         const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
-        const acknowledgeResult = await acknowledgePurchaseOnBackend({
+        const result = await acknowledgePurchaseOnBackend({
           itemId: purchaseToProcess.itemId as TierKey,
           purchaseToken: purchaseToProcess.purchaseToken,
         });
 
         alert(JSON.stringify(purchaseToProcess));
-        alert(JSON.stringify(acknowledgeResult));
+        alert(JSON.stringify(result));
 
-        if (acknowledgeResult === AcknowledgeResult.Success) {
+        if (result === ApiCallResult.Success) {
           // adding a query param to avoid endless reloads
           reloadOnce();
+        } else {
+          dispatch(
+            setAndShowAlert({
+              message:
+                "There's a purchase listed in Google Play but it cannot be acknowledged due to an error",
+              alertType: AlertType.Error,
+            })
+          );
         }
       } else {
-        clearSubscriptionCookie();
-        reloadOnce();
+        const result = await clearSubscriptionCookieOnBackend();
+        if (result === ApiCallResult.Success) {
+          // adding a query param to avoid endless reloads
+          reloadOnce();
+        } else {
+          dispatch(
+            setAndShowAlert({
+              message:
+                "There are no subscriptions listed in Google Play but logout cannot be processed due to an error",
+              alertType: AlertType.Error,
+            })
+          );
+        }
       }
     };
     listGooglePlayPurchases();

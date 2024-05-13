@@ -1,31 +1,47 @@
 import { PurchaseParams } from "@/lib/purchaseParams";
 
-export enum AcknowledgeResult {
+export enum ApiCallResult {
   Success,
   Error,
 }
 
-export async function acknowledgePurchaseOnBackend(
-  params: PurchaseParams
-): Promise<AcknowledgeResult> {
-  const { itemId, purchaseToken } = params;
+async function callApi(
+  endpoint: string,
+  method: string,
+  params?: Record<string, string>
+): Promise<ApiCallResult> {
   try {
-    const response = await fetch(
-      `/api/purchases/acknowledge?itemId=${itemId}&purchaseToken=${purchaseToken}`,
-      {
-        method: "POST",
-      }
-    );
+    const queryString = params ? `?${new URLSearchParams(params)}` : "";
+    const response = await fetch(`${endpoint}${queryString}`, {
+      method,
+    });
 
     if (!response.ok) {
       const responseData = await response.json(); // Extract error message from response
-      console.error("Error while acknowledging purchase", responseData);
-      return AcknowledgeResult.Error;
+      console.error(
+        `Error status received while calling ${endpoint}`,
+        responseData
+      );
+      return ApiCallResult.Error;
     }
 
-    return AcknowledgeResult.Success;
+    return ApiCallResult.Success;
   } catch (error: any) {
-    console.error("Error while acknowledging purchase", error);
-    return AcknowledgeResult.Error;
+    console.error(`Exception happened while calling ${endpoint}`, error);
+    return ApiCallResult.Error;
   }
+}
+
+export async function acknowledgePurchaseOnBackend(
+  params: PurchaseParams
+): Promise<ApiCallResult> {
+  const { itemId, purchaseToken } = params;
+  return callApi(`/api/purchases/acknowledge`, "POST", {
+    itemId,
+    purchaseToken,
+  });
+}
+
+export async function clearSubscriptionCookieOnBackend(): Promise<ApiCallResult> {
+  return callApi(`/api/purchases/logout`, "POST");
 }

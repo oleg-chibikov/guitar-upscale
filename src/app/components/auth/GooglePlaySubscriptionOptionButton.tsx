@@ -1,7 +1,4 @@
-import {
-  AcknowledgeResult,
-  acknowledgePurchaseOnBackend,
-} from "@/app/apiClient";
+import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
@@ -67,7 +64,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         purchaseToken,
       });
 
-      if (acknowledgeResult === AcknowledgeResult.Success) {
+      if (acknowledgeResult === ApiCallResult.Success) {
         const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
