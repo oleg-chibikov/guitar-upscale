@@ -1,4 +1,7 @@
-import { acknowldegeSubscriptionOnBackend } from "@/app/apiClient";
+import {
+  AcknowledgeResult,
+  acknowldegeSubscriptionOnBackend,
+} from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
@@ -16,11 +19,15 @@ interface GooglePlaySubscriptionOptionButtonProps {
 export const GooglePlaySubscriptionOptionButton: FC<
   GooglePlaySubscriptionOptionButtonProps
 > = ({ subscriptionOption, onClick, isSelected }) => {
+  const title = subscriptionOption.title.substring(
+    0,
+    subscriptionOption.title.indexOf(" (")
+  );
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
 
-  async function makePurchase(itemId: string) {
+  const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
       return;
     }
@@ -29,7 +36,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       {
         supportedMethods: "https://play.google.com/billing",
         data: {
-          sku: itemId,
+          sku: subscriptionOption.itemId,
         },
       },
     ];
@@ -49,14 +56,18 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const data = await acknowldegeSubscriptionOnBackend({
-        itemId,
+      const acknowledgeResult = await acknowldegeSubscriptionOnBackend({
+        itemId: subscriptionOption.itemId,
         purchaseToken,
       });
-      if (data.error) {
+      if (acknowledgeResult === AcknowledgeResult.Error) {
         await paymentResponse.complete("fail");
         dispatch(
-          setAndShowAlert({ message: data.error, alertType: AlertType.Error })
+          setAndShowAlert({
+            message:
+              "Cannot acknowledge subscription. It will be auto refunded in 3 days by Google",
+            alertType: AlertType.Error,
+          })
         );
         return;
       } else {
@@ -74,7 +85,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         await paymentResponse.complete("success");
         dispatch(
           setAndShowAlert({
-            message: "Payment successful! Subscribed to " + itemId,
+            message: `Payment successful! Subscribed to ${title}`,
           })
         );
       }
@@ -85,12 +96,12 @@ export const GooglePlaySubscriptionOptionButton: FC<
       console.log(e);
       dispatch(
         setAndShowAlert({
-          message: "Subscribe cancelled",
+          message: "Cancelled",
           alertType: AlertType.Warning,
         })
       );
     }
-  }
+  };
 
   // Format the price according to the user locale.
   const localizedPrice = new Intl.NumberFormat(navigator.language, {
@@ -112,19 +123,14 @@ export const GooglePlaySubscriptionOptionButton: FC<
           : "bg-accent_stronger-dark"
       }`}
     >
-      <p className="text-lg font-semibold">
-        {subscriptionOption.title.substring(
-          0,
-          subscriptionOption.title.indexOf(" (")
-        )}
-      </p>
+      <p className="text-lg font-semibold">{title}</p>
       <p className="text-sm grow">{subscriptionOption.description}</p>
       <p className="text-sm">{localizedPrice}</p>
       <Button
         size="small"
         variant="contained"
         color="primary"
-        onClick={() => makePurchase(subscriptionOption.itemId)}
+        onClick={() => makePurchase()}
       >
         Purchase
       </Button>

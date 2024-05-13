@@ -1,8 +1,13 @@
 import { PurchaseParams } from "@/lib/subscriptionTypes";
 
+export enum AcknowledgeResult {
+  Success,
+  Error,
+}
+
 export async function acknowldegeSubscriptionOnBackend(
   params: PurchaseParams
-): Promise<any> {
+): Promise<AcknowledgeResult> {
   const { itemId, purchaseToken } = params;
 
   try {
@@ -16,20 +21,16 @@ export async function acknowldegeSubscriptionOnBackend(
       }
     );
 
-    const responseData = await response.json(); // Extract error message from response
-    const responseAsString = JSON.stringify(responseData, undefined, 2);
-
     if (!response.ok) {
-      return {
-        error: responseAsString,
-      };
+      const responseData = await response.json(); // Extract error message from response
+      console.log("Error while purchasing", responseData);
+      return AcknowledgeResult.Error;
     }
 
-    return { result: responseAsString };
+    return AcknowledgeResult.Success;
   } catch (error: any) {
+    console.log("Error while purchasing", error);
     // Construct a custom error message
-    return {
-      error: JSON.stringify(error),
-    };
+    return AcknowledgeResult.Error;
   }
 }

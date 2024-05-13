@@ -1,4 +1,3 @@
-import { acknowldegeSubscriptionOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
@@ -54,25 +53,6 @@ export const GooglePlaySubscribeSection: FC<
   if (!hasDigitalGoodsService) {
     return null;
   }
-
-  // TODO: This should be done in a Root context in order to set the right permissions straight away
-  const listPurchases = async (service: DigitalGoodsService) => {
-    const existingPurchases = await service.listPurchases();
-    for (const p of existingPurchases) {
-      const data = await acknowldegeSubscriptionOnBackend({ ...p });
-      if (data.error) {
-        dispatch(
-          setAndShowAlert({ message: data.error, alertType: AlertType.Error })
-        );
-        return;
-      } else {
-        console.log(`Users has entitlement for ${p.itemId}`);
-        // TODO: WE NEED TO GET SUBSCRIPTION STATUS ON BACKEND WITHOUT STORING THE USER. BUT HOW TO DO THAT AS DigitalGoodsService is only available on frontend?
-      }
-      // Update the UI with items the user is already entitled to.
-      console.log(`Users has entitlement for ${p.itemId}`);
-    }
-  };
 
   return (
     <ul className="flex flex-col gap-2">
