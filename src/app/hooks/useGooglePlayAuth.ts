@@ -1,9 +1,14 @@
+import { selectAuth } from "@/app/store/authSlice";
 import { clearSubscriptionCookie } from "@/lib/purchaseParams";
 import { TierKey } from "@/lib/tiers";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { AcknowledgeResult, acknowledgePurchaseOnBackend } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
+import { hasQueryParam, reloadPageWithQueryParam } from "../helpers/urlHelper";
+
+const QUERY_PARAM = "noReload";
 
 function sortByItemId(
   itemA: { itemId: string },
@@ -21,25 +26,12 @@ function sortByItemId(
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
   const hasDigitalGoodsService = useDigitalGoodsService();
-
+  const { subscriptionTier } = useSelector(selectAuth);
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
+
   useEffect(() => {
     const listGooglePlayPurchases = async () => {
       if (!hasDigitalGoodsService) {
-        return;
-      }
-
-      const signInCheckCountRaw = localStorage.getItem(
-        "googlePlaySignInCheckCount"
-      );
-      const signInCheckCount =
-        signInCheckCountRaw !== null ? parseInt(signInCheckCountRaw) : 0;
-      console.log("Google Play session reload count", signInCheckCount);
-
-      if (signInCheckCount > 0) {
-        console.log(
-          "Google Play session check reload count exceeded limit. Avoid further reload"
-        );
         return;
       }
 
@@ -53,13 +45,11 @@ export const useGooglePlayAuth = () => {
         });
 
         if (acknowledgeResult === AcknowledgeResult.Success) {
-          console.log("Reloading page");
-          // check to avoid endless reloads
-          localStorage.setItem(
-            "googlePlaySignInCheckCount",
-            (signInCheckCount + 1).toString()
-          );
-          location.reload(); // this should take the subscriptionTier from cookie and reload page
+          // adding a query param to avoid endless reloads
+          if (!hasQueryParam(QUERY_PARAM)) {
+            console.log("Reloading page");
+            reloadPageWithQueryParam(QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+          }
         }
       } else {
         clearSubscriptionCookie();

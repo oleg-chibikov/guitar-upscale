@@ -6,6 +6,8 @@ import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvide
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { reloadPageWithQueryParam } from "@/app/helpers/urlHelper";
+import { GOOGLE_PLAY_AUTH_QUERY_PARAM } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
 import { Button } from "@mui/material";
@@ -88,9 +90,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           })
         );
         console.log("Reloading page");
-        // check to avoid endless reloads
-        localStorage.setItem("googlePlaySignInCheckCount", (1).toString());
-        location.reload(); // this should take the subscriptionTier from cookie and reload page
+        reloadPageWithQueryParam(GOOGLE_PLAY_AUTH_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
       }
     } catch (e) {
       // The purchase failed, and we can handle the failure here.
