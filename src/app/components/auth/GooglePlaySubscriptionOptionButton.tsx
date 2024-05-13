@@ -5,7 +5,9 @@ import {
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { TierKey } from "@/lib/tiers";
 import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,7 +59,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const { purchaseToken } = paymentResponse.details;
 
       const acknowledgeResult = await acknowledgePurchaseOnBackend({
-        itemId: subscriptionOption.itemId,
+        itemId: subscriptionOption.itemId as TierKey,
         purchaseToken,
       });
       if (acknowledgeResult === AcknowledgeResult.Error) {
