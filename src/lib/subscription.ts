@@ -1,28 +1,28 @@
 import { Session } from "next-auth";
 import { auth } from "./auth";
-import { Tier } from "./tiers";
+import { getDataFromSubscriptionCookie } from "./purchaseParams";
+import { fetchSubscriptionPurchase } from "./purchases";
+import { Tier, tierMap } from "./tiers";
 
 const composerWhitelist = new Set<string>(
   process.env.COMPOSER_WHITELIST?.split(",")
 );
+
 const explorerWhitelist = new Set<string>(
   process.env.EXPLORER_WHITELIST?.split(",")
 );
 
-async function getTierName(
-  email: string | null,
-  accessToken: string
-): Promise<Tier | undefined> {
-  // Checking whitelists
-  if (email) {
-    if (composerWhitelist.has(email)) {
-      return "Composer";
-    }
-    if (explorerWhitelist.has(email)) {
-      return "Explorer";
+const getGooglePlaySubscriptionTierFromCookie = async () => {
+  const subscriptionData = getDataFromSubscriptionCookie();
+  if (subscriptionData) {
+    const subscription = await fetchSubscriptionPurchase(subscriptionData);
+    if (subscription) {
+      return tierMap.get(subscriptionData.itemId);
     }
   }
+};
 
+const getTierFromPatreonApi = async (accessToken: string) => {
   // Getting tier name from patreon API
 
   // tiers by priority asc
@@ -57,6 +57,40 @@ async function getTierName(
     console.error("Error fetching tier names:", error);
     throw error;
   }
+};
+
+const getTierFromWhitelist = (email: string | null) => {
+  if (email) {
+    if (composerWhitelist.has(email)) {
+      return "Composer";
+    }
+    if (explorerWhitelist.has(email)) {
+      return "Explorer";
+    }
+  }
+};
+
+async function getTierName(
+  email: string | null,
+  accessToken: string
+): Promise<Tier | undefined> {
+  // Checking whitelists
+  let tier: Tier | undefined;
+
+  tier = getTierFromWhitelist(email);
+
+  if (tier) {
+    return tier;
+  }
+
+  tier = await getGooglePlaySubscriptionTierFromCookie();
+  if (tier) {
+    return tier;
+  }
+
+  tier = await getTierFromPatreonApi(accessToken);
+
+  return tier;
 }
 
 export type PremiumFeaturesWithSession = {
@@ -117,7 +151,9 @@ export const applyTierToResult = (result: any, subscriptionTier?: Tier) => {
   return result;
 };
 
-export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
+export async function getPremiumFeatures(
+  purchaseToken?: string
+): Promise<PremiumFeaturesWithSession> {
   "use server";
   // Determine premium status
   const session = await auth();

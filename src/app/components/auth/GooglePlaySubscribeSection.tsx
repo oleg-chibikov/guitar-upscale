@@ -1,16 +1,11 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { Tier } from "@/lib/tiers";
+import { Tier, tierMap } from "@/lib/tiers";
 import { LinearProgress } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
-
-const tierMap = new Map<string, Tier>([
-  ["guitar_upscale.composer", "Composer"],
-  ["guitar_upscale.explorer", "Explorer"],
-]);
 
 interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option?: Tier) => void;

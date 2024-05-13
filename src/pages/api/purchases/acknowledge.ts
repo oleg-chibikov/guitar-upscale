@@ -1,6 +1,6 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionPurchase } from "@/lib/billing";
-import { PurchaseParams } from "@/lib/purchaseParams";
+import { PurchaseParams, setSubscriptionCookie } from "@/lib/purchaseParams";
 import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
@@ -58,7 +58,7 @@ const handle = async (
     // We need to add some state to make sure subscription.ts / getTierName uses it. This state should be also set when the app loads
 
     console.log("Acknowledged subscription");
-
+    setSubscriptionCookie(params, req, res);
     res.status(200);
   } finally {
     res.end(); // End the response

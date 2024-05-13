@@ -28,6 +28,7 @@
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
     "axios": "^1.6.8",
+    "cookies-next": "^4.1.1",
     "dotenv": "^16.4.5",
     "eruda": "^3.0.1",
     "googleapis": "^137.1.0",
