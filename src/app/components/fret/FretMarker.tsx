@@ -251,8 +251,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                       (isFromPreviousChord
                         ? `border-4 ${
                             theme === Theme.Light
-                              ? "text-background-light border-border_accent_stronger-light"
-                              : "text-background-dark border-border_accent_stronger-dark"
+                              ? "text-background-light border-accent_stronger-light"
+                              : "text-background-dark border-accent_stronger-dark"
                           } ${
                             isColored
                               ? `${

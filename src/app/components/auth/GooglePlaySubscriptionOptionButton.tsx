@@ -95,11 +95,11 @@ export const GooglePlaySubscriptionOptionButton: FC<
       className={`flex justify-between align-middle items-center flex-row gap 2 p-2 gap 2 ${
         isSelected
           ? theme === Theme.Light
-            ? "bg-accented_background-light"
-            : "bg-accented_background-dark"
+            ? "bg-accent-light"
+            : "bg-accent-dark"
           : theme === Theme.Light
-          ? "bg-panel-light"
-          : "bg-panel-dark"
+          ? "bg-accent_stronger-light"
+          : "bg-accent_stronger-dark"
       }`}
     >
       <p className="text-lg font-semibold">

@@ -68,15 +68,15 @@ const config: Config = {
           light: "#8D6E63", // Coffee Bean
           dark: "#999999",
         },
-        border_accent: {
+        accent: {
           light: "#D48CA7",
           dark: "#9567DB",
         },
-        border_accent_stronger: {
+        accent_stronger: {
           light: "#B8505C",
           dark: "#9932CC",
         },
-        border_accent_strongest: {
+        accent_strongest: {
           light: "#9B3320",
           dark: "#B103BC",
         },

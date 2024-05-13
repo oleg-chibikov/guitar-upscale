@@ -134,16 +134,16 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       } items-center justify-center content-center ${
         isGracePeriod
           ? theme === Theme.Light
-            ? "border-border_accent_stronger-light"
-            : " border-border_accent_stronger-dark"
+            ? "border-accent_stronger-light"
+            : " border-accent_stronger-dark"
           : isPlaying
           ? theme === Theme.Light
-            ? "border-border_accent_strongest-light"
-            : " border-border_accent_strongest-dark"
+            ? "border-accent_strongest-light"
+            : " border-accent_strongest-dark"
           : isClicked
           ? theme === Theme.Light
-            ? "border-border_accent-light"
-            : "border-border_accent-dark"
+            ? "border-accent-light"
+            : "border-accent-dark"
           : undefined
       } ${
         isDisabled
