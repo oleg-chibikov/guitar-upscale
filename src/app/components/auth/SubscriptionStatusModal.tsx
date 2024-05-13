@@ -106,7 +106,6 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                   {"Subscription level:"}{" "}
                   <strong>{subscriptionTier ?? "Not subscribed"}</strong>
                 </span>
-                <strong>Premium features:</strong>
                 {
                   <ul className="flex flex-col items-start">
                     {Object.entries(featureNames).map(([key, value]) => (
