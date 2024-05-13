@@ -103,7 +103,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
     <div
       onClick={() => onClick(subscriptionOption)}
       className={`flex justify-between align-middle items-center flex-row p-2 gap-2 ${
-        isSelected
+        !isSelected
           ? theme === Theme.Light
             ? "bg-accent-light"
             : "bg-accent-dark"
