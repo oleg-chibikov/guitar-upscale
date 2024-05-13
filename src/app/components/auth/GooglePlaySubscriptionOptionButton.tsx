@@ -89,7 +89,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   // TODO: UI
   return (
     <div
-      className={`flex flex-row gap 2 p-4 ${
+      className={`flex justify-between align-middle items-center flex-row gap 2 p-4 ${
         theme === Theme.Light
           ? "bg-border_accent-light"
           : "bg-border_accent-dark"
