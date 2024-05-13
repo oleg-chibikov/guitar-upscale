@@ -120,7 +120,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
               </>
             </div>
           </div>
-          <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
+          <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
             {/* This button is visible only on Android. The user can subscribe or change subscription there */}
             {hasDigitalGoodsService && (
               <GooglePlaySubscribeSection
