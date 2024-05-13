@@ -23,9 +23,7 @@ export const ContextProvider: FC<PremiumFeaturesContextProviderProps> = ({
       <Provider store={store}>
         <MuiThemeProvider>
           <DigitalGoodsServiceProvider>
-            <PremiumFeaturesProvider
-              premiumFeatures={premiumFeatures.premiumFeatures}
-            >
+            <PremiumFeaturesProvider premiumFeatures={premiumFeatures}>
               <PersistGate loading={null} persistor={persistor}>
                 {children}
               </PersistGate>

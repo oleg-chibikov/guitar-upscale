@@ -1,20 +1,22 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
+import { Tier } from "@/lib/tiers";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
 
-const subscriptionItemIds = [
-  "guitar_upscale.composer",
-  "guitar_upscale.explorer",
-];
-
-interface GooglePlaySubscribeSectionProps {}
+const tierMap = new Map<string, Tier>([
+  ["guitar_upscale.composer", "Composer"],
+  ["guitar_upscale.explorer", "Explorer"],
+]);
+interface GooglePlaySubscribeSectionProps {
+  onOptionSelected: (option: Tier) => void;
+}
 
 export const GooglePlaySubscribeSection: FC<
   GooglePlaySubscribeSectionProps
-> = ({}) => {
+> = ({ onOptionSelected }) => {
   const dispatch = useDispatch();
   const [selectedOption, setSelectedOption] =
     useState<DigitalGoodsProductDetails>();
@@ -35,7 +37,7 @@ export const GooglePlaySubscribeSection: FC<
           "https://play.google.com/billing"
         );
         const details = await digitalGoodsService.getDetails(
-          subscriptionItemIds
+          Array.from(tierMap.keys())
         );
         setSubscriptionOptions(details);
       } catch (ex: any) {
@@ -61,6 +63,7 @@ export const GooglePlaySubscribeSection: FC<
           isSelected={selectedOption === subscriptionOption}
           onClick={(subscriptionOption) => {
             setSelectedOption(subscriptionOption);
+            onOptionSelected(tierMap.get(subscriptionOption.itemId)!);
           }}
           key={subscriptionOption.itemId}
           subscriptionOption={subscriptionOption}

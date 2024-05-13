@@ -1,5 +1,6 @@
 import { Session } from "next-auth";
 import { auth } from "./auth";
+import { Tier } from "./tiers";
 
 const composerWhitelist = new Set<string>(
   process.env.COMPOSER_WHITELIST?.split(",")
@@ -11,7 +12,7 @@ const explorerWhitelist = new Set<string>(
 async function getTierName(
   email: string | null,
   accessToken: string
-): Promise<string | undefined> {
+): Promise<Tier | undefined> {
   // Checking whitelists
   if (email) {
     if (composerWhitelist.has(email)) {
@@ -28,7 +29,7 @@ async function getTierName(
 
   // tiers by priority asc
   const orderedTargetTierIds = ["22790257", "22790278"];
-  let tierName: string | undefined;
+  let tierName: Tier | undefined;
 
   try {
     const url = "TODO";
@@ -62,11 +63,13 @@ async function getTierName(
 
 export type PremiumFeaturesWithSession = {
   premiumFeatures: PremiumFeatures;
+  explorerPremiumFeatures: PremiumFeatures;
+  composerPremiumFeatures: PremiumFeatures;
   session: Session | null;
+  subscriptionTier?: string;
 };
 
 export type PremiumFeatures = {
-  subscriptionTier?: string;
   midiRecorder?: boolean;
   playbackTypeSelection?: boolean;
   advancedChords?: boolean;
@@ -84,8 +87,32 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
   "use server";
   // Determine premium status
   const session = await auth();
+
+  const explorerPremiumFeatures: PremiumFeatures = {
+    melodies: true,
+    advancedChords: true,
+    instruments: true,
+    reverbStrength: true,
+    playbackTypeSelection: true,
+    chordDetection: true,
+  };
+
+  const composerPremiumFeatures: PremiumFeatures = {
+    ...explorerPremiumFeatures,
+    midiRecorder: true,
+    toggleMetronomeWhenRecordingCheckbox: true,
+    skinSelection: true,
+  };
+
+  const result: PremiumFeaturesWithSession = {
+    session,
+    premiumFeatures: {},
+    explorerPremiumFeatures,
+    composerPremiumFeatures,
+  };
+
   if (!session?.accessToken) {
-    return { session, premiumFeatures: {} };
+    return result;
   }
 
   const subscriptionTier = await getTierName(
@@ -93,35 +120,21 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
     session.accessToken
   );
   console.log("Subscription tier", subscriptionTier);
-  // Load premium feature only if user is premium
-  const settings = {
-    session,
-    premiumFeatures: {
-      melodies: true,
-      advancedChords: true,
-      instruments: true,
-      reverbStrength: true,
-      playbackTypeSelection: true,
-      chordDetection: true,
-      subscriptionTier,
-    } as PremiumFeatures,
-  };
-  if (subscriptionTier === "Explorer") {
-    // Dynamically import premium feature
 
-    return settings;
+  if (subscriptionTier === "Explorer") {
+    return {
+      ...result,
+      premiumFeatures: explorerPremiumFeatures,
+      subscriptionTier,
+    };
   }
 
   if (subscriptionTier === "Composer") {
     return {
-      ...settings,
-      premiumFeatures: {
-        ...settings.premiumFeatures,
-        midiRecorder: true,
-        toggleMetronomeWhenRecordingCheckbox: true,
-        skinSelection: true,
-      },
+      ...result,
+      premiumFeatures: composerPremiumFeatures,
+      subscriptionTier,
     };
   }
-  return { session, premiumFeatures: {} };
+  return result;
 }

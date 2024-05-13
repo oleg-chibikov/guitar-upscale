@@ -1,4 +1,4 @@
-import { PurchaseParams } from "@/lib/subscriptionTypes";
+import { PurchaseParams } from "@/lib/purchaseParams";
 
 export enum AcknowledgeResult {
   Success,

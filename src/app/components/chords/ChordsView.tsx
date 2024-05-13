@@ -36,7 +36,7 @@ export const ChordsView: React.FC = () => {
     useSharpChords,
   } = useSelector(selectUi);
   const dispatch = useDispatch();
-  const premiumFeatures = usePremiumFeatures();
+  const { premiumFeatures } = usePremiumFeatures();
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };

@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import * as billing from "./billing";
-import { PurchaseParams } from "./subscriptionTypes";
+import { PurchaseParams } from "./purchaseParams";
 
 //https://developers.google.com/android-publisher/api-ref/rest
 //https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest

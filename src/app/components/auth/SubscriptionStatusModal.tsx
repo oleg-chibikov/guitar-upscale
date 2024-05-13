@@ -1,10 +1,13 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
+import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
+import { PremiumFeatureKeys } from "@/lib/subscription";
+import { Tier } from "@/lib/tiers";
 import { Avatar, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
@@ -33,21 +36,41 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
   openModal,
   handleCloseModal,
 }) => {
-  const premiumFeatures = usePremiumFeatures() as { [key: string]: string };
+  const { premiumFeatures, composerPremiumFeatures, explorerPremiumFeatures } =
+    usePremiumFeatures();
+  const keyValueCurrentFeatures = premiumFeatures as { [key: string]: string };
+  const keyValueComposerFeatures = composerPremiumFeatures as {
+    [key: string]: string;
+  };
+  const keyValueExplorerFeatures = explorerPremiumFeatures as {
+    [key: string]: string;
+  };
   const { data: session } = useSession();
   const { theme } = useSelector(selectUi);
+  const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsService();
   const premiumFeatureNames: string[] = [];
   const disabledFeatureNames: string[] = [];
+  const [highlightedOption, setHighlightedOption] = useState<Tier>();
 
   Object.entries(featureNames).forEach(([key, featureName]) => {
-    const premiumFeature = premiumFeatures[key];
+    const premiumFeature = keyValueCurrentFeatures[key];
     if (premiumFeature) {
       premiumFeatureNames.push(featureName);
     } else {
       disabledFeatureNames.push(featureName);
     }
   });
+
+  const renderPossibleFeature = (x: PremiumFeatureKeys) => {
+    if (
+      (highlightedOption === "Composer" && keyValueComposerFeatures[x]) ||
+      (highlightedOption === "Explorer" && keyValueExplorerFeatures[x])
+    ) {
+      return <span className="text-green-500 opacity-50">✓</span>;
+    }
+    return null;
+  };
 
   return (
     <Modal
@@ -84,9 +107,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
               <>
                 <span>
                   {"Subscription level:"}{" "}
-                  <strong>
-                    {premiumFeatures.subscriptionTier ?? "Not subscribed"}
-                  </strong>
+                  <strong>{subscriptionTier ?? "Not subscribed"}</strong>
                 </span>
                 <strong>Premium features:</strong>
                 {
@@ -94,11 +115,13 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
                     {premiumFeatureNames.map((x) => (
                       <li key={x}>
                         <span className="text-green-500">✓</span> {x}
+                        {renderPossibleFeature(x as PremiumFeatureKeys)}
                       </li>
                     ))}
                     {disabledFeatureNames.map((x) => (
                       <li key={x}>
                         <span className="text-red-500">⨯</span> {x}
+                        {renderPossibleFeature(x as PremiumFeatureKeys)}
                       </li>
                     ))}
                   </ul>
@@ -108,7 +131,13 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
           </div>
           <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
             {/* This button is visible only on Android. The user can subscribe or change subscription there */}
-            {hasDigitalGoodsService && <GooglePlaySubscribeSection />}
+            {hasDigitalGoodsService && (
+              <GooglePlaySubscribeSection
+                onOptionSelected={(tier) => {
+                  setHighlightedOption(tier);
+                }}
+              />
+            )}
             {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
             <PatreonModalAuthButton closeModal={handleCloseModal} />

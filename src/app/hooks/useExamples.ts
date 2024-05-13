@@ -3,7 +3,7 @@ import { usePremiumFeatures } from "../context/PremiumFeaturesProvider";
 import { Example } from "../data/example";
 
 export const useExamples = () => {
-  const premiumFeatures = usePremiumFeatures();
+  const { premiumFeatures } = usePremiumFeatures();
   const [examplesMap, setExamplesMap] =
     useState<Map<string, Map<string, Example[]>>>();
 

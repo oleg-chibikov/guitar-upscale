@@ -1,11 +1,11 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionPurchase } from "@/lib/billing";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { PurchaseParams } from "../../lib/purchaseParams";
 import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
 } from "../../lib/purchases";
-import { PurchaseParams } from "../../lib/subscriptionTypes";
 
 type ResponseData = {
   subscription?: SubscriptionPurchase;
