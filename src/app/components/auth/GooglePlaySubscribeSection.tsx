@@ -10,10 +10,10 @@ const subscriptionItemIds = [
   "guitar_upscale.explorer",
 ];
 
-interface GooglePlaySubscribeButtonProps {}
+interface GooglePlaySubscribeSectionProps {}
 
-export const GooglePlaySubscribeButton: FC<
-  GooglePlaySubscribeButtonProps
+export const GooglePlaySubscribeSection: FC<
+  GooglePlaySubscribeSectionProps
 > = ({}) => {
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsService();
@@ -71,7 +71,6 @@ export const GooglePlaySubscribeButton: FC<
 
   return (
     <ul className="flex flex-col gap-2">
-      <strong>Google Play Subscriptions:</strong>
       {subscriptionOptions.map((subscriptionOption) => (
         <GooglePlaySubscriptionOptionButton
           key={subscriptionOption.itemId}

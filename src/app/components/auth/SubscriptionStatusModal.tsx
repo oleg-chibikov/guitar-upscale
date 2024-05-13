@@ -9,9 +9,9 @@ import { useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
-const GooglePlaySubscribeButton = React.lazy(() =>
-  import("./GooglePlaySubscribeButton").then((module) => ({
-    default: module.GooglePlaySubscribeButton,
+const GooglePlaySubscribeSection = React.lazy(() =>
+  import("./GooglePlaySubscribeSection").then((module) => ({
+    default: module.GooglePlaySubscribeSection,
   }))
 );
 
@@ -108,7 +108,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
           </div>
           <div className="mt-2 flex w-full flex-col gap-1 items-stretch justify-center">
             {/* This button is visible only on Android. The user can subscribe or change subscription there */}
-            {hasDigitalGoodsService && <GooglePlaySubscribeButton />}
+            {hasDigitalGoodsService && <GooglePlaySubscribeSection />}
             {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
             <PatreonModalAuthButton closeModal={handleCloseModal} />
