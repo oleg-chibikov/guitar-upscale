@@ -77,7 +77,7 @@ export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`flex overflow-auto max-h-full flex-col gap-1 border-2 p-1 ${
+          className={`flex overflow-auto max-h-full flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"

@@ -12,9 +12,7 @@ export async function acknowldegeSubscriptionOnBackend(
 
   try {
     const response = await fetch(
-      `/api/googlePlayBillingSubscription?itemId=${itemId}&purchaseToken=${
-        "b" + purchaseToken.substring(1) //TODO for testing!
-      }`,
+      `/api/googlePlayBillingSubscription?itemId=${itemId}&purchaseToken=${purchaseToken}`,
       {
         method: "POST",
         headers: {

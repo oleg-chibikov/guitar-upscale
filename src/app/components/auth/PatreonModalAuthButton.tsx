@@ -44,7 +44,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
       )}
       {!isSignedIn && !userWantsToSignInWithPatreon && (
         <CheckBox
-          label="I have subscribed on the website, let me use my subscription"
+          label="I have already subscribed on the website, let me use my subscription"
           value={userWantsToSignInWithPatreon}
           onValueChange={setUserWantsToSignInWithPatreon}
         />
