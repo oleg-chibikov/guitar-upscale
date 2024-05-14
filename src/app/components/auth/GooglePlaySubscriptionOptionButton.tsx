@@ -86,6 +86,14 @@ export const GooglePlaySubscriptionOptionButton: FC<
           })
         );
       }
+    } catch (e) {
+      console.log(e);
+      dispatch(
+        setAndShowAlert({
+          message: "Cancellation aborted",
+          alertType: AlertType.Warning,
+        })
+      );
     } finally {
       setIsLoading(false);
     }
@@ -169,7 +177,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       console.log(e);
       dispatch(
         setAndShowAlert({
-          message: "Cancelled",
+          message: "Subscribing aborted",
           alertType: AlertType.Warning,
         })
       );
@@ -214,6 +222,8 @@ export const GooglePlaySubscriptionOptionButton: FC<
           await makePurchase();
         }}
       >
+        {/* TODO: Cancel in a separate modal with confirmation */}
+        {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
         {isAlreadyPurchased ? "Cancel subscription" : "Subscribe"}
       </Button>
     </div>
