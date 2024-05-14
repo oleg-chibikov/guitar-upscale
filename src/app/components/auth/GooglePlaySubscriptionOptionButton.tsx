@@ -44,39 +44,44 @@ export const GooglePlaySubscriptionOptionButton: FC<
     if (!hasDigitalGoodsService) {
       return;
     }
-    const digitalGoodsService = await buildDigitalGoodsService();
-    const existingPurchases = await digitalGoodsService.listPurchases();
-    const purchases = existingPurchases
-      .filter((x) => x.itemId === subscriptionOption.itemId)
-      .map((x) => ({
-        itemId: x.itemId as TierKey,
-        purchaseToken: x.purchaseToken,
-      }));
-    if (!purchases.length) {
-      dispatch(
-        setAndShowAlert({
-          message:
-            "Cannot cancel the subscription. Google Play api doesn't list it as purchased",
-          alertType: AlertType.Error,
-        })
-      );
-    }
-    const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
-    if (cancelResult === ApiCallResult.Success) {
-      // TODO: It is hidden by reload
-      dispatch(
-        setAndShowAlert({
-          message: `Subscription "${title}" has been successfully cancelled`,
-        })
-      );
-      incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
-    } else {
-      dispatch(
-        setAndShowAlert({
-          message: "Cannot cancel the subscription due to an error",
-          alertType: AlertType.Error,
-        })
-      );
+    setIsLoading(true);
+    try {
+      const digitalGoodsService = await buildDigitalGoodsService();
+      const existingPurchases = await digitalGoodsService.listPurchases();
+      const purchases = existingPurchases
+        .filter((x) => x.itemId === subscriptionOption.itemId)
+        .map((x) => ({
+          itemId: x.itemId as TierKey,
+          purchaseToken: x.purchaseToken,
+        }));
+      if (!purchases.length) {
+        dispatch(
+          setAndShowAlert({
+            message:
+              "Cannot cancel the subscription. Google Play api doesn't list it as purchased",
+            alertType: AlertType.Error,
+          })
+        );
+      }
+      const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
+      if (cancelResult === ApiCallResult.Success) {
+        // TODO: It is hidden by reload
+        dispatch(
+          setAndShowAlert({
+            message: `Subscription "${title}" has been successfully cancelled`,
+          })
+        );
+        incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
+      } else {
+        dispatch(
+          setAndShowAlert({
+            message: "Cannot cancel the subscription due to an error",
+            alertType: AlertType.Error,
+          })
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -166,10 +171,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
     currency: subscriptionOption.price.currency,
   }).format(parseFloat(subscriptionOption.price.value));
 
-  // TODO: UI
   return (
     <div
-      onClick={() => onClick(subscriptionOption)}
+      onClick={() => !isAlreadyPurchased && onClick(subscriptionOption)}
       className={`flex justify-between align-middle items-center flex-row p-2 gap-2 ${
         isAlreadyPurchased
           ? "bg-emerald-600" // TODO: themed colors?
@@ -196,7 +200,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           await makePurchase();
         }}
       >
-        Purchase
+        {isAlreadyPurchased ? "Cancel subscription" : "Subscribe"}
       </Button>
     </div>
   );
