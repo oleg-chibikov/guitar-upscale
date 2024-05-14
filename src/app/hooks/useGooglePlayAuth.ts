@@ -46,31 +46,24 @@ export const useGooglePlayAuth = () => {
       const digitalGoodsService = await buildDigitalGoodsService();
       const existingPurchases = await digitalGoodsService.listPurchases();
 
-      alert(
-        existingPurchases.length + ": " + subscriptionTier
-          ? JSON.stringify(subscriptionTier)
-          : "no tier"
-      );
-
       await processWithReloads(
         dispatch,
         GOOGLE_PLAY_RELOAD_KEY,
         () => {
           const hasGooglePlaySubscription =
             subscriptionTier?.provider === SubscriptionProvider.GooglePlay;
-          return (
+          const isM =
             (existingPurchases.length && !hasGooglePlaySubscription) ||
-            (hasGooglePlaySubscription && !existingPurchases.length)
-          );
+            (hasGooglePlaySubscription && !existingPurchases.length);
+          alert(isM + " : " + hasGooglePlaySubscription);
+          return isM;
         },
         async () => {
-          console.log(
-            "Mismatch in the Google play session status - reload needed"
-          );
+          alert("Mismatch in the Google play session status - reload needed");
           if (existingPurchases.length) {
             const logMessage =
               "Google Play api mentions purchases but permissions are not set";
-            console.log(logMessage);
+            alert(logMessage);
             const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
             const result = await acknowledgePurchaseOnBackend({
               itemId: purchaseToProcess.itemId as TierKey,
@@ -98,7 +91,7 @@ export const useGooglePlayAuth = () => {
           } else {
             const logMessage =
               "Google Play api mentions no purchases but permissions are set";
-            console.log(logMessage);
+            alert(logMessage);
             const result = await clearSubscriptionCookieOnBackend();
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
