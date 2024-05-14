@@ -1,4 +1,3 @@
-import { sleep } from "../engine/sleep";
 import { setLoadingMessage } from "../store/uiSlice";
 
 export function getReloadCount(key: string) {
@@ -26,7 +25,7 @@ export async function incrementAndReload(
       (reloadMessage ?? "Signin status mismatch") + " - reloading page"
     )
   );
-  await sleep(2000);
+  // await sleep(2000);
   console.log("Reloading page");
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
