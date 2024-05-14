@@ -62,9 +62,9 @@ export const useGooglePlayAuth = () => {
             "Mismatch in the Google play session status - reload needed"
           );
           if (existingPurchases.length) {
-            console.log(
-              "Google Play api mentions purchases but there are no permissions"
-            );
+            const logMessage =
+              "Google Play api mentions purchases but permissions are not set";
+            console.log(logMessage);
             const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
             const result = await acknowledgePurchaseOnBackend({
               itemId: purchaseToProcess.itemId as TierKey,
@@ -75,7 +75,7 @@ export const useGooglePlayAuth = () => {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
                 shouldIncrement: true,
-                message: "Successfully subscribed",
+                message: logMessage,
               };
             } else {
               dispatch(
@@ -90,15 +90,15 @@ export const useGooglePlayAuth = () => {
               };
             }
           } else {
-            console.log(
-              "Google Play api mentions no purchases but there are permissions"
-            );
+            const logMessage =
+              "Google Play api mentions no purchases but permissions are set";
+            console.log(logMessage);
             const result = await clearSubscriptionCookieOnBackend();
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
                 shouldIncrement: true,
-                message: "Successfully removed subscription token",
+                message: logMessage,
               };
             } else {
               dispatch(
