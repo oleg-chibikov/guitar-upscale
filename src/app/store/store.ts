@@ -62,6 +62,8 @@ const persistConfig = {
         delete newState.isMetronomeActive;
         delete newState.chordIsBeingDetected;
         delete newState.isRecording;
+        delete newState.subscriptionTier;
+        delete newState.premiumFeatures;
         return newState;
       },
       out: (state: any) => state, // No transformation needed when deserializing
