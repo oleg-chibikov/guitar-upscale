@@ -1,10 +1,6 @@
 import { Session } from "next-auth";
-import { cookies } from "next/headers";
 import { auth } from "./auth";
-import {
-  GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
-  getDataFromCookieValue,
-} from "./purchaseParams";
+import { googlePlaySession } from "./googlePlaySession";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { SubscriptionProvider, TierInfo } from "./subscriptionProvider";
 import { Tier, tierMap } from "./tiers";
@@ -17,18 +13,18 @@ const explorerWhitelist = new Set<string>(
   process.env.EXPLORER_WHITELIST?.split(",")
 );
 
-const getDataFromSubscriptionCookie = () => {
-  const value = cookies().get(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY)?.value;
+const getDataFromSubscriptionCookie = async () => {
+  const value = await googlePlaySession().all();
   if (!value) {
-    console.log("No value in subscription cookie");
+    console.log("No subscription value in session");
     return undefined;
   }
-  console.log("Value in subscription cookie", value);
-  return getDataFromCookieValue(value);
+  console.log("Session has subscription value", value);
+  return value;
 };
 
 const getGooglePlaySubscriptionTierFromCookie = async () => {
-  const subscriptionData = getDataFromSubscriptionCookie();
+  const subscriptionData = await getDataFromSubscriptionCookie();
   if (subscriptionData) {
     const subscription = await fetchSubscriptionPurchase(subscriptionData);
     if (subscription) {
