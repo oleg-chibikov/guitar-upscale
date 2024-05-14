@@ -34,6 +34,7 @@ export const useSessionAuth = () => {
 
     const checkSession = async () => {
       await processWithReloads(
+        dispatch,
         SESSION_RELOAD_KEY,
         () => ((isSignedIn && !session) || (session && !isSignedIn)) ?? false,
         () => Promise.resolve(true),

@@ -1,5 +1,3 @@
-"use client";
-
 import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Alert, Slide } from "@mui/material";

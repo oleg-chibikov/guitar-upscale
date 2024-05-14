@@ -1,4 +1,3 @@
-"use client";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { FC, Suspense, useEffect, useState } from "react";

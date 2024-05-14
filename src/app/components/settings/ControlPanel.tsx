@@ -1,4 +1,3 @@
-"use client";
 import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";

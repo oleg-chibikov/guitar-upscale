@@ -1,4 +1,3 @@
-"use client";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";

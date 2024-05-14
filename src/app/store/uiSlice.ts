@@ -29,6 +29,7 @@ interface UiState {
   strummingSettingsExpanded: boolean;
   useAdvancedChords: boolean;
   useSharpChords: boolean;
+  loadingMessage?: string;
 }
 
 const initialState: UiState = {
@@ -156,6 +157,9 @@ export const uiSlice = createSlice({
     setUseSharpChords(state, action: PayloadAction<boolean>) {
       state.useSharpChords = action.payload;
     },
+    setLoadingMessage(state, action: PayloadAction<string | undefined>) {
+      state.loadingMessage = action.payload;
+    },
   },
 });
 
@@ -174,6 +178,7 @@ export const {
   setStrummingSettingsExpanded,
   setUseAdvancedChords,
   setUseSharpChords,
+  setLoadingMessage,
 } = uiSlice.actions;
 
 export const selectUi = (state: RootState) => state.ui;

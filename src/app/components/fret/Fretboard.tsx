@@ -1,4 +1,3 @@
-"use client";
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { Skin } from "@/app/data/skin";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";

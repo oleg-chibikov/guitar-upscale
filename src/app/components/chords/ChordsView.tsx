@@ -1,9 +1,3 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
-
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import {
   ChordsDisplayMode,
@@ -14,6 +8,9 @@ import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
 import {
   ChordMode,
   NoteChordMode,

@@ -1,4 +1,3 @@
-"use client";
 import { Theme } from "@/app/data/theme";
 import { useEffect } from "react";
 import ReactGA from "react-ga4";
@@ -10,6 +9,8 @@ import {
 } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import { playNote } from "../engine/sound/soundProvider";
+import { useGooglePlayAuth } from "../hooks/useGooglePlayAuth";
+import { useSessionAuth } from "../hooks/useSessionAuth";
 import {
   chordInstrumentValue,
   init,
@@ -21,6 +22,8 @@ import { selectUi } from "../store/uiSlice";
 export const Initializer: React.FC = () => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
+  useSessionAuth();
+  useGooglePlayAuth();
 
   useEffect(() => {
     dispatch(init());

@@ -1,4 +1,3 @@
-"use client";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";

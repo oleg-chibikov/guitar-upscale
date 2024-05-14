@@ -6,16 +6,7 @@ import {
   PremiumComponent,
   WithPremiumFeatures,
 } from "../helpers/WithPremiumFeatures";
-import { Initializer } from "./Initializer";
-import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
-import { AlertWrapper } from "./alert/AlertWrapper";
-import AuthPanel from "./auth/AuthPanel";
-import { ChordsView } from "./chords/ChordsView";
-import { Fretboard } from "./fret/Fretboard";
-import { AspectRatioControl } from "./settings/AspectRatioControl";
-import { ControlPanel } from "./settings/ControlPanel";
-import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
-import { StrummingSettings } from "./settings/StrummingSettings";
+import { ClientRoot } from "./ClientRoot";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
 import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox";
 
@@ -119,21 +110,10 @@ export const premiumFeaturesToMap = (
   return premiumComponents;
 };
 
-export const Main: React.FC<WithPremiumFeatures> = ({ premiumFeatures }) => {
+export const PremiumComponentsLoader: React.FC<WithPremiumFeatures> = ({
+  premiumFeatures,
+}) => {
   const premiumComponents = premiumFeaturesToMap(premiumFeatures);
 
-  return (
-    <main>
-      <Initializer />
-      <AlertWrapper />
-      <ControlPanel premiumComponents={premiumComponents} />
-      <Fretboard />
-      <SettingsViewWrapper premiumComponents={premiumComponents} />
-      <ChordsView />
-      <AspectRatioControl />
-      <AuthPanel />
-      <StrummingSettings />
-      <MenuOutsideClickHandler />
-    </main>
-  );
+  return <ClientRoot premiumComponents={premiumComponents} />;
 };

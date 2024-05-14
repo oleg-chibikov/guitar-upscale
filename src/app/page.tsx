@@ -1,4 +1,4 @@
-import { Main } from "./components/Main";
+import { PremiumComponentsLoader } from "./components/PremiumComponentsLoader";
 import ServerActionRoot from "./components/ServerActionRoot";
 import { ContextProvider } from "./context/ContextProvider";
 
@@ -7,7 +7,9 @@ const Home: React.FC = async () => {
     <ServerActionRoot
       renderChildren={(premiumFeaturesWithSession) => (
         <ContextProvider premiumFeatures={premiumFeaturesWithSession}>
-          <Main premiumFeatures={premiumFeaturesWithSession.premiumFeatures} />
+          <PremiumComponentsLoader
+            premiumFeatures={premiumFeaturesWithSession.premiumFeatures}
+          />
         </ContextProvider>
       )}
     ></ServerActionRoot>

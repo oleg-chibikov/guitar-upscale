@@ -1,3 +1,6 @@
+import { sleep } from "../engine/sleep";
+import { setLoadingMessage } from "../store/uiSlice";
+
 export function getReloadCount(key: string) {
   const signInCheckCountRaw = localStorage.getItem(key);
   const signInCheckCount =
@@ -19,6 +22,7 @@ export function incrementAndReload(key: string, currentValue: number) {
 }
 
 export const processWithReloads = async (
+  dispatch: (param: any) => void,
   key: string,
   isMismatch: () => boolean,
   onMismatchWithinLimit: () => Promise<boolean>,
@@ -34,18 +38,23 @@ export const processWithReloads = async (
       // check to avoid endless reloads
       const shouldIncrement = await onMismatchWithinLimit();
       if (shouldIncrement) {
+        dispatch(setLoadingMessage("Signin status mismatch - Reloading page"));
+        await sleep(1000);
         incrementAndReload(key, signInCheckCount);
       } else {
         console.log("Mismatch cannot be fixed - skipping reload");
+        dispatch(setLoadingMessage(undefined));
       }
     } else {
       console.log("Reload attempts exceeded", key);
       onMismatchAndLimitExceeded();
+      dispatch(setLoadingMessage(undefined));
     }
   } else {
     console.log("Signin status matched", key);
     // sign in status in state matches session
     clearReloadCount(key);
     onMatch();
+    dispatch(setLoadingMessage(undefined));
   }
 };

@@ -47,6 +47,7 @@ export const useGooglePlayAuth = () => {
       const existingPurchases = await digitalGoodsService.listPurchases();
 
       await processWithReloads(
+        dispatch,
         GOOGLE_PLAY_RELOAD_KEY,
         () => {
           const hasGooglePlaySubscription =
