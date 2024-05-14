@@ -1,3 +1,4 @@
+import { getCookie } from "cookies-next";
 import { Session } from "next-auth";
 import { cookies } from "next/headers";
 import { auth } from "./auth";
@@ -18,7 +19,7 @@ const explorerWhitelist = new Set<string>(
 );
 
 const getDataFromSubscriptionCookie = () => {
-  const value = cookies().get(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY)?.value;
+  const value = getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, { cookies });
   if (!value) {
     console.log("No value in subscription cookie");
     return undefined;
