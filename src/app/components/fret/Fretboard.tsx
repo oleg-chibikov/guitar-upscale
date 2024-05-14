@@ -12,8 +12,6 @@ import { getAssetsForSkin } from "../../helpers/skinHelper";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
-const X_SHIFT = 756;
-
 const getPositionForSkin = (skin?: Skin) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
@@ -21,21 +19,25 @@ const getPositionForSkin = (skin?: Skin) => {
       return {
         top: -583,
         left: -455,
+        xShift: 450,
       };
     case Skin.Ibanez_AE140_WKH:
       return {
         top: -589,
         left: -544,
+        xShift: 520,
       };
     case Skin.Yamaha_CSF3M:
       return {
         top: -573,
         left: -465,
+        xShift: 450,
       };
     case Skin.Yamaha_SLG200NW:
       return {
         top: -567,
         left: -520,
+        xShift: 450,
       };
   }
 };
@@ -120,7 +122,7 @@ export const Fretboard: React.FC = () => {
       <div
         className={"flex relative flex-col items-start z-10"}
         style={{
-          left: X_SHIFT,
+          left: position.xShift,
           top: needYShift ? -100 : 0,
         }}
       >
