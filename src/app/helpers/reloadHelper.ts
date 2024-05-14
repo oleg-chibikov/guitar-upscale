@@ -23,10 +23,10 @@ export async function incrementAndReload(
   console.log("Waiting to reload");
   dispatch(
     setLoadingMessage(
-      (reloadMessage ?? "Signin status mismatch") + " - Reloading page"
+      (reloadMessage ?? "Signin status mismatch") + " - reloading page"
     )
   );
-  await sleep(1000);
+  await sleep(2000);
   console.log("Reloading page");
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
