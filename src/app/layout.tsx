@@ -7,9 +7,6 @@ import { WithChildren } from "./helpers/withChildren";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const a = SpeedInsights; // just to retain the import
-const b = Analytics; // just to retain the import
-
 export const metadata: Metadata = {
   title: "Guitar upscale",
   description: "Upscale your guitar skills",
@@ -24,7 +21,11 @@ export default function RootLayout({ children }: Readonly<WithChildren>) {
         <link rel="manifest" href="manifest.json" />
         <meta name="google" content="notranslate" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
