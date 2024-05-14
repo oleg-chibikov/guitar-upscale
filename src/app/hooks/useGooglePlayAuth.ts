@@ -73,7 +73,10 @@ export const useGooglePlayAuth = () => {
 
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
-              return true;
+              return {
+                shouldIncrement: true,
+                message: "Successfully subscribed",
+              };
             } else {
               dispatch(
                 setAndShowAlert({
@@ -82,7 +85,9 @@ export const useGooglePlayAuth = () => {
                   alertType: AlertType.Error,
                 })
               );
-              return false;
+              return {
+                shouldIncrement: false,
+              };
             }
           } else {
             console.log(
@@ -91,7 +96,10 @@ export const useGooglePlayAuth = () => {
             const result = await clearSubscriptionCookieOnBackend();
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
-              return true;
+              return {
+                shouldIncrement: true,
+                message: "Successfully removed subscription token",
+              };
             } else {
               dispatch(
                 setAndShowAlert({
@@ -100,7 +108,9 @@ export const useGooglePlayAuth = () => {
                   alertType: AlertType.Error,
                 })
               );
-              return false;
+              return {
+                shouldIncrement: false,
+              };
             }
           }
         },

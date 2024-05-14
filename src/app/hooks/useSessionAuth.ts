@@ -37,7 +37,16 @@ export const useSessionAuth = () => {
         dispatch,
         SESSION_RELOAD_KEY,
         () => ((isSignedIn && !session) || (session && !isSignedIn)) ?? false,
-        () => Promise.resolve(true),
+        () =>
+          Promise.resolve({
+            shouldIncrement: true,
+            message:
+              isSignedIn && !session
+                ? "Signed in, but no session is present"
+                : session && !isSignedIn
+                ? "Session is present but not signed in"
+                : undefined,
+          }),
         () => {
           dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
           checkError();
