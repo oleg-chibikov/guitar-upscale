@@ -47,6 +47,11 @@ export const processWithReloads = async (
 ) => {
   const signInCheckCount = getReloadCount(key);
 
+  const clear = () => {
+    dispatch(setLoadingMessage(undefined));
+    clearReloadCount(key);
+  };
+
   if (isMismatch()) {
     console.log("Signin status mismatch", key);
     if (signInCheckCount < limit) {
@@ -56,18 +61,17 @@ export const processWithReloads = async (
         await incrementAndReload(key, signInCheckCount, dispatch, message);
       } else {
         console.log("Mismatch cannot be fixed - skipping reload");
-        dispatch(setLoadingMessage(undefined));
+        clear();
       }
     } else {
       console.log("Reload attempts exceeded", key);
       onMismatchAndLimitExceeded();
-      dispatch(setLoadingMessage(undefined));
+      clear();
     }
   } else {
     console.log("Signin status matched", key);
     // sign in status in state matches session
-    clearReloadCount(key);
     onMatch();
-    dispatch(setLoadingMessage(undefined));
+    clear();
   }
 };

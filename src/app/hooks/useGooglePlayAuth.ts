@@ -52,18 +52,19 @@ export const useGooglePlayAuth = () => {
         () => {
           const hasGooglePlaySubscription =
             subscriptionTier?.provider === SubscriptionProvider.GooglePlay;
-          const isM =
+          return (
             (existingPurchases.length && !hasGooglePlaySubscription) ||
-            (hasGooglePlaySubscription && !existingPurchases.length);
-          alert(isM + " : " + hasGooglePlaySubscription);
-          return isM;
+            (hasGooglePlaySubscription && !existingPurchases.length)
+          );
         },
         async () => {
-          alert("Mismatch in the Google play session status - reload needed");
+          console.log(
+            "Mismatch in the Google play session status - reload needed"
+          );
           if (existingPurchases.length) {
             const logMessage =
               "Google Play api mentions purchases but permissions are not set";
-            alert(logMessage);
+            console.log(logMessage);
             const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
             const result = await acknowledgePurchaseOnBackend({
               itemId: purchaseToProcess.itemId as TierKey,
@@ -91,7 +92,7 @@ export const useGooglePlayAuth = () => {
           } else {
             const logMessage =
               "Google Play api mentions no purchases but permissions are set";
-            alert(logMessage);
+            console.log(logMessage);
             const result = await clearSubscriptionCookieOnBackend();
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
