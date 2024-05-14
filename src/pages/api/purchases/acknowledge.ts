@@ -65,26 +65,19 @@ const handle = async (
     }
 
     const params: PurchaseParams = { itemId, purchaseToken };
-
-    console.log("Getting subscription");
-
     const subscription = await fetchSubscriptionPurchase(params);
-
-    console.log("Got subscription", subscription);
-
+    const wasAcknowledged = subscription?.wasAcknowledged();
+    console.log("Subscription acknowdegement state", wasAcknowledged);
     // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
 
-    console.log("Acknowledging subscription");
-    await acknowledgeSubscriptionPurchase(params);
+    if (!wasAcknowledged) {
+      await acknowledgeSubscriptionPurchase(params);
+    }
 
-    // TODO: After sub is acknowledged we need to grant the necessary permissions (set the subscription tier like Patreon does). Can we make sure sub belongs to the user without storing the users here?
-    // We need to add some state to make sure subscription.ts / getTierName uses it. This state should be also set when the app loads
-
-    console.log("Acknowledged subscription");
     setSubscriptionCookie(params, req, res);
     res.status(200);
   } finally {
-    res.end(); // End the response
+    res.end();
   }
 };
 

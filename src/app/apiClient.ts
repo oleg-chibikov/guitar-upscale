@@ -42,6 +42,16 @@ export async function acknowledgePurchaseOnBackend(
   });
 }
 
+export async function cancelSubscriptionOnBackend(
+  params: PurchaseParams
+): Promise<ApiCallResult> {
+  const { itemId, purchaseToken } = params;
+  return callApi(`/api/purchases/cancel`, "POST", {
+    itemId,
+    purchaseToken,
+  });
+}
+
 export async function clearSubscriptionCookieOnBackend(): Promise<ApiCallResult> {
   return callApi(`/api/purchases/logout`, "POST");
 }

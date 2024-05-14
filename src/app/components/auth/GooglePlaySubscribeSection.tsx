@@ -63,31 +63,29 @@ export const GooglePlaySubscribeSection: FC<
 
   return (
     <ul className="flex flex-col gap-2">
-      {subscriptionOptions
-        .filter(
-          (subscriptionOption) =>
-            tierMap.get(subscriptionOption.itemId as TierKey) !==
+      {subscriptionOptions.map((subscriptionOption) => (
+        <GooglePlaySubscriptionOptionButton
+          isSelected={selectedOption === subscriptionOption}
+          onClick={(subscriptionOption) => {
+            if (subscriptionOption === selectedOption) {
+              setSelectedOption(undefined);
+              onOptionSelected(undefined);
+            } else {
+              setSelectedOption(subscriptionOption);
+              onOptionSelected(
+                tierMap.get(subscriptionOption.itemId as TierKey)
+              );
+            }
+          }}
+          key={subscriptionOption.itemId}
+          subscriptionOption={subscriptionOption}
+          setIsLoading={setIsLoading}
+          isAlreadyPurchased={
+            tierMap.get(subscriptionOption.itemId as TierKey) ===
             subscriptionTier?.tier
-        )
-        .map((subscriptionOption) => (
-          <GooglePlaySubscriptionOptionButton
-            isSelected={selectedOption === subscriptionOption}
-            onClick={(subscriptionOption) => {
-              if (subscriptionOption === selectedOption) {
-                setSelectedOption(undefined);
-                onOptionSelected(undefined);
-              } else {
-                setSelectedOption(subscriptionOption);
-                onOptionSelected(
-                  tierMap.get(subscriptionOption.itemId as TierKey)
-                );
-              }
-            }}
-            key={subscriptionOption.itemId}
-            subscriptionOption={subscriptionOption}
-            setIsLoading={setIsLoading}
-          />
-        ))}
+          }
+        />
+      ))}
     </ul>
   );
 };

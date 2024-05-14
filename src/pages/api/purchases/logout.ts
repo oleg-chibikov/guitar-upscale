@@ -3,14 +3,20 @@ import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
 import { deleteCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+export const clearSubscriptionCookie = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
+    req,
+    res,
+  });
+  console.log("Subscription cookie cleared");
+};
+
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
-      req,
-      res,
-    });
-    console.log("Subscription cookie cleared");
-
+    clearSubscriptionCookie(req, res);
     res.status(200);
   } finally {
     res.end(); // End the response

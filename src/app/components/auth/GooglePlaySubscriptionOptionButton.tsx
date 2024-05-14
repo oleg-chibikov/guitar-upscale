@@ -1,4 +1,8 @@
-import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
+import {
+  ApiCallResult,
+  acknowledgePurchaseOnBackend,
+  cancelSubscriptionOnBackend,
+} from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
@@ -16,11 +20,18 @@ interface GooglePlaySubscriptionOptionButtonProps {
   onClick: (option: DigitalGoodsProductDetails) => void;
   isSelected: boolean;
   setIsLoading: (isLoading: boolean) => void;
+  isAlreadyPurchased: boolean;
 }
 
 export const GooglePlaySubscriptionOptionButton: FC<
   GooglePlaySubscriptionOptionButtonProps
-> = ({ subscriptionOption, onClick, isSelected, setIsLoading }) => {
+> = ({
+  subscriptionOption,
+  onClick,
+  isSelected,
+  setIsLoading,
+  isAlreadyPurchased,
+}) => {
   const title = subscriptionOption.title.substring(
     0,
     subscriptionOption.title.indexOf(" (")
@@ -28,6 +39,46 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
+
+  const cancelSubscription = async () => {
+    if (!hasDigitalGoodsService) {
+      return;
+    }
+    const digitalGoodsService = await buildDigitalGoodsService();
+    const existingPurchases = await digitalGoodsService.listPurchases();
+    const purchases = existingPurchases
+      .filter((x) => x.itemId === subscriptionOption.itemId)
+      .map((x) => ({
+        itemId: x.itemId as TierKey,
+        purchaseToken: x.purchaseToken,
+      }));
+    if (!purchases.length) {
+      dispatch(
+        setAndShowAlert({
+          message:
+            "Cannot cancel the subscription. Google Play api doesn't list it as purchased",
+          alertType: AlertType.Error,
+        })
+      );
+    }
+    const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
+    if (cancelResult === ApiCallResult.Success) {
+      // TODO: It is hidden by reload
+      dispatch(
+        setAndShowAlert({
+          message: `Subscription "${title}" has been successfully cancelled`,
+        })
+      );
+      incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
+    } else {
+      dispatch(
+        setAndShowAlert({
+          message: "Cannot cancel the subscription due to an error",
+          alertType: AlertType.Error,
+        })
+      );
+    }
+  };
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -75,6 +126,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         // successful. The user-agent may show a "payment successful"
         // message to the user.
         await paymentResponse.complete("success");
+        // TODO: It is hidden by reload
         dispatch(
           setAndShowAlert({
             message: `Payment successful! Your subscription level is "${title}"`,
@@ -119,7 +171,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
     <div
       onClick={() => onClick(subscriptionOption)}
       className={`flex justify-between align-middle items-center flex-row p-2 gap-2 ${
-        !isSelected
+        isAlreadyPurchased
+          ? "bg-emerald-600" // TODO: themed colors?
+          : !isSelected
           ? theme === Theme.Light
             ? "bg-accent-light"
             : "bg-accent-dark"
@@ -134,8 +188,13 @@ export const GooglePlaySubscriptionOptionButton: FC<
       <Button
         size="small"
         variant="contained"
-        color="primary"
-        onClick={() => makePurchase()}
+        color={isAlreadyPurchased ? "error" : "primary"}
+        onClick={async () => {
+          if (isAlreadyPurchased) {
+            await cancelSubscription();
+          }
+          await makePurchase();
+        }}
       >
         Purchase
       </Button>

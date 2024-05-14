@@ -54,13 +54,14 @@ const setupClient = async () => {
 // }
 
 /**
- * Acknowledge a subscription purchase with  Play Developer API.
+ * Acknowledge a subscription purchase with Play Developer API.
  * @param {params} PurchaseParams
  * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
  */
 export async function acknowledgeSubscriptionPurchase(
   params: PurchaseParams
 ): Promise<boolean> {
+  console.log("Acknowledging subscription", params);
   try {
     const playApi = await setupClient();
     const apiResponse = (
@@ -76,7 +77,7 @@ export async function acknowledgeSubscriptionPurchase(
     }
     return false;
   } catch (error) {
-    console.error(`Error acknowledging subscription purchase : ${error}`);
+    console.error("Error acknowledging subscription", error);
     throw error;
   }
 }
@@ -118,7 +119,8 @@ export async function acknowledgeSubscriptionPurchase(
  */
 export async function fetchSubscriptionPurchase(
   params: PurchaseParams
-): Promise<billing.SubscriptionPurchase | null> {
+): Promise<billing.SubscriptionPurchase> {
+  console.log("Fetching subscription", params);
   try {
     const playApi = await setupClient();
     const apiResponse = (
@@ -134,7 +136,35 @@ export async function fetchSubscriptionPurchase(
       params.purchaseToken
     );
   } catch (error) {
-    console.error(`Error fetching subscription purchase info : ${error}`);
+    console.error("Error fetching subscription", error);
+    throw error;
+  }
+}
+
+/**
+ * Cancel subscription using Play Developer API.
+ * @param {params} PurchaseParams
+ */
+export async function cancelSubscription(
+  params: PurchaseParams
+): Promise<billing.SubscriptionPurchase | null> {
+  console.log("Cancelling subscription", params);
+  try {
+    const playApi = await setupClient();
+    const apiResponse = (
+      await playApi.purchases.subscriptions.cancel({
+        packageName: process.env.ANDROID_PACKAGE_ID,
+        subscriptionId: params.itemId,
+        token: params.purchaseToken,
+      })
+    )?.data;
+    console.log("Cancelled subscription", apiResponse);
+    return billing.SubscriptionPurchase.fromApiResponse(
+      apiResponse,
+      params.purchaseToken
+    );
+  } catch (error) {
+    console.error("Error cancelling subscription", error);
     throw error;
   }
 }
