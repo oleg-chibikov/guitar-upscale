@@ -30,7 +30,15 @@ export async function incrementAndReload(
   console.log("Reloading page");
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
-  location.reload();
+  navigator.serviceWorker.getRegistration().then(function (reg) {
+    if (reg) {
+      reg.unregister().then(function () {
+        window.location.reload();
+      });
+    } else {
+      window.location.reload();
+    }
+  });
 }
 
 export const processWithReloads = async (
