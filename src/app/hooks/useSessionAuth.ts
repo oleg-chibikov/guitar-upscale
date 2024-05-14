@@ -39,7 +39,7 @@ export const useSessionAuth = () => {
         () => ((isSignedIn && !session) || (session && !isSignedIn)) ?? false,
         () =>
           Promise.resolve({
-            shouldIncrement: true,
+            shouldReload: true,
             message:
               isSignedIn && !session
                 ? "Signed in, but no session is present"

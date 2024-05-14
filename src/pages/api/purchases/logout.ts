@@ -1,5 +1,6 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
+import { HttpStatusCode } from "axios";
 import { deleteCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -17,7 +18,7 @@ export const clearSubscriptionCookie = (
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     clearSubscriptionCookie(req, res);
-    res.status(200);
+    res.status(HttpStatusCode.Ok);
   } finally {
     res.end(); // End the response
   }

@@ -1,5 +1,5 @@
 // ./utils/api.ts
-import { Method } from "axios";
+import { HttpStatusCode, Method } from "axios";
 import createHttpError from "http-errors";
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { ValidationError } from "yup";
@@ -57,11 +57,13 @@ const errorHandler = (err: unknown, res: NextApiResponse<ErrorResponse>) => {
     return res.status(err.statusCode).json({ error: { message: err.message } });
   } else if (err instanceof ValidationError) {
     // Handle yup validation errors
-    return res.status(400).json({ error: { message: err.errors.join(", ") } });
+    return res
+      .status(HttpStatusCode.BadRequest)
+      .json({ error: { message: err.errors.join(", ") } });
   } else {
     // default to 500 server error
     console.error(err);
-    return res.status(500).json({
+    return res.status(HttpStatusCode.InternalServerError).json({
       error: { message: "Internal Server Error", err: err },
       status: createHttpError.isHttpError(err) ? err.statusCode : 500,
     });

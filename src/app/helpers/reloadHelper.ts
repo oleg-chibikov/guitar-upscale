@@ -30,9 +30,12 @@ export async function incrementAndReload(
   console.log("Reloading page");
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
+
+  // Unregistering service worker in order to avoid the necessity of double refresh
   navigator.serviceWorker.getRegistration().then(function (reg) {
     if (reg) {
       reg.unregister().then(function () {
+        // window.location.href = window.location.href - force reload
         window.location.reload();
       });
     } else {
@@ -46,7 +49,7 @@ export const processWithReloads = async (
   key: string,
   isMismatch: () => boolean,
   onMismatchWithinLimit: () => Promise<{
-    shouldIncrement: boolean;
+    shouldReload: boolean;
     message?: string;
   }>,
   onMismatchAndLimitExceeded: () => void,
@@ -64,11 +67,11 @@ export const processWithReloads = async (
     console.log("Signin status mismatch", key);
     if (signInCheckCount < limit) {
       // check to avoid endless reloads
-      const { shouldIncrement, message } = await onMismatchWithinLimit();
-      if (shouldIncrement) {
+      const { shouldReload, message } = await onMismatchWithinLimit();
+      if (shouldReload) {
         await incrementAndReload(key, signInCheckCount, dispatch, message);
       } else {
-        console.log("Mismatch cannot be fixed - skipping reload");
+        console.log("Skipping reload");
         clear();
       }
     } else {

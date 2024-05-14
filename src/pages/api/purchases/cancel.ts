@@ -1,8 +1,9 @@
 import { apiHandler } from "@/lib/apiHelper";
-import { SubscriptionPurchase } from "@/lib/billing";
+import { CancelReason, SubscriptionPurchase } from "@/lib/billing";
 import { PurchaseParams } from "@/lib/purchaseParams";
-import { cancelSubscription } from "@/lib/purchases";
+import { cancelSubscription, fetchSubscriptionPurchase } from "@/lib/purchases";
 import { TierKey } from "@/lib/tiers";
+import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { clearSubscriptionCookie } from "./logout";
 
@@ -42,10 +43,21 @@ const handle = async (
 
     const params: PurchaseParams = { itemId, purchaseToken };
 
+    const subscription = await fetchSubscriptionPurchase(params);
+
+    if (subscription?.cancelReason !== CancelReason.NONE) {
+      console.log(
+        "Subscription is already cancelled. Cancellation is not needed",
+        subscription.cancelReason
+      );
+      res.status(HttpStatusCode.Gone);
+      return;
+    }
+
     await cancelSubscription(params);
 
     clearSubscriptionCookie(req, res);
-    res.status(200);
+    res.status(HttpStatusCode.Ok);
   } finally {
     res.end();
   }

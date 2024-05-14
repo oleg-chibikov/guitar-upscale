@@ -1,5 +1,5 @@
 import { apiHandler } from "@/lib/apiHelper";
-import { SubscriptionPurchase } from "@/lib/billing";
+import { CancelReason, SubscriptionPurchase } from "@/lib/billing";
 import {
   GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
   PurchaseParams,
@@ -10,6 +10,7 @@ import {
   fetchSubscriptionPurchase,
 } from "@/lib/purchases";
 import { TierKey } from "@/lib/tiers";
+import { HttpStatusCode } from "axios";
 import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -66,6 +67,16 @@ const handle = async (
 
     const params: PurchaseParams = { itemId, purchaseToken };
     const subscription = await fetchSubscriptionPurchase(params);
+
+    if (subscription?.cancelReason !== CancelReason.NONE) {
+      console.log(
+        "Subscription is cancelled. Permissions won't be set",
+        subscription.cancelReason
+      );
+      res.status(HttpStatusCode.Gone);
+      return;
+    }
+
     const wasAcknowledged = subscription?.wasAcknowledged();
     console.log("Subscription acknowdegement state", wasAcknowledged);
     // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
@@ -75,7 +86,7 @@ const handle = async (
     }
 
     setSubscriptionCookie(params, req, res);
-    res.status(200);
+    res.status(HttpStatusCode.Ok);
   } finally {
     res.end();
   }

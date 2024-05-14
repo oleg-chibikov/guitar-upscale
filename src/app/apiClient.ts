@@ -1,7 +1,9 @@
 import { PurchaseParams } from "@/lib/purchaseParams";
+import { HttpStatusCode } from "axios";
 
 export enum ApiCallResult {
   Success,
+  SkipProcessing,
   Error,
 }
 
@@ -17,6 +19,10 @@ async function callApi(
     });
 
     if (!response.ok) {
+      if (response.status === HttpStatusCode.Gone) {
+        return ApiCallResult.SkipProcessing;
+      }
+
       const responseData = await response.json(); // Extract error message from response
       console.error(
         `Error status received while calling ${endpoint}`,

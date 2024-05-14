@@ -57,8 +57,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       if (!purchases.length) {
         dispatch(
           setAndShowAlert({
-            message:
-              "Cannot cancel the subscription. Google Play api doesn't list it as purchased",
+            message: `Cannot cancel the subscription "${title}". Google Play api doesn't list it as purchased`,
             alertType: AlertType.Error,
           })
         );
@@ -72,10 +71,17 @@ export const GooglePlaySubscriptionOptionButton: FC<
           })
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
+      } else if (cancelResult === ApiCallResult.SkipProcessing) {
+        dispatch(
+          setAndShowAlert({
+            message: `Subscription "${title}" is already cancelled`,
+            alertType: AlertType.Warning,
+          })
+        );
       } else {
         dispatch(
           setAndShowAlert({
-            message: "Cannot cancel the subscription due to an error",
+            message: `Cannot cancel the subscription "${title}" due to an error`,
             alertType: AlertType.Error,
           })
         );
@@ -116,12 +122,12 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const acknowledgeResult = await acknowledgePurchaseOnBackend({
+      const result = await acknowledgePurchaseOnBackend({
         itemId: subscriptionOption.itemId as TierKey,
         purchaseToken,
       });
 
-      if (acknowledgeResult === ApiCallResult.Success) {
+      if (result === ApiCallResult.Success) {
         const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
@@ -138,6 +144,13 @@ export const GooglePlaySubscriptionOptionButton: FC<
           })
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
+      } else if (result === ApiCallResult.SkipProcessing) {
+        dispatch(
+          setAndShowAlert({
+            message: `Subscription "${title}" is cancelled. Cannot acknowledge`,
+            alertType: AlertType.Warning,
+          })
+        );
       } else {
         await paymentResponse.complete("fail");
         dispatch(
@@ -189,6 +202,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       <p className="text-lg font-semibold">{title}</p>
       <p className="text-sm grow">{subscriptionOption.description}</p>
       <p className="text-sm">{localizedPrice}</p>
+      <p className="text-sm grow">{subscriptionOption.subscriptionPeriod}</p>
       <Button
         size="small"
         variant="contained"

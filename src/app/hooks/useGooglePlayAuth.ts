@@ -58,9 +58,6 @@ export const useGooglePlayAuth = () => {
           );
         },
         async () => {
-          console.log(
-            "Mismatch in the Google play session status - reload needed"
-          );
           if (existingPurchases.length) {
             const logMessage =
               "Google Play api mentions purchases but permissions are not set";
@@ -74,8 +71,15 @@ export const useGooglePlayAuth = () => {
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
-                shouldIncrement: true,
+                shouldReload: true,
                 message: logMessage,
+              };
+            } else if (result === ApiCallResult.SkipProcessing) {
+              console.log(
+                "Skipped mismatch processing. Subscription is cancelled"
+              );
+              return {
+                shouldReload: false,
               };
             } else {
               dispatch(
@@ -86,7 +90,7 @@ export const useGooglePlayAuth = () => {
                 })
               );
               return {
-                shouldIncrement: false,
+                shouldReload: false,
               };
             }
           } else {
@@ -97,7 +101,7 @@ export const useGooglePlayAuth = () => {
             if (result === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
-                shouldIncrement: true,
+                shouldReload: true,
                 message: logMessage,
               };
             } else {
@@ -109,7 +113,7 @@ export const useGooglePlayAuth = () => {
                 })
               );
               return {
-                shouldIncrement: false,
+                shouldReload: false,
               };
             }
           }
