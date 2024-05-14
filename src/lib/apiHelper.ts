@@ -42,6 +42,9 @@ const apiHandler = (handler: ApiMethodHandlers) => {
       // global error handler
       errorHandler(err, res);
     } finally {
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Vary", "Cookie");
       res.end(); // End the response
     }
   };
