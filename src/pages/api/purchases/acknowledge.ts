@@ -1,12 +1,16 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionPurchase } from "@/lib/billing";
-import { googlePlaySession } from "@/lib/googlePlaySession";
-import { PurchaseParams } from "@/lib/purchaseParams";
+import {
+  GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
+  PurchaseParams,
+  getCookieValue,
+} from "@/lib/purchaseParams";
 import {
   acknowledgeSubscriptionPurchase,
   fetchSubscriptionPurchase,
 } from "@/lib/purchases";
 import { TierKey } from "@/lib/tiers";
+import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type ResponseData = {
@@ -26,12 +30,21 @@ function validateParameter<T>(
   return param as T; // Validation passed
 }
 
-const saveSubscriptionInSession = async (
+const setSubscriptionCookie = (
   params: PurchaseParams,
-  req: NextApiRequest
+  req: NextApiRequest,
+  res: NextApiResponse
 ) => {
-  await googlePlaySession(req).setAll(params);
-  console.log("Subscription set in session", params);
+  const value = getCookieValue(params);
+  setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {
+    req,
+    res,
+    maxAge: 60 * 60 * 24,
+    sameSite: true,
+    secure: true,
+    httpOnly: true,
+  });
+  console.log("Subscription cookie set", value);
 };
 
 const handle = async (
@@ -61,7 +74,7 @@ const handle = async (
       await acknowledgeSubscriptionPurchase(params);
     }
 
-    await saveSubscriptionInSession(params, req);
+    setSubscriptionCookie(params, req, res);
     res.status(200);
   } finally {
     res.end();

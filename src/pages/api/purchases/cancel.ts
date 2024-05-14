@@ -1,10 +1,15 @@
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionPurchase } from "@/lib/billing";
-import { PurchaseParams } from "@/lib/purchaseParams";
+import {
+  GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
+  PurchaseParams,
+  getCookieValue,
+} from "@/lib/purchaseParams";
 import { cancelSubscription } from "@/lib/purchases";
 import { TierKey } from "@/lib/tiers";
+import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { deleteSession } from "./logout";
+import { clearSubscriptionCookie } from "./logout";
 
 type ResponseData = {
   subscription?: SubscriptionPurchase;
@@ -22,6 +27,23 @@ function validateParameter<T>(
   }
   return param as T; // Validation passed
 }
+
+const setSubscriptionCookie = (
+  params: PurchaseParams,
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  const value = getCookieValue(params);
+  setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {
+    req,
+    res,
+    maxAge: 60 * 60 * 24,
+    sameSite: true,
+    secure: true,
+    httpOnly: true,
+  });
+  console.log("Subscription cookie set", value);
+};
 
 const handle = async (
   req: NextApiRequest,
@@ -43,7 +65,8 @@ const handle = async (
     const params: PurchaseParams = { itemId, purchaseToken };
 
     await cancelSubscription(params);
-    await deleteSession(req);
+
+    clearSubscriptionCookie(req, res);
     res.status(200);
   } finally {
     res.end();
