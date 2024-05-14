@@ -23,6 +23,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
   return (
     <>
       <Initializer />
+      <AlertWrapper />
       {loadingMessage ? (
         <main
           className={`flex justify-center align-middle items-center text-4xl ${
@@ -35,7 +36,6 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
         </main>
       ) : (
         <main>
-          <AlertWrapper />
           <ControlPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />

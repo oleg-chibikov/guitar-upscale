@@ -14,7 +14,14 @@ export function clearReloadCount(key: string) {
   localStorage.removeItem(key);
 }
 
-export function incrementAndReload(key: string, currentValue: number) {
+export function incrementAndReload(
+  key: string,
+  currentValue: number,
+  dispatch: (param: any) => void
+) {
+  console.log("Waiting to reload");
+  dispatch(setLoadingMessage("Signin status mismatch - Reloading page"));
+  await sleep(1000);
   console.log("Reloading page");
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
@@ -38,8 +45,6 @@ export const processWithReloads = async (
       // check to avoid endless reloads
       const shouldIncrement = await onMismatchWithinLimit();
       if (shouldIncrement) {
-        dispatch(setLoadingMessage("Signin status mismatch - Reloading page"));
-        await sleep(1000);
         incrementAndReload(key, signInCheckCount);
       } else {
         console.log("Mismatch cannot be fixed - skipping reload");

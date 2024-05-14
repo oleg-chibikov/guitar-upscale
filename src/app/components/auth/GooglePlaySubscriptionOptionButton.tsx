@@ -65,13 +65,12 @@ export const GooglePlaySubscriptionOptionButton: FC<
       }
       const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
       if (cancelResult === ApiCallResult.Success) {
-        // TODO: It is hidden by reload
         dispatch(
           setAndShowAlert({
             message: `Subscription "${title}" has been successfully cancelled`,
           })
         );
-        incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
+        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch);
       } else {
         dispatch(
           setAndShowAlert({
@@ -131,13 +130,12 @@ export const GooglePlaySubscriptionOptionButton: FC<
         // successful. The user-agent may show a "payment successful"
         // message to the user.
         await paymentResponse.complete("success");
-        // TODO: It is hidden by reload
         dispatch(
           setAndShowAlert({
             message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
-        incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
+        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch);
       } else {
         await paymentResponse.complete("fail");
         dispatch(
