@@ -40,9 +40,9 @@ const setSubscriptionCookie = (
     req,
     res,
     maxAge: 60 * 60 * 24,
-    // sameSite: true,
-    // secure: true,
-    // httpOnly: true,
+    sameSite: true,
+    secure: true,
+    httpOnly: true,
   });
   console.log("Subscription cookie set", value);
 };
