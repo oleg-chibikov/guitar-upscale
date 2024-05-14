@@ -1,6 +1,7 @@
+import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { TierKey } from "@/lib/tiers";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ApiCallResult,
   acknowledgePurchaseOnBackend,
@@ -8,18 +9,16 @@ import {
 } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { AlertType } from "../data/alertType";
-import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 import {
-  hasQueryParam,
-  reloadPageWithQueryParam,
-  removeParamsFromQuery,
-} from "../helpers/urlHelper";
+  clearReloadCount,
+  getReloadCount,
+  incrementAndReload,
+} from "../helpers/reloadHelper";
+import { buildDigitalGoodsService } from "../helpers/serviceHelper";
+import { selectAuth } from "../store/authSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
-const NO_RELOAD_QUERY_PARAM = "noReload";
-
-export const reloadOnce = () =>
-  reloadPageWithQueryParam(NO_RELOAD_QUERY_PARAM, "true"); // this should take the subscriptionTier from cookie and reload the page. Only do it once
+export const GOOGLE_PLAY_RELOAD_KEY = "GOOGLE_PLAY_RELOAD_COUNT";
 
 function sortByItemId(
   itemA: { itemId: string },
@@ -36,6 +35,7 @@ function sortByItemId(
 
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
+  const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsService();
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
 
@@ -46,48 +46,72 @@ export const useGooglePlayAuth = () => {
         return;
       }
 
-      if (hasQueryParam(NO_RELOAD_QUERY_PARAM)) {
-        removeParamsFromQuery();
-        // It's just been reloaded - no need to reload further
+      const reloadCount = getReloadCount(GOOGLE_PLAY_RELOAD_KEY);
+
+      if (reloadCount > 2) {
+        // Reload attempts exceeded
         return;
       }
 
       // It takes the purchased subscription from DigitalGoodsService and sends it to backend for validation. Backend sets the cookie with permissions. Then location is reloaded
       const digitalGoodsService = await buildDigitalGoodsService();
       const existingPurchases = await digitalGoodsService.listPurchases();
-      if (existingPurchases.length) {
-        const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
-        const result = await acknowledgePurchaseOnBackend({
-          itemId: purchaseToProcess.itemId as TierKey,
-          purchaseToken: purchaseToProcess.purchaseToken,
-        });
-
-        if (result === ApiCallResult.Success) {
-          // adding a query param to avoid endless reloads
-          reloadOnce();
-        } else {
-          dispatch(
-            setAndShowAlert({
-              message:
-                "There's a purchase listed in Google Play but it cannot be acknowledged due to an error",
-              alertType: AlertType.Error,
-            })
+      const hasGooglePlaySubscription =
+        subscriptionTier?.provider === SubscriptionProvider.GooglePlay;
+      const isMismatch =
+        (existingPurchases.length && !hasGooglePlaySubscription) ||
+        (hasGooglePlaySubscription && !existingPurchases.length);
+      subscriptionTier?.provider !== SubscriptionProvider.GooglePlay;
+      if (isMismatch) {
+        // mismatch in status - need to grant the permissions and reload
+        console.log(
+          "Mismatch in the Google play session status - reload needed"
+        );
+        if (existingPurchases.length) {
+          console.log(
+            "Google Play api mentions purchases but there are no permissions"
           );
+          const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
+          const result = await acknowledgePurchaseOnBackend({
+            itemId: purchaseToProcess.itemId as TierKey,
+            purchaseToken: purchaseToProcess.purchaseToken,
+          });
+
+          if (result === ApiCallResult.Success) {
+            // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
+            incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, reloadCount);
+          } else {
+            dispatch(
+              setAndShowAlert({
+                message:
+                  "There's a purchase listed in Google Play but it cannot be acknowledged due to an error",
+                alertType: AlertType.Error,
+              })
+            );
+          }
+        } else {
+          console.log(
+            "Google Play api mentions no purchases but there are permissions"
+          );
+          const result = await clearSubscriptionCookieOnBackend();
+          if (result === ApiCallResult.Success) {
+            // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
+            incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, reloadCount);
+          } else {
+            dispatch(
+              setAndShowAlert({
+                message:
+                  "There are no subscriptions listed in Google Play but logout cannot be processed due to an error",
+                alertType: AlertType.Error,
+              })
+            );
+          }
         }
       } else {
-        const result = await clearSubscriptionCookieOnBackend();
-        if (result === ApiCallResult.Success) {
-          // adding a query param to avoid endless reloads
-          reloadOnce();
-        } else {
-          dispatch(
-            setAndShowAlert({
-              message:
-                "There are no subscriptions listed in Google Play but logout cannot be processed due to an error",
-              alertType: AlertType.Error,
-            })
-          );
-        }
+        console.log(
+          "No mismatch in the Google play session status - no reload needed"
+        );
+        clearReloadCount(GOOGLE_PLAY_RELOAD_KEY);
       }
     };
     listGooglePlayPurchases();

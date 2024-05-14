@@ -4,7 +4,14 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AlertType } from "../data/alertType";
+import {
+  clearReloadCount,
+  getReloadCount,
+  incrementAndReload,
+} from "../helpers/reloadHelper";
 import { removeParamsFromQuery } from "../helpers/urlHelper";
+
+const SESSION_RELOAD_KEY = "SESSION_RELOAD_COUNT";
 
 // This hook reloads the page if the session status mismatches with the state
 export const useSessionAuth = () => {
@@ -13,9 +20,7 @@ export const useSessionAuth = () => {
   const { isSignedIn } = useSelector(selectAuth);
 
   useEffect(() => {
-    const signInCheckCountRaw = localStorage.getItem("signInCheckCount");
-    const signInCheckCount =
-      signInCheckCountRaw !== null ? parseInt(signInCheckCountRaw) : 0;
+    const signInCheckCount = getReloadCount(SESSION_RELOAD_KEY);
     console.log("Session status", session, isSignedIn, signInCheckCount);
 
     const checkError = () => {
@@ -34,26 +39,23 @@ export const useSessionAuth = () => {
       }
     };
 
-    if ((isSignedIn && !session) || (session && !isSignedIn)) {
+    const isMismatch = (isSignedIn && !session) || (session && !isSignedIn);
+
+    if (isMismatch) {
       console.log("Signin status mismatch");
       if (signInCheckCount < 2) {
-        console.log("Reloading page");
         // check to avoid endless reloads
-        localStorage.setItem(
-          "signInCheckCount",
-          (signInCheckCount + 1).toString()
-        );
-        location.reload();
+        incrementAndReload("signInCheckCount", signInCheckCount);
       } else {
         console.log("Reload attempts exceeded");
-        //localStorage.removeItem("signInCheckCount");
+        //   clearReloadCount(RELOAD_KEY);
         dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
         checkError();
       }
     } else {
       console.log("Signin status matched");
       // sign in status in state matches session
-      localStorage.removeItem("signInCheckCount");
+      clearReloadCount(SESSION_RELOAD_KEY);
       checkError();
     }
     //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically

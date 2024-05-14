@@ -2,8 +2,9 @@ import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { reloadOnce } from "@/app/hooks/useGooglePlayAuth";
+import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
 import { Button } from "@mui/material";
@@ -79,7 +80,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
             message: `Payment successful! Your subscription level is "${title}"`,
           })
         );
-        reloadOnce();
+        incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0);
       } else {
         await paymentResponse.complete("fail");
         dispatch(
