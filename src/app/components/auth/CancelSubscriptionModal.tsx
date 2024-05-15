@@ -11,6 +11,7 @@ import { TierKey } from "@/lib/tiers";
 import { Button, Modal, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 
 export const CancelSubscriptionModal: FC<
@@ -91,12 +92,13 @@ export const CancelSubscriptionModal: FC<
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`flex overflow-auto max-h-full h-1/2 justify-stretch items-center flex-col gap-2 border-2 p-2 ${
+          className={`relative flex overflow-auto max-h-full h-1/2 justify-center items-stretch flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
           }`}
         >
+          <CloseIcon onPress={handleCloseModal} />
           <div className="mb-4">{`Are you sure you would like to cancel your "${getTitle(
             subscriptionOption
           )}" subscription?`}</div>
@@ -107,7 +109,7 @@ export const CancelSubscriptionModal: FC<
             color="secondary"
             title="Don't cancel"
           >
-            No, I prefer keeping it
+            {"No, I'd prefer to keep it"}
           </Button>
           <Button
             size="small"
