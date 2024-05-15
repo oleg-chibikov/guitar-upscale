@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
+import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
 const GooglePlaySubscribeSection = React.lazy(() =>
@@ -28,12 +29,7 @@ const featureNames = {
   skinSelection: "Configurable skins",
 };
 
-interface SubscriptionStatusModalProps {
-  openModal: boolean;
-  handleCloseModal: () => void;
-}
-
-export const SubscriptionStatusModal: FC<SubscriptionStatusModalProps> = ({
+export const SubscriptionStatusModal: FC<ModalProps> = ({
   openModal,
   handleCloseModal,
 }) => {

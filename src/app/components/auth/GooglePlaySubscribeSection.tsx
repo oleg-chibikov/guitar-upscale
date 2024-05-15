@@ -5,9 +5,15 @@ import { selectAuth } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Tier, TierKey, tierMap } from "@/lib/tiers";
 import { LinearProgress } from "@mui/material";
+import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
+
+const CancelSubscriptionModal = dynamic(
+  async () =>
+    (await import("./CancelSubscriptionModal")).CancelSubscriptionModal
+);
 
 interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option?: Tier) => void;
@@ -24,7 +30,18 @@ export const GooglePlaySubscribeSection: FC<
   const [subscriptionOptions, setSubscriptionOptions] = useState<
     DigitalGoodsProductDetails[]
   >([]);
+  const [cancelSubscriptionModalOpen, setSubscriptionModalOpen] =
+    useState<boolean>(false);
+  const [cancelSubscriptionModalOpened, setSubscriptionModalOpened] =
+    useState<boolean>(false);
+  const [subscriptionToCancel, setSubscriptionToCancel] =
+    useState<DigitalGoodsProductDetails>();
   const { subscriptionTier } = useSelector(selectAuth);
+
+  const handleOpenModal = () => {
+    setSubscriptionModalOpen(true);
+    setSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  };
 
   useEffect(() => {
     if (!hasDigitalGoodsService) {
@@ -62,30 +79,44 @@ export const GooglePlaySubscribeSection: FC<
   }
 
   return (
-    <ul className="flex flex-col gap-2">
-      {subscriptionOptions.map((subscriptionOption) => (
-        <GooglePlaySubscriptionOptionButton
-          isSelected={selectedOption === subscriptionOption}
-          onClick={(subscriptionOption) => {
-            if (subscriptionOption === selectedOption) {
-              setSelectedOption(undefined);
-              onOptionSelected(undefined);
-            } else {
-              setSelectedOption(subscriptionOption);
-              onOptionSelected(
-                tierMap.get(subscriptionOption.itemId as TierKey)
-              );
-            }
-          }}
-          key={subscriptionOption.itemId}
-          subscriptionOption={subscriptionOption}
+    <>
+      {subscriptionToCancel && cancelSubscriptionModalOpened && (
+        <CancelSubscriptionModal
+          openModal={cancelSubscriptionModalOpen}
+          handleCloseModal={() => setSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
-          isAlreadyPurchased={
-            tierMap.get(subscriptionOption.itemId as TierKey) ===
-            subscriptionTier?.tier
-          }
+          subscriptionOption={subscriptionToCancel}
         />
-      ))}
-    </ul>
+      )}
+      <ul className="flex flex-col gap-2">
+        {subscriptionOptions.map((subscriptionOption) => (
+          <GooglePlaySubscriptionOptionButton
+            showCancellationModal={(option) => {
+              setSubscriptionToCancel(option);
+              handleOpenModal();
+            }}
+            isSelected={selectedOption === subscriptionOption}
+            onClick={(subscriptionOption) => {
+              if (subscriptionOption === selectedOption) {
+                setSelectedOption(undefined);
+                onOptionSelected(undefined);
+              } else {
+                setSelectedOption(subscriptionOption);
+                onOptionSelected(
+                  tierMap.get(subscriptionOption.itemId as TierKey)
+                );
+              }
+            }}
+            key={subscriptionOption.itemId}
+            subscriptionOption={subscriptionOption}
+            setIsLoading={setIsLoading}
+            isAlreadyPurchased={
+              tierMap.get(subscriptionOption.itemId as TierKey) ===
+              subscriptionTier?.tier
+            }
+          />
+        ))}
+      </ul>
+    </>
   );
 };
