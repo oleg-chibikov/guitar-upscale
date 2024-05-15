@@ -157,7 +157,7 @@ export const GooglePlayPurchaseOptionButton: FC<
       : "bg-primary-dark");
 
   const buttonContent = isAlreadyPurchased
-    ? purchaseOption.cancellationMode == CancellationMode.Revoke
+    ? purchaseOption.cancellationMode == CancellationMode.Cancel
       ? "Cancel further payments"
       : "Revoke and refund subscription"
     : isCancelled

@@ -15,7 +15,6 @@ const handle = async (
     // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
     const subscriptionData = await getSubscriptionFromRequest(req, res, true);
     if (!subscriptionData) {
-      res.status(HttpStatusCode.Ok).json({ message: "Not subscribed" });
       return;
     }
     res.status(HttpStatusCode.Ok).json({
