@@ -20,7 +20,7 @@ const config: Config = {
           light: "#E6B39A", // Mocha
           dark: "#b3cde4",
         },
-        previous_chord: {
+        secondary: {
           light: "#F6E7D2", // Cappuccino
           dark: "#1d3f58",
         },
