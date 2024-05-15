@@ -92,7 +92,7 @@ export const CancelSubscriptionModal: FC<
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`relative flex overflow-auto max-h-full h-1/2 justify-center items-stretch flex-col gap-2 border-2 p-2 ${
+          className={`relative flex overflow-auto max-h-full h-1/2 justify-center text-center items-stretch flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
