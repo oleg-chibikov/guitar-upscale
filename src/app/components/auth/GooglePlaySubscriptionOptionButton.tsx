@@ -171,7 +171,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       </p>
       <p className={className}>
         <Button
-          className="w-full"
+          className="w-full whitespace-nowrap"
           disabled={disabledMessage !== undefined}
           size="small"
           variant="contained"
