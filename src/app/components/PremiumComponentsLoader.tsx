@@ -1,6 +1,6 @@
 import "server-only";
 
-import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/subscription";
+import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
 import {
   PremiumComponent,

@@ -3,7 +3,7 @@ import "server-only";
 import {
   PremiumFeaturesWithSession,
   getPremiumFeatures,
-} from "@/lib/subscription";
+} from "@/lib/premiumFeatures";
 import React, { ReactElement } from "react";
 
 const ServerActionRoot: React.FC<{
