@@ -1,15 +1,10 @@
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateParameter } from "./apiHelper";
-import { CancelReason, SubscriptionPurchase } from "./billing";
+import { CancelReason } from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { TierKey } from "./tier";
-
-export type SubscriptionResponseData = {
-  subscription?: SubscriptionPurchase;
-  error?: string;
-};
 
 export const getSubscriptionFromRequest = async <T>(
   req: NextApiRequest,

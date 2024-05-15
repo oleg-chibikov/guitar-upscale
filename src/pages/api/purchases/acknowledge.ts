@@ -1,14 +1,11 @@
-import { apiHandler } from "@/lib/apiHelper";
+import { ResponseData, apiHandler } from "@/lib/apiHelper";
 import {
   GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
   PurchaseParams,
   getCookieValue,
 } from "@/lib/purchaseParams";
 import { acknowledgeSubscriptionPurchase } from "@/lib/purchases";
-import {
-  SubscriptionResponseData,
-  getSubscriptionFromRequest,
-} from "@/lib/subscriptionHelper";
+import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
 import { HttpStatusCode } from "axios";
 import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -32,7 +29,7 @@ const setSubscriptionCookie = (
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<SubscriptionResponseData>
+  res: NextApiResponse<ResponseData>
 ) => {
   try {
     // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
@@ -51,7 +48,7 @@ const handle = async (
     }
 
     setSubscriptionCookie(params, req, res);
-    res.status(HttpStatusCode.Ok);
+    res.status(HttpStatusCode.Ok).json({ message: "Acknowledged" });
   } finally {
     res.end();
   }

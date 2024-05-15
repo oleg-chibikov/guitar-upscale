@@ -1,16 +1,13 @@
-import { apiHandler } from "@/lib/apiHelper";
+import { ResponseData, apiHandler } from "@/lib/apiHelper";
 import { cancelSubscription, revokeSubscription } from "@/lib/purchases";
-import {
-  SubscriptionResponseData,
-  getSubscriptionFromRequest,
-} from "@/lib/subscriptionHelper";
+import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { clearSubscriptionCookie } from "./logout";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<SubscriptionResponseData>
+  res: NextApiResponse<ResponseData>
 ) => {
   try {
     const subscriptionData = await getSubscriptionFromRequest(req, res, false);
@@ -19,6 +16,7 @@ const handle = async (
     }
     const { subscription, params } = subscriptionData;
 
+    let message: string;
     if (subscription.isGracePeriod()) {
       console.log(
         "Subscription is still in grace period. Revoking permissions",
@@ -26,16 +24,18 @@ const handle = async (
       );
       await revokeSubscription(params);
       clearSubscriptionCookie(req, res);
+      message = "Revoked";
     } else {
       console.log(
         "Subscription is not in grace period anymore. Keeping permissions",
         params
       );
       await cancelSubscription(params);
+      message = "Cancelled";
       // we should keep the permissions. it will be revoked only when the subscription expires
     }
 
-    res.status(HttpStatusCode.Ok);
+    res.status(HttpStatusCode.Ok).json({ message });
   } finally {
     res.end();
   }
