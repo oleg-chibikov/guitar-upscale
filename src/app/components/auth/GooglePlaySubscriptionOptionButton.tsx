@@ -183,17 +183,16 @@ export const GooglePlaySubscriptionOptionButton: FC<
       <p className={className}>
         <Button
           className="w-full whitespace-nowrap"
-          disabled={isCancelled || disabledMessage !== undefined}
+          disabled={disabledMessage !== undefined}
           size="small"
           variant="contained"
           color={isAlreadyPurchased ? "error" : "primary"}
           title={cancelledMessage ?? disabledMessage ?? buttonContent}
           onClick={async () => {
-            if (isAlreadyPurchased) {
-              if (!isCancelled) {
-                showCancellationModal(subscriptionOption);
-              }
+            if (isAlreadyPurchased && !isCancelled) {
+              showCancellationModal(subscriptionOption);
             } else {
+              // Purchase new subscription or repurchase cancelled one
               await makePurchase();
             }
           }}

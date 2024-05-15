@@ -31,7 +31,7 @@ export const CancelSubscriptionModal: FC<
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const title = subscriptionOption.title;
+  const title = getTitle(subscriptionOption);
 
   const cancelSubscription = async () => {
     if (!hasDigitalGoodsService) {
