@@ -43,8 +43,13 @@ const getPositionForSkin = (skin?: Skin) => {
 };
 
 export const Fretboard: React.FC = () => {
-  const { skin, fretboardScaleX, fretboardScaleY, chordsExpanded } =
-    useSelector(selectUi);
+  const {
+    skin,
+    fretboardScaleX,
+    fretboardScaleY,
+    chordsExpanded,
+    useAdvancedChords,
+  } = useSelector(selectUi);
   const { neck } = useSelector(selectSettings);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [maxHeight, setMaxHeight] = useState(window.innerHeight);
@@ -122,7 +127,7 @@ export const Fretboard: React.FC = () => {
       <div
         className={"flex relative flex-col items-start z-10"}
         style={{
-          left: position.xShift,
+          left: position.xShift + (useAdvancedChords ? 200 : 0),
           top: needYShift ? -100 : 0,
         }}
       >
