@@ -20,7 +20,7 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
         contrastText: theme === Theme.Light ? "#2E1F1B" : "#001b2e",
       },
       secondary: {
-        main: theme === Theme.Light ? "#F6E7D2" : "#b3cde4",
+        main: theme === Theme.Light ? "#F6E7D2" : "#1d3f58",
         contrastText: theme === Theme.Light ? "#2E1F1B" : "#001b2e",
       },
     },
