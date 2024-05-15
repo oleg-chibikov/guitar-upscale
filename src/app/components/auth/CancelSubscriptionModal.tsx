@@ -4,6 +4,7 @@ import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
@@ -90,13 +91,24 @@ export const CancelSubscriptionModal: FC<
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`flex overflow-auto max-h-full h-1/2 justify-center items-center flex-col gap-2 border-2 p-2 ${
+          className={`flex overflow-auto max-h-full h-1/2 justify-stretch items-center flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
           }`}
         >
-          <div>{`Are you sure you would like to cancel your"${subscriptionOption.title}" subscription?`}</div>
+          <div className="mb-4">{`Are you sure you would like to cancel your "${getTitle(
+            subscriptionOption
+          )}" subscription?`}</div>
+          <Button
+            size="small"
+            onClick={handleCloseModal}
+            variant="contained"
+            color="secondary"
+            title="Don't cancel"
+          >
+            No, I still want to have it
+          </Button>
           <Button
             size="small"
             onClick={cancelSubscription}
@@ -105,15 +117,6 @@ export const CancelSubscriptionModal: FC<
             title="Cancel subscription"
           >
             Cancel subscription
-          </Button>
-          <Button
-            size="small"
-            onClick={handleCloseModal}
-            variant="contained"
-            color="secondary"
-            title="Don't cancel"
-          >
-            Don not cancel. I still want to have it
           </Button>
         </section>
       </Slide>

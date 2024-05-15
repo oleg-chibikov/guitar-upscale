@@ -4,6 +4,7 @@ import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
@@ -30,10 +31,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   isAlreadyPurchased,
   showCancellationModal,
 }) => {
-  const title = subscriptionOption.title.substring(
-    0,
-    subscriptionOption.title.indexOf(" (")
-  );
+  const title = getTitle(subscriptionOption);
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
@@ -162,7 +160,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
           }
         }}
       >
-        {/* TODO: Cancel in a separate modal with confirmation */}
         {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
         {isAlreadyPurchased ? "Cancel subscription" : "Subscribe"}
       </Button>
