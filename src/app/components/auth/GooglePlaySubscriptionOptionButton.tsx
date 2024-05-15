@@ -42,6 +42,10 @@ export const GooglePlaySubscriptionOptionButton: FC<
     if (!hasDigitalGoodsService) {
       return;
     }
+    if (disabledMessage !== undefined) {
+      console.log(disabledMessage);
+      return;
+    }
     // Define the preferred payment method and item ID
     const paymentMethods: PaymentMethodData[] = [
       {

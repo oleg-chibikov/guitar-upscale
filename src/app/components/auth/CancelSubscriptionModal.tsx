@@ -18,8 +18,15 @@ export const CancelSubscriptionModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
     subscriptionOption: DigitalGoodsProductDetails;
+    disabledMessage?: string;
   }
-> = ({ openModal, handleCloseModal, setIsLoading, subscriptionOption }) => {
+> = ({
+  openModal,
+  handleCloseModal,
+  setIsLoading,
+  subscriptionOption,
+  disabledMessage,
+}) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsService();
@@ -27,6 +34,10 @@ export const CancelSubscriptionModal: FC<
 
   const cancelSubscription = async () => {
     if (!hasDigitalGoodsService) {
+      return;
+    }
+    if (disabledMessage) {
+      console.log(disabledMessage);
       return;
     }
     setIsLoading(true);
@@ -112,6 +123,7 @@ export const CancelSubscriptionModal: FC<
             {"No, I'd prefer to keep it"}
           </Button>
           <Button
+            disabled={disabledMessage !== undefined}
             size="small"
             onClick={cancelSubscription}
             variant="contained"

@@ -91,7 +91,7 @@ export const GooglePlaySubscribeSection: FC<
         />
       )}
       <ul
-        className="grid gap-y-2 p-2 justify-center items-center"
+        className="grid gap-y-2 p-2 items-stretch"
         style={{
           gridTemplateColumns: "1fr 5fr 1fr 1fr 2fr",
           gridTemplateRows: "auto auto",
@@ -104,7 +104,7 @@ export const GooglePlaySubscribeSection: FC<
               handleOpenModal();
             }}
             disabledMessage={
-              !online ? "Cannot subscribe while offline" : undefined
+              !online ? "Cannot subscribe/unsubscribe while offline" : undefined
             }
             isSelected={selectedOption === subscriptionOption}
             onClick={(subscriptionOption) => {
