@@ -89,7 +89,7 @@ export const GooglePlaySubscribeSection: FC<
         />
       )}
       <ul
-        className="grid gap-y-2"
+        className="grid gap-y-2 p-2 justify-center items-center"
         style={{
           gridTemplateColumns: "1fr 3fr 1fr 1fr 2fr",
           gridTemplateRows: "auto auto",
