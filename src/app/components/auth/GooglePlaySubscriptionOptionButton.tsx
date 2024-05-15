@@ -4,7 +4,10 @@ import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
+import {
+  getBillingPeriod,
+  getTitle,
+} from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tiers";
@@ -166,8 +169,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         {localizedPrice}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
-        {/* TODO: convert value */}
-        {subscriptionOption.subscriptionPeriod}
+        {"Renews " + getBillingPeriod(subscriptionOption)}
       </p>
       <p className={className}>
         <Button
