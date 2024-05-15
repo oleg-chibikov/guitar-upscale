@@ -20,11 +20,7 @@ export async function incrementAndReload(
   reloadMessage?: string
 ) {
   console.log("Waiting to reload");
-  dispatch(
-    setLoadingMessage(
-      (reloadMessage ?? "Signin status mismatch") + " - reloading page"
-    )
-  );
+  dispatch(setLoadingMessage(reloadMessage ?? "Signin status mismatch"));
   // await sleep(2000);
   console.log("Reloading page");
   // check to avoid endless reloads
