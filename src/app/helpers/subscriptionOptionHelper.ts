@@ -7,7 +7,7 @@ export const getBillingPeriod = (
   switch (subscriptionOption.subscriptionPeriod) {
     case "P1W":
       return "weekly";
-    case "P1M ":
+    case "P1M":
       return "monthly";
     case "P3M":
       return "quarterly";
