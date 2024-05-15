@@ -98,7 +98,7 @@ export const GooglePlaySubscribeSection: FC<
       <ul
         className="grid gap-y-2 items-stretch"
         style={{
-          gridTemplateColumns: "1fr 5fr 1fr 1fr 2fr",
+          gridTemplateColumns: "1fr 5fr 1fr 2fr 2fr",
           gridTemplateRows: "auto auto",
         }}
       >

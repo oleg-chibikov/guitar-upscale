@@ -168,7 +168,10 @@ export const GooglePlaySubscriptionOptionButton: FC<
       <p onClick={handleClick} className={`${className} text-sm`}>
         {localizedPrice}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm`}>
+      <p
+        onClick={handleClick}
+        className={`${className} text-sm whitespace-nowrap`}
+      >
         {"Renews " + getBillingPeriod(subscriptionOption)}
       </p>
       <p className={className}>
