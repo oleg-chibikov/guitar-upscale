@@ -110,7 +110,7 @@ export const CancelSubscriptionModal: FC<
           }`}
         >
           <CloseIcon onPress={handleCloseModal} />
-          <div className="mb-4">{`Are you sure you would like to cancel your "${getTitle(
+          <div>{`Are you sure you would like to cancel your "${getTitle(
             subscriptionOption
           )}" subscription?`}</div>
           <Button
