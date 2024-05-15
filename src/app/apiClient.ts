@@ -24,12 +24,12 @@ async function callApi<T>(
       method,
     });
 
+    const responseData = await response.json(); // Extract error message from response
     if (!response.ok) {
       if (response.status === HttpStatusCode.Gone) {
-        return { status: ApiCallResult.SkipProcessing };
+        return { status: ApiCallResult.SkipProcessing, data: responseData };
       }
 
-      const responseData = await response.json(); // Extract error message from response
       console.error(
         `Error status received while calling ${endpoint}`,
         responseData
@@ -37,8 +37,7 @@ async function callApi<T>(
       return { status: ApiCallResult.Error, data: responseData };
     }
 
-    const responseData = await response.json(); // Extract error message from response
-    return { status: ApiCallResult.Success, data: responseData as T };
+    return { status: ApiCallResult.Success, data: responseData };
   } catch (error: any) {
     console.error(`Exception happened while calling ${endpoint}`, error);
     return { status: ApiCallResult.Error, data: error };
