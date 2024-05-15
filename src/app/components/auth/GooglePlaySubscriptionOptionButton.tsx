@@ -160,34 +160,35 @@ export const GooglePlaySubscriptionOptionButton: FC<
       >
         {title}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
+      <p onClick={handleClick} className={`${className} text-sm px-1`}>
         {subscriptionOption.description}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
+      <p onClick={handleClick} className={`${className} text-sm px-1`}>
         {localizedPrice}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
+      <p onClick={handleClick} className={`${className} text-sm px-1`}>
         {/* TODO: convert value */}
         {subscriptionOption.subscriptionPeriod}
       </p>
-      <Button
-        className={className + " pl-1"}
-        disabled={disabledMessage !== undefined}
-        size="small"
-        variant="contained"
-        color={isAlreadyPurchased ? "error" : "primary"}
-        title={disabledMessage ?? buttonContent}
-        onClick={async () => {
-          if (isAlreadyPurchased) {
-            showCancellationModal(subscriptionOption);
-          } else {
-            await makePurchase();
-          }
-        }}
-      >
-        {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
-        {buttonContent}
-      </Button>
+      <p className={className + " pl-1"}>
+        <Button
+          disabled={disabledMessage !== undefined}
+          size="small"
+          variant="contained"
+          color={isAlreadyPurchased ? "error" : "primary"}
+          title={disabledMessage ?? buttonContent}
+          onClick={async () => {
+            if (isAlreadyPurchased) {
+              showCancellationModal(subscriptionOption);
+            } else {
+              await makePurchase();
+            }
+          }}
+        >
+          {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
+          {buttonContent}
+        </Button>
+      </p>
     </>
   );
 };
