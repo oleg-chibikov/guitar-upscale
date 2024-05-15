@@ -1,51 +1,47 @@
-import {
-  ApiCallResult,
-  getSubscriptionCancellationReasonOnBackend,
-} from "@/app/apiClient";
+import { ApiCallResult, getPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
+import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
+import { CancellationMode, PurchaseResponseData } from "@/lib/apiTypes";
 import { CancelReason } from "@/lib/billing";
 import { Tier, TierKey, tierMap } from "@/lib/tier";
 import { LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
+import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
 
-const CancelSubscriptionModal = dynamic(
-  async () =>
-    (await import("./CancelSubscriptionModal")).CancelSubscriptionModal
+const CancelPurchaseModal = dynamic(
+  async () => (await import("./CancelPurchaseModal")).CancelPurchaseModal
 );
 
 interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option?: Tier) => void;
 }
 
-export type SubscriptionInfo = DigitalGoodsProductDetails & {
+export type PurchaseInfo = DigitalGoodsProductDetails & {
   purchaseToken?: string;
   isCancelled: boolean;
+  cancellationMode?: CancellationMode;
 };
 
 export const GooglePlaySubscribeSection: FC<
   GooglePlaySubscribeSectionProps
 > = ({ onOptionSelected }) => {
   const dispatch = useDispatch();
-  const [selectedOption, setSelectedOption] = useState<SubscriptionInfo>();
+  const [selectedOption, setSelectedOption] = useState<PurchaseInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const [subscriptionOptions, setSubscriptionOptions] = useState<
-    SubscriptionInfo[]
-  >([]);
+  const [purchaseOptions, setPurchaseOptions] = useState<PurchaseInfo[]>([]);
   const [cancelSubscriptionModalOpen, setSubscriptionModalOpen] =
     useState<boolean>(false);
   const [cancelSubscriptionModalOpened, setSubscriptionModalOpened] =
     useState<boolean>(false);
   const [subscriptionToCancel, setSubscriptionToCancel] =
-    useState<SubscriptionInfo>();
+    useState<PurchaseInfo>();
   const online = useOnlineStatus();
 
   const handleOpenModal = () => {
@@ -58,7 +54,7 @@ export const GooglePlaySubscribeSection: FC<
       return;
     }
 
-    const getSubscriptionOptions = async () => {
+    const getPurchaseOptions = async () => {
       setIsLoading(true);
       try {
         const digitalGoodsService = await buildDigitalGoodsService();
@@ -68,45 +64,45 @@ export const GooglePlaySubscribeSection: FC<
 
         const existingPurchases = await digitalGoodsService.listPurchases();
         const options = await Promise.all(
-          details.map(async (subscriptionOption) => {
+          details.map(async (purchaseOption) => {
             const correspondingItem = existingPurchases.find(
-              (x) => x.itemId === subscriptionOption.itemId
+              (x) => x.itemId === purchaseOption.itemId
             );
-            let cancellationReason: CancelReason | undefined;
+            let responseData: PurchaseResponseData | undefined;
+            let cancellationReason = responseData?.cancellationReason;
             if (correspondingItem) {
-              const response = await getSubscriptionCancellationReasonOnBackend(
-                {
-                  itemId: subscriptionOption.itemId as TierKey,
-                  purchaseToken: correspondingItem.purchaseToken,
-                }
-              );
+              const response = await getPurchaseOnBackend({
+                itemId: purchaseOption.itemId as TierKey,
+                purchaseToken: correspondingItem.purchaseToken,
+              });
               if (response.status === ApiCallResult.Success) {
-                cancellationReason = response.data;
+                responseData = response.data;
               } else {
-                const title = getTitle(subscriptionOption);
+                const title = getTitle(purchaseOption);
                 dispatch(
                   setAndShowAlert({
-                    message: `Cannot check if purchase for "${title}" is cancelled due to an error`,
+                    message: `Cannot get details of "${title}" due to an error`,
                     alertType: AlertType.Error,
                   })
                 );
               }
             }
             return {
-              ...subscriptionOption,
+              ...purchaseOption,
+              cancellationMode: responseData?.cancellationMode,
               purchaseToken: correspondingItem?.purchaseToken,
               isCancelled: cancellationReason
                 ? cancellationReason !== CancelReason.NONE
                 : false,
-            };
+            } as PurchaseInfo;
           })
         );
 
-        setSubscriptionOptions(options);
+        setPurchaseOptions(options);
       } catch (ex: any) {
         dispatch(
           setAndShowAlert({
-            message: "Cannot get supscription options " + ex,
+            message: "Cannot get purchase options " + ex,
             alertType: AlertType.Error,
           })
         );
@@ -114,7 +110,7 @@ export const GooglePlaySubscribeSection: FC<
         setIsLoading(false);
       }
     };
-    getSubscriptionOptions();
+    getPurchaseOptions();
   }, [hasDigitalGoodsService, dispatch]);
 
   if (!hasDigitalGoodsService) {
@@ -125,18 +121,16 @@ export const GooglePlaySubscribeSection: FC<
     return <LinearProgress />;
   }
 
-  const disabledMessage = !online
-    ? "Cannot subscribe/unsubscribe while offline"
-    : undefined;
+  const disabledMessage = !online ? "Cannot purchase while offline" : undefined;
 
   return (
     <>
       {subscriptionToCancel && cancelSubscriptionModalOpened && (
-        <CancelSubscriptionModal
+        <CancelPurchaseModal
           openModal={cancelSubscriptionModalOpen}
           handleCloseModal={() => setSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
-          subscriptionOption={subscriptionToCancel}
+          purchaseOption={subscriptionToCancel}
           disabledMessage={disabledMessage}
         />
       )}
@@ -146,27 +140,25 @@ export const GooglePlaySubscribeSection: FC<
           gridTemplateColumns: "1fr 7fr 1fr 2fr 2fr",
         }}
       >
-        {subscriptionOptions.map((subscriptionOption) => (
-          <GooglePlaySubscriptionOptionButton
+        {purchaseOptions.map((purchaseOption) => (
+          <GooglePlayPurchaseOptionButton
             showCancellationModal={(option) => {
               setSubscriptionToCancel(option);
               handleOpenModal();
             }}
             disabledMessage={disabledMessage}
-            isSelected={selectedOption === subscriptionOption}
-            onClick={(subscriptionOption) => {
-              if (subscriptionOption === selectedOption) {
+            isSelected={selectedOption === purchaseOption}
+            onClick={(purchaseOption) => {
+              if (purchaseOption === selectedOption) {
                 setSelectedOption(undefined);
                 onOptionSelected(undefined);
               } else {
-                setSelectedOption(subscriptionOption);
-                onOptionSelected(
-                  tierMap.get(subscriptionOption.itemId as TierKey)
-                );
+                setSelectedOption(purchaseOption);
+                onOptionSelected(tierMap.get(purchaseOption.itemId as TierKey));
               }
             }}
-            key={subscriptionOption.itemId}
-            subscriptionOption={subscriptionOption}
+            key={purchaseOption.itemId}
+            purchaseOption={purchaseOption}
             setIsLoading={setIsLoading}
           />
         ))}

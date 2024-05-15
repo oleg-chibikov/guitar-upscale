@@ -2,48 +2,44 @@ import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { getBillingPeriod, getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import {
-  getBillingPeriod,
-  getTitle,
-} from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { CancellationMode } from "@/lib/apiTypes";
 import { TierKey } from "@/lib/tier";
 import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SubscriptionInfo } from "./GooglePlaySubscribeSection";
+import { PurchaseInfo } from "./GooglePlayPurchaseSection";
 
-interface GooglePlaySubscriptionOptionButtonProps {
-  subscriptionOption: SubscriptionInfo;
-  onClick: (option: SubscriptionInfo) => void;
+interface GooglePlayPurchaseOptionButtonProps {
+  purchaseOption: PurchaseInfo;
+  onClick: (option: PurchaseInfo) => void;
   isSelected: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  showCancellationModal: (option: SubscriptionInfo) => void;
+  showCancellationModal: (option: PurchaseInfo) => void;
   disabledMessage?: string;
 }
 
-export const GooglePlaySubscriptionOptionButton: FC<
-  GooglePlaySubscriptionOptionButtonProps
+export const GooglePlayPurchaseOptionButton: FC<
+  GooglePlayPurchaseOptionButtonProps
 > = ({
-  subscriptionOption,
+  purchaseOption,
   onClick,
   isSelected,
   setIsLoading,
   showCancellationModal,
   disabledMessage,
 }) => {
-  const title = getTitle(subscriptionOption);
+  const title = getTitle(purchaseOption);
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
-  const isAlreadyPurchased = subscriptionOption.purchaseToken !== undefined;
-  const isCancelled = subscriptionOption.isCancelled;
-  const cancelledMessage = isCancelled
-    ? "Subscription already cancelled"
-    : undefined;
+  const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
+  const isCancelled = purchaseOption.isCancelled;
+  const cancelledMessage = isCancelled ? "Already cancelled" : undefined;
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -58,7 +54,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       {
         supportedMethods: "https://play.google.com/billing",
         data: {
-          sku: subscriptionOption.itemId,
+          sku: purchaseOption.itemId,
         },
       },
     ];
@@ -80,7 +76,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       const { purchaseToken } = paymentResponse.details;
 
       const result = await acknowledgePurchaseOnBackend({
-        itemId: subscriptionOption.itemId as TierKey,
+        itemId: purchaseOption.itemId as TierKey,
         purchaseToken,
       });
 
@@ -94,7 +90,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         // successful. The user-agent may show a "payment successful"
         // message to the user.
         await paymentResponse.complete("success");
-        const message = `Payment successful! Your subscription level is "${title}"`;
+        const message = `Payment successful! Your level is "${title}"`;
         dispatch(
           setAndShowAlert({
             message,
@@ -104,7 +100,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       } else if (result.status === ApiCallResult.SkipProcessing) {
         dispatch(
           setAndShowAlert({
-            message: `Subscription "${title}" is cancelled. Cannot acknowledge`,
+            message: `"${title}" is cancelled. Cannot acknowledge`,
             alertType: AlertType.Warning,
           })
         );
@@ -125,7 +121,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       console.log(e);
       dispatch(
         setAndShowAlert({
-          message: "Subscribing aborted",
+          message: "Purchasing aborted",
           alertType: AlertType.Warning,
         })
       );
@@ -137,14 +133,14 @@ export const GooglePlaySubscriptionOptionButton: FC<
   // Format the price according to the user locale.
   const localizedPrice = new Intl.NumberFormat(navigator.language, {
     style: "currency",
-    currency: subscriptionOption.price.currency,
-  }).format(parseFloat(subscriptionOption.price.value));
+    currency: purchaseOption.price.currency,
+  }).format(parseFloat(purchaseOption.price.value));
 
-  const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
+  const handleClick = () => !isAlreadyPurchased && onClick(purchaseOption);
 
   const className =
     "p-2 flex flex-col gap-1 justify-center cursor-pointer " +
-    (subscriptionOption.isCancelled
+    (purchaseOption.isCancelled
       ? theme === Theme.Light
         ? "bg-disabled-light"
         : "bg-disabled-dark"
@@ -161,7 +157,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
       : "bg-primary-dark");
 
   const buttonContent = isAlreadyPurchased
-    ? "Cancel subscription"
+    ? purchaseOption.cancellationMode == CancellationMode.Revoke
+      ? "Cancel further payments"
+      : "Revoke and refund subscription"
     : isCancelled
     ? "Re-subscribe"
     : "Subscribe";
@@ -173,7 +171,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         {status && <div className="text-xs">{status}</div>}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
-        {subscriptionOption.description}
+        {purchaseOption.description}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
         {localizedPrice}
@@ -182,7 +180,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         onClick={handleClick}
         className={`${className} text-sm whitespace-nowrap`}
       >
-        {"Renews " + getBillingPeriod(subscriptionOption)}
+        {"Renews " + getBillingPeriod(purchaseOption)}
       </p>
       <p className={className}>
         <Button
@@ -194,7 +192,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           title={cancelledMessage ?? disabledMessage ?? buttonContent}
           onClick={async () => {
             if (isAlreadyPurchased && !isCancelled) {
-              showCancellationModal(subscriptionOption);
+              showCancellationModal(purchaseOption);
             } else {
               // Purchase new subscription or repurchase cancelled one
               await makePurchase();

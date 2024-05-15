@@ -15,7 +15,7 @@ import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
 const GooglePlaySubscribeSection = React.lazy(() =>
-  import("./GooglePlaySubscribeSection").then((module) => ({
+  import("./GooglePlayPurchaseSection").then((module) => ({
     default: module.GooglePlaySubscribeSection,
   }))
 );

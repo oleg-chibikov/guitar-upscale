@@ -17,11 +17,6 @@ type ApiMethodHandlers = {
   [key in Uppercase<Method>]?: NextApiHandler;
 };
 
-export type ResponseData = {
-  message?: string;
-  error?: string;
-};
-
 export function validateParameter<T>(
   param: unknown,
   paramName: string,

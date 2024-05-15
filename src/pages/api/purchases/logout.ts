@@ -1,4 +1,5 @@
-import { ResponseData, apiHandler } from "@/lib/apiHelper";
+import { apiHandler } from "@/lib/apiHelper";
+import { ResponseData } from "@/lib/apiTypes";
 import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
 import { HttpStatusCode } from "axios";
 import { deleteCookie } from "cookies-next";

@@ -1,7 +1,7 @@
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateParameter } from "./apiHelper";
-import { CancelReason } from "./billing";
+import { CancelReason, SubscriptionPurchase } from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { TierKey } from "./tier";
@@ -34,3 +34,6 @@ export const getSubscriptionFromRequest = async <T>(
 
   return { subscription, params };
 };
+
+export const shouldRevoke = (subscription: SubscriptionPurchase) =>
+  subscription.isGracePeriod();

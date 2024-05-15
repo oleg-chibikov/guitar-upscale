@@ -1,10 +1,10 @@
-import { ApiCallResult, cancelSubscriptionOnBackend } from "@/app/apiClient";
+import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { TierKey } from "@/lib/tier";
@@ -13,27 +13,27 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
-import { SubscriptionInfo } from "./GooglePlaySubscribeSection";
+import { PurchaseInfo } from "./GooglePlayPurchaseSection";
 
-export const CancelSubscriptionModal: FC<
+export const CancelPurchaseModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
-    subscriptionOption: SubscriptionInfo;
+    purchaseOption: PurchaseInfo;
     disabledMessage?: string;
   }
 > = ({
   openModal,
   handleCloseModal,
   setIsLoading,
-  subscriptionOption,
+  purchaseOption,
   disabledMessage,
 }) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const title = getTitle(subscriptionOption);
+  const title = getTitle(purchaseOption);
 
-  const cancelSubscription = async () => {
+  const cancelPurchase = async () => {
     if (!hasDigitalGoodsService) {
       return;
     }
@@ -46,7 +46,7 @@ export const CancelSubscriptionModal: FC<
       const digitalGoodsService = await buildDigitalGoodsService();
       const existingPurchases = await digitalGoodsService.listPurchases();
       const purchases = existingPurchases
-        .filter((x) => x.itemId === subscriptionOption.itemId)
+        .filter((x) => x.itemId === purchaseOption.itemId)
         .map((x) => ({
           itemId: x.itemId as TierKey,
           purchaseToken: x.purchaseToken,
@@ -59,7 +59,7 @@ export const CancelSubscriptionModal: FC<
           })
         );
       }
-      const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
+      const cancelResult = await cancelPurchaseOnBackend(purchases[0]);
       if (cancelResult.status === ApiCallResult.Success) {
         const message = `Subscription "${title}" has been successfully cancelled`;
         dispatch(
@@ -112,7 +112,7 @@ export const CancelSubscriptionModal: FC<
         >
           <CloseIcon onPress={handleCloseModal} />
           <div>{`Are you sure you would like to cancel your "${getTitle(
-            subscriptionOption
+            purchaseOption
           )}" subscription?`}</div>
           <Button
             size="small"
@@ -126,7 +126,7 @@ export const CancelSubscriptionModal: FC<
           <Button
             disabled={disabledMessage !== undefined}
             size="small"
-            onClick={cancelSubscription}
+            onClick={cancelPurchase}
             variant="contained"
             color="error"
             title="Cancel subscription"

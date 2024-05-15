@@ -1,4 +1,4 @@
-import { CancelReason } from "@/lib/billing";
+import { PurchaseResponseData, ResponseData } from "@/lib/apiTypes";
 import { PurchaseParams } from "@/lib/purchaseParams";
 import { HttpStatusCode } from "axios";
 
@@ -47,7 +47,7 @@ async function callApi<T>(
 
 export async function acknowledgePurchaseOnBackend(
   params: PurchaseParams
-): Promise<Response<string>> {
+): Promise<Response<ResponseData>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/acknowledge`, "POST", {
     itemId,
@@ -55,9 +55,9 @@ export async function acknowledgePurchaseOnBackend(
   });
 }
 
-export async function cancelSubscriptionOnBackend(
+export async function cancelPurchaseOnBackend(
   params: PurchaseParams
-): Promise<Response<string>> {
+): Promise<Response<ResponseData>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/cancel`, "POST", {
     itemId,
@@ -65,15 +65,15 @@ export async function cancelSubscriptionOnBackend(
   });
 }
 
-export async function logoutOnBackend(): Promise<Response<string>> {
+export async function logoutOnBackend(): Promise<Response<ResponseData>> {
   return callApi(`/api/purchases/logout`, "POST");
 }
 
-export async function getSubscriptionCancellationReasonOnBackend(
+export async function getPurchaseOnBackend(
   params: PurchaseParams
-): Promise<Response<CancelReason>> {
+): Promise<Response<PurchaseResponseData>> {
   const { itemId, purchaseToken } = params;
-  return callApi(`/api/purchases/getCancellationReason`, "GET", {
+  return callApi(`/api/purchases/get`, "GET", {
     itemId,
     purchaseToken,
   });

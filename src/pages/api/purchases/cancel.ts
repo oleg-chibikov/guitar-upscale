@@ -1,6 +1,10 @@
-import { ResponseData, apiHandler } from "@/lib/apiHelper";
+import { apiHandler } from "@/lib/apiHelper";
+import { ResponseData } from "@/lib/apiTypes";
 import { cancelSubscription, revokeSubscription } from "@/lib/purchases";
-import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
+import {
+  getSubscriptionFromRequest,
+  shouldRevoke,
+} from "@/lib/subscriptionHelper";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { clearSubscriptionCookie } from "./logout";
@@ -17,7 +21,7 @@ const handle = async (
     const { subscription, params } = subscriptionData;
 
     let message: string = "Cancelled";
-    if (subscription.isGracePeriod()) {
+    if (shouldRevoke(subscription)) {
       console.log(
         "Subscription is still in grace period. Revoking permissions",
         params
