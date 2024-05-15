@@ -165,6 +165,11 @@ export const GooglePlaySubscriptionOptionButton: FC<
     : isCancelled
     ? "Re-subscribe"
     : "Subscribe";
+  const status = isAlreadyPurchased
+    ? "Owned"
+    : isCancelled
+    ? "Cancelled"
+    : "Available";
   return (
     <>
       <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
@@ -182,6 +187,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
       >
         {"Renews " + getBillingPeriod(subscriptionOption)}
       </p>
+      <p className={`${className} text-sm whitespace-nowrap`}>{status}</p>
       <p className={className}>
         <Button
           className="w-full whitespace-nowrap"
