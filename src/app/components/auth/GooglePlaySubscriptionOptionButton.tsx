@@ -19,6 +19,7 @@ interface GooglePlaySubscriptionOptionButtonProps {
   setIsLoading: (isLoading: boolean) => void;
   isAlreadyPurchased: boolean;
   showCancellationModal: (option: DigitalGoodsProductDetails) => void;
+  disabledMessage?: string;
 }
 
 export const GooglePlaySubscriptionOptionButton: FC<
@@ -30,6 +31,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   setIsLoading,
   isAlreadyPurchased,
   showCancellationModal,
+  disabledMessage,
 }) => {
   const title = getTitle(subscriptionOption);
   const hasDigitalGoodsService = useDigitalGoodsService();
@@ -141,6 +143,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
     ? "bg-accent_stronger-light"
     : "bg-accent_stronger-dark";
 
+  const buttonContent = isAlreadyPurchased
+    ? "Cancel subscription"
+    : "Subscribe";
   return (
     <>
       <p
@@ -170,9 +175,11 @@ export const GooglePlaySubscriptionOptionButton: FC<
       </p>
       <Button
         className={className}
+        disabled={disabledMessage !== undefined}
         size="small"
         variant="contained"
         color={isAlreadyPurchased ? "error" : "primary"}
+        title={disabledMessage ?? buttonContent}
         onClick={async () => {
           if (isAlreadyPurchased) {
             showCancellationModal(subscriptionOption);
@@ -182,7 +189,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         }}
       >
         {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
-        {isAlreadyPurchased ? "Cancel subscription" : "Subscribe"}
+        {buttonContent}
       </Button>
     </>
   );

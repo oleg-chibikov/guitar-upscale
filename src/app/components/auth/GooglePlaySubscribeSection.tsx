@@ -1,6 +1,7 @@
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { selectAuth } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Tier, TierKey, tierMap } from "@/lib/tiers";
@@ -37,6 +38,7 @@ export const GooglePlaySubscribeSection: FC<
   const [subscriptionToCancel, setSubscriptionToCancel] =
     useState<DigitalGoodsProductDetails>();
   const { subscriptionTier } = useSelector(selectAuth);
+  const online = useOnlineStatus();
 
   const handleOpenModal = () => {
     setSubscriptionModalOpen(true);
@@ -91,7 +93,7 @@ export const GooglePlaySubscribeSection: FC<
       <ul
         className="grid gap-y-2 p-2 justify-center items-center"
         style={{
-          gridTemplateColumns: "1fr 3fr 1fr 1fr 2fr",
+          gridTemplateColumns: "1fr 5fr 1fr 1fr 2fr",
           gridTemplateRows: "auto auto",
         }}
       >
@@ -101,6 +103,9 @@ export const GooglePlaySubscribeSection: FC<
               setSubscriptionToCancel(option);
               handleOpenModal();
             }}
+            disabledMessage={
+              !online ? "Cannot subscribe while offline" : undefined
+            }
             isSelected={selectedOption === subscriptionOption}
             onClick={(subscriptionOption) => {
               if (subscriptionOption === selectedOption) {
