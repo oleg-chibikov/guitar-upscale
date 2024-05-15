@@ -4,7 +4,7 @@ import { validateParameter } from "./apiHelper";
 import { CancelReason, SubscriptionPurchase } from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
-import { TierKey } from "./tiers";
+import { TierKey } from "./tier";
 
 export type SubscriptionResponseData = {
   subscription?: SubscriptionPurchase;

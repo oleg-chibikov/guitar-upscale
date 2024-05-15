@@ -10,14 +10,7 @@ import {
 } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { SubscriptionProvider } from "./subscriptionProvider";
-
-export type Tier = "Explorer" | "Composer";
-export type TierKey = "guitar_upscale.composer" | "guitar_upscale.explorer";
-
-export const tierMap = new Map<TierKey, Tier>([
-  ["guitar_upscale.composer", "Composer"],
-  ["guitar_upscale.explorer", "Explorer"],
-]);
+import { Tier, TierInfo, tierMap } from "./tier";
 
 const composerWhitelist = new Set<string>(
   process.env.COMPOSER_WHITELIST?.split(",")
@@ -156,9 +149,4 @@ export const applyTierToResult = (result: any, subscriptionTier?: TierInfo) => {
   }
 
   return result;
-};
-
-export type TierInfo = {
-  tier: Tier;
-  provider: SubscriptionProvider;
 };

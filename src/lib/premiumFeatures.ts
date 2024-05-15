@@ -1,6 +1,7 @@
 import { Session } from "next-auth";
 import { auth } from "./auth";
-import { TierInfo, applyTierToResult, getTierName } from "./tiers";
+import { TierInfo } from "./tier";
+import { applyTierToResult, getTierName } from "./tierHelper";
 
 export type PremiumFeaturesWithSession = {
   premiumFeatures: PremiumFeatures;

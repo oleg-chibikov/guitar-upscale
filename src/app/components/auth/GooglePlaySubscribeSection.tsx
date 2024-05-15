@@ -4,7 +4,7 @@ import { AlertType } from "@/app/data/alertType";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { Tier, TierKey, tierMap } from "@/lib/tiers";
+import { Tier, TierKey, tierMap } from "@/lib/tier";
 import { LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";

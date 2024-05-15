@@ -1,5 +1,5 @@
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
-import { TierKey } from "@/lib/tiers";
+import { TierKey } from "@/lib/tier";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {

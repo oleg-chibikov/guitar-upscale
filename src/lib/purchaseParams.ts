@@ -1,4 +1,4 @@
-import { TierKey } from "./tiers";
+import { TierKey } from "./tier";
 
 export const GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY = "subscriptionData";
 

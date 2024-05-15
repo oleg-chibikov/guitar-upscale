@@ -5,7 +5,7 @@ import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
-import { Tier } from "@/lib/tiers";
+import { Tier } from "@/lib/tier";
 import { Avatar, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";

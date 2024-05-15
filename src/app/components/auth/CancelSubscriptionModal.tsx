@@ -7,7 +7,7 @@ import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
-import { TierKey } from "@/lib/tiers";
+import { TierKey } from "@/lib/tier";
 import { Button, Modal, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,7 +60,7 @@ export const CancelSubscriptionModal: FC<
         );
       }
       const cancelResult = await cancelSubscriptionOnBackend(purchases[0]);
-      if (cancelResult === ApiCallResult.Success) {
+      if (cancelResult.status === ApiCallResult.Success) {
         const message = `Subscription "${title}" has been successfully cancelled`;
         dispatch(
           setAndShowAlert({
@@ -68,7 +68,7 @@ export const CancelSubscriptionModal: FC<
           })
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
-      } else if (cancelResult === ApiCallResult.SkipProcessing) {
+      } else if (cancelResult.status === ApiCallResult.SkipProcessing) {
         dispatch(
           setAndShowAlert({
             message: `Subscription "${title}" is already cancelled`,
