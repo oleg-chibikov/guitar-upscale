@@ -107,7 +107,7 @@ export const CancelSubscriptionModal: FC<
             color="secondary"
             title="Don't cancel"
           >
-            No, I still want to have it
+            No, I prefer keeping it
           </Button>
           <Button
             size="small"
