@@ -157,8 +157,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
         onClick={async () => {
           if (isAlreadyPurchased) {
             showCancellationModal(subscriptionOption);
+          } else {
+            await makePurchase();
           }
-          await makePurchase();
         }}
       >
         {/* TODO: Cancel in a separate modal with confirmation */}
