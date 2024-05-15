@@ -89,8 +89,11 @@ export const GooglePlaySubscribeSection: FC<
         />
       )}
       <ul
-        className="grid gap-2"
-        style={{ gridTemplateColumns: "1fr 3 fr 1fr 1fr 2fr" }}
+        className="grid gap-y-2"
+        style={{
+          gridTemplateColumns: "1fr 3fr 1fr 1fr 2fr",
+          gridTemplateRows: "auto auto",
+        }}
       >
         {subscriptionOptions.map((subscriptionOption) => (
           <GooglePlaySubscriptionOptionButton
