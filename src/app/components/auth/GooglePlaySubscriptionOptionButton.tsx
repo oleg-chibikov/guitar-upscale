@@ -133,43 +133,33 @@ export const GooglePlaySubscriptionOptionButton: FC<
 
   const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
 
-  const className = isAlreadyPurchased
-    ? "bg-emerald-600" // TODO: themed colors?
-    : !isSelected
-    ? theme === Theme.Light
-      ? "bg-accent-light"
-      : "bg-accent-dark"
-    : theme === Theme.Light
-    ? "bg-accent_stronger-light"
-    : "bg-accent_stronger-dark";
+  const className =
+    "flex items-center cursor-pointer " +
+    (isAlreadyPurchased
+      ? "bg-emerald-600" // TODO: themed colors?
+      : !isSelected
+      ? theme === Theme.Light
+        ? "bg-accent-light"
+        : "bg-accent-dark"
+      : theme === Theme.Light
+      ? "bg-accent_stronger-light"
+      : "bg-accent_stronger-dark");
 
   const buttonContent = isAlreadyPurchased
     ? "Cancel subscription"
     : "Subscribe";
   return (
     <>
-      <p
-        onClick={handleClick}
-        className={`${className} cursor-pointer text-lg font-semibold`}
-      >
+      <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
         {title}
       </p>
-      <p
-        onClick={handleClick}
-        className={`${className} cursor-pointer text-sm grow`}
-      >
+      <p onClick={handleClick} className={`${className} text-sm`}>
         {subscriptionOption.description}
       </p>
-      <p
-        onClick={handleClick}
-        className={`${className} cursor-pointer text-sm`}
-      >
+      <p onClick={handleClick} className={`${className} text-sm`}>
         {localizedPrice}
       </p>
-      <p
-        onClick={handleClick}
-        className={`${className} cursor-pointer text-sm grow`}
-      >
+      <p onClick={handleClick} className={`${className} text-sm`}>
         {/* TODO: convert value */}
         {subscriptionOption.subscriptionPeriod}
       </p>
