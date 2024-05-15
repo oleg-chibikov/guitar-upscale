@@ -138,7 +138,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
 
   const className =
-    "px-2 flex items-center cursor-pointer " +
+    "flex items-center cursor-pointer " +
     (isAlreadyPurchased
       ? "bg-emerald-600" // TODO: themed colors?
       : !isSelected
@@ -154,21 +154,24 @@ export const GooglePlaySubscriptionOptionButton: FC<
     : "Subscribe";
   return (
     <>
-      <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
+      <p
+        onClick={handleClick}
+        className={`${className} text-lg font-semibold pr-1`}
+      >
         {title}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm`}>
+      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
         {subscriptionOption.description}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm`}>
+      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
         {localizedPrice}
       </p>
-      <p onClick={handleClick} className={`${className} text-sm`}>
+      <p onClick={handleClick} className={`${className} text-sm px-1 `}>
         {/* TODO: convert value */}
         {subscriptionOption.subscriptionPeriod}
       </p>
       <Button
-        className={className}
+        className={className + " pl-1"}
         disabled={disabledMessage !== undefined}
         size="small"
         variant="contained"
