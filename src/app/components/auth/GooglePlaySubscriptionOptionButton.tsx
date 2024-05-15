@@ -132,7 +132,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   return (
     <div
       onClick={() => !isAlreadyPurchased && onClick(subscriptionOption)}
-      className={`flex justify-between align-middle items-center flex-row p-2 gap-2 ${
+      className={`${
         isAlreadyPurchased
           ? "bg-emerald-600" // TODO: themed colors?
           : !isSelected

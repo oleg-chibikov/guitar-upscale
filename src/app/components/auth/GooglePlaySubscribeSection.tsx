@@ -88,7 +88,10 @@ export const GooglePlaySubscribeSection: FC<
           subscriptionOption={subscriptionToCancel}
         />
       )}
-      <ul className="flex flex-col gap-2">
+      <ul
+        className="grid gap-2"
+        style={{ gridTemplateColumns: "1fr 3 fr 1fr 1fr 2fr" }}
+      >
         {subscriptionOptions.map((subscriptionOption) => (
           <GooglePlaySubscriptionOptionButton
             showCancellationModal={(option) => {
