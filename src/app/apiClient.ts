@@ -37,6 +37,7 @@ async function callApi<T>(
       return { status: ApiCallResult.Error, data: responseData };
     }
 
+    console.log("Successfully called ${endpoint}", responseData);
     return { status: ApiCallResult.Success, data: responseData };
   } catch (error: any) {
     console.error(`Exception happened while calling ${endpoint}`, error);
@@ -46,7 +47,7 @@ async function callApi<T>(
 
 export async function acknowledgePurchaseOnBackend(
   params: PurchaseParams
-): Promise<Response<void>> {
+): Promise<Response<string>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/acknowledge`, "POST", {
     itemId,
@@ -56,7 +57,7 @@ export async function acknowledgePurchaseOnBackend(
 
 export async function cancelSubscriptionOnBackend(
   params: PurchaseParams
-): Promise<Response<void>> {
+): Promise<Response<string>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/cancel`, "POST", {
     itemId,
@@ -64,7 +65,7 @@ export async function cancelSubscriptionOnBackend(
   });
 }
 
-export async function logoutOnBackend(): Promise<Response<void>> {
+export async function logoutOnBackend(): Promise<Response<string>> {
   return callApi(`/api/purchases/logout`, "POST");
 }
 
