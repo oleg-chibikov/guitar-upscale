@@ -41,6 +41,9 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const { theme } = useSelector(selectUi);
   const isAlreadyPurchased = subscriptionOption.purchaseToken !== undefined;
   const isCancelled = subscriptionOption.isCancelled;
+  const cancelledMessage = isCancelled
+    ? "Subscription already cancelled"
+    : undefined;
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -180,14 +183,16 @@ export const GooglePlaySubscriptionOptionButton: FC<
       <p className={className}>
         <Button
           className="w-full whitespace-nowrap"
-          disabled={disabledMessage !== undefined}
+          disabled={isCancelled || disabledMessage !== undefined}
           size="small"
           variant="contained"
           color={isAlreadyPurchased ? "error" : "primary"}
-          title={disabledMessage ?? buttonContent}
+          title={cancelledMessage ?? disabledMessage ?? buttonContent}
           onClick={async () => {
-            if (isAlreadyPurchased && !isCancelled) {
-              showCancellationModal(subscriptionOption);
+            if (isAlreadyPurchased) {
+              if (!isCancelled) {
+                showCancellationModal(subscriptionOption);
+              }
             } else {
               await makePurchase();
             }
