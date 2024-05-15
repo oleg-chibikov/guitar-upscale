@@ -80,6 +80,10 @@ export const GooglePlaySubscribeSection: FC<
     return <LinearProgress />;
   }
 
+  const disabledMessage = !online
+    ? "Cannot subscribe/unsubscribe while offline"
+    : undefined;
+
   return (
     <>
       {subscriptionToCancel && cancelSubscriptionModalOpened && (
@@ -88,10 +92,11 @@ export const GooglePlaySubscribeSection: FC<
           handleCloseModal={() => setSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
           subscriptionOption={subscriptionToCancel}
+          disabledMessage={disabledMessage}
         />
       )}
       <ul
-        className="grid gap-y-2 p-2 items-stretch"
+        className="grid gap-y-2 items-stretch"
         style={{
           gridTemplateColumns: "1fr 5fr 1fr 1fr 2fr",
           gridTemplateRows: "auto auto",
@@ -103,9 +108,7 @@ export const GooglePlaySubscribeSection: FC<
               setSubscriptionToCancel(option);
               handleOpenModal();
             }}
-            disabledMessage={
-              !online ? "Cannot subscribe/unsubscribe while offline" : undefined
-            }
+            disabledMessage={disabledMessage}
             isSelected={selectedOption === subscriptionOption}
             onClick={(subscriptionOption) => {
               if (subscriptionOption === selectedOption) {
