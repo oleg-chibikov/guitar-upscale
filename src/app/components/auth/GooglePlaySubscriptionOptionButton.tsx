@@ -138,7 +138,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
 
   const className =
-    "flex items-center cursor-pointer " +
+    "px-2 flex items-center cursor-pointer " +
     (isAlreadyPurchased
       ? "bg-emerald-600" // TODO: themed colors?
       : !isSelected
