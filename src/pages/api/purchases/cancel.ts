@@ -16,7 +16,7 @@ const handle = async (
     }
     const { subscription, params } = subscriptionData;
 
-    let message: string;
+    let message: string = "Cancelled";
     if (subscription.isGracePeriod()) {
       console.log(
         "Subscription is still in grace period. Revoking permissions",
@@ -31,11 +31,10 @@ const handle = async (
         params
       );
       await cancelSubscription(params);
-      message = "Cancelled";
       // we should keep the permissions. it will be revoked only when the subscription expires
     }
 
-    res.status(HttpStatusCode.Ok).json({ message });
+    res.status(HttpStatusCode.Ok).json({ message: message });
   } finally {
     res.end();
   }
