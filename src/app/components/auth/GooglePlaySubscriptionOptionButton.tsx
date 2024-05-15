@@ -162,6 +162,8 @@ export const GooglePlaySubscriptionOptionButton: FC<
 
   const buttonContent = isAlreadyPurchased
     ? "Cancel subscription"
+    : isCancelled
+    ? "Re-subscribe"
     : "Subscribe";
   return (
     <>
