@@ -90,20 +90,31 @@ export const CancelSubscriptionModal: FC<
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
-          className={`flex overflow-auto max-h-full flex-col gap-2 border-2 p-2 ${
+          className={`flex overflow-auto max-h-full h-1/2 justify-center items-center flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light
               ? "bg-accented_background-light border-border-light text-foreground-light"
               : "bg-accented_background-dark  border-border-dark text-foreground-dark"
           }`}
         >
-          Are you sure you would like to cancel the subscription?
+          <div>{`Are you sure you would like to cancel your"${subscriptionOption.title}" subscription?`}</div>
           <Button
             size="small"
             onClick={cancelSubscription}
             variant="contained"
-            color="primary"
+            color="error"
             title="Cancel subscription"
-          ></Button>
+          >
+            Cancel subscription
+          </Button>
+          <Button
+            size="small"
+            onClick={handleCloseModal}
+            variant="contained"
+            color="secondary"
+            title="Don't cancel"
+          >
+            Don not cancel. I still want to have it
+          </Button>
         </section>
       </Slide>
     </Modal>
