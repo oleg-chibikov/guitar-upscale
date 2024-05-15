@@ -140,14 +140,16 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const className =
     "flex items-center cursor-pointer " +
     (isAlreadyPurchased
-      ? "bg-emerald-600" // TODO: themed colors?
-      : !isSelected
       ? theme === Theme.Light
         ? "bg-accent-light"
         : "bg-accent-dark"
+      : !isSelected
+      ? theme === Theme.Light
+        ? "bg-secondary-light"
+        : "bg-secondary-dark"
       : theme === Theme.Light
-      ? "bg-accent_stronger-light"
-      : "bg-accent_stronger-dark");
+      ? "bg-primary-light"
+      : "bg-primary-dark");
 
   const buttonContent = isAlreadyPurchased
     ? "Cancel subscription"

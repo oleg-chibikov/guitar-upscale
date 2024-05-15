@@ -165,10 +165,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             } ${
               theme === Theme.Light
                 ? wasPlayedLast
-                  ? "bg-previous_chord-light"
+                  ? "bg-secondary-light"
                   : "bg-button-light"
                 : wasPlayedLast
-                ? "bg-previous_chord-dark"
+                ? "bg-secondary-dark"
                 : "bg-button-dark"
             }`
       } font-mono select-none ${
