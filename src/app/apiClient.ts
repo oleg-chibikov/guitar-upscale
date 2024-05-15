@@ -37,7 +37,7 @@ async function callApi<T>(
       return { status: ApiCallResult.Error, data: responseData };
     }
 
-    console.log("Successfully called ${endpoint}", responseData);
+    console.log(`Successfully called ${endpoint}`, responseData);
     return { status: ApiCallResult.Success, data: responseData };
   } catch (error: any) {
     console.error(`Exception happened while calling ${endpoint}`, error);

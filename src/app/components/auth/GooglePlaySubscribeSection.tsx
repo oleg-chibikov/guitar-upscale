@@ -82,10 +82,6 @@ export const GooglePlaySubscribeSection: FC<
               );
               if (response.status === ApiCallResult.Success) {
                 cancellationReason = response.data;
-                console.log(
-                  "Cancellation reason for " + subscriptionOption.itemId,
-                  cancellationReason
-                );
               } else {
                 const title = getTitle(subscriptionOption);
                 dispatch(
@@ -99,7 +95,7 @@ export const GooglePlaySubscribeSection: FC<
             return {
               ...subscriptionOption,
               purchaseToken: correspondingItem?.purchaseToken,
-              isCancelled: cancellationReason !== undefined,
+              isCancelled: cancellationReason !== CancelReason.NONE,
             };
           })
         );
