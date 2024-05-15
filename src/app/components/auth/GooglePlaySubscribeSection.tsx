@@ -95,7 +95,9 @@ export const GooglePlaySubscribeSection: FC<
             return {
               ...subscriptionOption,
               purchaseToken: correspondingItem?.purchaseToken,
-              isCancelled: cancellationReason !== CancelReason.NONE,
+              isCancelled: cancellationReason
+                ? cancellationReason !== CancelReason.NONE
+                : false,
             };
           })
         );
