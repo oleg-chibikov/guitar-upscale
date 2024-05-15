@@ -91,9 +91,10 @@ export const GooglePlaySubscribeSection: FC<
               ...purchaseOption,
               cancellationMode: responseData?.cancellationMode,
               purchaseToken: correspondingItem?.purchaseToken,
-              isCancelled: cancellationReason
-                ? cancellationReason !== CancelReason.NONE
-                : false,
+              isCancelled:
+                cancellationReason !== undefined
+                  ? cancellationReason !== CancelReason.NONE
+                  : false,
             } as PurchaseInfo;
           })
         );
