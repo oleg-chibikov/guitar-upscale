@@ -143,7 +143,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
 
   const className =
-    "p-1 flex items-center cursor-pointer " +
+    "p-1 flex flex-col gap-1 items-center cursor-pointer " +
     (subscriptionOption.isCancelled
       ? theme === Theme.Light
         ? "bg-disabled-light"
@@ -165,15 +165,12 @@ export const GooglePlaySubscriptionOptionButton: FC<
     : isCancelled
     ? "Re-subscribe"
     : "Subscribe";
-  const status = isAlreadyPurchased
-    ? "Owned"
-    : isCancelled
-    ? "Cancelled"
-    : "Available";
+  const status = isAlreadyPurchased ? "Owned" : isCancelled ? "Cancelled" : "";
   return (
     <>
       <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
-        {title}
+        <div>{title}</div>
+        {status && <div className="text-xs">{status}</div>}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
         {subscriptionOption.description}
@@ -187,7 +184,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
       >
         {"Renews " + getBillingPeriod(subscriptionOption)}
       </p>
-      <p className={`${className} text-sm whitespace-nowrap`}>{status}</p>
       <p className={className}>
         <Button
           className="w-full whitespace-nowrap"
