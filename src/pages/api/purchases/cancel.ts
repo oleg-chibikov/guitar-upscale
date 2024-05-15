@@ -1,62 +1,40 @@
 import { apiHandler } from "@/lib/apiHelper";
-import { CancelReason, SubscriptionPurchase } from "@/lib/billing";
-import { PurchaseParams } from "@/lib/purchaseParams";
-import { cancelSubscription, fetchSubscriptionPurchase } from "@/lib/purchases";
-import { TierKey } from "@/lib/tiers";
+import { cancelSubscription, revokeSubscription } from "@/lib/purchases";
+import {
+  SubscriptionResponseData,
+  getSubscriptionFromRequest,
+} from "@/lib/subscriptionHelper";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { clearSubscriptionCookie } from "./logout";
 
-type ResponseData = {
-  subscription?: SubscriptionPurchase;
-  error?: string;
-};
-
-function validateParameter<T>(
-  param: unknown,
-  paramName: string,
-  res: NextApiResponse
-): T | null {
-  if (typeof param !== "string") {
-    res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
-    return null; // Validation failed
-  }
-  return param as T; // Validation passed
-}
-
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<SubscriptionResponseData>
 ) => {
   try {
-    const itemId = validateParameter<TierKey>(req.query.itemId, "itemId", res);
-
-    const purchaseToken = validateParameter<string>(
-      req.query.purchaseToken,
-      "purchaseToken",
-      res
-    );
-
-    if (itemId === null || purchaseToken === null) {
-      return; // Exit early if validation fails
-    }
-
-    const params: PurchaseParams = { itemId, purchaseToken };
-
-    const subscription = await fetchSubscriptionPurchase(params);
-
-    if (subscription?.cancelReason !== CancelReason.NONE) {
-      console.log(
-        "Subscription is already cancelled. Cancellation is not needed",
-        subscription.cancelReason
-      );
-      res.status(HttpStatusCode.Gone);
+    const subscriptionData = await getSubscriptionFromRequest(req, res, false);
+    if (!subscriptionData) {
       return;
     }
+    const { subscription, params } = subscriptionData;
 
-    await cancelSubscription(params);
+    if (subscription.isGracePeriod()) {
+      console.log(
+        "Subscription is still in grace period. Revoking permissions",
+        params
+      );
+      await revokeSubscription(params);
+      clearSubscriptionCookie(req, res);
+    } else {
+      console.log(
+        "Subscription is not in grace period anymore. Keeping permissions",
+        params
+      );
+      await cancelSubscription(params);
+      // we should keep the permissions. it will be revoked only when the subscription expires
+    }
 
-    clearSubscriptionCookie(req, res);
     res.status(HttpStatusCode.Ok);
   } finally {
     res.end();

@@ -3,7 +3,7 @@ import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import { PremiumFeatureKeys } from "@/lib/subscription";
+import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tiers";
 import { Avatar, Modal, Slide } from "@mui/material";

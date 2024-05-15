@@ -14,14 +14,14 @@ import { TierKey } from "@/lib/tiers";
 import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { SubscriptionInfo } from "./GooglePlaySubscribeSection";
 
 interface GooglePlaySubscriptionOptionButtonProps {
-  subscriptionOption: DigitalGoodsProductDetails;
-  onClick: (option: DigitalGoodsProductDetails) => void;
+  subscriptionOption: SubscriptionInfo;
+  onClick: (option: SubscriptionInfo) => void;
   isSelected: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  isAlreadyPurchased: boolean;
-  showCancellationModal: (option: DigitalGoodsProductDetails) => void;
+  showCancellationModal: (option: SubscriptionInfo) => void;
   disabledMessage?: string;
 }
 
@@ -32,7 +32,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
   onClick,
   isSelected,
   setIsLoading,
-  isAlreadyPurchased,
   showCancellationModal,
   disabledMessage,
 }) => {
@@ -40,6 +39,8 @@ export const GooglePlaySubscriptionOptionButton: FC<
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
+  const isAlreadyPurchased = subscriptionOption.purchaseToken !== undefined;
+  const isCancelled = subscriptionOption.isCancelled;
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -70,7 +71,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
     };
 
     const request = new PaymentRequest(paymentMethods, paymentDetails);
-
     setIsLoading(true);
     try {
       const paymentResponse = await request.show();
@@ -81,7 +81,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         purchaseToken,
       });
 
-      if (result === ApiCallResult.Success) {
+      if (result.status === ApiCallResult.Success) {
         const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
@@ -98,7 +98,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           })
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
-      } else if (result === ApiCallResult.SkipProcessing) {
+      } else if (result.status === ApiCallResult.SkipProcessing) {
         dispatch(
           setAndShowAlert({
             message: `Subscription "${title}" is cancelled. Cannot acknowledge`,
@@ -142,7 +142,11 @@ export const GooglePlaySubscriptionOptionButton: FC<
 
   const className =
     "p-1 flex items-center cursor-pointer " +
-    (isAlreadyPurchased
+    (subscriptionOption.isCancelled
+      ? theme === Theme.Light
+        ? "bg-disabled-light"
+        : "bg-disabled-dark"
+      : isAlreadyPurchased
       ? theme === Theme.Light
         ? "bg-accent-light"
         : "bg-accent-dark"
@@ -183,7 +187,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
           color={isAlreadyPurchased ? "error" : "primary"}
           title={disabledMessage ?? buttonContent}
           onClick={async () => {
-            if (isAlreadyPurchased) {
+            if (isAlreadyPurchased && !isCancelled) {
               showCancellationModal(subscriptionOption);
             } else {
               await makePurchase();

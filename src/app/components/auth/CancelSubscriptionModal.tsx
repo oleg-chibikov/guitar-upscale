@@ -13,11 +13,12 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
+import { SubscriptionInfo } from "./GooglePlaySubscribeSection";
 
 export const CancelSubscriptionModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
-    subscriptionOption: DigitalGoodsProductDetails;
+    subscriptionOption: SubscriptionInfo;
     disabledMessage?: string;
   }
 > = ({

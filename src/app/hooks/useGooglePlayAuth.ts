@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   ApiCallResult,
   acknowledgePurchaseOnBackend,
-  clearSubscriptionCookieOnBackend,
+  logoutOnBackend,
 } from "../apiClient";
 import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
 import { AlertType } from "../data/alertType";
@@ -67,13 +67,13 @@ export const useGooglePlayAuth = () => {
               purchaseToken: purchaseToProcess.purchaseToken,
             });
 
-            if (result === ApiCallResult.Success) {
+            if (result.status === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
                 shouldReload: true,
                 message: logMessage,
               };
-            } else if (result === ApiCallResult.SkipProcessing) {
+            } else if (result.status === ApiCallResult.SkipProcessing) {
               console.log(
                 "Skipped mismatch processing. Subscription is cancelled"
               );
@@ -95,8 +95,8 @@ export const useGooglePlayAuth = () => {
           } else {
             const logMessage = "Revoking expired permissions";
             console.log(logMessage);
-            const result = await clearSubscriptionCookieOnBackend();
-            if (result === ApiCallResult.Success) {
+            const result = await logoutOnBackend();
+            if (result.status === ApiCallResult.Success) {
               // reloading the page - after reload the permissions will be taken from the cookie which should be already set during acknowledge
               return {
                 shouldReload: true,

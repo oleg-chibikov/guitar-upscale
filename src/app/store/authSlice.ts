@@ -1,4 +1,4 @@
-import { TierInfo } from "@/lib/subscriptionProvider";
+import { TierInfo } from "@/lib/tiers";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store"; // Define RootState type
 

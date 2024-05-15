@@ -1,35 +1,17 @@
 import { apiHandler } from "@/lib/apiHelper";
-import { CancelReason, SubscriptionPurchase } from "@/lib/billing";
 import {
   GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
   PurchaseParams,
   getCookieValue,
 } from "@/lib/purchaseParams";
+import { acknowledgeSubscriptionPurchase } from "@/lib/purchases";
 import {
-  acknowledgeSubscriptionPurchase,
-  fetchSubscriptionPurchase,
-} from "@/lib/purchases";
-import { TierKey } from "@/lib/tiers";
+  SubscriptionResponseData,
+  getSubscriptionFromRequest,
+} from "@/lib/subscriptionHelper";
 import { HttpStatusCode } from "axios";
 import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-type ResponseData = {
-  subscription?: SubscriptionPurchase;
-  error?: string;
-};
-
-function validateParameter<T>(
-  param: unknown,
-  paramName: string,
-  res: NextApiResponse
-): T | null {
-  if (typeof param !== "string") {
-    res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
-    return null; // Validation failed
-  }
-  return param as T; // Validation passed
-}
 
 const setSubscriptionCookie = (
   params: PurchaseParams,
@@ -50,32 +32,15 @@ const setSubscriptionCookie = (
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<SubscriptionResponseData>
 ) => {
   try {
-    const itemId = validateParameter<TierKey>(req.query.itemId, "itemId", res);
-
-    const purchaseToken = validateParameter<string>(
-      req.query.purchaseToken,
-      "purchaseToken",
-      res
-    );
-
-    if (itemId === null || purchaseToken === null) {
-      return; // Exit early if validation fails
-    }
-
-    const params: PurchaseParams = { itemId, purchaseToken };
-    const subscription = await fetchSubscriptionPurchase(params);
-
-    if (subscription?.cancelReason !== CancelReason.NONE) {
-      console.log(
-        "Subscription is cancelled. Permissions won't be set",
-        subscription.cancelReason
-      );
-      res.status(HttpStatusCode.Gone);
+    // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
+    const subscriptionData = await getSubscriptionFromRequest(req, res, true);
+    if (!subscriptionData) {
       return;
     }
+    const { subscription, params } = subscriptionData;
 
     const wasAcknowledged = subscription?.wasAcknowledged();
     console.log("Subscription acknowdegement state", wasAcknowledged);

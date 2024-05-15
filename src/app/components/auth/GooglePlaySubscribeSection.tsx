@@ -1,14 +1,14 @@
+import { getSubscriptionCancellationReasonOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
-import { selectAuth } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Tier, TierKey, tierMap } from "@/lib/tiers";
 import { LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { GooglePlaySubscriptionOptionButton } from "./GooglePlaySubscriptionOptionButton";
 
 const CancelSubscriptionModal = dynamic(
@@ -20,24 +20,27 @@ interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option?: Tier) => void;
 }
 
+export type SubscriptionInfo = DigitalGoodsProductDetails & {
+  purchaseToken?: string;
+  isCancelled: boolean;
+};
+
 export const GooglePlaySubscribeSection: FC<
   GooglePlaySubscribeSectionProps
 > = ({ onOptionSelected }) => {
   const dispatch = useDispatch();
-  const [selectedOption, setSelectedOption] =
-    useState<DigitalGoodsProductDetails>();
+  const [selectedOption, setSelectedOption] = useState<SubscriptionInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const hasDigitalGoodsService = useDigitalGoodsService();
   const [subscriptionOptions, setSubscriptionOptions] = useState<
-    DigitalGoodsProductDetails[]
+    SubscriptionInfo[]
   >([]);
   const [cancelSubscriptionModalOpen, setSubscriptionModalOpen] =
     useState<boolean>(false);
   const [cancelSubscriptionModalOpened, setSubscriptionModalOpened] =
     useState<boolean>(false);
   const [subscriptionToCancel, setSubscriptionToCancel] =
-    useState<DigitalGoodsProductDetails>();
-  const { subscriptionTier } = useSelector(selectAuth);
+    useState<SubscriptionInfo>();
   const online = useOnlineStatus();
 
   const handleOpenModal = () => {
@@ -57,7 +60,24 @@ export const GooglePlaySubscribeSection: FC<
         const details = await digitalGoodsService.getDetails(
           Array.from(tierMap.keys())
         );
-        setSubscriptionOptions(details);
+
+        const existingPurchases = await digitalGoodsService.listPurchases();
+        const options = await Promise.all(
+          details.map(async (subscriptionOption) => {
+            const correspondingItem = existingPurchases.find(
+              (x) => x.itemId === subscriptionOption.itemId
+            );
+            const cancellationReason =
+              await getSubscriptionCancellationReasonOnBackend();
+            return {
+              ...subscriptionOption,
+              purchaseToken: correspondingItem?.purchaseToken,
+              isCancelled: cancellationReason !== undefined,
+            };
+          })
+        );
+
+        setSubscriptionOptions(options);
       } catch (ex: any) {
         dispatch(
           setAndShowAlert({
@@ -124,10 +144,6 @@ export const GooglePlaySubscribeSection: FC<
             key={subscriptionOption.itemId}
             subscriptionOption={subscriptionOption}
             setIsLoading={setIsLoading}
-            isAlreadyPurchased={
-              tierMap.get(subscriptionOption.itemId as TierKey) ===
-              subscriptionTier?.tier
-            }
           />
         ))}
       </ul>

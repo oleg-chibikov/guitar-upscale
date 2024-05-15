@@ -17,7 +17,19 @@ type ApiMethodHandlers = {
   [key in Uppercase<Method>]?: NextApiHandler;
 };
 
-const apiHandler = (handler: ApiMethodHandlers) => {
+export function validateParameter<T>(
+  param: unknown,
+  paramName: string,
+  res: NextApiResponse
+): T | null {
+  if (typeof param !== "string") {
+    res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
+    return null; // Validation failed
+  }
+  return param as T; // Validation passed
+}
+
+export const apiHandler = (handler: ApiMethodHandlers) => {
   return async (req: NextApiRequest, res: NextApiResponse<ErrorResponse>) => {
     try {
       const method = req.method
@@ -66,5 +78,3 @@ const errorHandler = (err: unknown, res: NextApiResponse<ErrorResponse>) => {
     });
   }
 };
-
-export { apiHandler };

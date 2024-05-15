@@ -142,7 +142,7 @@ export async function fetchSubscriptionPurchase(
 }
 
 /**
- * Cancel subscription using Play Developer API.
+ * Cancel subscription using Play Developer API. It remains valid until its expiration period, but don't renew afterwards
  * @param {params} PurchaseParams
  */
 export async function cancelSubscription(
@@ -165,6 +165,34 @@ export async function cancelSubscription(
     );
   } catch (error) {
     console.error("Error cancelling subscription", error);
+    throw error;
+  }
+}
+
+/**
+ * Immediately revoke and refund subscription using Play Developer API.
+ * @param {params} PurchaseParams
+ */
+export async function revokeSubscription(
+  params: PurchaseParams
+): Promise<billing.SubscriptionPurchase | null> {
+  console.log("Revoking subscription", params);
+  try {
+    const playApi = await setupClient();
+    const apiResponse = (
+      await playApi.purchases.subscriptions.revoke({
+        packageName: process.env.ANDROID_PACKAGE_ID,
+        subscriptionId: params.itemId,
+        token: params.purchaseToken,
+      })
+    )?.data;
+    console.log("Revoked subscription", apiResponse);
+    return billing.SubscriptionPurchase.fromApiResponse(
+      apiResponse,
+      params.purchaseToken
+    );
+  } catch (error) {
+    console.error("Error revoking subscription", error);
     throw error;
   }
 }
