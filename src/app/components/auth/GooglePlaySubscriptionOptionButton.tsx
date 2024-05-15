@@ -129,26 +129,47 @@ export const GooglePlaySubscriptionOptionButton: FC<
     currency: subscriptionOption.price.currency,
   }).format(parseFloat(subscriptionOption.price.value));
 
+  const handleClick = () => !isAlreadyPurchased && onClick(subscriptionOption);
+
+  const className = isAlreadyPurchased
+    ? "bg-emerald-600" // TODO: themed colors?
+    : !isSelected
+    ? theme === Theme.Light
+      ? "bg-accent-light"
+      : "bg-accent-dark"
+    : theme === Theme.Light
+    ? "bg-accent_stronger-light"
+    : "bg-accent_stronger-dark";
+
   return (
-    <div
-      onClick={() => !isAlreadyPurchased && onClick(subscriptionOption)}
-      className={`${
-        isAlreadyPurchased
-          ? "bg-emerald-600" // TODO: themed colors?
-          : !isSelected
-          ? theme === Theme.Light
-            ? "bg-accent-light"
-            : "bg-accent-dark"
-          : theme === Theme.Light
-          ? "bg-accent_stronger-light"
-          : "bg-accent_stronger-dark"
-      }`}
-    >
-      <p className="text-lg font-semibold">{title}</p>
-      <p className="text-sm grow">{subscriptionOption.description}</p>
-      <p className="text-sm">{localizedPrice}</p>
-      <p className="text-sm grow">{subscriptionOption.subscriptionPeriod}</p>
+    <>
+      <p
+        onClick={handleClick}
+        className={`${className} cursor-pointer text-lg font-semibold`}
+      >
+        {title}
+      </p>
+      <p
+        onClick={handleClick}
+        className={`${className} cursor-pointer text-sm grow`}
+      >
+        {subscriptionOption.description}
+      </p>
+      <p
+        onClick={handleClick}
+        className={`${className} cursor-pointer text-sm`}
+      >
+        {localizedPrice}
+      </p>
+      <p
+        onClick={handleClick}
+        className={`${className} cursor-pointer text-sm grow`}
+      >
+        {/* TODO: convert value */}
+        {subscriptionOption.subscriptionPeriod}
+      </p>
       <Button
+        className={className}
         size="small"
         variant="contained"
         color={isAlreadyPurchased ? "error" : "primary"}
@@ -163,6 +184,6 @@ export const GooglePlaySubscriptionOptionButton: FC<
         {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
         {isAlreadyPurchased ? "Cancel subscription" : "Subscribe"}
       </Button>
-    </div>
+    </>
   );
 };
