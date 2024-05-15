@@ -59,8 +59,7 @@ export const useGooglePlayAuth = () => {
         },
         async () => {
           if (existingPurchases.length) {
-            const logMessage =
-              "Google Play api mentions purchases but permissions are not set";
+            const logMessage = `Granting "${subscriptionTier?.tier}" permissions`;
             console.log(logMessage);
             const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
             const result = await acknowledgePurchaseOnBackend({
@@ -94,8 +93,7 @@ export const useGooglePlayAuth = () => {
               };
             }
           } else {
-            const logMessage =
-              "Google Play api mentions no purchases but permissions are set";
+            const logMessage = "Revoking expired permissions";
             console.log(logMessage);
             const result = await clearSubscriptionCookieOnBackend();
             if (result === ApiCallResult.Success) {
