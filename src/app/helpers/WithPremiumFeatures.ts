@@ -2,7 +2,7 @@ import {
   PremiumFeatureKeys,
   PremiumFeatures,
   PremiumFeaturesWithSession,
-} from "@/lib/subscription";
+} from "@/lib/premiumFeatures";
 import { ReactNode } from "react";
 
 export interface WithPremiumFeaturesWithSession {

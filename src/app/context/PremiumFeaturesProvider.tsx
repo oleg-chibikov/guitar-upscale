@@ -1,8 +1,9 @@
 "use client";
+
 import {
   PremiumFeatures,
   PremiumFeaturesWithSession,
-} from "@/lib/subscription";
+} from "@/lib/premiumFeatures";
 import React, { createContext, useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { WithChildren } from "../helpers/withChildren";
