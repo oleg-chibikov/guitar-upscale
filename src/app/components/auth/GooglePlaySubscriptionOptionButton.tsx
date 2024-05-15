@@ -109,8 +109,7 @@ export const GooglePlaySubscriptionOptionButton: FC<
         await paymentResponse.complete("fail");
         dispatch(
           setAndShowAlert({
-            message:
-              "Cannot acknowledge the purchase. It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)",
+            message: `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`,
             alertType: AlertType.Error,
           })
         );

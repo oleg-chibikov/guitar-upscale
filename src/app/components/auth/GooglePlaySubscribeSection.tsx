@@ -1,9 +1,14 @@
-import { getSubscriptionCancellationReasonOnBackend } from "@/app/apiClient";
+import {
+  ApiCallResult,
+  getSubscriptionCancellationReasonOnBackend,
+} from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { getTitle } from "@/app/helpers/subscriptionOptionHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
+import { CancelReason } from "@/lib/billing";
 import { Tier, TierKey, tierMap } from "@/lib/tier";
 import { LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
@@ -67,8 +72,30 @@ export const GooglePlaySubscribeSection: FC<
             const correspondingItem = existingPurchases.find(
               (x) => x.itemId === subscriptionOption.itemId
             );
-            const cancellationReason =
-              await getSubscriptionCancellationReasonOnBackend();
+            let cancellationReason: CancelReason | undefined;
+            if (correspondingItem) {
+              const response = await getSubscriptionCancellationReasonOnBackend(
+                {
+                  itemId: subscriptionOption.itemId as TierKey,
+                  purchaseToken: correspondingItem.purchaseToken,
+                }
+              );
+              if (response.status === ApiCallResult.Success) {
+                cancellationReason = response.data;
+                console.log(
+                  "Cancellation reason for " + subscriptionOption.itemId,
+                  cancellationReason
+                );
+              } else {
+                const title = getTitle(subscriptionOption);
+                dispatch(
+                  setAndShowAlert({
+                    message: `Cannot check if purchase for "${title}" is cancelled due to an error`,
+                    alertType: AlertType.Error,
+                  })
+                );
+              }
+            }
             return {
               ...subscriptionOption,
               purchaseToken: correspondingItem?.purchaseToken,

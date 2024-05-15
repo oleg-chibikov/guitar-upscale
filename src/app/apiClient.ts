@@ -68,8 +68,12 @@ export async function logoutOnBackend(): Promise<Response<void>> {
   return callApi(`/api/purchases/logout`, "POST");
 }
 
-export async function getSubscriptionCancellationReasonOnBackend(): Promise<
-  Response<CancelReason>
-> {
-  return callApi(`/api/purchases/getCancellationReason`, "GET");
+export async function getSubscriptionCancellationReasonOnBackend(
+  params: PurchaseParams
+): Promise<Response<CancelReason>> {
+  const { itemId, purchaseToken } = params;
+  return callApi(`/api/purchases/getCancellationReason`, "GET", {
+    itemId,
+    purchaseToken,
+  });
 }
