@@ -101,9 +101,7 @@ export const CancelSubscriptionModal: FC<
   const purchaseData = purchaseOption.purchaseData;
   const expirationDate = msToFormattedDate(purchaseData?.expirationDateMs);
   const subscribedDate = msToFormattedDate(purchaseData?.subscribedDateMs);
-
   const expirationDateText = expirationDate ? ` ${expirationDate}` : "";
-
   const subscribedDateText = subscribedDate ? ` (${subscribedDate})` : "";
   const cancellationMode = purchaseData?.cancellationMode;
 
@@ -125,13 +123,13 @@ export const CancelSubscriptionModal: FC<
           <div>{`Are you sure you would like to cancel your "${getTitle(
             purchaseOption
           )}" subscription?`}</div>
-          {cancellationMode && (
+          {cancellationMode !== undefined ? (
             <Alert severity="info">
               {cancellationMode === CancellationMode.Revoke
                 ? `Subscription was purchased recently${subscribedDateText}. It will be revoked immediately and refunded`
                 : `Subscription was purchased a while ago${subscribedDateText}. It will be cancelled but you'll own it till its expiration date${expirationDateText}`}
             </Alert>
-          )}
+          ) : undefined}
           <Button
             size="small"
             onClick={handleCloseModal}
