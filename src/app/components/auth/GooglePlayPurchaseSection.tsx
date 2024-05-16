@@ -7,7 +7,7 @@ import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
 import { Tier, TierKey, tierMap } from "@/lib/tier";
-import { LinearProgress } from "@mui/material";
+import { Alert, LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -54,6 +54,9 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
     }
 
     const getPurchaseOptions = async () => {
+      if (!online) {
+        return;
+      }
       setIsLoading(true);
       try {
         const digitalGoodsService = await buildDigitalGoodsService();
@@ -109,7 +112,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       }
     };
     getPurchaseOptions();
-  }, [hasDigitalGoodsService, dispatch]);
+  }, [hasDigitalGoodsService, dispatch, online]);
 
   if (!hasDigitalGoodsService) {
     return null;
@@ -138,6 +141,11 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           gridTemplateColumns: "4fr 10fr 1fr 2fr 2fr",
         }}
       >
+        {!online && !purchaseOptions.length && (
+          <Alert severity="warning">
+            Subscription options cannot be loaded while offline
+          </Alert>
+        )}
         {purchaseOptions.map((purchaseOption) => (
           <GooglePlayPurchaseOptionButton
             showCancellationModal={(option) => {

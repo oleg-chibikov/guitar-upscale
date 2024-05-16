@@ -127,7 +127,7 @@ export const Fretboard: React.FC = () => {
       <div
         className={"flex relative flex-col items-start z-10"}
         style={{
-          left: position.xShift + (useAdvancedChords ? 200 : 0),
+          left: position.xShift + (useAdvancedChords ? 250 : 0),
           top: needYShift ? -100 : 0,
         }}
       >
