@@ -69,7 +69,7 @@ export const GooglePlaySubscribeSection: FC<
               (x) => x.itemId === purchaseOption.itemId
             );
             let responseData: PurchaseResponseData | undefined;
-            let cancellationReason = responseData?.cancellationReason;
+            let cancellationReason: CancelReason | undefined;
             if (correspondingItem) {
               const response = await getPurchaseOnBackend({
                 itemId: purchaseOption.itemId as TierKey,
@@ -77,6 +77,7 @@ export const GooglePlaySubscribeSection: FC<
               });
               if (response.status === ApiCallResult.Success) {
                 responseData = response.data;
+                cancellationReason = responseData?.cancellationReason;
               } else {
                 const title = getTitle(purchaseOption);
                 dispatch(
@@ -87,6 +88,7 @@ export const GooglePlaySubscribeSection: FC<
                 );
               }
             }
+
             const isCancelled =
               cancellationReason !== undefined
                 ? cancellationReason !== CancelReason.NONE
