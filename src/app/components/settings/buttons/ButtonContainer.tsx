@@ -13,10 +13,20 @@ import { PlayButton } from "./PlayButton";
 interface ButtonContainerProps extends WithPremiumComponents {
   style?: CSSProperties;
 }
+
 const DisabledRecordButton = dynamic(
   async () =>
     (await import("@/app/components/settings/buttons/DisabledRecordButton"))
       .DisabledRecordButton
+);
+
+const DisabledDetectChordButton = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/buttons/DisabledDetectChordButton"
+      )
+    ).DisabledDetectChordButton
 );
 
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({
@@ -35,7 +45,9 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenSettingsButton />
         <FullscreenButton />
-        {premiumComponents.get("chordDetection") as ReactNode}
+        {(premiumComponents.get("chordDetection") as ReactNode) ?? (
+          <DisabledDetectChordButton />
+        )}
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       </div>
       <div
