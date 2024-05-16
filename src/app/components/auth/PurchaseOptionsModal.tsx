@@ -14,9 +14,9 @@ import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
-const GooglePlaySubscribeSection = React.lazy(() =>
+const GooglePlayPurchaseSection = React.lazy(() =>
   import("./GooglePlayPurchaseSection").then((module) => ({
-    default: module.GooglePlaySubscribeSection,
+    default: module.GooglePlayPurchaseSection,
   }))
 );
 
@@ -29,7 +29,7 @@ const featureNames = {
   skinSelection: "Configurable skins",
 };
 
-export const SubscriptionStatusModal: FC<ModalProps> = ({
+export const PurchaseOptionsModal: FC<ModalProps> = ({
   openModal,
   handleCloseModal,
 }) => {
@@ -70,7 +70,7 @@ export const SubscriptionStatusModal: FC<ModalProps> = ({
     <Modal
       open={openModal}
       onClose={handleCloseModal}
-      aria-labelledby="subscription-modal"
+      aria-labelledby="purchase-options-modal"
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
@@ -123,7 +123,7 @@ export const SubscriptionStatusModal: FC<ModalProps> = ({
               (!subscriptionTier ||
                 subscriptionTier.provider ===
                   SubscriptionProvider.GooglePlay) && (
-                <GooglePlaySubscribeSection
+                <GooglePlayPurchaseSection
                   onOptionSelected={(tier) => {
                     setHighlightedOption(tier);
                   }}

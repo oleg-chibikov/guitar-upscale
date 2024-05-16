@@ -7,19 +7,29 @@ import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { CancellationMode } from "@/lib/apiTypes";
 import { TierKey } from "@/lib/tier";
-import { Button, Modal, Slide } from "@mui/material";
+import { Alert, Button, Modal, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 import { PurchaseInfo } from "./GooglePlayPurchaseSection";
 
-export const CancelPurchaseModal: FC<
+const dateFormatOptions: Intl.DateTimeFormatOptions = {
+  weekday: "short",
+  year: "2-digit",
+  month: "2-digit",
+  day: "2-digit",
+};
+
+export const CancelSubscriptionModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
     purchaseOption: PurchaseInfo;
     disabledMessage?: string;
+    cancellationMode?: CancellationMode;
+    expirationDate?: Date;
   }
 > = ({
   openModal,
@@ -27,13 +37,15 @@ export const CancelPurchaseModal: FC<
   setIsLoading,
   purchaseOption,
   disabledMessage,
+  cancellationMode,
+  expirationDate,
 }) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsService();
   const title = getTitle(purchaseOption);
 
-  const cancelPurchase = async () => {
+  const cancelSubscription = async () => {
     if (!hasDigitalGoodsService) {
       return;
     }
@@ -100,7 +112,7 @@ export const CancelPurchaseModal: FC<
     <Modal
       open={openModal}
       onClose={handleCloseModal}
-      aria-labelledby="subscription-modal"
+      aria-labelledby="cancel-subscription-modal"
     >
       <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
         <section
@@ -114,6 +126,17 @@ export const CancelPurchaseModal: FC<
           <div>{`Are you sure you would like to cancel your "${getTitle(
             purchaseOption
           )}" subscription?`}</div>
+          {cancellationMode && (
+            <Alert severity="info">
+              {cancellationMode === CancellationMode.Revoke
+                ? "Subscription was purchased recently. It will be revoked immediately and refunded"
+                : "Subscription was purchased a while ago. It will be cancelled but you'll own it till its expiration date" +
+                  (expirationDate
+                    ? " " +
+                      expirationDate.toLocaleDateString("en", dateFormatOptions)
+                    : "")}
+            </Alert>
+          )}
           <Button
             size="small"
             onClick={handleCloseModal}
@@ -126,7 +149,7 @@ export const CancelPurchaseModal: FC<
           <Button
             disabled={disabledMessage !== undefined}
             size="small"
-            onClick={cancelPurchase}
+            onClick={cancelSubscription}
             variant="contained"
             color="error"
             title="Cancel subscription"

@@ -15,7 +15,8 @@ import { useDispatch } from "react-redux";
 import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
 
 const CancelPurchaseModal = dynamic(
-  async () => (await import("./CancelPurchaseModal")).CancelPurchaseModal
+  async () =>
+    (await import("./CancelSubscriptionModal")).CancelSubscriptionModal
 );
 
 interface GooglePlaySubscribeSectionProps {
@@ -28,9 +29,9 @@ export type PurchaseInfo = DigitalGoodsProductDetails & {
   cancellationMode?: CancellationMode;
 };
 
-export const GooglePlaySubscribeSection: FC<
-  GooglePlaySubscribeSectionProps
-> = ({ onOptionSelected }) => {
+export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
+  onOptionSelected,
+}) => {
   const dispatch = useDispatch();
   const [selectedOption, setSelectedOption] = useState<PurchaseInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -136,6 +137,7 @@ export const GooglePlaySubscribeSection: FC<
           setIsLoading={setIsLoading}
           purchaseOption={subscriptionToCancel}
           disabledMessage={disabledMessage}
+          cancellationMode={subscriptionToCancel.cancellationMode}
         />
       )}
       <ul

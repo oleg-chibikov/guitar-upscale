@@ -10,8 +10,7 @@ import { OpenAuthModalButton } from "./OpenAuthModalButton";
 import { SignedInButton } from "./SignedInButton";
 
 const SubscriptionStatusModal = dynamic(
-  async () =>
-    (await import("./SubscriptionStatusModal")).SubscriptionStatusModal
+  async () => (await import("./PurchaseOptionsModal")).PurchaseOptionsModal
 );
 
 // https://docs.patreon.com/#oauth
