@@ -156,6 +156,8 @@ export const GooglePlayPurchaseOptionButton: FC<
       ? "bg-primary-light"
       : "bg-primary-dark");
 
+  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isCancelled;
+
   const buttonContent = isCancelled
     ? "Re-subscribe"
     : isAlreadyPurchased
@@ -188,10 +190,10 @@ export const GooglePlayPurchaseOptionButton: FC<
           disabled={disabledMessage !== undefined}
           size="small"
           variant="contained"
-          color={isAlreadyPurchased ? "error" : "primary"}
+          color={isPurchasedAndNotCancelled ? "error" : "primary"}
           title={cancelledMessage ?? disabledMessage ?? buttonContent}
           onClick={async () => {
-            if (isAlreadyPurchased && !isCancelled) {
+            if (isPurchasedAndNotCancelled) {
               showCancellationModal(purchaseOption);
             } else {
               // Purchase new subscription or repurchase cancelled one
