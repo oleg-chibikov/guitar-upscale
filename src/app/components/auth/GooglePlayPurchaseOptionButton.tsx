@@ -157,8 +157,8 @@ export const GooglePlayPurchaseOptionButton: FC<
     }`;
     buttonContent =
       purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
-        ? "Cancel further payments"
-        : "Revoke and refund subscription";
+        ? "Cancel"
+        : "Revoke";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
     bg = theme === Theme.Light ? "bg-accent-light" : "bg-accent-dark";
