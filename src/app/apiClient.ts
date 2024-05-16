@@ -24,7 +24,7 @@ async function callApi<T>(
       method,
     });
 
-    const responseData = await response.json(); // Extract error message from response
+    const responseData = await response.json(); // Extract error message from response. It means that API should produce JSON for any result, otherwise it would fail
     if (!response.ok) {
       if (response.status === HttpStatusCode.Gone) {
         return { status: ApiCallResult.SkipProcessing, data: responseData };

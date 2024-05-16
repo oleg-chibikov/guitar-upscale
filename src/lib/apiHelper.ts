@@ -29,6 +29,7 @@ export function validateParameter<T>(
   return param as T; // Validation passed
 }
 
+// Note: client consumer (callApi method) is built the way so that EACH response should have some json output regardless of its status
 export const apiHandler = (handler: ApiMethodHandlers) => {
   return async (req: NextApiRequest, res: NextApiResponse<ErrorResponse>) => {
     try {
