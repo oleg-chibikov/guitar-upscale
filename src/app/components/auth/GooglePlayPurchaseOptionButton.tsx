@@ -156,14 +156,14 @@ export const GooglePlayPurchaseOptionButton: FC<
       ? "bg-primary-light"
       : "bg-primary-dark");
 
-  const buttonContent = isAlreadyPurchased
+  const buttonContent = isCancelled
+    ? "Re-subscribe"
+    : isAlreadyPurchased
     ? purchaseOption.cancellationMode == CancellationMode.Cancel
       ? "Cancel further payments"
       : "Revoke and refund subscription"
-    : isCancelled
-    ? "Re-subscribe"
     : "Subscribe";
-  const status = isAlreadyPurchased ? "Owned" : isCancelled ? "Cancelled" : "";
+  const status = isCancelled ? "Cancelled" : isAlreadyPurchased ? "Owned" : "";
   return (
     <>
       <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
