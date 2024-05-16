@@ -2,6 +2,7 @@ import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { msToFormattedDate } from "@/app/helpers/dateHelper";
 import {
   getBillingPeriod,
   getTitle,
@@ -43,7 +44,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   const { theme } = useSelector(selectUi);
   const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
   const isCancelled = isPurchaseCancelled(purchaseOption);
-  const cancelledMessage = isCancelled ? "Already cancelled" : undefined;
+  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isPurchaseCancelled;
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -134,6 +135,43 @@ export const GooglePlayPurchaseOptionButton: FC<
     }
   };
 
+  let buttonColor: "error" | "primary";
+  let buttonAction: () => Promise<void>;
+  let purchaseStatus: string | undefined;
+  let buttonContent: string;
+  let buttonTitle: string;
+  let buttonDisabled: boolean;
+
+  if (isPurchasedAndNotCancelled) {
+    buttonColor = "error";
+    buttonAction = async () => await showCancellationModal(purchaseOption);
+    purchaseStatus = "Owned";
+    buttonContent =
+      purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
+        ? "Cancel further payments"
+        : "Revoke and refund subscription";
+    buttonTitle = disabledMessage ?? buttonContent;
+    buttonDisabled = disabledMessage ? true : false;
+  } else if (isCancelled) {
+    buttonColor = "primary";
+    buttonAction = makePurchase; // re-subscribe
+    const expirationDate = msToFormattedDate(
+      purchaseOption.purchaseData?.expirationDateMs
+    );
+    purchaseStatus = "Cancelled, owned till " + (expirationDate ?? "expiry");
+    buttonContent = "Re-subscribe";
+    buttonTitle = disabledMessage ?? buttonContent;
+    buttonDisabled = disabledMessage ? true : false;
+  } else {
+    // not purchased
+    buttonColor = "primary";
+    buttonAction = makePurchase; // re-subscribe
+    purchaseStatus = "";
+    buttonContent = "Subscribe";
+    buttonTitle = disabledMessage ?? buttonContent;
+    buttonDisabled = disabledMessage ? true : false;
+  }
+
   // Format the price according to the user locale.
   const localizedPrice = new Intl.NumberFormat(navigator.language, {
     style: "currency",
@@ -160,21 +198,11 @@ export const GooglePlayPurchaseOptionButton: FC<
       ? "bg-primary-light"
       : "bg-primary-dark");
 
-  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isPurchaseCancelled;
-
-  const buttonContent = isCancelled
-    ? "Re-subscribe"
-    : isAlreadyPurchased
-    ? purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
-      ? "Cancel further payments"
-      : "Revoke and refund subscription"
-    : "Subscribe";
-  const status = isCancelled ? "Cancelled" : isAlreadyPurchased ? "Owned" : "";
   return (
     <>
       <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
         <div>{title}</div>
-        {status && <div className="text-xs">{status}</div>}
+        {purchaseStatus && <div className="text-xs">{purchaseStatus}</div>}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
         {purchaseOption.description}
@@ -191,19 +219,12 @@ export const GooglePlayPurchaseOptionButton: FC<
       <p className={className}>
         <Button
           className="w-full whitespace-nowrap"
-          disabled={disabledMessage !== undefined}
           size="small"
           variant="contained"
-          color={isPurchasedAndNotCancelled ? "error" : "primary"}
-          title={cancelledMessage ?? disabledMessage ?? buttonContent}
-          onClick={async () => {
-            if (isPurchasedAndNotCancelled) {
-              showCancellationModal(purchaseOption);
-            } else {
-              // Purchase new subscription or repurchase cancelled one
-              await makePurchase();
-            }
-          }}
+          disabled={buttonDisabled}
+          color={buttonColor}
+          title={buttonTitle}
+          onClick={buttonAction}
         >
           {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
           {buttonContent}

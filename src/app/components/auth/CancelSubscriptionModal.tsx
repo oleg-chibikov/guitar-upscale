@@ -2,6 +2,7 @@ import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
+import { msToFormattedDate } from "@/app/helpers/dateHelper";
 import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
@@ -15,13 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 import { PurchaseInfo } from "./GooglePlayPurchaseSection";
-
-const dateFormatOptions: Intl.DateTimeFormatOptions = {
-  weekday: "short",
-  year: "2-digit",
-  month: "2-digit",
-  day: "2-digit",
-};
 
 export const CancelSubscriptionModal: FC<
   ModalProps & {
@@ -105,16 +99,12 @@ export const CancelSubscriptionModal: FC<
   };
 
   const purchaseData = purchaseOption.purchaseData;
-  const expirationDate = msToDate(purchaseData?.expirationDateMs);
-  const subscribedDate = msToDate(purchaseData?.subscribedDateMs);
+  const expirationDate = msToFormattedDate(purchaseData?.expirationDateMs);
+  const subscribedDate = msToFormattedDate(purchaseData?.subscribedDateMs);
 
-  const expirationDateText = expirationDate
-    ? ` ${expirationDate.toLocaleDateString("en", dateFormatOptions)}`
-    : "";
+  const expirationDateText = expirationDate ? ` ${expirationDate}` : "";
 
-  const subscribedDateText = subscribedDate
-    ? ` (${subscribedDate.toLocaleDateString("en", dateFormatOptions)})`
-    : "";
+  const subscribedDateText = subscribedDate ? ` (${subscribedDate})` : "";
   const cancellationMode = purchaseData?.cancellationMode;
 
   return (
