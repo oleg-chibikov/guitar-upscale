@@ -6,8 +6,14 @@ export type ResponseData = {
 };
 
 export type PurchaseResponseData = ResponseData & {
-  cancellationReason?: CancelReason;
-  cancellationMode?: CancellationMode;
+  data?: PurchaseData;
+};
+
+export type PurchaseData = {
+  cancellationReason: CancelReason;
+  cancellationMode: CancellationMode;
+  expirationDateMs: number;
+  subscribedDateMs: number;
 };
 
 export enum CancellationMode {

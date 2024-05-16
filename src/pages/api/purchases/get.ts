@@ -17,12 +17,17 @@ const handle = async (
     if (!subscriptionData) {
       return;
     }
+    const subscription = subscriptionData.subscription;
     res.status(HttpStatusCode.Ok).json({
       message: "Subscribed",
-      cancellationReason: subscriptionData.subscription.cancelReason,
-      cancellationMode: shouldRevoke(subscriptionData.subscription)
-        ? CancellationMode.Revoke
-        : CancellationMode.Cancel,
+      data: {
+        cancellationReason: subscription.cancelReason,
+        cancellationMode: shouldRevoke(subscription)
+          ? CancellationMode.Revoke
+          : CancellationMode.Cancel,
+        expirationDateMs: subscription.expiryTimeMillis,
+        subscribedDateMs: subscription.startTimeMillis,
+      },
     });
   } finally {
     res.end();

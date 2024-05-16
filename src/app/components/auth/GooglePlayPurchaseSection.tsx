@@ -5,8 +5,7 @@ import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { CancellationMode, PurchaseResponseData } from "@/lib/apiTypes";
-import { CancelReason } from "@/lib/billing";
+import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
 import { Tier, TierKey, tierMap } from "@/lib/tier";
 import { LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
@@ -14,7 +13,7 @@ import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
 
-const CancelPurchaseModal = dynamic(
+const CancelSubscriptionModal = dynamic(
   async () =>
     (await import("./CancelSubscriptionModal")).CancelSubscriptionModal
 );
@@ -25,8 +24,7 @@ interface GooglePlaySubscribeSectionProps {
 
 export type PurchaseInfo = DigitalGoodsProductDetails & {
   purchaseToken?: string;
-  isCancelled: boolean;
-  cancellationMode?: CancellationMode;
+  purchaseData?: PurchaseData;
 };
 
 export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
@@ -66,23 +64,17 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         const existingPurchases = await digitalGoodsService.listPurchases();
         const options = await Promise.all(
           details.map(async (purchaseOption) => {
-            const correspondingItem = existingPurchases.find(
+            const correspondingPurchaseItem = existingPurchases.find(
               (x) => x.itemId === purchaseOption.itemId
             );
             let responseData: PurchaseResponseData | undefined;
-            let isCancelled: boolean = false;
-            if (correspondingItem) {
+            if (correspondingPurchaseItem) {
               const response = await getPurchaseOnBackend({
                 itemId: purchaseOption.itemId as TierKey,
-                purchaseToken: correspondingItem.purchaseToken,
+                purchaseToken: correspondingPurchaseItem.purchaseToken,
               });
               if (response.status === ApiCallResult.Success) {
                 responseData = response.data;
-                const cancellationReason = responseData?.cancellationReason;
-                isCancelled =
-                  cancellationReason !== undefined
-                    ? cancellationReason !== CancelReason.NONE
-                    : false;
               } else {
                 const title = getTitle(purchaseOption);
                 dispatch(
@@ -94,11 +86,12 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
               }
             }
 
+            const data = responseData?.data;
+
             return {
               ...purchaseOption,
-              cancellationMode: responseData?.cancellationMode,
-              purchaseToken: correspondingItem?.purchaseToken,
-              isCancelled,
+              purchaseData: data,
+              purchaseToken: correspondingPurchaseItem?.purchaseToken,
             } as PurchaseInfo;
           })
         );
@@ -131,13 +124,12 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
   return (
     <>
       {subscriptionToCancel && cancelSubscriptionModalOpened && (
-        <CancelPurchaseModal
+        <CancelSubscriptionModal
           openModal={cancelSubscriptionModalOpen}
           handleCloseModal={() => setSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={subscriptionToCancel}
           disabledMessage={disabledMessage}
-          cancellationMode={subscriptionToCancel.cancellationMode}
         />
       )}
       <ul

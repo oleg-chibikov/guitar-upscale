@@ -2,7 +2,11 @@ import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
-import { getBillingPeriod, getTitle } from "@/app/helpers/purchaseOptionHelper";
+import {
+  getBillingPeriod,
+  getTitle,
+  isPurchaseCancelled,
+} from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
@@ -38,7 +42,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   const dispatch = useDispatch();
   const { theme } = useSelector(selectUi);
   const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
-  const isCancelled = purchaseOption.isCancelled;
+  const isCancelled = isPurchaseCancelled(purchaseOption);
   const cancelledMessage = isCancelled ? "Already cancelled" : undefined;
 
   const makePurchase = async () => {
@@ -140,7 +144,7 @@ export const GooglePlayPurchaseOptionButton: FC<
 
   const className =
     "p-2 flex flex-col gap-1 justify-center cursor-pointer " +
-    (purchaseOption.isCancelled
+    (isCancelled
       ? theme === Theme.Light
         ? "bg-disabled-light"
         : "bg-disabled-dark"
@@ -156,12 +160,12 @@ export const GooglePlayPurchaseOptionButton: FC<
       ? "bg-primary-light"
       : "bg-primary-dark");
 
-  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isCancelled;
+  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isPurchaseCancelled;
 
   const buttonContent = isCancelled
     ? "Re-subscribe"
     : isAlreadyPurchased
-    ? purchaseOption.cancellationMode == CancellationMode.Cancel
+    ? purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
       ? "Cancel further payments"
       : "Revoke and refund subscription"
     : "Subscribe";

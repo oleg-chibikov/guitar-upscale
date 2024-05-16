@@ -28,8 +28,6 @@ export const CancelSubscriptionModal: FC<
     setIsLoading: (isLoading: boolean) => void;
     purchaseOption: PurchaseInfo;
     disabledMessage?: string;
-    cancellationMode?: CancellationMode;
-    expirationDate?: Date;
   }
 > = ({
   openModal,
@@ -37,8 +35,6 @@ export const CancelSubscriptionModal: FC<
   setIsLoading,
   purchaseOption,
   disabledMessage,
-  cancellationMode,
-  expirationDate,
 }) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
@@ -108,6 +104,19 @@ export const CancelSubscriptionModal: FC<
     }
   };
 
+  const purchaseData = purchaseOption.purchaseData;
+  const expirationDate = msToDate(purchaseData?.expirationDateMs);
+  const subscribedDate = msToDate(purchaseData?.subscribedDateMs);
+
+  const expirationDateText = expirationDate
+    ? ` ${expirationDate.toLocaleDateString("en", dateFormatOptions)}`
+    : "";
+
+  const subscribedDateText = subscribedDate
+    ? ` (${subscribedDate.toLocaleDateString("en", dateFormatOptions)})`
+    : "";
+  const cancellationMode = purchaseData?.cancellationMode;
+
   return (
     <Modal
       open={openModal}
@@ -129,12 +138,8 @@ export const CancelSubscriptionModal: FC<
           {cancellationMode && (
             <Alert severity="info">
               {cancellationMode === CancellationMode.Revoke
-                ? "Subscription was purchased recently. It will be revoked immediately and refunded"
-                : "Subscription was purchased a while ago. It will be cancelled but you'll own it till its expiration date" +
-                  (expirationDate
-                    ? " " +
-                      expirationDate.toLocaleDateString("en", dateFormatOptions)
-                    : "")}
+                ? `Subscription was purchased recently${subscribedDateText}. It will be revoked immediately and refunded`
+                : `Subscription was purchased a while ago${subscribedDateText}. It will be cancelled but you'll own it till its expiration date${expirationDateText}`}
             </Alert>
           )}
           <Button

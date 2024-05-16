@@ -1,3 +1,6 @@
+import { CancelReason } from "@/lib/billing";
+import { PurchaseInfo } from "../components/auth/GooglePlayPurchaseSection";
+
 export const getTitle = (purchaseOption: DigitalGoodsProductDetails) =>
   purchaseOption.title.substring(0, purchaseOption.title.indexOf(" ("));
 
@@ -18,4 +21,12 @@ export const getBillingPeriod = (
     default:
       return purchaseOption.subscriptionPeriod;
   }
+};
+
+export const isPurchaseCancelled = (purchaseOption: PurchaseInfo) => {
+  const cancellationReason = purchaseOption?.purchaseData?.cancellationReason;
+
+  return cancellationReason !== undefined
+    ? cancellationReason !== CancelReason.NONE
+    : false;
 };
