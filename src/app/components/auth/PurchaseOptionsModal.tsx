@@ -52,7 +52,8 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     const isCurrentlyEnabled = keyValueCurrentFeatures[x] ? true : false;
 
     let isTick: boolean;
-    let className = "border-dashed rounded-full w-2 h-2";
+    const className = "border-dashed rounded-full w-2 h-2";
+    let additionalClassName: string;
     if (highlightedOption) {
       // Show what it would look like if the selected option is applied
       const highlightedOptionHasFeature =
@@ -63,26 +64,34 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
       if (isCurrentlyEnabled) {
         if (highlightedOptionHasFeature) {
           isTick = true;
-          className = "text-green-500";
+          additionalClassName = "text-green-500";
         } else {
           isTick = false;
-          className = "text-red-500 opacity-50 border-2 border-red-500";
+          additionalClassName =
+            "text-red-500 opacity-50 border-2 border-red-500";
         }
       } else {
         if (highlightedOptionHasFeature) {
           isTick = true;
-          className = "text-green-500 opacity-50 border-2 border-green-500";
+          additionalClassName =
+            "text-green-500 opacity-50 border-2 border-green-500";
         } else {
           isTick = false;
-          className = "text-red-500";
+          additionalClassName = "text-red-500";
         }
       }
     } else {
       isTick = isCurrentlyEnabled;
-      className = isCurrentlyEnabled ? "text-green-500" : "text-red-500";
+      additionalClassName = isCurrentlyEnabled
+        ? "text-green-500"
+        : "text-red-500";
     }
 
-    return <span className={className}>{isTick ? "✓" : "⨯"}</span>;
+    return (
+      <span className={className + " " + additionalClassName}>
+        {isTick ? "✓" : "⨯"}
+      </span>
+    );
   };
 
   return (
