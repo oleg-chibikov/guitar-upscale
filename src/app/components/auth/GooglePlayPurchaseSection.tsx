@@ -126,6 +126,11 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
 
   return (
     <>
+      {!online && !purchaseOptions.length && (
+        <Alert severity="warning">
+          Google Play subscription options cannot be loaded while offline
+        </Alert>
+      )}
       {subscriptionToCancel && cancelSubscriptionModalOpened && (
         <CancelSubscriptionModal
           openModal={cancelSubscriptionModalOpen}
@@ -141,11 +146,6 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           gridTemplateColumns: "4fr 10fr 1fr 2fr 2fr",
         }}
       >
-        {!online && !purchaseOptions.length && (
-          <Alert severity="warning" className="w-full">
-            Google Play subscription options cannot be loaded while offline
-          </Alert>
-        )}
         {purchaseOptions.map((purchaseOption) => (
           <GooglePlayPurchaseOptionButton
             showCancellationModal={(option) => {
