@@ -92,7 +92,13 @@ export const GooglePlaySubscribeSection: FC<
                 ? cancellationReason !== CancelReason.NONE
                 : false;
 
-            console.log(isCancelled);
+            // TODO: Fix bug and remove
+            console.log(
+              "Is cancelled ",
+              isCancelled,
+              cancellationReason,
+              responseData
+            );
             return {
               ...purchaseOption,
               cancellationMode: responseData?.cancellationMode,
