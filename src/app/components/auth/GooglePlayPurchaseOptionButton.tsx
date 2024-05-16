@@ -144,9 +144,17 @@ export const GooglePlayPurchaseOptionButton: FC<
   let bg: string;
 
   if (isPurchasedAndNotCancelled) {
+    const expirationDate = msToFormattedDate(
+      purchaseOption.purchaseData?.expirationDateMs
+    );
+    const subscribedDate = msToFormattedDate(
+      purchaseOption.purchaseData?.subscribedDateMs
+    );
     buttonColor = "error";
     buttonAction = async () => await showCancellationModal(purchaseOption);
-    purchaseStatus = "Owned";
+    purchaseStatus = `Owned${subscribedDate ? "since " + subscribedDate : ""}${
+      expirationDate ? "Next payment: " + expirationDate : ""
+    }`;
     buttonContent =
       purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
         ? "Cancel further payments"
@@ -155,11 +163,11 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonDisabled = disabledMessage ? true : false;
     bg = theme === Theme.Light ? "bg-accent-light" : "bg-accent-dark";
   } else if (isCancelled) {
-    buttonColor = "primary";
-    buttonAction = makePurchase; // re-subscribe
     const expirationDate = msToFormattedDate(
       purchaseOption.purchaseData?.expirationDateMs
     );
+    buttonColor = "primary";
+    buttonAction = makePurchase; // re-subscribe
     purchaseStatus = "Cancelled, owned till " + (expirationDate ?? "expiry");
     buttonContent = "Re-subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
