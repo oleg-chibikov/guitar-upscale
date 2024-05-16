@@ -17,7 +17,7 @@ import { useInterval } from "./useInterval";
 
 export const GOOGLE_PLAY_RELOAD_KEY = "GOOGLE_PLAY_RELOAD_COUNT";
 
-const FIVE_MINUTES = 5 * 60 * 1000;
+const ONE_MINUTE = 1 * 60 * 1000;
 
 function sortByItemId(
   itemA: { itemId: string },
@@ -40,7 +40,7 @@ export const useGooglePlayAuth = () => {
 
   useInterval(() => {
     checkPermissionsMismatch();
-  }, FIVE_MINUTES);
+  }, ONE_MINUTE);
   const dispatch = useDispatch();
   const checkPermissionsMismatch = async () => {
     if (!hasDigitalGoodsService) {
