@@ -131,6 +131,16 @@ export async function fetchSubscriptionPurchase(
       })
     )?.data;
     console.log("Get subscription response", apiResponse);
+
+    const apiResponseV2 = (
+      await playApi.purchases.subscriptionsv2.get({
+        packageName: process.env.ANDROID_PACKAGE_ID,
+        token: params.purchaseToken,
+      })
+    )?.data;
+
+    console.log("V2 RESPONSE TEMP", apiResponseV2);
+
     return billing.SubscriptionPurchase.fromApiResponse(
       apiResponse,
       params.purchaseToken
