@@ -41,7 +41,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
     useState<boolean>(false);
   const [subscriptionToCancel, setSubscriptionToCancel] =
     useState<PurchaseInfo>();
-  const online = useOnlineStatus();
+  const isOnline = useOnlineStatus();
 
   const handleOpenModal = () => {
     setSubscriptionModalOpen(true);
@@ -54,7 +54,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
     }
 
     const getPurchaseOptions = async () => {
-      if (!online) {
+      if (!isOnline) {
         return;
       }
       setIsLoading(true);
@@ -112,7 +112,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       }
     };
     getPurchaseOptions();
-  }, [hasDigitalGoodsService, dispatch, online]);
+  }, [hasDigitalGoodsService, dispatch, isOnline]);
 
   if (!hasDigitalGoodsService) {
     return null;
@@ -122,11 +122,13 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
     return <LinearProgress />;
   }
 
-  const disabledMessage = !online ? "Cannot purchase while offline" : undefined;
+  const disabledMessage = !isOnline
+    ? "Cannot purchase while offline"
+    : undefined;
 
   return (
     <>
-      {!online && !purchaseOptions.length && (
+      {!isOnline && !purchaseOptions.length && (
         <Alert severity="warning">
           Google Play subscription options cannot be loaded while offline
         </Alert>

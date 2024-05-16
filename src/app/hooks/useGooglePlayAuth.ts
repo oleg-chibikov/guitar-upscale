@@ -14,6 +14,7 @@ import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 import { selectAuth } from "../store/authSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 import { useInterval } from "./useInterval";
+import { useOnlineStatus } from "./useOnlineStatus";
 
 export const GOOGLE_PLAY_RELOAD_KEY = "GOOGLE_PLAY_RELOAD_COUNT";
 
@@ -36,14 +37,23 @@ function sortByItemId(
 export const useGooglePlayAuth = () => {
   const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsService();
+  const isOnline = useOnlineStatus();
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
+  // https://chromeos.dev/en/publish/play-billing-backend
+  // https://medium.com/androiddevelopers/implementing-linkedpurchasetoken-correctly-to-prevent-duplicate-subscriptions-82dfbf7167da
 
   useInterval(() => {
     checkPermissionsMismatch();
   }, ONE_MINUTE);
+
   const dispatch = useDispatch();
   const checkPermissionsMismatch = async () => {
     if (!hasDigitalGoodsService) {
+      return;
+    }
+
+    if (!isOnline) {
+      console.log("Offline. Skipping permissions mismatch check");
       return;
     }
 
@@ -132,5 +142,5 @@ export const useGooglePlayAuth = () => {
     checkPermissionsMismatch();
     //Dependencies should be empty to avoid endless reload
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isOnline]);
 };
