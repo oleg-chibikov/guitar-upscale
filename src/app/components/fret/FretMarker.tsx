@@ -248,7 +248,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           <span
             className={`flex justify-center items-center select-none font-mono
                     ${!isHeader && "rounded-full w-7 h-7"}
-                    ${isBeingDetected && `border-4 border-purple-600`}
+                    ${
+                      isBeingDetected &&
+                      `border-4 ${
+                        theme === Theme.Light
+                          ? "bg-chord_detection-light"
+                          : "bg-chord_detection-dark"
+                      }`
+                    }
                     ${
                       !isHeader &&
                       (isFromPreviousChord

@@ -68,6 +68,10 @@ const config: Config = {
           light: "#8D6E63", // Coffee Bean
           dark: "#999999",
         },
+        chord_detection: {
+          light: "#B8505C",
+          dark: "#F9C2A8",
+        },
         accent: {
           light: "#D48CA7",
           dark: "#9567DB",
