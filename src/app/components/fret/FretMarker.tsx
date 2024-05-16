@@ -213,31 +213,33 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       className={`
             flex relative justify-center items-center h-5 pt-1 pb-1
             ${
-              fret > 0 &&
-              `border-l-2 ${
-                theme === Theme.Light
-                  ? "border-border-light"
-                  : "border-border-dark"
-              }`
+              fret > 0
+                ? `border-l-2 ${
+                    theme === Theme.Light
+                      ? "border-border-light"
+                      : "border-border-dark"
+                  }`
+                : ""
             }
             ${
-              isHeader &&
-              "h-9 " +
-                (isColored
-                  ? isBehindCapo
+              isHeader
+                ? "h-9 " +
+                  (isColored
+                    ? isBehindCapo
+                      ? theme === Theme.Light
+                        ? "bg-disabled_match-light"
+                        : "bg-disabled_match-dark"
+                      : theme === Theme.Light
+                      ? "bg-fret_marker_match-light"
+                      : "bg-fret_marker_match-dark"
+                    : isBehindCapo
                     ? theme === Theme.Light
-                      ? "bg-disabled_match-light"
-                      : "bg-disabled_match-dark"
+                      ? "bg-disabled-light"
+                      : "bg-disabled-dark"
                     : theme === Theme.Light
-                    ? "bg-fret_marker_match-light"
-                    : "bg-fret_marker_match-dark"
-                  : isBehindCapo
-                  ? theme === Theme.Light
-                    ? "bg-disabled-light"
-                    : "bg-disabled-dark"
-                  : theme === Theme.Light
-                  ? "bg-fret_marker-light"
-                  : "bg-fret_marker-dark")
+                    ? "bg-fret_marker-light"
+                    : "bg-fret_marker-dark")
+                : ""
             }
             `}
       style={{ width, top }}
@@ -247,67 +249,74 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <span
             className={`flex justify-center items-center select-none font-mono
-                    ${!isHeader && "rounded-full w-7 h-7"}
+                    ${!isHeader ? "rounded-full w-7 h-7" : ""}
                     ${
-                      isBeingDetected &&
-                      `border-4 ${
-                        theme === Theme.Light
-                          ? "bg-chord_detection-light"
-                          : "bg-chord_detection-dark"
-                      }`
+                      isBeingDetected
+                        ? `border-4 shadow-glow ${
+                            theme === Theme.Light
+                              ? "border-chord_detection-light shadow-chord_detection_glow-light"
+                              : "border-chord_detection-dark shadow-chord_detection_glow-dark"
+                          }`
+                        : ""
                     }
                     ${
-                      !isHeader &&
-                      (isFromPreviousChord
-                        ? `${
-                            !isBeingDetected
-                              ? `border-4 ${
-                                  theme === Theme.Light
-                                    ? "text-background-light border-accent_stronger-light"
-                                    : "text-background-dark border-accent_stronger-dark"
-                                }`
-                              : ""
-                          } ${
-                            isColored
-                              ? `${
-                                  theme === Theme.Light
-                                    ? "bg-previous_fret_marker_match-light"
-                                    : "bg-previous_fret_marker_match-dark"
-                                }`
-                              : `${
-                                  theme === Theme.Light
-                                    ? "bg-previous_fret_marker-light"
-                                    : "bg-previous_fret_marker-dark"
-                                }`
-                          }`
-                        : `${
-                            theme === Theme.Light
-                              ? "text-foreground-light"
-                              : "text-foreground-dark"
-                          } ${
-                            isColored
-                              ? isBehindCapo
+                      !isHeader
+                        ? isFromPreviousChord
+                          ? ` ${
+                              theme === Theme.Light
+                                ? "text-background-light"
+                                : "text-background-dark"
+                            } ${
+                              !isBeingDetected
+                                ? `border-4 ${
+                                    theme === Theme.Light
+                                      ? "border-accent_stronger-light"
+                                      : "border-accent_stronger-dark"
+                                  }`
+                                : ""
+                            } ${
+                              isColored
+                                ? `${
+                                    theme === Theme.Light
+                                      ? "bg-previous_fret_marker_match-light"
+                                      : "bg-previous_fret_marker_match-dark"
+                                  }`
+                                : `${
+                                    theme === Theme.Light
+                                      ? "bg-previous_fret_marker-light"
+                                      : "bg-previous_fret_marker-dark"
+                                  }`
+                            }`
+                          : `${
+                              theme === Theme.Light
+                                ? "text-foreground-light"
+                                : "text-foreground-dark"
+                            } ${
+                              isColored
+                                ? isBehindCapo
+                                  ? theme === Theme.Light
+                                    ? "bg-disabled_match-light"
+                                    : "bg-disabled_match-dark"
+                                  : theme === Theme.Light
+                                  ? "bg-fret_marker_match-light"
+                                  : "bg-fret_marker_match-dark"
+                                : isBehindCapo
                                 ? theme === Theme.Light
-                                  ? "bg-disabled_match-light"
-                                  : "bg-disabled_match-dark"
+                                  ? "bg-disabled-light"
+                                  : "bg-disabled-dark"
                                 : theme === Theme.Light
-                                ? "bg-fret_marker_match-light"
-                                : "bg-fret_marker_match-dark"
-                              : isBehindCapo
-                              ? theme === Theme.Light
-                                ? "bg-disabled-light"
-                                : "bg-disabled-dark"
-                              : theme === Theme.Light
-                              ? "bg-fret_marker-light"
-                              : "bg-fret_marker-dark"
-                          }`)
+                                ? "bg-fret_marker-light"
+                                : "bg-fret_marker-dark"
+                            }`
+                        : ""
                     }
                     ${isHeader ? "text-xl" : "text-md"}
                     ${
-                      isHeader &&
-                      (theme === Theme.Light
-                        ? "text-foreground-light"
-                        : "text-foreground-dark")
+                      isHeader
+                        ? theme === Theme.Light
+                          ? "text-foreground-light"
+                          : "text-foreground-dark"
+                        : ""
                     }
                     ${
                       isNoteClicked

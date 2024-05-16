@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        glow: "0 0 40px 20px",
+      },
       screens: {
         maxhmd: { raw: "(max-height: 600px)" },
         maxhlg: { raw: "(max-height: 800px)" },
@@ -69,8 +72,12 @@ const config: Config = {
           dark: "#999999",
         },
         chord_detection: {
-          light: "#B8505C",
-          dark: "#F9C2A8",
+          light: "#8D6E63",
+          dark: "#F2F2F2",
+        },
+        chord_detection_glow: {
+          light: "#F6E7D2",
+          dark: "#a2cef5",
         },
         accent: {
           light: "#D48CA7",
