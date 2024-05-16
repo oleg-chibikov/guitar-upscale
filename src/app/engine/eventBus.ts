@@ -126,10 +126,10 @@ export const clearPreviousChords = () => {
 
 ChordEventBus.subscribe((chordWithMetadata: ChordWithPlayMetadata) => {
   console.log("EventBus: Chord play requested", chordWithMetadata);
-  if (chordWithMetadata.chord !== previousChord) {
-    clearPreviousChords();
-    previousChord = chordWithMetadata.chord;
-  }
+
+  // don't check for the same chord here - we need to clear the previous variation of the same chord (they might differ)
+  clearPreviousChords();
+  previousChord = chordWithMetadata.chord;
 
   const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
 
