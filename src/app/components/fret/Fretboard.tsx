@@ -52,8 +52,8 @@ export const Fretboard: React.FC = () => {
   } = useSelector(selectUi);
   const { neck } = useSelector(selectSettings);
   // const [highResLoaded, setHighResLoaded] = useState(false);
-  const [maxHeight, setMaxHeight] = useState(window.innerHeight);
-  const [maxWidth, setMaxWidth] = useState(window.innerWidth);
+  const [height, setHeight] = useState(window.innerHeight);
+  const [width, setWidth] = useState(window.innerWidth);
   const [position, setPosition] = useState(getPositionForSkin(skin));
   const orientation = useScreenOrientation();
 
@@ -66,8 +66,8 @@ export const Fretboard: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setMaxHeight(window.innerHeight);
-      setMaxWidth(window.innerWidth);
+      setHeight(window.innerHeight);
+      setWidth(window.innerWidth);
     };
 
     const debouncedHandeResize = trailingDebounce(handleResize, 200);
@@ -109,16 +109,18 @@ export const Fretboard: React.FC = () => {
 
   const assets = getAssetsForSkin(skin);
 
-  const needYShift =
-    chordsExpanded && maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS;
+  const isHeightEnoughToShowLargeChords =
+    height >= MIN_HEIGHT_TO_SHOW_LARGE_CHORDS;
+
+  const needYShift = chordsExpanded && isHeightEnoughToShowLargeChords;
 
   return (
     <section
       className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
         height:
-          maxHeight * fretboardScaleY +
-          (maxHeight > MIN_HEIGHT_TO_SHOW_LARGE_CHORDS ? -100 : 100),
+          height * fretboardScaleY +
+          (isHeightEnoughToShowLargeChords ? -100 : 100),
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
@@ -127,7 +129,9 @@ export const Fretboard: React.FC = () => {
       <div
         className={"flex relative flex-col items-start z-10"}
         style={{
-          left: position.xShift + (useAdvancedChords ? 250 : 0),
+          left:
+            position.xShift +
+            (useAdvancedChords && !isHeightEnoughToShowLargeChords ? 250 : 0),
           top: needYShift ? -100 : 0,
         }}
       >
@@ -136,11 +140,11 @@ export const Fretboard: React.FC = () => {
           style={{
             ...position,
             maxWidth:
-              Math.max(maxWidth * fretboardScaleX, 2500) -
+              Math.max(width * fretboardScaleX, 2500) -
               position.left -
               12 * fretboardScaleX,
             maxHeight:
-              Math.max((maxHeight - 380) * fretboardScaleY, 400) -
+              Math.max((height - 380) * fretboardScaleY, 400) -
               position.top +
               (needYShift ? 160 : 0),
           }}
