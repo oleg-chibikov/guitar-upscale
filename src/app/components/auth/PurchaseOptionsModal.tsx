@@ -52,7 +52,8 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     const isCurrentlyEnabled = keyValueCurrentFeatures[x] ? true : false;
 
     let isTick: boolean;
-    const className = "border-dashed rounded-full w-2 h-2";
+    const className =
+      "border-dashed rounded-full w-7 h-7 flex items-center justify-center";
     let additionalClassName: string;
     if (highlightedOption) {
       // Show what it would look like if the selected option is applied
