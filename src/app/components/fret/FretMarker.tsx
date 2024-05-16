@@ -250,7 +250,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                     ${!isHeader && "rounded-full w-7 h-7"}
                     ${
                       isBeingDetected &&
-                      `border-4 ${
+                      `border-6 ${
                         theme === Theme.Light
                           ? "bg-chord_detection-light"
                           : "bg-chord_detection-dark"
@@ -259,10 +259,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                     ${
                       !isHeader &&
                       (isFromPreviousChord
-                        ? `border-4 ${
-                            theme === Theme.Light
-                              ? "text-background-light border-accent_stronger-light"
-                              : "text-background-dark border-accent_stronger-dark"
+                        ? `${
+                            !isBeingDetected
+                              ? `border-4 ${
+                                  theme === Theme.Light
+                                    ? "text-background-light border-accent_stronger-light"
+                                    : "text-background-dark border-accent_stronger-dark"
+                                }`
+                              : ""
                           } ${
                             isColored
                               ? `${
