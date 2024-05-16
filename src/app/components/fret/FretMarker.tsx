@@ -250,7 +250,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
                     ${!isHeader && "rounded-full w-7 h-7"}
                     ${
                       isBeingDetected &&
-                      `border-6 ${
+                      `border-4 ${
                         theme === Theme.Light
                           ? "bg-chord_detection-light"
                           : "bg-chord_detection-dark"
