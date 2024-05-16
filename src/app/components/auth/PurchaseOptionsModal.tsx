@@ -88,9 +88,9 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     }
 
     return (
-      <span className={className + " " + additionalClassName}>
+      <div className={className + " " + additionalClassName}>
         {isTick ? "✓" : "⨯"}
-      </span>
+      </div>
     );
   };
 
