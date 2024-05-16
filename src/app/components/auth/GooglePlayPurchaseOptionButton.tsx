@@ -152,8 +152,8 @@ export const GooglePlayPurchaseOptionButton: FC<
     );
     buttonColor = "error";
     buttonAction = async () => await showCancellationModal(purchaseOption);
-    purchaseStatus = `Owned${subscribedDate ? "since " + subscribedDate : ""}${
-      expirationDate ? "Next payment: " + expirationDate : ""
+    purchaseStatus = `Owned${subscribedDate ? " since " + subscribedDate : ""}${
+      expirationDate ? ". Expires: " + expirationDate : ""
     }`;
     buttonContent =
       purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
