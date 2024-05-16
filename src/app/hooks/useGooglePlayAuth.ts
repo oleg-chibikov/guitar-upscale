@@ -47,6 +47,8 @@ export const useGooglePlayAuth = () => {
       return;
     }
 
+    console.log("Checking permissions mismatch");
+
     // It takes the purchased subscription from DigitalGoodsService and sends it to backend for validation. Backend sets the cookie with permissions. Then location is reloaded
     const digitalGoodsService = await buildDigitalGoodsService();
     const existingPurchases = await digitalGoodsService.listPurchases();
@@ -80,7 +82,7 @@ export const useGooglePlayAuth = () => {
             };
           } else if (result.status === ApiCallResult.SkipProcessing) {
             console.log(
-              "Skipped mismatch processing. Subscription is cancelled"
+              "Skipped permissions mismatch processing. Subscription is cancelled"
             );
             return {
               shouldReload: false,
