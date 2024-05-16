@@ -142,8 +142,8 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         }}
       >
         {!online && !purchaseOptions.length && (
-          <Alert severity="warning">
-            Subscription options cannot be loaded while offline
+          <Alert severity="warning" className="w-full">
+            Google Play subscription options cannot be loaded while offline
           </Alert>
         )}
         {purchaseOptions.map((purchaseOption) => (
