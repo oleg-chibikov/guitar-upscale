@@ -69,7 +69,7 @@ export const GooglePlaySubscribeSection: FC<
               (x) => x.itemId === purchaseOption.itemId
             );
             let responseData: PurchaseResponseData | undefined;
-            let cancellationReason: CancelReason | undefined;
+            let isCancelled: boolean = false;
             if (correspondingItem) {
               const response = await getPurchaseOnBackend({
                 itemId: purchaseOption.itemId as TierKey,
@@ -77,7 +77,11 @@ export const GooglePlaySubscribeSection: FC<
               });
               if (response.status === ApiCallResult.Success) {
                 responseData = response.data;
-                cancellationReason = responseData?.cancellationReason;
+                const cancellationReason = responseData?.cancellationReason;
+                isCancelled =
+                  cancellationReason !== undefined
+                    ? cancellationReason !== CancelReason.NONE
+                    : false;
               } else {
                 const title = getTitle(purchaseOption);
                 dispatch(
@@ -89,18 +93,6 @@ export const GooglePlaySubscribeSection: FC<
               }
             }
 
-            const isCancelled =
-              cancellationReason !== undefined
-                ? cancellationReason !== CancelReason.NONE
-                : false;
-
-            // TODO: Fix bug and remove
-            console.log(
-              "Is cancelled ",
-              isCancelled,
-              cancellationReason,
-              responseData
-            );
             return {
               ...purchaseOption,
               cancellationMode: responseData?.cancellationMode,
