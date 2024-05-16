@@ -87,14 +87,17 @@ export const GooglePlaySubscribeSection: FC<
                 );
               }
             }
+            const isCancelled =
+              cancellationReason !== undefined
+                ? cancellationReason !== CancelReason.NONE
+                : false;
+
+            console.log(isCancelled);
             return {
               ...purchaseOption,
               cancellationMode: responseData?.cancellationMode,
               purchaseToken: correspondingItem?.purchaseToken,
-              isCancelled:
-                cancellationReason !== undefined
-                  ? cancellationReason !== CancelReason.NONE
-                  : false,
+              isCancelled,
             } as PurchaseInfo;
           })
         );

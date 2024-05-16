@@ -1,14 +1,15 @@
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateParameter } from "./apiHelper";
+import { ResponseData } from "./apiTypes";
 import { CancelReason, SubscriptionPurchase } from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { TierKey } from "./tier";
 
-export const getSubscriptionFromRequest = async <T>(
+export const getSubscriptionFromRequest = async (
   req: NextApiRequest,
-  res: NextApiResponse<T>,
+  res: NextApiResponse<ResponseData>,
   allowCancelled: boolean
 ) => {
   const itemId = validateParameter<TierKey>(req.query.itemId, "itemId", res);
@@ -27,8 +28,13 @@ export const getSubscriptionFromRequest = async <T>(
   const subscription = await fetchSubscriptionPurchase(params);
 
   if (!allowCancelled && subscription?.cancelReason !== CancelReason.NONE) {
-    console.log("Subscription is cancelled", subscription.cancelReason);
-    res.status(HttpStatusCode.Gone);
+    console.log(
+      "Subscription is cancelled with reason",
+      subscription.cancelReason
+    );
+    res
+      .status(HttpStatusCode.Gone)
+      .json({ message: "Subscription is already cancelled" });
     return;
   }
 
