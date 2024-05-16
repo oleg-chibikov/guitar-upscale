@@ -41,6 +41,7 @@ export const useGooglePlayAuth = () => {
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
   // https://chromeos.dev/en/publish/play-billing-backend
   // https://medium.com/androiddevelopers/implementing-linkedpurchasetoken-correctly-to-prevent-duplicate-subscriptions-82dfbf7167da
+  // https://developer.android.com/google/play/billing/lifecycle/subscriptions#upgrades-downgrades
 
   useInterval(() => {
     checkPermissionsMismatch();
@@ -69,6 +70,11 @@ export const useGooglePlayAuth = () => {
       () => {
         const hasGooglePlaySubscription =
           subscriptionTier?.provider === SubscriptionProvider.GooglePlay;
+
+        console.log(
+          `Existing purchases: ${existingPurchases.length}; subscription tier`,
+          subscriptionTier
+        );
         return (
           (existingPurchases.length && !hasGooglePlaySubscription) ||
           (hasGooglePlaySubscription && !existingPurchases.length)

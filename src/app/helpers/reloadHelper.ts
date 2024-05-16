@@ -19,10 +19,10 @@ export async function incrementAndReload(
   dispatch: (param: any) => void,
   reloadMessage?: string
 ) {
-  console.log("Waiting to reload");
+  console.log("Waiting to reload for the key", key);
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   // await sleep(2000);
-  console.log("Reloading page");
+  console.log("Reloading page for the key", key);
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
 
@@ -59,7 +59,7 @@ export const processWithReloads = async (
   };
 
   if (isMismatch()) {
-    console.log("Signin status mismatch", key);
+    console.log("Signin status mismatch for the key", key);
     if (signInCheckCount < limit) {
       // check to avoid endless reloads
       const { shouldReload, message } = await onMismatchWithinLimit();
@@ -70,12 +70,12 @@ export const processWithReloads = async (
         clear();
       }
     } else {
-      console.log("Reload attempts exceeded", key);
+      console.log("Reload attempts exceeded for the key", key);
       onMismatchAndLimitExceeded();
       clear();
     }
   } else {
-    console.log("Signin status matched", key);
+    console.log("Signin status matched for the key", key);
     // sign in status in state matches session
     onMatch();
     clear();
