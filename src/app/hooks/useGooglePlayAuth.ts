@@ -59,7 +59,7 @@ export const useGooglePlayAuth = () => {
         },
         async () => {
           if (existingPurchases.length) {
-            const logMessage = `Granting "${subscriptionTier?.tier}" permissions`;
+            const logMessage = `Granting permissions`;
             console.log(logMessage);
             const purchaseToProcess = existingPurchases.sort(sortByItemId)[0];
             const result = await acknowledgePurchaseOnBackend({

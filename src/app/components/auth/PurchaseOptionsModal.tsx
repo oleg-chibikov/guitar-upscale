@@ -49,8 +49,10 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
 
   const renderCurrentFeature = (x: PremiumFeatureKeys) => {
-    const isCurrentlyEnabled = keyValueCurrentFeatures[x] || false;
+    const isCurrentlyEnabled = keyValueCurrentFeatures[x] ? true : false;
 
+    let isTick: boolean;
+    let className = "border-dashed rounded-full w-2 h-2";
     if (highlightedOption) {
       // Show what it would look like if the selected option is applied
       const highlightedOptionHasFeature =
@@ -60,32 +62,27 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
 
       if (isCurrentlyEnabled) {
         if (highlightedOptionHasFeature) {
-          return <span className="text-green-500">✓</span>;
+          isTick = true;
+          className = "text-green-500";
         } else {
-          return (
-            <span className="text-red-500 opacity-50 border-2 border-dashed rounded-full border-red-500">
-              ⨯
-            </span>
-          );
+          isTick = false;
+          className = "text-red-500 opacity-50 border-2 border-red-500";
         }
       } else {
         if (highlightedOptionHasFeature) {
-          return (
-            <span className="text-green-500 opacity-50 border-2 border-dashed rounded-full border-green-500">
-              ✓
-            </span>
-          );
+          isTick = true;
+          className = "text-green-500 opacity-50 border-2 border-green-500";
         } else {
-          return <span className="text-green-500">✓</span>;
+          isTick = false;
+          className = "text-red-500";
         }
       }
+    } else {
+      isTick = isCurrentlyEnabled;
+      className = isCurrentlyEnabled ? "text-green-500" : "text-red-500";
     }
 
-    return (
-      <span className={isCurrentlyEnabled ? "text-green-500" : "text-red-500"}>
-        {isCurrentlyEnabled ? "✓" : "⨯"}
-      </span>
-    );
+    return <span className={className}>{isTick ? "✓" : "⨯"}</span>;
   };
 
   return (
