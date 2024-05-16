@@ -44,7 +44,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   const { theme } = useSelector(selectUi);
   const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
   const isCancelled = isPurchaseCancelled(purchaseOption);
-  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isPurchaseCancelled;
+  const isPurchasedAndNotCancelled = isAlreadyPurchased && !isCancelled;
 
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
