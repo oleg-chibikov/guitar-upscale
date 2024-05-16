@@ -141,6 +141,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   let buttonContent: string;
   let buttonTitle: string;
   let buttonDisabled: boolean;
+  let bg: string;
 
   if (isPurchasedAndNotCancelled) {
     buttonColor = "error";
@@ -152,6 +153,7 @@ export const GooglePlayPurchaseOptionButton: FC<
         : "Revoke and refund subscription";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
+    bg = theme === Theme.Light ? "bg-accent-light" : "bg-accent-dark";
   } else if (isCancelled) {
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
@@ -162,6 +164,13 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonContent = "Re-subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
+    bg = isSelected
+      ? theme === Theme.Light
+        ? "bg-primary-light"
+        : "bg-primary-dark"
+      : theme === Theme.Light
+      ? "bg-disabled-light"
+      : "bg-disabled-dark";
   } else {
     // not purchased
     buttonColor = "primary";
@@ -170,6 +179,13 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonContent = "Subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
+    bg = isSelected
+      ? theme === Theme.Light
+        ? "bg-primary-light"
+        : "bg-primary-dark"
+      : theme === Theme.Light
+      ? "bg-secondary-light"
+      : "bg-secondary-dark";
   }
 
   // Format the price according to the user locale.
@@ -181,22 +197,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   const handleClick = () => !isAlreadyPurchased && onClick(purchaseOption);
 
   const className =
-    "p-2 flex flex-col gap-1 justify-center cursor-pointer " +
-    (isCancelled
-      ? theme === Theme.Light
-        ? "bg-disabled-light"
-        : "bg-disabled-dark"
-      : isAlreadyPurchased
-      ? theme === Theme.Light
-        ? "bg-accent-light"
-        : "bg-accent-dark"
-      : !isSelected
-      ? theme === Theme.Light
-        ? "bg-secondary-light"
-        : "bg-secondary-dark"
-      : theme === Theme.Light
-      ? "bg-primary-light"
-      : "bg-primary-dark");
+    "p-2 flex flex-col gap-1 justify-center cursor-pointer " + bg;
 
   return (
     <>
