@@ -48,23 +48,45 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   const hasDigitalGoodsService = useDigitalGoodsService();
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
 
-  const renderPossibleFeature = (x: PremiumFeatureKeys) => {
-    if (
-      (highlightedOption === "Composer" && keyValueComposerFeatures[x]) ||
-      (highlightedOption === "Explorer" && keyValueExplorerFeatures[x])
-    ) {
-      return <span className="text-green-500 opacity-50">✓</span>;
-    }
-    return null;
-  };
+  const renderCurrentFeature = (x: PremiumFeatureKeys) => {
+    const isCurrentlyEnabled = keyValueCurrentFeatures[x] || false;
 
-  const renderCurrentFeature = (x: PremiumFeatureKeys) => (
-    <span
-      className={keyValueCurrentFeatures[x] ? "text-green-500" : "text-red-500"}
-    >
-      {keyValueCurrentFeatures[x] ? "✓" : "⨯"}
-    </span>
-  );
+    if (highlightedOption) {
+      // Show what it would look like if the selected option is applied
+      const highlightedOptionHasFeature =
+        (highlightedOption === "Composer" && keyValueComposerFeatures[x]) ||
+        (highlightedOption === "Explorer" && keyValueExplorerFeatures[x]) ||
+        false;
+
+      if (isCurrentlyEnabled) {
+        if (highlightedOptionHasFeature) {
+          return <span className="text-green-500">✓</span>;
+        } else {
+          return (
+            <span className="text-red-500 opacity-50 border-2 border-dashed rounded-full border-red-500">
+              ⨯
+            </span>
+          );
+        }
+      } else {
+        if (highlightedOptionHasFeature) {
+          return (
+            <span className="text-green-500 opacity-50 border-2 border-dashed rounded-full border-green-500">
+              ✓
+            </span>
+          );
+        } else {
+          return <span className="text-green-500">✓</span>;
+        }
+      }
+    }
+
+    return (
+      <span className={isCurrentlyEnabled ? "text-green-500" : "text-red-500"}>
+        {isCurrentlyEnabled ? "✓" : "⨯"}
+      </span>
+    );
+  };
 
   return (
     <Modal
@@ -109,7 +131,6 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
                       <li key={key} className="flex flex-row gap-2">
                         {renderCurrentFeature(key as PremiumFeatureKeys)}
                         {value}
-                        {renderPossibleFeature(key as PremiumFeatureKeys)}
                       </li>
                     ))}
                   </ul>
