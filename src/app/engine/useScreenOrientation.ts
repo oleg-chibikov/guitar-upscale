@@ -1,5 +1,5 @@
+import { trailingDebounce } from "@/app/helpers/debounce";
 import { useEffect, useState } from "react";
-import { trailingDebounce } from "../helpers/debounce";
 
 export const useScreenOrientation = () => {
   const [orientation, setOrientation] = useState(

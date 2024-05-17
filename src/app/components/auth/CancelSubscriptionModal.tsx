@@ -1,3 +1,5 @@
+import { CloseIcon } from "@/app/CloseIcon";
+import { ModalProps } from "@/app/ModalProps";
 import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "@/app/data/alertType";
@@ -13,8 +15,6 @@ import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button, Modal, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CloseIcon } from "../CloseIcon";
-import { ModalProps } from "../ModalProps";
 import { PurchaseOption } from "./GooglePlayPurchaseSection";
 
 export const CancelSubscriptionModal: FC<

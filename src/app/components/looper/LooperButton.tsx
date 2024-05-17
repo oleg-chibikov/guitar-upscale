@@ -1,5 +1,5 @@
+import { IconButton } from "@/app/settings/buttons/IconButton";
 import { useState } from "react";
-import { IconButton } from "../settings/buttons/IconButton";
 
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import Pause from "@mui/icons-material/Pause";

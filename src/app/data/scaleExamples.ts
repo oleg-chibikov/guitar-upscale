@@ -1,9 +1,9 @@
-import { loadInstrument } from "../engine/sound/soundHelper";
+import { loadInstrument } from "@/app/engine/sound/soundHelper";
 import {
   reverbStrengthValue,
   scaleGroupValue,
   scaleValue,
-} from "../store/settingsSlice";
+} from "@/app/store/settingsSlice";
 import { Example } from "./example";
 
 export const examplesMap: Map<string, Map<string, Example[]>> = new Map([

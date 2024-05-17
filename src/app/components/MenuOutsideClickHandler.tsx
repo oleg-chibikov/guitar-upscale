@@ -1,10 +1,10 @@
-import { FC, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   selectUi,
   setSettingsExpanded,
   setStrummingSettingsExpanded,
-} from "../store/uiSlice";
+} from "@/app/store/uiSlice";
+import { FC, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const MenuOutsideClickHandler: FC = () => {
   const { settingsExpanded, strummingSettingsExpanded } = useSelector(selectUi);

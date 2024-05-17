@@ -1,13 +1,13 @@
 "use client";
 
+import { WithChildren } from "@/app/helpers/withChildren";
+import { setSubscriptionTier } from "@/app/store/authSlice";
 import {
   PremiumFeatures,
   PremiumFeaturesWithSession,
 } from "@/lib/premiumFeatures";
 import React, { createContext, useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { WithChildren } from "../helpers/withChildren";
-import { setSubscriptionTier } from "../store/authSlice";
 
 // Create a context for PremiumFeatures
 const PremiumFeaturesContext = createContext<{

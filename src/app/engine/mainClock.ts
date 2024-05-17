@@ -1,4 +1,4 @@
-import { tempoBpmValue } from "../store/settingsSlice";
+import { tempoBpmValue } from "@/app/store/settingsSlice";
 import { MetronomeEventBus } from "./eventBus";
 
 export const bpmToMilliseconds = (bpm: number): number => {

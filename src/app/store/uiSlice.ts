@@ -1,9 +1,9 @@
 import { AlertType } from "@/app/data/alertType";
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import { Skin } from "@/app/data/skin";
 import { Theme } from "@/app/data/theme";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChordsDisplayMode } from "../data/chordsDisplayMode";
-import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { RootState } from "./store"; // Define RootState type
 
 const initialTheme = Theme.Dark;

@@ -1,31 +1,31 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChordStrummingInterval } from "../data/chordStrummingInterval";
-import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
-import { Instrument, InstrumentGroup } from "../data/instruments";
-import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
-import { PlaybackType } from "../data/playbackType";
-import { scalesMap } from "../data/scales";
-import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
+import { ChordStrummingInterval } from "@/app/data/chordStrummingInterval";
+import { chordStrummingPatterns } from "@/app/data/chordStrummingPatterns";
+import { Instrument, InstrumentGroup } from "@/app/data/instruments";
+import { Chord, getNoteText, MAX_VELOCITY, Note } from "@/app/data/notes";
+import { PlaybackType } from "@/app/data/playbackType";
+import { scalesMap } from "@/app/data/scales";
+import { getShiftedNote, parseStringToNotes, Tuning } from "@/app/data/tunings";
 import {
   generateAllChords,
   getClosestVariation,
   getModeText,
   NoteChords,
-} from "../engine/chordsGenerator";
-import { clearPreviousChords } from "../engine/eventBus";
+} from "@/app/engine/chordsGenerator";
+import { clearPreviousChords } from "@/app/engine/eventBus";
 import {
   generateNeckRepresentation,
   Neck,
-} from "../engine/generateNeckRepresentation";
+} from "@/app/engine/generateNeckRepresentation";
 import {
   isMainClockActive,
   startInterval,
   stopInterval,
-} from "../engine/mainClock";
-import { loadMetronome } from "../engine/sound/metronomeProvider";
-import { loadInstrument } from "../engine/sound/soundHelper";
-import { strummingChordsMap } from "../engine/strummingState";
+} from "@/app/engine/mainClock";
+import { loadMetronome } from "@/app/engine/sound/metronomeProvider";
+import { loadInstrument } from "@/app/engine/sound/soundHelper";
+import { strummingChordsMap } from "@/app/engine/strummingState";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>

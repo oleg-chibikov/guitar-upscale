@@ -1,13 +1,13 @@
-import Midi from "midi-writer-js";
-import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
-import { Instrument } from "../data/instruments";
-import { MAX_VELOCITY, OctaveNote, getNoteText } from "../data/notes";
+import { Instrument } from "@/app/data/instruments";
+import { MAX_VELOCITY, OctaveNote, getNoteText } from "@/app/data/notes";
 import {
   baseNoteValue,
   scaleGroupValue,
   scaleValue,
   tempoBpmValue,
-} from "../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import Midi from "midi-writer-js";
+import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
 import { TICKS_IN_BEAT, globalCurrentTick } from "./mainClock";
 

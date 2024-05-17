@@ -1,23 +1,23 @@
+import { Note } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
-import { useEffect } from "react";
-import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
-import { Note } from "../data/notes";
 import {
   loadMetronome,
   playMetronomeBeat,
-} from "../engine/sound/metronomeProvider";
-import { loadInstrument } from "../engine/sound/soundHelper";
-import { playNote } from "../engine/sound/soundProvider";
-import { useGooglePlayAuth } from "../hooks/useGooglePlayAuth";
-import { useSessionAuth } from "../hooks/useSessionAuth";
+} from "@/app/engine/sound/metronomeProvider";
+import { loadInstrument } from "@/app/engine/sound/soundHelper";
+import { playNote } from "@/app/engine/sound/soundProvider";
+import { useGooglePlayAuth } from "@/app/hooks/useGooglePlayAuth";
+import { useSessionAuth } from "@/app/hooks/useSessionAuth";
 import {
   chordInstrumentValue,
   init,
   instrumentValue,
   reverbStrengthValue,
-} from "../store/settingsSlice";
-import { selectUi } from "../store/uiSlice";
+} from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
+import { useEffect } from "react";
+import ReactGA from "react-ga4";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Initializer: React.FC = () => {
   const { theme } = useSelector(selectUi);

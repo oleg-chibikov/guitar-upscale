@@ -1,12 +1,12 @@
 "use client";
 
+import { WithPremiumFeaturesWithSession } from "@/app/helpers/WithPremiumFeatures";
+import { WithChildren } from "@/app/helpers/withChildren";
+import { persistor, store } from "@/app/store/store";
 import { SessionProvider } from "next-auth/react";
 import { FC } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { WithPremiumFeaturesWithSession } from "../helpers/WithPremiumFeatures";
-import { WithChildren } from "../helpers/withChildren";
-import { persistor, store } from "../store/store";
 import { DigitalGoodsServiceInfoProvider } from "./DigitalGoodsServiceInfoProvider";
 import { MuiThemeProvider } from "./MuiThemeProvider";
 import { PremiumFeaturesProvider } from "./PremiumFeaturesProvider";

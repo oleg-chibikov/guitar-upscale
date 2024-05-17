@@ -1,6 +1,6 @@
 "use client";
+import { WithChildren } from "@/app/helpers/withChildren";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { WithChildren } from "../helpers/withChildren";
 
 // Create a context for DigitalGoodsService
 const DigitalGoodsServiceContext = createContext<boolean>(false);

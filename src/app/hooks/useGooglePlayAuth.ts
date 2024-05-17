@@ -1,19 +1,19 @@
-import { SubscriptionProvider } from "@/lib/subscriptionProvider";
-import { TierKey } from "@/lib/tier";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   ApiCallResult,
   acknowledgePurchaseOnBackend,
   logoutOnBackend,
-} from "../apiClient";
-import { useDigitalGoodsServiceInfo } from "../context/DigitalGoodsServiceInfoProvider";
-import { AlertType } from "../data/alertType";
-import { GuitarUpscaleSpecificPurchaseDetails } from "../digitalGoodsBrowser";
-import { processWithReloads } from "../helpers/reloadHelper";
-import { buildDigitalGoodsService } from "../helpers/serviceHelper";
-import { selectAuth } from "../store/authSlice";
-import { setAndShowAlert } from "../store/uiSlice";
+} from "@/app/apiClient";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { AlertType } from "@/app/data/alertType";
+import { GuitarUpscaleSpecificPurchaseDetails } from "@/app/digitalGoodsBrowser";
+import { processWithReloads } from "@/app/helpers/reloadHelper";
+import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
+import { selectAuth } from "@/app/store/authSlice";
+import { setAndShowAlert } from "@/app/store/uiSlice";
+import { SubscriptionProvider } from "@/lib/subscriptionProvider";
+import { TierKey } from "@/lib/tier";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useInterval } from "./useInterval";
 import { useOnlineStatus } from "./useOnlineStatus";
 

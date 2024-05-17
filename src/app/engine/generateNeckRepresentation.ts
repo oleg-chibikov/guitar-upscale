@@ -1,4 +1,4 @@
-import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
+import { Note, OctaveNote, StringOctaveNote } from "@/app/data/notes";
 
 export type Neck = (StringOctaveNote | null)[][];
 export const NOTE_COUNT: number = 12;

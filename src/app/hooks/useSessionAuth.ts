@@ -1,11 +1,11 @@
+import { AlertType } from "@/app/data/alertType";
+import { processWithReloads } from "@/app/helpers/reloadHelper";
+import { removeParamsFromQuery } from "@/app/helpers/urlHelper";
 import { selectAuth, setIsSignedIn } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AlertType } from "../data/alertType";
-import { processWithReloads } from "../helpers/reloadHelper";
-import { removeParamsFromQuery } from "../helpers/urlHelper";
 
 const SESSION_RELOAD_KEY = "SESSION_RELOAD_COUNT";
 

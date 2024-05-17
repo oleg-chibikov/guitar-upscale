@@ -1,10 +1,10 @@
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { CheckBox } from "@/app/settings/checkboxes/CheckBox";
 import { setIsSignedIn } from "@/app/store/authSlice";
 import { Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import React, { FC, Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { CheckBox } from "../settings/checkboxes/CheckBox";
 import { ModalAuthButtonProps } from "./AuthButtonProps";
 
 const PatreonSubscribeButton = React.lazy(() =>
