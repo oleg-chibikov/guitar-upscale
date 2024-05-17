@@ -83,25 +83,25 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       setIsLoading(true);
       try {
         const digitalGoodsService = await buildDigitalGoodsService();
-        const details = (await digitalGoodsService.getDetails(
+        const availablePurchaseOptions = (await digitalGoodsService.getDetails(
           Array.from(tierMap.keys())
         )) as GuitarUpscaleSpecificDigitalGoodsProductDetails[];
 
         const existingPurchases =
           (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
         const options = await Promise.all(
-          details.map(async (purchaseOption) => {
+          availablePurchaseOptions.map(async (purchaseOption) => {
             const correspondingPurchasedItem = existingPurchases.find(
               (x) => x.itemId === purchaseOption.itemId
             );
-            let responseData: PurchaseResponseData | undefined;
+            let purchaseDataFromBackend: PurchaseResponseData | undefined;
             if (correspondingPurchasedItem) {
               const response = await getPurchaseOnBackend({
                 itemId: purchaseOption.itemId,
                 purchaseToken: correspondingPurchasedItem.purchaseToken,
               });
               if (response.status === ApiCallResult.Success) {
-                responseData = response.data;
+                purchaseDataFromBackend = response.data;
               } else {
                 const title = getTitle(purchaseOption);
                 dispatch(
@@ -113,20 +113,24 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
               }
             }
 
-            const data = responseData?.data;
+            const purchaseData = purchaseDataFromBackend?.data;
 
             const result = {
               ...purchaseOption,
-              purchaseData: data,
+              purchaseData,
               purchaseToken: correspondingPurchasedItem?.purchaseToken,
             } as PurchaseOption;
 
-            if (data && data.cancellationReason !== CancelReason.NONE) {
+            if (
+              purchaseData &&
+              purchaseData.cancellationReason !== CancelReason.NONE
+            ) {
               console.log("A purchased item which is not cancelled", result);
               // at any time there should be only one not cancelled subscription. if there are more - it means something is not working as expected
               purchasedNonCancelledOptionRef.current = result;
             }
 
+            console.log("Available purchase option", result);
             return result;
           })
         );
