@@ -34,16 +34,16 @@ const handle = async (
       { itemId: "oldItemId", purchaseToken: "oldPurchaseToken" }
     );
 
-    console.log(
-      "New subscription: %o; Existing subscription to cancel: %o",
-      subscriptionData,
-      subscriptionToCancel
-    );
-
     if (!subscriptionToCancel) {
       console.error("Subscription to cancel is not provided");
       return;
     }
+
+    console.log(
+      "New subscription: %s; Existing subscription to cancel: %s",
+      subscriptionData.params.itemId,
+      subscriptionToCancel.params.itemId
+    );
 
     await acknowledge(subscriptionData);
 

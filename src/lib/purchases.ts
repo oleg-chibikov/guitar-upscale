@@ -43,7 +43,7 @@ export async function acknowledgeSubscriptionPurchase(
         token: params.purchaseToken,
       })
     )?.data;
-    console.log("Acknowledge response", apiResponse);
+    console.log("Acknowledge response");
     if (JSON.stringify(apiResponse) === `""`) {
       return true;
     }
@@ -71,7 +71,7 @@ export async function fetchSubscriptionPurchase(
         token: params.purchaseToken,
       })
     )?.data;
-    console.log("Get subscription response", apiResponse);
+    console.log("Fetch subscription response");
 
     console.log("Linked token", apiResponse.linkedPurchaseToken);
 
@@ -95,14 +95,13 @@ export async function cancelSubscription(
   console.log("Cancelling subscription", params);
   try {
     const playApi = await setupClient();
-    const apiResponse = (
-      await playApi.purchases.subscriptions.cancel({
-        packageName: process.env.ANDROID_PACKAGE_ID,
-        subscriptionId: params.itemId,
-        token: params.purchaseToken,
-      })
-    )?.data;
-    console.log("Cancelled subscription", apiResponse);
+
+    await playApi.purchases.subscriptions.cancel({
+      packageName: process.env.ANDROID_PACKAGE_ID,
+      subscriptionId: params.itemId,
+      token: params.purchaseToken,
+    });
+    console.log("Cancelled subscription");
   } catch (error) {
     console.error("Error cancelling subscription", error);
     throw error;
@@ -119,14 +118,13 @@ export async function revokeSubscription(
   console.log("Revoking subscription", params);
   try {
     const playApi = await setupClient();
-    const apiResponse = (
-      await playApi.purchases.subscriptions.revoke({
-        packageName: process.env.ANDROID_PACKAGE_ID,
-        subscriptionId: params.itemId,
-        token: params.purchaseToken,
-      })
-    )?.data;
-    console.log("Revoked subscription", apiResponse);
+
+    await playApi.purchases.subscriptions.revoke({
+      packageName: process.env.ANDROID_PACKAGE_ID,
+      subscriptionId: params.itemId,
+      token: params.purchaseToken,
+    });
+    console.log("Revoked subscription");
   } catch (error) {
     console.error("Error revoking subscription", error);
     throw error;
@@ -147,20 +145,18 @@ export async function deferSubscription(
   console.log("Deferring subscription", params);
   try {
     const playApi = await setupClient();
-    const apiResponse = (
-      await playApi.purchases.subscriptions.defer({
-        packageName: process.env.ANDROID_PACKAGE_ID,
-        subscriptionId: params.itemId,
-        token: params.purchaseToken,
-        requestBody: {
-          deferralInfo: {
-            desiredExpiryTimeMillis: newExpiryTimeMs.toString(),
-            expectedExpiryTimeMillis: currentExpiryTimeMs.toString(),
-          },
+    await playApi.purchases.subscriptions.defer({
+      packageName: process.env.ANDROID_PACKAGE_ID,
+      subscriptionId: params.itemId,
+      token: params.purchaseToken,
+      requestBody: {
+        deferralInfo: {
+          desiredExpiryTimeMillis: newExpiryTimeMs.toString(),
+          expectedExpiryTimeMillis: currentExpiryTimeMs.toString(),
         },
-      })
-    )?.data;
-    console.log("Deferred subscription", apiResponse);
+      },
+    });
+    console.log("Deferred subscription");
   } catch (error) {
     console.error("Error deferring subscription", error);
     throw error;
