@@ -6,7 +6,7 @@ import { Soundfont, SplendidGrandPiano } from "smplr";
 export const playSound = (
   note: OctaveNote,
   velocity: number,
-  soundfont: Soundfont,
+  soundfont: Soundfont | SplendidGrandPiano,
   durationMs: number
 ) => {
   return soundfont.start({
