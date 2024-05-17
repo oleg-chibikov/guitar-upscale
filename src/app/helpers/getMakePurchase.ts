@@ -132,6 +132,7 @@ export const getMakePurchase = (
           return;
         }
         const message = `Payment successful! Your level is "${title}"`;
+        console.log(message);
         dispatch(
           setAndShowAlert({
             message,
@@ -139,9 +140,11 @@ export const getMakePurchase = (
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
       } else if (result.status === ApiCallResult.SkipProcessing) {
+        const message = `"${title}" is cancelled. Cannot acknowledge`;
+        console.log(message);
         dispatch(
           setAndShowAlert({
-            message: `"${title}" is cancelled. Cannot acknowledge`,
+            message,
             alertType: AlertType.Warning,
           })
         );
@@ -158,9 +161,11 @@ export const getMakePurchase = (
           );
           return;
         }
+        const message = `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`;
+        console.error(message);
         dispatch(
           setAndShowAlert({
-            message: `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`,
+            message,
             alertType: AlertType.Error,
           })
         );
