@@ -13,7 +13,7 @@ import {
   NoteToFretMarkerEventMap,
 } from "@/app/engine/eventBus";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { sleep } from "@/app/engine/sleep";
+import { sleep } from "@/app/helpers/sleep";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
   baseNoteValue,

@@ -1,0 +1,50 @@
+{
+  "folder-color.pathColors": [
+    {
+      "folderPath": "guitar-upscale\\src\\app\\",
+      "color": "foldercolorizer.SpringGreen",
+      "badge": "🍏"
+    },
+    {
+      "folderPath": "guitar-upscale\\.vscode\\"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\lib\\",
+      "color": "foldercolorizer.Ecru",
+      "badge": "📓"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\pages\\",
+      "color": "foldercolorizer.PureGold",
+      "badge": "⚙️"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\store\\",
+      "color": "foldercolorizer.MediumSlateBlue"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\hooks\\",
+      "color": "foldercolorizer.SkyBlue"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\helpers\\",
+      "color": "foldercolorizer.Lavender"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\engine\\",
+      "color": "foldercolorizer.firebrick"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\data\\",
+      "color": "foldercolorizer.SandyBrown"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\context\\",
+      "color": "foldercolorizer.lime"
+    },
+    {
+      "folderPath": "guitar-upscale\\src\\app\\components\\",
+      "color": "foldercolorizer.Moccasin"
+    }
+  ]
+}
