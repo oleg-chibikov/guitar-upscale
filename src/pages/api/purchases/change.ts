@@ -45,12 +45,16 @@ const handle = async (
       return;
     }
 
+    await acknowledge(subscriptionData);
+
     const cancellationMode = await cancel(subscriptionToCancel);
     if (
       cancellationMode === CancellationMode.Cancel &&
       subscriptionToCancel.params.itemId === "guitar_upscale.composer"
     ) {
       // Downgrading - defer the new subscription to avoid overlap
+      const newSubscriptionCurrentExpiryTime =
+        subscriptionData.subscription.expiryTimeMillis;
       const cancelledSubscriptionExpiryTime =
         subscriptionToCancel.subscription.expiryTimeMillis;
       const currentSubscriptionDuration =
@@ -58,22 +62,30 @@ const handle = async (
         subscriptionData.subscription.startTimeMillis;
       const newSubscriptionDesiredExpiryTime =
         cancelledSubscriptionExpiryTime + currentSubscriptionDuration;
-
+      const expiryTimeDifference =
+        cancelledSubscriptionExpiryTime - newSubscriptionCurrentExpiryTime;
+      const differnceObject = msToTime(expiryTimeDifference);
       console.log(
-        "Deferrning subscription %s. New expiry time: %o. Duration: %o, cancelled subscription expiry time is: %o",
+        "Deferrning subscription %s. New subscription current expiry time: %o, new subscription desired expiry time: %o, cancelled subscription expiry time: %o, new subscription duration: %o, new subscription expiry time difference: %o",
         subscriptionData.params.itemId,
+        new Date(newSubscriptionCurrentExpiryTime),
         new Date(newSubscriptionDesiredExpiryTime),
+        new Date(cancelledSubscriptionExpiryTime),
         msToTime(currentSubscriptionDuration),
-        new Date(cancelledSubscriptionExpiryTime)
+        differnceObject
       );
-
-      await acknowledge(subscriptionData);
-
-      await deferSubscription(
-        subscriptionData.params,
-        subscriptionData.subscription.expiryTimeMillis,
-        newSubscriptionDesiredExpiryTime
-      );
+      if (differnceObject.days >= 1 && differnceObject.days <= 365) {
+        await deferSubscription(
+          subscriptionData.params,
+          subscriptionData.subscription.expiryTimeMillis,
+          newSubscriptionDesiredExpiryTime
+        );
+      } else {
+        // https://developer.android.com/google/play/billing/subscriptions#defer
+        console.log(
+          "Differnce in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
+        );
+      }
     }
 
     setSubscriptionCookie(subscriptionData.params, req, res);
