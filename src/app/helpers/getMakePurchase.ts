@@ -25,7 +25,7 @@ export const getMakePurchase = (
     purchaseOption,
     setIsLoading,
     disabledMessage,
-    existingNotCancelledPurchaseOption, //TODO
+    existingNotCancelledPurchaseOption,
   }: GetMakePurchaseParams,
   hasDigitalGoodsService: boolean,
   dispatch: Dispatch<UnknownAction>

@@ -18,10 +18,13 @@ type ApiMethodHandlers = {
 };
 
 export function validateParameter<T>(
-  param: unknown,
+  query: Partial<{
+    [key: string]: string | string[];
+  }>,
   paramName: string,
   res: NextApiResponse
 ): T | null {
+  const param = query[paramName];
   if (typeof param !== "string") {
     res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
     return null; // Validation failed

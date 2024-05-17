@@ -22,13 +22,13 @@ export const getSubscriptionFromRequest = async (
   }
 ): Promise<SubscriptionData | undefined> => {
   const itemId = validateParameter<TierKey>(
-    req.query.itemId,
+    req.query,
     paramNames?.itemId ?? "itemId",
     res
   );
 
   const purchaseToken = validateParameter<string>(
-    req.query.purchaseToken,
+    req.query,
     paramNames?.itemId ?? "purchaseToken",
     res
   );

@@ -24,8 +24,9 @@ async function callApi<T>(
   params?: Record<string, string>
 ): Promise<Response<T>> {
   try {
+    // TODO: move params to POST body
     const queryString = params ? `?${new URLSearchParams(params)}` : "";
-    console.log("Calling API: ", queryString);
+    // console.log("Calling API: ", queryString);
     const response = await fetch(`${endpoint}${queryString}`, {
       method,
     });
