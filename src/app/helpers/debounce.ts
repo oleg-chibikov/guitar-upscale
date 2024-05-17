@@ -1,6 +1,6 @@
-type Func<T extends [], R> = (...args: T) => R;
+type Func<T extends unknown[], R> = (...args: T) => R;
 
-export function trailingDebounce<T extends [], R>(
+export function trailingDebounce<T extends unknown[], R>(
   func: Func<T, R>,
   delay: number
 ): (...args: T) => void {
