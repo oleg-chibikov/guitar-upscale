@@ -19,7 +19,7 @@ const handle = async (
     }
     const subscription = subscriptionData.subscription;
     res.status(HttpStatusCode.Ok).json({
-      message: "Subscribed",
+      message: "Subscription details",
       data: {
         cancellationReason: subscription.cancelReason,
         cancellationMode: shouldRevoke(subscription)
