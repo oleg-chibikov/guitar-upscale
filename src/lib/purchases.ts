@@ -7,8 +7,6 @@ import { PurchaseParams } from "./purchaseParams";
 
 // TODO: Client should be setup once in the init. See nextjs instrumentation thing
 const setupClient = async () => {
-  console.log("Setting up client");
-
   const jwtClient = new google.auth.JWT(
     process.env.GOOGLE_CLIENT_EMAIL,
     undefined,
@@ -33,7 +31,7 @@ const setupClient = async () => {
 export async function acknowledgeSubscriptionPurchase(
   params: PurchaseParams
 ): Promise<boolean> {
-  console.log("Acknowledging subscription", params);
+  console.log("Acknowledging subscription", params.itemId);
   try {
     const playApi = await setupClient();
     const apiResponse = (
@@ -61,7 +59,7 @@ export async function acknowledgeSubscriptionPurchase(
 export async function fetchSubscriptionPurchase(
   params: PurchaseParams
 ): Promise<billing.SubscriptionPurchase> {
-  console.log("Fetching subscription", params);
+  console.log("Fetching subscription", params.itemId);
   try {
     const playApi = await setupClient();
     const apiResponse = (
@@ -92,7 +90,7 @@ export async function fetchSubscriptionPurchase(
 export async function cancelSubscription(
   params: PurchaseParams
 ): Promise<void> {
-  console.log("Cancelling subscription", params);
+  console.log("Cancelling subscription", params.itemId);
   try {
     const playApi = await setupClient();
 
@@ -115,7 +113,7 @@ export async function cancelSubscription(
 export async function revokeSubscription(
   params: PurchaseParams
 ): Promise<void> {
-  console.log("Revoking subscription", params);
+  console.log("Revoking subscription", params.itemId);
   try {
     const playApi = await setupClient();
 
@@ -142,7 +140,7 @@ export async function deferSubscription(
   currentExpiryTimeMs: number,
   newExpiryTimeMs: number
 ): Promise<void> {
-  console.log("Deferring subscription", params);
+  console.log("Deferring subscription", params.itemId);
   try {
     const playApi = await setupClient();
     await playApi.purchases.subscriptions.defer({
