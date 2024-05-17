@@ -43,19 +43,18 @@ export const getMakePurchase = (
 
     setIsLoading(true);
     try {
-      const purchaseResult = await showGooglePlayPurchaseUiAndSubscribe(
+      const paymentResponse = await showGooglePlayPurchaseUiAndSubscribe(
         dispatch,
         purchaseOption
       );
-      if (!purchaseResult) {
+      if (!paymentResponse) {
         return;
       }
-      const { completeResponse, purchaseToken } = purchaseResult;
 
       const result = await getPurchaseFunction(
         existingNotCancelledPurchaseOption,
         purchaseOption,
-        purchaseToken
+        paymentResponse.details.purchaseToken
       );
 
       if (result.status === ApiCallResult.Success) {
@@ -70,7 +69,7 @@ export const getMakePurchase = (
         //   return;
         // }
         const completeResult = await completeSuccessfulResponse(
-          completeResponse,
+          paymentResponse,
           dispatch,
           title
         );
@@ -96,7 +95,7 @@ export const getMakePurchase = (
         );
       } else {
         const completeResult = await completeFailedResonse(
-          completeResponse,
+          paymentResponse,
           dispatch,
           title
         );
@@ -169,11 +168,9 @@ async function showGooglePlayPurchaseUiAndSubscribe(
 
   const request = new PaymentRequest(paymentMethods, paymentDetails);
   let paymentResponse: PaymentResponse;
-  let purchaseToken: string;
   try {
     paymentResponse = await request.show();
-    purchaseToken = paymentResponse.details.purchaseToken;
-    return { completeResponse: paymentResponse.complete, purchaseToken };
+    return paymentResponse;
   } catch (e) {
     // The purchase failed, and we can handle the failure here.
     // AbortError usually means a user cancellation
@@ -189,7 +186,7 @@ async function showGooglePlayPurchaseUiAndSubscribe(
 }
 
 async function completeFailedResonse(
-  completeResponse: (result?: PaymentComplete | undefined) => Promise<void>,
+  paymentResponse: PaymentResponse,
   dispatch: Dispatch<UnknownAction>,
   title: string
 ) {
@@ -197,7 +194,7 @@ async function completeFailedResonse(
     // Optional: tell the PaymentRequest API the validation was not
     // successful. The user-agent may show a "payment failed"
     // message to the user.
-    await completeResponse("fail");
+    await paymentResponse.complete("fail");
     return true;
   } catch (error: unknown) {
     console.log(error);
@@ -212,7 +209,7 @@ async function completeFailedResonse(
 }
 
 async function completeSuccessfulResponse(
-  completeResponse: (result?: PaymentComplete | undefined) => Promise<void>,
+  paymentResponse: PaymentResponse,
   dispatch: Dispatch<UnknownAction>,
   title: string
 ) {
@@ -220,7 +217,7 @@ async function completeSuccessfulResponse(
     // Optional: tell the PaymentRequest API the validation was
     // successful. The user-agent may show a "payment successful"
     // message to the user.
-    await completeResponse("success");
+    await paymentResponse.complete("success");
     return true;
   } catch (error: unknown) {
     console.log(error);
