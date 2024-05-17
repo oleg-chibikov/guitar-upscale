@@ -21,15 +21,16 @@ export const getSubscriptionFromRequest = async (
     purchaseToken: string;
   }
 ): Promise<SubscriptionData | undefined> => {
+  // Extract parameters from the body instead of query
   const itemId = validateParameter<TierKey>(
-    req.query,
+    req.body,
     paramNames?.itemId ?? "itemId",
     res
   );
 
   const purchaseToken = validateParameter<string>(
-    req.query,
-    paramNames?.itemId ?? "purchaseToken",
+    req.body,
+    paramNames?.purchaseToken ?? "purchaseToken",
     res
   );
 

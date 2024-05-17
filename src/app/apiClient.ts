@@ -1,6 +1,11 @@
 import { PurchaseResponseData, ResponseData } from "@/lib/apiTypes";
 import { PurchaseParams } from "@/lib/purchaseParams";
-import { HttpStatusCode } from "axios";
+import axios, {
+  AxiosError,
+  AxiosResponse,
+  HttpStatusCode,
+  Method,
+} from "axios";
 
 export type Response<T> =
   | {
@@ -18,22 +23,31 @@ export enum ApiCallResult {
   Error,
 }
 
-async function callApi<T>(
+const callApi = async <T>(
   endpoint: string,
-  method: string,
-  params?: Record<string, string>
-): Promise<Response<T>> {
+  method: Method,
+  params?: Record<string, unknown>
+): Promise<Response<T>> => {
   try {
-    // TODO: move params to POST body
-    const queryString = params ? `?${new URLSearchParams(params)}` : "";
-    // console.log("Calling API: ", queryString);
-    const response = await fetch(`${endpoint}${queryString}`, {
+    const options = {
       method,
-    });
+      url: endpoint,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: params,
+    };
 
-    const responseData = await response.json(); // Extract error message from response. It means that API should produce JSON for any result, otherwise it would fail
-    if (!response.ok) {
-      if (response.status === HttpStatusCode.Gone) {
+    const response: AxiosResponse<T> = await axios(options);
+
+    console.log(`Successfully called ${endpoint}`, response.data);
+    return { status: ApiCallResult.Success, data: response.data };
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    const responseData = axiosError.response?.data;
+
+    if (axiosError.response) {
+      if (axiosError.response.status === HttpStatusCode.Gone) {
         return { status: ApiCallResult.SkipProcessing, data: responseData };
       }
 
@@ -44,13 +58,10 @@ async function callApi<T>(
       return { status: ApiCallResult.Error, data: responseData };
     }
 
-    console.log(`Successfully called ${endpoint}`, responseData);
-    return { status: ApiCallResult.Success, data: responseData };
-  } catch (error: unknown) {
     console.error(`Exception happened while calling ${endpoint}`, error);
     return { status: ApiCallResult.Error, data: error };
   }
-}
+};
 
 export async function acknowledgePurchaseOnBackend(
   params: PurchaseParams
