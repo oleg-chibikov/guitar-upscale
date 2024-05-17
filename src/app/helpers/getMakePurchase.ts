@@ -1,5 +1,4 @@
 import { UnknownAction } from "@reduxjs/toolkit";
-import { title } from "process";
 import { Dispatch } from "react";
 import {
   acknowledgePurchaseOnBackend,
@@ -10,6 +9,7 @@ import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
 import { AlertType } from "../data/alertType";
 import { GOOGLE_PLAY_RELOAD_KEY } from "../hooks/useGooglePlayAuth";
 import { setAndShowAlert } from "../store/uiSlice";
+import { getTitle } from "./purchaseOptionHelper";
 import { incrementAndReload } from "./reloadHelper";
 import { buildDigitalGoodsService } from "./serviceHelper";
 
@@ -39,6 +39,8 @@ export const getMakePurchase = (
       console.log(disabledMessage);
       return;
     }
+
+    const title = getTitle(purchaseOption);
 
     // Define the preferred payment method and item ID
     const paymentMethods: PaymentMethodData[] = [
