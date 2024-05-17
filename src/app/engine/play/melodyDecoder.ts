@@ -1,12 +1,12 @@
 import { Track } from "@/app/data/example";
 import { Note, OctaveNote, StringOctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
-import { FRET_COUNT, NOTE_COUNT, Neck } from "@/app/generateNeckRepresentation";
 import {
   baseNoteValue,
   isPlayingValue,
   tuningValue,
 } from "@/app/store/settingsSlice";
+import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
 const convertChord = (chord: string, tuningShift: number): string => {
   const baseNote = baseNoteValue;

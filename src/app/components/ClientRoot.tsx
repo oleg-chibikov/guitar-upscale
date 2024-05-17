@@ -1,9 +1,9 @@
 "use client";
 
-import { Theme } from "@/app/data/theme";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
-import { selectUi } from "@/app/store/uiSlice";
 import { useSelector } from "react-redux";
+import { Theme } from "../data/theme";
+import { WithPremiumComponents } from "../helpers/WithPremiumFeatures";
+import { selectUi } from "../store/uiSlice";
 import { Initializer } from "./Initializer";
 import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
 import { AlertWrapper } from "./alert/AlertWrapper";

@@ -1,15 +1,15 @@
+import { UnknownAction } from "@reduxjs/toolkit";
+import { title } from "process";
+import { Dispatch } from "react";
 import {
   acknowledgePurchaseOnBackend,
   ApiCallResult,
   changePurchaseOnBackend,
-} from "@/app/apiClient";
-import { PurchaseOption } from "@/app/components/auth/GooglePlayPurchaseSection";
-import { AlertType } from "@/app/data/alertType";
-import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
-import { setAndShowAlert } from "@/app/store/uiSlice";
-import { UnknownAction } from "@reduxjs/toolkit";
-import { title } from "process";
-import { Dispatch } from "react";
+} from "../apiClient";
+import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
+import { AlertType } from "../data/alertType";
+import { GOOGLE_PLAY_RELOAD_KEY } from "../hooks/useGooglePlayAuth";
+import { setAndShowAlert } from "../store/uiSlice";
 import { incrementAndReload } from "./reloadHelper";
 import { buildDigitalGoodsService } from "./serviceHelper";
 

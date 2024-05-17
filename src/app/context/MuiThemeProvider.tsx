@@ -1,10 +1,10 @@
 "use client";
 import { Theme } from "@/app/data/theme";
-import { WithChildren } from "@/app/helpers/withChildren";
-import { selectUi } from "@/app/store/uiSlice";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { FC } from "react";
 import { useSelector } from "react-redux";
+import { WithChildren } from "../helpers/withChildren";
+import { selectUi } from "../store/uiSlice";
 
 export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   const { theme } = useSelector(selectUi);

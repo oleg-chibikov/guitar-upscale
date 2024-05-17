@@ -1,9 +1,6 @@
-import { WithChildren } from "@/app/helpers/withChildren";
-import {
-  PremiumFeaturesWithSession,
-  getPremiumFeatures,
-} from "@/lib/premiumFeatures";
 import { FC } from "react";
+import { WithChildren } from "../helpers/withChildren";
+import { PremiumFeaturesWithSession, getPremiumFeatures } from "@/lib/premiumFeatures";
 
 interface PremiumFeatureWrapperProps extends WithChildren {
   shouldRender: (

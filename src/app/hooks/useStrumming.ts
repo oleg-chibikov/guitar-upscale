@@ -1,5 +1,6 @@
-import { ChordStrummingInterval } from "@/app/data/chordStrummingInterval";
-import { ChordEventBus } from "@/app/engine/eventBus";
+import { useCallback, useRef, useState } from "react";
+import { ChordStrummingInterval } from "../data/chordStrummingInterval";
+import { ChordEventBus } from "../engine/eventBus";
 import {
   bpmToMilliseconds,
   isMainClockActive,
@@ -8,7 +9,7 @@ import {
   waitForNextHalfBar,
   waitForNextHalfBeat,
   waitForNextTick,
-} from "@/app/engine/mainClock";
+} from "../engine/mainClock";
 import {
   areOtherChordsStrumming,
   currentChord,
@@ -24,8 +25,8 @@ import {
   registerChordClick,
   releaseChordClick,
   startChordGracePeriod,
-} from "@/app/engine/strummingState";
-import { asyncTimeout } from "@/app/helpers/asyncTimeout";
+} from "../engine/strummingState";
+import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
@@ -34,8 +35,7 @@ import {
   seamlessChordSwitchingValue,
   tempoBpmValue,
   useChordAlterationValue,
-} from "@/app/store/settingsSlice";
-import { useCallback, useRef, useState } from "react";
+} from "../store/settingsSlice";
 
 const GRACE_INTERVALS = 2;
 

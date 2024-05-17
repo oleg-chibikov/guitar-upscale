@@ -1,7 +1,7 @@
 import { PlayExampleParameters } from "@/app/data/playExampleParameters";
 import { parseStringToNotes } from "@/app/data/tunings";
-import { ChordEventBus, NotePlayEventBus } from "@/app/eventBus";
-import { setCurrentChord } from "@/app/strummingState";
+import { ChordEventBus, NotePlayEventBus } from "../eventBus";
+import { setCurrentChord } from "../strummingState";
 import { decodeMelody } from "./melodyDecoder";
 
 export const playExample = async ({

@@ -1,4 +1,4 @@
-import { setLoadingMessage } from "@/app/store/uiSlice";
+import { setLoadingMessage } from "../store/uiSlice";
 
 export function getReloadCount(key: string) {
   const signInCheckCountRaw = localStorage.getItem(key);

@@ -1,11 +1,11 @@
 import "server-only";
 
+import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
+import dynamic from "next/dynamic";
 import {
   PremiumComponent,
   WithPremiumFeatures,
-} from "@/app/helpers/WithPremiumFeatures";
-import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
-import dynamic from "next/dynamic";
+} from "../helpers/WithPremiumFeatures";
 import { ClientRoot } from "./ClientRoot";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
 import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox";

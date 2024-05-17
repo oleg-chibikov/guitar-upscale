@@ -1,16 +1,19 @@
-import { AlertType } from "@/app/data/alertType";
-import { Example } from "@/app/data/example";
-import { getNoteText } from "@/app/data/notes";
-import { PlayExampleParameters } from "@/app/data/playExampleParameters";
-import { PlaybackType } from "@/app/data/playbackType";
+import { useCallback, useEffect, useState } from "react";
+import ReactGA from "react-ga4";
+import { useDispatch, useSelector } from "react-redux";
+import { AlertType } from "../data/alertType";
+import { Example } from "../data/example";
+import { getNoteText } from "../data/notes";
+import { PlayExampleParameters } from "../data/playExampleParameters";
+import { PlaybackType } from "../data/playbackType";
 import {
   HALF_BEATS_IN_BAR,
   currentHalfBeat,
   isMainClockActive,
   waitForNextBar,
   waitForNextHalfBeat,
-} from "@/app/engine/mainClock";
-import { loadInstrument } from "@/app/engine/sound/soundHelper";
+} from "../engine/mainClock";
+import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   baseNoteValue,
   isPlayingValue,
@@ -21,11 +24,8 @@ import {
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
-} from "@/app/store/settingsSlice";
-import { setAndShowAlert } from "@/app/store/uiSlice";
-import { useCallback, useEffect, useState } from "react";
-import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
+} from "../store/settingsSlice";
+import { setAndShowAlert } from "../store/uiSlice";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;

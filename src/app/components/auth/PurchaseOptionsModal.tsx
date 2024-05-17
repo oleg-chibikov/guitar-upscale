@@ -1,5 +1,3 @@
-import { CloseIcon } from "@/app/CloseIcon";
-import { ModalProps } from "@/app/ModalProps";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
@@ -12,6 +10,8 @@ import { Avatar, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
+import { CloseIcon } from "../CloseIcon";
+import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
 const GooglePlayPurchaseSection = React.lazy(() =>

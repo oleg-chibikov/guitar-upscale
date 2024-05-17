@@ -1,6 +1,6 @@
-import { PurchaseOption } from "@/app/components/auth/GooglePlayPurchaseSection";
-import { GuitarUpscaleSpecificDigitalGoodsProductDetails } from "@/app/digitalGoodsBrowser";
 import { CancelReason } from "@/lib/billing";
+import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
+import { GuitarUpscaleSpecificDigitalGoodsProductDetails } from "../digitalGoodsBrowser";
 
 export const getTitle = (purchaseOption: DigitalGoodsProductDetails) =>
   purchaseOption.title.substring(0, purchaseOption.title.indexOf(" ("));

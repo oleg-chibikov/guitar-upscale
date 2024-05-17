@@ -1,5 +1,4 @@
 "use client";
-import { SelectWrapper } from "@/app/SelectWrapper";
 import {
   Instrument,
   InstrumentGroup,
@@ -16,6 +15,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useSelector } from "react-redux";
+import { SelectWrapper } from "../SelectWrapper";
 
 interface BaseInstrumentSelectorProps {
   label: string;

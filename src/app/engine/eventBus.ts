@@ -1,13 +1,13 @@
-import { Instrument } from "@/app/data/instruments";
-import { StringOctaveNote, serializeStringOctaveNote } from "@/app/data/notes";
+import { Subject } from "rxjs";
+import { Instrument } from "../data/instruments";
+import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
 import {
   chordInstrumentValue,
   instrumentValue,
   reverbStrengthValue,
   tempoBpmValue,
   velocityValue,
-} from "@/app/store/settingsSlice";
-import { Subject } from "rxjs";
+} from "../store/settingsSlice";
 import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 

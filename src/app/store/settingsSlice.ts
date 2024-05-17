@@ -1,31 +1,31 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { ChordStrummingInterval } from "@/app/data/chordStrummingInterval";
-import { chordStrummingPatterns } from "@/app/data/chordStrummingPatterns";
-import { Instrument, InstrumentGroup } from "@/app/data/instruments";
-import { Chord, getNoteText, MAX_VELOCITY, Note } from "@/app/data/notes";
-import { PlaybackType } from "@/app/data/playbackType";
-import { scalesMap } from "@/app/data/scales";
-import { getShiftedNote, parseStringToNotes, Tuning } from "@/app/data/tunings";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ChordStrummingInterval } from "../data/chordStrummingInterval";
+import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
+import { Instrument, InstrumentGroup } from "../data/instruments";
+import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
+import { PlaybackType } from "../data/playbackType";
+import { scalesMap } from "../data/scales";
+import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
 import {
   generateAllChords,
   getClosestVariation,
   getModeText,
   NoteChords,
-} from "@/app/engine/chordsGenerator";
-import { clearPreviousChords } from "@/app/engine/eventBus";
+} from "../engine/chordsGenerator";
+import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
   Neck,
-} from "@/app/engine/generateNeckRepresentation";
+} from "../engine/generateNeckRepresentation";
 import {
   isMainClockActive,
   startInterval,
   stopInterval,
-} from "@/app/engine/mainClock";
-import { loadMetronome } from "@/app/engine/sound/metronomeProvider";
-import { loadInstrument } from "@/app/engine/sound/soundHelper";
-import { strummingChordsMap } from "@/app/engine/strummingState";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+} from "../engine/mainClock";
+import { loadMetronome } from "../engine/sound/metronomeProvider";
+import { loadInstrument } from "../engine/sound/soundHelper";
+import { strummingChordsMap } from "../engine/strummingState";
 import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>

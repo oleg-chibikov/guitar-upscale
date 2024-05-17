@@ -1,8 +1,8 @@
-import { Chord, Note, StringOctaveNote } from "@/app/data/notes";
+import { Chord, Note, StringOctaveNote } from "../data/notes";
 import {
   calculateAverage,
   findObjectWithMinValue,
-} from "@/app/helpers/arrayHelper";
+} from "../helpers/arrayHelper";
 import { FRET_COUNT, NOTE_COUNT, Neck } from "./generateNeckRepresentation";
 
 export enum ChordMode {

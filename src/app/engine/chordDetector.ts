@@ -1,6 +1,6 @@
-import { Chord, StringOctaveNote } from "@/app/data/notes";
-import { trailingDebounce } from "@/app/helpers/debounce";
-import { Trie } from "@/app/helpers/trie";
+import { Chord, StringOctaveNote } from "../data/notes";
+import { trailingDebounce } from "../helpers/debounce";
+import { Trie } from "../helpers/trie";
 
 type NoteWithClearCallback = {
   stringOctaveNote: StringOctaveNote;

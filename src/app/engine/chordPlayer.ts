@@ -1,4 +1,4 @@
-import { Chord } from "@/app/data/notes";
+import { Chord } from "../data/notes";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
 import { NotePlayEventBus, TrackMetadata } from "./eventBus";
 import { sleep } from "./sleep";

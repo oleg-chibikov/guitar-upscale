@@ -1,4 +1,4 @@
-import { toggleInterval } from "@/app/store/settingsSlice";
+import { toggleInterval } from "../store/settingsSlice";
 
 export let currentChord: string | undefined;
 

@@ -1,9 +1,9 @@
-import { CloseIcon } from "@/app/CloseIcon";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Alert, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { CloseIcon } from "../CloseIcon";
 import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "./checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
 import { SeamlessChordSwitchingCheckbox } from "./checkboxes/SeamlessChordSwitchingCheckbox";
 import { ChordStrummingIntervalSelector } from "./selectors/ChordStrummingIntervalSelector";

@@ -1,7 +1,7 @@
 import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
-import { NotePlayEventBus } from "@/app/eventBus";
-import { Neck } from "@/app/generateNeckRepresentation";
 import { isPlayingValue } from "@/app/store/settingsSlice";
+import { NotePlayEventBus } from "../eventBus";
+import { Neck } from "../generateNeckRepresentation";
 
 export const playWholeScale = async (
   wait: () => Promise<void>,
