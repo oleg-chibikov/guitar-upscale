@@ -25,6 +25,7 @@ async function callApi<T>(
 ): Promise<Response<T>> {
   try {
     const queryString = params ? `?${new URLSearchParams(params)}` : "";
+    console.log("Calling API: ", queryString);
     const response = await fetch(`${endpoint}${queryString}`, {
       method,
     });

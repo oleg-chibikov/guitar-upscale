@@ -20,31 +20,38 @@
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\store\\",
-      "color": "foldercolorizer.MediumSlateBlue"
+      "color": "foldercolorizer.MediumSlateBlue",
+      "badge": "🏪"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\hooks\\",
-      "color": "foldercolorizer.MistyRose"
+      "color": "foldercolorizer.MistyRose",
+      "badge": "🪝"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\helpers\\",
-      "color": "foldercolorizer.CadetBlue"
+      "color": "foldercolorizer.CadetBlue",
+      "badge": "🧑‍🏭"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\engine\\",
-      "color": "foldercolorizer.Bronze"
+      "color": "foldercolorizer.Bronze",
+      "badge": "🚒"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\data\\",
-      "color": "foldercolorizer.SandyBrown"
+      "color": "foldercolorizer.SandyBrown",
+      "badge": "🧱"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\context\\",
-      "color": "foldercolorizer.lime"
+      "color": "foldercolorizer.lime",
+      "badge": "🗨️"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\components\\",
-      "color": "foldercolorizer.Moccasin"
+      "color": "foldercolorizer.Moccasin",
+      "badge": "🗃️"
     },
     {
       "folderPath": "guitar-upscale\\tsconfig.json\\"
