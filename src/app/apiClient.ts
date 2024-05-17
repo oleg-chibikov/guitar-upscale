@@ -35,7 +35,10 @@ const callApi = async <T>(
       headers: {
         "Content-Type": "application/json",
       },
-      data: params,
+      // Add params to the body if the method is not GET
+      ...(method !== "GET" && { data: params }),
+      // Add params to the query string if the method is GET
+      ...(method === "GET" && { params }),
     };
 
     const response: AxiosResponse<T> = await axios(options);
