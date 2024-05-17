@@ -13,7 +13,7 @@ import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
 import { Tier, tierMap } from "@/lib/tier";
 import { Alert, LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ChangeSubscriptionModal } from "./ChangeSubscriptionModal";
 import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
@@ -67,6 +67,9 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
     setChangeSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
 
+  const purchasedNonCancelledOptionRef =
+    useRef<GuitarUpscaleSpecificDigitalGoodsProductDetails>();
+
   useEffect(() => {
     if (!hasDigitalGoodsService) {
       return;
@@ -87,14 +90,14 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
         const options = await Promise.all(
           details.map(async (purchaseOption) => {
-            const correspondingPurchaseItem = existingPurchases.find(
+            const correspondingPurchasedItem = existingPurchases.find(
               (x) => x.itemId === purchaseOption.itemId
             );
             let responseData: PurchaseResponseData | undefined;
-            if (correspondingPurchaseItem) {
+            if (correspondingPurchasedItem) {
               const response = await getPurchaseOnBackend({
                 itemId: purchaseOption.itemId,
-                purchaseToken: correspondingPurchaseItem.purchaseToken,
+                purchaseToken: correspondingPurchasedItem.purchaseToken,
               });
               if (response.status === ApiCallResult.Success) {
                 responseData = response.data;
@@ -111,11 +114,18 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
 
             const data = responseData?.data;
 
-            return {
+            const result = {
               ...purchaseOption,
               purchaseData: data,
-              purchaseToken: correspondingPurchaseItem?.purchaseToken,
+              purchaseToken: correspondingPurchasedItem?.purchaseToken,
             } as PurchaseOption;
+
+            if (data && !data.cancellationReason) {
+              // at any time there should be only one not cancelled subscription. if there are more - it means something is not working as expected
+              purchasedNonCancelledOptionRef.current = result;
+            }
+
+            return result;
           })
         );
 
@@ -180,6 +190,9 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       >
         {purchaseOptions.map((purchaseOption) => (
           <GooglePlayPurchaseOptionButton
+            existingNotCancelledPurchaseOption={
+              purchasedNonCancelledOptionRef.current
+            }
             showCancellationModal={(option) => {
               setSubscriptionToCancel(option);
               handleOpenCancelScubscriptionModal();
