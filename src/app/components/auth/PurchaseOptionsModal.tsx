@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";

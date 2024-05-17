@@ -1,26 +1,26 @@
 import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
-import { msToFormattedDate } from "@/app/helpers/dateHelper";
+import { GuitarUpscaleSpecificPurchaseDetails } from "@/app/digitalGoodsBrowser";
 import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
-import { TierKey } from "@/lib/tier";
+import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button, Modal, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
-import { PurchaseInfo } from "./GooglePlayPurchaseSection";
+import { PurchaseOption } from "./GooglePlayPurchaseSection";
 
 export const CancelSubscriptionModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
-    purchaseOption: PurchaseInfo;
+    purchaseOption: PurchaseOption;
     disabledMessage?: string;
   }
 > = ({
@@ -46,11 +46,12 @@ export const CancelSubscriptionModal: FC<
     setIsLoading(true);
     try {
       const digitalGoodsService = await buildDigitalGoodsService();
-      const existingPurchases = await digitalGoodsService.listPurchases();
+      const existingPurchases =
+        (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
       const purchases = existingPurchases
         .filter((x) => x.itemId === purchaseOption.itemId)
         .map((x) => ({
-          itemId: x.itemId as TierKey,
+          itemId: x.itemId,
           purchaseToken: x.purchaseToken,
         }));
       if (!purchases.length) {
@@ -120,9 +121,7 @@ export const CancelSubscriptionModal: FC<
           }`}
         >
           <CloseIcon onPress={handleCloseModal} />
-          <div>{`Are you sure you would like to cancel your "${getTitle(
-            purchaseOption
-          )}" subscription?`}</div>
+          <div>{`Are you sure you would like to cancel your "${title}" subscription?`}</div>
           {cancellationMode !== undefined ? (
             <Alert severity="info">
               {cancellationMode === CancellationMode.Revoke

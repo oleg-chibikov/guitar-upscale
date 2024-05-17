@@ -1,10 +1,3 @@
-const dateFormatOptions: Intl.DateTimeFormatOptions = {
-  weekday: "short",
-  year: "2-digit",
-  month: "2-digit",
-  day: "2-digit",
-};
-
 const msToDate = (ms?: number) => (ms ? new Date(ms) : undefined);
 
 export const msToFormattedDate = (ms?: number) => {
@@ -23,3 +16,19 @@ export const msToFormattedDate = (ms?: number) => {
   }
   return undefined;
 };
+
+export function msToTime(durationMs: number) {
+  const milliseconds = (durationMs % 1000) / 100;
+  const seconds = Math.floor((durationMs / 1000) % 60);
+  const minutes = Math.floor((durationMs / (1000 * 60)) % 60);
+  const hours = Math.floor((durationMs / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+
+  return {
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+    milliseconds: milliseconds,
+  };
+}

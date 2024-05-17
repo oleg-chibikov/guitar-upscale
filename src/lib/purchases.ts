@@ -199,3 +199,37 @@ export async function revokeSubscription(
     throw error;
   }
 }
+
+/**
+ *Set the new expiry time for subscription using Play Developer API.
+ * @param {params} PurchaseParams
+ * @param {currentExpiryTimeMs} number
+ * @param {newExpiryTimeMs} number
+ */
+export async function deferSubscription(
+  params: PurchaseParams,
+  currentExpiryTimeMs: number,
+  newExpiryTimeMs: number
+): Promise<void> {
+  console.log("Deferring subscription", params);
+  try {
+    const playApi = await setupClient();
+    const apiResponse = (
+      await playApi.purchases.subscriptions.defer({
+        packageName: process.env.ANDROID_PACKAGE_ID,
+        subscriptionId: params.itemId,
+        token: params.purchaseToken,
+        requestBody: {
+          deferralInfo: {
+            desiredExpiryTimeMillis: newExpiryTimeMs.toString(),
+            expectedExpiryTimeMillis: currentExpiryTimeMs.toString(),
+          },
+        },
+      })
+    )?.data;
+    console.log("Deferred subscription", apiResponse);
+  } catch (error) {
+    console.error("Error deferring subscription", error);
+    throw error;
+  }
+}

@@ -7,16 +7,23 @@ import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { TierKey } from "./tier";
 
+export type SubscriptionData = {
+  subscription: SubscriptionPurchase;
+  params: PurchaseParams;
+};
+
 export const getSubscriptionFromRequest = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
-  allowCancelled: boolean
-) => {
-  const itemId = validateParameter<TierKey>(req.query.itemId, "itemId", res);
+  allowCancelled: boolean,
+  itemIdParam: string = "itemId",
+  purchaseTokenParam: string = "purchaseToken"
+): Promise<SubscriptionData | undefined> => {
+  const itemId = validateParameter<TierKey>(req.query.itemId, itemIdParam, res);
 
   const purchaseToken = validateParameter<string>(
     req.query.purchaseToken,
-    "purchaseToken",
+    purchaseTokenParam,
     res
   );
 

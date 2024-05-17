@@ -55,6 +55,20 @@ export async function acknowledgePurchaseOnBackend(
   });
 }
 
+export async function changePurchaseOnBackend(
+  newParams: PurchaseParams,
+  oldParams: PurchaseParams
+): Promise<Response<ResponseData>> {
+  const { itemId, purchaseToken } = newParams;
+  const { itemId: oldItemId, purchaseToken: oldPurchaseToken } = oldParams;
+  return callApi(`/api/purchases/change`, "POST", {
+    itemId,
+    purchaseToken,
+    oldItemId,
+    oldPurchaseToken,
+  });
+}
+
 export async function cancelPurchaseOnBackend(
   params: PurchaseParams
 ): Promise<Response<ResponseData>> {

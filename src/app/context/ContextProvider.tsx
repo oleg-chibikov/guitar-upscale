@@ -7,7 +7,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { WithPremiumFeaturesWithSession } from "../helpers/WithPremiumFeatures";
 import { WithChildren } from "../helpers/withChildren";
 import { persistor, store } from "../store/store";
-import { DigitalGoodsServiceProvider } from "./DIgitalGoodsServiceProvider";
+import { DigitalGoodsServiceProvider } from "./DigitalGoodsServiceProvider";
 import { MuiThemeProvider } from "./MuiThemeProvider";
 import { PremiumFeaturesProvider } from "./PremiumFeaturesProvider";
 

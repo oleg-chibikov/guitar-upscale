@@ -1,5 +1,6 @@
 import { CancelReason } from "@/lib/billing";
-import { PurchaseInfo } from "../components/auth/GooglePlayPurchaseSection";
+import { TierKey } from "@/lib/tier";
+import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
 
 export const getTitle = (purchaseOption: DigitalGoodsProductDetails) =>
   purchaseOption.title.substring(0, purchaseOption.title.indexOf(" ("));
@@ -23,10 +24,22 @@ export const getBillingPeriod = (
   }
 };
 
-export const isPurchaseCancelled = (purchaseOption: PurchaseInfo) => {
+export const isPurchaseCancelled = (purchaseOption: PurchaseOption) => {
   const cancellationReason = purchaseOption?.purchaseData?.cancellationReason;
 
   return cancellationReason !== undefined
     ? cancellationReason !== CancelReason.NONE
     : false;
 };
+
+export type ChangeAction = "Upgrade" | "Downgrade";
+
+export const getChangeAction = (
+  existingNotCancelledPurchaseOption?: PurchaseOption
+) =>
+  !existingNotCancelledPurchaseOption
+    ? undefined
+    : (existingNotCancelledPurchaseOption.itemId as TierKey) ===
+      "guitar_upscale.composer"
+    ? "Downgrade"
+    : "Upgrade";

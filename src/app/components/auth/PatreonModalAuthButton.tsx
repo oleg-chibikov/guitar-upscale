@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
 import { setIsSignedIn } from "@/app/store/authSlice";
 import { Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";

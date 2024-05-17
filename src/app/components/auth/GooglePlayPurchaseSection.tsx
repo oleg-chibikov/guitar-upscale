@@ -1,16 +1,21 @@
 import { ApiCallResult, getPurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
 import { AlertType } from "@/app/data/alertType";
+import {
+  GuitarUpscaleSpecificDigitalGoodsProductDetails,
+  GuitarUpscaleSpecificPurchaseDetails,
+} from "@/app/digitalGoodsBrowser";
 import { getTitle } from "@/app/helpers/purchaseOptionHelper";
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
-import { Tier, TierKey, tierMap } from "@/lib/tier";
+import { Tier, tierMap } from "@/lib/tier";
 import { Alert, LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { ChangeSubscriptionModal } from "./ChangeSubscriptionModal";
 import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
 
 const CancelSubscriptionModal = dynamic(
@@ -22,7 +27,7 @@ interface GooglePlaySubscribeSectionProps {
   onOptionSelected: (option?: Tier) => void;
 }
 
-export type PurchaseInfo = DigitalGoodsProductDetails & {
+export type PurchaseOption = GuitarUpscaleSpecificDigitalGoodsProductDetails & {
   purchaseToken?: string;
   purchaseData?: PurchaseData;
 };
@@ -31,21 +36,35 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
   onOptionSelected,
 }) => {
   const dispatch = useDispatch();
-  const [selectedOption, setSelectedOption] = useState<PurchaseInfo>();
+  const [selectedOption, setSelectedOption] = useState<PurchaseOption>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const hasDigitalGoodsService = useDigitalGoodsService();
-  const [purchaseOptions, setPurchaseOptions] = useState<PurchaseInfo[]>([]);
-  const [cancelSubscriptionModalOpen, setSubscriptionModalOpen] =
+  const [purchaseOptions, setPurchaseOptions] = useState<PurchaseOption[]>([]);
+  const [cancelSubscriptionModalOpen, setCancelSubscriptionModalOpen] =
     useState<boolean>(false);
-  const [cancelSubscriptionModalOpened, setSubscriptionModalOpened] =
+  const [cancelSubscriptionModalOpened, setCancelSubscriptionModalOpened] =
+    useState<boolean>(false);
+  const [changeSubscriptionModalOpen, setChangeSubscriptionModalOpen] =
+    useState<boolean>(false);
+  const [changeSubscriptionModalOpened, setChangeSubscriptionModalOpened] =
     useState<boolean>(false);
   const [subscriptionToCancel, setSubscriptionToCancel] =
-    useState<PurchaseInfo>();
+    useState<PurchaseOption>();
+
+  const [subscriptionsToChange, setSubscriptionsToChange] = useState<{
+    new: PurchaseOption;
+    old: PurchaseOption;
+  }>();
   const isOnline = useOnlineStatus();
 
-  const handleOpenModal = () => {
-    setSubscriptionModalOpen(true);
-    setSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  const handleOpenCancelScubscriptionModal = () => {
+    setCancelSubscriptionModalOpen(true);
+    setCancelSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  };
+
+  const handleOpenChangeScubscriptionModal = () => {
+    setChangeSubscriptionModalOpen(true);
+    setChangeSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
 
   useEffect(() => {
@@ -60,11 +79,12 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       setIsLoading(true);
       try {
         const digitalGoodsService = await buildDigitalGoodsService();
-        const details = await digitalGoodsService.getDetails(
+        const details = (await digitalGoodsService.getDetails(
           Array.from(tierMap.keys())
-        );
+        )) as GuitarUpscaleSpecificDigitalGoodsProductDetails[];
 
-        const existingPurchases = await digitalGoodsService.listPurchases();
+        const existingPurchases =
+          (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
         const options = await Promise.all(
           details.map(async (purchaseOption) => {
             const correspondingPurchaseItem = existingPurchases.find(
@@ -73,7 +93,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
             let responseData: PurchaseResponseData | undefined;
             if (correspondingPurchaseItem) {
               const response = await getPurchaseOnBackend({
-                itemId: purchaseOption.itemId as TierKey,
+                itemId: purchaseOption.itemId,
                 purchaseToken: correspondingPurchaseItem.purchaseToken,
               });
               if (response.status === ApiCallResult.Success) {
@@ -95,7 +115,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
               ...purchaseOption,
               purchaseData: data,
               purchaseToken: correspondingPurchaseItem?.purchaseToken,
-            } as PurchaseInfo;
+            } as PurchaseOption;
           })
         );
 
@@ -136,9 +156,19 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       {subscriptionToCancel && cancelSubscriptionModalOpened && (
         <CancelSubscriptionModal
           openModal={cancelSubscriptionModalOpen}
-          handleCloseModal={() => setSubscriptionModalOpen(false)}
+          handleCloseModal={() => setCancelSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={subscriptionToCancel}
+          disabledMessage={disabledMessage}
+        />
+      )}
+      {subscriptionsToChange && changeSubscriptionModalOpened && (
+        <ChangeSubscriptionModal
+          openModal={changeSubscriptionModalOpen}
+          handleCloseModal={() => setChangeSubscriptionModalOpen(false)}
+          setIsLoading={setIsLoading}
+          purchaseOption={subscriptionsToChange.new}
+          existingNotCancelledPurchaseOption={subscriptionsToChange.old}
           disabledMessage={disabledMessage}
         />
       )}
@@ -152,7 +182,11 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           <GooglePlayPurchaseOptionButton
             showCancellationModal={(option) => {
               setSubscriptionToCancel(option);
-              handleOpenModal();
+              handleOpenCancelScubscriptionModal();
+            }}
+            showChangeSubscriptionModal={(option, oldOption) => {
+              setSubscriptionsToChange({ new: option, old: oldOption });
+              handleOpenChangeScubscriptionModal();
             }}
             disabledMessage={disabledMessage}
             isSelected={selectedOption === purchaseOption}
@@ -162,7 +196,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
                 onOptionSelected(undefined);
               } else {
                 setSelectedOption(purchaseOption);
-                onOptionSelected(tierMap.get(purchaseOption.itemId as TierKey));
+                onOptionSelected(tierMap.get(purchaseOption.itemId));
               }
             }}
             key={purchaseOption.itemId}

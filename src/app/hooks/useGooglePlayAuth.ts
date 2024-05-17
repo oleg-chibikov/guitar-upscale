@@ -7,8 +7,9 @@ import {
   acknowledgePurchaseOnBackend,
   logoutOnBackend,
 } from "../apiClient";
-import { useDigitalGoodsService } from "../context/DIgitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "../context/DigitalGoodsServiceProvider";
 import { AlertType } from "../data/alertType";
+import { GuitarUpscaleSpecificPurchaseDetails } from "../digitalGoodsBrowser";
 import { processWithReloads } from "../helpers/reloadHelper";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
 import { selectAuth } from "../store/authSlice";
@@ -62,7 +63,8 @@ export const useGooglePlayAuth = () => {
 
     // It takes the purchased subscription from DigitalGoodsService and sends it to backend for validation. Backend sets the cookie with permissions. Then location is reloaded
     const digitalGoodsService = await buildDigitalGoodsService();
-    const existingPurchases = await digitalGoodsService.listPurchases();
+    const existingPurchases =
+      (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
 
     await processWithReloads(
       dispatch,

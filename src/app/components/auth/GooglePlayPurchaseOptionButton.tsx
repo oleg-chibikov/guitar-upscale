@@ -1,142 +1,65 @@
-import { ApiCallResult, acknowledgePurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DIgitalGoodsServiceProvider";
-import { AlertType } from "@/app/data/alertType";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
 import { Theme } from "@/app/data/theme";
-import { msToFormattedDate } from "@/app/helpers/dateHelper";
+import {
+  GetMakePurchaseParams,
+  getMakePurchase,
+} from "@/app/helpers/getMakePurchase";
 import {
   getBillingPeriod,
+  getChangeAction,
   getTitle,
   isPurchaseCancelled,
 } from "@/app/helpers/purchaseOptionHelper";
-import { incrementAndReload } from "@/app/helpers/reloadHelper";
-import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
-import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
-import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
-import { TierKey } from "@/lib/tier";
+import { msToFormattedDate } from "@/lib/dateHelper";
 import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PurchaseInfo } from "./GooglePlayPurchaseSection";
+import { PurchaseOption } from "./GooglePlayPurchaseSection";
 
-interface GooglePlayPurchaseOptionButtonProps {
-  purchaseOption: PurchaseInfo;
-  onClick: (option: PurchaseInfo) => void;
+interface GooglePlayPurchaseOptionButtonProps extends GetMakePurchaseParams {
+  onClick: (option: PurchaseOption) => void;
   isSelected: boolean;
-  setIsLoading: (isLoading: boolean) => void;
-  showCancellationModal: (option: PurchaseInfo) => void;
-  disabledMessage?: string;
+  showCancellationModal: (option: PurchaseOption) => void;
+  showChangeSubscriptionModal: (
+    option: PurchaseOption,
+    existingOption: PurchaseOption
+  ) => void;
 }
 
 export const GooglePlayPurchaseOptionButton: FC<
   GooglePlayPurchaseOptionButtonProps
-> = ({
-  purchaseOption,
-  onClick,
-  isSelected,
-  setIsLoading,
-  showCancellationModal,
-  disabledMessage,
-}) => {
-  const title = getTitle(purchaseOption);
+> = (params) => {
+  const {
+    purchaseOption,
+    onClick,
+    isSelected,
+    showCancellationModal,
+    showChangeSubscriptionModal,
+    disabledMessage,
+    existingNotCancelledPurchaseOption,
+  } = params;
+
   const hasDigitalGoodsService = useDigitalGoodsService();
   const dispatch = useDispatch();
+  const makePurchase = existingNotCancelledPurchaseOption
+    ? () =>
+        showChangeSubscriptionModal(
+          purchaseOption,
+          existingNotCancelledPurchaseOption
+        )
+    : getMakePurchase(params, hasDigitalGoodsService, dispatch);
+
+  const title = getTitle(purchaseOption);
   const { theme } = useSelector(selectUi);
   const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
   const isCancelled = isPurchaseCancelled(purchaseOption);
   const isPurchasedAndNotCancelled = isAlreadyPurchased && !isCancelled;
-
-  const makePurchase = async () => {
-    if (!hasDigitalGoodsService) {
-      return;
-    }
-    if (disabledMessage !== undefined) {
-      console.log(disabledMessage);
-      return;
-    }
-    // Define the preferred payment method and item ID
-    const paymentMethods: PaymentMethodData[] = [
-      {
-        supportedMethods: "https://play.google.com/billing",
-        data: {
-          sku: purchaseOption.itemId,
-        },
-      },
-    ];
-
-    // The "total" member of the paymentDetails is required by the Payment
-    // Request API, but is not used when using Google Play Billing. We can
-    // set it up with bogus details.
-    const paymentDetails = {
-      total: {
-        label: `Dummy`,
-        amount: { currency: `USD`, value: `0` },
-      },
-    };
-
-    const request = new PaymentRequest(paymentMethods, paymentDetails);
-    setIsLoading(true);
-    try {
-      const paymentResponse = await request.show();
-      const { purchaseToken } = paymentResponse.details;
-
-      const result = await acknowledgePurchaseOnBackend({
-        itemId: purchaseOption.itemId as TierKey,
-        purchaseToken,
-      });
-
-      if (result.status === ApiCallResult.Success) {
-        const digitalGoodsService = await buildDigitalGoodsService();
-        // Optional: consume the purchase, allowing the user to purchase
-        // the same item again.
-        digitalGoodsService.consume(purchaseToken);
-
-        // Optional: tell the PaymentRequest API the validation was
-        // successful. The user-agent may show a "payment successful"
-        // message to the user.
-        await paymentResponse.complete("success");
-        const message = `Payment successful! Your level is "${title}"`;
-        dispatch(
-          setAndShowAlert({
-            message,
-          })
-        );
-        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
-      } else if (result.status === ApiCallResult.SkipProcessing) {
-        dispatch(
-          setAndShowAlert({
-            message: `"${title}" is cancelled. Cannot acknowledge`,
-            alertType: AlertType.Warning,
-          })
-        );
-      } else {
-        await paymentResponse.complete("fail");
-        dispatch(
-          setAndShowAlert({
-            message: `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`,
-            alertType: AlertType.Error,
-          })
-        );
-        return;
-      }
-    } catch (e) {
-      // The purchase failed, and we can handle the failure here.
-      // AbortError usually means a user cancellation
-
-      console.log(e);
-      dispatch(
-        setAndShowAlert({
-          message: "Purchasing aborted",
-          alertType: AlertType.Warning,
-        })
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const changeAction = getChangeAction(existingNotCancelledPurchaseOption);
 
   let buttonColor: "error" | "primary";
-  let buttonAction: () => Promise<void>;
+  let buttonAction: () => void | Promise<void>;
   let purchaseStatus: string | undefined;
   let buttonContent: string;
   let buttonTitle: string;
@@ -169,7 +92,9 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
     purchaseStatus = "Cancelled, owned till " + (expirationDate ?? "expiry");
-    buttonContent = "Re-subscribe";
+    buttonContent =
+      "Re-subscribe" +
+      (changeAction ? " and " + changeAction.toLocaleLowerCase() : "");
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
     bg = isSelected
@@ -184,7 +109,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
     purchaseStatus = "";
-    buttonContent = "Subscribe";
+    buttonContent = changeAction ?? "Subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
     bg = isSelected
