@@ -11,7 +11,6 @@ import { GOOGLE_PLAY_RELOAD_KEY } from "../hooks/useGooglePlayAuth";
 import { setAndShowAlert } from "../store/uiSlice";
 import { getTitle } from "./purchaseOptionHelper";
 import { incrementAndReload } from "./reloadHelper";
-import { buildDigitalGoodsService } from "./serviceHelper";
 
 export interface GetMakePurchaseParams {
   purchaseOption: PurchaseOption;
@@ -60,16 +59,16 @@ export const getMakePurchase = (
       );
 
       if (result.status === ApiCallResult.Success) {
-        const digitalGoodsService = await buildDigitalGoodsService();
-        const consumeResult = await consumePurchaseToken(
-          digitalGoodsService,
-          purchaseToken,
-          dispatch,
-          title
-        );
-        if (!consumeResult) {
-          return;
-        }
+        // const digitalGoodsService = await buildDigitalGoodsService();
+        // const consumeResult = await consumePurchaseToken(
+        //   digitalGoodsService,
+        //   purchaseToken,
+        //   dispatch,
+        //   title
+        // );
+        // if (!consumeResult) {
+        //   return;
+        // }
         const completeResult = await completeSuccessfulResponse(
           completeResponse,
           dispatch,
@@ -235,25 +234,28 @@ async function completeSuccessfulResponse(
   }
 }
 
-async function consumePurchaseToken(
-  digitalGoodsService: DigitalGoodsService,
-  purchaseToken: string,
-  dispatch: Dispatch<UnknownAction>,
-  title: string
-) {
-  try {
-    // Optional: consume the purchase, allowing the user to purchase
-    // the same item again.
-    await digitalGoodsService.consume(purchaseToken);
-    return true;
-  } catch (error: unknown) {
-    console.log(error);
-    dispatch(
-      setAndShowAlert({
-        message: `Consuming purchase token was not successful for "${title}" due to an error`,
-        alertType: AlertType.Error,
-      })
-    );
-    return false;
-  }
-}
+// Looks like this code is not applicable to subscriptions. It throws errors and the description also tells that it's designed for repurchasing, while for subscriptions we need to cancel them to repurchase
+// Leaving it here for now, but may be deleted later
+
+// async function consumePurchaseToken(
+//   digitalGoodsService: DigitalGoodsService,
+//   purchaseToken: string,
+//   dispatch: Dispatch<UnknownAction>,
+//   title: string
+// ) {
+//   try {
+//     // Optional: consume the purchase, allowing the user to purchase
+//     // the same item again.
+//     await digitalGoodsService.consume(purchaseToken);
+//     return true;
+//   } catch (error: unknown) {
+//     console.log(error);
+//     dispatch(
+//       setAndShowAlert({
+//         message: `Consuming purchase token was not successful for "${title}" due to an error`,
+//         alertType: AlertType.Error,
+//       })
+//     );
+//     return false;
+//   }
+// }
