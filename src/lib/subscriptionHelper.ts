@@ -19,6 +19,8 @@ export const getSubscriptionFromRequest = async (
     purchaseToken: string;
   }
 ): Promise<SubscriptionData | undefined> => {
+  // TODO: Does not work
+  console.log("body", req.body);
   // Extract parameters from the body instead of query
   const itemId = req.body[paramNames?.itemId ?? "itemId"];
   const purchaseToken = req.body[paramNames?.purchaseToken ?? "purchaseToken"];
