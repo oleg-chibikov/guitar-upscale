@@ -10,6 +10,7 @@ import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
+import { CancelReason } from "@/lib/billing";
 import { Tier, tierMap } from "@/lib/tier";
 import { Alert, LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
@@ -120,8 +121,8 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
               purchaseToken: correspondingPurchasedItem?.purchaseToken,
             } as PurchaseOption;
 
-            if (data && !data.cancellationReason) {
-              console.log("Purchased not cancelled item", result);
+            if (data && data.cancellationReason !== CancelReason.NONE) {
+              console.log("A purchased item which is not cancelled", result);
               // at any time there should be only one not cancelled subscription. if there are more - it means something is not working as expected
               purchasedNonCancelledOptionRef.current = result;
             }

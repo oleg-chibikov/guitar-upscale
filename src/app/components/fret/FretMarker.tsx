@@ -17,7 +17,7 @@ import {
   NoteToFretMarkerEventMap,
 } from "../../engine/eventBus";
 import { sleep } from "../../engine/sleep";
-import { useInputChecker } from "../../helpers/useInputChecker";
+import { useInputChecker } from "../../hooks/useInputChecker";
 import {
   baseNoteValue,
   chordIsBeingDetectedValue,
