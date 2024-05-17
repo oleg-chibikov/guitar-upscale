@@ -30,18 +30,7 @@ export const getMakePurchase = (
   hasDigitalGoodsService: boolean,
   dispatch: Dispatch<UnknownAction>
 ) => {
-  const makePurchase = async () => {
-    if (!hasDigitalGoodsService) {
-      return;
-    }
-
-    if (disabledMessage !== undefined) {
-      console.log(disabledMessage);
-      return;
-    }
-
-    const title = getTitle(purchaseOption);
-
+  const showGooglePlayPurchaseUiAndSubscribe = async () => {
     // Define the preferred payment method and item ID
     const paymentMethods: PaymentMethodData[] = [
       {
@@ -63,11 +52,46 @@ export const getMakePurchase = (
     };
 
     const request = new PaymentRequest(paymentMethods, paymentDetails);
+    let paymentResponse: PaymentResponse;
+    let purchaseToken: string;
+    try {
+      paymentResponse = await request.show();
+      purchaseToken = paymentResponse.details.purchaseToken;
+      return { completeResponse: paymentResponse.complete, purchaseToken };
+    } catch (e) {
+      // The purchase failed, and we can handle the failure here.
+      // AbortError usually means a user cancellation
+
+      console.log(e);
+      dispatch(
+        setAndShowAlert({
+          message: "Purchasing aborted",
+          alertType: AlertType.Warning,
+        })
+      );
+      return null;
+    }
+  };
+
+  const makePurchase = async () => {
+    if (!hasDigitalGoodsService) {
+      return;
+    }
+
+    if (disabledMessage !== undefined) {
+      console.log(disabledMessage);
+      return;
+    }
+
+    const title = getTitle(purchaseOption);
+
     setIsLoading(true);
     try {
-      const paymentResponse = await request.show();
-      const { purchaseToken } = paymentResponse.details;
-
+      const purchaseResult = await showGooglePlayPurchaseUiAndSubscribe();
+      if (!purchaseResult) {
+        return;
+      }
+      const { completeResponse, purchaseToken } = purchaseResult;
       const purchaseFunction = existingNotCancelledPurchaseOption?.purchaseToken // this should always be true, just to satisfy the compiler
         ? changePurchaseOnBackend(
             {
@@ -87,15 +111,26 @@ export const getMakePurchase = (
       const result = await purchaseFunction;
 
       if (result.status === ApiCallResult.Success) {
-        const digitalGoodsService = await buildDigitalGoodsService();
-        // Optional: consume the purchase, allowing the user to purchase
-        // the same item again.
-        await digitalGoodsService.consume(purchaseToken);
+        try {
+          const digitalGoodsService = await buildDigitalGoodsService();
+          // Optional: consume the purchase, allowing the user to purchase
+          // the same item again.
+          await digitalGoodsService.consume(purchaseToken);
 
-        // Optional: tell the PaymentRequest API the validation was
-        // successful. The user-agent may show a "payment successful"
-        // message to the user.
-        await paymentResponse.complete("success");
+          // Optional: tell the PaymentRequest API the validation was
+          // successful. The user-agent may show a "payment successful"
+          // message to the user.
+          await completeResponse("success");
+        } catch (error: unknown) {
+          console.log(error);
+          dispatch(
+            setAndShowAlert({
+              message: `Consuming purchase token or completing response failed for "${title}" due to the error`,
+              alertType: AlertType.Error,
+            })
+          );
+          return;
+        }
         const message = `Payment successful! Your level is "${title}"`;
         dispatch(
           setAndShowAlert({
@@ -111,7 +146,18 @@ export const getMakePurchase = (
           })
         );
       } else {
-        await paymentResponse.complete("fail");
+        try {
+          await completeResponse("fail");
+        } catch (error: unknown) {
+          console.log(error);
+          dispatch(
+            setAndShowAlert({
+              message: `Completing response failed for "${title}" due to the error`,
+              alertType: AlertType.Error,
+            })
+          );
+          return;
+        }
         dispatch(
           setAndShowAlert({
             message: `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`,
@@ -120,17 +166,6 @@ export const getMakePurchase = (
         );
         return;
       }
-    } catch (e) {
-      // The purchase failed, and we can handle the failure here.
-      // AbortError usually means a user cancellation
-
-      console.log(e);
-      dispatch(
-        setAndShowAlert({
-          message: "Purchasing aborted",
-          alertType: AlertType.Warning,
-        })
-      );
     } finally {
       setIsLoading(false);
     }
