@@ -107,7 +107,7 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
             size="small"
             onClick={makePurchase}
             variant="contained"
-            color="error"
+            color="primary"
             title="Change subscription"
           >
             {`Change subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
