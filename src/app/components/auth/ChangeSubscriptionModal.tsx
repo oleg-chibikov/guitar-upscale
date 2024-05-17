@@ -38,14 +38,25 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
     dispatch
   );
 
-  const purchaseData = purchaseOption.purchaseData;
-  const expirationDate = msToFormattedDate(purchaseData?.expirationDateMs);
-  const subscribedDate = msToFormattedDate(purchaseData?.subscribedDateMs);
-  const expirationDateText = expirationDate ? ` ${expirationDate}` : "";
-  const subscribedDateText = subscribedDate ? ` (${subscribedDate})` : "";
+  const existingSubscriptionPurchaseData =
+    existingNotCancelledPurchaseOption.purchaseData;
+  const existingSubscriptionExpirationDate = msToFormattedDate(
+    existingSubscriptionPurchaseData?.expirationDateMs
+  );
+  const existingSubscriptionSubscribedDate = msToFormattedDate(
+    existingSubscriptionPurchaseData?.subscribedDateMs
+  );
+  const existingSubscriptionExpirationDateText =
+    existingSubscriptionExpirationDate
+      ? ` ${existingSubscriptionExpirationDate}`
+      : "";
+  const existingSubscriptionSubscribedDateText =
+    existingSubscriptionSubscribedDate
+      ? ` (${existingSubscriptionSubscribedDate})`
+      : "";
 
   const changeAction = getChangeAction(existingNotCancelledPurchaseOption)!;
-  const cancellationMode =
+  const existingSubscriptionCancellationMode =
     existingNotCancelledPurchaseOption.purchaseData?.cancellationMode;
 
   const existingSubscriptionTitle = getTitle(
@@ -73,12 +84,12 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
           )}" subscription?`}</div>
 
           <Alert severity="info">
-            {cancellationMode === CancellationMode.Revoke
-              ? `Subscription was purchased recently${subscribedDateText}. It will be revoked immediately and refunded, the new subscription will take effect immediately`
-              : `Subscription was purchased a while ago${subscribedDateText}. It will be cancelled but not refunded. ${
+            {existingSubscriptionCancellationMode === CancellationMode.Revoke
+              ? `Subscription was purchased recently${existingSubscriptionSubscribedDateText}. It will be revoked immediately and refunded, the new subscription will take effect immediately`
+              : `Subscription was purchased a while ago${existingSubscriptionSubscribedDateText}. It will be cancelled but not refunded. ${
                   changeAction === "Upgrade"
                     ? " As the new subscription upgrades existing it will take effect immediately"
-                    : ` As the new subscription is a downgrade from existing - you'll own the existing one till its expiration date${expirationDateText}. Then the new subscription will take effect`
+                    : ` As the new subscription is a downgrade from existing - you'll own the existing one till its expiration date${existingSubscriptionExpirationDateText}. Then the new subscription will take effect`
                 }`}
           </Alert>
 
@@ -99,7 +110,7 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
             color="error"
             title="Change subscription"
           >
-            {`Change subscription from "${existingSubscriptionTitle}" to ${newSubscriptionTitle}`}
+            {`Change subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
           </Button>
         </section>
       </Slide>
