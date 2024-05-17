@@ -108,6 +108,9 @@ export const CancelSubscriptionModal: FC<
 
   return (
     <Modal
+      slotProps={{
+        backdrop: { style: { backgroundColor: "rgba(255,255,255,0.2)" } },
+      }}
       open={openModal}
       onClose={handleCloseModal}
       aria-labelledby="cancel-subscription-modal"

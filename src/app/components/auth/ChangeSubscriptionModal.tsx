@@ -66,6 +66,9 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
 
   return (
     <Modal
+      slotProps={{
+        backdrop: { style: { backgroundColor: "rgba(255,255,255,0.2)" } },
+      }}
       open={openModal}
       onClose={handleCloseModal}
       aria-labelledby="change-subscription-modal"
