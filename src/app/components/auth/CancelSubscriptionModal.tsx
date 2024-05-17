@@ -1,5 +1,5 @@
 import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { GuitarUpscaleSpecificPurchaseDetails } from "@/app/digitalGoodsBrowser";
@@ -32,7 +32,7 @@ export const CancelSubscriptionModal: FC<
 }) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const title = getTitle(purchaseOption);
 
   const cancelSubscription = async () => {

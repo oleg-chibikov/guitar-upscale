@@ -6,12 +6,12 @@ import { WithChildren } from "../helpers/withChildren";
 const DigitalGoodsServiceContext = createContext<boolean>(false);
 
 // Create a custom hook to access DigitalGoodsService
-export const useDigitalGoodsService = () => {
+export const useDigitalGoodsServiceInfo = () => {
   return useContext(DigitalGoodsServiceContext);
 };
 
 // Create a provider component to wrap your app with DigitalGoodsService
-export const DigitalGoodsServiceProvider: React.FC<WithChildren> = ({
+export const DigitalGoodsServiceInfoProvider: React.FC<WithChildren> = ({
   children,
 }) => {
   const [hasService, setHasService] = useState<boolean>(false);

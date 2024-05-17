@@ -10,3 +10,7 @@ export interface GuitarUpscaleSpecificDigitalGoodsProductDetails
   extends DigitalGoodsProductDetails {
   itemId: TierKey; // Override itemId with TierKey type
 }
+
+export interface GuitarUpscaleSpecificPurchaseDetails extends PurchaseDetails {
+  itemId: TierKey; // Override itemId with TierKey type
+}

@@ -7,7 +7,7 @@ import {
   acknowledgePurchaseOnBackend,
   logoutOnBackend,
 } from "../apiClient";
-import { useDigitalGoodsService } from "../context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "../context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "../data/alertType";
 import { GuitarUpscaleSpecificPurchaseDetails } from "../digitalGoodsBrowser";
 import { processWithReloads } from "../helpers/reloadHelper";
@@ -37,7 +37,7 @@ function sortByItemId(
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
   const { subscriptionTier } = useSelector(selectAuth);
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const isOnline = useOnlineStatus();
   // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
   // https://chromeos.dev/en/publish/play-billing-backend

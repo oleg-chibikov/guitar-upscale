@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
@@ -45,7 +45,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   const { data: session } = useSession();
   const { theme } = useSelector(selectUi);
   const { subscriptionTier } = useSelector(selectAuth);
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
 
   const renderCurrentFeature = (x: PremiumFeatureKeys) => {

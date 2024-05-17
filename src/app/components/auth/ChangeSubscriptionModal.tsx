@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { Theme } from "@/app/data/theme";
 import {
   GetMakePurchaseParams,
@@ -26,7 +26,7 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
   } = params;
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
 
   if (!existingNotCancelledPurchaseOption) {
     return null;

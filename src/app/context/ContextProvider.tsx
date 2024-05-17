@@ -7,7 +7,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { WithPremiumFeaturesWithSession } from "../helpers/WithPremiumFeatures";
 import { WithChildren } from "../helpers/withChildren";
 import { persistor, store } from "../store/store";
-import { DigitalGoodsServiceProvider } from "./DigitalGoodsServiceInfoProvider";
+import { DigitalGoodsServiceInfoProvider } from "./DigitalGoodsServiceInfoProvider";
 import { MuiThemeProvider } from "./MuiThemeProvider";
 import { PremiumFeaturesProvider } from "./PremiumFeaturesProvider";
 
@@ -22,13 +22,13 @@ export const ContextProvider: FC<PremiumFeaturesContextProviderProps> = ({
     <SessionProvider session={premiumFeatures.session}>
       <Provider store={store}>
         <MuiThemeProvider>
-          <DigitalGoodsServiceProvider>
+          <DigitalGoodsServiceInfoProvider>
             <PremiumFeaturesProvider premiumFeatures={premiumFeatures}>
               <PersistGate loading={null} persistor={persistor}>
                 {children}
               </PersistGate>
             </PremiumFeaturesProvider>
-          </DigitalGoodsServiceProvider>
+          </DigitalGoodsServiceInfoProvider>
         </MuiThemeProvider>
       </Provider>
     </SessionProvider>

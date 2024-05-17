@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { setIsSignedIn } from "@/app/store/authSlice";
 import { Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -19,7 +19,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const isSignedIn = session?.user?.image && session?.user?.name;
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [userWantsToSignInWithPatreon, setUserWantsToSignInWithPatreon] =
     useState<boolean>(!hasDigitalGoodsService);
   useEffect(() => {

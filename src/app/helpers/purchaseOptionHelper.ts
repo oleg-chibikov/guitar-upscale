@@ -1,12 +1,12 @@
 import { CancelReason } from "@/lib/billing";
-import { TierKey } from "@/lib/tier";
 import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
+import { GuitarUpscaleSpecificDigitalGoodsProductDetails } from "../digitalGoodsBrowser";
 
 export const getTitle = (purchaseOption: DigitalGoodsProductDetails) =>
   purchaseOption.title.substring(0, purchaseOption.title.indexOf(" ("));
 
 export const getBillingPeriod = (
-  purchaseOption: DigitalGoodsProductDetails
+  purchaseOption: GuitarUpscaleSpecificDigitalGoodsProductDetails
 ) => {
   switch (purchaseOption.subscriptionPeriod) {
     case "P1W":
@@ -39,7 +39,6 @@ export const getChangeAction = (
 ) =>
   !existingNotCancelledPurchaseOption
     ? undefined
-    : (existingNotCancelledPurchaseOption.itemId as TierKey) ===
-      "guitar_upscale.composer"
+    : existingNotCancelledPurchaseOption.itemId === "guitar_upscale.composer"
     ? "Downgrade"
     : "Upgrade";

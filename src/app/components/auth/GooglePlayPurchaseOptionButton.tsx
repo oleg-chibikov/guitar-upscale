@@ -1,4 +1,4 @@
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { Theme } from "@/app/data/theme";
 import {
   GetMakePurchaseParams,
@@ -41,7 +41,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     existingNotCancelledPurchaseOption,
   } = params;
 
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const dispatch = useDispatch();
   const makePurchase = existingNotCancelledPurchaseOption
     ? () =>

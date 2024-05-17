@@ -1,5 +1,5 @@
 import { ApiCallResult, getPurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "@/app/data/alertType";
 import {
   GuitarUpscaleSpecificDigitalGoodsProductDetails,
@@ -38,7 +38,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
   const dispatch = useDispatch();
   const [selectedOption, setSelectedOption] = useState<PurchaseOption>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const hasDigitalGoodsService = useDigitalGoodsService();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [purchaseOptions, setPurchaseOptions] = useState<PurchaseOption[]>([]);
   const [cancelSubscriptionModalOpen, setCancelSubscriptionModalOpen] =
     useState<boolean>(false);
