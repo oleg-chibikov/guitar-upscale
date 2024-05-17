@@ -1,5 +1,5 @@
 import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
-import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { GuitarUpscaleSpecificPurchaseDetails } from "@/app/digitalGoodsBrowser";

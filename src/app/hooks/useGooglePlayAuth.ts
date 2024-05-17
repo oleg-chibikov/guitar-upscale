@@ -7,7 +7,7 @@ import {
   acknowledgePurchaseOnBackend,
   logoutOnBackend,
 } from "../apiClient";
-import { useDigitalGoodsService } from "../context/DigitalGoodsServiceProvider";
+import { useDigitalGoodsService } from "../context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "../data/alertType";
 import { GuitarUpscaleSpecificPurchaseDetails } from "../digitalGoodsBrowser";
 import { processWithReloads } from "../helpers/reloadHelper";
