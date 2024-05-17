@@ -1,3 +1,4 @@
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
@@ -5,7 +6,6 @@ import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import { ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { CloseIcon } from "../CloseIcon";
 import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";

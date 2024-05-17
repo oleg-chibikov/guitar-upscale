@@ -1,14 +1,14 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { Skin } from "@/app/data/skin";
+import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
+import { getAssetsForSkin } from "@/app/helpers/skinHelper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { FRET_COUNT } from "../../engine/generateNeckRepresentation";
-import { getAssetsForSkin } from "../../helpers/skinHelper";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 

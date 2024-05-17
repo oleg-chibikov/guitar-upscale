@@ -1,8 +1,8 @@
+import { Note, getNoteText } from "@/app/data/notes";
 import { getShiftedNote } from "@/app/data/tunings";
+import { selectSettings, setBaseNote } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Note, getNoteText } from "../../../data/notes";
-import { selectSettings, setBaseNote } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const BaseNoteSelector: React.FC = () => {

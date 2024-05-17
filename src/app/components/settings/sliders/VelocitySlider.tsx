@@ -1,9 +1,9 @@
 import { MAX_VELOCITY, Note } from "@/app/data/notes";
 import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
+import { selectSettings, setVelocity } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSettings, setVelocity } from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const VelocitySlider: React.FC = () => {

@@ -1,9 +1,9 @@
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
-import { ChordsDisplayMode } from "../../data/chordsDisplayMode";
 import { ButtonContainer } from "./buttons/ButtonContainer";
 import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 

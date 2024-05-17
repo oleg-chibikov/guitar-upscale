@@ -3,20 +3,20 @@ import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
+import { SHARP_NOTE_COUNT, getNoteText } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
+import {
+  ChordMode,
+  NoteChordMode,
+  getModeText,
+} from "@/app/engine/chordsGenerator";
 import { trailingDebounce } from "@/app/helpers/debounce";
+import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SHARP_NOTE_COUNT, getNoteText } from "../../data/notes";
-import {
-  ChordMode,
-  NoteChordMode,
-  getModeText,
-} from "../../engine/chordsGenerator";
-import { selectSettings } from "../../store/settingsSlice";
 import { ChordButton } from "./ChordButton";
 
 const AUTH_PANEL_RESERVED_HEIGHT = 110;

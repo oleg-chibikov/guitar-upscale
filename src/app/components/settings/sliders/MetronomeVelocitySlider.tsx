@@ -1,10 +1,10 @@
 import { MAX_VELOCITY } from "@/app/data/notes";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   selectSettings,
   setMetronomeVelocity,
-} from "../../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
 
 export const MetronomeVelocitySlider: React.FC = () => {

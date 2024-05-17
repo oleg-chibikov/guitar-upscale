@@ -1,9 +1,9 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   selectSettings,
   setChordStrummingDelayMs,
-} from "../../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { StepSlider } from "./StepSlider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {

@@ -1,12 +1,12 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   isMetronomeActiveValue,
   metronomeVelocityValue,
   selectSettings,
   setIsMetronomeActive,
-} from "../../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "./IconButton";
 
 function MdiMetronome() {

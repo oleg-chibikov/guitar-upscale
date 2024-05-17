@@ -1,7 +1,7 @@
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
+import { selectSettings, setChordPlayMode } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ChordPlayMode } from "../../../data/chordPlayMode";
-import { selectSettings, setChordPlayMode } from "../../../store/settingsSlice";
 import { EnumSelector } from "./EnumSelector";
 
 export const ChordPlayModeSelector: React.FC = () => {

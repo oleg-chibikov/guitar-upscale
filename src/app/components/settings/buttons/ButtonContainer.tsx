@@ -1,9 +1,9 @@
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
 import { FullscreenButton } from "./FullscreenButton";
 import { MetronomeButton } from "./MetronomeButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";

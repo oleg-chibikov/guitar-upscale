@@ -1,11 +1,11 @@
 "use client";
 import { UsePlayParams, usePlay } from "@/app/hooks/usePlay";
+import { chordsMap, selectSettings } from "@/app/store/settingsSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React from "react";
 import { useSelector } from "react-redux";
-import { chordsMap, selectSettings } from "../../../store/settingsSlice";
 import { IconButton } from "./IconButton";
 
 type PlayButtonProps = UsePlayParams;

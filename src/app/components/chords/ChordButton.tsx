@@ -1,10 +1,5 @@
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { Theme } from "@/app/data/theme";
-import { useInputChecker } from "@/app/helpers/useInputChecker";
-import { useStrumming } from "@/app/hooks/useStrumming";
-import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { ChordPlayMode } from "../../data/chordPlayMode";
 import {
   ChordPlayParameters,
   playAllVariations,
@@ -12,18 +7,23 @@ import {
   playFirstChordVariation,
   playRandomChordVariation,
   playRoundRobin,
-} from "../../engine/chordPlayer";
-import { NoteChordMode } from "../../engine/chordsGenerator";
+} from "@/app/engine/chordPlayer";
+import { NoteChordMode } from "@/app/engine/chordsGenerator";
 import {
   ChordMetadata,
   ChordToChordButtonEventMap,
-} from "../../engine/eventBus";
+} from "@/app/engine/eventBus";
+import { useInputChecker } from "@/app/hooks/useInputChecker";
+import { useStrumming } from "@/app/hooks/useStrumming";
 import {
   chordIsBeingDetectedValue,
   chordNotesToPlayValue,
   chordPlayModeValue,
   chordStrummingDelayMsValue,
-} from "../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface ChordButtonProps {
   chordName: string;

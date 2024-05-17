@@ -1,4 +1,4 @@
-import { MAX_VELOCITY, Note, OctaveNote } from "../../data/notes";
+import { MAX_VELOCITY, Note, OctaveNote } from "@/app/data/notes";
 import { loadInstrument, playSound } from "./soundHelper";
 
 export const loadMetronome = async () => {

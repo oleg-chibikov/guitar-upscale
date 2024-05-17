@@ -1,6 +1,6 @@
+import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSettings, setTempoBpm } from "../../../store/settingsSlice";
 import { StepSlider } from "./StepSlider";
 
 const generateStepsArray = () => {

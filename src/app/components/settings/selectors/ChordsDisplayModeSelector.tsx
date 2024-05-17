@@ -1,7 +1,7 @@
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { selectUi, setChordsDisplayMode } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ChordsDisplayMode } from "../../../data/chordsDisplayMode";
 import { EnumSelector } from "./EnumSelector";
 
 export const ChordsDisplayModeSelector: React.FC = () => {

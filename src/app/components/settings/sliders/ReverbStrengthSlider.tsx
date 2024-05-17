@@ -1,11 +1,8 @@
 "use client";
 
+import { selectSettings, setReverbStrength } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectSettings,
-  setReverbStrength,
-} from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const ReverbStrengthSlider: React.FC = () => {

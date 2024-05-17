@@ -1,10 +1,10 @@
 import { ChordStrummingInterval } from "@/app/data/chordStrummingInterval";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   selectSettings,
   setChordStrummingInterval,
-} from "../../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
 
 export const ChordStrummingIntervalSelector: React.FC = () => {

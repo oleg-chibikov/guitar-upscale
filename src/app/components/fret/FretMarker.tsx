@@ -1,29 +1,29 @@
 import { AlertType } from "@/app/data/alertType";
-import { Theme } from "@/app/data/theme";
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { NoteDisplayMode } from "../../data/noteDisplayMode";
+import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import {
   StringOctaveNote,
   getNoteText,
   serializeStringOctaveNote,
-} from "../../data/notes";
+} from "@/app/data/notes";
+import { Theme } from "@/app/data/theme";
 import {
   ClearNoteMetadata,
   NoteMetadata,
   NotePlayEventBus,
   NoteToFretMarkerEventMap,
-} from "../../engine/eventBus";
-import { sleep } from "../../engine/sleep";
-import { useInputChecker } from "../../hooks/useInputChecker";
+} from "@/app/engine/eventBus";
+import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+import { sleep } from "@/app/engine/sleep";
+import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
   baseNoteValue,
   chordIsBeingDetectedValue,
   chordStrummingDelayMsValue,
   selectSettings,
-} from "../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 

@@ -1,10 +1,10 @@
 "use client";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   selectSettings,
   setToggleMetronomeWhenRecording,
-} from "../../../store/settingsSlice";
+} from "@/app/store/settingsSlice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { CheckBox } from "./CheckBox";
 
 export const ToggleMetronomeWhenRecordingCheckbox: React.FC = (props) => {

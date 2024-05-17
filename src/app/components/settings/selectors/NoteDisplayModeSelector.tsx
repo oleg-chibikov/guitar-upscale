@@ -1,7 +1,7 @@
+import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import { selectUi, setNoteDisplayMode } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NoteDisplayMode } from "../../../data/noteDisplayMode";
 import { EnumSelector } from "./EnumSelector";
 
 export const NoteDisplayModeSelector: React.FC = () => {

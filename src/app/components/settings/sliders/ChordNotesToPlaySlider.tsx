@@ -1,9 +1,6 @@
+import { selectSettings, setChordNotesToPlay } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectSettings,
-  setChordNotesToPlay,
-} from "../../../store/settingsSlice";
 import { Slider } from "./Slider";
 
 export const ChordNotesToPlaySlider: React.FC = () => {

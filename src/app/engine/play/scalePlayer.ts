@@ -1,5 +1,5 @@
-import { Chord, OctaveNote, serializeOctaveNote } from "../../data/notes";
-import { isPlayingValue } from "../../store/settingsSlice";
+import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
+import { isPlayingValue } from "@/app/store/settingsSlice";
 import { NotePlayEventBus } from "../eventBus";
 import { Neck } from "../generateNeckRepresentation";
 
