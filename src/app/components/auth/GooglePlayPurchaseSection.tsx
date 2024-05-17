@@ -123,7 +123,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
 
             if (
               purchaseData &&
-              purchaseData.cancellationReason !== CancelReason.NONE
+              purchaseData.cancellationReason === CancelReason.NONE
             ) {
               console.log("A purchased item which is not cancelled", result);
               // at any time there should be only one not cancelled subscription. if there are more - it means something is not working as expected
