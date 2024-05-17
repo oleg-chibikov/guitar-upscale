@@ -57,7 +57,7 @@ export const useSessionAuth = () => {
       );
     };
 
-    checkSession();
+    void checkSession();
     //Dependencies should be empty to avoid endless reload - checking the session after redirect callback from Patreon - it doesn't refresh automatically
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

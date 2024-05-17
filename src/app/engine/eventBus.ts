@@ -85,7 +85,7 @@ const play = async ({
 };
 
 NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
-  play(noteMetadata);
+  void play(noteMetadata);
   //console.log("EventBus: Note play requested", noteMetadata.stringOctaveNote);
   const serialized = serializeStringOctaveNote(noteMetadata.stringOctaveNote);
   const animateAction = NoteToFretMarkerEventMap.get(serialized);

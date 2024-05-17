@@ -1,3 +1,5 @@
+import { UnknownAction } from "@reduxjs/toolkit";
+import { Dispatch } from "react";
 import { setLoadingMessage } from "../store/uiSlice";
 
 export function getReloadCount(key: string) {
@@ -16,7 +18,7 @@ export function clearReloadCount(key: string) {
 export async function incrementAndReload(
   key: string,
   currentValue: number,
-  dispatch: (param: any) => void,
+  dispatch: Dispatch<UnknownAction>,
   reloadMessage?: string
 ) {
   console.log("Waiting to reload for the key", key);
@@ -27,9 +29,9 @@ export async function incrementAndReload(
   localStorage.setItem(key, (currentValue + 1).toString());
 
   // Unregistering service worker in order to avoid the necessity of double refresh
-  navigator.serviceWorker.getRegistration().then(function (reg) {
+  await navigator.serviceWorker.getRegistration().then(async (reg) => {
     if (reg) {
-      reg.unregister().then(function () {
+      await reg.unregister().then(function () {
         // window.location.href = window.location.href - force reload
         window.location.reload();
       });
@@ -40,7 +42,7 @@ export async function incrementAndReload(
 }
 
 export const processWithReloads = async (
-  dispatch: (param: any) => void,
+  dispatch: Dispatch<UnknownAction>,
   key: string,
   isMismatch: () => boolean,
   onMismatchWithinLimit: () => Promise<{

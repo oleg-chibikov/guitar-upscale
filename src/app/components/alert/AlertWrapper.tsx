@@ -6,9 +6,7 @@ import { useSelector } from "react-redux";
 // only load chords module when expanded
 const Alert = dynamic(async () => (await import("./Alert")).Alert);
 
-interface AlertWrapperProps {}
-
-export const AlertWrapper: FC<AlertWrapperProps> = ({}) => {
+export const AlertWrapper: FC = () => {
   const [opened, setOpened] = useState(false);
   const { showAlert } = useSelector(selectUi);
   useEffect(() => {

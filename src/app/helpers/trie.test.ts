@@ -65,7 +65,7 @@ describe("TrieTest", () => {
     trie.add("bear");
     trie.add("core");
     trie.remove("core");
-    let expected = new Set<string>(["cape", "cat", "bear"]);
+    const expected = new Set<string>(["cape", "cat", "bear"]);
     expect(getAll(trie)).toEqual(expected);
 
     trie.remove("cat");

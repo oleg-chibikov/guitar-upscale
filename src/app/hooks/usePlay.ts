@@ -96,7 +96,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         console.log(
           `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
         );
-        for (var i = 0; i < halfBeatsToWait; i++) {
+        for (let i = 0; i < halfBeatsToWait; i++) {
           await waitForNextHalfBeat();
         }
       } else {
@@ -147,10 +147,10 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
   }, [neck, dispatch]);
 
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
+    const handleKeyPress = async (event: KeyboardEvent) => {
       if (event.code === "Space") {
         // Call your function here
-        handlePlay();
+        await handlePlay();
       }
     };
 

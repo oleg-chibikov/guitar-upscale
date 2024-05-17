@@ -26,7 +26,7 @@ type StrummingData = {
   gracePeriodPromiseAndResolve?: PromiseAndResolve;
 };
 
-export let strummingChordsMap = new Map<string, StrummingData>();
+export const strummingChordsMap = new Map<string, StrummingData>();
 
 const createStrummingPromise = (): PromiseAndResolve => {
   let resolve: ((value: void | PromiseLike<void>) => void) | undefined;

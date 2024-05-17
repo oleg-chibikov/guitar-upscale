@@ -1,11 +1,12 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote, getNoteText } from "@/app/data/notes";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { Soundfont, SplendidGrandPiano } from "smplr";
 
 export const playSound = (
   note: OctaveNote,
   velocity: number,
-  soundfont: any,
+  soundfont: Soundfont,
   durationMs: number
 ) => {
   return soundfont.start({
@@ -15,7 +16,7 @@ export const playSound = (
   });
 };
 
-const soundfountMap = new Map<string, any>();
+const soundfountMap = new Map<string, Soundfont | SplendidGrandPiano>();
 
 export const loadInstrument = async (
   instrument: Instrument,

@@ -60,7 +60,7 @@ export const Slider: React.FC<SliderProps> = ({
             onValueChange && onValueChange(parseInt(event.target.value))
           }
           style={{
-            appearance: isVertical ? ("slider-vertical" as any) : undefined,
+            appearance: isVertical ? ("slider-vertical" as never) : undefined,
             width: isVertical ? "5px" : "100%",
             height: isVertical ? "100%" : "5px",
           }}

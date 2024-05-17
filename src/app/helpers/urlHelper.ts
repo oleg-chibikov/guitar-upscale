@@ -5,7 +5,7 @@ export const reloadPageWithQueryParam = (
 ) => {
   console.log("Reloading page");
   // Get the current URL
-  let currentUrl = new URL(window.location.href);
+  const currentUrl = new URL(window.location.href);
 
   // Set or update the query string parameter
   currentUrl.searchParams.set(paramName, paramValue);
@@ -17,10 +17,10 @@ export const reloadPageWithQueryParam = (
 // Function to check if a query string parameter exists
 export const hasQueryParam = (paramName: string) => {
   // Get the current URL
-  let currentUrl = new URL(window.location.href);
+  const currentUrl = new URL(window.location.href);
 
   // Get the search parameters
-  let params = currentUrl.searchParams;
+  const params = currentUrl.searchParams;
 
   // Check if the parameter exists
   return params.has(paramName);

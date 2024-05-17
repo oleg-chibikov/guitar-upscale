@@ -98,7 +98,7 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
             onClick={handleCloseModal}
             variant="contained"
             color="secondary"
-            title="Don't change"
+            title={`Don't ${changeAction.toLocaleLowerCase()} subscription`}
           >
             {`No, I'd prefer to keep my existing subscription "${existingSubscriptionTitle}"`}
           </Button>
@@ -108,9 +108,9 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
             onClick={makePurchase}
             variant="contained"
             color="primary"
-            title="Change subscription"
+            title={`${changeAction} subscription`}
           >
-            {`Change subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
+            {`${changeAction} subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
           </Button>
         </section>
       </Slide>

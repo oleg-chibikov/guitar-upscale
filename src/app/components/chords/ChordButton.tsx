@@ -117,15 +117,15 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     <ul
       onTouchStart={
         hasTouchInput
-          ? () => {
-              onChordPress();
+          ? async () => {
+              await onChordPress();
             }
           : undefined
       }
       onMouseDown={
         !hasTouchInput
-          ? () => {
-              onChordPress();
+          ? async () => {
+              await onChordPress();
             }
           : undefined
       }

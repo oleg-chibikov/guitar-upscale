@@ -31,7 +31,7 @@ export function EnumSelector<
       options={options}
       value={selectedValue.toString()}
       onChange={(value: string | number) =>
-        onValueChange(parseInt(value as string) as any)
+        onValueChange(parseInt(value as string) as T[keyof T])
       }
     />
   );

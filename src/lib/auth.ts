@@ -25,13 +25,15 @@ export const getAuthConfig = () => {
   // to `NextAuth` in `app/api/auth/[...nextauth]/route.ts`
   return {
     callbacks: {
-      async session({ session, token, user }) {
+      async session({ session, token }) {
         //console.log("session", user, token);
-        (session as any).user.id = token.id;
-        (session as any).accessToken = token.accessToken;
+        if (session.user) {
+          (session.user as { id: unknown }).id = token.id;
+          session.accessToken = token.accessToken;
+        }
         return session;
       },
-      async jwt({ token, user, account, profile, isNewUser }) {
+      async jwt({ token, user, account }) {
         //console.log("jwt", user, account, profile);
         if (user) {
           token.id = user.id;

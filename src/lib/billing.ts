@@ -150,8 +150,8 @@ export class Purchase {
    * @param {string} productId
    * @return {Purchase}
    */
-  static fromApiResponse(
-    apiResponse: any,
+  static fromApiResponse<T>(
+    apiResponse: T,
     purchaseToken: string,
     productId: string
   ): Purchase {
@@ -298,8 +298,8 @@ export class SubscriptionPurchase extends Purchase {
    * @param {string} purchaseToken
    * @return {SubscriptionPurchase}
    */
-  static fromApiResponse(
-    apiResponse: any,
+  static fromApiResponse<T>(
+    apiResponse: T,
     purchaseToken: string
   ): SubscriptionPurchase {
     const subPurchase = new SubscriptionPurchase();

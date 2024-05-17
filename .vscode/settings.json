@@ -24,15 +24,15 @@
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\hooks\\",
-      "color": "foldercolorizer.SkyBlue"
+      "color": "foldercolorizer.MistyRose"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\helpers\\",
-      "color": "foldercolorizer.Lavender"
+      "color": "foldercolorizer.CadetBlue"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\engine\\",
-      "color": "foldercolorizer.firebrick"
+      "color": "foldercolorizer.Bronze"
     },
     {
       "folderPath": "guitar-upscale\\src\\app\\data\\",
@@ -45,6 +45,9 @@
     {
       "folderPath": "guitar-upscale\\src\\app\\components\\",
       "color": "foldercolorizer.Moccasin"
+    },
+    {
+      "folderPath": "guitar-upscale\\tsconfig.json\\"
     }
   ]
 }

@@ -15,7 +15,7 @@ export const useExamples = () => {
       }
     };
 
-    updateExampleFeature();
+    void updateExampleFeature();
   }, [premiumFeatures]);
 
   return examplesMap;

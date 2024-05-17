@@ -2,10 +2,15 @@ import { PurchaseResponseData, ResponseData } from "@/lib/apiTypes";
 import { PurchaseParams } from "@/lib/purchaseParams";
 import { HttpStatusCode } from "axios";
 
-export type Response<T> = {
-  status: ApiCallResult;
-  data?: T;
-};
+export type Response<T> =
+  | {
+      status: ApiCallResult.Success;
+      data?: T;
+    }
+  | {
+      status: ApiCallResult.SkipProcessing | ApiCallResult.Error;
+      data?: unknown;
+    };
 
 export enum ApiCallResult {
   Success,
@@ -39,7 +44,7 @@ async function callApi<T>(
 
     console.log(`Successfully called ${endpoint}`, responseData);
     return { status: ApiCallResult.Success, data: responseData };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Exception happened while calling ${endpoint}`, error);
     return { status: ApiCallResult.Error, data: error };
   }

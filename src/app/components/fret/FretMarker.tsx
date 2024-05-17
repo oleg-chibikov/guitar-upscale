@@ -150,9 +150,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     switch (noteDisplayMode) {
       case NoteDisplayMode.Note:
         return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
-      case NoteDisplayMode.Note_Shift:
+      case NoteDisplayMode.Note_Shift: {
         const result = (stringOctaveNote.note - baseNoteValue) % NOTE_COUNT;
         return result >= 0 ? result : result + NOTE_COUNT;
+      }
       default:
         return fret;
     }
@@ -198,9 +199,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         await handlePress();
       }
     },
-    onMouseDown: () => {
+    onMouseDown: async () => {
       if (stringOctaveNote && !hasTouchInput) {
-        handlePress();
+        await handlePress();
       }
     },
   };

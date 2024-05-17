@@ -68,23 +68,21 @@ export const getMakePurchase = (
       const paymentResponse = await request.show();
       const { purchaseToken } = paymentResponse.details;
 
-      const purchaseFunction =
-        existingNotCancelledPurchaseOption &&
-        existingNotCancelledPurchaseOption.purchaseToken // this should always be true, just to satisfy compiler
-          ? changePurchaseOnBackend(
-              {
-                itemId: purchaseOption.itemId,
-                purchaseToken,
-              },
-              {
-                itemId: existingNotCancelledPurchaseOption.itemId,
-                purchaseToken: existingNotCancelledPurchaseOption.purchaseToken,
-              }
-            )
-          : acknowledgePurchaseOnBackend({
+      const purchaseFunction = existingNotCancelledPurchaseOption?.purchaseToken // this should always be true, just to satisfy the compiler
+        ? changePurchaseOnBackend(
+            {
               itemId: purchaseOption.itemId,
               purchaseToken,
-            });
+            },
+            {
+              itemId: existingNotCancelledPurchaseOption.itemId,
+              purchaseToken: existingNotCancelledPurchaseOption.purchaseToken,
+            }
+          )
+        : acknowledgePurchaseOnBackend({
+            itemId: purchaseOption.itemId,
+            purchaseToken,
+          });
 
       const result = await purchaseFunction;
 
@@ -92,7 +90,7 @@ export const getMakePurchase = (
         const digitalGoodsService = await buildDigitalGoodsService();
         // Optional: consume the purchase, allowing the user to purchase
         // the same item again.
-        digitalGoodsService.consume(purchaseToken);
+        await digitalGoodsService.consume(purchaseToken);
 
         // Optional: tell the PaymentRequest API the validation was
         // successful. The user-agent may show a "payment successful"

@@ -1,12 +1,13 @@
-type Func<T extends any[], R> = (...args: T) => R;
+type Func<T extends [], R> = (...args: T) => R;
 
-export function trailingDebounce<T extends any[], R>(
+export function trailingDebounce<T extends [], R>(
   func: Func<T, R>,
   delay: number
 ): (...args: T) => void {
   let timeoutId: ReturnType<typeof setTimeout>;
 
-  return function (this: any, ...args: T) {
+  return function (this: unknown, ...args: T) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this;
 
     clearTimeout(timeoutId);

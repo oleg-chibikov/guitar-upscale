@@ -9,9 +9,7 @@ import { SeamlessChordSwitchingCheckbox } from "./checkboxes/SeamlessChordSwitch
 import { ChordStrummingIntervalSelector } from "./selectors/ChordStrummingIntervalSelector";
 import { StrummingPatternSelector } from "./selectors/StrummingPatternSelector";
 
-interface StrummingSettingsProps {}
-
-export const StrummingSettings: FC<StrummingSettingsProps> = ({}) => {
+export const StrummingSettings: FC = () => {
   const dispatch = useDispatch();
   const { theme, strummingSettingsExpanded } = useSelector(selectUi);
 

@@ -35,7 +35,7 @@ export const Initializer: React.FC = () => {
       const eruda = (await import("eruda")).default;
       eruda.init();
     };
-    loadErudaDevTools();
+    void loadErudaDevTools();
   }, []);
 
   useEffect(() => {
@@ -110,11 +110,13 @@ export const Initializer: React.FC = () => {
     // prevent the Google translate bottom popup from appearing on mobile screen
     document.addEventListener(
       "click",
-      function (event: any) {
+      function (event: MouseEvent) {
+        const elementTarget = event.target as Element;
         if (
-          event.target.nodeName === "UL" ||
-          event.target.nodeName === "LI" ||
-          event.target.nodeName === "SPAN"
+          elementTarget &&
+          (elementTarget.nodeName === "UL" ||
+            elementTarget.nodeName === "LI" ||
+            elementTarget.nodeName === "SPAN")
         ) {
           event.preventDefault();
         }
@@ -123,7 +125,7 @@ export const Initializer: React.FC = () => {
     );
 
     if (typeof navigator.serviceWorker !== "undefined") {
-      navigator.serviceWorker.register("/sw.js");
+      void navigator.serviceWorker.register("/sw.js");
     }
   }, []);
   return null;

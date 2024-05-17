@@ -44,8 +44,8 @@ export const useGooglePlayAuth = () => {
   // https://medium.com/androiddevelopers/implementing-linkedpurchasetoken-correctly-to-prevent-duplicate-subscriptions-82dfbf7167da
   // https://developer.android.com/google/play/billing/lifecycle/subscriptions#upgrades-downgrades
 
-  useInterval(() => {
-    checkPermissionsMismatch();
+  useInterval(async () => {
+    void checkPermissionsMismatch();
   }, ONE_MINUTE);
 
   const dispatch = useDispatch();
@@ -147,7 +147,7 @@ export const useGooglePlayAuth = () => {
   };
 
   useEffect(() => {
-    checkPermissionsMismatch();
+    void checkPermissionsMismatch();
     //Dependencies should be empty to avoid endless reload
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnline]);

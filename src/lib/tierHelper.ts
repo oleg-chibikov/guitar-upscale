@@ -1,6 +1,7 @@
 import { getCookie } from "cookies-next";
 import { cookies } from "next/headers";
 import {
+  PremiumFeaturesWithSession,
   composerPremiumFeatures,
   explorerPremiumFeatures,
 } from "./premiumFeatures";
@@ -67,11 +68,11 @@ const getTierFromPatreonApi = async (accessToken: string) => {
     console.log("Patreon API result", responseData);
 
     const includedTiers = responseData.included?.filter(
-      (item: any) =>
+      (item: { type: "tier" | unknown; id: string }) =>
         item.type === "tier" && orderedTargetTierIds.includes(item.id)
     );
 
-    includedTiers?.forEach((tier: any) => {
+    includedTiers?.forEach((tier: { attributes: { title: Tier } }) => {
       tierName = tier.attributes.title; // overwrite with higher priority if has several
     });
 
@@ -127,7 +128,10 @@ export async function getTierName(
   return undefined;
 }
 
-export const applyTierToResult = (result: any, subscriptionTier?: TierInfo) => {
+export const applyTierToResult = (
+  result: PremiumFeaturesWithSession,
+  subscriptionTier?: TierInfo
+) => {
   if (!subscriptionTier) {
     return result;
   }

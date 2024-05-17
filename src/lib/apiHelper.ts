@@ -8,7 +8,7 @@ import { ValidationError } from "yup";
 interface ErrorResponse {
   error: {
     message: string;
-    err?: any; // Sent for unhandled errors reulting in 500
+    err?: unknown; // Sent for unhandled errors reulting in 500
   };
   status?: number; // Sent for unhandled errors reulting in 500
 }

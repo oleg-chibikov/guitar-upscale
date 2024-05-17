@@ -26,34 +26,6 @@ const setupClient = async () => {
 };
 
 /**
- *  Acknowledge an in-app item purchase with Play Developer API.
- *
- * @param {params} PurchaseParams
- * @return {(Promise<boolean>)} whether the acknowledgement of the in-app purchase was successful
- */
-// export async function acknowledgeInAppPurchase(
-//   params: PurchaseParams
-// ): Promise<boolean> {
-//   try {
-//     const playApi = await setupClient();
-//     const apiResponse = (
-//       await playApi.purchases.products.acknowledge({
-//         packageName: process.env.ANDROID_PACKAGE_ID,
-//         productId: params.itemId,
-//         token: params.purchaseToken,
-//       })
-//     )?.data;
-//     if (JSON.stringify(apiResponse) === `""`) {
-//       return true;
-//     }
-//     return false;
-//   } catch (error) {
-//     console.error(`Error acknowledging in-app purchase : ${error}`);
-//     throw error;
-//   }
-// }
-
-/**
  * Acknowledge a subscription purchase with Play Developer API.
  * @param {params} PurchaseParams
  * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
@@ -81,37 +53,6 @@ export async function acknowledgeSubscriptionPurchase(
     throw error;
   }
 }
-
-/**
- *  Fetch a purchase from the Play Developer API and validate that it has not been consumed already.
- *
- * @param {params} PurchaseParams
- */
-// export async function fetchPurchase(
-//   params: PurchaseParams
-// ): Promise<billing.Purchase | null> {
-//   try {
-//     const playApi = await setupClient();
-//     const apiResponse = (
-//       await playApi.purchases.products.get({
-//         packageName: process.env.ANDROID_PACKAGE_ID,
-//         productId: params.itemId,
-//         token: params.purchaseToken,
-//       })
-//     )?.data;
-//     console.log(
-//       `PlayAPI Response : ${JSON.stringify(apiResponse, undefined, 2)}`
-//     );
-//     return billing.Purchase.fromApiResponse(
-//       apiResponse,
-//       params.purchaseToken,
-//       params.itemId
-//     );
-//   } catch (error) {
-//     console.error(`Error fetching purchase info : ${error}`);
-//     throw error;
-//   }
-// }
 
 /**
  * Fetch full subscription purchase details from Play Developer API.
@@ -150,7 +91,7 @@ export async function fetchSubscriptionPurchase(
  */
 export async function cancelSubscription(
   params: PurchaseParams
-): Promise<billing.SubscriptionPurchase | null> {
+): Promise<void> {
   console.log("Cancelling subscription", params);
   try {
     const playApi = await setupClient();
@@ -162,10 +103,6 @@ export async function cancelSubscription(
       })
     )?.data;
     console.log("Cancelled subscription", apiResponse);
-    return billing.SubscriptionPurchase.fromApiResponse(
-      apiResponse,
-      params.purchaseToken
-    );
   } catch (error) {
     console.error("Error cancelling subscription", error);
     throw error;
@@ -178,7 +115,7 @@ export async function cancelSubscription(
  */
 export async function revokeSubscription(
   params: PurchaseParams
-): Promise<billing.SubscriptionPurchase | null> {
+): Promise<void> {
   console.log("Revoking subscription", params);
   try {
     const playApi = await setupClient();
@@ -190,10 +127,6 @@ export async function revokeSubscription(
       })
     )?.data;
     console.log("Revoked subscription", apiResponse);
-    return billing.SubscriptionPurchase.fromApiResponse(
-      apiResponse,
-      params.purchaseToken
-    );
   } catch (error) {
     console.error("Error revoking subscription", error);
     throw error;
@@ -233,3 +166,62 @@ export async function deferSubscription(
     throw error;
   }
 }
+
+/**
+ *  Acknowledge an in-app item purchase with Play Developer API.
+ *
+ * @param {params} PurchaseParams
+ * @return {(Promise<boolean>)} whether the acknowledgement of the in-app purchase was successful
+ */
+// export async function acknowledgeInAppPurchase(
+//   params: PurchaseParams
+// ): Promise<boolean> {
+//   try {
+//     const playApi = await setupClient();
+//     const apiResponse = (
+//       await playApi.purchases.products.acknowledge({
+//         packageName: process.env.ANDROID_PACKAGE_ID,
+//         productId: params.itemId,
+//         token: params.purchaseToken,
+//       })
+//     )?.data;
+//     if (JSON.stringify(apiResponse) === `""`) {
+//       return true;
+//     }
+//     return false;
+//   } catch (error) {
+//     console.error(`Error acknowledging in-app purchase : ${error}`);
+//     throw error;
+//   }
+// }
+
+/**
+ *  Fetch a purchase from the Play Developer API and validate that it has not been consumed already.
+ *
+ * @param {params} PurchaseParams
+ */
+// export async function fetchPurchase(
+//   params: PurchaseParams
+// ): Promise<billing.Purchase | null> {
+//   try {
+//     const playApi = await setupClient();
+//     const apiResponse = (
+//       await playApi.purchases.products.get({
+//         packageName: process.env.ANDROID_PACKAGE_ID,
+//         productId: params.itemId,
+//         token: params.purchaseToken,
+//       })
+//     )?.data;
+//     console.log(
+//       `PlayAPI Response : ${JSON.stringify(apiResponse, undefined, 2)}`
+//     );
+//     return billing.Purchase.fromApiResponse(
+//       apiResponse,
+//       params.purchaseToken,
+//       params.itemId
+//     );
+//   } catch (error) {
+//     console.error(`Error fetching purchase info : ${error}`);
+//     throw error;
+//   }
+// }

@@ -5,7 +5,7 @@ import screenfull from "screenfull";
 import { IconButton } from "./IconButton";
 
 export const FullscreenButton: React.FC = (props) => {
-  const [_, setIsFullscreen] = useState(false);
+  const [, setIsFullscreen] = useState(false);
   useEffect(() => {
     if (!screenfull.isEnabled) {
       return;

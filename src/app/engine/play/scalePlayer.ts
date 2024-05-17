@@ -9,7 +9,7 @@ export const playWholeScale = async (
   playFullString: boolean
 ) => {
   const reverse = Math.random() < 0.5;
-  var neckCopy = [...neck];
+  const neckCopy = [...neck];
   if (reverse) {
     neckCopy.reverse();
   }

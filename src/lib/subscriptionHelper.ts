@@ -16,14 +16,20 @@ export const getSubscriptionFromRequest = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
   allowCancelled: boolean,
-  itemIdParam: string = "itemId",
-  purchaseTokenParam: string = "purchaseToken"
+  paramNames?: {
+    itemId: string;
+    purchaseToken: string;
+  }
 ): Promise<SubscriptionData | undefined> => {
-  const itemId = validateParameter<TierKey>(req.query.itemId, itemIdParam, res);
+  const itemId = validateParameter<TierKey>(
+    req.query.itemId,
+    paramNames?.itemId ?? "itemId",
+    res
+  );
 
   const purchaseToken = validateParameter<string>(
     req.query.purchaseToken,
-    purchaseTokenParam,
+    paramNames?.itemId ?? "purchaseToken",
     res
   );
 

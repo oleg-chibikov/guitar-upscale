@@ -253,9 +253,9 @@ export const settingsSlice = createSlice({
       playbackTypeValue = state.playbackType;
       tuningValue = state.tuning;
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
-      loadInstrument(instrumentValue, reverbStrengthValue);
-      loadInstrument(chordInstrumentValue, reverbStrengthValue);
-      loadMetronome();
+      void loadInstrument(instrumentValue, reverbStrengthValue);
+      void loadInstrument(chordInstrumentValue, reverbStrengthValue);
+      void loadMetronome();
     },
     refreshSettings: (state) => {
       onGuitarSettingsUpdate(state);

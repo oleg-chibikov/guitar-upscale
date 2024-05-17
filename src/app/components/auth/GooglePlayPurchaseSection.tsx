@@ -136,7 +136,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         );
 
         setPurchaseOptions(options);
-      } catch (ex: any) {
+      } catch (ex: unknown) {
         dispatch(
           setAndShowAlert({
             message: "Cannot get purchase options " + ex,
@@ -147,7 +147,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         setIsLoading(false);
       }
     };
-    getPurchaseOptions();
+    void getPurchaseOptions();
   }, [hasDigitalGoodsService, dispatch, isOnline]);
 
   if (!hasDigitalGoodsService) {

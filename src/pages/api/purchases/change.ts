@@ -26,22 +26,26 @@ const handle = async (
       return;
     }
 
-    acknowledge(subscriptionData);
-
-    // if the old subscription is already cancelled - don't proceed with the operation. Client should use acknowledge ednpoint in this case
+    // if the old subscription is already cancelled - don't proceed with the operation. Client should use acknowledge endpoint in this case
     const subscriptionToCancel = await getSubscriptionFromRequest(
       req,
       res,
       false,
-      "oldItemId",
-      "oldPurchaseToken"
+      { itemId: "oldItemId", purchaseToken: "oldPurchaseToken" }
+    );
+
+    console.log(
+      "New subscription: %o; Existing subscription to cancel: %o",
+      subscriptionData,
+      subscriptionToCancel
     );
 
     if (!subscriptionToCancel) {
+      console.error("Subscription to cancel is not provided");
       return;
     }
 
-    let cancellationMode = await cancel(subscriptionToCancel);
+    const cancellationMode = await cancel(subscriptionToCancel);
     if (
       cancellationMode === CancellationMode.Cancel &&
       subscriptionToCancel.params.itemId === "guitar_upscale.composer"
@@ -62,6 +66,8 @@ const handle = async (
         msToTime(currentSubscriptionDuration),
         new Date(cancelledSubscriptionExpiryTime)
       );
+
+      await acknowledge(subscriptionData);
 
       await deferSubscription(
         subscriptionData.params,

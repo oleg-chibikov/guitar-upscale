@@ -1,7 +1,7 @@
 // store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import { persistReducer, persistStore } from "redux-persist";
+import { PersistedState, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./authSlice";
@@ -20,7 +20,7 @@ const persistConfig = {
   key: "root",
   version: VERSION,
   storage,
-  migrate: (state: any) => {
+  migrate: (state: PersistedState) => {
     if (typeof window === "undefined") {
       return Promise.resolve(state);
     }
@@ -31,7 +31,7 @@ const persistConfig = {
       localStorage.setItem("reduxPersist:root:version", VERSION.toString());
     };
     if (storedVersionRaw === null) {
-      persistor.purge(); // if there is something before introducing versions
+      void persistor.purge(); // if there is something before introducing versions
       setCurrentVersionToLocalStorage();
       return Promise.resolve(state);
     }
@@ -45,15 +45,16 @@ const persistConfig = {
           VERSION
       );
       // Clear previous state if version has changed
-      persistor.purge();
+      void persistor.purge();
       setCurrentVersionToLocalStorage();
     }
     return Promise.resolve(state);
   },
   transforms: [
     {
-      in: (state: any) => {
-        const newState = { ...state };
+      in: (state: PersistedState) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const newState = { ...state } as any; // TODO: I don't understand it fully, but it works like this
         delete newState.neck;
         delete newState.chords;
         delete newState.showAlert;
@@ -66,7 +67,7 @@ const persistConfig = {
         delete newState.premiumFeatures;
         return newState;
       },
-      out: (state: any) => state, // No transformation needed when deserializing
+      out: (state: PersistedState) => state, // No transformation needed when deserializing
     },
   ],
 };
