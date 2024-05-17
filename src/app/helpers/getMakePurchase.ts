@@ -52,23 +52,32 @@ export const getMakePurchase = (
         return;
       }
       const { completeResponse, purchaseToken } = purchaseResult;
-      const purchaseFunction = getPurchaseFunction(
+
+      const result = await getPurchaseFunction(
         existingNotCancelledPurchaseOption,
         purchaseOption,
         purchaseToken
       );
 
-      const result = await purchaseFunction;
-
       if (result.status === ApiCallResult.Success) {
         const digitalGoodsService = await buildDigitalGoodsService();
-        await consumePurchaseToken(
+        const consumeResult = await consumePurchaseToken(
           digitalGoodsService,
           purchaseToken,
           dispatch,
           title
         );
-        await completeSuccessfulResponse(completeResponse, dispatch, title);
+        if (!consumeResult) {
+          return;
+        }
+        const completeResult = await completeSuccessfulResponse(
+          completeResponse,
+          dispatch,
+          title
+        );
+        if (!completeResult) {
+          return;
+        }
         const message = `Payment successful! Your level is "${title}"`;
         console.log(message);
         dispatch(
@@ -87,7 +96,14 @@ export const getMakePurchase = (
           })
         );
       } else {
-        await completeFailedResonse(completeResponse, dispatch, title);
+        const completeResult = await completeFailedResonse(
+          completeResponse,
+          dispatch,
+          title
+        );
+        if (!completeResult) {
+          return;
+        }
         const message = `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`;
         console.error(message);
         dispatch(
@@ -183,6 +199,7 @@ async function completeFailedResonse(
     // successful. The user-agent may show a "payment failed"
     // message to the user.
     await completeResponse("fail");
+    return true;
   } catch (error: unknown) {
     console.log(error);
     dispatch(
@@ -191,6 +208,7 @@ async function completeFailedResonse(
         alertType: AlertType.Error,
       })
     );
+    return false;
   }
 }
 
@@ -204,6 +222,7 @@ async function completeSuccessfulResponse(
     // successful. The user-agent may show a "payment successful"
     // message to the user.
     await completeResponse("success");
+    return true;
   } catch (error: unknown) {
     console.log(error);
     dispatch(
@@ -212,6 +231,7 @@ async function completeSuccessfulResponse(
         alertType: AlertType.Error,
       })
     );
+    return false;
   }
 }
 
@@ -225,6 +245,7 @@ async function consumePurchaseToken(
     // Optional: consume the purchase, allowing the user to purchase
     // the same item again.
     await digitalGoodsService.consume(purchaseToken);
+    return true;
   } catch (error: unknown) {
     console.log(error);
     dispatch(
@@ -233,5 +254,6 @@ async function consumePurchaseToken(
         alertType: AlertType.Error,
       })
     );
+    return false;
   }
 }
