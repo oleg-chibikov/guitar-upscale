@@ -17,21 +17,6 @@ type ApiMethodHandlers = {
   [key in Uppercase<Method>]?: NextApiHandler;
 };
 
-export function validateParameter<T>(
-  body: Partial<{
-    [key: string]: string | string[];
-  }>,
-  paramName: string,
-  res: NextApiResponse
-): T | null {
-  const param = body[paramName];
-  if (typeof param !== "string") {
-    res.status(400).json({ error: `Parameter ${paramName} must be a string.` });
-    return null; // Validation failed
-  }
-  return param as T; // Validation passed
-}
-
 // Note: client consumer (callApi method) is built the way so that EACH response should have some json output regardless of its status
 export const apiHandler = (handler: ApiMethodHandlers) => {
   return async (req: NextApiRequest, res: NextApiResponse<ErrorResponse>) => {

@@ -1,11 +1,9 @@
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateParameter } from "./apiHelper";
 import { ResponseData } from "./apiTypes";
 import { CancelReason, SubscriptionPurchase } from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
-import { TierKey } from "./tier";
 
 export type SubscriptionData = {
   subscription: SubscriptionPurchase;
@@ -22,17 +20,8 @@ export const getSubscriptionFromRequest = async (
   }
 ): Promise<SubscriptionData | undefined> => {
   // Extract parameters from the body instead of query
-  const itemId = validateParameter<TierKey>(
-    req.body,
-    paramNames?.itemId ?? "itemId",
-    res
-  );
-
-  const purchaseToken = validateParameter<string>(
-    req.body,
-    paramNames?.purchaseToken ?? "purchaseToken",
-    res
-  );
+  const itemId = req.body[paramNames?.itemId ?? "itemId"];
+  const purchaseToken = req.body[paramNames?.purchaseToken ?? "purchaseToken"];
 
   if (itemId === null || purchaseToken === null) {
     return; // Exit early if validation fails
