@@ -24,6 +24,9 @@ export const getSubscriptionFromRequest = async (
   const purchaseToken = req.body[paramNames?.purchaseToken ?? "purchaseToken"];
 
   if (itemId === null || purchaseToken === null) {
+    res
+      .status(HttpStatusCode.BadRequest)
+      .json({ message: "Required parameters are not set" });
     return; // Exit early if validation fails
   }
 
