@@ -208,7 +208,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       <ul
         className="grid gap-y-2 items-stretch"
         style={{
-          gridTemplateColumns: "4fr 10fr 1fr 2fr 2fr",
+          gridTemplateColumns: "8fr 10fr 1fr 2fr 2fr",
         }}
       >
         {purchaseOptions.map((purchaseOption) => (
