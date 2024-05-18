@@ -12,8 +12,10 @@ const handle = async (
   res: NextApiResponse<PurchaseResponseData>
 ) => {
   try {
-    // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
-    const subscriptionData = await getSubscriptionFromRequest(req, res, true);
+    const subscriptionData = await getSubscriptionFromRequest(req, res, {
+      allowCancelled: true,
+      required: true,
+    });
     if (!subscriptionData) {
       return;
     }

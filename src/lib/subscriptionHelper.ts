@@ -10,16 +10,20 @@ export type SubscriptionData = {
   params: PurchaseParams;
 };
 
-export const getSubscriptionFromRequest = async (
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
-  allowCancelled: boolean,
+type GetSubscriptionParams = {
+  allowCancelled: boolean;
   paramNames?: {
     itemId: string;
     purchaseToken: string;
-  }
+  };
+  required: boolean;
+};
+
+export const getSubscriptionFromRequest = async <T extends ResponseData>(
+  req: NextApiRequest,
+  res: NextApiResponse<T>,
+  { allowCancelled, paramNames, required }: GetSubscriptionParams
 ): Promise<SubscriptionData | undefined> => {
-  // TODO: Does not work
   console.log("Request", {
     body: req.body,
     query: req.query,
@@ -31,10 +35,10 @@ export const getSubscriptionFromRequest = async (
   const purchaseToken =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
-  if (itemId === null || purchaseToken === null) {
+  if (required && (itemId === null || purchaseToken === null)) {
     res
       .status(HttpStatusCode.BadRequest)
-      .json({ message: "Required parameters are not set" });
+      .json({ error: "Required parameters are not set" } as T);
     return; // Exit early if validation fails
   }
 
@@ -42,17 +46,30 @@ export const getSubscriptionFromRequest = async (
   const subscription = await fetchSubscriptionPurchase(params);
 
   if (!allowCancelled && subscription?.cancelReason !== CancelReason.NONE) {
-    console.log(
-      "Subscription is cancelled with reason",
-      subscription.cancelReason
-    );
-    res
-      .status(HttpStatusCode.Gone)
-      .json({ message: "Subscription is already cancelled" });
+    const message = "Subscription is already cancelled";
+    console.log(message);
+    res.status(HttpStatusCode.Gone).json({ error: message } as T);
     return;
   }
 
   return { subscription, params };
+};
+
+// This is a single cancelled subscription with the highest tier
+export const getCancelledSubscriptionFromRequest = async <
+  T extends ResponseData
+>(
+  req: NextApiRequest,
+  res: NextApiResponse<T>
+) => {
+  return await getSubscriptionFromRequest(req, res, {
+    allowCancelled: true, // this param can contain only cancelled subscription
+    required: false, // there might be no such subscription,
+    paramNames: {
+      itemId: "cancelledSubscriptionItemId",
+      purchaseToken: "cancelledSubscriptionPurchaseToken",
+    },
+  });
 };
 
 export const shouldRevoke = (subscription: SubscriptionPurchase) =>

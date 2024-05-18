@@ -7,7 +7,7 @@ import {
 import {
   getBillingPeriod,
   getChangeAction,
-  getTitle,
+  getExistingNonCancelledPurchase,
   isPurchaseCancelled,
 } from "@/app/helpers/purchaseOptionHelper";
 import { selectUi } from "@/app/store/uiSlice";
@@ -16,16 +16,12 @@ import { msToFormattedDate } from "@/lib/dateHelper";
 import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PurchaseOption } from "./GooglePlayPurchaseSection";
 
 interface GooglePlayPurchaseOptionButtonProps extends GetMakePurchaseParams {
-  onClick: (option: PurchaseOption) => void;
+  onClick: () => void;
   isSelected: boolean;
-  showCancellationModal: (option: PurchaseOption) => void;
-  showChangeSubscriptionModal: (
-    option: PurchaseOption,
-    existingOption: PurchaseOption
-  ) => void;
+  showCancellationModal: () => void;
+  showChangeSubscriptionModal: () => void;
 }
 
 export const GooglePlayPurchaseOptionButton: FC<
@@ -38,25 +34,26 @@ export const GooglePlayPurchaseOptionButton: FC<
     showCancellationModal,
     showChangeSubscriptionModal,
     disabledMessage,
-    existingNotCancelledPurchaseOption,
+    allPurchasedOptions,
   } = params;
 
+  const existingNonCancelledPurchaseOption = getExistingNonCancelledPurchase(
+    allPurchasedOptions,
+    purchaseOption
+  );
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const dispatch = useDispatch();
-  const makePurchase = existingNotCancelledPurchaseOption
-    ? () =>
-        showChangeSubscriptionModal(
-          purchaseOption,
-          existingNotCancelledPurchaseOption
-        )
+  const makePurchase = existingNonCancelledPurchaseOption
+    ? () => showChangeSubscriptionModal()
     : getMakePurchase(params, hasDigitalGoodsService, dispatch);
 
-  const title = getTitle(purchaseOption);
+  const title = purchaseOption.tier;
   const { theme } = useSelector(selectUi);
-  const isAlreadyPurchased = purchaseOption.purchaseToken !== undefined;
+  const isAlreadyPurchased =
+    purchaseOption.purchaseData?.purchaseToken !== undefined;
   const isCancelled = isPurchaseCancelled(purchaseOption);
   const isPurchasedAndNotCancelled = isAlreadyPurchased && !isCancelled;
-  const changeAction = getChangeAction(existingNotCancelledPurchaseOption);
+  const changeAction = getChangeAction(existingNonCancelledPurchaseOption);
 
   let buttonColor: "error" | "primary";
   let buttonAction: () => void | Promise<void>;
@@ -74,7 +71,7 @@ export const GooglePlayPurchaseOptionButton: FC<
       purchaseOption.purchaseData?.subscribedDateMs
     );
     buttonColor = "error";
-    buttonAction = async () => await showCancellationModal(purchaseOption);
+    buttonAction = async () => await showCancellationModal();
     purchaseStatus = `Owned${subscribedDate ? " since " + subscribedDate : ""}${
       expirationDate ? ". Expires: " + expirationDate : ""
     }`;
@@ -124,10 +121,10 @@ export const GooglePlayPurchaseOptionButton: FC<
   // Format the price according to the user locale.
   const localizedPrice = new Intl.NumberFormat(navigator.language, {
     style: "currency",
-    currency: purchaseOption.price.currency,
-  }).format(parseFloat(purchaseOption.price.value));
+    currency: purchaseOption.details.price.currency,
+  }).format(parseFloat(purchaseOption.details.price.value));
 
-  const handleClick = () => !isAlreadyPurchased && onClick(purchaseOption);
+  const handleClick = () => !isAlreadyPurchased && onClick();
 
   const className =
     "p-2 flex flex-col gap-1 justify-center cursor-pointer " + bg;
@@ -139,7 +136,7 @@ export const GooglePlayPurchaseOptionButton: FC<
         {purchaseStatus && <div className="text-xs">{purchaseStatus}</div>}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
-        {purchaseOption.description}
+        {purchaseOption.details.description}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
         {localizedPrice}
@@ -148,7 +145,7 @@ export const GooglePlayPurchaseOptionButton: FC<
         onClick={handleClick}
         className={`${className} text-sm whitespace-nowrap`}
       >
-        {"Renews " + getBillingPeriod(purchaseOption)}
+        {"Renews " + getBillingPeriod(purchaseOption.details)}
       </p>
       <p className={className}>
         <Button

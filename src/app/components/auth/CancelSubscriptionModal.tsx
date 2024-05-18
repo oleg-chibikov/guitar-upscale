@@ -2,10 +2,8 @@ import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
-import { GuitarUpscaleSpecificPurchaseDetails } from "@/app/digitalGoodsBrowser";
-import { getTitle } from "@/app/helpers/purchaseOptionHelper";
+import { getExistingCancelledPurchase } from "@/app/helpers/purchaseOptionHelper";
 import { incrementAndReload } from "@/app/helpers/reloadHelper";
-import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
 import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
@@ -15,13 +13,14 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
-import { PurchaseOption } from "./GooglePlayPurchaseSection";
+import { PurchaseOption, PurchasedOption } from "./GooglePlayPurchaseSection";
 
 export const CancelSubscriptionModal: FC<
   ModalProps & {
     setIsLoading: (isLoading: boolean) => void;
     purchaseOption: PurchaseOption;
     disabledMessage?: string;
+    allPurchasedOptions: PurchasedOption[];
   }
 > = ({
   openModal,
@@ -29,11 +28,12 @@ export const CancelSubscriptionModal: FC<
   setIsLoading,
   purchaseOption,
   disabledMessage,
+  allPurchasedOptions,
 }) => {
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
-  const title = getTitle(purchaseOption);
+  const title = purchaseOption.tier;
 
   const cancelSubscription = async () => {
     if (!hasDigitalGoodsService) {
@@ -43,26 +43,15 @@ export const CancelSubscriptionModal: FC<
       console.log(disabledMessage);
       return;
     }
+    if (!purchaseOption.purchaseData) {
+      return;
+    }
     setIsLoading(true);
     try {
-      const digitalGoodsService = await buildDigitalGoodsService();
-      const existingPurchases =
-        (await digitalGoodsService.listPurchases()) as GuitarUpscaleSpecificPurchaseDetails[];
-      const purchases = existingPurchases
-        .filter((x) => x.itemId === purchaseOption.itemId)
-        .map((x) => ({
-          itemId: x.itemId,
-          purchaseToken: x.purchaseToken,
-        }));
-      if (!purchases.length) {
-        dispatch(
-          setAndShowAlert({
-            message: `Cannot cancel the subscription "${title}". Google Play api doesn't list it as purchased`,
-            alertType: AlertType.Error,
-          })
-        );
-      }
-      const cancelResult = await cancelPurchaseOnBackend(purchases[0]);
+      const cancelResult = await cancelPurchaseOnBackend(
+        purchaseOption.purchaseData,
+        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
+      );
       if (cancelResult.status === ApiCallResult.Success) {
         const message = `Subscription "${title}" has been successfully cancelled`;
         dispatch(

@@ -7,10 +7,15 @@
 */
 
 import { apiHandler } from "@/lib/apiHelper";
-import { CancellationMode, ResponseData } from "@/lib/apiTypes";
+import {
+  CancellationMode,
+  ChangeAction,
+  ChangeResponseData,
+} from "@/lib/apiTypes";
 import { msToTime } from "@/lib/dateHelper";
 import { deferSubscription } from "@/lib/purchases";
 import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
+import { Tier } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { acknowledge, setSubscriptionCookie } from "./acknowledge";
@@ -18,21 +23,23 @@ import { cancel } from "./cancel";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<ChangeResponseData>
 ) => {
   try {
-    const subscriptionData = await getSubscriptionFromRequest(req, res, false);
+    const subscriptionData = await getSubscriptionFromRequest(req, res, {
+      allowCancelled: false,
+      required: true,
+    });
     if (!subscriptionData) {
       return;
     }
 
     // if the old subscription is already cancelled - don't proceed with the operation. Client should use acknowledge endpoint in this case
-    const subscriptionToCancel = await getSubscriptionFromRequest(
-      req,
-      res,
-      false,
-      { itemId: "oldItemId", purchaseToken: "oldPurchaseToken" }
-    );
+    const subscriptionToCancel = await getSubscriptionFromRequest(req, res, {
+      allowCancelled: false,
+      required: true,
+      paramNames: { itemId: "oldItemId", purchaseToken: "oldPurchaseToken" },
+    });
 
     if (!subscriptionToCancel) {
       console.error("Subscription to cancel is not provided");
@@ -47,50 +54,93 @@ const handle = async (
 
     await acknowledge(subscriptionData);
 
+    let wasDeferred: boolean = false;
+
+    // this is the same as cancelled subscription expiry time
+    const newSubscriptionDesiredStartTimeMs =
+      subscriptionToCancel.subscription.expiryTimeMillis;
+
+    let newSubscriptionDesiredExpiryTimeMs =
+      subscriptionData.subscription.expiryTimeMillis;
+
     const cancellationMode = await cancel(subscriptionToCancel);
-    if (
-      cancellationMode === CancellationMode.Cancel &&
+    const changeAction: ChangeAction =
       subscriptionToCancel.params.itemId === "guitar_upscale.composer"
-    ) {
+        ? "Downgrade"
+        : "Upgrade";
+    const isDowngradeWithCancellation =
+      cancellationMode === CancellationMode.Cancel &&
+      changeAction === "Downgrade";
+    let newTier: Tier;
+    let tierChanged: boolean;
+
+    if (isDowngradeWithCancellation) {
+      // If downgraded, but the old subscription was not revoked immediately - keep the old permissions until they expire
+
+      newTier = "Composer";
+      tierChanged = false;
       // Downgrading - defer the new subscription to avoid overlap
-      const newSubscriptionCurrentExpiryTime =
+
+      const newSubscriptionCurrentExpiryTimeMs =
         subscriptionData.subscription.expiryTimeMillis;
-      const cancelledSubscriptionExpiryTime =
-        subscriptionToCancel.subscription.expiryTimeMillis;
-      const currentSubscriptionDuration =
+
+      const currentSubscriptionDurationMs =
         subscriptionData.subscription.expiryTimeMillis -
         subscriptionData.subscription.startTimeMillis;
-      const newSubscriptionDesiredExpiryTime =
-        cancelledSubscriptionExpiryTime + currentSubscriptionDuration;
+
+      newSubscriptionDesiredExpiryTimeMs =
+        newSubscriptionDesiredStartTimeMs + currentSubscriptionDurationMs;
+
       const expiryTimeDifference =
-        cancelledSubscriptionExpiryTime - newSubscriptionCurrentExpiryTime;
+        newSubscriptionDesiredExpiryTimeMs - newSubscriptionCurrentExpiryTimeMs;
+
       const differnceObject = msToTime(expiryTimeDifference);
       console.log(
-        "Deferrning subscription %s. New subscription current expiry time: %o, new subscription desired expiry time: %o, cancelled subscription expiry time: %o, new subscription duration: %o, new subscription expiry time difference: %o",
+        `Deferrning subscription %s;
+        desired start time: %o;
+        desired expiry time: %o;
+        current expiry time: %o,
+        duration: %o;
+        expiry time difference: %o`,
         subscriptionData.params.itemId,
-        new Date(newSubscriptionCurrentExpiryTime),
-        new Date(newSubscriptionDesiredExpiryTime),
-        new Date(cancelledSubscriptionExpiryTime),
-        msToTime(currentSubscriptionDuration),
+        new Date(newSubscriptionDesiredStartTimeMs),
+        new Date(newSubscriptionDesiredExpiryTimeMs),
+        new Date(newSubscriptionCurrentExpiryTimeMs),
+        msToTime(currentSubscriptionDurationMs),
         differnceObject
       );
       if (differnceObject.days >= 1 && differnceObject.days <= 365) {
-        await deferSubscription(
-          subscriptionData.params,
-          subscriptionData.subscription.expiryTimeMillis,
-          newSubscriptionDesiredExpiryTime
-        );
+        try {
+          await deferSubscription(
+            subscriptionData.params,
+            subscriptionData.subscription.expiryTimeMillis,
+            newSubscriptionDesiredExpiryTimeMs
+          );
+          wasDeferred = true;
+        } catch (error: unknown) {
+          wasDeferred = false;
+        }
       } else {
         // https://developer.android.com/google/play/billing/subscriptions#defer
         console.log(
           "Differnce in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
         );
       }
+    } else {
+      // upgrade or downgrade with revoke - change tier according to the new subscription
+      setSubscriptionCookie(subscriptionData.params, req, res);
+
+      newTier = changeAction === "Downgrade" ? "Explorer" : "Composer";
+      tierChanged = true;
     }
 
-    setSubscriptionCookie(subscriptionData.params, req, res);
-
-    res.status(HttpStatusCode.Ok).json({ message: "Changed" });
+    res.status(HttpStatusCode.Ok).json({
+      message: "Changed",
+      changeAction,
+      wasDeferred,
+      newTier,
+      tierChanged,
+    } as ChangeResponseData);
   } finally {
     res.end();
   }

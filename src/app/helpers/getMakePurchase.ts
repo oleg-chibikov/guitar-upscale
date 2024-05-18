@@ -1,22 +1,35 @@
+import {
+  ChangeResponseData,
+  ResponseData,
+  SubscriptionActionResponseData,
+} from "@/lib/apiTypes";
+import { PurchaseParams } from "@/lib/purchaseParams";
 import { UnknownAction } from "@reduxjs/toolkit";
 import { Dispatch } from "react";
 import {
-  acknowledgePurchaseOnBackend,
   ApiCallResult,
+  Response,
+  acknowledgePurchaseOnBackend,
   changePurchaseOnBackend,
 } from "../apiClient";
-import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
+import {
+  PurchaseOption,
+  PurchasedOption,
+} from "../components/auth/GooglePlayPurchaseSection";
 import { AlertType } from "../data/alertType";
 import { GOOGLE_PLAY_RELOAD_KEY } from "../hooks/useGooglePlayAuth";
 import { setAndShowAlert } from "../store/uiSlice";
-import { getTitle } from "./purchaseOptionHelper";
+import {
+  getExistingCancelledPurchase,
+  getExistingNonCancelledPurchase,
+} from "./purchaseOptionHelper";
 import { incrementAndReload } from "./reloadHelper";
 
 export interface GetMakePurchaseParams {
   purchaseOption: PurchaseOption;
   setIsLoading: (isLoading: boolean) => void;
   disabledMessage?: string;
-  existingNotCancelledPurchaseOption?: PurchaseOption; // another option different from purchaseOption. If it exists - we should change the existing subscription instead of subscribing to the new one
+  allPurchasedOptions: PurchasedOption[];
 }
 
 export const getMakePurchase = (
@@ -24,7 +37,7 @@ export const getMakePurchase = (
     purchaseOption,
     setIsLoading,
     disabledMessage,
-    existingNotCancelledPurchaseOption,
+    allPurchasedOptions,
   }: GetMakePurchaseParams,
   hasDigitalGoodsService: boolean,
   dispatch: Dispatch<UnknownAction>
@@ -39,8 +52,6 @@ export const getMakePurchase = (
       return;
     }
 
-    const title = getTitle(purchaseOption);
-
     setIsLoading(true);
     try {
       const paymentResponse = await showGooglePlayPurchaseUiAndSubscribe(
@@ -51,13 +62,26 @@ export const getMakePurchase = (
         return;
       }
 
-      const result = await getPurchaseFunction(
+      const existingNotCancelledPurchaseOption =
+        getExistingNonCancelledPurchase(allPurchasedOptions, purchaseOption);
+
+      const postPurchaseFunc = getPostPurchaseFunction(
         existingNotCancelledPurchaseOption,
         purchaseOption,
-        paymentResponse.details.purchaseToken
+        paymentResponse.details.purchaseToken,
+        allPurchasedOptions
       );
 
+      const actionString = existingNotCancelledPurchaseOption
+        ? "change"
+        : "acknowledge";
+
+      const result = await postPurchaseFunc;
+
       if (result.status === ApiCallResult.Success) {
+        const dataAsChangeAction =
+          result.data as SubscriptionActionResponseData;
+
         // const digitalGoodsService = await buildDigitalGoodsService();
         // const consumeResult = await consumePurchaseToken(
         //   digitalGoodsService,
@@ -71,12 +95,20 @@ export const getMakePurchase = (
         const completeResult = await completeSuccessfulResponse(
           paymentResponse,
           dispatch,
-          title
+          purchaseOption.tier
         );
         if (!completeResult) {
           return;
         }
-        const message = `Payment successful! Your level is "${title}"`;
+        const message = `Payment for "${
+          purchaseOption.tier
+        }" successful! Your current subscription level is "${
+          dataAsChangeAction.newTier
+        }"${
+          !dataAsChangeAction.tierChanged
+            ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
+            : ""
+        }`;
         console.log(message);
         dispatch(
           setAndShowAlert({
@@ -85,7 +117,7 @@ export const getMakePurchase = (
         );
         await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
       } else if (result.status === ApiCallResult.SkipProcessing) {
-        const message = `"${title}" is cancelled. Cannot acknowledge`;
+        const message = `Subscription is already cancelled. Cannot ${actionString} it`;
         console.log(message);
         dispatch(
           setAndShowAlert({
@@ -97,12 +129,12 @@ export const getMakePurchase = (
         const completeResult = await completeFailedResonse(
           paymentResponse,
           dispatch,
-          title
+          purchaseOption.tier
         );
         if (!completeResult) {
           return;
         }
-        const message = `Cannot acknowledge the purchase for "${title}". It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`;
+        const message = `Cannot ${actionString} subscription. It will be auto refunded in 3 days by Google unless acknowlege succeeds (it can happen when you launch the app)`;
         console.error(message);
         dispatch(
           setAndShowAlert({
@@ -120,26 +152,25 @@ export const getMakePurchase = (
   return makePurchase;
 };
 
-function getPurchaseFunction(
-  existingNotCancelledPurchaseOption: PurchaseOption | undefined,
+function getPostPurchaseFunction(
+  existingNotCancelledPurchaseOption: PurchasedOption | undefined,
   purchaseOption: PurchaseOption,
-  purchaseToken: string
-) {
+  purchaseToken: string, // this is a newly acquired purchaseToken
+  allPurchasedOptions: PurchasedOption[]
+): Promise<Response<ResponseData | ChangeResponseData>> {
+  const purchaseParams: PurchaseParams = {
+    itemId: purchaseOption.details.itemId,
+    purchaseToken,
+  };
   return existingNotCancelledPurchaseOption?.purchaseToken // this should always be true, just to satisfy the compiler
     ? changePurchaseOnBackend(
-        {
-          itemId: purchaseOption.itemId,
-          purchaseToken,
-        },
-        {
-          itemId: existingNotCancelledPurchaseOption.itemId,
-          purchaseToken: existingNotCancelledPurchaseOption.purchaseToken,
-        }
+        purchaseParams,
+        existingNotCancelledPurchaseOption
       )
-    : acknowledgePurchaseOnBackend({
-        itemId: purchaseOption.itemId,
-        purchaseToken,
-      });
+    : acknowledgePurchaseOnBackend(
+        purchaseParams,
+        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
+      );
 }
 
 async function showGooglePlayPurchaseUiAndSubscribe(
@@ -151,7 +182,7 @@ async function showGooglePlayPurchaseUiAndSubscribe(
     {
       supportedMethods: "https://play.google.com/billing",
       data: {
-        sku: purchaseOption.itemId,
+        sku: purchaseOption.details.itemId,
       },
     },
   ];

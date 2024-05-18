@@ -10,9 +10,9 @@ import { HttpStatusCode } from "axios";
 import { deleteCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export const clearSubscriptionCookie = (
+export const clearSubscriptionCookie = <T extends ResponseData>(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<T>
 ) => {
   deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
     req,

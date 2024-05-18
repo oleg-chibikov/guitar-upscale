@@ -1,9 +1,9 @@
 import { CancelReason } from "@/lib/billing";
-import { PurchaseOption } from "../components/auth/GooglePlayPurchaseSection";
+import {
+  PurchaseOption,
+  PurchasedOption,
+} from "../components/auth/GooglePlayPurchaseSection";
 import { GuitarUpscaleSpecificDigitalGoodsProductDetails } from "../digitalGoodsBrowser";
-
-export const getTitle = (purchaseOption: DigitalGoodsProductDetails) =>
-  purchaseOption.title.substring(0, purchaseOption.title.indexOf(" ("));
 
 export const getBillingPeriod = (
   purchaseOption: GuitarUpscaleSpecificDigitalGoodsProductDetails
@@ -32,13 +32,32 @@ export const isPurchaseCancelled = (purchaseOption: PurchaseOption) => {
     : false;
 };
 
-export type ChangeAction = "Upgrade" | "Downgrade";
-
 export const getChangeAction = (
-  existingNotCancelledPurchaseOption?: PurchaseOption
+  existingNotCancelledPurchaseOption?: PurchasedOption
 ) =>
   !existingNotCancelledPurchaseOption
     ? undefined
-    : existingNotCancelledPurchaseOption.itemId === "guitar_upscale.composer"
+    : existingNotCancelledPurchaseOption.tier === "Composer"
     ? "Downgrade"
     : "Upgrade";
+
+// Another non cancelled option different from purchaseOption
+// If it exists - we should change the existing subscription instead of subscribing to the new one
+// There should be only once such option
+export const getExistingNonCancelledPurchase = (
+  allPurchasedOptions: PurchasedOption[],
+  purchaseOption: PurchaseOption // search for something other than this
+) =>
+  allPurchasedOptions.find(
+    (x) => !x.isCancelled && x.tier !== purchaseOption.tier
+  );
+
+// Another cancelled option different from purchaseOption
+// If it exists we should take its tier into account when granting permissions (on backend)
+export const getExistingCancelledPurchase = (
+  allPurchasedOptions: PurchasedOption[],
+  purchaseOption: PurchaseOption // search for something other than this
+) =>
+  allPurchasedOptions.find(
+    (x) => x.isCancelled && x.tier !== purchaseOption.tier
+  );

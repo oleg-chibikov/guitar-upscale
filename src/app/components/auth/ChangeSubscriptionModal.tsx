@@ -4,7 +4,10 @@ import {
   GetMakePurchaseParams,
   getMakePurchase,
 } from "@/app/helpers/getMakePurchase";
-import { getChangeAction, getTitle } from "@/app/helpers/purchaseOptionHelper";
+import {
+  getChangeAction,
+  getExistingNonCancelledPurchase,
+} from "@/app/helpers/purchaseOptionHelper";
 import { selectUi } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
 import { msToFormattedDate } from "@/lib/dateHelper";
@@ -22,15 +25,11 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
     handleCloseModal,
     purchaseOption,
     disabledMessage,
-    existingNotCancelledPurchaseOption,
+    allPurchasedOptions,
   } = params;
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
-
-  if (!existingNotCancelledPurchaseOption) {
-    return null;
-  }
 
   const makePurchase = getMakePurchase(
     params,
@@ -38,13 +37,20 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
     dispatch
   );
 
-  const existingSubscriptionPurchaseData =
-    existingNotCancelledPurchaseOption.purchaseData;
+  const existingNotCancelledPurchaseOption = getExistingNonCancelledPurchase(
+    allPurchasedOptions,
+    purchaseOption
+  );
+
+  if (!existingNotCancelledPurchaseOption) {
+    return;
+  }
+
   const existingSubscriptionExpirationDate = msToFormattedDate(
-    existingSubscriptionPurchaseData?.expirationDateMs
+    existingNotCancelledPurchaseOption?.expirationDateMs
   );
   const existingSubscriptionSubscribedDate = msToFormattedDate(
-    existingSubscriptionPurchaseData?.subscribedDateMs
+    existingNotCancelledPurchaseOption?.subscribedDateMs
   );
   const existingSubscriptionExpirationDateText =
     existingSubscriptionExpirationDate
@@ -57,12 +63,10 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
 
   const changeAction = getChangeAction(existingNotCancelledPurchaseOption)!;
   const existingSubscriptionCancellationMode =
-    existingNotCancelledPurchaseOption.purchaseData?.cancellationMode;
+    existingNotCancelledPurchaseOption.cancellationMode;
 
-  const existingSubscriptionTitle = getTitle(
-    existingNotCancelledPurchaseOption
-  );
-  const newSubscriptionTitle = getTitle(purchaseOption);
+  const existingSubscriptionTitle = existingNotCancelledPurchaseOption.tier;
+  const newSubscriptionTitle = purchaseOption.tier;
 
   return (
     <Modal
@@ -82,9 +86,7 @@ export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
           }`}
         >
           <CloseIcon onPress={handleCloseModal} />
-          <div>{`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${getTitle(
-            existingNotCancelledPurchaseOption
-          )}" subscription?`}</div>
+          <div>{`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}</div>
 
           <Alert severity="info">
             {existingSubscriptionCancellationMode === CancellationMode.Revoke
