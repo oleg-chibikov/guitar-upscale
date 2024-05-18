@@ -30,7 +30,7 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
   const purchaseToken =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
-  if (itemId === null || purchaseToken === null) {
+  if (!itemId || !purchaseToken) {
     if (required) {
       res
         .status(HttpStatusCode.BadRequest)
