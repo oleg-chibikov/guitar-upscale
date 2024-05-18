@@ -3,6 +3,8 @@ import { Dispatch } from "react";
 import { setLoadingMessage } from "../store/uiSlice";
 import { sleep } from "./sleep";
 
+export const READ_MESSAGE_WAIT_TIME = 3000;
+
 export function getReloadCount(key: string) {
   const signInCheckCountRaw = localStorage.getItem(key);
   const signInCheckCount =
@@ -21,13 +23,13 @@ export async function incrementAndReload(
   currentValue: number,
   dispatch: Dispatch<UnknownAction>,
   reloadMessage?: string,
-  sleepTime?: number
+  sleepTimeMs?: number
 ) {
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   console.log("Waiting to reload for the key", key);
   // some time to read the message
-  if (sleepTime) {
-    await sleep(sleepTime);
+  if (sleepTimeMs) {
+    await sleep(sleepTimeMs);
   }
   console.log("Reloading page for the key", key);
   // check to avoid endless reloads
