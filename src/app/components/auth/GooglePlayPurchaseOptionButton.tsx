@@ -58,7 +58,8 @@ export const GooglePlayPurchaseOptionButton: FC<
 
   let buttonColor: "error" | "primary";
   let buttonAction: () => void | Promise<void>;
-  let purchaseStatus: string | undefined;
+  let purchaseStatusLine1: string | undefined;
+  let purchaseStatusLine2: string | undefined;
   let buttonContent: string;
   let buttonTitle: string;
   let buttonDisabled: boolean;
@@ -73,9 +74,9 @@ export const GooglePlayPurchaseOptionButton: FC<
     );
     buttonColor = "error";
     buttonAction = async () => await showCancellationModal();
-    purchaseStatus = `Owned${subscribedDate ? " since " + subscribedDate : ""}${
-      expirationDate ? ". Expires: " + expirationDate : ""
-    }`;
+    purchaseStatusLine1 =
+      "Owned" + (subscribedDate ? " since " + subscribedDate : "");
+    purchaseStatusLine2 = expirationDate ? "Expires: " + expirationDate : "";
     buttonContent =
       purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
         ? "Cancel"
@@ -89,7 +90,8 @@ export const GooglePlayPurchaseOptionButton: FC<
     );
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
-    purchaseStatus = "Cancelled, owned till " + (expirationDate ?? "expiry");
+    purchaseStatusLine1 = "Cancelled";
+    purchaseStatusLine2 = "Owned till " + (expirationDate ?? "expiry");
     buttonContent =
       "Re-subscribe" +
       (changeAction ? " and " + changeAction.toLocaleLowerCase() : "");
@@ -106,7 +108,6 @@ export const GooglePlayPurchaseOptionButton: FC<
     // not purchased
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
-    purchaseStatus = "";
     buttonContent = changeAction ?? "Subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
     buttonDisabled = disabledMessage ? true : false;
@@ -132,9 +133,14 @@ export const GooglePlayPurchaseOptionButton: FC<
 
   return (
     <>
-      <p onClick={handleClick} className={`${className} text-lg font-semibold`}>
-        <div>{title}</div>
-        {purchaseStatus && <div className="text-xs">{purchaseStatus}</div>}
+      <p onClick={handleClick} className={`${className}`}>
+        <div className="text-lg font-semibold">{title}</div>
+        {purchaseStatusLine1 && (
+          <div className="text-xs">{purchaseStatusLine2}</div>
+        )}
+        {purchaseStatusLine2 && (
+          <div className="text-xs">{purchaseStatusLine2}</div>
+        )}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>
         {purchaseOption.details.description}
