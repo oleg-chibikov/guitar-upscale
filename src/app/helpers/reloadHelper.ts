@@ -20,12 +20,15 @@ export async function incrementAndReload(
   key: string,
   currentValue: number,
   dispatch: Dispatch<UnknownAction>,
-  reloadMessage?: string
+  reloadMessage?: string,
+  sleepTime?: number
 ) {
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   console.log("Waiting to reload for the key", key);
   // some time to read the message
-  await sleep(2000);
+  if (sleepTime) {
+    await sleep(sleepTime);
+  }
   console.log("Reloading page for the key", key);
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());

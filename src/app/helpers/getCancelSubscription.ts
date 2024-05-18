@@ -9,7 +9,7 @@ import {
   getTierInfoMessage,
 } from "./getMakePurchase";
 import { getExistingCancelledPurchase } from "./purchaseOptionHelper";
-import { incrementAndReload } from "./reloadHelper";
+import { READ_MESSAGE_WAIT_TIME, incrementAndReload } from "./reloadHelper";
 
 export const getCancelSubscription = (
   {
@@ -43,10 +43,16 @@ export const getCancelSubscription = (
         const message = `Subscription "${purchaseOption.tier}" has been successfully cancelled! ${tierInfoMessage}`;
         dispatch(
           setAndShowAlert({
-            message,
+            message: "Success",
           })
         );
-        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
+        await incrementAndReload(
+          GOOGLE_PLAY_RELOAD_KEY,
+          0,
+          dispatch,
+          message,
+          READ_MESSAGE_WAIT_TIME
+        );
       } else if (cancelResult.status === ApiCallResult.SkipProcessing) {
         dispatch(
           setAndShowAlert({

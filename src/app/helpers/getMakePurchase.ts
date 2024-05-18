@@ -22,7 +22,7 @@ import {
   getExistingCancelledPurchase,
   getExistingNonCancelledPurchase,
 } from "./purchaseOptionHelper";
-import { incrementAndReload } from "./reloadHelper";
+import { READ_MESSAGE_WAIT_TIME, incrementAndReload } from "./reloadHelper";
 
 export interface GetSubscriptionActionParams {
   purchaseOption: PurchaseOption;
@@ -128,10 +128,16 @@ export const getMakePurchase = (
         console.log(message);
         dispatch(
           setAndShowAlert({
-            message,
+            message: "Success",
           })
         );
-        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
+        await incrementAndReload(
+          GOOGLE_PLAY_RELOAD_KEY,
+          0,
+          dispatch,
+          message,
+          READ_MESSAGE_WAIT_TIME
+        );
       } else if (result.status === ApiCallResult.SkipProcessing) {
         const message = `Subscription is already cancelled. Cannot ${actionString} it`;
         console.log(message);
