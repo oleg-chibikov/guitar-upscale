@@ -121,16 +121,10 @@ export const getMakePurchase = (
           postfix = ". Your new tier will become active immediately";
         }
 
-        const tierInfo = `Your current subscription level is "${
-          result.data.newTier
-        }"${
-          !result.data.tierChanged
-            ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
-            : ""
-        }`;
+        const tierInfoMessage = getTierInfoMessage(result.data);
 
         // TODO: Add better message when it's a change
-        const message = `${prefix} "${purchaseOption.tier}" successful! ${tierInfo}${postfix}`;
+        const message = `${prefix} "${purchaseOption.tier}" successful! ${tierInfoMessage}${postfix}`;
         console.log(message);
         dispatch(
           setAndShowAlert({
@@ -173,6 +167,14 @@ export const getMakePurchase = (
 
   return makePurchase;
 };
+
+export function getTierInfoMessage(data: SubscriptionActionResponseData) {
+  return `Your current subscription level is "${data.newTier}"${
+    !data.tierChanged
+      ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
+      : ""
+  }`;
+}
 
 async function showGooglePlayPurchaseUiAndSubscribe(
   dispatch: Dispatch<UnknownAction>,
