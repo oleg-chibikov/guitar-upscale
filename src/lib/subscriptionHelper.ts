@@ -24,21 +24,18 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
   res: NextApiResponse<T>,
   { allowCancelled, paramNames, required }: GetSubscriptionParams
 ): Promise<SubscriptionData | undefined> => {
-  console.log("Request", {
-    body: req.body,
-    query: req.query,
-    method: req.method,
-  });
   const paramCollection = req.method === "POST" ? req.body : req.query;
   // Extract parameters from the body instead of query
   const itemId = paramCollection[paramNames?.itemId ?? "itemId"];
   const purchaseToken =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
-  if (required && (itemId === null || purchaseToken === null)) {
-    res
-      .status(HttpStatusCode.BadRequest)
-      .json({ error: "Required parameters are not set" } as T);
+  if (itemId === null || purchaseToken === null) {
+    if (required) {
+      res
+        .status(HttpStatusCode.BadRequest)
+        .json({ error: "Required parameters are not set" } as T);
+    }
     return; // Exit early if validation fails
   }
 

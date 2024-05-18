@@ -4,22 +4,9 @@
 */
 
 import { apiHandler } from "@/lib/apiHelper";
-import { ResponseData } from "@/lib/apiTypes";
-import { GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY } from "@/lib/purchaseParams";
+import { clearSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
 import { HttpStatusCode } from "axios";
-import { deleteCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-export const clearSubscriptionCookie = <T extends ResponseData>(
-  req: NextApiRequest,
-  res: NextApiResponse<T>
-) => {
-  deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
-    req,
-    res,
-  });
-  console.log("Subscription cookie cleared");
-};
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   clearSubscriptionCookie(req, res);

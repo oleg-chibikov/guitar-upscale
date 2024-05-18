@@ -9,6 +9,7 @@ import {
   SubscriptionActionResponseData,
 } from "@/lib/apiTypes";
 import { cancelSubscription, revokeSubscription } from "@/lib/purchases";
+import { clearSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
 import {
   SubscriptionData,
   getCancelledSubscriptionFromRequest,
@@ -18,7 +19,6 @@ import {
 import { Tier, tierMap } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { clearSubscriptionCookie } from "./logout";
 
 export const cancel = async (subscriptionData: SubscriptionData) => {
   const { subscription, params } = subscriptionData;
@@ -26,15 +26,15 @@ export const cancel = async (subscriptionData: SubscriptionData) => {
   let mode: CancellationMode = CancellationMode.Cancel;
   if (shouldRevoke(subscription)) {
     console.log(
-      "Subscription is still in grace period. Revoking permissions",
-      params
+      "Subscription %s is still in grace period. Revoking permissions",
+      params.itemId
     );
     await revokeSubscription(params);
     mode = CancellationMode.Revoke;
   } else {
     console.log(
-      "Subscription is not in grace period anymore. Keeping permissions",
-      params
+      "Subscription %s is not in grace period anymore. Keeping permissions",
+      params.itemId
     );
     await cancelSubscription(params);
     // we should keep the permissions. it will be revoked only when the subscription expires

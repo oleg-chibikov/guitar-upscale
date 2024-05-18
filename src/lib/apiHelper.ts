@@ -21,6 +21,11 @@ type ApiMethodHandlers = {
 export const apiHandler = (handler: ApiMethodHandlers) => {
   return async (req: NextApiRequest, res: NextApiResponse<ErrorResponse>) => {
     try {
+      console.log("Request", {
+        body: req.body,
+        query: req.query,
+        method: req.method,
+      });
       const method = req.method
         ? (req.method.toUpperCase() as keyof ApiMethodHandlers)
         : undefined;

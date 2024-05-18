@@ -9,12 +9,8 @@
 
 import { apiHandler } from "@/lib/apiHelper";
 import { SubscriptionActionResponseData } from "@/lib/apiTypes";
-import {
-  GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY,
-  PurchaseParams,
-  getCookieValue,
-} from "@/lib/purchaseParams";
 import { acknowledgeSubscriptionPurchase } from "@/lib/purchases";
+import { setSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
 import {
   SubscriptionData,
   getCancelledSubscriptionFromRequest,
@@ -22,30 +18,16 @@ import {
 } from "@/lib/subscriptionHelper";
 import { Tier, tierMap } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
-import { setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-export const setSubscriptionCookie = (
-  params: PurchaseParams,
-  req: NextApiRequest,
-  res: NextApiResponse
-) => {
-  const value = getCookieValue(params);
-  setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {
-    req,
-    res,
-    maxAge: 60 * 60 * 24,
-    sameSite: true,
-    secure: true,
-    httpOnly: true,
-  });
-  console.log("Subscription cookie set", value);
-};
 
 export const acknowledge = async (subscriptionData: SubscriptionData) => {
   const { subscription, params } = subscriptionData;
   const wasAcknowledged = subscription?.wasAcknowledged();
-  console.log("Subscription acknowdegement state", wasAcknowledged);
+  console.log(
+    "Subscription %s acknowdegement state %s",
+    params.itemId,
+    wasAcknowledged
+  );
   // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
 
   if (!wasAcknowledged) {

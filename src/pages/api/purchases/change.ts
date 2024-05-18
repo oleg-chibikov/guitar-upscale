@@ -14,11 +14,12 @@ import {
 } from "@/lib/apiTypes";
 import { msToTime } from "@/lib/dateHelper";
 import { deferSubscription } from "@/lib/purchases";
+import { setSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
 import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
 import { Tier } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { acknowledge, setSubscriptionCookie } from "./acknowledge";
+import { acknowledge } from "./acknowledge";
 import { cancel } from "./cancel";
 
 const handle = async (
