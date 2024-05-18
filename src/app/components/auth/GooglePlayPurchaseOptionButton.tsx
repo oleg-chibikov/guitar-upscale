@@ -136,10 +136,10 @@ export const GooglePlayPurchaseOptionButton: FC<
       <p onClick={handleClick} className={`${className}`}>
         <div className="text-lg font-semibold">{title}</div>
         {purchaseStatusLine1 && (
-          <div className="text-xs">{purchaseStatusLine1}</div>
+          <div className="text-xs whitespace-nowrap">{purchaseStatusLine1}</div>
         )}
         {purchaseStatusLine2 && (
-          <div className="text-xs">{purchaseStatusLine2}</div>
+          <div className="text-xs whitespace-nowrap">{purchaseStatusLine2}</div>
         )}
       </p>
       <p onClick={handleClick} className={`${className} text-sm`}>

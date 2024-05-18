@@ -175,11 +175,9 @@ export const getMakePurchase = (
 };
 
 export function getTierInfoMessage(data: SubscriptionActionResponseData) {
-  return `Your current subscription level is "${data.newTier}"${
-    !data.tierChanged
-      ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
-      : ""
-  }`;
+  return !data.tierChanged
+    ? "Current tier was not changed as your cancelled subscription is still active till its expiry"
+    : `Your subscription level is "${data.newTier}`;
 }
 
 async function showGooglePlayPurchaseUiAndSubscribe(
