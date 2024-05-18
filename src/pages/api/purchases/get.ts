@@ -11,29 +11,25 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<PurchaseResponseData>
 ) => {
-  try {
-    const subscriptionData = await getSubscriptionFromRequest(req, res, {
-      allowCancelled: true,
-      required: true,
-    });
-    if (!subscriptionData) {
-      return;
-    }
-    const subscription = subscriptionData.subscription;
-    res.status(HttpStatusCode.Ok).json({
-      message: "Subscription details",
-      data: {
-        cancellationReason: subscription.cancelReason,
-        cancellationMode: shouldRevoke(subscription)
-          ? CancellationMode.Revoke
-          : CancellationMode.Cancel,
-        expirationDateMs: subscription.expiryTimeMillis,
-        subscribedDateMs: subscription.startTimeMillis,
-      },
-    });
-  } finally {
-    res.end();
+  const subscriptionData = await getSubscriptionFromRequest(req, res, {
+    allowCancelled: true,
+    required: true,
+  });
+  if (!subscriptionData) {
+    return;
   }
+  const subscription = subscriptionData.subscription;
+  res.status(HttpStatusCode.Ok).json({
+    message: "Subscription details",
+    data: {
+      cancellationReason: subscription.cancelReason,
+      cancellationMode: shouldRevoke(subscription)
+        ? CancellationMode.Revoke
+        : CancellationMode.Cancel,
+      expirationDateMs: subscription.expiryTimeMillis,
+      subscribedDateMs: subscription.startTimeMillis,
+    },
+  });
 };
 
 export default apiHandler({

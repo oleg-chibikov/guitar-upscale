@@ -57,62 +57,58 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<SubscriptionActionResponseData>
 ) => {
-  try {
-    // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
-    const subscriptionData = await getSubscriptionFromRequest(req, res, {
-      allowCancelled: true, // allow re-subscribe
-      required: true,
-    });
-    if (!subscriptionData) {
-      return;
-    }
+  // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
+  const subscriptionData = await getSubscriptionFromRequest(req, res, {
+    allowCancelled: true, // allow re-subscribe
+    required: true,
+  });
+  if (!subscriptionData) {
+    return;
+  }
 
-    await acknowledge(subscriptionData);
+  await acknowledge(subscriptionData);
 
-    const cancelledSubscription = await getCancelledSubscriptionFromRequest(
-      req,
-      res
-    );
+  const cancelledSubscription = await getCancelledSubscriptionFromRequest(
+    req,
+    res
+  );
 
-    let newTier: Tier;
-    let tierChanged: boolean;
+  let newTier: Tier;
+  let tierChanged: boolean;
 
-    const purchasedTier = tierMap.get(subscriptionData.params.itemId)!;
+  const purchasedTier = tierMap.get(subscriptionData.params.itemId)!;
 
-    if (!cancelledSubscription) {
-      // set new tier from purchased subscription
-      tierChanged = true;
-      setSubscriptionCookie(subscriptionData.params, req, res);
-      newTier = purchasedTier;
+  if (!cancelledSubscription) {
+    // set new tier from purchased subscription
+    tierChanged = true;
+    setSubscriptionCookie(subscriptionData.params, req, res);
+    newTier = purchasedTier;
+  } else {
+    const cancelledTier = tierMap.get(cancelledSubscription.params.itemId);
+    if (cancelledTier === "Composer") {
+      // user already has composer tier - leave it
+      tierChanged = false;
+      newTier = cancelledTier;
     } else {
-      const cancelledTier = tierMap.get(cancelledSubscription.params.itemId);
-      if (cancelledTier === "Composer") {
-        // user already has composer tier - leave it
-        tierChanged = false;
-        newTier = cancelledTier;
+      // cancelled tier is explorer
+      if (purchasedTier === "Composer") {
+        // if the existing subscription is Explorer but new is Composer - set permissions
+        tierChanged = true;
+        newTier = purchasedTier;
+        setSubscriptionCookie(subscriptionData.params, req, res);
       } else {
-        // cancelled tier is explorer
-        if (purchasedTier === "Composer") {
-          // if the existing subscription is Explorer but new is Composer - set permissions
-          tierChanged = true;
-          newTier = purchasedTier;
-          setSubscriptionCookie(subscriptionData.params, req, res);
-        } else {
-          // it shouldn't happen - it means the cancelled and purchased tiers are the same
-          tierChanged = false;
-          newTier = "Explorer";
-        }
+        // it shouldn't happen - it means the cancelled and purchased tiers are the same
+        tierChanged = false;
+        newTier = "Explorer";
       }
     }
-
-    res.status(HttpStatusCode.Ok).json({
-      message: "Acknowledged",
-      newTier,
-      tierChanged,
-    } as SubscriptionActionResponseData);
-  } finally {
-    res.end();
   }
+
+  res.status(HttpStatusCode.Ok).json({
+    message: "Acknowledged",
+    newTier,
+    tierChanged,
+  } as SubscriptionActionResponseData);
 };
 
 export default apiHandler({

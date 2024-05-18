@@ -61,52 +61,48 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<SubscriptionActionResponseData>
 ) => {
-  try {
-    const subscriptionToCancel = await getSubscriptionFromRequest(req, res, {
-      allowCancelled: false,
-      required: true,
-    });
-    if (!subscriptionToCancel) {
-      return undefined;
-    }
-    const mode = await cancel(subscriptionToCancel);
-
-    let newTier: Tier | undefined;
-    let tierChanged: boolean;
-
-    const anotherCancelledSubscription =
-      await getCancelledSubscriptionFromRequest(req, res);
-    const subscriptionToCancelTier = tierMap.get(
-      subscriptionToCancel.params.itemId
-    );
-    if (!anotherCancelledSubscription) {
-      if (mode === CancellationMode.Revoke) {
-        // no permissions after revoke when there is no another cancelled subscription
-        clearSubscriptionCookie(req, res);
-        tierChanged = true;
-        newTier = undefined;
-      } else {
-        // cancel, but leave permissions from the subscription that was just cancelled
-        tierChanged = false;
-        newTier = subscriptionToCancelTier;
-      }
-    } else {
-      // leave the highest tier of cancelledSubscriptions
-      tierChanged = false;
-      newTier = getMaxTier([
-        subscriptionToCancelTier,
-        tierMap.get(anotherCancelledSubscription.params.itemId),
-      ]);
-    }
-
-    res.status(HttpStatusCode.Ok).json({
-      message: mode === CancellationMode.Revoke ? "Revoked" : "Cancelled",
-      tierChanged,
-      newTier,
-    } as SubscriptionActionResponseData);
-  } finally {
-    res.end();
+  const subscriptionToCancel = await getSubscriptionFromRequest(req, res, {
+    allowCancelled: false,
+    required: true,
+  });
+  if (!subscriptionToCancel) {
+    return undefined;
   }
+  const mode = await cancel(subscriptionToCancel);
+
+  let newTier: Tier | undefined;
+  let tierChanged: boolean;
+
+  const anotherCancelledSubscription =
+    await getCancelledSubscriptionFromRequest(req, res);
+  const subscriptionToCancelTier = tierMap.get(
+    subscriptionToCancel.params.itemId
+  );
+  if (!anotherCancelledSubscription) {
+    if (mode === CancellationMode.Revoke) {
+      // no permissions after revoke when there is no another cancelled subscription
+      clearSubscriptionCookie(req, res);
+      tierChanged = true;
+      newTier = undefined;
+    } else {
+      // cancel, but leave permissions from the subscription that was just cancelled
+      tierChanged = false;
+      newTier = subscriptionToCancelTier;
+    }
+  } else {
+    // leave the highest tier of cancelledSubscriptions
+    tierChanged = false;
+    newTier = getMaxTier([
+      subscriptionToCancelTier,
+      tierMap.get(anotherCancelledSubscription.params.itemId),
+    ]);
+  }
+
+  res.status(HttpStatusCode.Ok).json({
+    message: mode === CancellationMode.Revoke ? "Revoked" : "Cancelled",
+    tierChanged,
+    newTier,
+  } as SubscriptionActionResponseData);
 };
 
 export default apiHandler({

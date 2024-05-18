@@ -22,12 +22,8 @@ export const clearSubscriptionCookie = <T extends ResponseData>(
 };
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    clearSubscriptionCookie(req, res);
-    res.status(HttpStatusCode.Ok).json({ message: "Acknowledged" });
-  } finally {
-    res.end(); // End the response
-  }
+  clearSubscriptionCookie(req, res);
+  res.status(HttpStatusCode.Ok).json({ message: "Acknowledged" });
 };
 
 export default apiHandler({
