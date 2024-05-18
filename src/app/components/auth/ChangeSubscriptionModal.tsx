@@ -71,7 +71,7 @@ export const ChangeSubscriptionModal: FC<
   return (
     <Modal
       slotProps={{
-        backdrop: { style: { backgroundColor: "rgba(0,0,0,0.8)" } },
+        backdrop: { style: { backgroundColor: "rgba(0,0,0,0.9)" } },
       }}
       open={openModal}
       onClose={handleCloseModal}
