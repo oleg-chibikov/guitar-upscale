@@ -1,6 +1,5 @@
 import {
   ChangeResponseData,
-  ResponseData,
   SubscriptionActionResponseData,
 } from "@/lib/apiTypes";
 import { PurchaseParams } from "@/lib/purchaseParams";
@@ -65,23 +64,29 @@ export const getMakePurchase = (
       const existingNotCancelledPurchaseOption =
         getExistingNonCancelledPurchase(allPurchasedOptions, purchaseOption);
 
-      const postPurchaseFunc = getPostPurchaseFunction(
-        existingNotCancelledPurchaseOption,
-        purchaseOption,
-        paymentResponse.details.purchaseToken,
-        allPurchasedOptions
-      );
+      const purchaseParams: PurchaseParams = {
+        itemId: purchaseOption.details.itemId,
+        purchaseToken: paymentResponse.details.purchaseToken,
+      };
 
-      const actionString = existingNotCancelledPurchaseOption
-        ? "change"
-        : "acknowledge";
+      let result: Response<SubscriptionActionResponseData | ChangeResponseData>;
+      let actionString: string;
 
-      const result = await postPurchaseFunc;
+      if (existingNotCancelledPurchaseOption) {
+        result = await changePurchaseOnBackend(
+          purchaseParams,
+          existingNotCancelledPurchaseOption
+        );
+        actionString = "change";
+      } else {
+        result = await acknowledgePurchaseOnBackend(
+          purchaseParams,
+          getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
+        );
+        actionString = "acknowledge";
+      }
 
       if (result.status === ApiCallResult.Success) {
-        const dataAsChangeAction =
-          result.data as SubscriptionActionResponseData;
-
         // const digitalGoodsService = await buildDigitalGoodsService();
         // const consumeResult = await consumePurchaseToken(
         //   digitalGoodsService,
@@ -100,15 +105,32 @@ export const getMakePurchase = (
         if (!completeResult) {
           return;
         }
-        const message = `Payment for "${
+
+        let prefix = "Payment for";
+        const changeAction = (result.data as ChangeResponseData).changeAction;
+        if (changeAction) {
+          prefix = changeAction + " to";
+        }
+
+        let postfix: string = "";
+        const wasDeferred = (result.data as ChangeResponseData).wasDeferred;
+        if (wasDeferred === true) {
+          postfix =
+            ". Your new tier will become active when the cancelled subscription expires";
+        } else if (wasDeferred === false) {
+          postfix = ". Your new tier will become active immediately";
+        }
+
+        // TODO: Add better message when it's a change
+        const message = `${prefix} "${
           purchaseOption.tier
         }" successful! Your current subscription level is "${
-          dataAsChangeAction.newTier
+          result.data.newTier
         }"${
-          !dataAsChangeAction.tierChanged
+          !result.data.tierChanged
             ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
             : ""
-        }`;
+        }${postfix}`;
         console.log(message);
         dispatch(
           setAndShowAlert({
@@ -151,27 +173,6 @@ export const getMakePurchase = (
 
   return makePurchase;
 };
-
-function getPostPurchaseFunction(
-  existingNotCancelledPurchaseOption: PurchasedOption | undefined,
-  purchaseOption: PurchaseOption,
-  purchaseToken: string, // this is a newly acquired purchaseToken
-  allPurchasedOptions: PurchasedOption[]
-): Promise<Response<ResponseData | ChangeResponseData>> {
-  const purchaseParams: PurchaseParams = {
-    itemId: purchaseOption.details.itemId,
-    purchaseToken,
-  };
-  return existingNotCancelledPurchaseOption?.purchaseToken // this should always be true, just to satisfy the compiler
-    ? changePurchaseOnBackend(
-        purchaseParams,
-        existingNotCancelledPurchaseOption
-      )
-    : acknowledgePurchaseOnBackend(
-        purchaseParams,
-        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
-      );
-}
 
 async function showGooglePlayPurchaseUiAndSubscribe(
   dispatch: Dispatch<UnknownAction>,

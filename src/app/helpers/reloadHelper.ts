@@ -1,6 +1,7 @@
 import { UnknownAction } from "@reduxjs/toolkit";
 import { Dispatch } from "react";
 import { setLoadingMessage } from "../store/uiSlice";
+import { sleep } from "./sleep";
 
 export function getReloadCount(key: string) {
   const signInCheckCountRaw = localStorage.getItem(key);
@@ -21,9 +22,10 @@ export async function incrementAndReload(
   dispatch: Dispatch<UnknownAction>,
   reloadMessage?: string
 ) {
-  console.log("Waiting to reload for the key", key);
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
-  // await sleep(2000);
+  console.log("Waiting to reload for the key", key);
+  // some time to read the message
+  await sleep(3000);
   console.log("Reloading page for the key", key);
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
