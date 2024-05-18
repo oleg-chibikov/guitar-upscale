@@ -25,7 +25,7 @@ export async function incrementAndReload(
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   console.log("Waiting to reload for the key", key);
   // some time to read the message
-  await sleep(3000);
+  await sleep(2000);
   console.log("Reloading page for the key", key);
   // check to avoid endless reloads
   localStorage.setItem(key, (currentValue + 1).toString());
