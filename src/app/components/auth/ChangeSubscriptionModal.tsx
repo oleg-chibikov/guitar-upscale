@@ -1,7 +1,7 @@
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { Theme } from "@/app/data/theme";
 import {
-  GetMakePurchaseParams,
+  GetSubscriptionActionParams,
   getMakePurchase,
 } from "@/app/helpers/getMakePurchase";
 import {
@@ -17,9 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 
-export const ChangeSubscriptionModal: FC<ModalProps & GetMakePurchaseParams> = (
-  params
-) => {
+export const ChangeSubscriptionModal: FC<
+  ModalProps & GetSubscriptionActionParams
+> = (params) => {
   const {
     openModal,
     handleCloseModal,

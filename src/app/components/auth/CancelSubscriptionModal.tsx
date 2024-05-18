@@ -1,11 +1,8 @@
-import { ApiCallResult, cancelPurchaseOnBackend } from "@/app/apiClient";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
-import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
-import { getExistingCancelledPurchase } from "@/app/helpers/purchaseOptionHelper";
-import { incrementAndReload } from "@/app/helpers/reloadHelper";
-import { GOOGLE_PLAY_RELOAD_KEY } from "@/app/hooks/useGooglePlayAuth";
-import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { getCancelSubscription } from "@/app/helpers/getCancelSubscription";
+import { GetSubscriptionActionParams } from "@/app/helpers/getMakePurchase";
+import { selectUi } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
 import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button, Modal, Slide } from "@mui/material";
@@ -13,80 +10,22 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
-import { PurchaseOption, PurchasedOption } from "./GooglePlayPurchaseSection";
 
 export const CancelSubscriptionModal: FC<
-  ModalProps & {
-    setIsLoading: (isLoading: boolean) => void;
-    purchaseOption: PurchaseOption;
-    disabledMessage?: string;
-    allPurchasedOptions: PurchasedOption[];
-  }
-> = ({
-  openModal,
-  handleCloseModal,
-  setIsLoading,
-  purchaseOption,
-  disabledMessage,
-  allPurchasedOptions,
-}) => {
+  ModalProps & GetSubscriptionActionParams
+> = (params) => {
+  const { openModal, handleCloseModal, purchaseOption, disabledMessage } =
+    params;
   const { theme } = useSelector(selectUi);
-  const dispatch = useDispatch();
-  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const title = purchaseOption.tier;
 
-  const cancelSubscription = async () => {
-    if (!hasDigitalGoodsService) {
-      return;
-    }
-    if (disabledMessage) {
-      console.log(disabledMessage);
-      return;
-    }
-    if (!purchaseOption.purchaseData) {
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const cancelResult = await cancelPurchaseOnBackend(
-        purchaseOption.purchaseData,
-        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
-      );
-      if (cancelResult.status === ApiCallResult.Success) {
-        const message = `Subscription "${title}" has been successfully cancelled`;
-        dispatch(
-          setAndShowAlert({
-            message,
-          })
-        );
-        await incrementAndReload(GOOGLE_PLAY_RELOAD_KEY, 0, dispatch, message);
-      } else if (cancelResult.status === ApiCallResult.SkipProcessing) {
-        dispatch(
-          setAndShowAlert({
-            message: `Subscription "${title}" is already cancelled`,
-            alertType: AlertType.Warning,
-          })
-        );
-      } else {
-        dispatch(
-          setAndShowAlert({
-            message: `Cannot cancel the subscription "${title}" due to an error`,
-            alertType: AlertType.Error,
-          })
-        );
-      }
-    } catch (e) {
-      console.log(e);
-      dispatch(
-        setAndShowAlert({
-          message: "Cancellation aborted",
-          alertType: AlertType.Warning,
-        })
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const dispatch = useDispatch();
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
+  const cancelSubscription = getCancelSubscription(
+    params,
+    hasDigitalGoodsService,
+    dispatch
+  );
 
   const purchaseData = purchaseOption.purchaseData;
   const expirationDate = msToFormattedDate(purchaseData?.expirationDateMs);

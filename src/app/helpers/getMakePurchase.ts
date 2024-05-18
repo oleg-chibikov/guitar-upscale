@@ -24,7 +24,7 @@ import {
 } from "./purchaseOptionHelper";
 import { incrementAndReload } from "./reloadHelper";
 
-export interface GetMakePurchaseParams {
+export interface GetSubscriptionActionParams {
   purchaseOption: PurchaseOption;
   setIsLoading: (isLoading: boolean) => void;
   disabledMessage?: string;
@@ -37,7 +37,7 @@ export const getMakePurchase = (
     setIsLoading,
     disabledMessage,
     allPurchasedOptions,
-  }: GetMakePurchaseParams,
+  }: GetSubscriptionActionParams,
   hasDigitalGoodsService: boolean,
   dispatch: Dispatch<UnknownAction>
 ) => {
@@ -121,16 +121,16 @@ export const getMakePurchase = (
           postfix = ". Your new tier will become active immediately";
         }
 
-        // TODO: Add better message when it's a change
-        const message = `${prefix} "${
-          purchaseOption.tier
-        }" successful! Your current subscription level is "${
+        const tierInfo = `Your current subscription level is "${
           result.data.newTier
         }"${
           !result.data.tierChanged
             ? ". Current tier was not changed as your cancelled subscription is still active till its expiry"
             : ""
-        }${postfix}`;
+        }`;
+
+        // TODO: Add better message when it's a change
+        const message = `${prefix} "${purchaseOption.tier}" successful! ${tierInfo}${postfix}`;
         console.log(message);
         dispatch(
           setAndShowAlert({

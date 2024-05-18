@@ -1,7 +1,7 @@
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { Theme } from "@/app/data/theme";
 import {
-  GetMakePurchaseParams,
+  GetSubscriptionActionParams,
   getMakePurchase,
 } from "@/app/helpers/getMakePurchase";
 import {
@@ -17,7 +17,8 @@ import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-interface GooglePlayPurchaseOptionButtonProps extends GetMakePurchaseParams {
+interface GooglePlayPurchaseOptionButtonProps
+  extends GetSubscriptionActionParams {
   onClick: () => void;
   isSelected: boolean;
   showCancellationModal: () => void;
