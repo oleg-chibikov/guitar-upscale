@@ -6,7 +6,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
-import { Avatar, Modal, Slide } from "@mui/material";
+import { Alert, Avatar, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
@@ -47,6 +47,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
+  const isOnline = useOnlineStatus();
 
   const renderCurrentFeature = (x: PremiumFeatureKeys) => {
     const isCurrentlyEnabled = keyValueCurrentFeatures[x] ? true : false;
@@ -145,22 +146,28 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
               </>
             </div>
           </div>
-          <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
-            {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
-            {hasDigitalGoodsService &&
-              (!subscriptionTier ||
-                subscriptionTier.provider ===
-                  SubscriptionProvider.GooglePlay) && (
-                <GooglePlayPurchaseSection
-                  onOptionSelected={(tier) => {
-                    setHighlightedOption(tier);
-                  }}
-                />
-              )}
-            {/* There should be a way for users to sign in to Patreon if they are
+          {isOnline ? (
+            <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+              {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
+              {hasDigitalGoodsService &&
+                (!subscriptionTier ||
+                  subscriptionTier.provider ===
+                    SubscriptionProvider.GooglePlay) && (
+                  <GooglePlayPurchaseSection
+                    onOptionSelected={(tier) => {
+                      setHighlightedOption(tier);
+                    }}
+                  />
+                )}
+              {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
-            <PatreonModalAuthButton closeModal={handleCloseModal} />
-          </div>
+              <PatreonModalAuthButton closeModal={handleCloseModal} />
+            </div>
+          ) : (
+            <Alert severity="warning">
+              {"Subscription options will be loaded when you're back online"}
+            </Alert>
+          )}
         </section>
       </Slide>
     </Modal>
