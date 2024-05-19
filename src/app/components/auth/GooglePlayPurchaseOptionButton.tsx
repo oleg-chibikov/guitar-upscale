@@ -126,7 +126,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     currency: purchaseOption.details.price.currency,
   }).format(parseFloat(purchaseOption.details.price.value));
 
-  const handleClick = () => !isAlreadyPurchased && onClick();
+  const handleClick = () => onClick();
 
   const className =
     "p-2 flex flex-col gap-1 justify-center cursor-pointer " + bg;
