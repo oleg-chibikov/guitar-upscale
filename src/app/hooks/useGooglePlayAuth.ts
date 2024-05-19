@@ -39,7 +39,7 @@ export const useGooglePlayAuth = () => {
   const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const isOnline = useOnlineStatus();
-  // TODO We need to be able to change subscription in google play. https://developer.android.com/google/play/billing/subscriptions
+  // https://developer.android.com/google/play/billing/subscriptions
   // https://chromeos.dev/en/publish/play-billing-backend
   // https://medium.com/androiddevelopers/implementing-linkedpurchasetoken-correctly-to-prevent-duplicate-subscriptions-82dfbf7167da
   // https://developer.android.com/google/play/billing/lifecycle/subscriptions#upgrades-downgrades

@@ -164,7 +164,6 @@ export const GooglePlayPurchaseOptionButton: FC<
           title={buttonTitle}
           onClick={buttonAction}
         >
-          {/* TODO: upgrade/downgrade instead of subscribe if there is another active not cancelled subscription */}
           {buttonContent}
         </Button>
       </p>
