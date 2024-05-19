@@ -7,7 +7,6 @@ import { Slide } from "@mui/material";
 import { ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
-import { SwitchToChromaticScaleCheckbox } from "./checkboxes/SwitchToChromaticScaleCheckbox";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
 import { BaseNoteSelector } from "./selectors/BaseNoteSelector";
@@ -50,7 +49,6 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           }}
         />
         {premiumComponents.get("advancedChords") as ReactNode}
-        <SwitchToChromaticScaleCheckbox />
         <UseSharpChordsCheckbox />
         <UseChordAlterationCheckbox />
         {

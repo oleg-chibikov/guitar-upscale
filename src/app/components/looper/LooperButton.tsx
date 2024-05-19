@@ -12,7 +12,6 @@ export const LooperButton: React.FC = () => {
 
   const handleRecordClick = () => {
     if (isRecording) {
-      // TODO: Wait for the bar to end
       setIsPlaying(true);
     }
     setIsRecording(!isRecording);

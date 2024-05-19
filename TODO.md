@@ -1,6 +1,5 @@
 Looper - 4 buttons to assign last non looped melody. The ones already assigned shouldn't repeat
 Midi upload and play
-Animations stop when clicking to fast
 More chords
 Ads
 more examples
