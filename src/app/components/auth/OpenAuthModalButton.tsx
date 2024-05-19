@@ -1,3 +1,4 @@
+import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
@@ -9,13 +10,15 @@ import { AuthButtonProps } from "./AuthButtonProps";
 
 export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
   const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
+  const text = hasDigitalGoodsService ? "Subscribe" : "Sign in";
   return (
     <Button
       size="small"
       onClick={openModal}
       variant="contained"
       color="primary"
-      title="Sign in"
+      title={text}
       style={{ minWidth: 0, padding: 6 }} // override MUI value
       className={`flex ${
         chordsDisplayMode === ChordsDisplayMode.Left
@@ -31,7 +34,7 @@ export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
             : "text-foreground-dark"
         }`}
       >
-        Sign in
+        {text}
       </span>
     </Button>
   );
