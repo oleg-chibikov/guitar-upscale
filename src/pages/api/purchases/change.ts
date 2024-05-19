@@ -9,22 +9,23 @@
 import { apiHandler } from "@/lib/apiHelper";
 import {
   CancellationMode,
-  ChangeAction,
-  ChangeResponseData,
+  GetPurchaseResponseData,
+  PurchaseAction,
 } from "@/lib/apiTypes";
-import { msToTime } from "@/lib/dateHelper";
-import { deferSubscription } from "@/lib/purchases";
 import { setSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
-import { getSubscriptionFromRequest } from "@/lib/subscriptionHelper";
+import {
+  acknowledge,
+  cancel,
+  defer,
+  getSubscriptionFromRequest,
+} from "@/lib/subscriptionHelper";
 import { Tier } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { acknowledge } from "./acknowledge";
-import { cancel } from "./cancel";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<ChangeResponseData>
+  res: NextApiResponse<GetPurchaseResponseData>
 ) => {
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
     allowCancelled: false,
@@ -54,17 +55,8 @@ const handle = async (
 
   await acknowledge(subscriptionData);
 
-  let wasDeferred: boolean = false;
-
-  // this is the same as cancelled subscription expiry time
-  const newSubscriptionDesiredStartTimeMs =
-    subscriptionToCancel.subscription.expiryTimeMillis;
-
-  let newSubscriptionDesiredExpiryTimeMs =
-    subscriptionData.subscription.expiryTimeMillis;
-
   const cancellationMode = await cancel(subscriptionToCancel);
-  const changeAction: ChangeAction =
+  const changeAction: PurchaseAction =
     subscriptionToCancel.params.itemId === "guitar_upscale.composer"
       ? "Downgrade"
       : "Upgrade";
@@ -74,6 +66,8 @@ const handle = async (
   let newTier: Tier;
   let tierChanged: boolean;
 
+  let wasDeferred: boolean = false;
+
   if (isDowngradeWithCancellation) {
     // If downgraded, but the old subscription was not revoked immediately - keep the old permissions until they expire
 
@@ -81,51 +75,8 @@ const handle = async (
     tierChanged = false;
     // Downgrading - defer the new subscription to avoid overlap
 
-    const newSubscriptionCurrentExpiryTimeMs =
-      subscriptionData.subscription.expiryTimeMillis;
-
-    const currentSubscriptionDurationMs =
-      subscriptionData.subscription.expiryTimeMillis -
-      subscriptionData.subscription.startTimeMillis;
-
-    newSubscriptionDesiredExpiryTimeMs =
-      newSubscriptionDesiredStartTimeMs + currentSubscriptionDurationMs;
-
-    const expiryTimeDifference =
-      newSubscriptionDesiredExpiryTimeMs - newSubscriptionCurrentExpiryTimeMs;
-
-    const differnceObject = msToTime(expiryTimeDifference);
-    console.log(
-      `Deferrning subscription %s;
-        desired start time: %o;
-        desired expiry time: %o;
-        current expiry time: %o,
-        duration: %o;
-        expiry time difference: %o`,
-      subscriptionData.params.itemId,
-      new Date(newSubscriptionDesiredStartTimeMs),
-      new Date(newSubscriptionDesiredExpiryTimeMs),
-      new Date(newSubscriptionCurrentExpiryTimeMs),
-      msToTime(currentSubscriptionDurationMs),
-      differnceObject
-    );
-    if (differnceObject.days >= 1 && differnceObject.days <= 365) {
-      try {
-        await deferSubscription(
-          subscriptionData.params,
-          subscriptionData.subscription.expiryTimeMillis,
-          newSubscriptionDesiredExpiryTimeMs
-        );
-        wasDeferred = true;
-      } catch (error: unknown) {
-        wasDeferred = false;
-      }
-    } else {
-      // https://developer.android.com/google/play/billing/subscriptions#defer
-      console.log(
-        "Differnce in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
-      );
-    }
+    // this is the same as cancelled subscription expiry time
+    wasDeferred = await defer(subscriptionToCancel, subscriptionData);
   } else {
     // upgrade or downgrade with revoke - change tier according to the new subscription
     setSubscriptionCookie(subscriptionData.params, req, res);
@@ -140,7 +91,7 @@ const handle = async (
     wasDeferred,
     newTier,
     tierChanged,
-  } as ChangeResponseData);
+  } as GetPurchaseResponseData);
 };
 
 export default apiHandler({

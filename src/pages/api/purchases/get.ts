@@ -1,5 +1,5 @@
 import { apiHandler } from "@/lib/apiHelper";
-import { CancellationMode, PurchaseResponseData } from "@/lib/apiTypes";
+import { CancellationMode, GetPurchaseResponseData } from "@/lib/apiTypes";
 import {
   getSubscriptionFromRequest,
   shouldRevoke,
@@ -9,7 +9,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<PurchaseResponseData>
+  res: NextApiResponse<GetPurchaseResponseData>
 ) => {
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
     allowCancelled: true,

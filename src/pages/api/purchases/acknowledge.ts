@@ -8,11 +8,11 @@
 */
 
 import { apiHandler } from "@/lib/apiHelper";
-import { SubscriptionActionResponseData } from "@/lib/apiTypes";
-import { acknowledgeSubscriptionPurchase } from "@/lib/purchases";
+import { ChangeSubscriptionActionResponseData } from "@/lib/apiTypes";
 import { setSubscriptionCookie } from "@/lib/subscriptionCookieUtils";
 import {
-  SubscriptionData,
+  acknowledge,
+  defer,
   getCancelledSubscriptionFromRequest,
   getSubscriptionFromRequest,
 } from "@/lib/subscriptionHelper";
@@ -20,24 +20,9 @@ import { Tier, tierMap } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export const acknowledge = async (subscriptionData: SubscriptionData) => {
-  const { subscription, params } = subscriptionData;
-  const wasAcknowledged = subscription?.wasAcknowledged();
-  console.log(
-    "Subscription %s acknowdegement state %s",
-    params.itemId,
-    wasAcknowledged
-  );
-  // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
-
-  if (!wasAcknowledged) {
-    await acknowledgeSubscriptionPurchase(params);
-  }
-};
-
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<SubscriptionActionResponseData>
+  res: NextApiResponse<ChangeSubscriptionActionResponseData>
 ) => {
   // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
@@ -59,6 +44,7 @@ const handle = async (
   let tierChanged: boolean;
 
   const purchasedTier = tierMap.get(subscriptionData.params.itemId)!;
+  let wasDeferred = false;
 
   if (!cancelledSubscription) {
     // set new tier from purchased subscription
@@ -71,6 +57,9 @@ const handle = async (
       // user already has composer tier - leave it
       tierChanged = false;
       newTier = cancelledTier;
+
+      // try to defer new subscription as it won't take effect until the current cancelled one expires
+      wasDeferred = await defer(cancelledSubscription, subscriptionData);
     } else {
       // cancelled tier is explorer
       if (purchasedTier === "Composer") {
@@ -90,7 +79,9 @@ const handle = async (
     message: "Acknowledged",
     newTier,
     tierChanged,
-  } as SubscriptionActionResponseData);
+    changeAction: "Purchase",
+    wasDeferred,
+  } as ChangeSubscriptionActionResponseData);
 };
 
 export default apiHandler({

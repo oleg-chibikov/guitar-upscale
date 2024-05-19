@@ -11,16 +11,17 @@ export type SubscriptionActionResponseData = ResponseData & {
   tierChanged: boolean;
 };
 
-export type PurchaseResponseData = ResponseData & {
+export type GetPurchaseResponseData = ResponseData & {
   data?: PurchaseData;
 };
 
-export type ChangeAction = "Upgrade" | "Downgrade";
+export type PurchaseAction = "Upgrade" | "Downgrade" | "Purchase";
 
-export type ChangeResponseData = SubscriptionActionResponseData & {
-  changeAction: ChangeAction;
-  wasDeferred: boolean;
-};
+export type ChangeSubscriptionActionResponseData =
+  SubscriptionActionResponseData & {
+    changeAction: PurchaseAction;
+    wasDeferred: boolean;
+  };
 
 export type PurchaseData = {
   cancellationReason: CancelReason;

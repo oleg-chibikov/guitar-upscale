@@ -1,6 +1,6 @@
 import {
-  ChangeResponseData,
-  PurchaseResponseData,
+  ChangeSubscriptionActionResponseData,
+  GetPurchaseResponseData,
   ResponseData,
   SubscriptionActionResponseData,
 } from "@/lib/apiTypes";
@@ -81,7 +81,7 @@ const callApi = async <T extends ResponseData>(
 export async function acknowledgePurchaseOnBackend(
   params: PurchaseParams,
   anotherCancelledSubscriptionParams?: PurchaseParams // there might be another cancelled subscription when we acknowledge a subscription. We need to make sure its tier is taken into account
-): Promise<Response<SubscriptionActionResponseData>> {
+): Promise<Response<ChangeSubscriptionActionResponseData>> {
   const { itemId, purchaseToken } = params;
   const {
     itemId: cancelledSubscriptionItemId,
@@ -98,7 +98,7 @@ export async function acknowledgePurchaseOnBackend(
 export async function changePurchaseOnBackend(
   newParams: PurchaseParams,
   oldParams: PurchaseParams
-): Promise<Response<ChangeResponseData>> {
+): Promise<Response<ChangeSubscriptionActionResponseData>> {
   // We don't check for any other cancelled subscriptions currently - we just have 2 options and both of them should be already passed to this method as newParams and oldParams
   const { itemId, purchaseToken } = newParams;
   const { itemId: oldItemId, purchaseToken: oldPurchaseToken } = oldParams;
@@ -133,7 +133,7 @@ export async function logoutOnBackend(): Promise<Response<ResponseData>> {
 
 export async function getPurchaseOnBackend(
   params: PurchaseParams
-): Promise<Response<PurchaseResponseData>> {
+): Promise<Response<GetPurchaseResponseData>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/get`, "GET", {
     itemId,

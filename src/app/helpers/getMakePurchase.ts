@@ -1,5 +1,5 @@
 import {
-  ChangeResponseData,
+  ChangeSubscriptionActionResponseData,
   SubscriptionActionResponseData,
 } from "@/lib/apiTypes";
 import { PurchaseParams } from "@/lib/purchaseParams";
@@ -69,7 +69,7 @@ export const getMakePurchase = (
         purchaseToken: paymentResponse.details.purchaseToken,
       };
 
-      let result: Response<SubscriptionActionResponseData | ChangeResponseData>;
+      let result: Response<ChangeSubscriptionActionResponseData>;
       let actionString: string;
 
       if (existingNotCancelledPurchaseOption) {
@@ -106,25 +106,11 @@ export const getMakePurchase = (
           return;
         }
 
-        let prefix = "Payment for";
-        const changeAction = (result.data as ChangeResponseData).changeAction;
-        if (changeAction) {
-          prefix = changeAction + " to";
-        }
-
-        let postfix: string = "";
-        const wasDeferred = (result.data as ChangeResponseData).wasDeferred;
-        if (wasDeferred === true) {
-          postfix =
-            ". Your new tier will become active when the cancelled subscription expires";
-        } else if (wasDeferred === false) {
-          postfix = ". Your new tier will become active immediately";
-        }
-
-        const tierInfoMessage = getTierInfoMessage(result.data);
-
-        // TODO: Add better message when it's a change
-        const message = `${prefix} "${purchaseOption.tier}" successful! ${tierInfoMessage}${postfix}`;
+        let deferredMessage: string = "";
+        const data = result.data;
+        deferredMessage = getDeferredMessage(data, deferredMessage);
+        const tierInfoMessage = getTierInfoMessage(data);
+        const message = `${data.changeAction} successful! ${tierInfoMessage}${deferredMessage}`;
         console.log(message);
         dispatch(
           setAndShowAlert({
@@ -173,6 +159,20 @@ export const getMakePurchase = (
 
   return makePurchase;
 };
+
+function getDeferredMessage(
+  data: ChangeSubscriptionActionResponseData,
+  postfix: string
+) {
+  const wasDeferred = data.wasDeferred;
+  if (wasDeferred === true) {
+    postfix =
+      ". Your new tier will become active when the cancelled subscription expires";
+  } else if (wasDeferred === false) {
+    postfix = ". Your new tier will become active immediately";
+  }
+  return postfix;
+}
 
 export function getTierInfoMessage(data: SubscriptionActionResponseData) {
   return !data.tierChanged

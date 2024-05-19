@@ -8,7 +8,7 @@ import {
 import { buildDigitalGoodsService } from "@/app/helpers/serviceHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { PurchaseData, PurchaseResponseData } from "@/lib/apiTypes";
+import { GetPurchaseResponseData, PurchaseData } from "@/lib/apiTypes";
 import { CancelReason } from "@/lib/billing";
 import { PurchaseParams } from "@/lib/purchaseParams";
 import { Tier, tierMap } from "@/lib/tier";
@@ -97,7 +97,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
             const correspondingPurchasedItem = existingPurchases.find(
               (x) => x.itemId === availablePurchaseOption.itemId
             );
-            let purchaseDataFromBackend: PurchaseResponseData | undefined;
+            let purchaseDataFromBackend: GetPurchaseResponseData | undefined;
             if (correspondingPurchasedItem) {
               const response = await getPurchaseOnBackend({
                 itemId: availablePurchaseOption.itemId,

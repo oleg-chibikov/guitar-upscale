@@ -1,9 +1,18 @@
+import "server-only";
+
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
-import { ResponseData } from "./apiTypes";
+import { CancellationMode, ResponseData } from "./apiTypes";
 import { CancelReason, SubscriptionPurchase } from "./billing";
+import { msToTime } from "./dateHelper";
 import { PurchaseParams } from "./purchaseParams";
-import { fetchSubscriptionPurchase } from "./purchases";
+import {
+  acknowledgeSubscriptionPurchase,
+  cancelSubscription,
+  deferSubscription,
+  fetchSubscriptionPurchase,
+  revokeSubscription,
+} from "./purchases";
 
 export type SubscriptionData = {
   subscription: SubscriptionPurchase;
@@ -71,3 +80,98 @@ export const getCancelledSubscriptionFromRequest = async <
 
 export const shouldRevoke = (subscription: SubscriptionPurchase) =>
   subscription.isGracePeriod();
+
+export async function defer(
+  cancelledSubscription: SubscriptionData,
+  purchasedSubscription: SubscriptionData
+) {
+  const newSubscriptionDesiredStartTimeMs =
+    cancelledSubscription.subscription.expiryTimeMillis;
+
+  let newSubscriptionDesiredExpiryTimeMs =
+    purchasedSubscription.subscription.expiryTimeMillis;
+
+  const newSubscriptionCurrentExpiryTimeMs =
+    purchasedSubscription.subscription.expiryTimeMillis;
+
+  const currentSubscriptionDurationMs =
+    purchasedSubscription.subscription.expiryTimeMillis -
+    purchasedSubscription.subscription.startTimeMillis;
+
+  newSubscriptionDesiredExpiryTimeMs =
+    newSubscriptionDesiredStartTimeMs + currentSubscriptionDurationMs;
+
+  const expiryTimeDifference =
+    newSubscriptionDesiredExpiryTimeMs - newSubscriptionCurrentExpiryTimeMs;
+
+  const differnceObject = msToTime(expiryTimeDifference);
+  console.log(
+    `Deferrning subscription %s;
+        desired start time: %o;
+        desired expiry time: %o;
+        current expiry time: %o,
+        duration: %o;
+        expiry time difference: %o`,
+    purchasedSubscription.params.itemId,
+    new Date(newSubscriptionDesiredStartTimeMs),
+    new Date(newSubscriptionDesiredExpiryTimeMs),
+    new Date(newSubscriptionCurrentExpiryTimeMs),
+    msToTime(currentSubscriptionDurationMs),
+    differnceObject
+  );
+  if (differnceObject.days >= 1 && differnceObject.days <= 365) {
+    try {
+      await deferSubscription(
+        purchasedSubscription.params,
+        purchasedSubscription.subscription.expiryTimeMillis,
+        newSubscriptionDesiredExpiryTimeMs
+      );
+      return true;
+    } catch (error: unknown) {
+      return false;
+    }
+  } else {
+    // https://developer.android.com/google/play/billing/subscriptions#defer
+    console.log(
+      "Differnce in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
+    );
+    return false;
+  }
+}
+
+export const cancel = async (subscriptionData: SubscriptionData) => {
+  const { subscription, params } = subscriptionData;
+
+  let mode: CancellationMode = CancellationMode.Cancel;
+  if (shouldRevoke(subscription)) {
+    console.log(
+      "Subscription %s is still in grace period. Revoking permissions",
+      params.itemId
+    );
+    await revokeSubscription(params);
+    mode = CancellationMode.Revoke;
+  } else {
+    console.log(
+      "Subscription %s is not in grace period anymore. Keeping permissions",
+      params.itemId
+    );
+    await cancelSubscription(params);
+    // we should keep the permissions. it will be revoked only when the subscription expires
+  }
+  return mode;
+};
+
+export const acknowledge = async (subscriptionData: SubscriptionData) => {
+  const { subscription, params } = subscriptionData;
+  const wasAcknowledged = subscription?.wasAcknowledged();
+  console.log(
+    "Subscription %s acknowdegement state %s",
+    params.itemId,
+    wasAcknowledged
+  );
+  // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
+
+  if (!wasAcknowledged) {
+    await acknowledgeSubscriptionPurchase(params);
+  }
+};
