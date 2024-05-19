@@ -50,7 +50,6 @@ interface SettingsState extends WithNeck, WithControls {
   velocity: number;
   metronomeVelocity: number;
   playbackType: PlaybackType;
-  switchToChromaticScale: boolean;
   chordPlayMode: ChordPlayMode;
   chordNotesToPlay: number;
   tuning: Tuning;
@@ -82,7 +81,6 @@ const initialState: SettingsState = {
   velocity: MAX_VELOCITY,
   metronomeVelocity: MAX_VELOCITY,
   playbackType: PlaybackType.Melody,
-  switchToChromaticScale: true,
   chordPlayMode: ChordPlayMode.Closest_Variation,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
@@ -313,9 +311,6 @@ export const settingsSlice = createSlice({
       state.playbackType = action.payload;
       playbackTypeValue = action.payload;
     },
-    setSwitchToChromaticScale(state, action: PayloadAction<boolean>) {
-      state.switchToChromaticScale = action.payload;
-    },
     setChordPlayMode(state, action: PayloadAction<ChordPlayMode>) {
       state.chordPlayMode = action.payload;
       chordPlayModeValue = action.payload;
@@ -407,7 +402,6 @@ export const {
   setVelocity,
   setMetronomeVelocity,
   setPlaybackType,
-  setSwitchToChromaticScale,
   setChordStrummingDelayMs,
   setChordPlayMode,
   setChordNotesToPlay,
