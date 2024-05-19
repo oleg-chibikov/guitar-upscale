@@ -2,7 +2,6 @@ import { FC } from "react";
 import { ModalAuthButtonProps } from "./AuthButtonProps";
 import { Button } from "@mui/material";
 
-
 export const PatreonSubscribeButton: FC<ModalAuthButtonProps> = ({closeModal}) => {
   return (
     <Button

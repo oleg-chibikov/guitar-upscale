@@ -4,6 +4,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
+import { AboutButton } from "./AboutButton";
 import { FullscreenButton } from "./FullscreenButton";
 import { MetronomeButton } from "./MetronomeButton";
 import { OpenSettingsButton } from "./OpenSettingsButton";
@@ -62,6 +63,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
           <DisabledRecordButton />
         )}
         <OpenStrummingSettingsButton />
+        <AboutButton />
       </div>
     </section>
   );
