@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React from "react";
 
 interface GuitarImageProps {
@@ -13,8 +12,9 @@ export const GuitarImage: React.FC<GuitarImageProps> = ({
   className,
 }) => {
   return (
-    <Image
-      priority
+    // Use standard img tag to offload traffic from vercel (which contributes to usage)
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       className={`origin-top-left ${className}`}
       // loader={imageLoader}
       style={{

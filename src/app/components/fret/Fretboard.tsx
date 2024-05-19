@@ -152,7 +152,10 @@ export const Fretboard: React.FC = () => {
           {/* {!highResLoaded && <GuitarImage asset={assets[0]} />} */}
           <GuitarImage
             // className={!highResLoaded ? "collapse" : undefined}
-            asset={assets[1]}
+            asset={
+              "https://cdn.statically.io/gh/oleg-chibikov/guitar-upscale-assets/main" +
+              assets[1]
+            }
             // onLoad={() => {
             //   if (!highResLoaded) {
             //     console.log("Loaded full res image");
