@@ -10,7 +10,7 @@ export const AboutButton: FC = () => {
       isActive={false}
       onPress={() => {
         window.open(
-          "https://github.com/oleg-chibikov/guitar-upscale-assets/blob/main/Documentation.md",
+          "https://github.com/oleg-chibikov/guitar-upscale-assets/blob/main/documentation.md",
           "_blank"
         );
       }}
