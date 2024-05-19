@@ -41,7 +41,7 @@ export const TempoSlider: React.FC = () => {
 
   return (
     <>
-      <span>Playback speed:</span>
+      <span>Tempo:</span>
       <StepSlider
         onValueChange={handleSliderChange}
         value={tempoBpm}
