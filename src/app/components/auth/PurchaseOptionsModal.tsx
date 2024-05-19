@@ -1,6 +1,7 @@
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
+import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
