@@ -30,15 +30,6 @@ export const Initializer: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const loadErudaDevTools = async () => {
-      // TODO: Check if available in a server function
-      const eruda = (await import("eruda")).default;
-      eruda.init({ useShadowDom: false, defaults: { transparency: 0 } });
-    };
-    void loadErudaDevTools();
-  }, []);
-
-  useEffect(() => {
     const remove = () => {
       document.body.removeEventListener("scroll", handleFirstInteraction);
       document.body.removeEventListener("keydown", handleFirstInteraction);
