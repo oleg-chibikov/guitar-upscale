@@ -10,7 +10,7 @@ export const NoteDisplayModeSelector: React.FC = () => {
 
   return (
     <>
-      <span>Note Display Mode:</span>
+      <span>Note display mode:</span>
       <EnumSelector
         enumObj={NoteDisplayMode}
         selectedValue={noteDisplayMode}

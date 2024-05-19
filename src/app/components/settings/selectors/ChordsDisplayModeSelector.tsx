@@ -10,7 +10,7 @@ export const ChordsDisplayModeSelector: React.FC = () => {
 
   return (
     <>
-      <span>Chords Display Mode:</span>
+      <span>Chords display mode:</span>
       <EnumSelector
         enumObj={ChordsDisplayMode}
         selectedValue={chordsDisplayMode}
