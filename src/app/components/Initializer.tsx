@@ -33,7 +33,7 @@ export const Initializer: React.FC = () => {
     const loadErudaDevTools = async () => {
       // TODO: Check if available in a server function
       const eruda = (await import("eruda")).default;
-      eruda.init({ useShadowDom: false });
+      eruda.init({ useShadowDom: false, defaults: { transparency: 1 } });
     };
     void loadErudaDevTools();
   }, []);
