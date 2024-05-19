@@ -40,7 +40,7 @@ export const getCancelSubscription = (
       );
       if (cancelResult.status === ApiCallResult.Success) {
         const tierInfoMessage = getTierInfoMessage(cancelResult.data);
-        const message = `Subscription "${purchaseOption.tier}" has been successfully cancelled! ${tierInfoMessage}`;
+        const message = `Cancellation successful! ${tierInfoMessage}`;
         dispatch(
           setAndShowAlert({
             message: "Success",
