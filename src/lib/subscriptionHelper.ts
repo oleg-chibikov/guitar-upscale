@@ -1,4 +1,4 @@
-import "server-only";
+"use server";
 
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
