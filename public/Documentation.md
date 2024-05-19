@@ -81,7 +81,7 @@ A virtual guitar which allows to play notes and chords in a selected scale.
    1. `Scale` - the whole scale is played without repeating notes (randomly - top to bottom or vice versa)
    1. `FullStringScale` - the whole scale is played on each string one by one (randomly - top to bottom or vice versa)
    1. `Melody` (requires `Explorer` plan)
-      If the scale has examples (marked with \*) then the random example is played
+      If the scale has examples (marked with `*`) then the random example is played
       Tempo is set to match it.
       Examples usually involve multiple tracks including but not limited to: chords track, melody track and rhythm track. They typically represent different instrument.
       Playing all of them at once on a real guitar might require mastering the advanced techniques like fingerstyle and arranging the melody properly
