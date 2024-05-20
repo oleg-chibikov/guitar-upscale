@@ -73,7 +73,7 @@ export const tunings: { [key: string]: TuningData } = {
   DAFCGD: { name: "D", shift: -2, octaveNotes: "544333" },
   DAFCGC: { name: "Drop C", shift: -2, octaveNotes: "544332" },
 
-  "C#G#EBF#C": { name: "C#", shift: -3, octaveNotes: "544332" },
+  "C#G#EBF#C#": { name: "C#", shift: -3, octaveNotes: "544332" },
   "C#G#EBF#B": { name: "Drop B", shift: -3, octaveNotes: "544332" },
 
   "CGD#A#FC": { name: "C", shift: -4, octaveNotes: "444332" },
