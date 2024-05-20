@@ -104,9 +104,9 @@ export async function defer(
   const expiryTimeDifference =
     newSubscriptionDesiredExpiryTimeMs - newSubscriptionCurrentExpiryTimeMs;
 
-  const differnceObject = msToTime(expiryTimeDifference);
+  const differenceObject = msToTime(expiryTimeDifference);
   console.log(
-    `Deferrning subscription %s;
+    `Deferring subscription %s;
         desired start time: %o;
         desired expiry time: %o;
         current expiry time: %o,
@@ -117,9 +117,9 @@ export async function defer(
     new Date(newSubscriptionDesiredExpiryTimeMs),
     new Date(newSubscriptionCurrentExpiryTimeMs),
     msToTime(currentSubscriptionDurationMs),
-    differnceObject
+    differenceObject
   );
-  if (differnceObject.days >= 1 && differnceObject.days <= 365) {
+  if (differenceObject.days >= 1 && differenceObject.days <= 365) {
     try {
       await deferSubscription(
         purchasedSubscription.params,
@@ -133,7 +133,7 @@ export async function defer(
   } else {
     // https://developer.android.com/google/play/billing/subscriptions#defer
     console.log(
-      "Differnce in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
+      "Difference in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
     );
     return false;
   }
@@ -165,7 +165,7 @@ export const acknowledge = async (subscriptionData: SubscriptionData) => {
   const { subscription, params } = subscriptionData;
   const wasAcknowledged = subscription?.wasAcknowledged();
   console.log(
-    "Subscription %s acknowdegement state %s",
+    "Subscription %s acknowledgement state %s",
     params.itemId,
     wasAcknowledged
   );

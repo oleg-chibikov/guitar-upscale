@@ -51,7 +51,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     }
 
     let example: Example | undefined;
-    if (onPlayExample) {
+    if (onPlayExample && playbackTypeValue === melodyType) {
       const { getRandomScaleExample } = await import(
         "@/app/data/scaleExamples"
       );

@@ -23,7 +23,7 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
   const notes: OctaveNote[] = [];
 
   const data = tunings[tuningKey];
-  const octavesString = data.shift == -2 ? "544333" : OCTAVES_STING;
+  const octavesString = data.octaveNotes ?? OCTAVES_STING;
 
   for (
     let i = 0, j = 0;
@@ -55,17 +55,29 @@ export const getShiftedNote = (note: Note) => {
 interface TuningData {
   name: string;
   shift?: number;
+  octaveNotes?: string;
 }
 
 export const tunings: { [key: string]: TuningData } = {
-  EBGDAE: { name: "Standard E" },
-  EBGDAD: { name: "Drop E" },
-  "EBEG#BE": { name: "Open E" },
-  DADGAD: { name: "Celtic E" },
+  EBGDAE: { name: "E" },
+  EBGDAD: { name: "Drop D" },
+
+  "EBEG#BE": { name: "Open E", octaveNotes: "655433" },
+  DADGAD: { name: "Celtic E", octaveNotes: "655433" },
   DADDAD: { name: "Folk E" },
   EBEGBE: { name: "Cross note E" },
-  DAFCGD: { name: "Standard D", shift: -2 },
-  DAFCGC: { name: "Drop D", shift: -2 },
+
+  "D#A#F#C#G#D#": { name: "D#", shift: -1, octaveNotes: "544433" },
+  "D#A#F#C#G#C#": { name: "Drop C#", shift: -1, octaveNotes: "544433" },
+
+  DAFCGD: { name: "D", shift: -2, octaveNotes: "544333" },
+  DAFCGC: { name: "Drop C", shift: -2, octaveNotes: "544332" },
+
+  "C#G#EBF#C": { name: "C#", shift: -3, octaveNotes: "544332" },
+  "C#G#EBF#B": { name: "Drop B", shift: -3, octaveNotes: "544332" },
+
+  "CGD#A#FC": { name: "C", shift: -4, octaveNotes: "444332" },
+  "CGD#A#FA#": { name: "Drop A#", shift: -4, octaveNotes: "444332" },
 };
 
 export type Tuning = Extract<keyof typeof tunings, string>;

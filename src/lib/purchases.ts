@@ -6,6 +6,7 @@ import { PurchaseParams } from "./purchaseParams";
 //https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest
 
 // TODO: Client should be setup once in the init. See nextjs instrumentation thing
+// update - instrumentation worked locally, but didn't work on vercel. I left it as is so far
 const setupClient = async () => {
   const jwtClient = new google.auth.JWT(
     process.env.GOOGLE_CLIENT_EMAIL,
