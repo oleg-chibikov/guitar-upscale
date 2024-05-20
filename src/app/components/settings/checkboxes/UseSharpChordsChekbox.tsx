@@ -12,7 +12,7 @@ export const UseSharpChordsCheckbox: React.FC = (props) => {
   return (
     <CheckBox
       {...props}
-      label="Show chords for # notes"
+      label="Show chords for ♯ notes"
       value={useSharpChords}
       onValueChange={(value: boolean) => dispatch(setUseSharpChords(value))}
     />
