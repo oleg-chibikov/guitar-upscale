@@ -1,5 +1,6 @@
 "use client";
 
+import { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/WithPremiumFeatures";
@@ -45,6 +46,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <AuthPanel />
           <StrummingSettings />
           <MenuOutsideClickHandler />
+          {premiumComponents.get("looper") as ReactNode}
         </main>
       )}
     </>

@@ -18,6 +18,11 @@ import {
   generateNeckRepresentation,
   Neck,
 } from "../engine/generateNeckRepresentation";
+
+import {
+  currentlyPlayingLooperChannels,
+  currentlyRecordingLooperChannel,
+} from "../engine/looperShared";
 import {
   isMainClockActive,
   startInterval,
@@ -201,7 +206,9 @@ export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue ||
   strummingChordsMap.size > 0 ||
   isPlayingValue ||
-  isRecordingValue;
+  isRecordingValue ||
+  currentlyRecordingLooperChannel !== undefined ||
+  currentlyPlayingLooperChannels.size > 0;
 
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {

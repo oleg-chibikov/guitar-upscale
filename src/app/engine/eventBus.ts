@@ -8,6 +8,7 @@ import {
   tempoBpmValue,
   velocityValue,
 } from "../store/settingsSlice";
+import { currentlyRecordingLooperChannel } from "./looperShared";
 import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
@@ -29,6 +30,7 @@ export type NoteMetadata = TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
     skipChordDetection?: boolean;
+    fromLooper?: boolean;
   };
 
 export type ChordMetadata = TrackMetadata & {
@@ -102,8 +104,24 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   midiRecorder.addNoteToMidiTrack(
     noteMetadata.stringOctaveNote,
     trackNumber,
-    trackInstrument
+    trackInstrument,
+    false
   );
+
+  if (
+    !noteMetadata.fromLooper &&
+    currentlyRecordingLooperChannel !== undefined
+  ) {
+    const { looperState } = await import("./looper");
+    looperState[
+      currentlyRecordingLooperChannel
+    ].midiRecorder.addNoteToMidiTrack(
+      noteMetadata.stringOctaveNote,
+      trackNumber,
+      trackInstrument,
+      true
+    );
+  }
 
   animateAction?.(noteMetadata);
 });

@@ -74,6 +74,8 @@ console.log("Ticks in bar", TICKS_IN_BAR);
 
 export let currentTick = 0; // this tick is reset on every MAX_TICKS
 export let globalCurrentTick = 0; // this tick keeps incrementing while clock is active
+export let globalCurrentLastBarTick = 0;
+export let globalCurrentLastBeatTick = 0;
 export let currentHalfBeat = 0;
 export let currentBeat = 0;
 export let currentHalfBar = 0;
@@ -105,6 +107,8 @@ const reset = () => {
 export const startInterval = (afresh: boolean) => {
   if (afresh) {
     globalCurrentTick = 0;
+    globalCurrentLastBeatTick = 0;
+    globalCurrentLastBarTick = 0;
     reset();
     recreateNextBar();
     recreateNextHalfBar();
@@ -123,6 +127,7 @@ export const startInterval = (afresh: boolean) => {
       reset();
       recreateNextBar();
       currentBar++;
+      globalCurrentLastBarTick = globalCurrentTick;
     }
     // console.log(
     //   "Tick ",
@@ -141,6 +146,7 @@ export const startInterval = (afresh: boolean) => {
     if (isBeat) {
       recreateNextBeat();
       currentBeat++;
+      globalCurrentLastBeatTick = globalCurrentTick;
     }
     if (isHalfBeat) {
       recreateNextHalfBeat();

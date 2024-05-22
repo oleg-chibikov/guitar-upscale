@@ -1,7 +1,7 @@
 import { Theme } from "@/app/data/theme";
+import { selectUi } from "@/app/store/uiSlice";
 import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { selectUi } from "@/app/store/uiSlice";
 
 export interface IconButtonProps {
   onPress: () => void;
@@ -12,6 +12,8 @@ export interface IconButtonProps {
   tooltip: string;
   id?: string;
   className?: string;
+  disabled?: boolean;
+  allowHandlerInDisabledState?: boolean;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -23,6 +25,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
   tooltip,
   id,
   className,
+  disabled,
+  allowHandlerInDisabledState,
   ...rest
 }) => {
   const { theme } = useSelector(selectUi);
@@ -31,8 +35,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
     <button
       id={id}
       title={tooltip}
+      disabled={!allowHandlerInDisabledState && disabled}
       className={`${className} ${
-        isActive
+        disabled
+          ? theme === Theme.Light
+            ? "bg-disabled-light"
+            : "bg-disabled-dark"
+          : isActive
           ? activeBg ??
             (theme === Theme.Light ? "bg-button-light" : "bg-button-dark")
           : inactiveBg ??

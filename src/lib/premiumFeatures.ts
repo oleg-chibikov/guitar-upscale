@@ -13,6 +13,7 @@ export type PremiumFeaturesWithSession = {
 
 export type PremiumFeatures = {
   midiRecorder?: boolean;
+  looper?: boolean;
   playbackTypeSelection?: boolean;
   advancedChords?: boolean;
   instruments?: boolean;
@@ -37,6 +38,7 @@ export const explorerPremiumFeatures: PremiumFeatures = {
 export const composerPremiumFeatures: PremiumFeatures = {
   ...explorerPremiumFeatures,
   midiRecorder: true,
+  looper: true,
   toggleMetronomeWhenRecordingCheckbox: true,
   skinSelection: true,
 };

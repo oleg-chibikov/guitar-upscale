@@ -1,23 +1,20 @@
 "use client";
 import { AlertType } from "@/app/data/alertType";
-import { Theme } from "@/app/data/theme";
-import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { setAndShowAlert } from "@/app/store/uiSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButton } from "./IconButton";
 
 const noPremiumWarning = "Please subscribe to a Composer plan to record MIDI";
 export const DisabledRecordButton: React.FC = (props) => {
-  const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   return (
     <IconButton
       {...props}
       icon={<FiberManualRecord />}
-      inactiveBg={
-        theme === Theme.Light ? "bg-disabled-light" : "bg-disabled-dark"
-      }
+      disabled
+      allowHandlerInDisabledState
       tooltip={noPremiumWarning}
       onPress={() =>
         dispatch(

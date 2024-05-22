@@ -13,15 +13,15 @@ export enum Note {
   "D#" = 11,
 }
 
-export interface StringOctaveNote extends OctaveNote {
-  string: number;
-  fret: number;
-}
-
-export interface OctaveNote {
+export type OctaveNote = {
   octave: number;
   note: Note;
-}
+};
+
+export type StringOctaveNote = OctaveNote & {
+  string: number;
+  fret: number;
+};
 
 export const MAX_VELOCITY = 127;
 export const SHARP_NOTE_COUNT = 5;

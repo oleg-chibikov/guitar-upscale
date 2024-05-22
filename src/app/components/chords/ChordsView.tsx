@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
 const AUTH_PANEL_RESERVED_HEIGHT = 110;
-const ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH = 230;
+const ASSPECT_RATIO_HORIZONTAL_SLIDER_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
@@ -133,8 +133,6 @@ export const ChordsView: React.FC = () => {
             paddingTop: 10, // give area to tap top chords
           }}
         >
-          {/* TODO: Uncomment when implemented */}
-          {/* <LooperPanel /> */}
           <section
             ref={ref}
             className={`grid ${

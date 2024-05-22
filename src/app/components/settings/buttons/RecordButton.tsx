@@ -1,6 +1,7 @@
 "use client";
 import { Theme } from "@/app/data/theme";
 import {
+  isMetronomeActiveValue,
   selectSettings,
   setIsMetronomeActive,
   setIsRecording,
@@ -34,7 +35,9 @@ export const RecordButton: React.FC = (props) => {
               .midiRecorder;
             midiRecorder.stopRecording(false);
             dispatch(setIsRecording(false));
-            dispatch(setIsMetronomeActive(false));
+            if (toggleMetronomeWhenRecordingValue && isMetronomeActiveValue) {
+              dispatch(setIsMetronomeActive(false));
+            }
           }}
         />
       )}
@@ -53,7 +56,10 @@ export const RecordButton: React.FC = (props) => {
           } else {
             midiRecorder.stopRecording(true);
           }
-          if (toggleMetronomeWhenRecordingValue) {
+          if (
+            toggleMetronomeWhenRecordingValue &&
+            isMetronomeActiveValue !== newValue
+          ) {
             dispatch(setIsMetronomeActive(newValue));
           }
           dispatch(setIsRecording(newValue));

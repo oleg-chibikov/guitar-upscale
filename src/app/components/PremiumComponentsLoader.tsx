@@ -7,6 +7,7 @@ import {
   WithPremiumFeatures,
 } from "../helpers/WithPremiumFeatures";
 import { ClientRoot } from "./ClientRoot";
+import { LooperPanel } from "./looper/LooperPanel";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
 import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox";
 
@@ -73,6 +74,8 @@ export const premiumFeaturesToMap = (
     switch (key) {
       case "midiRecorder":
         return <RecordButton />;
+      case "looper":
+        return <LooperPanel />;
       case "toggleMetronomeWhenRecordingCheckbox":
         return <ToggleMetronomeWhenRecordingCheckbox />;
       case "skinSelection":
