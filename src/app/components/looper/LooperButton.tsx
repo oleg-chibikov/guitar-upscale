@@ -26,12 +26,14 @@ interface LooperButtonProps {
   channel: number;
   state: LooperChannelState;
   setState: (state: LooperState) => void; // it allows setting state for adjacent channels
+  showPlay: boolean;
 }
 
 export const LooperButton: React.FC<LooperButtonProps> = ({
   channel,
-  state: { isRecording, isPlaying, looperRecorder },
+  state: { isRecording, isPlaying, hasRecording },
   setState,
+  showPlay,
 }) => {
   const dispatch = useDispatch();
   const handleRecordClick = () => {
@@ -76,8 +78,6 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
     }
   };
 
-  const hasRecording = looperRecorder.hasRecording();
-
   return (
     <div className="flex flex-col gap-1 items-center">
       <IconButton
@@ -93,19 +93,21 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
           handleRecordClick();
         }}
       />
-      <IconButton
-        icon={isPlaying ? <Pause /> : <PlayArrow />}
-        disabled={isRecording || !hasRecording}
-        isActive={isPlaying || hasRecording}
-        tooltip={
-          isPlaying
-            ? "Pause loop at channel " + (channel + 1)
-            : "Play loop at channel " + (channel + 1)
-        }
-        onPress={() => {
-          handlePlayPauseClick();
-        }}
-      />
+      {showPlay ? (
+        <IconButton
+          icon={isPlaying ? <Pause /> : <PlayArrow />}
+          disabled={!hasRecording}
+          isActive={isPlaying || hasRecording}
+          tooltip={
+            isPlaying
+              ? "Pause loop at channel " + (channel + 1)
+              : "Play loop at channel " + (channel + 1)
+          }
+          onPress={() => {
+            handlePlayPauseClick();
+          }}
+        />
+      ) : null}
     </div>
   );
 };

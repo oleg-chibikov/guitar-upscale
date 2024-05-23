@@ -12,6 +12,7 @@ export type LooperChannelState = {
   isPlaying: boolean;
   isRecording: boolean;
   looperRecorder: LooperRecorder;
+  hasRecording: boolean;
 };
 
 export type LooperState = LooperChannelState[];
@@ -54,6 +55,7 @@ export const setRecordingInLooperChannel = (
     // start playing in the current channel right after recording
     setPlayingInLooperChannel(channel, true);
   }
+  looperChannel.hasRecording = looperChannel.looperRecorder.hasRecording();
 };
 
 export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
