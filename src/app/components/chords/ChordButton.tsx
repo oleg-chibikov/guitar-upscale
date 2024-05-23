@@ -17,7 +17,6 @@ import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {
   chordIsBeingDetectedValue,
-  chordNotesToPlayValue,
   chordPlayModeValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
@@ -72,12 +71,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
       const params: ChordPlayParameters = {
+        ...metadata,
         chordName,
         noteChordMode,
         delayMs,
-        notesToPlay: metadata.notesToPlay ?? chordNotesToPlayValue,
-        trackNumber: metadata.trackNumber,
-        trackInstrument: metadata.trackInstrument,
         reverse: isAlternateRef.current,
       };
 

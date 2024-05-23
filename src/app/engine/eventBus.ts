@@ -26,18 +26,25 @@ export type ClearNoteMetadata = {
   clearChordMarker?: boolean;
 };
 
-export type NoteMetadata = TrackMetadata &
+export type NoteMetadata = StrummingMetadata &
+  TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
     skipChordDetection?: boolean;
     fromLooper?: boolean;
   };
 
-export type ChordMetadata = TrackMetadata & {
-  notesToPlay?: number;
-  strummingDelayMs?: number;
-  clear?: boolean;
+export type StrummingMetadata = {
+  playedSeparatelyFromStrumming?: boolean; // It comes from strumming - the chord can be either played right after click or during strumming.
+  strummingClickNumber?: number; // It comes from strumming and identifies particular strumming sequence
 };
+
+export type ChordMetadata = StrummingMetadata &
+  TrackMetadata & {
+    notesToPlay?: number;
+    strummingDelayMs?: number;
+    clear?: boolean;
+  };
 
 export type ChordWithPlayMetadata = {
   chord: string;
@@ -95,6 +102,8 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     fretMarkersFromPreviousChord.add(serialized);
   }
 
+  const fromImmediateChord =
+    noteMetadata.playedSeparatelyFromStrumming ?? false;
   const midiRecorder = (await import("./midiRecorder")).midiRecorder;
   const trackNumber =
     noteMetadata.trackNumber ?? (noteMetadata.fromChord ? 1 : 0);
@@ -105,7 +114,9 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     noteMetadata.stringOctaveNote,
     trackNumber,
     trackInstrument,
-    false
+    false,
+    fromImmediateChord,
+    noteMetadata.strummingClickNumber
   );
 
   if (
@@ -119,7 +130,9 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
       noteMetadata.stringOctaveNote,
       trackNumber,
       trackInstrument,
-      true
+      true,
+      fromImmediateChord,
+      noteMetadata.strummingClickNumber
     );
   }
 

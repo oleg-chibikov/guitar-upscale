@@ -24,12 +24,19 @@ type InternalNoteEvent = {
   trackNumber: number;
   instrument: Instrument;
 };
+
 type TrackKey = string;
+
+export enum NoteOrigin {
+  Separate,
+  FromStrumming,
+  FromSingle,
+}
 
 // Define a class for MIDI recorder
 export class MidiRecorder {
   private midiEvents: Map<TrackKey, NoteEvent[]> | undefined;
-  private midiEventsByTick: Map<number, InternalNoteEvent[]> | undefined;
+  private midiEventsByTick: Map<number, Set<InternalNoteEvent>> | undefined;
   private isRecording: boolean = false;
   private startTick: number | undefined;
   private lastBarTickWhenStoppedRecording: number | undefined;
@@ -38,9 +45,17 @@ export class MidiRecorder {
   private TICK_SHIFT = 16; // Gap till next bar as starting from 0 for some reason gives corrupted melody
   private abortController = new AbortController();
 
+  // TODO: Instead of keeping this complex logic we can just start strumming from whatever position we currently have in the bar.
+  // For example if we are at 30th tick, then we skip events in the strumming pattern that come before that.
+  // This way we won't need to play this unwanted extra event at all.
+  private clearUndesiredChordCallbacks: Map<number, Set<() => void>> = new Map<
+    number,
+    Set<() => void>
+  >(); // key is the strumming sequence id (click number). Value is the function that deletes the undesired events for this strumming sequence
+
   startRecording() {
     this.midiEvents = new Map<TrackKey, NoteEvent[]>();
-    this.midiEventsByTick = new Map<number, InternalNoteEvent[]>();
+    this.midiEventsByTick = new Map<number, Set<InternalNoteEvent>>();
     this.isRecording = true;
     this.startTick = undefined;
     this.lastBarTickWhenStoppedRecording = undefined;
@@ -162,13 +177,13 @@ export class MidiRecorder {
   private playNotesAtTick(tick: number) {
     const eventsAtTick = this.midiEventsByTick!.get(tick);
 
-    if (!eventsAtTick?.length) {
+    if (!eventsAtTick?.size) {
       return;
     }
 
     console.log(
       "Playing notes [%s] at tick %d",
-      eventsAtTick
+      Array.from(eventsAtTick)
         .map((x) => getNoteText(x.note.note) + x.note.octave)
         .join(","),
       tick
@@ -181,6 +196,7 @@ export class MidiRecorder {
         fromLooper: true,
         trackInstrument: instrument,
         trackNumber,
+        skipChordDetection: true,
       });
     });
   }
@@ -189,7 +205,9 @@ export class MidiRecorder {
     note: StringOctaveNote,
     trackNumber: number,
     instrument: Instrument,
-    useLastBarAsStartTick: boolean
+    useLastBarAsStartTick: boolean,
+    fromImmediateChord: boolean,
+    strummingClickNumber?: number
   ) {
     if (this.isRecording) {
       const currentTick = globalCurrentTick;
@@ -208,7 +226,7 @@ export class MidiRecorder {
         return;
       }
       if (this.midiEventsByTick) {
-        const internalNoteEvent = {
+        const internalNoteEvent: InternalNoteEvent = {
           tick: currentTick,
           note,
           trackNumber,
@@ -216,10 +234,32 @@ export class MidiRecorder {
         };
         let eventsForTick = this.midiEventsByTick.get(currentTick);
         if (!eventsForTick) {
-          eventsForTick = [internalNoteEvent];
+          eventsForTick = new Set([internalNoteEvent]);
         } else {
-          eventsForTick.push(internalNoteEvent);
+          eventsForTick.add(internalNoteEvent);
         }
+
+        const removeEvent = () => {
+          console.log(
+            "Removing undesired event as strumming continues",
+            internalNoteEvent
+          );
+          eventsForTick.delete(internalNoteEvent);
+          if (!eventsForTick.size) {
+            console.log(
+              "No more events at tick %d. Deleting the events container for it",
+              currentTick
+            );
+            this.midiEventsByTick?.delete(currentTick);
+          }
+        };
+
+        this.registerUndesiredStrummingEvent(
+          strummingClickNumber,
+          fromImmediateChord,
+          removeEvent
+        );
+
         this.midiEventsByTick.set(currentTick, eventsForTick);
       }
 
@@ -254,6 +294,64 @@ export class MidiRecorder {
     const size = this.midiEventsByTick?.size;
     return size ? size > 0 : false;
   };
+
+  private registerUndesiredStrummingEvent(
+    strummingClickNumber: number | undefined,
+    fromImmediateChord: boolean,
+    removeEvent: () => void
+  ) {
+    if (strummingClickNumber !== undefined) {
+      console.log("Note from strumming sequence", strummingClickNumber);
+      if (fromImmediateChord) {
+        console.log(
+          "Registering note events coming from an immediate chord as possibly undesired for strumming sequence",
+          strummingClickNumber
+        );
+        // create and store the callback to remove these notes once we receive the note from strumming
+        // disclaimer: when strumming while main clock is active we play the first chord straight away and it is not the part of strumming. It is needed to be able to play single chords.
+        // but in looper or recording we don't wanna have such chords if they are followed by the actual strumming
+        // therefore we need to delete them from the play sequence.
+        // We only need to delete events for the same strumming sequence. It's done by storing them in a map keyed by the strumming sequence id
+
+        this.createOrAddUndesiredStrummingCallback(
+          strummingClickNumber,
+          removeEvent
+        );
+      } else {
+        console.log("Strumming continues");
+        // if we are here it means that we continue strumming. We need to wipe the unwanted events coming from the same sequence (the chord that was played immediately, before strumming)
+        const clearUndesiredChordCallbacksForThisSequence =
+          this.clearUndesiredChordCallbacks.get(strummingClickNumber);
+        if (clearUndesiredChordCallbacksForThisSequence?.size) {
+          console.log("Removing undesired events");
+          clearUndesiredChordCallbacksForThisSequence.forEach((callback) =>
+            callback()
+          );
+          clearUndesiredChordCallbacksForThisSequence.clear();
+          this.clearUndesiredChordCallbacks.delete(strummingClickNumber);
+        }
+      }
+    } else {
+      console.log("Note not from strumming sequence");
+    }
+  }
+
+  private createOrAddUndesiredStrummingCallback(
+    strummingClickNumber: number,
+    deleteUndesiredNoteCallback: () => void
+  ) {
+    let currentCallbacksForThisSequence =
+      this.clearUndesiredChordCallbacks.get(strummingClickNumber);
+    if (currentCallbacksForThisSequence) {
+      currentCallbacksForThisSequence.add(deleteUndesiredNoteCallback);
+    } else {
+      currentCallbacksForThisSequence = new Set([deleteUndesiredNoteCallback]);
+    }
+    this.clearUndesiredChordCallbacks.set(
+      strummingClickNumber,
+      currentCallbacksForThisSequence
+    );
+  }
 
   private async waitForTick(
     tickToWaitFor: number,

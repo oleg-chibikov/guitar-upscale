@@ -71,14 +71,23 @@ export const useStrumming = (
   const clickNumberRef = useRef<number>(0);
 
   const play = useCallback(
-    (isPlayedWithinGracePeriod: boolean) => {
+    (
+      isPlayedWithinGracePeriod: boolean,
+      playedSeparatelyFromStrumming: boolean
+    ) => {
       const chordToPlay =
         (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
         currentChord
           ? currentChord
           : chordName;
       // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
-      ChordEventBus.next({ chord: chordToPlay, metadata: {} });
+      ChordEventBus.next({
+        chord: chordToPlay,
+        metadata: {
+          playedSeparatelyFromStrumming: playedSeparatelyFromStrumming,
+          strummingClickNumber: clickNumberRef.current,
+        },
+      });
     },
     [chordName]
   );
@@ -196,7 +205,8 @@ export const useStrumming = (
       return;
     }
 
-    const wasClockActiveWhenChordPressed = isMainClockActive();
+    // this is true when the clock is active (eg metronome or example is playing or recording is enabled)
+    const shouldPlayImmediateChordAndStrumLater = isMainClockActive();
 
     if (isChordClicked(chordName)) {
       console.log("Mark as strumming", chordName, clickNumber);
@@ -223,6 +233,7 @@ export const useStrumming = (
     const clickedInOtherChordGracePeriod =
       otherChordsGracePeriodPromises.length > 0;
     let intervalsToSkip = 0;
+
     if (!wasStrummingWhenChordPressed) {
       console.log(
         "Playing chord immediately - no strumming happening now",
@@ -230,15 +241,11 @@ export const useStrumming = (
         clickNumber
       );
 
-      const playWithPossibleAlteration = () => {
-        console.log("Playing", chordName, clickNumber);
-        play(false);
-        if (useChordAlterationValue) {
-          isAlternateRef.current = !isAlternateRef.current;
-        }
-      };
-
-      playWithPossibleAlteration();
+      console.log("Playing", chordName, clickNumber);
+      play(false, shouldPlayImmediateChordAndStrumLater); // TODO: when nothing is ticking
+      if (useChordAlterationValue) {
+        isAlternateRef.current = !isAlternateRef.current;
+      }
     } else {
       console.log(
         "Skip playing chord immediately - strumming happening now",
@@ -258,7 +265,7 @@ export const useStrumming = (
         );
         return;
       }
-      if (wasClockActiveWhenChordPressed) {
+      if (shouldPlayImmediateChordAndStrumLater) {
         console.log("Clock was active when clicked", chordName, clickNumber);
 
         if (clickedInOtherChordGracePeriod) {
@@ -352,6 +359,7 @@ export const useStrumming = (
         clickNumber: number
       ): Promise<void> => {
         console.log("----> Started actual strumming", chordName, clickNumber);
+        // TODO: delete the previous chord
         setPlaying(true);
         try {
           let currentIndex = startIndex; // skip first as it was played already
@@ -362,11 +370,11 @@ export const useStrumming = (
             switch (char) {
               case "↑":
                 isAlternateRef.current = false;
-                play(clickedInGracePeriod);
+                play(clickedInGracePeriod, false);
                 break;
               case "↓":
                 isAlternateRef.current = true;
-                play(clickedInGracePeriod);
+                play(clickedInGracePeriod, false);
                 break;
               case "_":
                 break;

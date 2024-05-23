@@ -42,6 +42,10 @@ interface WithNeck {
   baseNote: Note;
 }
 
+interface WithMetronome {
+  isMetronomeActive: boolean;
+}
+
 interface WithControls {
   scaleGroup: string;
   scale: string;
@@ -49,7 +53,7 @@ interface WithControls {
   tuning: Tuning;
 }
 
-interface SettingsState extends WithNeck, WithControls {
+interface SettingsState extends WithMetronome, WithNeck, WithControls {
   tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
@@ -68,7 +72,6 @@ interface SettingsState extends WithNeck, WithControls {
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
-  isMetronomeActive: boolean;
   isPlaying: boolean;
   chordIsBeingDetected: boolean;
   isRecording: boolean;
@@ -161,6 +164,12 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   clearPreviousChords();
 };
 
+const toggleMetronome = (state: WithMetronome, value: boolean) => {
+  state.isMetronomeActive = value;
+  isMetronomeActiveValue = value;
+  toggleInterval(value);
+};
+
 export const setChordDetectorFunctions = (
   addChord: (chord: Chord, fullKey: string) => void,
   createLookup: () => void
@@ -202,13 +211,15 @@ const setChords = (state: WithNeck) => {
   }
 };
 
-export const isAnyTimerSpecificActivityRunning = () =>
-  isMetronomeActiveValue ||
+const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
   strummingChordsMap.size > 0 ||
   isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||
   currentlyPlayingLooperChannels.size > 0;
+
+export const isAnyTimerSpecificActivityRunning = () =>
+  isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
 
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {
@@ -289,7 +300,7 @@ export const settingsSlice = createSlice({
     },
     setTempoBpm: (
       state,
-      action: PayloadAction<{ tempo: number; updateInteval: boolean }>
+      action: PayloadAction<{ tempo: number; updateInterval: boolean }>
     ) => {
       if (tempoBpmValue === action.payload.tempo) {
         return;
@@ -297,7 +308,7 @@ export const settingsSlice = createSlice({
       state.tempoBpm = action.payload.tempo;
       tempoBpmValue = action.payload.tempo;
 
-      if (action.payload.updateInteval) {
+      if (action.payload.updateInterval) {
         stopInterval(false);
         startInterval(false); // afresh is set to false to maintain current beat/bar position
       }
@@ -375,9 +386,7 @@ export const settingsSlice = createSlice({
       seamlessChordSwitchingValue = action.payload;
     },
     setIsMetronomeActive(state, action: PayloadAction<boolean>) {
-      state.isMetronomeActive = action.payload;
-      isMetronomeActiveValue = action.payload;
-      toggleInterval(action.payload);
+      toggleMetronome(state, action.payload);
     },
     setIsPlaying(state, action: PayloadAction<boolean>) {
       state.isPlaying = action.payload;
@@ -392,10 +401,36 @@ export const settingsSlice = createSlice({
       state.toggleMetronomeWhenRecording = action.payload;
       toggleMetronomeWhenRecordingValue = action.payload;
     },
-    setIsRecording(state, action: PayloadAction<boolean>) {
-      state.isRecording = action.payload;
-      isRecordingValue = action.payload;
-      toggleInterval(action.payload);
+    setIsRecording(
+      state,
+      action: PayloadAction<{
+        value: boolean;
+        startRecording: () => void;
+        stopRecording: () => void;
+      }>
+    ) {
+      const value = action.payload.value;
+      state.isRecording = value;
+      isRecordingValue = value;
+      toggleInterval(value);
+
+      const canTriggerMetronome =
+        toggleMetronomeWhenRecordingValue && isMetronomeActiveValue !== value;
+      if (value) {
+        action.payload.startRecording();
+        if (canTriggerMetronome) {
+          toggleMetronome(state, true);
+        }
+      } else {
+        action.payload.stopRecording();
+        if (
+          canTriggerMetronome &&
+          !isAnyTimerSpecificActivityBesidesMetronomeRunning()
+        ) {
+          // only stop metronome when there is no other playing activity
+          toggleMetronome(state, false);
+        }
+      }
     },
   },
 });

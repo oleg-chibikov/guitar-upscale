@@ -36,7 +36,7 @@ export const TempoSlider: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
-    dispatch(setTempoBpm({ tempo: value, updateInteval: true }));
+    dispatch(setTempoBpm({ tempo: value, updateInterval: true }));
   };
 
   return (

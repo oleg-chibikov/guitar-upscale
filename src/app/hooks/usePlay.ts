@@ -58,7 +58,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       example = await getRandomScaleExample();
       const tempo = example?.tempo;
       if (tempo && tempo !== tempoBpmValue) {
-        dispatch(setTempoBpm({ tempo: tempo, updateInteval: false }));
+        dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
       }
     } else {
       await import("@/app/engine/play/scalePlayer");

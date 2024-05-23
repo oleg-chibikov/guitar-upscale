@@ -1,12 +1,6 @@
 "use client";
 import { Theme } from "@/app/data/theme";
-import {
-  isMetronomeActiveValue,
-  selectSettings,
-  setIsMetronomeActive,
-  setIsRecording,
-  toggleMetronomeWhenRecordingValue,
-} from "@/app/store/settingsSlice";
+import { selectSettings, setIsRecording } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
@@ -34,10 +28,15 @@ export const RecordButton: React.FC = (props) => {
             const midiRecorder = (await import("@/app/engine/midiRecorder"))
               .midiRecorder;
             midiRecorder.stopRecording(false);
-            dispatch(setIsRecording(false));
-            if (toggleMetronomeWhenRecordingValue && isMetronomeActiveValue) {
-              dispatch(setIsMetronomeActive(false));
-            }
+            dispatch(
+              setIsRecording({
+                value: false,
+                startRecording: midiRecorder.startRecording,
+                stopRecording: () => {
+                  midiRecorder.stopRecording(false);
+                },
+              })
+            );
           }}
         />
       )}
@@ -51,18 +50,17 @@ export const RecordButton: React.FC = (props) => {
           const newValue = !isRecording;
           const midiRecorder = (await import("@/app/engine/midiRecorder"))
             .midiRecorder;
-          if (newValue) {
-            midiRecorder.startRecording();
-          } else {
-            midiRecorder.stopRecording(true);
-          }
-          if (
-            toggleMetronomeWhenRecordingValue &&
-            isMetronomeActiveValue !== newValue
-          ) {
-            dispatch(setIsMetronomeActive(newValue));
-          }
-          dispatch(setIsRecording(newValue));
+          dispatch(
+            setIsRecording({
+              value: newValue,
+              startRecording: () => {
+                midiRecorder.startRecording();
+              },
+              stopRecording: () => {
+                midiRecorder.stopRecording(true);
+              },
+            })
+          );
         }}
       />
     </>

@@ -1,9 +1,10 @@
 import { Chord } from "../data/notes";
 import { sleep } from "../helpers/sleep";
+import { chordNotesToPlayValue } from "../store/settingsSlice";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
-import { NotePlayEventBus, TrackMetadata } from "./eventBus";
+import { ChordMetadata, NotePlayEventBus } from "./eventBus";
 
-export type ChordPlayParameters = TrackMetadata & {
+export type ChordPlayParameters = ChordMetadata & {
   chordName: string;
   noteChordMode: NoteChordMode;
   delayMs?: number;
@@ -21,26 +22,19 @@ const selectRandomVariation = (variations: Chord[]) => {
 const playVariation = async (
   variation: Chord,
   variationKey: string,
-  {
-    chordName,
-    delayMs,
-    notesToPlay,
-    trackNumber,
-    trackInstrument,
-    reverse,
-  }: ChordPlayParameters
+  { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
 ) => {
+  const noteCount = notesToPlay ?? chordNotesToPlayValue;
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
   const toPlay = reverse ? [...variation].reverse() : variation;
   for (const note of toPlay) {
     NotePlayEventBus.next({
-      trackInstrument,
+      ...rest, // track metadata and strumming metadata
       stringOctaveNote: note,
       fromChord: true,
-      trackNumber,
     });
-    if (notesToPlay && ++i >= notesToPlay) {
+    if (++i >= noteCount) {
       break;
     }
     if (delayMs) {
