@@ -78,6 +78,8 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
     }
   };
 
+  const isDisabled = !hasRecording;
+
   return (
     <div className="flex flex-col gap-1 items-center">
       <IconButton
@@ -96,7 +98,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
       {showPlay ? (
         <IconButton
           icon={isPlaying ? <Pause /> : <PlayArrow />}
-          disabled={!hasRecording}
+          disabled={isDisabled}
           isActive={isPlaying || hasRecording}
           tooltip={
             isPlaying
@@ -104,6 +106,9 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
               : "Play loop at channel " + (channel + 1)
           }
           onPress={() => {
+            if (isDisabled) {
+              return;
+            }
             handlePlayPauseClick();
           }}
         />
