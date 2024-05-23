@@ -125,7 +125,8 @@ export class LooperRecorder {
 
         this.playNotesAtTick(tick);
 
-        currentTick = tick;
+        await waitForNextTick();
+        currentTick = tick + 1; // +1 to avoid the situation where we have a single note/chord and it keeps playing immediately
       }
 
       ticksPassedSinceLastBar =
