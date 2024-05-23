@@ -11,7 +11,10 @@ export const LockRatioButton: React.FC = (props) => {
   return (
     <IconButton
       {...props}
-      icon={lockRatio ? <Lock /> : <LockOpen />}
+      className="scale-75 origin-bottom-right"
+      icon={
+        lockRatio ? <Lock fontSize="small" /> : <LockOpen fontSize="small" />
+      }
       tooltip={lockRatio ? "Unlock aspect ratio" : "Lock aspect ratio"}
       isActive={lockRatio}
       onPress={() => {

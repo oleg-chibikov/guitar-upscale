@@ -1,4 +1,9 @@
-import { maxYZoom, minYZoom, selectUi, setFretboardScaleY } from "@/app/store/uiSlice";
+import {
+  maxYZoom,
+  minYZoom,
+  selectUi,
+  setFretboardScaleY,
+} from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -18,7 +23,7 @@ export const FretboardScaleYSlider: React.FC = () => {
       minimumValue={minYZoom * 10}
       maximumValue={maxYZoom * 10}
       step={1}
-      className="h-32 px-2"
+      className="h-28 px-2"
       isVertical
     />
   );
