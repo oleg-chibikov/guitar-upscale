@@ -60,48 +60,48 @@ export class MidiRecorder {
     instrument: Instrument,
     useLastBarAsStartTick: boolean
   ) {
-    if (this.isRecording) {
-      const currentTick = globalCurrentTick;
-      if (this.startTick === undefined) {
-        this.startTick = useLastBarAsStartTick
-          ? globalCurrentLastBarTick
-          : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
-      }
-      const playAtTick = currentTick - this.startTick;
-      console.log(
-        `Recording ${getNoteText(note.note)}${
-          note.octave
-        }; delta: ${playAtTick} ticks`
-      );
-      if (!this.midiEvents) {
-        return;
-      }
-
-      const trackKey = this.getTrackKey(trackNumber, instrument);
-
-      let noteEventsForTrack = this.midiEvents.get(trackKey);
-
-      if (!noteEventsForTrack) {
-        noteEventsForTrack = [];
-
-        this.midiEvents.set(trackKey, noteEventsForTrack);
-      }
-
-      noteEventsForTrack.push(
-        new Midi.NoteEvent({
-          pitch: [
-            note.note +
-              this.noteShift +
-              (this.octaveShift + note.octave) * NOTE_COUNT,
-          ],
-          velocity: MAX_VELOCITY,
-          duration: "8", // the bigger the value - the shorter the note
-          channel: 1,
-          sequential: false,
-          tick: (playAtTick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
-        })
-      );
+    if (!this.isRecording || !this.midiEvents) {
+      return;
     }
+
+    const currentTick = globalCurrentTick;
+    if (this.startTick === undefined) {
+      this.startTick = useLastBarAsStartTick
+        ? globalCurrentLastBarTick
+        : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+    }
+
+    const playAtTick = currentTick - this.startTick;
+    console.log(
+      `Recording ${getNoteText(note.note)}${
+        note.octave
+      }; delta: ${playAtTick} ticks`
+    );
+
+    const trackKey = this.getTrackKey(trackNumber, instrument);
+
+    let noteEventsForTrack = this.midiEvents.get(trackKey);
+
+    if (!noteEventsForTrack) {
+      noteEventsForTrack = [];
+
+      this.midiEvents.set(trackKey, noteEventsForTrack);
+    }
+
+    noteEventsForTrack.push(
+      new Midi.NoteEvent({
+        pitch: [
+          note.note +
+            this.noteShift +
+            (this.octaveShift + note.octave) * NOTE_COUNT,
+        ],
+        velocity: MAX_VELOCITY,
+        duration: "8", // the bigger the value - the shorter the note
+        channel: 1,
+        sequential: false,
+        tick: (playAtTick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
+      })
+    );
   }
 
   private generateMidiData(midiEvents: Map<string, NoteEvent[]>): Blob {

@@ -161,58 +161,56 @@ export class LooperRecorder {
     fromImmediateChord: boolean,
     strummingClickNumber?: number
   ) {
-    if (this.isRecording) {
-      const currentTick = globalCurrentTick;
-      if (this.startTick === undefined) {
-        this.startTick = useLastBarAsStartTick
-          ? globalCurrentLastBarTick
-          : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
-      }
-      const playAtTick = currentTick - this.startTick;
-      console.log(
-        `Recording ${getNoteText(note.note)}${
-          note.octave
-        }; delta: ${playAtTick} ticks`
-      );
-      if (!this.midiEventsByTick) {
-        return;
-      }
-      const internalNoteEvent: InternalNoteEvent = {
-        tick: currentTick,
-        note,
-        trackNumber,
-        instrument,
-      };
-      let eventsForTick = this.midiEventsByTick.get(currentTick);
-      if (!eventsForTick) {
-        eventsForTick = new Set([internalNoteEvent]);
-      } else {
-        eventsForTick.add(internalNoteEvent);
-      }
-
-      const removeEvent = () => {
-        console.log(
-          "Removing undesired event as strumming continues",
-          internalNoteEvent
-        );
-        eventsForTick.delete(internalNoteEvent);
-        if (!eventsForTick.size) {
-          console.log(
-            "No more events at tick %d. Deleting the events container for it",
-            currentTick
-          );
-          this.midiEventsByTick?.delete(currentTick);
-        }
-      };
-
-      this.registerUndesiredStrummingEvent(
-        strummingClickNumber,
-        fromImmediateChord,
-        removeEvent
-      );
-
-      this.midiEventsByTick.set(currentTick, eventsForTick);
+    if (!this.isRecording || !this.midiEventsByTick) {
+      return;
     }
+    const currentTick = globalCurrentTick;
+    if (this.startTick === undefined) {
+      this.startTick = useLastBarAsStartTick
+        ? globalCurrentLastBarTick
+        : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+    }
+    const playAtTick = currentTick - this.startTick;
+    console.log(
+      `Recording ${getNoteText(note.note)}${
+        note.octave
+      }; delta: ${playAtTick} ticks`
+    );
+    const internalNoteEvent: InternalNoteEvent = {
+      tick: currentTick,
+      note,
+      trackNumber,
+      instrument,
+    };
+    let eventsForTick = this.midiEventsByTick.get(currentTick);
+    if (!eventsForTick) {
+      eventsForTick = new Set([internalNoteEvent]);
+    } else {
+      eventsForTick.add(internalNoteEvent);
+    }
+
+    const removeEvent = () => {
+      console.log(
+        "Removing undesired event as strumming continues",
+        internalNoteEvent
+      );
+      eventsForTick.delete(internalNoteEvent);
+      if (!eventsForTick.size) {
+        console.log(
+          "No more events at tick %d. Deleting the events container for it",
+          currentTick
+        );
+        this.midiEventsByTick?.delete(currentTick);
+      }
+    };
+
+    this.registerUndesiredStrummingEvent(
+      strummingClickNumber,
+      fromImmediateChord,
+      removeEvent
+    );
+
+    this.midiEventsByTick.set(currentTick, eventsForTick);
   }
 
   hasRecording = () => {
