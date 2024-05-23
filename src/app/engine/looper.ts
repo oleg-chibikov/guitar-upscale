@@ -23,6 +23,7 @@ export const looperState: LooperState = Array.from(
     isRecording: false,
     isPlaying: false,
     looperRecorder: new LooperRecorder(),
+    hasRecording: false,
   })
 );
 
