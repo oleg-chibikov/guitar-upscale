@@ -6,7 +6,9 @@ import {
   setCurrentlyRecordingLooperChannel,
 } from "./looperShared";
 
-export const LOOPER_CHANNEL_COUNT = 4;
+export const LOOPER_CHANNEL_INITIAL_COUNT = 2;
+export const LOOPER_CHANNEL_MIN_COUNT = 1;
+export const LOOPER_CHANNEL_MAX_COUNT = 8;
 
 export type LooperChannelState = {
   isPlaying: boolean;
@@ -17,13 +19,17 @@ export type LooperChannelState = {
 
 export type LooperState = LooperChannelState[];
 
+const initialChannelState = {
+  isRecording: false,
+  isPlaying: false,
+  looperRecorder: new LooperRecorder(),
+  hasRecording: false,
+};
+
 export const looperState: LooperState = Array.from(
-  { length: LOOPER_CHANNEL_COUNT },
+  { length: LOOPER_CHANNEL_INITIAL_COUNT },
   () => ({
-    isRecording: false,
-    isPlaying: false,
-    looperRecorder: new LooperRecorder(),
-    hasRecording: false,
+    ...initialChannelState,
   })
 );
 
@@ -85,3 +91,28 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
   }
   looperChannel.isPlaying = value;
 };
+
+export const addChannel = () => {
+  if (canAddChannel()) {
+    looperState.push({
+      ...initialChannelState,
+    });
+  }
+};
+
+export const removeChannel = () => {
+  if (canRemoveChannel()) {
+    looperState.pop();
+  }
+};
+
+export interface CanSetLooperState {
+  setState: (state: LooperState) => void; // it allows setting state for adjacent channels
+  disabled?: boolean;
+}
+
+export const canAddChannel = () =>
+  looperState.length < LOOPER_CHANNEL_MAX_COUNT;
+
+export const canRemoveChannel = () =>
+  looperState.length > LOOPER_CHANNEL_MIN_COUNT;

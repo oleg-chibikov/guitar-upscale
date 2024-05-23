@@ -1,6 +1,6 @@
 import {
+  CanSetLooperState,
   LooperChannelState,
-  LooperState,
   looperState,
   setPlayingInLooperChannel,
   setRecordingInLooperChannel,
@@ -22,10 +22,9 @@ import PlayArrow from "@mui/icons-material/PlayArrow";
 import StopCircle from "@mui/icons-material/StopCircle";
 import { useDispatch } from "react-redux";
 
-interface LooperButtonProps {
+interface LooperButtonProps extends CanSetLooperState {
   channel: number;
   state: LooperChannelState;
-  setState: (state: LooperState) => void; // it allows setting state for adjacent channels
   showPlay: boolean;
 }
 

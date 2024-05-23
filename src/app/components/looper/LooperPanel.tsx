@@ -1,6 +1,13 @@
 "use client";
 
-import { LooperState, looperState } from "@/app/engine/looper";
+import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
+import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
+import {
+  LooperState,
+  canAddChannel,
+  canRemoveChannel,
+  looperState,
+} from "@/app/engine/looper";
 import { useState } from "react";
 import { LooperButton } from "./LooperButton";
 
@@ -12,6 +19,10 @@ export const LooperPanel: React.FC = () => {
       className="flex p-1 bg-panel-dark fixed bottom-8 gap-1 justify-between"
       style={{ right: 32 }}
     >
+      <RemoveLooperChannelButton
+        setState={setState}
+        disabled={!canRemoveChannel()}
+      />
       {looperState.map((_, index) => (
         <div key={index}>
           <LooperButton
@@ -22,6 +33,7 @@ export const LooperPanel: React.FC = () => {
           />
         </div>
       ))}
+      <AddLooperChannelButton setState={setState} disabled={!canAddChannel()} />
     </div>
   );
 };
