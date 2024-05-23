@@ -9,11 +9,7 @@ import {
   tempoBpmValue,
 } from "../store/settingsSlice";
 import { NOTE_COUNT } from "./generateNeckRepresentation";
-import {
-  TICKS_IN_BEAT,
-  globalCurrentLastBarTick,
-  globalCurrentTick,
-} from "./mainClock";
+import { TICKS_IN_BEAT, globalCurrentTick } from "./mainClock";
 
 type TrackKey = string;
 
@@ -57,8 +53,7 @@ export class MidiRecorder {
   addNoteToMidiTrack(
     note: StringOctaveNote,
     trackNumber: number,
-    instrument: Instrument,
-    useLastBarAsStartTick: boolean
+    instrument: Instrument
   ) {
     if (!this.isRecording || !this.midiEvents) {
       return;
@@ -66,9 +61,7 @@ export class MidiRecorder {
 
     const currentTick = globalCurrentTick;
     if (this.startTick === undefined) {
-      this.startTick = useLastBarAsStartTick
-        ? globalCurrentLastBarTick
-        : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+      this.startTick = currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
     }
 
     const playAtTick = currentTick - this.startTick;

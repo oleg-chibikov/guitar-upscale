@@ -157,7 +157,6 @@ export class LooperRecorder {
     note: StringOctaveNote,
     trackNumber: number,
     instrument: Instrument,
-    useLastBarAsStartTick: boolean,
     fromImmediateChord: boolean,
     strummingClickNumber?: number
   ) {
@@ -166,9 +165,7 @@ export class LooperRecorder {
     }
     const currentTick = globalCurrentTick;
     if (this.startTick === undefined) {
-      this.startTick = useLastBarAsStartTick
-        ? globalCurrentLastBarTick
-        : currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+      this.startTick = globalCurrentLastBarTick;
     }
     const playAtTick = currentTick - this.startTick;
     console.log(

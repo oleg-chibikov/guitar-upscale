@@ -113,8 +113,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   midiRecorder.addNoteToMidiTrack(
     noteMetadata.stringOctaveNote,
     trackNumber,
-    trackInstrument,
-    false
+    trackInstrument
   );
 
   if (
@@ -126,7 +125,6 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
       noteMetadata.stringOctaveNote,
       trackNumber,
       trackInstrument,
-      true,
       fromImmediateChord,
       noteMetadata.strummingClickNumber
     );
