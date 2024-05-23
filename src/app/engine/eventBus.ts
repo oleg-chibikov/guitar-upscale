@@ -114,9 +114,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     noteMetadata.stringOctaveNote,
     trackNumber,
     trackInstrument,
-    false,
-    fromImmediateChord,
-    noteMetadata.strummingClickNumber
+    false
   );
 
   if (
@@ -124,9 +122,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     currentlyRecordingLooperChannel !== undefined
   ) {
     const { looperState } = await import("./looper");
-    looperState[
-      currentlyRecordingLooperChannel
-    ].midiRecorder.addNoteToMidiTrack(
+    looperState[currentlyRecordingLooperChannel].looperRecorder.recordNote(
       noteMetadata.stringOctaveNote,
       trackNumber,
       trackInstrument,

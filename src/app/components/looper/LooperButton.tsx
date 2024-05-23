@@ -30,7 +30,7 @@ interface LooperButtonProps {
 
 export const LooperButton: React.FC<LooperButtonProps> = ({
   channel,
-  state: { isRecording, isPlaying, midiRecorder },
+  state: { isRecording, isPlaying, looperRecorder },
   setState,
 }) => {
   const dispatch = useDispatch();
@@ -76,7 +76,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
     }
   };
 
-  const hasRecording = midiRecorder.hasRecording();
+  const hasRecording = looperRecorder.hasRecording();
 
   return (
     <div className="flex flex-col gap-1 items-center">

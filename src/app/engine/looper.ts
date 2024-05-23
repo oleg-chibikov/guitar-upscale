@@ -1,17 +1,17 @@
 import { toggleInterval } from "../store/settingsSlice";
+import { LooperRecorder } from "./looperRecorder";
 import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
   setCurrentlyRecordingLooperChannel,
 } from "./looperShared";
-import { MidiRecorder } from "./midiRecorder";
 
 export const LOOPER_CHANNEL_COUNT = 4;
 
 export type LooperChannelState = {
   isPlaying: boolean;
   isRecording: boolean;
-  midiRecorder: MidiRecorder;
+  looperRecorder: LooperRecorder;
 };
 
 export type LooperState = LooperChannelState[];
@@ -21,7 +21,7 @@ export const looperState: LooperState = Array.from(
   () => ({
     isRecording: false,
     isPlaying: false,
-    midiRecorder: new MidiRecorder(),
+    looperRecorder: new LooperRecorder(),
   })
 );
 
@@ -44,12 +44,12 @@ export const setRecordingInLooperChannel = (
     // stop playing in the current channel
     setPlayingInLooperChannel(channel, false);
     setCurrentlyRecordingLooperChannel(channel);
-    looperChannel.midiRecorder.startRecording();
+    looperChannel.looperRecorder.startRecording();
     toggleInterval(true);
   } else {
     // stop recording
     setCurrentlyRecordingLooperChannel(undefined);
-    looperChannel.midiRecorder.stopRecordingWithoutClearing();
+    looperChannel.looperRecorder.stopRecordingWithoutClearing();
     // toggleInterval(false); - no need to stop interval as the next command turns it on to play
     // start playing in the current channel right after recording
     setPlayingInLooperChannel(channel, true);
@@ -63,13 +63,13 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
       // already playing
       return;
     }
-    if (!looperChannel.midiRecorder.hasRecording()) {
+    if (!looperChannel.looperRecorder.hasRecording()) {
       return;
     }
 
     currentlyPlayingLooperChannels.add(channel);
     toggleInterval(true);
-    void looperChannel.midiRecorder.playMidi(); // don't wait for it
+    void looperChannel.looperRecorder.playMidi(); // don't wait for it
     //TODO: repeat until stopped
   } else {
     if (!looperChannel.isPlaying) {
@@ -77,7 +77,7 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
       return;
     }
     currentlyPlayingLooperChannels.delete(channel);
-    looperChannel.midiRecorder.stopPlaying();
+    looperChannel.looperRecorder.stopPlaying();
     toggleInterval(false);
   }
   looperChannel.isPlaying = value;
