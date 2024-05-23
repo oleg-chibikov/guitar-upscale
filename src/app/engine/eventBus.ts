@@ -26,8 +26,7 @@ export type ClearNoteMetadata = {
   clearChordMarker?: boolean;
 };
 
-export type NoteMetadata = StrummingMetadata &
-  TrackMetadata &
+export type NoteMetadata = TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
     skipChordDetection?: boolean;
@@ -44,6 +43,7 @@ export type ChordMetadata = StrummingMetadata &
     notesToPlay?: number;
     strummingDelayMs?: number;
     clear?: boolean;
+    fromLooper?: boolean;
   };
 
 export type ChordWithPlayMetadata = {
@@ -102,8 +102,6 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     fretMarkersFromPreviousChord.add(serialized);
   }
 
-  const fromImmediateChord =
-    noteMetadata.playedSeparatelyFromStrumming ?? false;
   const midiRecorder = (await import("./midiRecorder")).midiRecorder;
   const trackNumber =
     noteMetadata.trackNumber ?? (noteMetadata.fromChord ? 1 : 0);
@@ -117,6 +115,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   );
 
   if (
+    !noteMetadata.fromChord && // chords are recorded separately
     !noteMetadata.fromLooper &&
     currentlyRecordingLooperChannel !== undefined
   ) {
@@ -124,9 +123,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordNote(
       noteMetadata.stringOctaveNote,
       trackNumber,
-      trackInstrument,
-      fromImmediateChord,
-      noteMetadata.strummingClickNumber
+      trackInstrument
     );
   }
 
@@ -149,14 +146,22 @@ export const clearPreviousChords = () => {
   fretMarkersFromPreviousChord.clear(); // clear previous chord;
 };
 
-ChordEventBus.subscribe((chordWithMetadata: ChordWithPlayMetadata) => {
+ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
   console.log("EventBus: Chord play requested", chordWithMetadata);
 
   // don't check for the same chord here - we need to clear the previous variation of the same chord (they might differ)
   clearPreviousChords();
   previousChord = chordWithMetadata.chord;
 
-  const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
+  const metadata = chordWithMetadata.metadata;
 
-  playAction?.(chordWithMetadata.metadata);
+  const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
+  playAction?.(metadata);
+
+  if (!metadata.fromLooper && currentlyRecordingLooperChannel !== undefined) {
+    const { looperState } = await import("./looper");
+    looperState[currentlyRecordingLooperChannel].looperRecorder.recordChord(
+      chordWithMetadata
+    );
+  }
 });

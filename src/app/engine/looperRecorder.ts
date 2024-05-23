@@ -1,6 +1,10 @@
 import { Instrument } from "../data/instruments";
-import { StringOctaveNote, getNoteText } from "../data/notes";
-import { NotePlayEventBus } from "./eventBus";
+import { StringOctaveNote } from "../data/notes";
+import {
+  ChordEventBus,
+  ChordWithPlayMetadata,
+  NotePlayEventBus,
+} from "./eventBus";
 import {
   TICKS_IN_BAR,
   globalCurrentLastBarTick,
@@ -15,8 +19,13 @@ type InternalNoteEvent = {
   instrument: Instrument;
 };
 
+type ChordOrNote = {
+  note?: InternalNoteEvent;
+  chord?: ChordWithPlayMetadata;
+};
+
 export class LooperRecorder {
-  private midiEventsByTick: Map<number, Set<InternalNoteEvent>> | undefined;
+  private midiEventsByTick: Map<number, Set<ChordOrNote>> | undefined;
   private isRecording: boolean = false;
   private startTick: number | undefined;
   private lastBarTickWhenStoppedRecording: number | undefined;
@@ -31,7 +40,7 @@ export class LooperRecorder {
   >(); // key is the strumming sequence id (click number). Value is the function that deletes the undesired events for this strumming sequence
 
   startRecording() {
-    this.midiEventsByTick = new Map<number, Set<InternalNoteEvent>>();
+    this.midiEventsByTick = new Map<number, Set<ChordOrNote>>();
     this.isRecording = true;
     this.startTick = undefined;
     this.lastBarTickWhenStoppedRecording = undefined;
@@ -141,25 +150,25 @@ export class LooperRecorder {
 
     console.log("Playing notes at tick %d", tick);
 
-    eventsAtTick.forEach(({ note, trackNumber, instrument }) => {
-      NotePlayEventBus.next({
-        stringOctaveNote: note,
-        fromChord: false,
-        fromLooper: true,
-        trackInstrument: instrument,
-        trackNumber,
-        skipChordDetection: true,
-      });
+    eventsAtTick.forEach(({ note, chord }) => {
+      if (note) {
+        NotePlayEventBus.next({
+          stringOctaveNote: note.note,
+          fromChord: false,
+          fromLooper: true,
+          trackInstrument: note.instrument,
+          trackNumber: note.trackNumber,
+          skipChordDetection: true,
+        });
+      }
+      if (chord) {
+        chord.metadata.fromLooper = true;
+        ChordEventBus.next(chord);
+      }
     });
   }
 
-  recordNote(
-    note: StringOctaveNote,
-    trackNumber: number,
-    instrument: Instrument,
-    fromImmediateChord: boolean,
-    strummingClickNumber?: number
-  ) {
+  recordChord(data: ChordWithPlayMetadata) {
     if (!this.isRecording || !this.midiEventsByTick) {
       return;
     }
@@ -167,31 +176,13 @@ export class LooperRecorder {
     if (this.startTick === undefined) {
       this.startTick = globalCurrentLastBarTick;
     }
-    const playAtTick = currentTick - this.startTick;
-    console.log(
-      `Recording ${getNoteText(note.note)}${
-        note.octave
-      }; delta: ${playAtTick} ticks`
-    );
-    const internalNoteEvent: InternalNoteEvent = {
-      tick: currentTick,
-      note,
-      trackNumber,
-      instrument,
-    };
-    let eventsForTick = this.midiEventsByTick.get(currentTick);
-    if (!eventsForTick) {
-      eventsForTick = new Set([internalNoteEvent]);
-    } else {
-      eventsForTick.add(internalNoteEvent);
-    }
+
+    const eventData: ChordOrNote = { chord: data };
+    const eventsForTick = this.addOrUpdateEvent(currentTick, eventData);
 
     const removeEvent = () => {
-      console.log(
-        "Removing undesired event as strumming continues",
-        internalNoteEvent
-      );
-      eventsForTick.delete(internalNoteEvent);
+      console.log("Removing undesired event as strumming continues", eventData);
+      eventsForTick.delete(eventData);
       if (!eventsForTick.size) {
         console.log(
           "No more events at tick %d. Deleting the events container for it",
@@ -202,10 +193,37 @@ export class LooperRecorder {
     };
 
     this.registerUndesiredStrummingEvent(
-      strummingClickNumber,
-      fromImmediateChord,
+      data.metadata.strummingClickNumber,
+      data.metadata.playedSeparatelyFromStrumming ?? false,
       removeEvent
     );
+
+    this.midiEventsByTick.set(currentTick, eventsForTick);
+  }
+
+  recordNote(
+    note: StringOctaveNote,
+    trackNumber: number,
+    instrument: Instrument
+  ) {
+    if (!this.isRecording || !this.midiEventsByTick) {
+      return;
+    }
+    const currentTick = globalCurrentTick;
+    if (this.startTick === undefined) {
+      this.startTick = globalCurrentLastBarTick;
+    }
+
+    const internalNoteEvent: InternalNoteEvent = {
+      tick: currentTick,
+      note,
+      trackNumber,
+      instrument,
+    };
+
+    const eventsForTick = this.addOrUpdateEvent(currentTick, {
+      note: internalNoteEvent,
+    });
 
     this.midiEventsByTick.set(currentTick, eventsForTick);
   }
@@ -214,6 +232,16 @@ export class LooperRecorder {
     const size = this.midiEventsByTick?.size;
     return size ? size > 0 : false;
   };
+
+  private addOrUpdateEvent(currentTick: number, data: ChordOrNote) {
+    let eventsForTick = this.midiEventsByTick!.get(currentTick);
+    if (!eventsForTick) {
+      eventsForTick = new Set([data]);
+    } else {
+      eventsForTick.add(data);
+    }
+    return eventsForTick;
+  }
 
   private registerUndesiredStrummingEvent(
     strummingClickNumber: number | undefined,
