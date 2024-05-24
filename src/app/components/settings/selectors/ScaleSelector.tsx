@@ -19,7 +19,7 @@ const ScaleSelector: React.FC = () => {
       options={Array.from(scalesMap.get(scaleGroup)!.entries()).map(
         ([scaleName]) => {
           const examples = examplesMap?.get(scaleGroup)?.get(scaleName);
-          const exampleCount = examples?.length;
+          const exampleCount = examples?.length ?? 0;
           const asterisk = exampleCount ? ` (${exampleCount} ex.)` : "";
 
           return {

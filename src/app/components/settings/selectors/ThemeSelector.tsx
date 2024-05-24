@@ -7,11 +7,9 @@ import { EnumSelector } from "./EnumSelector";
 const convertOSTheme = (theme: Theme) => {
   let tempTheme = theme;
   if (tempTheme === Theme.MatchOS) {
-    tempTheme =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? Theme.Dark
-        : Theme.Light;
+    tempTheme = window.matchMedia?.("(prefers-color-scheme: dark)").matches
+      ? Theme.Dark
+      : Theme.Light;
   }
   return tempTheme;
 };

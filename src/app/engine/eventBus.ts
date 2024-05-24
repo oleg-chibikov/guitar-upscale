@@ -86,7 +86,8 @@ const play = async ({
   await playNote(
     stringOctaveNote,
     velocity ?? velocityValue,
-    trackInstrument ?? (fromChord ? chordInstrumentValue : instrumentValue),
+    trackInstrument ??
+      (fromChord === true ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,
     reverbStrengthValue,
     beatToMilliseconds(tempoBpmValue)
@@ -94,20 +95,20 @@ const play = async ({
 };
 
 NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
+  const fromChord = noteMetadata.fromChord === true;
   void play(noteMetadata);
   //console.log("EventBus: Note play requested", noteMetadata.stringOctaveNote);
   const serialized = serializeStringOctaveNote(noteMetadata.stringOctaveNote);
   const animateAction = NoteToFretMarkerEventMap.get(serialized);
-  if (noteMetadata.fromChord && animateAction) {
+  if (fromChord === true && animateAction) {
     fretMarkersFromPreviousChord.add(serialized);
   }
 
   const midiRecorder = (await import("./midiRecorder")).midiRecorder;
-  const trackNumber =
-    noteMetadata.trackNumber ?? (noteMetadata.fromChord ? 1 : 0);
+  const trackNumber = noteMetadata.trackNumber ?? (fromChord ? 1 : 0);
   const trackInstrument =
     noteMetadata.trackInstrument ??
-    (noteMetadata.fromChord ? chordInstrumentValue : instrumentValue);
+    (fromChord ? chordInstrumentValue : instrumentValue);
   midiRecorder.addNoteToMidiTrack(
     noteMetadata.stringOctaveNote,
     trackNumber,
@@ -115,7 +116,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   );
 
   if (
-    !noteMetadata.fromChord && // chords are recorded separately
+    !fromChord && // chords are recorded separately
     noteMetadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {

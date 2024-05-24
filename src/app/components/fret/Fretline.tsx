@@ -9,7 +9,7 @@ import { FretMarker } from "./FretMarker";
 export interface FretlineProps {
   elements: (StringOctaveNote | null)[];
   string?: number;
-  isHeader?: boolean;
+  isHeader: boolean;
 }
 
 const calculateTop = (string: number, fret: number, modifiers: number[]) => {

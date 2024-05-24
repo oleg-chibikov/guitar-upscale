@@ -20,7 +20,7 @@ export const useSessionAuth = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const errorParam = urlParams.get("auth-error");
 
-      if (errorParam) {
+      if (errorParam !== null && errorParam) {
         console.log("Query string container error");
         dispatch(
           setAndShowAlert({

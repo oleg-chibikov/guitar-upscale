@@ -51,9 +51,9 @@ export const IconButton: React.FC<IconButtonProps> = ({
     <button
       id={id}
       title={tooltip}
-      disabled={!allowHandlerInDisabledState && disabled}
+      disabled={allowHandlerInDisabledState !== true && disabled}
       className={`${className} ${
-        disabled
+        disabled === true
           ? theme === Theme.Light
             ? "bg-disabled-light"
             : "bg-disabled-dark"

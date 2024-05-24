@@ -53,11 +53,11 @@ export const ChangeSubscriptionModal: FC<
     existingNotCancelledPurchaseOption?.subscribedDateMs
   );
   const existingSubscriptionExpirationDateText =
-    existingSubscriptionExpirationDate
+    existingSubscriptionExpirationDate !== undefined
       ? ` ${existingSubscriptionExpirationDate}`
       : "";
   const existingSubscriptionSubscribedDateText =
-    existingSubscriptionSubscribedDate
+    existingSubscriptionSubscribedDate !== undefined
       ? ` (${existingSubscriptionSubscribedDate})`
       : "";
 

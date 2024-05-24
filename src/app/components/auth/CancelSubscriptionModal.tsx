@@ -30,8 +30,10 @@ export const CancelSubscriptionModal: FC<
   const purchaseData = purchaseOption.purchaseData;
   const expirationDate = msToFormattedDate(purchaseData?.expirationDateMs);
   const subscribedDate = msToFormattedDate(purchaseData?.subscribedDateMs);
-  const expirationDateText = expirationDate ? ` ${expirationDate}` : "";
-  const subscribedDateText = subscribedDate ? ` (${subscribedDate})` : "";
+  const expirationDateText =
+    expirationDate !== undefined ? ` ${expirationDate}` : "";
+  const subscribedDateText =
+    subscribedDate !== undefined ? ` (${subscribedDate})` : "";
   const cancellationMode = purchaseData?.cancellationMode;
 
   return (

@@ -25,7 +25,7 @@ export const getCancelSubscription = (
     if (!hasDigitalGoodsService) {
       return;
     }
-    if (disabledMessage) {
+    if (disabledMessage !== undefined) {
       console.log(disabledMessage);
       return;
     }

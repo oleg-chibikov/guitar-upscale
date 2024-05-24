@@ -53,7 +53,7 @@ export const playWholeScale = async (
         break;
       }
 
-      if (boundaryNote) {
+      if (boundaryNote !== undefined) {
         const serializedNote = serializeOctaveNote(note);
 
         if (serializedNote === boundaryNote) {

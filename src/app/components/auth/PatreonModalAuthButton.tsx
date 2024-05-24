@@ -18,7 +18,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const isSignedIn = session?.user?.image && session?.user?.name;
+  const isSignedIn = Boolean(session?.user);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [userWantsToSignInWithPatreon, setUserWantsToSignInWithPatreon] =
     useState<boolean>(!hasDigitalGoodsService);

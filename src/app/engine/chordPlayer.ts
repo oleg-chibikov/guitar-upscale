@@ -37,7 +37,7 @@ const playVariation = async (
     if (++i >= noteCount) {
       break;
     }
-    if (delayMs) {
+    if (delayMs !== undefined && delayMs > 0) {
       await sleep(delayMs);
     }
   }

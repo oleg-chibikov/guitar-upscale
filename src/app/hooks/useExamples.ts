@@ -9,7 +9,7 @@ export const useExamples = () => {
 
   useEffect(() => {
     const updateExampleFeature = async () => {
-      if (premiumFeatures.melodies) {
+      if (premiumFeatures.melodies === true) {
         const { examplesMap } = await import("@/app/data/scaleExamples");
         setExamplesMap(examplesMap);
       }

@@ -40,7 +40,7 @@ export const ChordsView: React.FC = () => {
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
-  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>();
+  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const getScrollbarVisible = () => {
@@ -80,7 +80,9 @@ export const ChordsView: React.FC = () => {
     return null;
   }
 
-  const hasAdvancedChords = useAdvancedChords && premiumFeatures.advancedChords; // TODO: so-so protection:)
+  const hasAdvancedChords = useAdvancedChords
+    ? premiumFeatures.advancedChords === true
+    : false; // TODO: so-so protection:)
 
   const checkIsHiddenMode = (noteChordMode: NoteChordMode) =>
     !hasAdvancedChords &&

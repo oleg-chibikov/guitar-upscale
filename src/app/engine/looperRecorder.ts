@@ -44,7 +44,7 @@ export class LooperRecorder {
 
   hasRecording = () => {
     const size = this.midiEventsByTick?.size;
-    return size ? size > 0 : false;
+    return size !== undefined ? size > 0 : false;
   };
 
   clear = () => {
@@ -68,7 +68,10 @@ export class LooperRecorder {
   }
 
   async playMidi(): Promise<void> {
-    if (!this.midiEventsByTick || !this.lastBarTickWhenStoppedRecording) {
+    if (
+      !this.midiEventsByTick ||
+      this.lastBarTickWhenStoppedRecording === undefined
+    ) {
       return;
     }
 
@@ -147,7 +150,7 @@ export class LooperRecorder {
 
         await this.waitForTick(tick, currentTick, abortSignal);
 
-        if (abortSignal.aborted || !this.midiEventsByTick) {
+        if (abortSignal.aborted || this.midiEventsByTick === undefined) {
           return;
         }
 
@@ -173,7 +176,7 @@ export class LooperRecorder {
   private playNotesAtTick(tick: number) {
     const eventsAtTick = this.midiEventsByTick!.get(tick);
 
-    if (!eventsAtTick?.size) {
+    if (!eventsAtTick || !eventsAtTick.size) {
       return;
     }
 
@@ -183,7 +186,6 @@ export class LooperRecorder {
       if (note) {
         NotePlayEventBus.next({
           stringOctaveNote: note.note,
-          fromChord: false,
           looperChannel: note.looperChannel,
           trackInstrument: note.instrument,
           trackNumber: note.trackNumber,
@@ -311,7 +313,10 @@ export class LooperRecorder {
         // if we are here it means that we continue strumming. We need to wipe the unwanted events coming from the same sequence (the chord that was played immediately, before strumming)
         const clearUndesiredChordCallbacksForThisSequence =
           this.clearUndesiredChordCallbacks.get(strummingClickNumber);
-        if (clearUndesiredChordCallbacksForThisSequence?.size) {
+        if (
+          clearUndesiredChordCallbacksForThisSequence &&
+          clearUndesiredChordCallbacksForThisSequence.size
+        ) {
           console.log("Removing undesired events");
           clearUndesiredChordCallbacksForThisSequence.forEach((callback) =>
             callback()

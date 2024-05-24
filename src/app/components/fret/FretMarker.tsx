@@ -32,7 +32,7 @@ interface FretMarkerProps {
   width: number;
   top: number;
   stringOctaveNote: StringOctaveNote | null;
-  isHeader?: boolean;
+  isHeader: boolean;
 }
 
 const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
@@ -75,7 +75,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
-  const [isBeingDetected, setIsBeingDetected] = useState<boolean>();
+  const [isBeingDetected, setIsBeingDetected] = useState<boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -90,14 +90,14 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     if (stringOctaveNote) {
       const key = serializeStringOctaveNote(stringOctaveNote);
       NoteToFretMarkerEventMap.set(key, async (metadata) => {
-        if ((metadata as ClearNoteMetadata).clearChordMarker) {
+        if ((metadata as ClearNoteMetadata).clearChordMarker === true) {
           setIsFromPreviousChord(false);
         } else {
           const noteMetadata = metadata as NoteMetadata;
           if (
             chordIsBeingDetectedValue &&
-            stringOctaveNote &&
-            !noteMetadata.skipChordDetection
+            stringOctaveNote !== null &&
+            noteMetadata.skipChordDetection !== true
           ) {
             const { addNoteToDetector } = await import(
               "@/app/engine/chordDetector"
@@ -126,16 +126,16 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           // it may come from several tracks for the same note simultaneously
           if (
             noteMetadata.looperChannel !== undefined ||
-            noteMetadata.trackNumber
+            noteMetadata.trackNumber !== undefined
           ) {
             trackNumberRef.current =
               noteMetadata.looperChannel ?? noteMetadata.trackNumber;
-          } else if (noteMetadata.fromChord) {
+          } else if (noteMetadata.fromChord === true) {
             trackNumberRef.current = 5; // another color for chords
           }
 
           animate();
-          if (noteMetadata.fromChord) {
+          if (noteMetadata.fromChord === true) {
             setIsFromPreviousChord(true);
           }
         }
@@ -181,7 +181,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         if (stringOctaveNote) {
           NotePlayEventBus.next({
             stringOctaveNote,
-            fromChord: false,
           });
           await sleep(chordStrummingDelayMsValue);
         }
@@ -192,7 +191,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     if (stringOctaveNote) {
       NotePlayEventBus.next({
         stringOctaveNote,
-        fromChord: false,
       });
     }
   };

@@ -70,9 +70,9 @@ export class Trie implements TrieInterface {
     len: number,
     wildcardMatches: Set<string>
   ): void {
-    if (!root) {
-      return;
-    }
+    // if (!root) {
+    //   return;
+    // }
     if (len === pattern.length) {
       if (root.isEnd) {
         wildcardMatches.add(prefix);
@@ -104,7 +104,7 @@ export class Trie implements TrieInterface {
       }
     } else {
       const child = root.children.get(char);
-      if (child) {
+      if (child !== undefined) {
         this.wildcardTraverse(
           pattern,
           prefix + char,

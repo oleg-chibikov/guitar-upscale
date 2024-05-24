@@ -178,7 +178,12 @@ export const Fretboard: React.FC = () => {
           {/* Notes */}
           <div className="mt-10">
             {neck.map((row, rowIndex) => (
-              <Fretline string={rowIndex} key={rowIndex} elements={row} />
+              <Fretline
+                string={rowIndex}
+                key={rowIndex}
+                elements={row}
+                isHeader={false}
+              />
             ))}
           </div>
         </div>

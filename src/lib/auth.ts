@@ -9,7 +9,7 @@ export const getAuthConfig = () => {
   const clientId = process.env.PATREON_CLIENT_ID;
   const clientSecret = process.env.PATREON_CLIENT_SECRET;
 
-  if (!clientId || !clientSecret) {
+  if (clientId === undefined || clientSecret === undefined) {
     throw new Error("No Patreon keys detected. Developer to fix");
   }
 
@@ -35,10 +35,10 @@ export const getAuthConfig = () => {
       },
       async jwt({ token, user, account }) {
         //console.log("jwt", user, account, profile);
-        if (user) {
+        if (user !== null && user !== undefined) {
           token.id = user.id;
         }
-        if (account) {
+        if (account !== null && account !== undefined) {
           token.accessToken = account.access_token;
         }
         return token;

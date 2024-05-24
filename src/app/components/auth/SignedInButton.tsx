@@ -1,8 +1,9 @@
+import { UserAvatar } from "@/app/components/auth/UserAvatar";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import { Avatar, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import { Session } from "next-auth";
 import { FC } from "react";
 import { useSelector } from "react-redux";
@@ -36,9 +37,8 @@ export const SignedInButton: FC<
       >
         {subscriptionTier?.tier ?? "Go premium"}
       </span>
-      {user?.image && (
-        <Avatar alt={user.name ?? "User avatar"} src={user.image} />
-      )}
+
+      <UserAvatar user={user} />
     </Button>
   );
 };

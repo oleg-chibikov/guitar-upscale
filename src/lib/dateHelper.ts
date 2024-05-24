@@ -1,4 +1,5 @@
-const msToDate = (ms?: number) => (ms ? new Date(ms) : undefined);
+const msToDate = (ms?: number) =>
+  ms !== undefined && ms > 0 ? new Date(ms) : undefined;
 
 export const msToFormattedDate = (ms?: number) => {
   const date = msToDate(ms);

@@ -1,6 +1,6 @@
 "use client";
 import { UsePlayParams, usePlay } from "@/app/hooks/usePlay";
-import { chordsMap, selectSettings } from "@/app/store/settingsSlice";
+import { selectSettings } from "@/app/store/settingsSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -15,10 +15,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
 
   const { isWaiting, handlePlay } = usePlay(params);
 
-  if (!neck) {
-    return null;
-  }
-  if (!chordsMap) {
+  if (neck === null) {
     return null;
   }
 

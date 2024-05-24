@@ -39,7 +39,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
 
     // Select the first instrument from the group
     const instrumentsInGroup = instrumentGroups[group];
-    if (instrumentsInGroup && instrumentsInGroup.length > 0) {
+    if (instrumentsInGroup.length) {
       await handleInstrumentChange(instrumentsInGroup[0]);
     }
   };

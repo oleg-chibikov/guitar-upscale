@@ -75,14 +75,16 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonColor = "error";
     buttonAction = async () => await showCancellationModal();
     purchaseStatusLine1 =
-      "Owned" + (subscribedDate ? " since " + subscribedDate : "");
-    purchaseStatusLine2 = expirationDate ? "Expires " + expirationDate : "";
+      "Owned" +
+      (subscribedDate !== undefined ? " since " + subscribedDate : "");
+    purchaseStatusLine2 =
+      expirationDate !== undefined ? "Expires " + expirationDate : "";
     buttonContent =
       purchaseOption.purchaseData?.cancellationMode === CancellationMode.Cancel
         ? "Cancel"
         : "Revoke";
     buttonTitle = disabledMessage ?? buttonContent;
-    buttonDisabled = disabledMessage ? true : false;
+    buttonDisabled = disabledMessage !== undefined ? true : false;
     bg = theme === Theme.Light ? "bg-accent-light" : "bg-accent-dark";
   } else if (isCancelled) {
     const expirationDate = msToFormattedDate(
@@ -96,7 +98,7 @@ export const GooglePlayPurchaseOptionButton: FC<
       "Re-subscribe" +
       (changeAction ? " and " + changeAction.toLocaleLowerCase() : "");
     buttonTitle = disabledMessage ?? buttonContent;
-    buttonDisabled = disabledMessage ? true : false;
+    buttonDisabled = disabledMessage !== undefined ? true : false;
     bg = isSelected
       ? theme === Theme.Light
         ? "bg-primary-light"
@@ -110,7 +112,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     buttonAction = makePurchase; // re-subscribe
     buttonContent = changeAction ?? "Subscribe";
     buttonTitle = disabledMessage ?? buttonContent;
-    buttonDisabled = disabledMessage ? true : false;
+    buttonDisabled = disabledMessage !== undefined ? true : false;
     bg = isSelected
       ? theme === Theme.Light
         ? "bg-primary-light"
@@ -135,10 +137,10 @@ export const GooglePlayPurchaseOptionButton: FC<
     <>
       <p onClick={handleClick} className={`${className}`}>
         <div className="text-lg font-semibold">{title}</div>
-        {purchaseStatusLine1 && (
+        {purchaseStatusLine1 !== undefined && (
           <div className="text-xs whitespace-nowrap">{purchaseStatusLine1}</div>
         )}
-        {purchaseStatusLine2 && (
+        {purchaseStatusLine2 !== undefined && (
           <div className="text-xs whitespace-nowrap">{purchaseStatusLine2}</div>
         )}
       </p>

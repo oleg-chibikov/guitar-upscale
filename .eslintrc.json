@@ -10,6 +10,7 @@
   ],
   "rules": {
     "@typescript-eslint/no-floating-promises": "error",
-    "eqeqeq": ["error", "always"]
+    "eqeqeq": ["error", "always"],
+    "@typescript-eslint/strict-boolean-expressions": "error"
   }
 }

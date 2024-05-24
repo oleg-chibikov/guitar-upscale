@@ -26,7 +26,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
     <>
       <Initializer />
       <AlertWrapper />
-      {loadingMessage ? (
+      {loadingMessage !== undefined ? (
         <main
           className={`flex flex-col gap-2 justify-center align-middle items-center text-center text-2xl ${
             theme === Theme.Light

@@ -10,7 +10,7 @@ import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
 const convertChord = (chord: string, tuningShift: number): string => {
   const baseNote = baseNoteValue;
-  if (!baseNote && !tuningShift) {
+  if (baseNote === Note.E && !tuningShift) {
     return chord;
   }
 
@@ -111,9 +111,12 @@ export const decodeMelody = async (
       return Promise.resolve();
     }
     const char = melody[index];
-    const nextChar = index !== melody.length - 1 && melody[index + 1];
-    const nextSecondChar = index !== melody.length - 2 && melody[index + 2];
-    const nextThirdChar = index !== melody.length - 3 && melody[index + 3];
+    const nextChar =
+      index !== melody.length - 1 ? melody[index + 1] : undefined;
+    const nextSecondChar =
+      index !== melody.length - 2 ? melody[index + 2] : undefined;
+    const nextThirdChar =
+      index !== melody.length - 3 ? melody[index + 3] : undefined;
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
     const playChordAndReset = () => {
@@ -131,7 +134,7 @@ export const decodeMelody = async (
         playChordAndReset();
       } else {
         // keep recording chord
-        if (!immediateChord) {
+        if (immediateChord === undefined) {
           immediateChord = char;
         } else {
           immediateChord += char;
@@ -198,11 +201,11 @@ export const decodeMelody = async (
             index = indexToRepeat; // returning to the beginning of the pattern
           }
         } else {
-          if (!nextChar) {
+          if (nextChar === undefined) {
             repeatCount = 0;
           } else {
             repeatCount =
-              nextSecondChar === "-" && nextThirdChar //support repetition > 10 and < 100
+              nextSecondChar === "-" && nextThirdChar !== undefined //support repetition > 10 and < 100
                 ? parseInt(nextChar + nextThirdChar) - 1
                 : parseInt(nextChar) - 1;
           }

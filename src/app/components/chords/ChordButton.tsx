@@ -51,7 +51,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         return;
       }
 
-      if (metadata.clear) {
+      if (metadata.clear === true) {
         console.log("Clear previous chord marker: " + chordName);
         setWasPlayedLast(false);
         return;

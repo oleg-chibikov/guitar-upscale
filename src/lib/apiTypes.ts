@@ -24,7 +24,7 @@ export type ChangeSubscriptionActionResponseData =
   };
 
 export type PurchaseData = {
-  cancellationReason: CancelReason;
+  cancellationReason?: CancelReason;
   cancellationMode: CancellationMode;
   expirationDateMs: number;
   subscribedDateMs: number;

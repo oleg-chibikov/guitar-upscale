@@ -35,7 +35,7 @@ export class MidiRecorder {
 
   stopRecording(save: boolean) {
     this.isRecording = false;
-    if (save && this.midiEvents?.size) {
+    if (save && this.midiEvents !== undefined && this.midiEvents.size) {
       const midiData = this.generateMidiData(this.midiEvents);
       this.downloadMidiFile(midiData);
     }

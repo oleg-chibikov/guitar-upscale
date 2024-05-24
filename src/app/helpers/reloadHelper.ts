@@ -28,7 +28,7 @@ export async function incrementAndReload(
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   console.log("Waiting to reload for the key", key);
   // some time to read the message
-  if (sleepTimeMs) {
+  if (sleepTimeMs !== undefined && sleepTimeMs > 0) {
     await sleep(sleepTimeMs);
   }
   console.log("Reloading page for the key", key);

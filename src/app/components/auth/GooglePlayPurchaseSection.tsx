@@ -128,7 +128,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
                       ...correspondingPurchasedItem,
                       tier,
                       isCancelled:
-                        purchaseData.cancellationReason &&
+                        purchaseData.cancellationReason !== undefined && // shouldn't happen but just in case
                         purchaseData.cancellationReason !== CancelReason.NONE,
                     } as PurchasedOption)
                   : undefined,

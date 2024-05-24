@@ -23,7 +23,7 @@ const PremiumFeaturesContext = createContext<{
 // Create a custom hook to access PremiumFeatures
 export const usePremiumFeatures = () => {
   const context = useContext(PremiumFeaturesContext);
-  if (!context) {
+  if (context === undefined) {
     return {
       premiumFeatures: {},
       composerPremiumFeatures: {},

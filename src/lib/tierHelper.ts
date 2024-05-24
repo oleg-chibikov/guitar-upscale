@@ -23,7 +23,7 @@ const explorerWhitelist = new Set<string>(
 
 const getDataFromSubscriptionCookie = () => {
   const value = getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, { cookies });
-  if (!value) {
+  if (value === undefined || value.length === 0) {
     console.log("No value in subscription cookie");
     return undefined;
   }
@@ -35,7 +35,7 @@ const getGooglePlaySubscriptionTierFromCookie = async () => {
   const subscriptionData = getDataFromSubscriptionCookie();
   if (subscriptionData) {
     const subscription = await fetchSubscriptionPurchase(subscriptionData);
-    if (subscription) {
+    if (subscription !== undefined) {
       return tierMap.get(subscriptionData.itemId);
     }
   }
@@ -84,7 +84,7 @@ const getTierFromPatreonApi = async (accessToken: string) => {
 };
 
 const getTierFromWhitelist = (email?: string) => {
-  if (email) {
+  if (email !== undefined && email.length) {
     if (composerWhitelist.has(email)) {
       return "Composer";
     }
@@ -114,7 +114,7 @@ export async function getTierName(
     return { tier, provider: SubscriptionProvider.GooglePlay };
   }
 
-  if (!accessToken) {
+  if (accessToken === undefined || accessToken.length === 0) {
     return undefined;
   }
 

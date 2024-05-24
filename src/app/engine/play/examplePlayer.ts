@@ -20,7 +20,6 @@ export const playExample = async ({
           "Requesting auto play note in a melody: " + JSON.stringify(note)
         );
         NotePlayEventBus.next({
-          fromChord: false,
           trackNumber,
           trackInstrument: track.instrument,
           stringOctaveNote: note,

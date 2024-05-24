@@ -25,7 +25,7 @@ export const Slider: React.FC<SliderProps> = ({
   maximumValue,
   step = 1,
   className,
-  isVertical,
+  isVertical = false,
   label,
   labelClass,
 }) => {
@@ -57,7 +57,8 @@ export const Slider: React.FC<SliderProps> = ({
           value={value}
           step={step}
           onChange={(event) =>
-            onValueChange && onValueChange(parseInt(event.target.value))
+            onValueChange !== undefined &&
+            onValueChange(parseInt(event.target.value))
           }
           style={{
             appearance: isVertical ? ("slider-vertical" as never) : undefined,
@@ -66,7 +67,7 @@ export const Slider: React.FC<SliderProps> = ({
           }}
         />
       </div>
-      {label && (
+      {label !== undefined && (
         <span
           className={`text-nowrap ${
             theme === Theme.Light

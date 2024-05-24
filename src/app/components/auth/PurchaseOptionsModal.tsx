@@ -1,3 +1,4 @@
+import { UserAvatar } from "@/app/components/auth/UserAvatar";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { Theme } from "@/app/data/theme";
@@ -7,7 +8,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
-import { Alert, Avatar, Modal, Slide } from "@mui/material";
+import { Alert, Modal, Slide } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
@@ -68,8 +69,12 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     if (highlightedOption) {
       // Show what it would look like if the selected option is applied
       const highlightedOptionHasFeature =
-        (highlightedOption === "Composer" && keyValueComposerFeatures[x]) ||
-        (highlightedOption === "Explorer" && keyValueExplorerFeatures[x]) ||
+        (highlightedOption === "Composer" && keyValueComposerFeatures[x]
+          ? true
+          : false) ||
+        (highlightedOption === "Explorer" && keyValueExplorerFeatures[x]
+          ? true
+          : false) ||
         false;
 
       if (isCurrentlyEnabled) {
@@ -120,14 +125,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
           }`}
         >
           <div className="relative flex flex-row gap-4 items-center justify-center">
-            {session?.user?.name && session.user.image && (
-              <Avatar
-                className="left-2 top-2"
-                style={{ position: "absolute" }} // override MUI postion which is relative - can't do with tailwind
-                alt={session.user.name}
-                src={session.user.image}
-              />
-            )}
+            {session !== null ? <UserAvatar user={session.user} /> : null}
             <CloseIcon onPress={handleCloseModal} />
             <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
               {session?.user && (

@@ -1,5 +1,6 @@
 "use server";
 
+import { TierKey } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CancellationMode, ResponseData } from "./apiTypes";
@@ -33,13 +34,25 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
   res: NextApiResponse<T>,
   { allowCancelled, paramNames, required }: GetSubscriptionParams
 ): Promise<SubscriptionData | undefined> => {
-  const paramCollection = req.method === "POST" ? req.body : req.query;
+  const paramCollection = (
+    req.method === "POST" ? req.body : req.query
+  ) as Record<string, string | null | undefined>;
   // Extract parameters from the body instead of query
-  const itemId = paramCollection[paramNames?.itemId ?? "itemId"];
+  const itemId = paramCollection[paramNames?.itemId ?? "itemId"] as
+    | TierKey
+    | null
+    | undefined;
   const purchaseToken =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
-  if (!itemId || !purchaseToken) {
+  if (
+    itemId === null ||
+    itemId === undefined ||
+    !itemId.length ||
+    purchaseToken === null ||
+    purchaseToken === undefined ||
+    !purchaseToken.length
+  ) {
     if (required) {
       res
         .status(HttpStatusCode.BadRequest)

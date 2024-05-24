@@ -77,7 +77,7 @@ export const useStrumming = (
     ) => {
       const chordToPlay =
         (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
-        currentChord
+        currentChord !== undefined
           ? currentChord
           : chordName;
       // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
@@ -86,6 +86,7 @@ export const useStrumming = (
         metadata: {
           playedSeparatelyFromStrumming: playedSeparatelyFromStrumming,
           strummingClickNumber: clickNumberRef.current,
+          clear: false,
         },
       });
     },

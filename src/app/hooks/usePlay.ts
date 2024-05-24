@@ -57,7 +57,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       );
       example = await getRandomScaleExample();
       const tempo = example?.tempo;
-      if (tempo && tempo !== tempoBpmValue) {
+      if (tempo !== undefined && tempo !== tempoBpmValue) {
         dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
       }
     } else {
@@ -67,10 +67,10 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     // the instrument should be initialized before waiting for the first note
     // init metronome here as we don't want to get glitches if it gets turned on during playing
     const trackInstrumentPromises =
-      example?.tracks.map(
-        (track) =>
-          track.instrument &&
-          loadInstrument(track.instrument, reverbStrengthValue)
+      example?.tracks.map((track) =>
+        track.instrument !== undefined
+          ? loadInstrument(track.instrument, reverbStrengthValue)
+          : Promise.resolve()
       ) ?? [];
 
     await Promise.all(trackInstrumentPromises);
@@ -85,7 +85,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       setIsWaiting(true);
       // if metronome or chord strumming is already playing then wait for the bar, other
       console.log("Waiting for the next bar");
-      if (example?.halfBeatShift) {
+      if (example?.halfBeatShift !== undefined && example.halfBeatShift) {
         // wait for the remainder of the beats till desired value
         const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
         let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;

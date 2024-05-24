@@ -194,7 +194,7 @@ export const getRandomScaleExample = async (): Promise<Example | undefined> => {
 
   const instrumentLoadPromises = examples?.flatMap((example) =>
     example.tracks.map(async (track) => {
-      if (track.instrument) {
+      if (track.instrument !== undefined) {
         await loadInstrument(track.instrument, reverbStrengthValue);
       }
     })

@@ -104,7 +104,7 @@ export const Initializer: React.FC = () => {
       function (event: MouseEvent) {
         const elementTarget = event.target as Element;
         if (
-          elementTarget &&
+          elementTarget !== undefined &&
           (elementTarget.nodeName === "UL" ||
             elementTarget.nodeName === "LI" ||
             elementTarget.nodeName === "SPAN")

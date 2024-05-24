@@ -47,7 +47,7 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
 export const getShiftedNote = (note: Note) => {
   const tuningData = tunings[tuningValue];
 
-  return tuningData.shift
+  return tuningData.shift !== undefined && tuningData.shift > 0
     ? (NOTE_COUNT + note + tuningData.shift) % NOTE_COUNT
     : note;
 };
