@@ -21,12 +21,20 @@ const GooglePlayPurchaseSection = React.lazy(() =>
   }))
 );
 
-const featureNames = {
+type AllowedKeys = Exclude<
+  PremiumFeatureKeys,
+  | "reverbStrength"
+  | "playbackTypeSelection"
+  | "toggleMetronomeWhenRecordingCheckbox"
+>;
+
+const featureNames: Record<AllowedKeys, string> = {
   advancedChords: "Advanced chords",
   melodies: "Melody examples",
   chordDetection: "Chord detection",
   instruments: "Configurable instruments",
   midiRecorder: "MIDI recording",
+  looper: "Looper recorder",
   skinSelection: "Configurable skins",
 };
 
