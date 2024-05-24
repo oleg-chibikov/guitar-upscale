@@ -140,6 +140,7 @@ const initializeChannel = (
   setPlayingInLooperChannel(channel, false);
   looperChannel.looperRecorder.clear();
   stopRecording(looperChannel);
+  // we need to explicitly check if interval should be stopped
   toggleInterval(false);
 };
 
@@ -157,8 +158,6 @@ const stopRecording = (looperChannel: LooperChannelState) => {
   looperChannel.isRecording = false;
   setCurrentlyRecordingLooperChannel(undefined);
   looperChannel.looperRecorder.stopRecordingWithoutClearing();
-  // toggleInterval(false); - no need to stop interval as the next command turns it on to play
-  // start playing in the current channel right after recording
 };
 
 // init
