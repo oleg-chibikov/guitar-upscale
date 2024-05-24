@@ -1,4 +1,12 @@
-import { toggleInterval } from "../store/settingsSlice";
+import { UnknownAction } from "@reduxjs/toolkit";
+import { Dispatch } from "react";
+import {
+  isAnyTimerSpecificActivityBesidesMetronomeRunning,
+  isMetronomeActiveValue,
+  setIsMetronomeActive,
+  toggleInterval,
+  toggleMetronomeWhenRecordingValue,
+} from "../store/settingsSlice";
 import { LooperRecorder } from "./looperRecorder";
 import {
   currentlyPlayingLooperChannels,
@@ -19,20 +27,11 @@ export type LooperChannelState = {
 
 export type LooperState = LooperChannelState[];
 
-const createChannelState = () => {
-  return {
-    isRecording: false,
-    isPlaying: false,
-    looperRecorder: new LooperRecorder(),
-    hasRecording: false,
-  };
-};
-
 export const looperState: LooperState = [];
 
-for (let i = 0; i < LOOPER_CHANNEL_INITIAL_COUNT; i++) {
-  looperState.push(createChannelState());
-}
+export const clearLooperState = () => {
+  looperState.forEach(initializeChannel);
+};
 
 export const setRecordingInLooperChannel = (
   channel: number,
@@ -57,8 +56,7 @@ export const setRecordingInLooperChannel = (
     toggleInterval(true);
   } else {
     // stop recording
-    setCurrentlyRecordingLooperChannel(undefined);
-    looperChannel.looperRecorder.stopRecordingWithoutClearing();
+    stopRecording(looperChannel);
     // toggleInterval(false); - no need to stop interval as the next command turns it on to play
     // start playing in the current channel right after recording
     setPlayingInLooperChannel(channel, true);
@@ -101,9 +99,9 @@ export const addChannel = () => {
 
 export const removeChannel = () => {
   if (canRemoveChannel()) {
-    setRecordingInLooperChannel(looperState.length - 1, false);
-    setPlayingInLooperChannel(looperState.length - 1, false);
-
+    const channel = looperState.length - 1;
+    const looperChannel = looperState[channel];
+    initializeChannel(looperChannel, channel);
     looperState.pop();
   }
 };
@@ -118,3 +116,51 @@ export const canAddChannel = () =>
 
 export const canRemoveChannel = () =>
   looperState.length > LOOPER_CHANNEL_MIN_COUNT;
+
+export const stopMetronomeIfNeeded = (dispatch: Dispatch<UnknownAction>) => {
+  if (
+    toggleMetronomeWhenRecordingValue &&
+    isMetronomeActiveValue &&
+    !isAnyTimerSpecificActivityBesidesMetronomeRunning()
+  ) {
+    dispatch(setIsMetronomeActive(false));
+  }
+};
+
+export const startMetronomeIfNeeded = (dispatch: Dispatch<UnknownAction>) => {
+  if (toggleMetronomeWhenRecordingValue && !isMetronomeActiveValue) {
+    dispatch(setIsMetronomeActive(true));
+  }
+};
+
+const initializeChannel = (
+  looperChannel: LooperChannelState,
+  channel: number
+) => {
+  setPlayingInLooperChannel(channel, false);
+  looperChannel.looperRecorder.clear();
+  stopRecording(looperChannel);
+  toggleInterval(false);
+};
+
+const createChannelState = () => {
+  return {
+    isRecording: false,
+    isPlaying: false,
+    looperRecorder: new LooperRecorder(),
+    hasRecording: false,
+  };
+};
+
+const stopRecording = (looperChannel: LooperChannelState) => {
+  // stop recording
+  setCurrentlyRecordingLooperChannel(undefined);
+  looperChannel.looperRecorder.stopRecordingWithoutClearing();
+  // toggleInterval(false); - no need to stop interval as the next command turns it on to play
+  // start playing in the current channel right after recording
+};
+
+// init
+for (let i = 0; i < LOOPER_CHANNEL_INITIAL_COUNT; i++) {
+  looperState.push(createChannelState());
+}

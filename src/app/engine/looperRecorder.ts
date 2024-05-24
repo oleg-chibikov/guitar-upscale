@@ -41,11 +41,19 @@ export class LooperRecorder {
     Set<() => void>
   >(); // key is the strumming sequence id (click number). Value is the function that deletes the undesired events for this strumming sequence
 
+  hasRecording = () => {
+    const size = this.midiEventsByTick?.size;
+    return size ? size > 0 : false;
+  };
+
+  clear = () => {
+    this.initialize();
+    this.stopPlaying();
+  };
+
   startRecording() {
-    this.midiEventsByTick = new Map<number, Set<ChordOrNote>>();
     this.isRecording = true;
-    this.startTick = undefined;
-    this.lastBarTickWhenStoppedRecording = undefined;
+    this.initialize();
   }
 
   stopRecordingWithoutClearing() {
@@ -242,10 +250,11 @@ export class LooperRecorder {
     this.midiEventsByTick.set(currentTick, eventsForTick);
   }
 
-  hasRecording = () => {
-    const size = this.midiEventsByTick?.size;
-    return size ? size > 0 : false;
-  };
+  private initialize() {
+    this.midiEventsByTick = new Map<number, Set<ChordOrNote>>();
+    this.startTick = undefined;
+    this.lastBarTickWhenStoppedRecording = undefined;
+  }
 
   private addOrUpdateEvent(currentTick: number, data: ChordOrNote) {
     let eventsForTick = this.midiEventsByTick!.get(currentTick);

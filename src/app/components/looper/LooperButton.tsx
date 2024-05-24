@@ -4,18 +4,11 @@ import {
   looperState,
   setPlayingInLooperChannel,
   setRecordingInLooperChannel,
+  startMetronomeIfNeeded,
+  stopMetronomeIfNeeded,
 } from "@/app/engine/looper";
 import { IconButton } from "../settings/buttons/IconButton";
 
-import {
-  currentlyPlayingLooperChannels,
-  currentlyRecordingLooperChannel,
-} from "@/app/engine/looperShared";
-import {
-  isMetronomeActiveValue,
-  setIsMetronomeActive,
-  toggleMetronomeWhenRecordingValue,
-} from "@/app/store/settingsSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -39,10 +32,10 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
     const shouldRecord = !looperState[channel].isRecording;
     if (shouldRecord) {
       setRecordingInLooperChannel(channel, true);
-      startMetronome();
+      startMetronomeIfNeeded(dispatch);
     } else {
       setRecordingInLooperChannel(channel, false);
-      stopMetronome();
+      stopMetronomeIfNeeded(dispatch);
     }
 
     setState({ ...looperState });
@@ -52,29 +45,12 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
     const shouldPlay = !looperState[channel].isPlaying;
     if (shouldPlay) {
       setPlayingInLooperChannel(channel, true);
-      startMetronome();
+      startMetronomeIfNeeded(dispatch);
     } else {
       setPlayingInLooperChannel(channel, false);
-      stopMetronome();
+      stopMetronomeIfNeeded(dispatch);
     }
     setState({ ...looperState });
-  };
-
-  const startMetronome = () => {
-    if (toggleMetronomeWhenRecordingValue && !isMetronomeActiveValue) {
-      dispatch(setIsMetronomeActive(true));
-    }
-  };
-
-  const stopMetronome = () => {
-    if (
-      toggleMetronomeWhenRecordingValue &&
-      isMetronomeActiveValue &&
-      !currentlyPlayingLooperChannels.size && // nothing else should play or record to stop
-      currentlyRecordingLooperChannel === undefined
-    ) {
-      dispatch(setIsMetronomeActive(false));
-    }
   };
 
   const isDisabled = !hasRecording;

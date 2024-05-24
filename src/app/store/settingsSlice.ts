@@ -46,6 +46,10 @@ interface WithMetronome {
   isMetronomeActive: boolean;
 }
 
+interface CanUpdateGuitarSettings {
+  guitarSettingsUpdatedTrigger: boolean;
+}
+
 interface WithControls {
   scaleGroup: string;
   scale: string;
@@ -53,7 +57,11 @@ interface WithControls {
   tuning: Tuning;
 }
 
-interface SettingsState extends WithMetronome, WithNeck, WithControls {
+interface SettingsState
+  extends WithMetronome,
+    WithNeck,
+    WithControls,
+    CanUpdateGuitarSettings {
   tempoBpm: number;
   chordStrummingDelayMs: number;
   velocity: number;
@@ -107,6 +115,7 @@ const initialState: SettingsState = {
   chordIsBeingDetected: false,
   isRecording: false,
   toggleMetronomeWhenRecording: true,
+  guitarSettingsUpdatedTrigger: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -148,7 +157,9 @@ export let toggleMetronomeWhenRecordingValue: boolean =
 
 export let chordsMap = new Map<string, Chord>();
 
-const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
+const onGuitarSettingsUpdate = (
+  state: WithControls & WithNeck & CanUpdateGuitarSettings
+) => {
   const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
   const scalePattern = new Set(scaleNotes?.concat([0]));
 
@@ -162,6 +173,8 @@ const onGuitarSettingsUpdate = (state: WithControls & WithNeck) => {
   state.neck = neck;
   setChords(state);
   clearPreviousChords();
+  // this can notify all the controls that use this prop to rerender
+  state.guitarSettingsUpdatedTrigger = !state.guitarSettingsUpdatedTrigger;
 };
 
 const toggleMetronome = (state: WithMetronome, value: boolean) => {
@@ -211,7 +224,7 @@ const setChords = (state: WithNeck) => {
   }
 };
 
-const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
+export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
   strummingChordsMap.size > 0 ||
   isPlayingValue ||
   isRecordingValue ||
