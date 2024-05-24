@@ -34,7 +34,7 @@ const featureNames: Record<AllowedKeys, string> = {
   chordDetection: "Chord detection",
   instruments: "Configurable instruments",
   midiRecorder: "MIDI recording",
-  looper: "Looper recorder",
+  looper: "Looper",
   skinSelection: "Configurable skins",
 };
 
