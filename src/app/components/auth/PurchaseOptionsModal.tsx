@@ -125,7 +125,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
           }`}
         >
           <div className="relative flex flex-row gap-4 items-center justify-center">
-            {session !== null ? <UserAvatar user={session.user} /> : null}
+            {session !== null ? <UserAvatar user={session.user} className="left-2 top-2" style={{ position: "absolute" }} /> : null}
             <CloseIcon onPress={handleCloseModal} />
             <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
               {session?.user && (

@@ -46,10 +46,10 @@ export const setRecordingInLooperChannel = (
     setRecordingInLooperChannel(currentlyRecordingLooperChannel, false);
   }
 
-  looperChannel.isRecording = value;
   if (value) {
     // start recording
     // stop playing in the current channel
+    looperChannel.isRecording = true;
     setPlayingInLooperChannel(channel, false);
     setCurrentlyRecordingLooperChannel(channel);
     looperChannel.looperRecorder.startRecording();
@@ -154,6 +154,7 @@ const createChannelState = () => {
 
 const stopRecording = (looperChannel: LooperChannelState) => {
   // stop recording
+  looperChannel.isRecording = false;
   setCurrentlyRecordingLooperChannel(undefined);
   looperChannel.looperRecorder.stopRecordingWithoutClearing();
   // toggleInterval(false); - no need to stop interval as the next command turns it on to play
