@@ -8,6 +8,7 @@ import {
 } from "./eventBus";
 import {
   TICKS_IN_BAR,
+  TICKS_IN_HALF_BAR,
   globalCurrentLastBarTick,
   globalCurrentTick,
   waitForNextTick,
@@ -67,8 +68,7 @@ export class LooperRecorder {
   }
 
   async playMidi(): Promise<void> {
-    const abortSignal = this.abortController.signal;
-    if (!this.midiEventsByTick) {
+    if (!this.midiEventsByTick || !this.lastBarTickWhenStoppedRecording) {
       return;
     }
 
@@ -80,8 +80,9 @@ export class LooperRecorder {
     if (sortedTicks.length === 0) {
       return;
     }
-    const firstNoteTick = sortedTicks[0];
 
+    const abortSignal = this.abortController.signal;
+    const firstNoteTick = sortedTicks[0];
     let ticksPassedSinceLastBar = globalCurrentTick - globalCurrentLastBarTick;
 
     while (!abortSignal.aborted) {
@@ -127,6 +128,23 @@ export class LooperRecorder {
           return;
         }
 
+        if (
+          this.lastBarTickWhenStoppedRecording !== this.startTick && // if recording spans more than one bar
+          tick > this.lastBarTickWhenStoppedRecording
+        ) {
+          const tickOfTheLastEvent = sortedTicks[sortedTicks.length - 1];
+          if (
+            tickOfTheLastEvent - this.lastBarTickWhenStoppedRecording <
+            TICKS_IN_HALF_BAR
+          ) {
+            console.log("Skipping the rest of incomplete bar");
+            // if the last bar is incomplete (it has events only for less than half of the bar) then don't include it in the loop
+            break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh
+          } else {
+            console.log("Last bar has events in its second half - don't skip");
+          }
+        }
+
         await this.waitForTick(tick, currentTick, abortSignal);
 
         if (abortSignal.aborted || !this.midiEventsByTick) {
@@ -140,7 +158,7 @@ export class LooperRecorder {
       }
 
       ticksPassedSinceLastBar =
-        currentTick - this.lastBarTickWhenStoppedRecording!;
+        currentTick - this.lastBarTickWhenStoppedRecording;
 
       // if (this.endTick !== undefined && this.endTick > currentTick) {
       //   console.log("---Waiting for the end tick");
