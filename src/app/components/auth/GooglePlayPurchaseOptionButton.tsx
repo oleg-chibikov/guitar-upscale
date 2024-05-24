@@ -78,7 +78,7 @@ export const GooglePlayPurchaseOptionButton: FC<
       "Owned" + (subscribedDate ? " since " + subscribedDate : "");
     purchaseStatusLine2 = expirationDate ? "Expires " + expirationDate : "";
     buttonContent =
-      purchaseOption.purchaseData?.cancellationMode == CancellationMode.Cancel
+      purchaseOption.purchaseData?.cancellationMode === CancellationMode.Cancel
         ? "Cancel"
         : "Revoke";
     buttonTitle = disabledMessage ?? buttonContent;

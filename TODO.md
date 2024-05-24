@@ -1,7 +1,7 @@
 Looper - Strumming - last note in the pattern - ignore for recording
 Strumming - start strumming with the current position (skip part of the pattern), don't wait for the next tick - this way we won't need to play separate note and delete it from recording
 
-looper - when the bar is over give grace period to stop recording. if stopped within this period - ignore the notes after bar end
+updown controls for tempo and volume in the top panel
 
 Midi upload and play
 More chords

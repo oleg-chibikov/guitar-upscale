@@ -117,7 +117,7 @@ export const decodeMelody = async (
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
     const playChordAndReset = () => {
-      if (immediateChord != undefined) {
+      if (immediateChord !== undefined) {
         nextIsImmediateChord = false;
         const newChord = convertChord(immediateChord, tuningShift);
 

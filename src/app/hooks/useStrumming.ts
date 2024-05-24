@@ -418,7 +418,7 @@ export const useStrumming = (
                   await waitBetweenChords();
                 }
                 currentIndex++;
-                if (currentIndex == currentPattern.length) {
+                if (currentIndex === currentPattern.length) {
                   currentIndex = 0;
                 }
               }
