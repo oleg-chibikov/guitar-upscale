@@ -30,7 +30,7 @@ export type NoteMetadata = TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
     skipChordDetection?: boolean;
-    fromLooper?: boolean;
+    looperChannel?: number;
   };
 
 export type StrummingMetadata = {
@@ -43,7 +43,7 @@ export type ChordMetadata = StrummingMetadata &
     notesToPlay?: number;
     strummingDelayMs?: number;
     clear?: boolean;
-    fromLooper?: boolean;
+    looperChannel?: number;
   };
 
 export type ChordWithPlayMetadata = {
@@ -116,7 +116,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
 
   if (
     !noteMetadata.fromChord && // chords are recorded separately
-    !noteMetadata.fromLooper &&
+    noteMetadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {
     const { looperState } = await import("./looper");
@@ -158,7 +158,10 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
   const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
   playAction?.(metadata);
 
-  if (!metadata.fromLooper && currentlyRecordingLooperChannel !== undefined) {
+  if (
+    metadata.looperChannel === undefined &&
+    currentlyRecordingLooperChannel !== undefined
+  ) {
     const { looperState } = await import("./looper");
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordChord(
       chordWithMetadata

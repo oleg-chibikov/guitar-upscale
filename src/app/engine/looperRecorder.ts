@@ -1,3 +1,4 @@
+import { currentlyRecordingLooperChannel } from "@/app/engine/looperShared";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote } from "../data/notes";
 import {
@@ -15,6 +16,7 @@ import {
 type InternalNoteEvent = {
   note: StringOctaveNote;
   tick: number;
+  looperChannel: number;
   trackNumber: number;
   instrument: Instrument;
 };
@@ -156,23 +158,28 @@ export class LooperRecorder {
         NotePlayEventBus.next({
           stringOctaveNote: note.note,
           fromChord: false,
-          fromLooper: true,
+          looperChannel: note.looperChannel,
           trackInstrument: note.instrument,
           trackNumber: note.trackNumber,
           skipChordDetection: true,
         });
       }
       if (chord) {
-        chord.metadata.fromLooper = true;
         ChordEventBus.next(chord);
       }
     });
   }
 
   recordChord(data: ChordWithPlayMetadata) {
-    if (!this.isRecording || !this.midiEventsByTick) {
+    if (
+      !this.isRecording ||
+      !this.midiEventsByTick ||
+      currentlyRecordingLooperChannel === undefined
+    ) {
       return;
     }
+
+    data.metadata.looperChannel = currentlyRecordingLooperChannel;
     const currentTick = globalCurrentTick;
     if (this.startTick === undefined) {
       this.startTick = globalCurrentLastBarTick;
@@ -207,9 +214,14 @@ export class LooperRecorder {
     trackNumber: number,
     instrument: Instrument
   ) {
-    if (!this.isRecording || !this.midiEventsByTick) {
+    if (
+      !this.isRecording ||
+      !this.midiEventsByTick ||
+      currentlyRecordingLooperChannel === undefined
+    ) {
       return;
     }
+
     const currentTick = globalCurrentTick;
     if (this.startTick === undefined) {
       this.startTick = globalCurrentLastBarTick;
@@ -218,8 +230,9 @@ export class LooperRecorder {
     const internalNoteEvent: InternalNoteEvent = {
       tick: currentTick,
       note,
-      trackNumber,
+      looperChannel: currentlyRecordingLooperChannel,
       instrument,
+      trackNumber,
     };
 
     const eventsForTick = this.addOrUpdateEvent(currentTick, {

@@ -123,9 +123,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             );
           }
 
-          // it may come from several tracks for the same note simutaneously
-          if (noteMetadata.trackInstrument) {
-            trackNumberRef.current = noteMetadata.trackNumber;
+          // it may come from several tracks for the same note simultaneously
+          if (
+            noteMetadata.looperChannel !== undefined ||
+            noteMetadata.trackNumber
+          ) {
+            trackNumberRef.current =
+              noteMetadata.looperChannel ?? noteMetadata.trackNumber;
           } else if (noteMetadata.fromChord) {
             trackNumberRef.current = 5; // another color for chords
           }

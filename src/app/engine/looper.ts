@@ -19,19 +19,20 @@ export type LooperChannelState = {
 
 export type LooperState = LooperChannelState[];
 
-const initialChannelState = {
-  isRecording: false,
-  isPlaying: false,
-  looperRecorder: new LooperRecorder(),
-  hasRecording: false,
+const createChannelState = () => {
+  return {
+    isRecording: false,
+    isPlaying: false,
+    looperRecorder: new LooperRecorder(),
+    hasRecording: false,
+  };
 };
 
-export const looperState: LooperState = Array.from(
-  { length: LOOPER_CHANNEL_INITIAL_COUNT },
-  () => ({
-    ...initialChannelState,
-  })
-);
+export const looperState: LooperState = [];
+
+for (let i = 0; i < LOOPER_CHANNEL_INITIAL_COUNT; i++) {
+  looperState.push(createChannelState());
+}
 
 export const setRecordingInLooperChannel = (
   channel: number,
@@ -94,14 +95,15 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
 
 export const addChannel = () => {
   if (canAddChannel()) {
-    looperState.push({
-      ...initialChannelState,
-    });
+    looperState.push(createChannelState());
   }
 };
 
 export const removeChannel = () => {
   if (canRemoveChannel()) {
+    setRecordingInLooperChannel(looperState.length - 1, false);
+    setPlayingInLooperChannel(looperState.length - 1, false);
+
     looperState.pop();
   }
 };

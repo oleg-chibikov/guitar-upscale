@@ -8,9 +8,11 @@ import Add from "@mui/icons-material/Add";
 
 export const AddLooperChannelButton: React.FC<CanSetLooperState> = ({
   setState,
+  disabled,
 }) => {
   return (
     <IconButton
+      disabled={disabled}
       className="scale-75 origin-center"
       icon={<Add fontSize="small" />}
       tooltip={"Add looper channel"}

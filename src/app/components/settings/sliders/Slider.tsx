@@ -34,16 +34,16 @@ export const Slider: React.FC<SliderProps> = ({
     <div
       className={`items-center flex ${
         isVertical ? "flex-col" : "flex-row"
-      } gap-2 justify-center`}
+      } gap-2 justify-center ${className}`}
     >
       <div
-        className={`w-full flex items-center ${
+        className={`${isVertical ? "h-full" : "w-full"} flex items-center ${
           isVertical
             ? chordsDisplayMode === ChordsDisplayMode.Left
               ? "justify-end"
               : "justify-start"
             : "justify-center"
-        } ${className}`}
+        }`}
       >
         <input
           type="range"

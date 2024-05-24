@@ -1,6 +1,4 @@
 Looper - Strumming - last note in the pattern - ignore for recording
-Looper - Strumming and chords - can we highlight chords when repeating?
-Looper - separate channels should be highlighted separately
 Strumming - start strumming with the current position (skip part of the pattern), don't wait for the next tick - this way we won't need to play separate note and delete it from recording
 
 Midi upload and play
