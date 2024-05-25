@@ -57,7 +57,15 @@
       "folderPath": "guitar-upscale\\tsconfig.json\\"
     }
   ],
-  "cSpell.words": ["Fretboard", "Fretline", "nextauth", "Unregistering"],
+  "cSpell.words": [
+    "Fretboard",
+    "Fretline",
+    "nextauth",
+    "persistor",
+    "smplr",
+    "soundfont",
+    "Unregistering"
+  ],
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "typescript.preferences.importModuleSpecifier": "non-relative"
 }

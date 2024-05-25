@@ -16,14 +16,14 @@ export const playSound = (
   });
 };
 
-const soundfountMap = new Map<string, Soundfont | SplendidGrandPiano>();
+const soundfontMap = new Map<string, Soundfont | SplendidGrandPiano>();
 
 export const loadInstrument = async (
   instrument: Instrument,
   reverbStrength: number
 ) => {
   const key = instrument + "_" + reverbStrength;
-  let soundfont = soundfountMap.get(key);
+  let soundfont = soundfontMap.get(key);
   if (soundfont) {
     return soundfont;
   }
@@ -46,7 +46,7 @@ export const loadInstrument = async (
     soundfont.output.addEffect("reverb", new Reverb(context), reverbStrength);
   }
 
-  soundfountMap.set(key, soundfont);
+  soundfontMap.set(key, soundfont);
 
   await soundfont.load;
   return soundfont;
