@@ -97,9 +97,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   ]);
 
   const handleTextFieldClick = (
-    event:
-      | React.MouseEvent<HTMLInputElement>
-      | React.TouchEvent<HTMLInputElement>
+    event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>
   ) => {
     const { clientX, clientY } = "touches" in event ? event.touches[0] : event;
     setStartPosition({ x: clientX, y: clientY });
@@ -111,7 +109,13 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
 
   return (
     <div className="relative">
-      <div className="absolute top-1 left-1">{icon}</div>
+      <div
+        className="absolute top-1 left-1"
+        onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
+        onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
+      >
+        {icon}
+      </div>
       <input
         type="text"
         value={formattedValue}
