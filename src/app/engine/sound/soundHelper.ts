@@ -11,7 +11,7 @@ export const playSound = (
 ) => {
   return soundfont.start({
     note: getNoteText(note.note) + note.octave,
-    volume: volume,
+    velocity: volume,
     duration: durationMs / 1000,
   });
 };
