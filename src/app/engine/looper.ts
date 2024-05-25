@@ -157,7 +157,7 @@ const stopRecording = (looperChannel: LooperChannelState) => {
   // stop recording
   looperChannel.isRecording = false;
   setCurrentlyRecordingLooperChannel(undefined);
-  looperChannel.looperRecorder.stopRecordingWithoutClearing();
+  looperChannel.looperRecorder.stopRecording();
 };
 
 // init

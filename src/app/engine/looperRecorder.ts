@@ -32,6 +32,8 @@ export class LooperRecorder {
   private isRecording: boolean = false;
   private startTick: number | undefined;
   private lastBarTickWhenStoppedRecording: number | undefined;
+  private endTick: number | undefined;
+  private recordingStoppedAtTheFirstHalfOfLastBar: boolean | undefined;
   private abortController = new AbortController();
 
   // TODO: Instead of keeping this complex logic we can just start strumming from whatever position we currently have in the bar.
@@ -57,9 +59,12 @@ export class LooperRecorder {
     this.initialize();
   }
 
-  stopRecordingWithoutClearing() {
+  stopRecording() {
     this.isRecording = false;
     this.lastBarTickWhenStoppedRecording = globalCurrentLastBarTick;
+    this.endTick = globalCurrentTick;
+    this.recordingStoppedAtTheFirstHalfOfLastBar =
+      this.endTick - this.lastBarTickWhenStoppedRecording < TICKS_IN_HALF_BAR;
   }
 
   stopPlaying(): void {
@@ -93,7 +98,7 @@ export class LooperRecorder {
         ticksPassedSinceLastBar,
         firstNoteTick
       );
-      console.log("---Start playing from ", currentTick);
+      console.log("---Start playing from tick %d", currentTick);
 
       for (const tick of sortedTicks) {
         if (abortSignal.aborted) {
@@ -102,19 +107,13 @@ export class LooperRecorder {
 
         if (
           this.lastBarTickWhenStoppedRecording !== this.startTick && // if recording spans more than one bar
-          tick > this.lastBarTickWhenStoppedRecording
+          tick >= this.lastBarTickWhenStoppedRecording && // we arch at the tick from the last bar
+          this.recordingStoppedAtTheFirstHalfOfLastBar === true // we keep the last bar if the recording stopped in its second half (regardless of notes being recorded)
         ) {
-          const tickOfTheLastEvent = sortedTicks[sortedTicks.length - 1];
-          if (
-            tickOfTheLastEvent - this.lastBarTickWhenStoppedRecording <
-            TICKS_IN_HALF_BAR
-          ) {
-            console.log("Skipping the rest of incomplete bar");
-            // if the last bar is incomplete (it has events only for less than half of the bar) then don't include it in the loop
-            break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh
-          } else {
-            console.log("Last bar has events in its second half - don't skip");
-          }
+          console.log(
+            "Last bar recording was stopped before it reached its second half. Skipping the last bar"
+          );
+          break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh
         }
 
         await this.waitForTick(tick, currentTick, abortSignal);
@@ -282,6 +281,8 @@ export class LooperRecorder {
     this.midiEventsByTick = new Map<number, Set<ChordOrNote>>();
     this.startTick = undefined;
     this.lastBarTickWhenStoppedRecording = undefined;
+    this.endTick = undefined;
+    this.recordingStoppedAtTheFirstHalfOfLastBar = undefined;
   }
 
   private addOrUpdateEvent(currentTick: number, data: ChordOrNote) {
