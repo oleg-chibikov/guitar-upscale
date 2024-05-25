@@ -18,6 +18,7 @@ export const ChordStrummingDelayControl: React.FC = () => {
 
   return (
     <ValueModalControl
+      label="Delay between notes in chord (ms)"
       icon={<Schedule />}
       value={chordStrummingDelayMs}
       setValue={handleSliderChange}

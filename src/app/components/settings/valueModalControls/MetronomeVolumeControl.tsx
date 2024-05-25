@@ -15,6 +15,7 @@ export const MetronomeVolumeControl: React.FC = () => {
 
   return (
     <ValueModalControl
+      label="Metronome volume"
       icon={<MdiMetronome />}
       value={metronomeVolume}
       setValue={handleSliderChange}

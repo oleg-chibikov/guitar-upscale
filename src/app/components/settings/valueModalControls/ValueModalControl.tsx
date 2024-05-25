@@ -12,6 +12,7 @@ interface ValueModalControlProps {
   formatValue?: (value: number) => string;
   steps: number[];
   icon: ReactNode;
+  label: string;
 }
 
 export const ValueModalControl: React.FC<ValueModalControlProps> = ({
@@ -20,6 +21,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   formatValue,
   steps,
   icon,
+  label,
 }) => {
   const { theme } = useSelector(selectUi);
   const [modalOpen, setModalOpen] = useState(false);
@@ -139,6 +141,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
               modalOpen ? "opacity-100" : "opacity-0"
             }`}
           >
+            <strong>{label}</strong>
             <div>
               {(hasTouchInput ? "Swipe" : "Move the mouse") +
                 " around while pressed"}

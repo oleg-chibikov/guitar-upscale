@@ -15,6 +15,7 @@ export const TempoControl: React.FC = () => {
 
   return (
     <ValueModalControl
+      label="Tempo (BPM)"
       icon={<Speed />}
       value={tempoBpm}
       setValue={handleSliderChange}

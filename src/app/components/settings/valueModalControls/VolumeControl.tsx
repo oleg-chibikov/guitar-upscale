@@ -15,6 +15,7 @@ export const VolumeControl: React.FC = () => {
 
   return (
     <ValueModalControl
+      label="Volume"
       icon={<VolumeUp />}
       value={volume}
       setValue={handleSliderChange}
