@@ -118,7 +118,7 @@ export class LooperRecorder {
 
         await this.waitForTick(tick, currentTick, abortSignal);
 
-        if (abortSignal.aborted || this.midiEventsByTick === undefined) {
+        if (abortSignal.aborted) {
           return;
         }
 
@@ -181,7 +181,11 @@ export class LooperRecorder {
   }
 
   private playNotesAtTick(tick: number) {
-    const eventsAtTick = this.midiEventsByTick!.get(tick);
+    if (!this.midiEventsByTick) {
+      return;
+    }
+
+    const eventsAtTick = this.midiEventsByTick.get(tick);
 
     if (!eventsAtTick || !eventsAtTick.size) {
       return;
