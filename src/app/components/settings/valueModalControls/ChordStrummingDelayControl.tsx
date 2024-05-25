@@ -18,10 +18,11 @@ export const ChordStrummingDelayControl: React.FC = () => {
 
   return (
     <ValueModalControl
-      label="Delay between notes in chord (ms)"
+      label="Delay between notes in chord"
       icon={<Schedule />}
       value={chordStrummingDelayMs}
       setValue={handleSliderChange}
+      postfix="ms"
       steps={chordStrummingDelaySteps}
     />
   );

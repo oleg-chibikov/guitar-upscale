@@ -9,19 +9,19 @@ import { useSelector } from "react-redux";
 interface ValueModalControlProps {
   value: number;
   setValue: (value: number) => void;
-  formatValue?: (value: number) => string;
   steps: number[];
   icon: ReactNode;
   label: string;
+  postfix?: string;
 }
 
 export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   value,
   setValue,
-  formatValue,
   steps,
   icon,
   label,
+  postfix,
 }) => {
   const { theme } = useSelector(selectUi);
   const [modalOpen, setModalOpen] = useState(false);
@@ -105,24 +105,32 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
     setModalOpen(true);
   };
 
-  const formattedValue = formatValue ? formatValue(value) : value.toString();
-
   return (
     <div className="relative">
       <div
-        className="absolute top-1 left-1"
+        className="absolute top-1/2 -translate-y-1/2 left-1"
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
       >
         {icon}
       </div>
+      <span
+        className="absolute top-1/2 -translate-y-1/2 right-1"
+        style={{ fontSize: 9 }}
+        onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
+        onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
+      >
+        {postfix}
+      </span>
       <input
         type="text"
-        value={formattedValue}
+        value={value}
         readOnly
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className="pl-8 text-sm box-border w-16 h-8 cursor-pointer"
+        className={`pl-7 text-sm box-border ${
+          postfix !== undefined ? "w-20" : "w-16"
+        } h-8 cursor-pointer`}
       />
       <Modal
         open={modalOpen}
@@ -154,7 +162,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
               onValueChange={() => null}
               value={value}
               steps={steps}
-              label={formattedValue}
+              label={value + (postfix !== undefined ? " " + postfix : "")}
               labelClass="w-20"
             />
           </Box>
