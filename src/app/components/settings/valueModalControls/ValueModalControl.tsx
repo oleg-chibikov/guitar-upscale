@@ -110,7 +110,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
       <div
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className={`flex flex-row gap-1 justify-between items-center w-16 p-1 ${
+        className={`flex flex-row gap-1 justify-around items-center w-16 p-1 ${
           theme === Theme.Light
             ? "bg-select_background-light"
             : "bg-select_background-dark"
