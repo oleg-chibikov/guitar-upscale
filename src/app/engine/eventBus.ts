@@ -6,7 +6,7 @@ import {
   instrumentValue,
   reverbStrengthValue,
   tempoBpmValue,
-  velocityValue,
+  volumeValue,
 } from "../store/settingsSlice";
 import { currentlyRecordingLooperChannel } from "./looperShared";
 import { beatToMilliseconds } from "./mainClock";
@@ -14,7 +14,7 @@ import { playNote } from "./sound/soundProvider";
 
 export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
-  velocity?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
+  volume?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
 };
 
 export type TrackMetadata = {
@@ -77,7 +77,7 @@ export let previousChord: string;
 const play = async ({
   stringOctaveNote,
   trackInstrument,
-  velocity,
+  volume,
   fromChord,
 }: NoteMetadata) => {
   // This module is essential and should be loaded asap, so I commented out lazy loading here
@@ -85,7 +85,7 @@ const play = async ({
   //   .playNote;
   await playNote(
     stringOctaveNote,
-    velocity ?? velocityValue,
+    volume ?? volumeValue,
     trackInstrument ??
       (fromChord === true ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,

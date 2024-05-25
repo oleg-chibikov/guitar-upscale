@@ -1,18 +1,18 @@
-import { MAX_VELOCITY, Note } from "@/app/data/notes";
+import { MAX_VOLUME, Note } from "@/app/data/notes";
 import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
-import { selectSettings, setVelocity } from "@/app/store/settingsSlice";
+import { selectSettings, setVolume } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
 
-export const VelocitySlider: React.FC = () => {
-  const { velocity, reverbStrength, instrument, tempoBpm } =
+export const VolumeSlider: React.FC = () => {
+  const { volume, reverbStrength, instrument, tempoBpm } =
     useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = async (value: number) => {
-    dispatch(setVelocity(value));
+    dispatch(setVolume(value));
     await playNote(
       { note: Note.E, octave: 5 },
       value,
@@ -27,11 +27,11 @@ export const VelocitySlider: React.FC = () => {
       <span>Playback volume:</span>
       <Slider
         onValueChange={handleSliderChange}
-        value={velocity}
+        value={volume}
         minimumValue={1}
-        maximumValue={MAX_VELOCITY}
+        maximumValue={MAX_VOLUME}
         step={1}
-        label={velocity.toString()}
+        label={volume.toString()}
       />
     </>
   );

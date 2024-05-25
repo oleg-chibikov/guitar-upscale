@@ -1,18 +1,15 @@
-import { MAX_VELOCITY } from "@/app/data/notes";
-import {
-  selectSettings,
-  setMetronomeVelocity,
-} from "@/app/store/settingsSlice";
+import { MAX_VOLUME } from "@/app/data/notes";
+import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
 
-export const MetronomeVelocitySlider: React.FC = () => {
-  const { metronomeVelocity } = useSelector(selectSettings);
+export const MetronomeVolumeSlider: React.FC = () => {
+  const { metronomeVolume } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = async (value: number) => {
-    dispatch(setMetronomeVelocity(value));
+    dispatch(setMetronomeVolume(value));
     const playMetronomeBeat = (
       await import("@/app/engine/sound/metronomeProvider")
     ).playMetronomeBeat;
@@ -24,11 +21,11 @@ export const MetronomeVelocitySlider: React.FC = () => {
       <span>Metronome volume:</span>
       <Slider
         onValueChange={handleSliderChange}
-        value={metronomeVelocity}
+        value={metronomeVolume}
         minimumValue={1}
-        maximumValue={MAX_VELOCITY}
+        maximumValue={MAX_VOLUME}
         step={1}
-        label={metronomeVelocity.toString()}
+        label={metronomeVolume.toString()}
       />
     </>
   );

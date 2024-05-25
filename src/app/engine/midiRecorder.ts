@@ -1,7 +1,7 @@
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../data/instruments";
-import { MAX_VELOCITY, StringOctaveNote, getNoteText } from "../data/notes";
+import { MAX_VOLUME, StringOctaveNote, getNoteText } from "../data/notes";
 import {
   baseNoteValue,
   scaleGroupValue,
@@ -88,7 +88,7 @@ export class MidiRecorder {
             this.noteShift +
             (this.octaveShift + note.octave) * NOTE_COUNT,
         ],
-        velocity: MAX_VELOCITY,
+        volume: MAX_VOLUME,
         duration: "8", // the bigger the value - the shorter the note
         channel: 1,
         sequential: false,

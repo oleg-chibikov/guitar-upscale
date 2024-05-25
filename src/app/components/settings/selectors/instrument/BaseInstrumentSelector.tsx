@@ -11,7 +11,7 @@ import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   reverbStrengthValue,
   selectSettings,
-  velocityValue,
+  volumeValue,
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -48,7 +48,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
     setInstrument(value as Instrument);
     await playNote(
       { note: Note.E, octave: 5 },
-      velocityValue,
+      volumeValue,
       value,
       reverbStrengthValue,
       beatToMilliseconds(tempoBpm)

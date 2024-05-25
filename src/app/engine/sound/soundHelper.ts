@@ -5,13 +5,13 @@ import { Soundfont, SplendidGrandPiano } from "smplr";
 
 export const playSound = (
   note: OctaveNote,
-  velocity: number,
+  volume: number,
   soundfont: Soundfont | SplendidGrandPiano,
   durationMs: number
 ) => {
   return soundfont.start({
     note: getNoteText(note.note) + note.octave,
-    velocity: velocity,
+    volume: volume,
     duration: durationMs / 1000,
   });
 };

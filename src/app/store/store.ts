@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
 });
 
-const VERSION = 3;
+const VERSION = 4;
 
 const persistConfig = {
   key: "root",

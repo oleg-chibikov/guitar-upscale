@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
-import { Chord, getNoteText, MAX_VELOCITY, Note } from "../data/notes";
+import { Chord, getNoteText, MAX_VOLUME, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
@@ -64,8 +64,8 @@ interface SettingsState
     CanUpdateGuitarSettings {
   tempoBpm: number;
   chordStrummingDelayMs: number;
-  velocity: number;
-  metronomeVelocity: number;
+  volume: number;
+  metronomeVolume: number;
   playbackType: PlaybackType;
   chordPlayMode: ChordPlayMode;
   chordNotesToPlay: number;
@@ -94,8 +94,8 @@ const initialState: SettingsState = {
   chords: null,
   tempoBpm: 140,
   chordStrummingDelayMs: 20,
-  velocity: MAX_VELOCITY,
-  metronomeVelocity: MAX_VELOCITY,
+  volume: MAX_VOLUME,
+  metronomeVolume: MAX_VOLUME,
   playbackType: PlaybackType.Melody,
   chordPlayMode: ChordPlayMode.Closest_Variation,
   chordNotesToPlay: 6,
@@ -123,8 +123,8 @@ const initialState: SettingsState = {
 // They are controlling how it behaves - NOT how it looks like
 // For settings affecting the UI use the state values, not these. State values are triggering rerender when changing
 
-export let velocityValue: number = initialState.velocity;
-export let metronomeVelocityValue: number = initialState.metronomeVelocity;
+export let volumeValue: number = initialState.volume;
+export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
 export let instrumentValue: Instrument = initialState.instrument;
 export let chordInstrumentValue: Instrument = initialState.chordInstrument;
@@ -257,8 +257,8 @@ export const settingsSlice = createSlice({
     init: (state) => {
       onGuitarSettingsUpdate(state);
       // update initial settings after they got loaded from redux persist
-      velocityValue = state.velocity;
-      metronomeVelocityValue = state.metronomeVelocity;
+      volumeValue = state.volume;
+      metronomeVolumeValue = state.metronomeVolume;
       tempoBpmValue = state.tempoBpm;
       instrumentValue = state.instrument;
       chordInstrumentValue = state.chordInstrument;
@@ -330,13 +330,13 @@ export const settingsSlice = createSlice({
       state.chordStrummingDelayMs = action.payload;
       chordStrummingDelayMsValue = action.payload;
     },
-    setVelocity: (state, action: PayloadAction<number>) => {
-      state.velocity = action.payload;
-      velocityValue = action.payload;
+    setVolume: (state, action: PayloadAction<number>) => {
+      state.volume = action.payload;
+      volumeValue = action.payload;
     },
-    setMetronomeVelocity: (state, action: PayloadAction<number>) => {
-      state.metronomeVelocity = action.payload;
-      metronomeVelocityValue = action.payload;
+    setMetronomeVolume: (state, action: PayloadAction<number>) => {
+      state.metronomeVolume = action.payload;
+      metronomeVolumeValue = action.payload;
     },
     setPlaybackType(state, action: PayloadAction<PlaybackType>) {
       state.playbackType = action.payload;
@@ -454,8 +454,8 @@ export const {
   setScaleGroup,
   setBaseNote,
   setTempoBpm,
-  setVelocity,
-  setMetronomeVelocity,
+  setVolume,
+  setMetronomeVolume,
   setPlaybackType,
   setChordStrummingDelayMs,
   setChordPlayMode,

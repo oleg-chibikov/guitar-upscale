@@ -1,4 +1,4 @@
-import { MAX_VELOCITY, Note, OctaveNote } from "@/app/data/notes";
+import { MAX_VOLUME, Note, OctaveNote } from "@/app/data/notes";
 import { loadInstrument, playSound } from "./soundHelper";
 
 export const loadMetronome = async () => {
@@ -7,7 +7,7 @@ export const loadMetronome = async () => {
 
 export const playMetronomeBeat = async (
   isAccented: boolean,
-  baseVelocity: number
+  baseVolume: number
 ) => {
   const metronomeBeatNote: OctaveNote = {
     note: Note.C,
@@ -15,7 +15,7 @@ export const playMetronomeBeat = async (
   };
   playSound(
     metronomeBeatNote,
-    Math.min(baseVelocity + (isAccented ? 20 : 0), MAX_VELOCITY),
+    Math.min(baseVolume + (isAccented ? 20 : 0), MAX_VOLUME),
     await loadMetronome(),
     1000
   );

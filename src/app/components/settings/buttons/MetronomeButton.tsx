@@ -1,7 +1,7 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import {
   isMetronomeActiveValue,
-  metronomeVelocityValue,
+  metronomeVolumeValue,
   selectSettings,
   setIsMetronomeActive,
 } from "@/app/store/settingsSlice";
@@ -37,9 +37,9 @@ export const MetronomeButton: React.FC = (props) => {
           await import("@/app/engine/sound/metronomeProvider")
         ).playMetronomeBeat;
         if (isBar) {
-          await playMetronomeBeat(true, metronomeVelocityValue);
+          await playMetronomeBeat(true, metronomeVolumeValue);
         } else if (isBeat) {
-          await playMetronomeBeat(false, metronomeVelocityValue);
+          await playMetronomeBeat(false, metronomeVolumeValue);
         }
       }
     });

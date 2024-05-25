@@ -4,14 +4,14 @@ import { loadInstrument, playSound } from "./soundHelper";
 
 export const playNote = async (
   note: OctaveNote,
-  velocity: number,
+  volume: number,
   instrument: Instrument,
   reverbStrength: number,
   durationMs: number
 ) => {
   playSound(
     note,
-    velocity,
+    volume,
     await loadInstrument(instrument, reverbStrength),
     durationMs
   );

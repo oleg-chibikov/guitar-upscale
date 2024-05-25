@@ -1,5 +1,5 @@
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
-import { VolumeControl } from "@/app/components/settings/valueModalControls/VelocityControl";
+import { VolumeControl } from "@/app/components/settings/valueModalControls/VolumeControl";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";

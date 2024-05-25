@@ -17,9 +17,9 @@ import { ThemeSelector } from "./selectors/ThemeSelector";
 import { TuningSelector } from "./selectors/TuningSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
-import { MetronomeVelocitySlider } from "./sliders/MetronomeVelocitySlider";
+import { MetronomeVolumeSlider } from "./sliders/MetronomeVolumeSlider";
 import { TempoSlider } from "./sliders/TempoSlider";
-import { VelocitySlider } from "./sliders/VelocitySlider";
+import { VolumeSlider } from "./sliders/VolumeSlider";
 
 export const SettingsView: React.FC<WithPremiumComponents> = ({
   premiumComponents,
@@ -78,8 +78,8 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           <TempoSlider />
           <ChordStrummingDelaySlider />
           <ChordNotesToPlaySlider />
-          <VelocitySlider />
-          <MetronomeVelocitySlider />
+          <VolumeSlider />
+          <MetronomeVolumeSlider />
           {!isMobileDevice() &&
             (premiumComponents.get("reverbStrength") as ReactNode)}
         </div>
