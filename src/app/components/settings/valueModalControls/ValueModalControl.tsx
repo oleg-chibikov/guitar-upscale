@@ -126,11 +126,10 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         type="text"
         value={value}
         readOnly
+        style={{ width: postfix !== undefined ? 84 : 64 }}
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className={`pl-7 text-sm box-border ${
-          postfix !== undefined ? "w-20" : "w-16"
-        } h-8 cursor-pointer`}
+        className="pl-8 text-sm box-border h-8 cursor-pointer"
       />
       <Modal
         open={modalOpen}
