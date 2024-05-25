@@ -119,7 +119,9 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         <div>{icon}</div>
         <div className="flex flex-col items-center gap-1 leading-none">
           <div>{value}</div>
-          <div style={{ fontSize: 9 }}>{postfix}</div>
+          {postfix !== undefined && (
+            <div style={{ fontSize: 9 }}>{postfix}</div>
+          )}
         </div>
       </div>
       <Modal
