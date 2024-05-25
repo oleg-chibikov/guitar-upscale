@@ -9,9 +9,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "./IconButton";
 
-function MdiMetronome() {
+export function MdiMetronome() {
   return (
     <svg
+      className="inline-block"
       xmlns="http://www.w3.org/2000/svg"
       height="24"
       viewBox="0 0 24 24"

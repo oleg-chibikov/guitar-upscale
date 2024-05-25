@@ -1,4 +1,5 @@
-import { MAX_VOLUME, Note } from "@/app/data/notes";
+import { Note } from "@/app/data/notes";
+import { MAX_VOLUME } from "@/app/data/volume";
 import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectSettings, setVolume } from "@/app/store/settingsSlice";

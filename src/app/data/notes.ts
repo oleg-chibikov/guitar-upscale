@@ -23,7 +23,6 @@ export type StringOctaveNote = OctaveNote & {
   fret: number;
 };
 
-export const MAX_VOLUME = 127;
 export const SHARP_NOTE_COUNT = 5;
 
 // Reverse mapping object

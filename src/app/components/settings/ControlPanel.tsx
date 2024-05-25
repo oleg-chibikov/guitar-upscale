@@ -1,3 +1,5 @@
+import { ChordStrummingDelayControl } from "@/app/components/settings/valueModalControls/ChordStrummingDelayControl";
+import { MetronomeVolumeControl } from "@/app/components/settings/valueModalControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueModalControls/VolumeControl";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
@@ -37,7 +39,11 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
       <ButtonContainer premiumComponents={premiumComponents} />
       <div className="flex flex-col gap-1">
         <VolumeControl />
+        <MetronomeVolumeControl />
+      </div>
+      <div className="flex flex-col gap-1">
         <TempoControl />
+        <ChordStrummingDelayControl />
       </div>
     </section>
   );

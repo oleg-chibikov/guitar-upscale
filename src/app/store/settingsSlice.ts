@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
-import { Chord, getNoteText, MAX_VOLUME, Note } from "../data/notes";
+import { Chord, getNoteText, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
@@ -19,6 +19,7 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 
+import { MAX_VOLUME } from "@/app/data/volume";
 import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,

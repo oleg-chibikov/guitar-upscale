@@ -3,7 +3,7 @@ import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Box, Fade, Modal } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 interface ValueModalControlProps {
@@ -11,6 +11,7 @@ interface ValueModalControlProps {
   setValue: (value: number) => void;
   formatValue?: (value: number) => string;
   steps: number[];
+  icon: ReactNode;
 }
 
 export const ValueModalControl: React.FC<ValueModalControlProps> = ({
@@ -18,6 +19,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   setValue,
   formatValue,
   steps,
+  icon,
 }) => {
   const { theme } = useSelector(selectUi);
   const [modalOpen, setModalOpen] = useState(false);
@@ -106,14 +108,15 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   const formattedValue = formatValue ? formatValue(value) : value.toString();
 
   return (
-    <div>
+    <div className="relative">
+      <div className="absolute top-1 left-1">{icon}</div>
       <input
         type="text"
         value={formattedValue}
         readOnly
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className="text-sm box-border w-20 h-8 text-center cursor-pointer"
+        className="pl-8 text-sm box-border w-16 h-8 cursor-pointer"
       />
       <Modal
         open={modalOpen}

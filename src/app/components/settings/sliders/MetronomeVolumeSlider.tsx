@@ -1,4 +1,4 @@
-import { MAX_VOLUME } from "@/app/data/notes";
+import { MAX_VOLUME } from "@/app/data/volume";
 import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";

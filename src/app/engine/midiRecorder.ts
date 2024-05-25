@@ -1,7 +1,8 @@
+import { MAX_VOLUME } from "@/app/data/volume";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../data/instruments";
-import { MAX_VOLUME, StringOctaveNote, getNoteText } from "../data/notes";
+import { StringOctaveNote, getNoteText } from "../data/notes";
 import {
   baseNoteValue,
   scaleGroupValue,

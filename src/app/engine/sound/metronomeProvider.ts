@@ -1,4 +1,5 @@
-import { MAX_VOLUME, Note, OctaveNote } from "@/app/data/notes";
+import { Note, OctaveNote } from "@/app/data/notes";
+import { MAX_VOLUME } from "@/app/data/volume";
 import { loadInstrument, playSound } from "./soundHelper";
 
 export const loadMetronome = async () => {
