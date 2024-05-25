@@ -108,29 +108,20 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   return (
     <div className="relative">
       <div
-        className="absolute top-1/2 -translate-y-1/2 left-1"
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
+        className={`flex flex-row gap-1 justify-between items-center w-16 p-1 ${
+          theme === Theme.Light
+            ? "bg-select_background-light"
+            : "bg-select_background-dark"
+        } text-sm h-8 cursor-pointer`}
       >
-        {icon}
+        <div>{icon}</div>
+        <div className="flex flex-col items-center gap-1 leading-none">
+          <div>{value}</div>
+          <div style={{ fontSize: 9 }}>{postfix}</div>
+        </div>
       </div>
-      <span
-        className="absolute top-1/2 -translate-y-1/2 right-1"
-        style={{ fontSize: 9 }}
-        onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
-        onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-      >
-        {postfix}
-      </span>
-      <input
-        type="text"
-        value={value}
-        readOnly
-        style={{ width: postfix !== undefined ? 84 : 64 }}
-        onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
-        onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className="pl-8 text-sm box-border h-8 cursor-pointer"
-      />
       <Modal
         open={modalOpen}
         className="cursor-move"

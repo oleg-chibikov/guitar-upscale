@@ -89,42 +89,11 @@ export class LooperRecorder {
     let ticksPassedSinceLastBar = globalCurrentTick - globalCurrentLastBarTick;
 
     while (!abortSignal.aborted) {
-      console.log("---Start playing");
-
-      const ticksTillNextBar = TICKS_IN_BAR - ticksPassedSinceLastBar;
-      // startTick is the tick number at the start of the bar closest to the first recorded note (not the value when the record button was clicked)
-      const startTick = this.startTick ?? 0;
-
-      const ticksFromStartToFirst = firstNoteTick - startTick!;
-
-      // Imagine an example: first note - 10 ticks from start of the bar
-      // we are at 9th tick now - we can play the first note in 1 tick and play the rest of the melody.
-      // we are at 11th tick now - we need to wait till the bar start, then wait for 10 ticks.
-
-      let ticksToWaitForTheFirstNote: number;
-      if (ticksPassedSinceLastBar <= ticksFromStartToFirst) {
-        ticksToWaitForTheFirstNote =
-          ticksFromStartToFirst - ticksPassedSinceLastBar;
-        console.log(
-          "---We are at tick %d now. First note starts at %d tick. We need to wait for %d ticks to play the first note",
-          startTick + ticksPassedSinceLastBar,
-          startTick + ticksFromStartToFirst,
-          ticksToWaitForTheFirstNote
-        );
-      } else {
-        ticksToWaitForTheFirstNote = ticksTillNextBar + ticksFromStartToFirst;
-        console.log(
-          "---We are at tick %d now. First note starts at %d tick. We need to wait for the next bar and then %d ticks to play the first note (%d ticks in total)",
-          startTick + ticksPassedSinceLastBar,
-          startTick + ticksFromStartToFirst,
-          ticksFromStartToFirst,
-          ticksToWaitForTheFirstNote
-        );
-      }
-
-      const playStartTick = firstNoteTick - ticksToWaitForTheFirstNote;
-
-      let currentTick = playStartTick;
+      let currentTick = this.getStartingTick(
+        ticksPassedSinceLastBar,
+        firstNoteTick
+      );
+      console.log("---Start playing from ", currentTick);
 
       for (const tick of sortedTicks) {
         if (abortSignal.aborted) {
@@ -171,6 +140,45 @@ export class LooperRecorder {
 
       // wait till the end of the bar and then repeat
     }
+  }
+
+  private getStartingTick(
+    ticksPassedSinceLastBar: number,
+    firstNoteTick: number
+  ) {
+    const ticksTillNextBar = TICKS_IN_BAR - ticksPassedSinceLastBar;
+    // startTick is the tick number at the start of the bar closest to the first recorded note (not the value when the record button was clicked)
+    const startTick = this.startTick ?? 0;
+
+    const ticksFromStartToFirst = firstNoteTick - startTick!;
+
+    // Imagine an example: first note - 10 ticks from start of the bar
+    // we are at 9th tick now - we can play the first note in 1 tick and play the rest of the melody.
+    // we are at 11th tick now - we need to wait till the bar start, then wait for 10 ticks.
+    let ticksToWaitForTheFirstNote: number;
+    if (ticksPassedSinceLastBar <= ticksFromStartToFirst) {
+      ticksToWaitForTheFirstNote =
+        ticksFromStartToFirst - ticksPassedSinceLastBar;
+      console.log(
+        "---We are at tick %d now. First note starts at %d tick. We need to wait for %d ticks to play the first note",
+        startTick + ticksPassedSinceLastBar,
+        startTick + ticksFromStartToFirst,
+        ticksToWaitForTheFirstNote
+      );
+    } else {
+      ticksToWaitForTheFirstNote = ticksTillNextBar + ticksFromStartToFirst;
+      console.log(
+        "---We are at tick %d now. First note starts at %d tick. We need to wait for the next bar and then %d ticks to play the first note (%d ticks in total)",
+        startTick + ticksPassedSinceLastBar,
+        startTick + ticksFromStartToFirst,
+        ticksFromStartToFirst,
+        ticksToWaitForTheFirstNote
+      );
+    }
+
+    const playStartTick = firstNoteTick - ticksToWaitForTheFirstNote;
+
+    return playStartTick;
   }
 
   private playNotesAtTick(tick: number) {
