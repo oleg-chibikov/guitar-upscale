@@ -1,0 +1,23 @@
+import { tempoSteps } from "@/app/data/tempo";
+import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ValueModalControl } from "./ValueModalControl";
+
+export const TempoControl: React.FC = () => {
+  const { tempoBpm } = useSelector(selectSettings);
+  const dispatch = useDispatch();
+
+  const handleSliderChange = (value: number) => {
+    dispatch(setTempoBpm({ tempo: value, updateInterval: true }));
+  };
+
+  return (
+    <ValueModalControl
+      value={tempoBpm}
+      setValue={handleSliderChange}
+      steps={tempoSteps}
+      formatValue={(value) => value + " BPM"}
+    />
+  );
+};

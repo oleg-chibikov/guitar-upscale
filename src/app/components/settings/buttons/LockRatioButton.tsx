@@ -1,3 +1,4 @@
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { selectUi, setLockRatio } from "@/app/store/uiSlice";
 import Lock from "@mui/icons-material/Lock";
 import LockOpen from "@mui/icons-material/LockOpen";
@@ -7,11 +8,16 @@ import { IconButton } from "./IconButton";
 
 export const LockRatioButton: React.FC = (props) => {
   const dispatch = useDispatch();
+  const { chordsDisplayMode } = useSelector(selectUi);
   const { lockRatio } = useSelector(selectUi);
   return (
     <IconButton
       {...props}
-      className="scale-75 origin-bottom-right"
+      className={`scale-75 ${
+        chordsDisplayMode === ChordsDisplayMode.Left
+          ? "origin-bottom-right"
+          : "origin-bottom-left"
+      }`}
       icon={
         lockRatio ? <Lock fontSize="small" /> : <LockOpen fontSize="small" />
       }
