@@ -13,10 +13,7 @@ import {
   NoteToFretMarkerEventMap,
 } from "@/app/engine/eventBus";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import {
-  globalCurrentLastBarTick,
-  globalCurrentTick,
-} from "@/app/engine/mainClock";
+import { getCurrentRelativeTick } from "@/app/engine/mainClock";
 import { sleep } from "@/app/helpers/sleep";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
@@ -181,7 +178,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       console.log(
         "Playing all the notes on fret at tick %d",
         fret,
-        globalCurrentTick - globalCurrentLastBarTick
+        getCurrentRelativeTick()
       );
       for (let stringIndex = 0; stringIndex < neck.length; stringIndex++) {
         const string = neck[stringIndex];
@@ -198,7 +195,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     console.log(
       "Playing note (manual) %o at tick %d",
       stringOctaveNote,
-      globalCurrentTick - globalCurrentLastBarTick
+      getCurrentRelativeTick()
     );
     if (stringOctaveNote) {
       NotePlayEventBus.next({

@@ -16,6 +16,7 @@ import {
   waitForNextTick,
 } from "../engine/mainClock";
 import {
+  STRUMMING_LOG_PREFIX,
   areOtherChordsStrumming,
   currentChord,
   finishChordGracePeriod,
@@ -43,7 +44,6 @@ import {
 } from "../store/settingsSlice";
 
 const GRACE_INTERVALS = 2;
-const LOG_PREFIX = "Strumming: ";
 
 enum PromiseType {
   PressReleased = 1,
@@ -100,7 +100,7 @@ export const useStrumming = (
 
     const register = () => {
       console.log(
-        LOG_PREFIX + "Registering mouseup/touchend",
+        STRUMMING_LOG_PREFIX + "Registering mouseup/touchend",
         chordName,
         clickNumber
       );
@@ -112,7 +112,7 @@ export const useStrumming = (
 
     const unregister = () => {
       console.log(
-        LOG_PREFIX + "Unregistering mouseup/touchend",
+        STRUMMING_LOG_PREFIX + "Unregistering mouseup/touchend",
         chordName,
         clickNumber
       );
@@ -138,7 +138,8 @@ export const useStrumming = (
 
       if (clickIgnored) {
         console.log(
-          LOG_PREFIX + "Clicked on fretboard - ignoring press release",
+          STRUMMING_LOG_PREFIX +
+            "Clicked on fretboard - ignoring press release",
           chordName,
           clickNumber
         );
@@ -149,13 +150,13 @@ export const useStrumming = (
 
       try {
         console.log(
-          LOG_PREFIX + "Chord press released",
+          STRUMMING_LOG_PREFIX + "Chord press released",
           chordName,
           clickNumber
         );
         if (!isChordClicked(chordName) || isDisabled) {
           console.log(
-            LOG_PREFIX + "Chord not clicked yet - ignoring",
+            STRUMMING_LOG_PREFIX + "Chord not clicked yet - ignoring",
             chordName,
             clickNumber
           );
@@ -164,7 +165,8 @@ export const useStrumming = (
 
         if (!isChordStrumming(chordName)) {
           console.log(
-            LOG_PREFIX + "Not playing when press released - stop strumming",
+            STRUMMING_LOG_PREFIX +
+              "Not playing when press released - stop strumming",
             chordName,
             clickNumber
           );
@@ -200,14 +202,14 @@ export const useStrumming = (
       setIsPlaying(value);
     };
 
-    console.log(LOG_PREFIX + "Pressed chord", chordName, clickNumber);
+    console.log(STRUMMING_LOG_PREFIX + "Pressed chord", chordName, clickNumber);
     setClicked(true);
 
     register();
 
     if (isChordStrummingOrPendingStrumming(chordName)) {
       console.log(
-        LOG_PREFIX +
+        STRUMMING_LOG_PREFIX +
           "This chord is already strumming or pending strumming, ignoring",
         chordName,
         clickNumber
@@ -222,11 +224,15 @@ export const useStrumming = (
     const wasMainClockActiveWhenStrummingStarted = isMainClockActive();
 
     if (isChordClicked(chordName)) {
-      console.log(LOG_PREFIX + "Mark as strumming", chordName, clickNumber);
+      console.log(
+        STRUMMING_LOG_PREFIX + "Mark as strumming",
+        chordName,
+        clickNumber
+      );
       markChordAsPendingStrumming(chordName, clickNumber);
     } else {
       console.log(
-        LOG_PREFIX +
+        STRUMMING_LOG_PREFIX +
           "Already released mouse/touch after immediate chord. Don't start strumming",
         chordName,
         clickNumber
@@ -250,19 +256,21 @@ export const useStrumming = (
 
     if (!wasStrummingWhenChordPressed) {
       console.log(
-        LOG_PREFIX + "Playing chord immediately - no strumming happening now",
+        STRUMMING_LOG_PREFIX +
+          "Playing chord immediately - no strumming happening now",
         chordName,
         clickNumber
       );
 
-      console.log(LOG_PREFIX + "Playing", chordName, clickNumber);
+      console.log(STRUMMING_LOG_PREFIX + "Playing", chordName, clickNumber);
       play(false);
       if (useChordAlterationValue) {
         isAlternateRef.current = !isAlternateRef.current;
       }
     } else {
       console.log(
-        LOG_PREFIX + "Skip playing chord immediately - strumming happening now",
+        STRUMMING_LOG_PREFIX +
+          "Skip playing chord immediately - strumming happening now",
         chordName,
         clickNumber
       );
@@ -301,7 +309,7 @@ export const useStrumming = (
 
       if (!isChordClicked(chordName)) {
         console.log(
-          LOG_PREFIX +
+          STRUMMING_LOG_PREFIX +
             "WAITING - not clicked at the moment of waiting. Don't wait and don't strum",
           chordName,
           clickNumber
@@ -310,14 +318,14 @@ export const useStrumming = (
       }
       if (wasMainClockActiveWhenStrummingStarted) {
         console.log(
-          LOG_PREFIX + "Clock was active when clicked",
+          STRUMMING_LOG_PREFIX + "Clock was active when clicked",
           chordName,
           clickNumber
         );
 
         if (clickedInOtherChordGracePeriod) {
           console.log(
-            LOG_PREFIX +
+            STRUMMING_LOG_PREFIX +
               `WAITING - Clicked in grace period. Waiting for it to finish to start strumming. Skipping ${GRACE_INTERVALS} intervals`,
             chordName,
             clickNumber
@@ -328,7 +336,7 @@ export const useStrumming = (
           // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
 
           console.log(
-            LOG_PREFIX +
+            STRUMMING_LOG_PREFIX +
               "WAITING - Waiting for current strumming pattern to finish before beginning strumming new chord",
             chordName,
             clickNumber
@@ -336,7 +344,7 @@ export const useStrumming = (
           initialWait = () => Promise.all(otherChordsStrummingPromises);
         } else if (wasStrummingWhenChordPressed) {
           console.log(
-            LOG_PREFIX +
+            STRUMMING_LOG_PREFIX +
               "WAITING - Strumming not over - waiting for the next interval to strum",
             chordName,
             clickNumber
@@ -348,7 +356,7 @@ export const useStrumming = (
         ) {
           intervalsToSkip = getIntervalsToSkip();
           console.log(
-            LOG_PREFIX +
+            STRUMMING_LOG_PREFIX +
               "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
             intervalsToSkip,
             chordName,
@@ -357,7 +365,7 @@ export const useStrumming = (
           initialWait = waitBetween;
         } else {
           console.log(
-            LOG_PREFIX +
+            STRUMMING_LOG_PREFIX +
               "WAITING - Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
             chordName,
             clickNumber
@@ -366,7 +374,7 @@ export const useStrumming = (
         }
       } else {
         console.log(
-          LOG_PREFIX +
+          STRUMMING_LOG_PREFIX +
             "WAITING - Clock not active - waiting for the next interval to strum and skip one interval",
           chordName,
           clickNumber
@@ -392,7 +400,7 @@ export const useStrumming = (
         !isChordClicked(chordName)
       ) {
         console.log(
-          LOG_PREFIX +
+          STRUMMING_LOG_PREFIX +
             "Already released mouse/touch after wait. Don't start strumming",
           chordName,
           clickNumber
@@ -401,7 +409,7 @@ export const useStrumming = (
       }
       if (isChordStrumming(chordName)) {
         console.log(
-          LOG_PREFIX +
+          STRUMMING_LOG_PREFIX +
             "Already strumming this chord. Don't start strumming again",
           chordName,
           clickNumber
@@ -416,7 +424,7 @@ export const useStrumming = (
         clickNumber: number
       ): Promise<void> => {
         console.log(
-          LOG_PREFIX + "----> Started actual strumming",
+          STRUMMING_LOG_PREFIX + "----> Started actual strumming",
           chordName,
           clickNumber
         );
@@ -466,7 +474,7 @@ export const useStrumming = (
             // Wait GRACE_INTERVALS intervals - This gives additional opportunity to press another chord and repeat the pattern
             if (!areOtherChordsStrumming(chordName)) {
               console.log(
-                LOG_PREFIX +
+                STRUMMING_LOG_PREFIX +
                   "Other chords are not strumming - play grace chords",
                 chordName,
                 clickNumber
@@ -487,7 +495,8 @@ export const useStrumming = (
           }
         } finally {
           console.log(
-            LOG_PREFIX + "Strumming finished - setting isPlaying to false",
+            STRUMMING_LOG_PREFIX +
+              "Strumming finished - setting isPlaying to false",
             chordName,
             clickNumber
           );
@@ -506,7 +515,7 @@ export const useStrumming = (
 
     if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
       console.log(
-        LOG_PREFIX + "Wait and strum with delay",
+        STRUMMING_LOG_PREFIX + "Wait and strum with delay",
         chordName,
         clickNumber
       );
@@ -514,7 +523,7 @@ export const useStrumming = (
       await asyncTimeout(waitAndStrum, bpmToMilliseconds(tempoBpmValue) / 2);
     } else {
       console.log(
-        LOG_PREFIX + "Wait and strum immediately",
+        STRUMMING_LOG_PREFIX + "Wait and strum immediately",
         chordName,
         clickNumber
       );
