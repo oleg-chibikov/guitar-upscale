@@ -42,14 +42,6 @@ export class LooperRecorder {
   private recordingStoppedInTheFirstHalfOfLastBar: boolean | undefined;
   private abortController = new AbortController();
 
-  // TODO: Instead of keeping this complex logic we can just start strumming from whatever position we currently have in the bar.
-  // For example if we are at 30th tick, then we skip events in the strumming pattern that come before that.
-  // This way we won't need to play this unwanted extra event at all.
-  private clearUndesiredChordCallbacks: Map<number, Set<() => void>> = new Map<
-    number,
-    Set<() => void>
-  >(); // key is the strumming sequence id (click number). Value is the function that deletes the undesired events for this strumming sequence
-
   hasRecording = () => {
     const size = this.eventsByTick?.size;
     return size !== undefined ? size > 0 : false;
@@ -278,28 +270,6 @@ export class LooperRecorder {
     const eventData: ChordOrNote = { chord: data };
     const eventsForTick = this.addOrUpdateEvent(currentTick, eventData);
 
-    const removeEvent = () => {
-      console.log(
-        LOG_PREFIX + "Removing undesired event as strumming continues",
-        eventData
-      );
-      eventsForTick.delete(eventData);
-      if (!eventsForTick.size) {
-        console.log(
-          LOG_PREFIX +
-            "No more events at tick %d. Deleting the events container for it",
-          currentTick
-        );
-        this.eventsByTick?.delete(currentTick);
-      }
-    };
-
-    this.registerUndesiredStrummingEvent(
-      data.metadata.strummingClickNumber,
-      data.metadata.playedSeparatelyFromStrumming ?? false,
-      removeEvent
-    );
-
     this.eventsByTick.set(currentTick, eventsForTick);
   }
 
@@ -358,71 +328,6 @@ export class LooperRecorder {
       eventsForTick.add(data);
     }
     return eventsForTick;
-  }
-
-  private registerUndesiredStrummingEvent(
-    strummingClickNumber: number | undefined,
-    fromImmediateChord: boolean,
-    removeEvent: () => void
-  ) {
-    if (strummingClickNumber !== undefined) {
-      console.log(
-        LOG_PREFIX + "Note from strumming sequence",
-        strummingClickNumber
-      );
-      if (fromImmediateChord) {
-        console.log(
-          LOG_PREFIX +
-            "Registering note events coming from an immediate chord as possibly undesired for strumming sequence",
-          strummingClickNumber
-        );
-        // create and store the callback to remove these notes once we receive the note from strumming
-        // disclaimer: when strumming while main clock is active we play the first chord straight away and it is not the part of strumming. It is needed to be able to play single chords.
-        // but in looper or recording we don't wanna have such chords if they are followed by the actual strumming
-        // therefore we need to delete them from the play sequence.
-        // We only need to delete events for the same strumming sequence. It's done by storing them in a map keyed by the strumming sequence id
-
-        this.createOrAddUndesiredStrummingCallback(
-          strummingClickNumber,
-          removeEvent
-        );
-      } else {
-        console.log(LOG_PREFIX + "Strumming continues");
-        // if we are here it means that we continue strumming. We need to wipe the unwanted events coming from the same sequence (the chord that was played immediately, before strumming)
-        const clearUndesiredChordCallbacksForThisSequence =
-          this.clearUndesiredChordCallbacks.get(strummingClickNumber);
-        if (
-          clearUndesiredChordCallbacksForThisSequence &&
-          clearUndesiredChordCallbacksForThisSequence.size
-        ) {
-          console.log(LOG_PREFIX + "Removing undesired events");
-          clearUndesiredChordCallbacksForThisSequence.forEach((callback) =>
-            callback()
-          );
-          clearUndesiredChordCallbacksForThisSequence.clear();
-          this.clearUndesiredChordCallbacks.delete(strummingClickNumber);
-        }
-      }
-    } else {
-      console.log(LOG_PREFIX + "Note not from strumming sequence");
-    }
-  }
-
-  private createOrAddUndesiredStrummingCallback(
-    strummingClickNumber: number,
-    deleteUndesiredNoteCallback: () => void
-  ) {
-    let currentCallbacksForThisSequence =
-      this.clearUndesiredChordCallbacks.get(strummingClickNumber);
-    if (currentCallbacksForThisSequence) {
-      currentCallbacksForThisSequence.add(deleteUndesiredNoteCallback);
-    } else {
-      currentCallbacksForThisSequence = new Set([deleteUndesiredNoteCallback]);
-    }
-    this.clearUndesiredChordCallbacks.set(
-      strummingClickNumber,
-      currentCallbacksForThisSequence
-    );
   }
 
   private async waitForTick(

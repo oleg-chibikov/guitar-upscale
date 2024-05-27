@@ -33,18 +33,12 @@ export type NoteMetadata = TrackMetadata &
     looperChannel?: number;
   };
 
-export type StrummingMetadata = {
-  playedSeparatelyFromStrumming?: boolean; // It comes from strumming - the chord can be either played right after click or during strumming.
-  strummingClickNumber?: number; // It comes from strumming and identifies particular strumming sequence
+export type ChordMetadata = TrackMetadata & {
+  notesToPlay?: number;
+  strummingDelayMs?: number;
+  clear?: boolean;
+  looperChannel?: number;
 };
-
-export type ChordMetadata = StrummingMetadata &
-  TrackMetadata & {
-    notesToPlay?: number;
-    strummingDelayMs?: number;
-    clear?: boolean;
-    looperChannel?: number;
-  };
 
 export type ChordWithPlayMetadata = {
   chord: string;

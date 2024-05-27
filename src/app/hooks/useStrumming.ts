@@ -86,11 +86,7 @@ export const useStrumming = (
       // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
       ChordEventBus.next({
         chord: chordToPlay,
-        metadata: {
-          //  playedSeparatelyFromStrumming: playedSeparatelyFromStrumming, // TODO: keeping this functionality in the looper for a while, but it isn't used anymore
-          strummingClickNumber: clickNumberRef.current,
-          clear: false,
-        },
+        metadata: {},
       });
     },
     [chordName]
