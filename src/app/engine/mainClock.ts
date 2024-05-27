@@ -81,6 +81,9 @@ export let currentBeat = 0;
 export let currentHalfBar = 0;
 export let currentBar = 0;
 
+export const getCurrentRelativeTick = () =>
+  globalCurrentTick - globalCurrentLastBarTick;
+
 export const isMainClockActive = () => {
   return timer !== undefined;
 };

@@ -2,7 +2,12 @@ import { useCallback, useRef, useState } from "react";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { ChordEventBus } from "../engine/eventBus";
 import {
+  TICKS_IN_BAR,
+  TICKS_IN_BEAT,
+  TICKS_IN_HALF_BAR,
+  TICKS_IN_HALF_BEAT,
   bpmToMilliseconds,
+  getCurrentRelativeTick,
   isMainClockActive,
   waitForNextBar,
   waitForNextBeat,
@@ -72,10 +77,7 @@ export const useStrumming = (
   const clickNumberRef = useRef<number>(0);
 
   const play = useCallback(
-    (
-      isPlayedWithinGracePeriod: boolean,
-      playedSeparatelyFromStrumming: boolean
-    ) => {
+    (isPlayedWithinGracePeriod: boolean) => {
       const chordToPlay =
         (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
         currentChord !== undefined
@@ -85,7 +87,7 @@ export const useStrumming = (
       ChordEventBus.next({
         chord: chordToPlay,
         metadata: {
-          playedSeparatelyFromStrumming: playedSeparatelyFromStrumming,
+          //  playedSeparatelyFromStrumming: playedSeparatelyFromStrumming, // TODO: keeping this functionality in the looper for a while, but it isn't used anymore
           strummingClickNumber: clickNumberRef.current,
           clear: false,
         },
@@ -221,7 +223,7 @@ export const useStrumming = (
     }
 
     // this is true when the clock is active (eg metronome or example is playing or recording is enabled)
-    const shouldPlayImmediateChordAndStrumLater = isMainClockActive();
+    const wasMainClockActiveWhenStrummingStarted = isMainClockActive();
 
     if (isChordClicked(chordName)) {
       console.log(LOG_PREFIX + "Mark as strumming", chordName, clickNumber);
@@ -258,7 +260,7 @@ export const useStrumming = (
       );
 
       console.log(LOG_PREFIX + "Playing", chordName, clickNumber);
-      play(false, shouldPlayImmediateChordAndStrumLater); // TODO: when nothing is ticking
+      play(false);
       if (useChordAlterationValue) {
         isAlternateRef.current = !isAlternateRef.current;
       }
@@ -269,6 +271,34 @@ export const useStrumming = (
         clickNumber
       );
     }
+
+    const getNumberOfTicks = () => {
+      switch (chordStrummingIntervalValue) {
+        case ChordStrummingInterval.Bar:
+          return TICKS_IN_BAR;
+        case ChordStrummingInterval.HalfBar:
+          return TICKS_IN_HALF_BAR;
+        case ChordStrummingInterval.Beat:
+          return TICKS_IN_BEAT;
+        case ChordStrummingInterval.HalfBeat:
+          return TICKS_IN_HALF_BEAT;
+        default:
+          return 1;
+      }
+    };
+
+    const getIntervalsToSkip = () => {
+      // get the tick number since the last bar
+      const currentTick = getCurrentRelativeTick();
+      // get the value of
+      const ticksInInterval = getNumberOfTicks();
+      const ticksRemainingToTheNextInterval = currentTick % ticksInInterval;
+      if (ticksRemainingToTheNextInterval === 0) {
+        return 1;
+      }
+      const intervalsToSkip = Math.floor(currentTick / ticksInInterval);
+      return intervalsToSkip + 1;
+    };
 
     const waitAndStrum = async () => {
       let initialWait: () => Promise<void | void[]>;
@@ -282,7 +312,7 @@ export const useStrumming = (
         );
         return;
       }
-      if (shouldPlayImmediateChordAndStrumLater) {
+      if (wasMainClockActiveWhenStrummingStarted) {
         console.log(
           LOG_PREFIX + "Clock was active when clicked",
           chordName,
@@ -320,13 +350,15 @@ export const useStrumming = (
           isAnyTimerSpecificActivityRunning() &&
           !isOtherChordStrumming
         ) {
+          intervalsToSkip = getIntervalsToSkip();
           console.log(
             LOG_PREFIX +
-              "WAITING - Metronome/play/recording active but no strumming - waiting for the next bar to strum",
+              "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
+            intervalsToSkip,
             chordName,
             clickNumber
           );
-          initialWait = waitForNextBar;
+          initialWait = waitBetween;
         } else {
           console.log(
             LOG_PREFIX +
@@ -403,11 +435,11 @@ export const useStrumming = (
             switch (char) {
               case "↑":
                 isAlternateRef.current = false;
-                play(clickedInGracePeriod, false);
+                play(clickedInGracePeriod);
                 break;
               case "↓":
                 isAlternateRef.current = true;
-                play(clickedInGracePeriod, false);
+                play(clickedInGracePeriod);
                 break;
               case "_":
                 break;
@@ -443,9 +475,8 @@ export const useStrumming = (
                 chordName,
                 clickNumber
               );
-              await playChordOnce(); // play first chord once every time during grace period
 
-              for (let i = 1; i < GRACE_INTERVALS; i++) {
+              for (let i = 0; i < GRACE_INTERVALS; i++) {
                 if (areOtherChordsStrumming(chordName)) {
                   await playChordOnce(); // play subsequent chords only if there are other chords pending, otherwise just wait for grace period end
                 } else {

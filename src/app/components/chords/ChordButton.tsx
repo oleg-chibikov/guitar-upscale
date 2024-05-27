@@ -13,6 +13,10 @@ import {
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
+import {
+  globalCurrentLastBarTick,
+  globalCurrentTick,
+} from "@/app/engine/mainClock";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {
@@ -63,7 +67,11 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         clearDetector();
       }
 
-      console.log("Playing chord: " + chordName);
+      console.log(
+        "Playing chord: %s at tick %d",
+        chordName,
+        globalCurrentTick - globalCurrentLastBarTick
+      );
       setWasPlayedLast(true);
       // Start the animation sequence
       setAnimate(true);

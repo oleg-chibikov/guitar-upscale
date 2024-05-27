@@ -9,6 +9,7 @@ import {
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
+  getCurrentRelativeTick,
   globalCurrentLastBarTick,
   globalCurrentTick,
   waitForNextBar,
@@ -71,7 +72,7 @@ export class LooperRecorder {
         globalCurrentLastBarTick - this.absoluteStartTick;
       this.endTick = globalCurrentTick - this.absoluteStartTick;
       this.recordingStoppedInTheFirstHalfOfLastBar =
-        globalCurrentTick - globalCurrentLastBarTick < TICKS_IN_HALF_BAR;
+        getCurrentRelativeTick() < TICKS_IN_HALF_BAR;
 
       if (this.lastBarTickForLastRecordedEvent !== undefined) {
         this.recordingEndedInFurtherBar =
@@ -130,13 +131,9 @@ export class LooperRecorder {
 
     const abortSignal = this.abortController.signal;
     const firstEventTick = sortedTicks[0];
-    let ticksPassedSinceLastBar = globalCurrentTick - globalCurrentLastBarTick;
 
     while (!abortSignal.aborted) {
-      let currentTick: number = await this.waitForFirstEvent(
-        ticksPassedSinceLastBar,
-        firstEventTick
-      );
+      let currentTick: number = await this.waitForFirstEvent(firstEventTick);
       console.log(LOG_PREFIX + `Loop starts. Current tick is %d`, currentTick);
       for (const tick of sortedTicks) {
         if (abortSignal.aborted) {
@@ -181,20 +178,16 @@ export class LooperRecorder {
       }
 
       console.log(LOG_PREFIX + "Waiting for a single tick to finish the loop");
+
       // wait for 1 tick to prevent instant replaying of the first event in the bar (for example, if the loop is just 1 event - we need to wait for a bar between replaying it. Otherwise it will just immediately repeat in a loop and will crash the browser)
       await waitForNextTick();
-      currentTick++;
-      // we'll need to wait for the first note in the current bar or in the next bar, the same way as when the loop started for the first time, but the current note now is the last note of the loop
-      ticksPassedSinceLastBar = currentTick;
 
       console.log(LOG_PREFIX + "Loop ends");
     }
   }
 
-  private async waitForFirstEvent(
-    ticksPassedSinceLastBar: number,
-    firstEventTick: number
-  ) {
+  private async waitForFirstEvent(firstEventTick: number) {
+    const ticksPassedSinceLastBar = getCurrentRelativeTick();
     const mod = ticksPassedSinceLastBar % TICKS_IN_BAR;
     if (mod > firstEventTick) {
       console.log(
@@ -204,7 +197,7 @@ export class LooperRecorder {
         firstEventTick
       );
       await waitForNextBar();
-      return 0;
+      return 1; // ticks are 1-based
     } else {
       console.log(
         LOG_PREFIX +
@@ -227,7 +220,20 @@ export class LooperRecorder {
       return;
     }
 
+    const realTick = getCurrentRelativeTick();
+
     console.log(LOG_PREFIX + "Playing events at tick %d", tick);
+
+    const tickInBar = tick % TICKS_IN_BAR;
+
+    if (tickInBar % TICKS_IN_BAR !== realTick) {
+      console.error(
+        LOG_PREFIX +
+          "Tick %d should be equal to real tick %d. Programming error",
+        tickInBar,
+        realTick
+      );
+    }
 
     eventsAtTick.forEach(({ note, chord }) => {
       if (note) {
