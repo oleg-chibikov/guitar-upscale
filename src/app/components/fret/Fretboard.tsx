@@ -140,7 +140,7 @@ export const Fretboard: React.FC = () => {
           style={{
             ...position,
             maxWidth:
-              Math.max(width * fretboardScaleX, 2500) -
+              Math.max(width * fretboardScaleX, 2000) -
               position.left -
               12 * fretboardScaleX,
             maxHeight:
