@@ -15,6 +15,8 @@ import {
   waitForNextTick,
 } from "./mainClock";
 
+const LOG_PREFIX = "Looper: ";
+
 type InternalNoteEvent = {
   note: StringOctaveNote;
   tick: number;
@@ -37,7 +39,6 @@ export class LooperRecorder {
   private endTick: number | undefined;
   private recordingEndedInFurtherBar: boolean | undefined;
   private recordingStoppedInTheFirstHalfOfLastBar: boolean | undefined;
-  private lastEventWasRecordedInTheFirstHalfOfLastBar: boolean | undefined;
   private abortController = new AbortController();
 
   // TODO: Instead of keeping this complex logic we can just start strumming from whatever position we currently have in the bar.
@@ -108,11 +109,11 @@ export class LooperRecorder {
     }
 
     console.log(
-      `Looper: Loop info
+      LOG_PREFIX +
+        `Loop info
       All ticks in the loop: %s,
       Last event tick: %d,
       Last bar tick for last recorded event: %d
-      Last event was in the first half of this bar: %s
       ---
       End recording tick: %d
       Last bar tick when recording was stopped: %d
@@ -121,7 +122,6 @@ export class LooperRecorder {
       sortedTicks.join(", "),
       sortedTicks[sortedTicks.length - 1],
       this.lastBarTickForLastRecordedEvent,
-      this.lastEventWasRecordedInTheFirstHalfOfLastBar,
       this.endTick,
       this.lastBarTickWhenStoppedRecording,
       this.recordingEndedInFurtherBar,
@@ -137,7 +137,7 @@ export class LooperRecorder {
         ticksPassedSinceLastBar,
         firstEventTick
       );
-      console.log(`Looper: Loop starts. Current tick is %d`, currentTick);
+      console.log(LOG_PREFIX + `Loop starts. Current tick is %d`, currentTick);
       for (const tick of sortedTicks) {
         if (abortSignal.aborted) {
           return;
@@ -150,7 +150,8 @@ export class LooperRecorder {
           this.recordingStoppedInTheFirstHalfOfLastBar === true // last event was recorded in the first half of the last bar
         ) {
           console.log(
-            "Looper: Last bar recording was stopped before it reached its second half. Skipping the last bar"
+            LOG_PREFIX +
+              "Last bar recording was stopped before it reached its second half. Skipping the last bar"
           );
 
           break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh (this allows filtering out unnecessary events)
@@ -165,11 +166,12 @@ export class LooperRecorder {
 
         this.playEventsAtTick(currentTick);
       }
-      console.log("Looper: All notes in the loop are played");
+      console.log(LOG_PREFIX + "All notes in the loop are played");
 
       if (this.recordingEndedInFurtherBar === true) {
         console.log(
-          "Recording ended in the further bar (not when the last event was recorded). Waiting for the tick when recording stopped and then for the first event"
+          LOG_PREFIX +
+            "Recording ended in the further bar (not when the last event was recorded). Waiting for the tick when recording stopped and then for the first event"
         );
         await this.waitForTick(
           this.lastBarTickWhenStoppedRecording,
@@ -178,14 +180,14 @@ export class LooperRecorder {
         );
       }
 
-      console.log("Waiting for a single tick to finish the loop");
+      console.log(LOG_PREFIX + "Waiting for a single tick to finish the loop");
       // wait for 1 tick to prevent instant replaying of the first event in the bar (for example, if the loop is just 1 event - we need to wait for a bar between replaying it. Otherwise it will just immediately repeat in a loop and will crash the browser)
       await waitForNextTick();
       currentTick++;
       // we'll need to wait for the first note in the current bar or in the next bar, the same way as when the loop started for the first time, but the current note now is the last note of the loop
       ticksPassedSinceLastBar = currentTick;
 
-      console.log("Looper: Loop ends");
+      console.log(LOG_PREFIX + "Loop ends");
     }
   }
 
@@ -196,7 +198,8 @@ export class LooperRecorder {
     const mod = ticksPassedSinceLastBar % TICKS_IN_BAR;
     if (mod > firstEventTick) {
       console.log(
-        "Looper: Waiting for the first event. Current tick %d is later than the first event %d - wait for the next bar first",
+        LOG_PREFIX +
+          "Waiting for the first event. Current tick %d is later than the first event %d - wait for the next bar first",
         mod,
         firstEventTick
       );
@@ -204,7 +207,8 @@ export class LooperRecorder {
       return 0;
     } else {
       console.log(
-        "Looper: Waiting for the first event. Current tick %d is earlier than the first event %d - just wait for it in the current bar",
+        LOG_PREFIX +
+          "Waiting for the first event. Current tick %d is earlier than the first event %d - just wait for it in the current bar",
         mod,
         firstEventTick
       );
@@ -223,7 +227,7 @@ export class LooperRecorder {
       return;
     }
 
-    console.log("Looper: Playing events at tick %d", tick);
+    console.log(LOG_PREFIX + "Playing events at tick %d", tick);
 
     eventsAtTick.forEach(({ note, chord }) => {
       if (note) {
@@ -243,7 +247,7 @@ export class LooperRecorder {
 
   private setStartTickAndGetCurrentTick() {
     if (this.absoluteStartTick === undefined) {
-      console.log("Looper: Absolute start tick", globalCurrentLastBarTick);
+      console.log(LOG_PREFIX + "Absolute start tick", globalCurrentLastBarTick);
       this.absoluteStartTick = globalCurrentLastBarTick;
     }
 
@@ -270,13 +274,14 @@ export class LooperRecorder {
 
     const removeEvent = () => {
       console.log(
-        "Looper: Removing undesired event as strumming continues",
+        LOG_PREFIX + "Removing undesired event as strumming continues",
         eventData
       );
       eventsForTick.delete(eventData);
       if (!eventsForTick.size) {
         console.log(
-          "Looper: No more events at tick %d. Deleting the events container for it",
+          LOG_PREFIX +
+            "No more events at tick %d. Deleting the events container for it",
           currentTick
         );
         this.eventsByTick?.delete(currentTick);
@@ -325,8 +330,6 @@ export class LooperRecorder {
   private recordLastBarTickForLastRecordedEvent = (startTick: number) => {
     // overwrite this value for each new event
     this.lastBarTickForLastRecordedEvent = globalCurrentLastBarTick - startTick;
-    this.lastEventWasRecordedInTheFirstHalfOfLastBar =
-      globalCurrentTick - globalCurrentLastBarTick < TICKS_IN_HALF_BAR;
   };
 
   private initialize() {
@@ -338,7 +341,6 @@ export class LooperRecorder {
     this.lastBarTickForLastRecordedEvent = undefined;
 
     this.recordingEndedInFurtherBar = undefined;
-    this.lastEventWasRecordedInTheFirstHalfOfLastBar = undefined;
     this.recordingStoppedInTheFirstHalfOfLastBar = undefined;
   }
 
@@ -358,10 +360,14 @@ export class LooperRecorder {
     removeEvent: () => void
   ) {
     if (strummingClickNumber !== undefined) {
-      console.log("Looper: Note from strumming sequence", strummingClickNumber);
+      console.log(
+        LOG_PREFIX + "Note from strumming sequence",
+        strummingClickNumber
+      );
       if (fromImmediateChord) {
         console.log(
-          "Looper: Registering note events coming from an immediate chord as possibly undesired for strumming sequence",
+          LOG_PREFIX +
+            "Registering note events coming from an immediate chord as possibly undesired for strumming sequence",
           strummingClickNumber
         );
         // create and store the callback to remove these notes once we receive the note from strumming
@@ -375,7 +381,7 @@ export class LooperRecorder {
           removeEvent
         );
       } else {
-        console.log("Looper: Strumming continues");
+        console.log(LOG_PREFIX + "Strumming continues");
         // if we are here it means that we continue strumming. We need to wipe the unwanted events coming from the same sequence (the chord that was played immediately, before strumming)
         const clearUndesiredChordCallbacksForThisSequence =
           this.clearUndesiredChordCallbacks.get(strummingClickNumber);
@@ -383,7 +389,7 @@ export class LooperRecorder {
           clearUndesiredChordCallbacksForThisSequence &&
           clearUndesiredChordCallbacksForThisSequence.size
         ) {
-          console.log("Looper: Removing undesired events");
+          console.log(LOG_PREFIX + "Removing undesired events");
           clearUndesiredChordCallbacksForThisSequence.forEach((callback) =>
             callback()
           );
@@ -392,7 +398,7 @@ export class LooperRecorder {
         }
       }
     } else {
-      console.log("Looper: Note not from strumming sequence");
+      console.log(LOG_PREFIX + "Note not from strumming sequence");
     }
   }
 
@@ -419,7 +425,7 @@ export class LooperRecorder {
     abortSignal: AbortSignal
   ) {
     const ticksToWait = tickToWaitFor - currentTick;
-    console.log("Looper: Waiting for %d ticks", ticksToWait);
+    console.log(LOG_PREFIX + "Waiting for %d ticks", ticksToWait);
     for (let i = 0; i < ticksToWait; i++) {
       if (abortSignal.aborted) {
         return Promise.resolve();
