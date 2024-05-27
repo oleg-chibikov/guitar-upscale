@@ -77,7 +77,7 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
 
     currentlyPlayingLooperChannels.add(channel);
     toggleInterval(true);
-    void looperChannel.looperRecorder.playMidi(); // don't wait for it
+    void looperChannel.looperRecorder.playLoop(); // don't wait for it
     //TODO: repeat until stopped
   } else {
     if (!looperChannel.isPlaying) {
