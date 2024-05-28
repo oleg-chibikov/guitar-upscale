@@ -77,8 +77,7 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
 
     currentlyPlayingLooperChannels.add(channel);
     toggleInterval(true);
-    void looperChannel.looperRecorder.playLoop(); // don't wait for it
-    //TODO: repeat until stopped
+    void looperChannel.looperRecorder?.startPlaying(); // don't wait for it
   } else {
     if (!looperChannel.isPlaying) {
       // doesn't play - nothing to stop
