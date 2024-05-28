@@ -123,10 +123,6 @@ export class LooperPlayer {
   private async getStartingPosition(firstEventTick: number) {
     const ticksPassedSinceLastBar = getCurrentRelativeTick();
     let mod = ticksPassedSinceLastBar % TICKS_IN_BAR;
-    if (firstEventTick < 0) {
-      // shift the current tick 1 bar before
-      mod = mod - TICKS_IN_BAR;
-    }
 
     if (mod > firstEventTick) {
       console.log(
@@ -186,10 +182,6 @@ export class LooperPlayer {
   private verifyTickIsCorrect(tick: number) {
     const realTick = getCurrentRelativeTick();
     let tickInBar = tick % TICKS_IN_BAR;
-    if (tickInBar < 0) {
-      tickInBar += TICKS_IN_BAR;
-    }
-
     if (tickInBar !== realTick) {
       console.error(
         LOG_PREFIX +

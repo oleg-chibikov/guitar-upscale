@@ -6,8 +6,8 @@ import { StringOctaveNote } from "../data/notes";
 import { ChordWithPlayMetadata } from "./eventBus";
 import {
   TICKS_IN_BAR,
-  TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
+  TICKS_IN_HALF_BEAT,
   getCurrentRelativeTick,
   globalCurrentLastBarTick,
   globalCurrentTick,
@@ -18,9 +18,7 @@ const LOG_PREFIX = "LooperRecorder: ";
 export class LooperRecorder {
   private eventsByTick: Map<number, Set<ChordOrNote>> | undefined;
   private isRecording: boolean = false;
-  private absoluteStartTick: number | undefined;
-  private startEventIsCloseToNewBar: boolean | undefined;
-  private startEventIsExactlyAtNewBarPosition: boolean | undefined;
+  private absoluteTickAtTheBeginningOfFirstEventBar: number | undefined;
   private lastBarTickForLastRecordedEvent: number | undefined;
   private looperPlayer: LooperPlayer | undefined;
 
@@ -42,7 +40,7 @@ export class LooperRecorder {
   stopRecording() {
     this.isRecording = false;
     if (
-      this.absoluteStartTick === undefined ||
+      this.absoluteTickAtTheBeginningOfFirstEventBar === undefined ||
       this.lastBarTickForLastRecordedEvent === undefined
     ) {
       console.error(LOG_PREFIX + "Stopped recording without starting it");
@@ -54,8 +52,9 @@ export class LooperRecorder {
     }
 
     const lastBarTickWhenStoppedRecording =
-      globalCurrentLastBarTick - this.absoluteStartTick;
-    const endTick = globalCurrentTick - this.absoluteStartTick;
+      globalCurrentLastBarTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
+    const endTick =
+      globalCurrentTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
     const recordingStoppedInTheFirstHalfOfLastBar =
       getCurrentRelativeTick() < TICKS_IN_HALF_BAR;
 
@@ -102,6 +101,10 @@ export class LooperRecorder {
     data.metadata.looperChannel = currentlyRecordingLooperChannel;
 
     const currentTick = this.setStartTickAndGetCurrentTick();
+    if (currentTick === undefined) {
+      // don't record this event
+      return;
+    }
 
     const eventData: ChordOrNote = { chord: data };
     const eventsForTick = this.addOrUpdateEvent(currentTick, eventData);
@@ -123,6 +126,10 @@ export class LooperRecorder {
     }
 
     const currentTick = this.setStartTickAndGetCurrentTick();
+    if (currentTick === undefined) {
+      // don't record this event
+      return;
+    }
 
     const internalNoteEvent: InternalNoteEvent = {
       note,
@@ -140,53 +147,51 @@ export class LooperRecorder {
 
   private setStartTickAndGetCurrentTick() {
     let firstEvent = false;
-    if (this.absoluteStartTick === undefined) {
+    if (this.absoluteTickAtTheBeginningOfFirstEventBar === undefined) {
       console.log(LOG_PREFIX + "Absolute start tick", globalCurrentLastBarTick);
-      this.absoluteStartTick = globalCurrentLastBarTick;
+      this.absoluteTickAtTheBeginningOfFirstEventBar = globalCurrentLastBarTick;
       firstEvent = true;
     }
 
     // recorded ticks are relative to the starting point
     // overwrite this value for each new event
-    this.lastBarTickForLastRecordedEvent =
-      globalCurrentLastBarTick - this.absoluteStartTick;
-    const relativeTick = globalCurrentTick - this.absoluteStartTick;
-    if (firstEvent && relativeTick > TICKS_IN_BAR - TICKS_IN_BEAT) {
-      console.log(
-        LOG_PREFIX +
-          "The first event at tick %d is within a beat from the new bar. Shifting the ticks by 1 bar",
-        relativeTick
-      );
-      this.startEventIsCloseToNewBar = true;
+    const relativeTick =
+      globalCurrentTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
+    if (firstEvent) {
+      if (relativeTick > TICKS_IN_BAR - TICKS_IN_HALF_BEAT) {
+        // first event is very close to the end of the bar
+        this.absoluteTickAtTheBeginningOfFirstEventBar += TICKS_IN_BAR; // Consider the next bar as the starting point
+        this.lastBarTickForLastRecordedEvent = 1;
+        console.log(
+          LOG_PREFIX +
+            "The first event at tick %d is within a half beat from the new bar. Shifting the ticks by 1 bar and setting the first tick to 1",
+          relativeTick
+        );
+        return 1; // ticks are 1-based
+      }
+    } else {
+      // subsequent event
+      if (globalCurrentTick <= this.absoluteTickAtTheBeginningOfFirstEventBar) {
+        console.log(
+          "The event is not first and the new bar hasn't yet started. Ignoring the event"
+        );
+        return undefined;
+      }
+
+      // update the last bar number with every new event - it will point to the last one
+      this.lastBarTickForLastRecordedEvent =
+        globalCurrentLastBarTick -
+        this.absoluteTickAtTheBeginningOfFirstEventBar;
     }
-    if (firstEvent && relativeTick === TICKS_IN_BAR) {
-      console.log(
-        LOG_PREFIX +
-          "The first event at tick %d is exactly at the beginning of the bar. Adding 1 tick to it to avoid mismatch",
-        relativeTick
-      );
-      this.startEventIsExactlyAtNewBarPosition = true;
-    }
 
-    let valueToReturn =
-      this.startEventIsCloseToNewBar === true
-        ? relativeTick - TICKS_IN_BAR // subtract the bar so that the first tick will get a negative number
-        : relativeTick;
+    console.log(LOG_PREFIX + "Recorded event at tick", relativeTick);
 
-    if (this.startEventIsExactlyAtNewBarPosition === true) {
-      valueToReturn++; // I don't know why but if start tick is 0 it mismatches with the clock. Adding 1 to all the events in the loop fixes it.
-    }
-
-    console.log(LOG_PREFIX + "Recorded event at tick", valueToReturn);
-
-    return valueToReturn;
+    return relativeTick;
   }
 
   private initialize() {
     this.eventsByTick = new Map<number, Set<ChordOrNote>>();
-    this.absoluteStartTick = undefined;
-    this.startEventIsCloseToNewBar = undefined;
-    this.startEventIsExactlyAtNewBarPosition = undefined;
+    this.absoluteTickAtTheBeginningOfFirstEventBar = undefined;
     this.lastBarTickForLastRecordedEvent = undefined;
     this.looperPlayer = undefined;
   }
