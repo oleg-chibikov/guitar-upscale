@@ -1,10 +1,11 @@
-import { ChordOrNote } from "@/app/engine/looperData";
+import { ChordOrNote } from "@/app/data/looperData";
 import { ChordEventBus, NotePlayEventBus } from "./eventBus";
 import {
   TICKS_IN_BAR,
   getCurrentRelativeTick,
   waitForNextBar,
   waitForNextTick,
+  waitForTick,
 } from "./mainClock";
 
 const LOG_PREFIX = "LooperPlayer: ";
@@ -87,7 +88,7 @@ export class LooperPlayer {
           break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh (this allows filtering out unnecessary events)
         }
 
-        await this.waitForTick(tick, currentTick, abortSignal);
+        await waitForTick(tick, currentTick, abortSignal, LOG_PREFIX);
         currentTick = tick;
 
         if (abortSignal.aborted) {
@@ -103,10 +104,11 @@ export class LooperPlayer {
           LOG_PREFIX +
             "Recording ended in the further bar (not when the last event was recorded). Waiting for the tick when recording stopped and then for the first event"
         );
-        await this.waitForTick(
+        await waitForTick(
           this.options.lastBarTickWhenStoppedRecording,
           currentTick,
-          abortSignal
+          abortSignal,
+          LOG_PREFIX
         );
       }
 
@@ -189,21 +191,6 @@ export class LooperPlayer {
         tickInBar,
         realTick
       );
-    }
-  }
-
-  private async waitForTick(
-    tickToWaitFor: number,
-    currentTick: number,
-    abortSignal: AbortSignal
-  ) {
-    const ticksToWait = tickToWaitFor - currentTick;
-    console.log(LOG_PREFIX + "Waiting for %d ticks", ticksToWait);
-    for (let i = 0; i < ticksToWait; i++) {
-      if (abortSignal.aborted) {
-        return Promise.resolve();
-      }
-      await waitForNextTick();
     }
   }
 }

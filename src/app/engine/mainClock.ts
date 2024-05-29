@@ -166,3 +166,19 @@ export const startInterval = (afresh: boolean) => {
     bpmToMilliseconds(tempoBpmValue) / TICKS_IN_HALF_BEAT
   );
 };
+
+export const waitForTick = async (
+  tickToWaitFor: number,
+  currentTick: number,
+  abortSignal: AbortSignal,
+  logPrefix: string
+) => {
+  const ticksToWait = tickToWaitFor - currentTick;
+  console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
+  for (let i = 0; i < ticksToWait; i++) {
+    if (abortSignal.aborted) {
+      return Promise.resolve();
+    }
+    await waitForNextTick();
+  }
+};

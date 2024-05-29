@@ -2,7 +2,7 @@ import { MAX_VOLUME } from "@/app/data/volume";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../data/instruments";
-import { StringOctaveNote, getNoteText } from "../data/notes";
+import { Note, StringOctaveNote, getNoteText } from "../data/notes";
 import {
   baseNoteValue,
   scaleGroupValue,
@@ -81,13 +81,14 @@ export class MidiRecorder {
 
       this.midiEvents.set(trackKey, noteEventsForTrack);
     }
+    const midiOctave = note.note >= Note.C ? note.octave - 1 : note.octave;
 
     noteEventsForTrack.push(
       new Midi.NoteEvent({
         pitch: [
           note.note +
             this.noteShift +
-            (this.octaveShift + note.octave) * NOTE_COUNT,
+            (this.octaveShift + midiOctave) * NOTE_COUNT,
         ],
         volume: MAX_VOLUME,
         duration: "8", // the bigger the value - the shorter the note

@@ -1,5 +1,5 @@
+import { ChordOrNote, LooperNoteEvent } from "@/app/data/looperData";
 import { Note, StringOctaveNote } from "@/app/data/notes";
-import { ChordOrNote, InternalNoteEvent } from "@/app/engine/looperData";
 import { ChordEventBus, NotePlayEventBus } from "./eventBus";
 import { LooperPlayer, LooperPlayerOptions } from "./looperPlayer";
 import {
@@ -19,7 +19,7 @@ const mockNote: StringOctaveNote = {
   fret: 0,
 };
 
-const mockNoteWrapper: InternalNoteEvent = {
+const mockNoteWrapper: LooperNoteEvent = {
   note: mockNote,
   instrument: "acoustic_guitar_nylon",
   looperChannel: 1,

@@ -2,14 +2,18 @@ import { Instrument } from "@/app/data/instruments";
 import { StringOctaveNote } from "@/app/data/notes";
 import { ChordWithPlayMetadata } from "@/app/engine/eventBus";
 
-export type InternalNoteEvent = {
+export type NoteEvent = {
   note: StringOctaveNote;
-  looperChannel: number;
   trackNumber: number;
   instrument: Instrument;
+  velocity?: number;
+};
+
+export type LooperNoteEvent = NoteEvent & {
+  looperChannel: number;
 };
 
 export type ChordOrNote = {
-  note?: InternalNoteEvent;
+  note?: LooperNoteEvent;
   chord?: ChordWithPlayMetadata;
 };

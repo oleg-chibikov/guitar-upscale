@@ -1,4 +1,4 @@
-import { ChordOrNote, InternalNoteEvent } from "@/app/engine/looperData";
+import { ChordOrNote, LooperNoteEvent } from "@/app/data/looperData";
 import { LooperPlayer, LooperPlayerOptions } from "@/app/engine/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looperShared";
 import { Instrument } from "../data/instruments";
@@ -43,7 +43,6 @@ export class LooperRecorder {
       this.absoluteTickAtTheBeginningOfFirstEventBar === undefined ||
       this.lastBarTickForLastRecordedEvent === undefined
     ) {
-      console.error(LOG_PREFIX + "Stopped recording without starting it");
       return;
     }
 
@@ -82,10 +81,6 @@ export class LooperRecorder {
   }
 
   stopPlaying(): void {
-    if (this.looperPlayer === undefined) {
-      console.error(LOG_PREFIX + "Stopped playing without a recording");
-      return;
-    }
     this.looperPlayer?.stopPlaying();
   }
 
@@ -131,7 +126,7 @@ export class LooperRecorder {
       return;
     }
 
-    const internalNoteEvent: InternalNoteEvent = {
+    const internalNoteEvent: LooperNoteEvent = {
       note,
       looperChannel: currentlyRecordingLooperChannel,
       instrument,
