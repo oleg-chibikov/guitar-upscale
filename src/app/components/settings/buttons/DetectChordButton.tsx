@@ -25,16 +25,15 @@ export const DetectChordButton: React.FC = (props) => {
       activeBg="bg-red-500"
       onPress={async () => {
         if (chordIsBeingDetected) {
-          const { clearDetector } = await import("@/app/engine/chordDetector");
-          clearDetector();
+          const { mainDetector } = await import("@/app/engine/chordDetector");
+          mainDetector.clearDetector();
         } else {
           if (!settingsSet.current) {
             // async load detector module and set its functions to settings on the first detect action.
-            const { createChordDetectorLookup, addChordToDetectorLookup } =
-              await import("@/app/engine/chordDetector");
+            const { mainDetector } = await import("@/app/engine/chordDetector");
             setChordDetectorFunctions(
-              addChordToDetectorLookup,
-              createChordDetectorLookup
+              mainDetector.addChordToDetectorLookup,
+              mainDetector.createChordDetectorLookup
             );
             dispatch(refreshSettings());
           }
