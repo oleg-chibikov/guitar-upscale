@@ -1,18 +1,19 @@
-import { NoteEvent } from "@/app/data/looperData";
-import { NotePlayEventBus } from "@/app/engine/eventBus";
+import { ChordOrNote } from "@/app/data/looperData";
+import { playAllNotes } from "@/app/engine/playerHelper";
+import { isPlayingValue } from "@/app/store/settingsSlice";
 import { waitForTick } from "./mainClock";
 
 const LOG_PREFIX = "MidiPlayer: ";
 
 export type MidiPlayerOptions = {
-  eventsByTick: Map<number, NoteEvent[]>;
+  eventsByTick: Map<number, ChordOrNote[]>;
 };
 
 export class MidiPlayer {
-  private eventsByTick: Map<number, NoteEvent[]>;
+  private eventsByTick: Map<number, ChordOrNote[]>;
   private abortController = new AbortController();
 
-  constructor(eventsByTick: Map<number, NoteEvent[]>) {
+  constructor(eventsByTick: Map<number, ChordOrNote[]>) {
     this.eventsByTick = eventsByTick;
   }
 
@@ -23,12 +24,9 @@ export class MidiPlayer {
 
   async play(): Promise<void> {
     console.log("Playing midi file");
-    const sortedTicks = Array.from(this.eventsByTick.keys()).sort(
-      (a, b) => a - b
-    );
 
     // Edge case: if there are no notes, just return
-    if (sortedTicks.length === 0) {
+    if (this.eventsByTick.size === 0) {
       console.log("No events in midi file");
       return;
     }
@@ -40,9 +38,11 @@ export class MidiPlayer {
     // await waitForNextBar();
 
     let currentTick = 1;
-
-    for (const tick of sortedTicks) {
-      if (abortSignal.aborted) {
+    // const sortedTicks = Array.from(this.eventsByTick.keys()).sort(
+    //   (a, b) => a - b
+    // );
+    for (const tick of Array.from(this.eventsByTick.keys())) {
+      if (abortSignal.aborted || !isPlayingValue) {
         return;
       }
 
@@ -66,13 +66,6 @@ export class MidiPlayer {
     }
 
     console.log(LOG_PREFIX + "Playing events at tick %d", tick);
-    eventsAtTick.forEach((note) => {
-      NotePlayEventBus.next({
-        stringOctaveNote: note.note,
-        trackInstrument: note.instrument,
-        trackNumber: note.trackNumber,
-        skipChordDetection: true,
-      });
-    });
+    playAllNotes(eventsAtTick);
   }
 }

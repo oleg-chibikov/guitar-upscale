@@ -1,16 +1,22 @@
 import { Instrument } from "@/app/data/instruments";
-import { NoteEvent } from "@/app/data/looperData";
+import { ChordOrNote, NoteEvent } from "@/app/data/looperData";
 import {
   Note,
   OctaveNote,
   StringOctaveNote,
   serializeOctaveNote,
 } from "@/app/data/notes";
+import { mainDetector } from "@/app/engine/chordDetector";
 import {
   NOTE_COUNT,
   octaveNoteToStringOctaveNoteMap,
 } from "@/app/engine/generateNeckRepresentation";
 import { TICKS_IN_BEAT, TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
+import {
+  chordInstrumentValue,
+  chordNotesToPlayValue,
+  chordStrummingDelayMsValue,
+} from "@/app/store/settingsSlice";
 import {
   ChannelEvent,
   Event,
@@ -64,7 +70,7 @@ export const parseMidiData = async (midiData: MidiFile) => {
   // TODO: First, determine and set the scale and base note. Once it's set wait for neck to update.
   // then continue with assigning notes to strings
 
-  const eventsByTick = new Map<number, NoteEvent[]>();
+  const eventsByTick = new Map<number, ChordOrNote[]>();
 
   let trackIndex = 0;
   for (const track of trackDataArray) {
@@ -73,54 +79,92 @@ export const parseMidiData = async (midiData: MidiFile) => {
       TOLERANCE_TICKS
     );
 
-    for (const toleranceGroup of groupedByTolerance) {
-      const { matchedNotes, notMatchedNotes } =
-        getChordNotesFromToleranceGroup(toleranceGroup);
-      // TODO: Try matching a chord out of matched notes.
+    let previousNote: StringOctaveNote | undefined;
+    for (const [toleranceWindowStart, toleranceGroup] of Array.from(
+      groupedByTolerance.entries()
+    )) {
+      // Try matching a chord out of matched notes.
       // If matched - play it as a chord. Play notMatchedNotes individually
       // If not matched - play all the notes in groupedByTolerance individually
-      // TODO: Wrap chordDetector in a class
-    }
+      const { chord, individualNotes } =
+        matchChordForToleranceGroup(toleranceGroup);
 
-    // TODO: This is not relevant - should be done within tolerance group
-    let previousNote: StringOctaveNote | undefined;
-    for (const event of track.events) {
-      const { octaveNote } = event;
-      const serializedOctaveNote = serializeOctaveNote(octaveNote);
-      const possibleStringOctaveNotes =
-        octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote);
-      if (
-        possibleStringOctaveNotes === undefined ||
-        possibleStringOctaveNotes.length === 0
-      ) {
-        console.error(
-          "note %s is not in the scale. Skipping it",
-          serializedOctaveNote
-        );
-      } else {
-        const stringOctaveNote = chooseBestPosition(
-          possibleStringOctaveNotes,
-          previousNote
-        );
-        previousNote = stringOctaveNote;
-        // TODO: How can we detect a chord here? Ideally we'd like to play a chord instead of notes. Probably we could preprocess our array by selecting all the notes within HALF BEAT
-        const noteEvent: NoteEvent = {
-          note: stringOctaveNote,
-          trackNumber: trackIndex,
-          velocity: event.velocity || 127,
-          instrument: track.instrument ?? "acoustic_guitar_nylon",
-        };
-        if (!eventsByTick.has(event.tick)) {
-          eventsByTick.set(event.tick, []);
+      if (chord !== undefined) {
+        if (!eventsByTick.has(toleranceWindowStart)) {
+          eventsByTick.set(toleranceWindowStart, []);
         }
-        eventsByTick.get(event.tick)?.push(noteEvent);
+        eventsByTick.get(toleranceWindowStart)?.push({
+          chord: {
+            chord,
+            metadata: {
+              trackNumber: trackIndex,
+              notesToPlay: chordNotesToPlayValue,
+              strummingDelayMs: chordStrummingDelayMsValue,
+              trackInstrument: chordInstrumentValue,
+            },
+          },
+        });
+      }
+
+      for (const event of individualNotes) {
+        const { octaveNote } = event;
+        const serializedOctaveNote = serializeOctaveNote(octaveNote);
+        const possibleStringOctaveNotes =
+          octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote);
+        if (
+          possibleStringOctaveNotes === undefined ||
+          possibleStringOctaveNotes.length === 0
+        ) {
+          console.error(
+            "note %s is not in the scale. Skipping it",
+            serializedOctaveNote
+          );
+        } else {
+          const stringOctaveNote = chooseBestPosition(
+            possibleStringOctaveNotes,
+            previousNote
+          );
+          previousNote = stringOctaveNote;
+          const noteEvent: NoteEvent = {
+            note: stringOctaveNote,
+            trackNumber: trackIndex,
+            velocity: event.velocity || 127,
+            instrument: track.instrument ?? "acoustic_guitar_nylon",
+          };
+          if (!eventsByTick.has(event.tick)) {
+            eventsByTick.set(event.tick, []);
+          }
+          eventsByTick.get(event.tick)?.push({ note: noteEvent });
+        }
       }
     }
+
     trackIndex++;
   }
 
   return eventsByTick;
 };
+
+type ChordMatchResult = { chord?: string; individualNotes: NotePlayEvent[] };
+
+function matchChordForToleranceGroup(
+  toleranceGroup: NotePlayEvent[]
+): ChordMatchResult {
+  const { matchedNotes, notMatchedNotes } =
+    getChordNotesFromToleranceGroup(toleranceGroup);
+  if (matchedNotes.length) {
+    const chordDetector = mainDetector.clone(false); // TODO: await import
+    for (const stringOctaveNote of matchedNotes) {
+      chordDetector.addNoteToDetector({ stringOctaveNote });
+    }
+    // TODO: Check why it doesn't find matches
+    const matchedChords = chordDetector.findMatches();
+    if (matchedChords?.length) {
+      return { chord: matchedChords[0], individualNotes: notMatchedNotes };
+    }
+  }
+  return { individualNotes: toleranceGroup };
+}
 
 function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
   const matchedNotes: StringOctaveNote[] = [];
@@ -140,7 +184,7 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
     let firstMatchingNote: StringOctaveNote | undefined;
 
     for (const stringOctaveNote of possibleStringOctaveNotes) {
-      if (lastString !== undefined && stringOctaveNote.string <= lastString) {
+      if (lastString !== undefined && stringOctaveNote.string >= lastString) {
         continue; // skip all the strings that are lower or equal to the string of last note from the chord
       }
       firstMatchingNote = stringOctaveNote;
@@ -160,9 +204,9 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
 function groupEventsByTickWithTolerance(
   events: NotePlayEvent[],
   tolerance: number
-): NotePlayEvent[][] {
+): Map<number, NotePlayEvent[]> {
   // Assume events are already sorted
-  const groupedEvents: NotePlayEvent[][] = [];
+  const groupedEventsMap: Map<number, NotePlayEvent[]> = new Map();
   let currentGroup: NotePlayEvent[] = [];
   let toleranceWindowStart: number | null = null;
 
@@ -178,8 +222,10 @@ function groupEventsByTickWithTolerance(
       // If the event falls within the tolerance window, add it to the current group
       currentGroup.push(currentEvent);
     } else {
-      // If the event is outside the tolerance window, push the current group to the groupedEvents array
-      groupedEvents.push(currentGroup);
+      // If the event is outside the tolerance window, add the current group to the map
+      if (toleranceWindowStart !== null) {
+        groupedEventsMap.set(toleranceWindowStart, currentGroup);
+      }
       // Start a new group with the current event
       currentGroup = [currentEvent];
       // Reset tolerance window start
@@ -187,12 +233,12 @@ function groupEventsByTickWithTolerance(
     }
   }
 
-  // Push the last group
-  if (currentGroup.length > 0) {
-    groupedEvents.push(currentGroup);
+  // Add the last group to the map
+  if (currentGroup.length > 0 && toleranceWindowStart !== null) {
+    groupedEventsMap.set(toleranceWindowStart, currentGroup);
   }
 
-  return groupedEvents;
+  return groupedEventsMap;
 }
 
 function chooseBestPosition(
@@ -269,7 +315,6 @@ function parseMidiFile(midiData: MidiFile) {
                     tick: matchedNoteOnPosition,
                     octaveNote,
                     duration: convertedPosition - matchedNoteOnPosition,
-                    trackIndex,
                     velocity: noteOffEvent.velocity,
                   });
                 }

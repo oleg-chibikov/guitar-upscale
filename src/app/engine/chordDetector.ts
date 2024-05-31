@@ -4,18 +4,23 @@ import { Trie } from "../helpers/trie";
 
 type NoteWithClearCallback = {
   stringOctaveNote: StringOctaveNote;
-  clear: () => void;
+  clear?: () => void;
 };
+
 type MissingChar = "x" | "?";
 
-export class ChordDetector {
+class ChordDetector {
   private stringNotes: (NoteWithClearCallback | null)[];
   private trie: Trie;
   private reverseChordsMap: Map<string, string>;
-  private debouncedFindMatches: (showChord: (name: string) => void) => void;
+  private debouncedFindMatches: () => void;
   private findMatchesAutomatically: boolean;
+  private showChord?: (name: string) => void;
 
-  constructor(findMatchesAutomatically: boolean = true) {
+  constructor(
+    findMatchesAutomatically: boolean = true,
+    showChord?: (name: string) => void
+  ) {
     this.stringNotes = [];
     this.trie = new Trie();
     this.reverseChordsMap = new Map<string, string>();
@@ -24,6 +29,15 @@ export class ChordDetector {
       200
     );
     this.findMatchesAutomatically = findMatchesAutomatically;
+    this.showChord = showChord;
+  }
+
+  clone(findMatchesAutomatically: boolean) {
+    // use this function to avoid populating the new detector afresh
+    const cloned = new ChordDetector(findMatchesAutomatically);
+    cloned.trie = this.trie;
+    cloned.reverseChordsMap = this.reverseChordsMap;
+    return cloned;
   }
 
   createChordDetectorLookup() {
@@ -37,16 +51,13 @@ export class ChordDetector {
     this.reverseChordsMap.set(serializedChord, fullKey);
   }
 
-  addNoteToDetector(
-    note: NoteWithClearCallback,
-    showChord: (name: string) => void
-  ) {
+  addNoteToDetector(note: NoteWithClearCallback) {
     console.log("Adding note to chordDetector", note);
     // index in this array corresponds to the string of the note
     const index = note.stringOctaveNote.string;
     const existing = this.stringNotes[index];
     // only one note per string allowed
-    existing?.clear();
+    existing?.clear?.();
 
     // clicked on the marked note
     if (existing?.stringOctaveNote.fret === note.stringOctaveNote.fret) {
@@ -56,11 +67,11 @@ export class ChordDetector {
     }
 
     if (this.findMatchesAutomatically) {
-      this.debouncedFindMatches(showChord);
+      this.debouncedFindMatches();
     }
   }
 
-  findMatches(showChord: (name: string) => void) {
+  findMatches() {
     console.log("Detecting chord");
     const usedNotes = this.stringNotes.filter((x) => x);
     if (usedNotes.length <= 2) {
@@ -76,12 +87,13 @@ export class ChordDetector {
       this.reverseChordsMap.get(x)
     );
     console.log("Matched chord names", chordNames);
-    showChord(chordNames.join(", "));
+    this.showChord?.(chordNames.join(", "));
+    return chordNames;
   }
 
   clearDetector() {
     console.log("Clearing note detector");
-    this.stringNotes.forEach((note) => note?.clear());
+    this.stringNotes.forEach((note) => note?.clear?.());
     this.stringNotes = [];
   }
 
