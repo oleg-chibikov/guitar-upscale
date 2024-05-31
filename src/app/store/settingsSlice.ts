@@ -185,25 +185,20 @@ const toggleMetronome = (state: WithMetronome, value: boolean) => {
 };
 
 export const setChordDetectorFunctions = (
-  addChord: (chord: Chord, fullKey: string) => void,
-  createLookup: () => void
+  addChord: (chord: Chord, fullKey: string) => void
 ) => {
   addChordToDetectorLookup = addChord;
-  createChordDetectorLookup = createLookup;
 };
 
 let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
-let createChordDetectorLookup: (() => void) | undefined;
 
 const setChords = (state: WithNeck) => {
   if (state.neck) {
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
     const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
     state.chords = chordsForNeck;
-
-    createChordDetectorLookup?.();
     chordsMap = new Map<string, Chord>(); // name to chord (notes)
     for (const chord of chordsForNeck) {
       const key = getNoteText(chord.note);

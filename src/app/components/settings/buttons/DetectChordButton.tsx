@@ -32,8 +32,7 @@ export const DetectChordButton: React.FC = (props) => {
             // async load detector module and set its functions to settings on the first detect action.
             const { mainDetector } = await import("@/app/engine/chordDetector");
             setChordDetectorFunctions(
-              mainDetector.addChordToDetectorLookup,
-              mainDetector.createChordDetectorLookup
+              mainDetector.addChordToDetectorLookup.bind(mainDetector)
             );
             dispatch(refreshSettings());
           }
