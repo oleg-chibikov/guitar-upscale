@@ -26,11 +26,6 @@ export class ChordDetector {
     this.findMatchesAutomatically = findMatchesAutomatically;
   }
 
-  createChordDetectorLookup() {
-    this.trie = new Trie();
-    this.reverseChordsMap = new Map<string, string>();
-  }
-
   addChordToDetectorLookup(chord: Chord, fullKey: string) {
     const serializedChord = this.serializeChord(chord, "x");
     this.trie.add(serializedChord);
