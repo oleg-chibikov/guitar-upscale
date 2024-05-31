@@ -4,3 +4,4 @@ packages:
   - "packages/**"
   # if required, exclude some directories
   - "!**/test/**"
+ignore-workspace-root-check: true

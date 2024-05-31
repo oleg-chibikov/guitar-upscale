@@ -1,3 +1,4 @@
+import { MidiUpload } from "@/app/components/midiReader/MidiUpload";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
@@ -50,6 +51,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
           <DisabledDetectChordButton />
         )}
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
+        <MidiUpload />
       </div>
       <div
         className={`flex flex-row gap-1 ${
