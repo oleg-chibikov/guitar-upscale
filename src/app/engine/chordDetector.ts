@@ -13,8 +13,9 @@ export class ChordDetector {
   private trie: Trie;
   private reverseChordsMap: Map<string, string>;
   private debouncedFindMatches: (showChord: (name: string) => void) => void;
+  private findMatchesAutomatically: boolean;
 
-  constructor() {
+  constructor(findMatchesAutomatically: boolean = true) {
     this.stringNotes = [];
     this.trie = new Trie();
     this.reverseChordsMap = new Map<string, string>();
@@ -22,6 +23,7 @@ export class ChordDetector {
       this.findMatches.bind(this),
       200
     );
+    this.findMatchesAutomatically = findMatchesAutomatically;
   }
 
   createChordDetectorLookup() {
@@ -53,32 +55,9 @@ export class ChordDetector {
       this.stringNotes[index] = note;
     }
 
-    this.debouncedFindMatches(showChord);
-  }
-
-  clearDetector() {
-    console.log("Clearing note detector");
-    this.stringNotes.forEach((note) => note?.clear());
-    this.stringNotes = [];
-  }
-
-  serializeChord(chord: Chord, missingChar: MissingChar) {
-    const serializedChord: (number | MissingChar)[] = [];
-
-    // Initialize the serializedChord with '?' for each position
-    for (let i = 0; i < 6; i++) {
-      serializedChord.push(missingChar);
+    if (this.findMatchesAutomatically) {
+      this.debouncedFindMatches(showChord);
     }
-
-    // Populate serializedChord with note values where string is set
-    chord.forEach((stringOctaveNote) => {
-      serializedChord[stringOctaveNote.string] = stringOctaveNote.fret;
-    });
-
-    // Convert note values to string and return the serialized chord
-    return serializedChord
-      .map((item) => (typeof item === "number" ? item.toString() : item))
-      .join("");
   }
 
   findMatches(showChord: (name: string) => void) {
@@ -98,6 +77,31 @@ export class ChordDetector {
     );
     console.log("Matched chord names", chordNames);
     showChord(chordNames.join(", "));
+  }
+
+  clearDetector() {
+    console.log("Clearing note detector");
+    this.stringNotes.forEach((note) => note?.clear());
+    this.stringNotes = [];
+  }
+
+  private serializeChord(chord: Chord, missingChar: MissingChar) {
+    const serializedChord: (number | MissingChar)[] = [];
+
+    // Initialize the serializedChord with '?' for each position
+    for (let i = 0; i < 6; i++) {
+      serializedChord.push(missingChar);
+    }
+
+    // Populate serializedChord with note values where string is set
+    chord.forEach((stringOctaveNote) => {
+      serializedChord[stringOctaveNote.string] = stringOctaveNote.fret;
+    });
+
+    // Convert note values to string and return the serialized chord
+    return serializedChord
+      .map((item) => (typeof item === "number" ? item.toString() : item))
+      .join("");
   }
 }
 
