@@ -4,23 +4,19 @@ import { MidiPlayer } from "@/app/engine/midiPlayer";
 import { setIsPlaying } from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { read } from "midifile-ts";
-import React, { Fragment } from "react";
+import React, { Fragment, useRef } from "react";
 import { useDispatch } from "react-redux";
 
-interface MidiEvent {
-  note: number;
-  track: number;
-  velocity: number;
-  position: number;
-}
-
 export const MidiUpload: React.FC = () => {
+  const ref = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Processing midi file");
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (event) => {
+        console.log("File loaded");
         if (event.target?.result) {
           const arrayBuffer = event.target.result as ArrayBuffer;
           const byteArray = new Uint8Array(arrayBuffer);
@@ -33,15 +29,23 @@ export const MidiUpload: React.FC = () => {
             await midiPlayer.play();
             dispatch(setIsPlaying(false));
           }
+        } else {
+          console.warn("No result in onload handler");
         }
       };
       reader.readAsArrayBuffer(file);
+    } else {
+      console.warn("No midi file selected");
+    }
+    if (ref.current) {
+      ref.current.value = ""; // allows selecting the same file
     }
   };
 
   return (
     <Fragment>
       <input
+        ref={ref}
         className="hidden"
         accept=".mid"
         id="icon-button-file"
@@ -51,7 +55,7 @@ export const MidiUpload: React.FC = () => {
       <IconButton
         icon={<UploadFileIcon />}
         onPress={() => {
-          document.getElementById("icon-button-file")?.click();
+          ref.current?.click();
         }}
         tooltip={"Play midi file"}
       ></IconButton>

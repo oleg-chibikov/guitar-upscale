@@ -1,6 +1,6 @@
 import { NoteEvent } from "@/app/data/looperData";
 import { NotePlayEventBus } from "@/app/engine/eventBus";
-import { waitForNextBar, waitForTick } from "./mainClock";
+import { waitForTick } from "./mainClock";
 
 const LOG_PREFIX = "MidiPlayer: ";
 
@@ -22,12 +22,14 @@ export class MidiPlayer {
   }
 
   async play(): Promise<void> {
+    console.log("Playing midi file");
     const sortedTicks = Array.from(this.eventsByTick.keys()).sort(
       (a, b) => a - b
     );
 
     // Edge case: if there are no notes, just return
     if (sortedTicks.length === 0) {
+      console.log("No events in midi file");
       return;
     }
 
@@ -35,7 +37,7 @@ export class MidiPlayer {
 
     const abortSignal = this.abortController.signal;
 
-    await waitForNextBar();
+    // await waitForNextBar();
 
     let currentTick = 1;
 
