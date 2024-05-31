@@ -24,6 +24,7 @@ export const generateNeckRepresentation = (
   octaveNoteToStringOctaveNoteMap.clear();
   const neck: Neck = [];
 
+  // going from the lowest string to the highest one
   for (let i = stringTuning.length - 1; i >= 0; i--) {
     const octaveNoteForString = stringTuning[i];
     const stringModifier = octaveNoteForString.note;
