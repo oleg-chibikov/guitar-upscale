@@ -3,6 +3,7 @@ import { tuningValue } from "../store/settingsSlice";
 import { Note, OctaveNote } from "./notes";
 
 const OCTAVES_STING = "544433"; // octaves for notes in tuning
+const BASE_TUNING_SHIFT = Note.E - Note.C;
 
 const noteLookup: { [key: string]: Note } = {
   E: Note.E,
@@ -47,9 +48,12 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
 export const getShiftedNote = (note: Note) => {
   const tuningData = tunings[tuningValue];
 
-  return tuningData.shift !== undefined
-    ? (NOTE_COUNT + note + tuningData.shift) % NOTE_COUNT
-    : note;
+  const withTuningShift =
+    tuningData.shift !== undefined
+      ? NOTE_COUNT + note + tuningData.shift
+      : note;
+
+  return (withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
 
 interface TuningData {
