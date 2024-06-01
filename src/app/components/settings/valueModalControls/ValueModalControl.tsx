@@ -30,6 +30,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
     y: number;
   } | null>(null);
   const [startIndex, setStartIndex] = useState<number>(steps.indexOf(value));
+  const [highlight, setHighlight] = useState(false);
 
   const hasTouchInput = useInputChecker();
 
@@ -43,6 +44,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         if (newIndex < 0) newIndex = 0;
         if (newIndex >= steps.length) newIndex = steps.length - 1;
         setValue(steps[newIndex]);
+        setHighlight(true); // Trigger highlight
       }
     },
     [startPosition, startIndex, steps, setValue]
@@ -96,6 +98,13 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
     hasTouchInput,
   ]);
 
+  useEffect(() => {
+    if (highlight) {
+      const timer = setTimeout(() => setHighlight(false), 1000); // Remove highlight after 1 second
+      return () => clearTimeout(timer);
+    }
+  }, [highlight]);
+
   const handleTextFieldClick = (
     event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>
   ) => {
@@ -114,7 +123,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
           theme === Theme.Light
             ? "bg-select_background-light"
             : "bg-select_background-dark"
-        } text-sm h-8 cursor-pointer`}
+        } text-sm h-8 cursor-pointer ${highlight ? "highlight" : ""}`}
       >
         <div>{icon}</div>
         <div className="flex flex-col items-center gap-0.5 leading-none">
