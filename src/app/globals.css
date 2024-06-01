@@ -76,6 +76,19 @@ main {
   animation: blast 0.3s ease-out;
 }
 
+@keyframes highlight {
+  0% {
+    background-color: rgb(235, 188, 102);
+  }
+  100% {
+    background-color: #f2f2f2; /* same as bg-select_background-light */
+  }
+}
+
+.highlight {
+  animation: highlight 1s;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
