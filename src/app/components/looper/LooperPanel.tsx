@@ -2,6 +2,7 @@
 
 import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
 import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
+import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import {
   LooperState,
   canAddChannel,
@@ -11,12 +12,16 @@ import {
   stopMetronomeIfNeeded,
 } from "@/app/engine/looper";
 import { selectSettings } from "@/app/store/settingsSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LooperButton } from "./LooperButton";
 
+const MARGIN = 32;
+
 export const LooperPanel: React.FC = () => {
   const [state, setState] = useState<LooperState>(looperState);
+  const { chordsDisplayMode } = useSelector(selectUi);
   const showPlay = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
 
   const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
@@ -29,7 +34,11 @@ export const LooperPanel: React.FC = () => {
   return (
     <div
       className="flex p-1 bg-panel-dark fixed bottom-8 gap-1 justify-between"
-      style={{ right: 32 }}
+      style={
+        chordsDisplayMode === ChordsDisplayMode.Left
+          ? { right: MARGIN }
+          : { left: MARGIN }
+      }
     >
       <RemoveLooperChannelButton
         setState={setState}
