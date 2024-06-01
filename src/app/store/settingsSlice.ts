@@ -44,6 +44,10 @@ interface WithNeck {
   baseNote: Note;
 }
 
+interface WithIsPaused {
+  isPaused: boolean;
+}
+
 interface WithMetronome {
   isMetronomeActive: boolean;
 }
@@ -61,6 +65,7 @@ interface WithControls {
 
 interface SettingsState
   extends WithMetronome,
+    WithIsPaused,
     WithNeck,
     WithControls,
     CanUpdateGuitarSettings {
@@ -83,7 +88,6 @@ interface SettingsState
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
-  isPaused: boolean;
   chordIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
@@ -198,6 +202,12 @@ let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 
+const updateIsPaused = (value: boolean, state: WithIsPaused) => {
+  isPausedValue = value;
+  state.isPaused = isPausedValue;
+  togglePause(!isPausedValue);
+};
+
 const setChords = (state: WithNeck) => {
   if (state.neck) {
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
@@ -241,6 +251,9 @@ export const waitForPauseToBeReleased = async () => {
     return;
   }
   await pausePromise;
+  if (!isPausedValue) {
+    return;
+  }
   await waitForNextHalfBeat(); // wait for the next interval after pause has been released. Otherwise 2 notes might play simultaneously
 };
 let resolvePause: (value: void | PromiseLike<void>) => void = () => null;
@@ -441,15 +454,12 @@ export const settingsSlice = createSlice({
       isPlayingValue = action.payload;
       state.isPlaying = isPlayingValue;
       if (!isPlayingValue) {
-        state.isPaused = false;
-        resolvePause();
+        updateIsPaused(false, state);
       }
       toggleInterval(isPlayingValue);
     },
     setIsPaused(state, action: PayloadAction<boolean>) {
-      isPausedValue = action.payload;
-      state.isPaused = isPausedValue;
-      togglePause(!isPausedValue);
+      updateIsPaused(action.payload, state);
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
