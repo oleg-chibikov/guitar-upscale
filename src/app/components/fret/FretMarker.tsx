@@ -1,4 +1,3 @@
-import { AlertType } from "@/app/data/alertType";
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import {
   StringOctaveNote,
@@ -22,7 +21,7 @@ import {
   chordStrummingDelayMsValue,
   selectSettings,
 } from "@/app/store/settingsSlice";
-import { selectUi, setAndShowAlert } from "@/app/store/uiSlice";
+import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -102,24 +101,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           ) {
             const { mainDetector } = await import("@/app/engine/chordDetector");
             setIsBeingDetected(true);
-            mainDetector.addNoteToDetector(
-              {
-                stringOctaveNote: stringOctaveNote,
-                clear: () => {
-                  setIsBeingDetected(false);
-                },
+            mainDetector.addNoteToDetector({
+              stringOctaveNote: stringOctaveNote,
+              clear: () => {
+                setIsBeingDetected(false);
               },
-              (chordNames) => {
-                dispatch(
-                  setAndShowAlert({
-                    message: chordNames || "No matching chords",
-                    alertType: !chordNames
-                      ? AlertType.Warning
-                      : AlertType.Success,
-                  })
-                );
-              }
-            );
+            });
           }
 
           // it may come from several tracks for the same note simultaneously

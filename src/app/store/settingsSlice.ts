@@ -190,7 +190,7 @@ export const setChordDetectorFunctions = (
   addChordToDetectorLookup = addChord;
 };
 
-let addChordToDetectorLookup:
+export let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 

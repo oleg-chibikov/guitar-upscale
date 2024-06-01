@@ -1,15 +1,17 @@
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser";
 import { MidiPlayer } from "@/app/engine/midiPlayer";
+import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { setIsPlaying } from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { read } from "midifile-ts";
 import React, { Fragment, useRef } from "react";
 import { useDispatch } from "react-redux";
 
-export const MidiUpload: React.FC = () => {
+export const MidiUploadButton: React.FC = () => {
   const ref = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
+  const setupChordDetector = useChordDetectorSetup();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("Processing midi file");
     const file = e.target.files?.[0];
@@ -17,6 +19,7 @@ export const MidiUpload: React.FC = () => {
       const reader = new FileReader();
       reader.onload = async (event) => {
         console.log("File loaded");
+        await setupChordDetector();
         if (event.target?.result) {
           const arrayBuffer = event.target.result as ArrayBuffer;
           const byteArray = new Uint8Array(arrayBuffer);

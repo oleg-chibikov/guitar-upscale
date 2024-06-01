@@ -32,11 +32,16 @@ class ChordDetector {
     this.showChord = showChord;
   }
 
+  setChordFoundCallback = (showChord?: (name: string) => void) => {
+    this.showChord = showChord;
+  };
+
   clone(findMatchesAutomatically: boolean) {
     // use this function to avoid populating the new detector afresh
     const cloned = new ChordDetector(findMatchesAutomatically);
     cloned.trie = this.trie;
     cloned.reverseChordsMap = this.reverseChordsMap;
+    //  cloned.showChord = this.showChord;
     return cloned;
   }
 
