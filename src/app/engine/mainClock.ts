@@ -1,13 +1,16 @@
 import { tempoBpmValue } from "../store/settingsSlice";
 import { MetronomeEventBus } from "./eventBus";
 
-export const bpmToMilliseconds = (bpm: number): number => {
-  return 60000 / bpm / 2;
-};
+const MILLISECONDS_PER_MINUTE = 60_000;
+const MICROSECONDS_PER_MINUTE = MILLISECONDS_PER_MINUTE * 1000;
 
-export const beatToMilliseconds = (bpm: number): number => {
-  return bpmToMilliseconds(bpm) * 4;
-};
+export const bpmToMilliseconds = (bpm: number): number => 60_000 / bpm / 2;
+
+export const microsecondsToBpm = (microsecondsPerBeat: number): number =>
+  Math.floor(MICROSECONDS_PER_MINUTE / microsecondsPerBeat);
+
+export const beatToMilliseconds = (bpm: number): number =>
+  bpmToMilliseconds(bpm) * 4;
 
 const createPromise = () => {
   let resolveCurrentPromise: (value: void | PromiseLike<void>) => void;

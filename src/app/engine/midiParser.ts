@@ -11,7 +11,11 @@ import {
   NOTE_COUNT,
   octaveNoteToStringOctaveNoteMap,
 } from "@/app/engine/generateNeckRepresentation";
-import { TICKS_IN_BEAT, TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
+import {
+  TICKS_IN_BEAT,
+  TICKS_IN_HALF_BEAT,
+  microsecondsToBpm,
+} from "@/app/engine/mainClock";
 import {
   chordInstrumentValue,
   chordNotesToPlayValue,
@@ -25,21 +29,11 @@ import {
   MidiFile,
   NoteOffEvent,
   NoteOnEvent,
+  SetTempoEvent,
 } from "midifile-ts";
 
 //TODO: Set tempo:
-/*deltaTime
-: 
-0
-microsecondsPerBeat
-: 
-555556
-subtype
-: 
-"setTempo"
-type
-: 
-"meta"*/
+
 // TODO: detect scale and set it. Use trie similar to chords.
 // TODO: If a tick inside the track has more than 3 notes - detect chord.
 // TODO: Enable chord detector while playing (or add the setting)
@@ -64,9 +58,12 @@ function compareOctaveNotes(a: NotePlayEvent, b: NotePlayEvent) {
   return a.octaveNote.octave - b.octaveNote.octave;
 }
 
-export const parseMidiData = async (midiData: MidiFile) => {
+export const parseMidiData = async (
+  midiData: MidiFile,
+  setTempo: (bpm: number) => void
+) => {
   console.log(midiData);
-  const trackDataArray = parseMidiFile(midiData);
+  const trackDataArray = parseMidiFile(midiData, setTempo);
   // TODO: First, determine and set the scale and base note. Once it's set wait for neck to update.
   // then continue with assigning notes to strings
 
@@ -267,7 +264,7 @@ function chooseBestPosition(
 
 type TrackData = { instrument?: Instrument; events: NotePlayEvent[] };
 
-function parseMidiFile(midiData: MidiFile) {
+function parseMidiFile(midiData: MidiFile, setTempo: (bpm: number) => void) {
   console.log("Parsing midi file");
   const dataByTrack: TrackData[] = [];
   const getGuitarUpscaleTicks = (midiTicks: number) =>
@@ -304,8 +301,7 @@ function parseMidiFile(midiData: MidiFile) {
                 } else {
                   const noteNumber = noteOffEvent.noteNumber;
                   const octave = Math.floor(noteNumber / NOTE_COUNT);
-                  const note = ((NOTE_COUNT + noteNumber - 4) %
-                    NOTE_COUNT) as Note;
+                  const note = ((NOTE_COUNT + noteNumber) % NOTE_COUNT) as Note;
 
                   const octaveNote: OctaveNote = {
                     note,
@@ -331,6 +327,14 @@ function parseMidiFile(midiData: MidiFile) {
                 data.instrument = instrumentEvent.text;
               }
               break;
+            case "setTempo": {
+              const setTempoEvent = event as SetTempoEvent;
+              const newBpm = microsecondsToBpm(
+                setTempoEvent.microsecondsPerBeat
+              );
+              setTempo(newBpm);
+              break;
+            }
           }
           break;
       }

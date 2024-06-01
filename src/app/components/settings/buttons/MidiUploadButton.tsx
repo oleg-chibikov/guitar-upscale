@@ -2,7 +2,7 @@ import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser";
 import { MidiPlayer } from "@/app/engine/midiPlayer";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
-import { setIsPlaying } from "@/app/store/settingsSlice";
+import { setIsPlaying, setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { read } from "midifile-ts";
 import React, { Fragment, useRef } from "react";
@@ -24,7 +24,9 @@ export const MidiUploadButton: React.FC = () => {
           const arrayBuffer = event.target.result as ArrayBuffer;
           const byteArray = new Uint8Array(arrayBuffer);
           const midiData = read(byteArray);
-          const eventsByTick = await parseMidiData(midiData);
+          const eventsByTick = await parseMidiData(midiData, (bpm) => {
+            dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
+          });
 
           if (eventsByTick.size > 0) {
             dispatch(setIsPlaying(true));
