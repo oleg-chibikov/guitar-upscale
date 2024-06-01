@@ -7,7 +7,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButton } from "../settings/buttons/IconButton";
 
 export function MdiMetronome() {
   return (

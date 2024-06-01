@@ -13,8 +13,7 @@ import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/Togg
 
 const RecordButton = dynamic(
   async () =>
-    (await import("@/app/components/settings/buttons/RecordButton"))
-      .RecordButton
+    (await import("@/app/components/playPanel/RecordButton")).RecordButton
 );
 const SkinSelector = dynamic(
   async () =>
@@ -28,7 +27,7 @@ const PlaybackTypeSelector = dynamic(
 );
 const PremiumPlayButton = dynamic(
   async () =>
-    (await import("@/app/components/settings/buttons/PremiumPlayButton"))
+    (await import("@/app/components/playPanel/PremiumPlayButton"))
       .PremiumPlayButton
 );
 const UseAdvancedChordsCheckbox = dynamic(

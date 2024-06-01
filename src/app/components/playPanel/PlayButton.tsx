@@ -2,11 +2,11 @@
 import { UsePlayParams, usePlay } from "@/app/hooks/usePlay";
 import { selectSettings } from "@/app/store/settingsSlice";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
-import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
+import Stop from "@mui/icons-material/Stop";
 import React from "react";
 import { useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButton } from "../settings/buttons/IconButton";
 
 type PlayButtonProps = UsePlayParams;
 
@@ -30,7 +30,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           : "Play scale"
       }
       icon={
-        isWaiting ? <HourglassTopIcon /> : isPlaying ? <Pause /> : <PlayArrow />
+        isWaiting ? <HourglassTopIcon /> : isPlaying ? <Stop /> : <PlayArrow />
       }
       onPress={handlePlay}
     />

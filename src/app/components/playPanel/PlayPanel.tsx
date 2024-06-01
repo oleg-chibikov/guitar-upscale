@@ -1,17 +1,14 @@
+import { MetronomeButton } from "@/app/components/playPanel/MetronomeButton";
+import { PauseButton } from "@/app/components/playPanel/PauseButton";
+import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { AboutButton } from "./AboutButton";
-import { FullscreenButton } from "./FullscreenButton";
-import { MetronomeButton } from "./MetronomeButton";
-import { OpenSettingsButton } from "./OpenSettingsButton";
-import { OpenStrummingSettingsButton } from "./OpenStrummingSettingsButton";
-import { PlayButton } from "./PlayButton";
 
-interface ButtonContainerProps extends WithPremiumComponents {
+interface PlayPanelProps extends WithPremiumComponents {
   style?: CSSProperties;
 }
 
@@ -21,16 +18,7 @@ const DisabledRecordButton = dynamic(
       .DisabledRecordButton
 );
 
-const DisabledDetectChordButton = dynamic(
-  async () =>
-    (
-      await import(
-        "@/app/components/settings/buttons/DisabledDetectChordButton"
-      )
-    ).DisabledDetectChordButton
-);
-
-export const ButtonContainer: React.FC<ButtonContainerProps> = ({
+export const PlayPanel: React.FC<PlayPanelProps> = ({
   style,
   premiumComponents,
 }) => {
@@ -44,12 +32,8 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
             : "justify-start"
         }`}
       >
-        <OpenSettingsButton />
-        <FullscreenButton />
-        {(premiumComponents.get("chordDetection") as ReactNode) ?? (
-          <DisabledDetectChordButton />
-        )}
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
+        <PauseButton />
       </div>
       <div
         className={`flex flex-row gap-1 ${
@@ -62,8 +46,6 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
           <DisabledRecordButton />
         )}
-        <OpenStrummingSettingsButton />
-        <AboutButton />
       </div>
     </section>
   );

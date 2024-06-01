@@ -82,6 +82,7 @@ interface SettingsState
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
+  isPaused: boolean;
   chordIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
@@ -113,6 +114,7 @@ const initialState: SettingsState = {
   seamlessChordSwitching: true,
   isMetronomeActive: false,
   isPlaying: false,
+  isPaused: false,
   chordIsBeingDetected: false,
   isRecording: false,
   toggleMetronomeWhenRecording: true,
@@ -141,6 +143,7 @@ export let seamlessChordSwitchingValue: boolean =
   initialState.seamlessChordSwitching;
 export let isMetronomeActiveValue = initialState.isMetronomeActive;
 export let isPlayingValue: boolean = initialState.isPlaying;
+export let isPausedValue: boolean = initialState.isPaused;
 export let chordStrummingDelayMsValue: number =
   initialState.chordStrummingDelayMs;
 export let chordIsBeingDetectedValue: boolean =
@@ -246,6 +249,20 @@ export const toggleInterval = (toggle: boolean) => {
   }
 };
 
+export const togglePause = (toggle: boolean) => {
+  if (toggle) {
+    // starting time-based activity
+    if (!isMainClockActive()) {
+      console.log("Resuming clock");
+      startInterval(false);
+    }
+  } else {
+    // stopping clock if nothing is playing
+    console.log("Pausing clock");
+    stopInterval(false);
+  }
+};
+
 export const settingsSlice = createSlice({
   name: "settings",
   initialState,
@@ -271,6 +288,7 @@ export const settingsSlice = createSlice({
       chordPlayModeValue = state.chordPlayMode;
       chordNotesToPlayValue = state.chordNotesToPlay;
       isPlayingValue = state.isPlaying;
+      isPausedValue = state.isPaused;
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
       baseNoteValue = state.baseNote;
@@ -398,9 +416,17 @@ export const settingsSlice = createSlice({
       toggleMetronome(state, action.payload);
     },
     setIsPlaying(state, action: PayloadAction<boolean>) {
-      state.isPlaying = action.payload;
       isPlayingValue = action.payload;
-      toggleInterval(action.payload);
+      state.isPlaying = isPlayingValue;
+      if (!isPlayingValue) {
+        state.isPaused = false;
+      }
+      toggleInterval(isPlayingValue);
+    },
+    setIsPaused(state, action: PayloadAction<boolean>) {
+      isPausedValue = action.payload;
+      state.isPaused = isPausedValue;
+      togglePause(!isPausedValue);
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
@@ -469,6 +495,7 @@ export const {
   setSeamlessChordSwitching,
   setIsMetronomeActive,
   setIsPlaying,
+  setIsPaused,
   setChordIsBeingDetected,
   setIsRecording,
   setToggleMetronomeWhenRecording,
