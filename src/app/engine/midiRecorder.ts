@@ -2,7 +2,7 @@ import { MAX_VOLUME } from "@/app/data/volume";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../data/instruments";
-import { Note, StringOctaveNote, getNoteText } from "../data/notes";
+import { StringOctaveNote, getNoteText } from "../data/notes";
 import {
   baseNoteValue,
   scaleGroupValue,
@@ -24,7 +24,6 @@ export class MidiRecorder {
   private midiEvents: Map<TrackKey, NoteEvent[]> | undefined;
   private isRecording: boolean = false;
   private startTick: number | undefined;
-  private noteShift = 4; // Shift from the program's 0 note (E) to midi-writer-js zero note which is C
   private octaveShift = 0;
   private TICK_SHIFT = 16; // Gap till next bar as starting from 0 for some reason gives corrupted melody
 
@@ -81,15 +80,11 @@ export class MidiRecorder {
 
       this.midiEvents.set(trackKey, noteEventsForTrack);
     }
-    const midiOctave = note.note >= Note.C ? note.octave - 1 : note.octave;
+    const midiOctave = note.octave;
 
     noteEventsForTrack.push(
       new Midi.NoteEvent({
-        pitch: [
-          note.note +
-            this.noteShift +
-            (this.octaveShift + midiOctave) * NOTE_COUNT,
-        ],
+        pitch: [note.note + (this.octaveShift + midiOctave) * NOTE_COUNT],
         volume: MAX_VOLUME,
         duration: "8", // the bigger the value - the shorter the note
         channel: 1,
