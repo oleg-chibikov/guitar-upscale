@@ -24,6 +24,7 @@ import {
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
+  waitForPauseToBeReleased,
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
@@ -106,6 +107,10 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       setIsWaiting(false);
     }
 
+    const waitForIntervalAndPause = async () => {
+      await Promise.all([waitForNextHalfBeat(), waitForPauseToBeReleased()]);
+    };
+
     try {
       console.log("Start playing");
       dispatch(setIsPlaying(true));
@@ -114,7 +119,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       if (onPlayExample && example && playbackTypeValue === melodyType) {
         await onPlayExample({
           example,
-          waitNote: waitForNextHalfBeat,
+          waitNote: waitForIntervalAndPause,
           neck,
           showAlert: dispatchAlert,
         });

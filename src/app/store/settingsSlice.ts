@@ -233,6 +233,19 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
 
+// this promise is resolved only when pause is released
+let pausePromise: Promise<void> = Promise.resolve();
+export const waitForPauseToBeReleased = async () => {
+  await pausePromise;
+};
+let resolvePause: (value: void | PromiseLike<void>) => void = () => null;
+
+const recreatePausePromise = () => {
+  pausePromise = new Promise((resolve) => {
+    resolvePause = resolve;
+  });
+};
+
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
@@ -250,14 +263,18 @@ export const toggleInterval = (toggle: boolean) => {
 };
 
 export const togglePause = (toggle: boolean) => {
+  // This function stops the clock without recreating it and also sets a dedicated promise to wait mode
+  // Even if the clock is later started the pause won't be released automatically
   if (toggle) {
-    // starting time-based activity
+    // start clock if it's not active yet
     if (!isMainClockActive()) {
       console.log("Resuming clock");
       startInterval(false);
     }
+    resolvePause();
   } else {
-    // stopping clock if nothing is playing
+    recreatePausePromise();
+    // stopping clock without resetting it
     console.log("Pausing clock");
     stopInterval(false);
   }
@@ -420,6 +437,7 @@ export const settingsSlice = createSlice({
       state.isPlaying = isPlayingValue;
       if (!isPlayingValue) {
         state.isPaused = false;
+        resolvePause();
       }
       toggleInterval(isPlayingValue);
     },
