@@ -108,7 +108,9 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     }
 
     const waitForIntervalAndPause = async () => {
-      await Promise.all([waitForNextHalfBeat(), waitForPauseToBeReleased()]);
+      // these 2 promises whould be waited for sequentially - we should check if it's paused after the clock interval has been released, otherwise the extra note might get played
+      await waitForNextHalfBeat();
+      await waitForPauseToBeReleased();
     };
 
     try {

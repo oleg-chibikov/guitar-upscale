@@ -28,6 +28,7 @@ import {
   isMainClockActive,
   startInterval,
   stopInterval,
+  waitForNextHalfBeat,
 } from "../engine/mainClock";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -236,7 +237,11 @@ export const isAnyTimerSpecificActivityRunning = () =>
 // this promise is resolved only when pause is released
 let pausePromise: Promise<void> = Promise.resolve();
 export const waitForPauseToBeReleased = async () => {
+  if (!isPausedValue) {
+    return;
+  }
   await pausePromise;
+  await waitForNextHalfBeat(); // wait for the next interval after pause has been released. Otherwise 2 notes might play simultaneously
 };
 let resolvePause: (value: void | PromiseLike<void>) => void = () => null;
 
