@@ -1,16 +1,30 @@
-import { Note, OctaveNote, StringOctaveNote } from "../data/notes";
+import {
+  Note,
+  OctaveNote,
+  StringOctaveNote,
+  serializeOctaveNote,
+} from "../data/notes";
 
 export type Neck = (StringOctaveNote | null)[][];
 export const NOTE_COUNT: number = 12;
 export const FRET_COUNT: number = NOTE_COUNT * 2;
+
+// This map helps getting the notes on the fret based on just notes.
+// Each note has several positions on the fret. The map contains them all
+export const octaveNoteToStringOctaveNoteMap = new Map<
+  string,
+  StringOctaveNote[]
+>();
 
 export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
   stringTuning: OctaveNote[],
   baseNote: Note
 ): Neck => {
+  octaveNoteToStringOctaveNoteMap.clear();
   const neck: Neck = [];
 
+  // going from the lowest string to the highest one
   for (let i = stringTuning.length - 1; i >= 0; i--) {
     const octaveNoteForString = stringTuning[i];
     const stringModifier = octaveNoteForString.note;
@@ -33,7 +47,21 @@ export const generateNeckRepresentation = (
         octave++;
       }
 
-      neck[i][j] = isInScale ? { note, octave, string: i, fret: j } : null;
+      const stringOctaveNote = isInScale
+        ? { note, octave, string: i, fret: j }
+        : null;
+      neck[i][j] = stringOctaveNote;
+
+      if (stringOctaveNote !== null) {
+        const serializedOctaveNote = serializeOctaveNote({ note, octave });
+        const stringOctaveNotesArray =
+          octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote) ?? [];
+        stringOctaveNotesArray.push(stringOctaveNote);
+        octaveNoteToStringOctaveNoteMap.set(
+          serializedOctaveNote,
+          stringOctaveNotesArray
+        );
+      }
     }
   }
 

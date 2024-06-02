@@ -56,6 +56,9 @@ importers:
       midi-writer-js:
         specifier: ^3.1.1
         version: 3.1.1
+      midifile-ts:
+        specifier: ^1.5.1
+        version: 1.5.1
       next:
         specifier: 14.2.3
         version: 14.2.3(@babel/core@7.24.6)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2245,6 +2248,9 @@ packages:
 
   midi-writer-js@3.1.1:
     resolution: {integrity: sha512-ruRzUWtmcvD7xQcrKRk9fH+1BELv8x07QJxhpM4PS5n6+MOyPb39ifxTV/oI1hHPgKMSuhnhWw2MaGWUAvH9DA==}
+
+  midifile-ts@1.5.1:
+    resolution: {integrity: sha512-233Yd15Q++LdI+EbQRwxyW1QeuxTiy6ApxVXh2F1K3OruqH7uGBXiRdxiOjZjk8Y//oa3JMQ4mGVQ0Gsd/VkaQ==}
 
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
@@ -5793,6 +5799,8 @@ snapshots:
   midi-writer-js@3.1.1:
     dependencies:
       '@tonaljs/midi': 4.9.3
+
+  midifile-ts@1.5.1: {}
 
   mime-db@1.52.0: {}
 

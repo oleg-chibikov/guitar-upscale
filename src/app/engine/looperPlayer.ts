@@ -1,5 +1,5 @@
 import { ChordOrNote } from "@/app/data/looperData";
-import { ChordEventBus, NotePlayEventBus } from "./eventBus";
+import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   TICKS_IN_BAR,
   getCurrentRelativeTick,
@@ -135,21 +135,22 @@ export class LooperPlayer {
       );
       await waitForNextBar();
       return 1; // ticks are 1-based
-    } else if (mod < firstEventTick) {
-      console.log(
-        LOG_PREFIX +
-          "Waiting for the first event. Current tick %d is earlier than the first tick event %d - just wait for it in the current bar",
-        mod,
-        firstEventTick
-      );
-      return mod;
     } else {
-      console.log(
-        LOG_PREFIX +
-          "Waiting for the first event. Current tick %d is equal to the first event tick %d - play it immediately",
-        mod,
-        firstEventTick
-      );
+      if (mod < firstEventTick) {
+        console.log(
+          LOG_PREFIX +
+            "Waiting for the first event. Current tick %d is earlier than the first tick event %d - just wait for it in the current bar",
+          mod,
+          firstEventTick
+        );
+      } else {
+        console.log(
+          LOG_PREFIX +
+            "Waiting for the first event. Current tick %d is equal to the first event tick %d - play it immediately",
+          mod,
+          firstEventTick
+        );
+      }
       return mod;
     }
   }
@@ -165,25 +166,12 @@ export class LooperPlayer {
 
     this.verifyTickIsCorrect(tick);
 
-    eventsAtTick.forEach(({ note, chord }) => {
-      if (note) {
-        NotePlayEventBus.next({
-          stringOctaveNote: note.note,
-          looperChannel: note.looperChannel,
-          trackInstrument: note.instrument,
-          trackNumber: note.trackNumber,
-          skipChordDetection: true,
-        });
-      }
-      if (chord) {
-        ChordEventBus.next(chord);
-      }
-    });
+    playAllNotes(eventsAtTick);
   }
 
   private verifyTickIsCorrect(tick: number) {
     const realTick = getCurrentRelativeTick();
-    let tickInBar = tick % TICKS_IN_BAR;
+    const tickInBar = tick % TICKS_IN_BAR;
     if (tickInBar !== realTick) {
       console.error(
         LOG_PREFIX +

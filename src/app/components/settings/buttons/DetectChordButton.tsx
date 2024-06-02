@@ -1,21 +1,20 @@
 "use client";
 
+import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import {
-  refreshSettings,
   selectSettings,
-  setChordDetectorFunctions,
   setChordIsBeingDetected,
 } from "@/app/store/settingsSlice";
 import SearchOff from "@mui/icons-material/SearchOff";
 import Troubleshoot from "@mui/icons-material/Troubleshoot";
-import React, { useRef } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "./IconButton";
 
 export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { chordIsBeingDetected } = useSelector(selectSettings);
-  const settingsSet = useRef<boolean>(false);
+  const setupChordDetector = useChordDetectorSetup();
   return (
     <IconButton
       {...props}
@@ -28,15 +27,7 @@ export const DetectChordButton: React.FC = (props) => {
           const { mainDetector } = await import("@/app/engine/chordDetector");
           mainDetector.clearDetector();
         } else {
-          if (!settingsSet.current) {
-            // async load detector module and set its functions to settings on the first detect action.
-            const { mainDetector } = await import("@/app/engine/chordDetector");
-            setChordDetectorFunctions(
-              mainDetector.addChordToDetectorLookup.bind(mainDetector)
-            );
-            dispatch(refreshSettings());
-          }
-          settingsSet.current = true;
+          await setupChordDetector();
         }
         dispatch(setChordIsBeingDetected(!chordIsBeingDetected));
       }}

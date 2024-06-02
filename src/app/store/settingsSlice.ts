@@ -198,7 +198,7 @@ export const setChordDetectorFunctions = (
   addChordToDetectorLookup = addChord;
 };
 
-let addChordToDetectorLookup:
+export let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 
@@ -364,11 +364,13 @@ export const settingsSlice = createSlice({
       state,
       action: PayloadAction<{ tempo: number; updateInterval: boolean }>
     ) => {
-      if (tempoBpmValue === action.payload.tempo) {
+      const newValue = action.payload.tempo;
+      if (tempoBpmValue === newValue) {
         return;
       }
-      state.tempoBpm = action.payload.tempo;
-      tempoBpmValue = action.payload.tempo;
+      console.log("setting tempo to", newValue);
+      state.tempoBpm = newValue;
+      tempoBpmValue = newValue;
 
       if (action.payload.updateInterval) {
         stopInterval(false);

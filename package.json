@@ -35,6 +35,7 @@
     "googleapis": "^137.1.0",
     "http-errors": "^2.0.0",
     "midi-writer-js": "^3.1.1",
+    "midifile-ts": "^1.5.1",
     "next": "14.2.3",
     "next-auth": "^4.24.7",
     "react": "^18",

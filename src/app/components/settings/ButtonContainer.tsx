@@ -57,6 +57,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenStrummingSettingsButton />
         <AboutButton />
+        {/* <MidiUploadButton /> */}
       </div>
     </section>
   );

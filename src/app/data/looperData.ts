@@ -7,13 +7,10 @@ export type NoteEvent = {
   trackNumber: number;
   instrument: Instrument;
   velocity?: number;
-};
-
-export type LooperNoteEvent = NoteEvent & {
-  looperChannel: number;
+  looperChannel?: number;
 };
 
 export type ChordOrNote = {
-  note?: LooperNoteEvent;
+  note?: NoteEvent;
   chord?: ChordWithPlayMetadata;
 };
