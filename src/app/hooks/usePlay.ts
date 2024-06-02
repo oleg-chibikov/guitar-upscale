@@ -18,6 +18,7 @@ import {
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   baseNoteValue,
+  clearWipeExampleCacheTrigger,
   isPlayingValue,
   playbackTypeValue,
   reverbStrengthValue,
@@ -26,6 +27,7 @@ import {
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
+  wipeExampleCacheTriggerValue,
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
@@ -54,9 +56,14 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
     let example: Example | undefined;
     if (decodeExample && playbackTypeValue === melodyType) {
-      const { getRandomScaleExample } = await import(
+      const { getRandomScaleExample, wipeExamplesCache } = await import(
         "@/app/data/scaleExamples"
       );
+      if (wipeExampleCacheTriggerValue) {
+        // all the decoded examples should be deleted if the scale shift changes
+        wipeExamplesCache();
+        clearWipeExampleCacheTrigger();
+      }
       example = await getRandomScaleExample();
       const tempo = example?.tempo;
       if (tempo !== undefined && tempo !== tempoBpmValue) {

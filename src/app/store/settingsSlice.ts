@@ -6,7 +6,12 @@ import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Chord, getNoteText, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
-import { getShiftedNote, parseStringToNotes, Tuning } from "../data/tunings";
+import {
+  getCurrentShift,
+  getShiftedNote,
+  parseStringToNotes,
+  Tuning,
+} from "../data/tunings";
 import {
   generateAllChords,
   getClosestVariation,
@@ -163,6 +168,7 @@ export let tuningValue: Tuning = initialState.tuning;
 export let isRecordingValue: boolean = initialState.isRecording;
 export let toggleMetronomeWhenRecordingValue: boolean =
   initialState.toggleMetronomeWhenRecording;
+export let wipeExampleCacheTriggerValue: boolean = false;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -190,6 +196,10 @@ const toggleMetronome = (state: WithMetronome, value: boolean) => {
   state.isMetronomeActive = value;
   isMetronomeActiveValue = value;
   toggleInterval(value);
+};
+
+export const clearWipeExampleCacheTrigger = () => {
+  wipeExampleCacheTriggerValue = false;
 };
 
 export const setChordDetectorFunctions = (
@@ -356,9 +366,16 @@ export const settingsSlice = createSlice({
       baseNoteValue = action.payload;
     },
     setTuning(state, action: PayloadAction<Tuning>) {
+      const previousShift = getCurrentShift();
       state.tuning = action.payload;
       tuningValue = action.payload;
       onGuitarSettingsUpdate(state);
+      const newShift = getCurrentShift();
+      if (previousShift !== newShift) {
+        // all the decoded examples should be deleted if the scale shift changes.
+        // They will be deleted async right before the next example is played. (this is needed to avoid loading examples module here)
+        wipeExampleCacheTriggerValue = true;
+      }
     },
     setTempoBpm: (
       state,

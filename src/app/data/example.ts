@@ -1,4 +1,3 @@
-import { EventsByTick } from "@/app/engine/eventsByTick";
 import { Instrument } from "./instruments";
 import { Tuning } from "./tunings";
 
@@ -9,7 +8,6 @@ export type Example = {
   tuning?: Tuning;
   tempo?: number;
   halfBeatShift?: number;
-  decodedTracks?: EventsByTick;
 };
 
 export type Track = {

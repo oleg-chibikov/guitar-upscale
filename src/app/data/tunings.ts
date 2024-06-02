@@ -46,15 +46,17 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
 }
 
 export const getShiftedNote = (note: Note) => {
-  const tuningData = tunings[tuningValue];
+  const currentTuningShift = getCurrentShift();
 
   const withTuningShift =
-    tuningData.shift !== undefined
-      ? NOTE_COUNT + note + tuningData.shift
+    currentTuningShift !== undefined
+      ? NOTE_COUNT + note + currentTuningShift
       : note;
 
   return (withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
+
+export const getCurrentShift = () => tunings[tuningValue].shift;
 
 interface TuningData {
   name: string;

@@ -185,6 +185,19 @@ const getRandomRecord = <T>(array: T[]): T => {
   return array[randomIndex];
 };
 
+export const wipeExamplesCache = () => {
+  console.log("Wiping example cache");
+  for (const [_scaleGroup, mapForScaleGroup] of Array.from(
+    examplesMap.entries()
+  )) {
+    for (const [_scale, examples] of Array.from(mapForScaleGroup.entries())) {
+      for (const example of examples) {
+        example.decodedTracks = undefined;
+      }
+    }
+  }
+};
+
 export const getRandomScaleExample = async (): Promise<Example | undefined> => {
   const groupScales = examplesMap.get(scaleGroupValue);
   const examples = groupScales?.get(scaleValue);
