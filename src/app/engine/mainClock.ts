@@ -95,10 +95,10 @@ export const stopInterval = (resolvePreviousPromises: boolean) => {
   if (timer) {
     clearInterval(timer);
     timer = undefined;
-    if (resolvePreviousPromises) {
-      // any wait for the next interval will finish straight away
-      resolveAll();
-    }
+  }
+  if (resolvePreviousPromises) {
+    // any wait for the next interval will finish straight away
+    resolveAll();
   }
 };
 

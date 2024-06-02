@@ -1,4 +1,4 @@
-import { MdiMetronome } from "@/app/components/settings/buttons/MetronomeButton";
+import { MdiMetronome } from "@/app/components/playPanel/MetronomeButton";
 import { volumeSteps } from "@/app/data/volume";
 import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
 import React from "react";

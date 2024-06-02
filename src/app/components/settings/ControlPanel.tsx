@@ -1,3 +1,4 @@
+import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueModalControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueModalControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
@@ -8,7 +9,7 @@ import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
-import { ButtonContainer } from "./buttons/ButtonContainer";
+import { ButtonContainer } from "./ButtonContainer";
 import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 
 export const ControlPanel: React.FC<WithPremiumComponents> = ({
@@ -45,6 +46,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
         <TempoControl />
         <ChordStrummingDelayControl />
       </div>
+      <PlayPanel premiumComponents={premiumComponents} />
     </section>
   );
 };

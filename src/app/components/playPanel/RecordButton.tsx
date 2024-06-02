@@ -7,7 +7,7 @@ import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButton } from "../settings/buttons/IconButton";
 
 export const RecordButton: React.FC = (props) => {
   const { theme } = useSelector(selectUi);

@@ -24,6 +24,7 @@ import {
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
+  waitForPauseToBeReleased,
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
@@ -106,6 +107,12 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       setIsWaiting(false);
     }
 
+    const waitForIntervalAndPause = async () => {
+      // these 2 promises should be waited for sequentially - we should check if it's paused after the clock interval has been released, otherwise the extra note might get played
+      await waitForNextHalfBeat();
+      await waitForPauseToBeReleased();
+    };
+
     try {
       console.log("Start playing");
       dispatch(setIsPlaying(true));
@@ -114,7 +121,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       if (onPlayExample && example && playbackTypeValue === melodyType) {
         await onPlayExample({
           example,
-          waitNote: waitForNextHalfBeat,
+          waitNote: waitForIntervalAndPause,
           neck,
           showAlert: dispatchAlert,
         });

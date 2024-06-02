@@ -28,6 +28,7 @@ import {
   isMainClockActive,
   startInterval,
   stopInterval,
+  waitForNextHalfBeat,
 } from "../engine/mainClock";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -41,6 +42,10 @@ interface WithNeck {
   neck: Neck | null;
   chords: NoteChords[] | null;
   baseNote: Note;
+}
+
+interface WithIsPaused {
+  isPaused: boolean;
 }
 
 interface WithMetronome {
@@ -60,6 +65,7 @@ interface WithControls {
 
 interface SettingsState
   extends WithMetronome,
+    WithIsPaused,
     WithNeck,
     WithControls,
     CanUpdateGuitarSettings {
@@ -113,6 +119,7 @@ const initialState: SettingsState = {
   seamlessChordSwitching: true,
   isMetronomeActive: false,
   isPlaying: false,
+  isPaused: false,
   chordIsBeingDetected: false,
   isRecording: false,
   toggleMetronomeWhenRecording: true,
@@ -141,6 +148,7 @@ export let seamlessChordSwitchingValue: boolean =
   initialState.seamlessChordSwitching;
 export let isMetronomeActiveValue = initialState.isMetronomeActive;
 export let isPlayingValue: boolean = initialState.isPlaying;
+export let isPausedValue: boolean = initialState.isPaused;
 export let chordStrummingDelayMsValue: number =
   initialState.chordStrummingDelayMs;
 export let chordIsBeingDetectedValue: boolean =
@@ -194,6 +202,12 @@ export let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 
+const updateIsPaused = (value: boolean, state: WithIsPaused) => {
+  isPausedValue = value;
+  state.isPaused = isPausedValue;
+  togglePause(!isPausedValue);
+};
+
 const setChords = (state: WithNeck) => {
   if (state.neck) {
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
@@ -230,6 +244,26 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
 
+// this promise is resolved only when pause is released
+let pausePromise: Promise<void> = Promise.resolve();
+export const waitForPauseToBeReleased = async () => {
+  if (!isPausedValue) {
+    return;
+  }
+  await pausePromise;
+  if (!isPausedValue) {
+    return;
+  }
+  await waitForNextHalfBeat(); // wait for the next interval after pause has been released. Otherwise 2 notes might play simultaneously
+};
+let resolvePause: (value: void | PromiseLike<void>) => void = () => null;
+
+const recreatePausePromise = () => {
+  pausePromise = new Promise((resolve) => {
+    resolvePause = resolve;
+  });
+};
+
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
@@ -243,6 +277,24 @@ export const toggleInterval = (toggle: boolean) => {
       console.log("Nothing playing - stopping clock");
       stopInterval(true);
     }
+  }
+};
+
+export const togglePause = (toggle: boolean) => {
+  // This function stops the clock without recreating it and also sets a dedicated promise to wait mode
+  // Even if the clock is later started the pause won't be released automatically
+  if (toggle) {
+    // start clock if it's not active yet
+    if (!isMainClockActive()) {
+      console.log("Resuming clock");
+      startInterval(false);
+    }
+    resolvePause();
+  } else {
+    recreatePausePromise();
+    // stopping clock without resetting it
+    console.log("Pausing clock");
+    stopInterval(false);
   }
 };
 
@@ -271,6 +323,7 @@ export const settingsSlice = createSlice({
       chordPlayModeValue = state.chordPlayMode;
       chordNotesToPlayValue = state.chordNotesToPlay;
       isPlayingValue = state.isPlaying;
+      isPausedValue = state.isPaused;
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
       baseNoteValue = state.baseNote;
@@ -400,9 +453,15 @@ export const settingsSlice = createSlice({
       toggleMetronome(state, action.payload);
     },
     setIsPlaying(state, action: PayloadAction<boolean>) {
-      state.isPlaying = action.payload;
       isPlayingValue = action.payload;
-      toggleInterval(action.payload);
+      state.isPlaying = isPlayingValue;
+      if (!isPlayingValue) {
+        updateIsPaused(false, state);
+      }
+      toggleInterval(isPlayingValue);
+    },
+    setIsPaused(state, action: PayloadAction<boolean>) {
+      updateIsPaused(action.payload, state);
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
@@ -471,6 +530,7 @@ export const {
   setSeamlessChordSwitching,
   setIsMetronomeActive,
   setIsPlaying,
+  setIsPaused,
   setChordIsBeingDetected,
   setIsRecording,
   setToggleMetronomeWhenRecording,
