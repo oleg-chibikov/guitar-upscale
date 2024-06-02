@@ -60,7 +60,6 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         "@/app/data/scaleExamples"
       );
       if (wipeExampleCacheTriggerValue) {
-        // all the decoded examples should be deleted if the scale shift changes
         wipeExamplesCache();
         clearWipeExampleCacheTrigger();
       }
