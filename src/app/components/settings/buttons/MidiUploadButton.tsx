@@ -28,7 +28,7 @@ export const MidiUploadButton: React.FC = () => {
             dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
           });
 
-          if (eventsByTick.size > 0) {
+          if (eventsByTick.hasItems) {
             dispatch(setIsPlaying(true));
             const midiPlayer = new MidiPlayer(eventsByTick);
             await midiPlayer.play();

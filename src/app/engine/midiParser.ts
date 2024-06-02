@@ -1,5 +1,4 @@
 import { Instrument } from "@/app/data/instruments";
-import { ChordOrNote, NoteEvent } from "@/app/data/looperData";
 import {
   Note,
   OctaveNote,
@@ -7,6 +6,7 @@ import {
   serializeOctaveNote,
 } from "@/app/data/notes";
 import { mainDetector } from "@/app/engine/chordDetector";
+import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   NOTE_COUNT,
   octaveNoteToStringOctaveNoteMap,
@@ -67,7 +67,7 @@ export const parseMidiData = async (
   // TODO: First, determine and set the scale and base note. Once it's set wait for neck to update.
   // then continue with assigning notes to strings
 
-  const eventsByTick = new Map<number, ChordOrNote[]>();
+  const eventsByTick = new EventsByTick();
 
   let trackIndex = 0;
   for (const track of trackDataArray) {
@@ -87,18 +87,13 @@ export const parseMidiData = async (
         matchChordForToleranceGroup(toleranceGroup);
 
       if (chord !== undefined) {
-        if (!eventsByTick.has(toleranceWindowStart)) {
-          eventsByTick.set(toleranceWindowStart, []);
-        }
-        eventsByTick.get(toleranceWindowStart)?.push({
-          chord: {
-            chord,
-            metadata: {
-              trackNumber: trackIndex,
-              notesToPlay: chordNotesToPlayValue,
-              strummingDelayMs: chordStrummingDelayMsValue,
-              trackInstrument: chordInstrumentValue,
-            },
+        eventsByTick.addOrUpdateEvent(toleranceWindowStart, {
+          chord,
+          metadata: {
+            trackNumber: trackIndex,
+            notesToPlay: chordNotesToPlayValue,
+            strummingDelayMs: chordStrummingDelayMsValue,
+            trackInstrument: chordInstrumentValue,
           },
         });
       }
@@ -128,10 +123,7 @@ export const parseMidiData = async (
             velocity: event.velocity || 127,
             instrument: track.instrument ?? "acoustic_guitar_nylon",
           };
-          if (!eventsByTick.has(event.tick)) {
-            eventsByTick.set(event.tick, []);
-          }
-          eventsByTick.get(event.tick)?.push({ note: noteEvent });
+          eventsByTick.addOrUpdateEvent(event.tick, noteEvent);
         }
       }
     }

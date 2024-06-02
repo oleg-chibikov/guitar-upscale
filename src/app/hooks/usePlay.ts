@@ -1,3 +1,5 @@
+import { EventsByTick } from "@/app/engine/eventsByTick";
+import { MidiPlayer } from "@/app/engine/midiPlayer";
 import { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +26,6 @@ import {
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
-  waitForPauseToBeReleased,
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
@@ -32,10 +33,10 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 
 export interface UsePlayParams {
-  onPlayExample?: (params: PlayExampleParameters) => Promise<void>;
+  decodeExample?: (params: PlayExampleParameters) => Promise<EventsByTick>;
 }
 
-export const usePlay = ({ onPlayExample }: UsePlayParams) => {
+export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const { neck } = useSelector(selectSettings);
   const [isWaiting, setIsWaiting] = useState(false);
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
     }
 
     let example: Example | undefined;
-    if (onPlayExample && playbackTypeValue === melodyType) {
+    if (decodeExample && playbackTypeValue === melodyType) {
       const { getRandomScaleExample } = await import(
         "@/app/data/scaleExamples"
       );
@@ -62,7 +63,7 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
         dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
       }
     } else {
-      await import("@/app/engine/play/scalePlayer");
+      await import("@/app/engine/play/scaleDecoder");
     }
 
     // the instrument should be initialized before waiting for the first note
@@ -107,46 +108,39 @@ export const usePlay = ({ onPlayExample }: UsePlayParams) => {
       setIsWaiting(false);
     }
 
-    const waitForIntervalAndPause = async () => {
-      // these 2 promises should be waited for sequentially - we should check if it's paused after the clock interval has been released, otherwise the extra note might get played
-      await waitForNextHalfBeat();
-      await waitForPauseToBeReleased();
-    };
-
     try {
       console.log("Start playing");
       dispatch(setIsPlaying(true));
-      const dispatchAlert = (message: string) =>
-        dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
-      if (onPlayExample && example && playbackTypeValue === melodyType) {
-        await onPlayExample({
+
+      let eventsToPlay: EventsByTick;
+      let message: string;
+      if (decodeExample && example && playbackTypeValue === melodyType) {
+        // this sets decoded melody in the example
+        eventsToPlay = await decodeExample({
           example,
-          waitNote: waitForIntervalAndPause,
           neck,
-          showAlert: dispatchAlert,
         });
+        message = example.band + " - " + example.title;
       } else {
         const isFullStringScalePlayback =
           playbackTypeValue === fullStringScaleType;
-        dispatchAlert(
-          `${getNoteText(baseNoteValue)} ${scaleValue} ${
-            isFullStringScalePlayback ? " (full string)" : ""
-          }`
-        );
+        message = `${getNoteText(baseNoteValue)} ${scaleValue} ${
+          isFullStringScalePlayback ? " (full string)" : ""
+        }`;
 
-        const { playWholeScale } = await import(
-          "@/app/engine/play/scalePlayer"
+        const { getWholeScale } = await import(
+          "@/app/engine/play/scaleDecoder"
         );
-        await playWholeScale(
-          waitForNextHalfBeat,
-          neck,
-          isFullStringScalePlayback
-        );
+        eventsToPlay = getWholeScale(neck, isFullStringScalePlayback);
       }
+
+      dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
+      const player = new MidiPlayer(eventsToPlay);
+      await player.play();
     } finally {
       dispatch(setIsPlaying(false));
     }
-  }, [dispatch, neck, onPlayExample]);
+  }, [dispatch, neck, decodeExample]);
 
   useEffect(() => {
     // stop playing when any of dependencies changes

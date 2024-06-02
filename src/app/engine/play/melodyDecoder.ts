@@ -1,13 +1,12 @@
-import { Track } from "@/app/data/example";
+import { TrackWithNumber } from "@/app/data/example";
 import { Note, OctaveNote, StringOctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
-import {
-  baseNoteValue,
-  isPlayingValue,
-  tuningValue,
-} from "@/app/store/settingsSlice";
+import { EventsByTick } from "@/app/engine/eventsByTick";
+import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
+import { baseNoteValue, tuningValue } from "@/app/store/settingsSlice";
 import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
+// TODO: Class
 const convertChord = (chord: string, tuningShift: number): string => {
   const baseNote = baseNoteValue;
   if (baseNote === Note.E && !tuningShift) {
@@ -37,22 +36,21 @@ const convertChord = (chord: string, tuningShift: number): string => {
   );
 
   // Reconstruct the chord string
-  const newChord = newChordNote + alterations;
-
-  return newChord;
+  return newChordNote + alterations;
 };
 
 export type PlayNoteCallback = (note: StringOctaveNote) => void;
 
-const playNote = async (
+const recordNote = (
+  result: EventsByTick,
+  tickIndex: number,
   fretNumberBuilder: string,
   stringNumber: number,
   scriptTuning: OctaveNote[],
   tuning: OctaveNote[],
   neck: Neck,
   tuningShift: number,
-  play: PlayNoteCallback,
-  wait?: () => Promise<void>
+  track: TrackWithNumber
 ) => {
   const stringTuning = tuning[stringNumber]; // Get the custom tuning for the string
   const scriptStringTuning = scriptTuning[stringNumber]; // Get the original tuning for the string (melody is written using this tuning)
@@ -68,30 +66,22 @@ const playNote = async (
   // TODO: go to the upper string (we already do that when playing scales)
   const string = neck[stringNumber];
   const stringOctaveNote = string[fret];
+
   if (stringOctaveNote) {
-    await playStringOctaveNote(stringOctaveNote, play, wait);
+    result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+      ...track,
+      note: stringOctaveNote,
+    });
+    tickIndex++;
   }
 };
 
-const playStringOctaveNote = async (
-  stringOctaveNote: StringOctaveNote,
-  play: PlayNoteCallback,
-  wait?: () => Promise<void>
-) => {
-  play(stringOctaveNote);
-  if (wait) {
-    await wait();
-  }
-};
-
-export const decodeMelody = async (
-  track: Track,
-  play: PlayNoteCallback,
-  playChord: (chord: string) => void,
-  waitNote: () => Promise<void>,
+export const decodeMelody = (
+  track: TrackWithNumber,
   neck: Neck,
   scriptTuning: OctaveNote[]
-): Promise<void> => {
+): EventsByTick => {
+  const result: EventsByTick = new EventsByTick();
   let index = 0;
   let stringNumber: number | undefined;
   let nextIsString = false;
@@ -105,11 +95,9 @@ export const decodeMelody = async (
   const melody = track.melody;
   const currentTuning = parseStringToNotes(tuningValue);
   const tuningShift = tunings[tuningValue].shift ?? 0;
+  let tickIndex = 0;
 
   while (index < melody.length) {
-    if (!isPlayingValue) {
-      return Promise.resolve();
-    }
     const char = melody[index];
     const nextChar =
       index !== melody.length - 1 ? melody[index + 1] : undefined;
@@ -119,19 +107,26 @@ export const decodeMelody = async (
       index !== melody.length - 3 ? melody[index + 3] : undefined;
     const number = parseFloat(char);
     const isNumeric = !isNaN(number);
-    const playChordAndReset = () => {
+    const recordChordAndReset = () => {
       if (immediateChord !== undefined) {
         nextIsImmediateChord = false;
         const newChord = convertChord(immediateChord, tuningShift);
 
-        playChord(newChord);
+        result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+          chord: newChord,
+          metadata: {
+            trackNumber: track.trackNumber,
+            trackInstrument: track.instrument,
+            // TODO: We can set predefined values for delay and number of notes or leave them as in settings
+          },
+        });
         immediateChord = undefined;
       }
     };
     if (nextIsImmediateChord) {
       if (char === ">") {
         // end recording chord
-        playChordAndReset();
+        recordChordAndReset();
       } else {
         // keep recording chord
         if (immediateChord === undefined) {
@@ -155,31 +150,35 @@ export const decodeMelody = async (
           // The same note continues
         } else if (immediateStringNumber !== undefined) {
           if (fretNumberBuilder !== "") {
-            // Note is fully read - we can play it
-            await playNote(
+            // Note is fully read - we can play it without incrementing tick index (it's an immediate note)
+            recordNote(
+              result,
+              tickIndex,
               fretNumberBuilder,
               immediateStringNumber,
               scriptTuning,
               currentTuning,
               neck,
               tuningShift,
-              play
+              track
             );
             fretNumberBuilder = "";
             immediateStringNumber = undefined;
           }
         } else if (fretNumberBuilder !== "" && stringNumber !== undefined) {
-          // Note is fully read - we can play it
-          await playNote(
+          // Note is fully read - we can play it and increment the tick index
+          recordNote(
+            result,
+            tickIndex,
             fretNumberBuilder,
             stringNumber,
             scriptTuning,
             currentTuning,
             neck,
             tuningShift,
-            play,
-            waitNote
+            track
           );
+          tickIndex++;
           fretNumberBuilder = "";
         }
       }
@@ -216,7 +215,7 @@ export const decodeMelody = async (
       }
     } else if (char === "_") {
       // wait between notes
-      await waitNote();
+      tickIndex++;
     } else if (char === "*") {
       // set string marker for upcoming (not immediate) notes
       nextIsString = true;
@@ -230,4 +229,5 @@ export const decodeMelody = async (
 
     index++;
   }
+  return result;
 };

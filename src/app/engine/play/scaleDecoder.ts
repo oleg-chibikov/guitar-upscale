@@ -1,19 +1,22 @@
 import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
+import { EventsByTick } from "@/app/engine/eventsByTick";
+import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
 import { isPlayingValue } from "@/app/store/settingsSlice";
 import { NotePlayEventBus } from "../eventBus";
 import { Neck } from "../generateNeckRepresentation";
 
-export const playWholeScale = async (
-  wait: () => Promise<void>,
+export const getWholeScale = (
   neck: Neck,
   playFullString: boolean
-) => {
+): EventsByTick => {
   const reverse = Math.random() < 0.5;
   const neckCopy = [...neck];
   if (reverse) {
     neckCopy.reverse();
   }
 
+  let tickIndex = 0;
+  const result = new EventsByTick();
   // used to be stored in StringOctaveNotes
   let realStringIndex = reverse ? neckCopy.length - 1 : 0;
   let orderedStringIndex = 0;
@@ -67,7 +70,13 @@ export const playWholeScale = async (
         stringOctaveNote: note,
         skipChordDetection: true,
       });
-      await wait();
+
+      result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+        trackNumber: 0,
+        note,
+      });
+      tickIndex++;
     }
   }
+  return result;
 };

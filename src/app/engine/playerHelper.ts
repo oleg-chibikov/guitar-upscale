@@ -1,5 +1,5 @@
-import { ChordOrNote } from "@/app/data/looperData";
 import { ChordEventBus, NotePlayEventBus } from "@/app/engine/eventBus";
+import { ChordOrNote } from "@/app/engine/eventsByTick";
 
 export const playAllNotes = (
   eventsToPlay: ChordOrNote[] | Set<ChordOrNote>

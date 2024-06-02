@@ -1,4 +1,4 @@
-import { ChordOrNote } from "@/app/data/looperData";
+import { ChordOrNote } from "@/app/engine/eventsByTick";
 import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   TICKS_IN_BAR,

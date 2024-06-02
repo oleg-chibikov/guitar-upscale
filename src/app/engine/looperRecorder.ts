@@ -1,4 +1,4 @@
-import { ChordOrNote, LooperNoteEvent } from "@/app/data/looperData";
+import { ChordOrNote, NoteEvent } from "@/app/engine/eventsByTick";
 import { LooperPlayer, LooperPlayerOptions } from "@/app/engine/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looperShared";
 import { Instrument } from "../data/instruments";
@@ -126,7 +126,7 @@ export class LooperRecorder {
       return;
     }
 
-    const internalNoteEvent: LooperNoteEvent = {
+    const internalNoteEvent: NoteEvent = {
       note,
       looperChannel: currentlyRecordingLooperChannel,
       instrument,

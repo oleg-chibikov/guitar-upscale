@@ -1,5 +1,5 @@
-import { ChordOrNote, LooperNoteEvent } from "@/app/data/looperData";
 import { Note, StringOctaveNote } from "@/app/data/notes";
+import { ChordOrNote, LooperNoteEvent } from "@/app/engine/eventsByTick";
 import { ChordEventBus, NotePlayEventBus } from "./eventBus";
 import { LooperPlayer, LooperPlayerOptions } from "./looperPlayer";
 import {
