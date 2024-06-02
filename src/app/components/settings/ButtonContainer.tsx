@@ -47,7 +47,6 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         {(premiumComponents.get("chordDetection") as ReactNode) ?? (
           <DisabledDetectChordButton />
         )}
-        <MidiUploadButton />
       </div>
       <div
         className={`flex flex-row gap-1 ${
@@ -58,6 +57,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenStrummingSettingsButton />
         <AboutButton />
+        {/* <MidiUploadButton /> */}
       </div>
     </section>
   );
