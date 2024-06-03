@@ -41,7 +41,8 @@ export class MidiPlayer {
     // await waitForNextBar();
 
     let currentTick = 1;
-    for (const { tick, events } of this.eventsByTick.items) {
+    const items = this.eventsByTick.items;
+    for (const { tick, events } of items) {
       if (abortSignal.aborted || !isPlayingValue) {
         return;
       }
