@@ -1,4 +1,4 @@
-import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { EventsByTick } from "@/app/engine/eventsByTick";
 import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   TICKS_IN_BAR,
@@ -11,7 +11,7 @@ import {
 const LOG_PREFIX = "LooperPlayer: ";
 
 export type LooperPlayerOptions = {
-  eventsByTick: Map<number, Set<ChordOrNote>>;
+  eventsByTick: EventsByTick;
   lastBarTickWhenStoppedRecording: number;
   lastBarTickForLastRecordedEvent: number;
   endTick: number;
@@ -36,19 +36,17 @@ export class LooperPlayer {
   }
 
   async playLoop(): Promise<void> {
-    const sortedTicks = Array.from(this.options.eventsByTick.keys()).sort(
-      (a, b) => a - b
-    );
-
+    const eventsByTick = this.options.eventsByTick;
     // Edge case: if there are no notes, just return
-    if (sortedTicks.length === 0) {
+    if (!eventsByTick.hasItems) {
       return;
     }
 
     console.log(LOG_PREFIX + "Loop info", this.options);
 
     const abortSignal = this.abortController.signal;
-    const firstEventTick = sortedTicks[0];
+    const items = eventsByTick.items;
+    const firstEventTick = items[0].tick;
     let currentTick: number;
 
     while (!abortSignal.aborted) {
@@ -60,7 +58,7 @@ export class LooperPlayer {
       });
       currentTick = await this.getStartingPosition(firstEventTick);
       console.log(LOG_PREFIX + `Loop starts. Current tick is %d`, currentTick);
-      for (const tick of sortedTicks) {
+      for (const { tick, events } of items) {
         if (abortSignal.aborted) {
           return;
         }
@@ -95,7 +93,11 @@ export class LooperPlayer {
           return;
         }
 
-        this.playEventsAtTick(currentTick);
+        console.log(LOG_PREFIX + "Playing events at tick %d", tick);
+
+        this.verifyTickIsCorrect(tick);
+
+        playAllNotes(events);
       }
       console.log(LOG_PREFIX + "All notes in the loop are played");
 
@@ -153,20 +155,6 @@ export class LooperPlayer {
       }
       return mod;
     }
-  }
-
-  private playEventsAtTick(tick: number) {
-    const eventsAtTick = this.options.eventsByTick.get(tick);
-
-    if (!eventsAtTick || !eventsAtTick.size) {
-      return;
-    }
-
-    console.log(LOG_PREFIX + "Playing events at tick %d", tick);
-
-    this.verifyTickIsCorrect(tick);
-
-    playAllNotes(eventsAtTick);
   }
 
   private verifyTickIsCorrect(tick: number) {

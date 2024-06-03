@@ -52,28 +52,24 @@ export class EventsByTick {
   /**
    * Gets the events for a given tick (time).
    *
-   * @param key - The tick (time) to get events for
+   * @param tick - The tick (time) to get events for
    * @returns An array of ChordOrNote or undefined if the key does not exist
    */
-  getEvents(key: number): ChordOrNote[] | undefined {
-    return this.events.get(key);
+  getEvents(tick: number): ChordOrNote[] | undefined {
+    return this.events.get(tick);
   }
 
   /**
-   * Iterates over all events in sorted order asynchronously, invoking the provided callback for each key-value pair.
-   *
-   * @param callback - An async function to execute for each entry in the map
+   * Get the iterable collection of all events in sorted order.
    */
-  async forEachEvent(
-    callback: (key: number, value: ChordOrNote[]) => Promise<void>
-  ): Promise<void> {
-    const sortedKeys = Array.from(this.events.keys()).sort((a, b) => a - b);
-    for (const key of sortedKeys) {
-      const value = this.events.get(key);
-      if (value?.length) {
-        await callback(key, value);
-      }
-    }
+  get items() {
+    return Array.from(this.events.keys())
+      .sort((a, b) => a - b)
+      .map((x) => ({ tick: x, events: this.events.get(x) }))
+      .filter((x) => x.events?.length) as {
+      tick: number;
+      events: ChordOrNote[];
+    }[];
   }
 
   /**

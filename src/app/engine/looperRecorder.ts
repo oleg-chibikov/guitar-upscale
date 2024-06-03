@@ -1,4 +1,4 @@
-import { ChordOrNote, NoteEvent } from "@/app/engine/eventsByTick";
+import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import { LooperPlayer, LooperPlayerOptions } from "@/app/engine/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looperShared";
 import { Instrument } from "../data/instruments";
@@ -16,15 +16,14 @@ import {
 const LOG_PREFIX = "LooperRecorder: ";
 
 export class LooperRecorder {
-  private eventsByTick: Map<number, Set<ChordOrNote>> | undefined;
+  private eventsByTick: EventsByTick | undefined;
   private isRecording: boolean = false;
   private absoluteTickAtTheBeginningOfFirstEventBar: number | undefined;
   private lastBarTickForLastRecordedEvent: number | undefined;
   private looperPlayer: LooperPlayer | undefined;
 
   hasRecording = () => {
-    const size = this.eventsByTick?.size;
-    return size !== undefined ? size > 0 : false;
+    return this.eventsByTick?.hasItems ?? false;
   };
 
   clear = () => {
@@ -46,7 +45,7 @@ export class LooperRecorder {
       return;
     }
 
-    if (!this.eventsByTick?.size) {
+    if (!this.eventsByTick?.hasItems) {
       return;
     }
 
@@ -101,10 +100,7 @@ export class LooperRecorder {
       return;
     }
 
-    const eventData: ChordOrNote = { chord: data };
-    const eventsForTick = this.addOrUpdateEvent(currentTick, eventData);
-
-    this.eventsByTick.set(currentTick, eventsForTick);
+    this.eventsByTick.addOrUpdateEvent(currentTick, data);
   }
 
   recordNote(
@@ -133,11 +129,7 @@ export class LooperRecorder {
       trackNumber,
     };
 
-    const eventsForTick = this.addOrUpdateEvent(currentTick, {
-      note: internalNoteEvent,
-    });
-
-    this.eventsByTick.set(currentTick, eventsForTick);
+    this.eventsByTick.addOrUpdateEvent(currentTick, internalNoteEvent);
   }
 
   private setStartTickAndGetCurrentTick() {
@@ -185,19 +177,9 @@ export class LooperRecorder {
   }
 
   private initialize() {
-    this.eventsByTick = new Map<number, Set<ChordOrNote>>();
+    this.eventsByTick = new EventsByTick();
     this.absoluteTickAtTheBeginningOfFirstEventBar = undefined;
     this.lastBarTickForLastRecordedEvent = undefined;
     this.looperPlayer = undefined;
-  }
-
-  private addOrUpdateEvent(currentTick: number, data: ChordOrNote) {
-    let eventsForTick = this.eventsByTick!.get(currentTick);
-    if (!eventsForTick) {
-      eventsForTick = new Set([data]);
-    } else {
-      eventsForTick.add(data);
-    }
-    return eventsForTick;
   }
 }

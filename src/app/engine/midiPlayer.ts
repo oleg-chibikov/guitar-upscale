@@ -41,7 +41,7 @@ export class MidiPlayer {
     // await waitForNextBar();
 
     let currentTick = 1;
-    await this.eventsByTick.forEachEvent(async (tick, events) => {
+    for (const { tick, events } of this.eventsByTick.items) {
       if (abortSignal.aborted || !isPlayingValue) {
         return;
       }
@@ -57,7 +57,7 @@ export class MidiPlayer {
 
       console.log(LOG_PREFIX + "Playing events at tick %d", tick);
       playAllNotes(events);
-    });
+    }
     console.log(LOG_PREFIX + "All events are played");
   }
 }
