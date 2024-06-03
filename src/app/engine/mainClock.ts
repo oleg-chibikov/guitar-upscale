@@ -38,16 +38,22 @@ const createPromise = () => {
   };
 };
 
-const { waitForNext: waitForNextTick, recreate: recreateNextTick } =
-  createPromise();
-const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
-  createPromise();
-const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
-  createPromise();
-const { waitForNext: waitForNextHalfBar, recreate: recreateNextHalfBar } =
-  createPromise();
-const { waitForNext: waitForNextBar, recreate: recreateNextBar } =
-  createPromise();
+export const resolveNextTick = () => {
+  recreateNextTick(true);
+};
+
+const {
+  waitForNext: waitForNextTick,
+  recreate: recreateNextTick,
+  waitForNext: waitForNextHalfBeat,
+  recreate: recreateNextHalfBeat,
+  waitForNext: waitForNextBeat,
+  recreate: recreateNextBeat,
+  waitForNext: waitForNextHalfBar,
+  recreate: recreateNextHalfBar,
+  waitForNext: waitForNextBar,
+  recreate: recreateNextBar,
+} = createPromise();
 
 const resolveAll = () => {
   recreateNextTick(true);

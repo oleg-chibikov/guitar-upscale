@@ -18,7 +18,7 @@ export const PauseButton: React.FC<PlayButtonProps> = (params) => {
   return (
     <IconButton
       disabled={!isPlaying}
-      isActive={isPaused}
+      isActive={false}
       tooltip={isPaused ? "Continue playing" : "Play scale"}
       icon={isPaused ? <PlayArrow /> : <Pause />}
       onPress={() => {

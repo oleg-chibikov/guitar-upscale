@@ -1,6 +1,8 @@
 import { MetronomeButton } from "@/app/components/playPanel/MetronomeButton";
+import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
 import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
+import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
@@ -32,8 +34,10 @@ export const PlayPanel: React.FC<PlayPanelProps> = ({
             : "justify-start"
         }`}
       >
+        <PreviousEventButton />
         {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
         <PauseButton />
+        <NextEventButton />
       </div>
       <div
         className={`flex flex-row gap-1 ${

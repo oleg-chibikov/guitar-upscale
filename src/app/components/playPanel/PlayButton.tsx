@@ -22,6 +22,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   return (
     <IconButton
       isActive={isPlaying}
+      activeBg="bg-red-500"
       tooltip={
         isWaiting
           ? "Waiting for the next bar..."

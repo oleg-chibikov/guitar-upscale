@@ -9,3 +9,7 @@ Feedback form
 get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
 High string at the bottom mode
+
+STOP - extra note played
+Play on scale - the whole scale played initially in one tick
+WaitForNextHalfBeat could make the melody offbeat - we need to store what tick to wait for

@@ -1,29 +1,28 @@
-// "use client";
-// import { UsePlayParams } from "@/app/hooks/usePlay";
-// import { selectSettings, setIsPreviousEventd } from "@/app/store/settingsSlice";
-// import ChevronLeft from "@mui/icons-material/ChevronLeft";
-// import PlayArrow from "@mui/icons-material/PlayArrow";
-// import React from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { IconButton } from "../settings/buttons/IconButton";
+"use client";
+import {
+  PauseResolveValue,
+  moveCurrentPlayPosition,
+  selectSettings,
+} from "@/app/store/settingsSlice";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import React from "react";
+import { useSelector } from "react-redux";
+import { IconButton } from "../settings/buttons/IconButton";
 
-// type PlayButtonProps = UsePlayParams;
-
-// export const PreviousEventButton: React.FC<PlayButtonProps> = (params) => {
-//   const { isPaused } = useSelector(selectSettings);
-//   const dispatch = useDispatch();
-//   if (!isPaused) {
-//     return null;
-//   }
-//   return (
-//     <IconButton
-//       disabled={!isPaused}
-//       isActive={true}
-//       tooltip={"Previous event"}
-//       icon={<ChevronLeft />}
-//       onPress={() => {
-//         dispatch(setIsPreviousEvent(!isPreviousEventd));
-//       }}
-//     />
-//   );
-// };
+export const PreviousEventButton: React.FC = () => {
+  const { isPaused, playerEventIndex } = useSelector(selectSettings);
+  if (!isPaused) {
+    return null;
+  }
+  return (
+    <IconButton
+      disabled={!isPaused || playerEventIndex <= 1}
+      isActive={false}
+      tooltip={"Previous event"}
+      icon={<ChevronLeft />}
+      onPress={() => {
+        moveCurrentPlayPosition(PauseResolveValue.GoBack);
+      }}
+    />
+  );
+};

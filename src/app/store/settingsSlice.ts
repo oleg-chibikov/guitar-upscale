@@ -31,6 +31,7 @@ import {
 } from "../engine/looperShared";
 import {
   isMainClockActive,
+  resolveNextTick,
   startInterval,
   stopInterval,
   waitForNextHalfBeat,
@@ -96,6 +97,8 @@ interface SettingsState
   chordIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
+  playerEventIndex: number;
+  playerEventCount: number;
 }
 
 const initialState: SettingsState = {
@@ -129,6 +132,8 @@ const initialState: SettingsState = {
   isRecording: false,
   toggleMetronomeWhenRecording: true,
   guitarSettingsUpdatedTrigger: false,
+  playerEventIndex: 0,
+  playerEventCount: 0,
 };
 
 // A values that changes immediately without the need for rerender
@@ -212,12 +217,6 @@ export let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 
-const updateIsPaused = (value: boolean, state: WithIsPaused) => {
-  isPausedValue = value;
-  state.isPaused = isPausedValue;
-  togglePause(!isPausedValue);
-};
-
 const setChords = (state: WithNeck) => {
   if (state.neck) {
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
@@ -255,23 +254,52 @@ export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
 
 // this promise is resolved only when pause is released
-let pausePromise: Promise<void> = Promise.resolve();
-export const waitForPauseToBeReleased = async () => {
+let pausePromise: Promise<PauseResolveValue | undefined> =
+  Promise.resolve(undefined);
+
+export const waitForPauseToBeReleased = async (): Promise<
+  PauseResolveValue | undefined
+> => {
   if (!isPausedValue) {
     return;
   }
-  await pausePromise;
-  if (!isPausedValue) {
-    return;
+  const afterPauseAction = await pausePromise;
+  if (afterPauseAction !== undefined) {
+    return afterPauseAction;
   }
   await waitForNextHalfBeat(); // wait for the next interval after pause has been released. Otherwise 2 notes might play simultaneously
 };
-let resolvePause: (value: void | PromiseLike<void>) => void = () => null;
+
+let resolvePause: (
+  value:
+    | PauseResolveValue
+    | PromiseLike<PauseResolveValue | undefined>
+    | undefined
+) => void = () => null;
 
 const recreatePausePromise = () => {
-  pausePromise = new Promise((resolve) => {
+  pausePromise = new Promise<PauseResolveValue | undefined>((resolve) => {
     resolvePause = resolve;
   });
+};
+
+const updateIsPaused = (value: boolean, state: WithIsPaused) => {
+  isPausedValue = value;
+  state.isPaused = isPausedValue;
+  resolvePause(undefined);
+  recreatePausePromise();
+};
+
+export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
+  console.log("Resolving next tick");
+  resolveNextTick();
+  // setTimeout here helps to allow MidiPlayer to go into "Waiting for pause" state and process the next/prev event correctly
+  setTimeout(() => {
+    console.log("Resolving pause with type", type);
+    resolvePause(type); // release one tick and set pause again
+    console.log("Pause resolved");
+    recreatePausePromise();
+  }, 1);
 };
 
 export const toggleInterval = (toggle: boolean) => {
@@ -290,23 +318,10 @@ export const toggleInterval = (toggle: boolean) => {
   }
 };
 
-export const togglePause = (toggle: boolean) => {
-  // This function stops the clock without recreating it and also sets a dedicated promise to wait mode
-  // Even if the clock is later started the pause won't be released automatically
-  if (toggle) {
-    // start clock if it's not active yet
-    if (!isMainClockActive()) {
-      console.log("Resuming clock");
-      startInterval(false);
-    }
-    resolvePause();
-  } else {
-    recreatePausePromise();
-    // stopping clock without resetting it
-    console.log("Pausing clock");
-    stopInterval(false);
-  }
-};
+export enum PauseResolveValue {
+  GoBack,
+  GoForward,
+}
 
 export const settingsSlice = createSlice({
   name: "settings",
@@ -354,6 +369,12 @@ export const settingsSlice = createSlice({
       onGuitarSettingsUpdate(state);
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
+    },
+    setPlayerEventIndex: (state, action: PayloadAction<number>) => {
+      state.playerEventIndex = action.payload;
+    },
+    setPlayerEventCount: (state, action: PayloadAction<number>) => {
+      state.playerEventCount = action.payload;
     },
     setScale: (state, action: PayloadAction<string>) => {
       state.scale = action.payload;
@@ -552,6 +573,8 @@ export const {
   setIsRecording,
   setToggleMetronomeWhenRecording,
   refreshSettings,
+  setPlayerEventIndex,
+  setPlayerEventCount,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

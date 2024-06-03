@@ -93,11 +93,9 @@ export class LooperPlayer {
           return;
         }
 
-        console.log(LOG_PREFIX + "Playing events at tick %d", tick);
-
         this.verifyTickIsCorrect(tick);
 
-        playAllNotes(events);
+        playAllNotes(events, LOG_PREFIX, tick);
       }
       console.log(LOG_PREFIX + "All notes in the loop are played");
 
