@@ -126,7 +126,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
           example,
           neck,
         });
-        message = example.band + " - " + example.title;
+        message = `${example.band} - ${example.title}`;
       } else {
         const isFullStringScalePlayback =
           playbackTypeValue === fullStringScaleType;

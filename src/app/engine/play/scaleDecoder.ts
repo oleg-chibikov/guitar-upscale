@@ -2,7 +2,6 @@ import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
 import { isPlayingValue } from "@/app/store/settingsSlice";
-import { NotePlayEventBus } from "../eventBus";
 import { Neck } from "../generateNeckRepresentation";
 
 export const getWholeScale = (
@@ -64,12 +63,6 @@ export const getWholeScale = (
           break;
         }
       }
-
-      console.log("Requesting auto play note: " + JSON.stringify(note));
-      NotePlayEventBus.next({
-        stringOctaveNote: note,
-        skipChordDetection: true,
-      });
 
       result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
         trackNumber: 0,
