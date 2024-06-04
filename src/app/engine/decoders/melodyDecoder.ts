@@ -156,7 +156,7 @@ export class MelodyDecoder {
 
   private convertChord(chord: string, tuningShift: number): string {
     const baseNote = baseNoteValue;
-    if (baseNote === Note.E && !tuningShift) {
+    if (baseNote === 0 && !tuningShift) {
       return chord;
     }
 
@@ -209,7 +209,8 @@ export class MelodyDecoder {
 
     if (stringOctaveNote) {
       result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
-        ...this.track,
+        trackNumber: this.track.trackNumber,
+        instrument: this.track.instrument,
         note: stringOctaveNote,
       });
       tickIndex++;
