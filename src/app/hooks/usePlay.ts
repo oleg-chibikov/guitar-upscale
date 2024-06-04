@@ -2,7 +2,13 @@ import { EventsByTick } from "@/app/engine/eventsByTick";
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 import { MidiPlayer } from "@/app/engine/midiPlayer";
 import { asyncTimeout } from "@/app/helpers/asyncTimeout";
-import { useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import { AlertType } from "../data/alertType";
@@ -85,11 +91,6 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
     await Promise.all(trackInstrumentPromises);
 
-    ReactGA.event({
-      category: "Playback",
-      action: "Playback started",
-    });
-
     let {
       eventsToPlay,
       message,
@@ -103,36 +104,17 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       return;
     }
 
-    // Start playback
-    if (isMainClockActive()) {
-      setIsWaiting(true);
-      // if metronome or chord strumming is already playing then wait for the bar, other
-      console.log("Waiting for the next bar");
-      if (example?.halfBeatShift !== undefined && example.halfBeatShift) {
-        // wait for the remainder of the beats till desired value
-        const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
-        let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;
-        if (halfBeatsToWait < 0) {
-          // If play starts too close (less than tickShift ticks) to the next bar - wait for the bar after
-          halfBeatsToWait = HALF_BEATS_IN_BAR + halfBeatsToWait;
-        }
-        console.log(
-          `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
-        );
-        for (let i = 0; i < halfBeatsToWait; i++) {
-          await waitForNextHalfBeat();
-        }
-      } else {
-        await waitForNextBar();
-      }
-
-      setIsWaiting(false);
-    }
-
     const player = new MidiPlayer(eventsToPlay);
 
     const playMidi = async () => {
+      // Start playback
+      console.log("Waiting for playback to start...");
+      await waitForStart(setIsWaiting, example);
       console.log("Start playing");
+      ReactGA.event({
+        category: "Playback",
+        action: "Playback started",
+      });
       dispatch(setIsPlaying(true));
       try {
         await player.play();
@@ -144,7 +126,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     if (isPlayingValue) {
       dispatch(setIsPlaying(false));
       // a timeout is needed to properly stop the current playback
-      await asyncTimeout(playMidi, 1);
+      await asyncTimeout(playMidi, 10);
     } else {
       await playMidi();
     }
@@ -174,6 +156,36 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   return { isWaiting, handlePlay };
 };
+async function waitForStart(
+  setIsWaiting: Dispatch<SetStateAction<boolean>>,
+  example: Example | undefined
+) {
+  if (isMainClockActive()) {
+    setIsWaiting(true);
+    // if metronome or chord strumming is already playing then wait for the bar, other
+    console.log("Waiting for the next bar");
+    if (example?.halfBeatShift !== undefined && example.halfBeatShift) {
+      // wait for the remainder of the beats till desired value
+      const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
+      let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;
+      if (halfBeatsToWait < 0) {
+        // If play starts too close (less than tickShift ticks) to the next bar - wait for the bar after
+        halfBeatsToWait = HALF_BEATS_IN_BAR + halfBeatsToWait;
+      }
+      console.log(
+        `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
+      );
+      for (let i = 0; i < halfBeatsToWait; i++) {
+        await waitForNextHalfBeat();
+      }
+    } else {
+      await waitForNextBar();
+    }
+
+    setIsWaiting(false);
+  }
+}
+
 async function decode(
   decodeExample:
     | ((params: PlayExampleParameters) => Promise<EventsByTick>)

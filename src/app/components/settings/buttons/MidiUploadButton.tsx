@@ -48,7 +48,7 @@ export const MidiUploadButton: React.FC = () => {
           if (isPlayingValue) {
             dispatch(setIsPlaying(false));
             // a timeout is needed to properly stop the current playback
-            await asyncTimeout(playMidi, 1);
+            await asyncTimeout(playMidi, 10);
           } else {
             await playMidi();
           }
