@@ -11,6 +11,7 @@ import { store } from "@/app/store/store";
 import { waitForTick } from "./mainClock";
 
 const LOG_PREFIX = "MidiPlayer: ";
+const checkFinished = () => !isPlayingValue;
 
 export type MidiPlayerOptions = {
   eventsByTick: EventsByTick;
@@ -18,7 +19,6 @@ export type MidiPlayerOptions = {
 
 export class MidiPlayer {
   private eventsByTick: EventsByTick;
-  private abortController = new AbortController();
 
   constructor(eventsByTick: EventsByTick) {
     this.eventsByTick = eventsByTick;
@@ -26,23 +26,16 @@ export class MidiPlayer {
     store.dispatch(setPlayerEventIndex(0));
   }
 
-  stopPlaying(): void {
-    this.abortController.abort();
-    this.abortController = new AbortController();
-  }
-
   async play(): Promise<void> {
-    console.log("Playing midi file");
+    console.log(LOG_PREFIX + "Playing midi file");
 
     // Edge case: if there are no notes, just return
     if (!this.eventsByTick.hasItems) {
-      console.log("No events in midi file");
+      console.log(LOG_PREFIX + "No events in midi file");
       return;
     }
 
     console.log(LOG_PREFIX + "Midi info", this.eventsByTick);
-
-    const abortSignal = this.abortController.signal;
 
     // await waitForNextBar();
 
@@ -51,19 +44,19 @@ export class MidiPlayer {
     for (let i = 0; i < items.length; i++) {
       store.dispatch(setPlayerEventIndex(i));
       const { tick, events } = items[i];
-      if (abortSignal.aborted || !isPlayingValue) {
+      if (checkFinished()) {
         return;
       }
 
       // these 2 promises should be waited for sequentially - we should check if it's paused after the clock interval has been released, otherwise the extra note might get played
-      await waitForTick(tick, currentTick, abortSignal, LOG_PREFIX);
+      await waitForTick(tick, currentTick, checkFinished, LOG_PREFIX);
       console.log(LOG_PREFIX + "Waiting for pause");
       const afterPauseAction = await waitForPauseToBeReleased();
       console.log(LOG_PREFIX + "After pause: " + afterPauseAction);
       if (afterPauseAction === undefined) {
         currentTick = tick;
 
-        if (abortSignal.aborted) {
+        if (checkFinished()) {
           return;
         }
 

@@ -45,11 +45,12 @@ export class LooperPlayer {
     console.log(LOG_PREFIX + "Loop info", this.options);
 
     const abortSignal = this.abortController.signal;
+    const checkFinished = () => abortSignal.aborted;
     const items = eventsByTick.items;
     const firstEventTick = items[0].tick;
     let currentTick: number;
 
-    while (!abortSignal.aborted) {
+    while (!checkFinished()) {
       let resolveCurrentLoop: (
         value: void | PromiseLike<void>
       ) => void = () => {};
@@ -59,7 +60,7 @@ export class LooperPlayer {
       currentTick = await this.getStartingPosition(firstEventTick);
       console.log(LOG_PREFIX + `Loop starts. Current tick is %d`, currentTick);
       for (const { tick, events } of items) {
-        if (abortSignal.aborted) {
+        if (checkFinished()) {
           return;
         }
 
@@ -86,10 +87,10 @@ export class LooperPlayer {
           break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh (this allows filtering out unnecessary events)
         }
 
-        await waitForTick(tick, currentTick, abortSignal, LOG_PREFIX);
+        await waitForTick(tick, currentTick, checkFinished, LOG_PREFIX);
         currentTick = tick;
 
-        if (abortSignal.aborted) {
+        if (checkFinished()) {
           return;
         }
 
@@ -107,7 +108,7 @@ export class LooperPlayer {
         await waitForTick(
           this.options.lastBarTickWhenStoppedRecording,
           currentTick,
-          abortSignal,
+          checkFinished,
           LOG_PREFIX
         );
       }
