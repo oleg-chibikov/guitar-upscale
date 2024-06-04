@@ -38,22 +38,16 @@ const createPromise = () => {
   };
 };
 
-export const resolveNextTick = () => {
-  recreateNextTick(true);
-};
-
-const {
-  waitForNext: waitForNextTick,
-  recreate: recreateNextTick,
-  waitForNext: waitForNextHalfBeat,
-  recreate: recreateNextHalfBeat,
-  waitForNext: waitForNextBeat,
-  recreate: recreateNextBeat,
-  waitForNext: waitForNextHalfBar,
-  recreate: recreateNextHalfBar,
-  waitForNext: waitForNextBar,
-  recreate: recreateNextBar,
-} = createPromise();
+const { waitForNext: waitForNextTick, recreate: recreateNextTick } =
+  createPromise();
+const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
+  createPromise();
+const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
+  createPromise();
+const { waitForNext: waitForNextHalfBar, recreate: recreateNextHalfBar } =
+  createPromise();
+const { waitForNext: waitForNextBar, recreate: recreateNextBar } =
+  createPromise();
 
 const resolveAll = () => {
   recreateNextTick(true);
@@ -179,13 +173,13 @@ export const startInterval = (afresh: boolean) => {
 export const waitForTick = async (
   tickToWaitFor: number,
   currentTick: number,
-  checkFinished: () => boolean,
+  abortSignal: AbortSignal,
   logPrefix: string
 ) => {
   const ticksToWait = tickToWaitFor - currentTick;
   console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
   for (let i = 0; i < ticksToWait; i++) {
-    if (checkFinished()) {
+    if (abortSignal.aborted) {
       return Promise.resolve();
     }
     await waitForNextTick();
