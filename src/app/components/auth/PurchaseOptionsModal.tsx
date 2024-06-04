@@ -33,7 +33,7 @@ const featureNames: Record<AllowedKeys, string> = {
   advancedChords: "Advanced chords",
   melodies: "Melody examples",
   chordDetection: "Chord detection",
-  midiUpload: "Midi playback",
+  midiUpload: "Play MIDI files",
   instruments: "Configurable instruments",
   midiRecorder: "MIDI recording",
   looper: "Looper",
