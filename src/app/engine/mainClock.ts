@@ -185,3 +185,7 @@ export const waitForTick = async (
     await waitForNextTick();
   }
 };
+
+export const resolveNextTick = () => {
+  recreateNextTick(true);
+};

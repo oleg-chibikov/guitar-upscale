@@ -1,6 +1,9 @@
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
+import {
+  LooperPlayer,
+  LooperPlayerOptions,
+} from "@/app/engine/looper/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looper/looperShared";
-import { LooperPlayer, LooperPlayerOptions } from "@/app/engine/looperPlayer";
 import { Instrument } from "../../data/instruments";
 import { StringOctaveNote } from "../../data/notes";
 import { ChordWithPlayMetadata } from "../eventBus";
