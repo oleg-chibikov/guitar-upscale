@@ -10,13 +10,13 @@ import { useSelector } from "react-redux";
 import { IconButton } from "../settings/buttons/IconButton";
 
 export const PreviousEventButton: React.FC = () => {
-  const { isPaused, playerEventIndex } = useSelector(selectSettings);
+  const { isPaused, isFirstEvent } = useSelector(selectSettings);
   if (!isPaused) {
     return null;
   }
   return (
     <IconButton
-      disabled={!isPaused || playerEventIndex <= 1}
+      disabled={!isPaused || isFirstEvent}
       isActive={false}
       tooltip={"Previous event"}
       icon={<ChevronLeft />}

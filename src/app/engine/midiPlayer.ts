@@ -2,9 +2,11 @@ import { EventsByTick } from "@/app/engine/eventsByTick";
 import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   PauseResolveValue,
+  isFirstEventValue,
+  isLastEventValue,
   isPlayingValue,
-  setPlayerEventCount,
-  setPlayerEventIndex,
+  setIsFirstEvent,
+  setIsLastEvent,
   waitForPauseToBeReleased,
 } from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
@@ -22,11 +24,15 @@ export class MidiPlayer {
 
   constructor(eventsByTick: EventsByTick) {
     this.eventsByTick = eventsByTick;
-    store.dispatch(setPlayerEventCount(this.eventsByTick.items.length));
-    store.dispatch(setPlayerEventIndex(0));
   }
 
   async play(): Promise<void> {
+    if (isLastEventValue) {
+      store.dispatch(setIsLastEvent(false));
+    }
+    if (isFirstEventValue) {
+      store.dispatch(setIsFirstEvent(false));
+    }
     console.log(LOG_PREFIX + "Playing midi file");
 
     // Edge case: if there are no notes, just return
@@ -42,7 +48,6 @@ export class MidiPlayer {
     let currentTick = 1;
     const items = this.eventsByTick.items;
     for (let i = 0; i < items.length; i++) {
-      store.dispatch(setPlayerEventIndex(i));
       const { tick, events } = items[i];
       if (checkFinished()) {
         return;
@@ -54,6 +59,12 @@ export class MidiPlayer {
       const afterPauseAction = await waitForPauseToBeReleased();
       console.log(LOG_PREFIX + "After pause: " + afterPauseAction);
       if (afterPauseAction === undefined) {
+        if (isLastEventValue) {
+          store.dispatch(setIsLastEvent(false));
+        }
+        if (isFirstEventValue) {
+          store.dispatch(setIsFirstEvent(false));
+        }
         currentTick = tick;
 
         if (checkFinished()) {
@@ -64,29 +75,41 @@ export class MidiPlayer {
       } else {
         switch (afterPauseAction) {
           case PauseResolveValue.GoBack:
-            if (i === 0) {
-              break;
+            if (isLastEventValue) {
+              i--; // special edge case to play the last note correctly
+              store.dispatch(setIsLastEvent(false));
+            } else {
+              i -= 2; // -2 to avoid being stuck on the current event as then the loop will increment the counter
             }
-            i--;
+
+            if (i <= 0) {
+              i = 0;
+              store.dispatch(setIsFirstEvent(true));
+            }
             const previousItem = items[i];
             currentTick = previousItem.tick;
             playAllNotes(previousItem.events, LOG_PREFIX, tick);
             if (i === 0) {
-              break;
+              i = -1; // special edge case to play the first note correctly (so that GoForward / Play would start from the 0 note)
             }
-            i--; // one more decrement is needed to avoid being stuck on the same note
             break;
           case PauseResolveValue.GoForward:
             const nextItem = items[i];
             currentTick = nextItem.tick;
             playAllNotes(nextItem.events, LOG_PREFIX, tick);
+            if (isFirstEventValue) {
+              store.dispatch(setIsFirstEvent(false));
+            }
             if (i === items.length - 1) {
+              store.dispatch(setIsLastEvent(true));
               i--; // allow playing the last note over and over again
             }
             break;
         }
       }
     }
+    store.dispatch(setIsLastEvent(true));
+    store.dispatch(setIsFirstEvent(true));
     console.log(LOG_PREFIX + "All events are played");
   }
 }

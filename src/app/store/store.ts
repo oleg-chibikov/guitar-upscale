@@ -65,6 +65,8 @@ const persistConfig = {
         delete newState.isRecording;
         delete newState.subscriptionTier;
         delete newState.premiumFeatures;
+        delete newState.isLastEvent;
+        delete newState.isFirstEvent;
         return newState;
       },
       out: (state: PersistedState) => state, // No transformation needed when deserializing

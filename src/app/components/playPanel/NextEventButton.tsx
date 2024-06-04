@@ -10,14 +10,13 @@ import { useSelector } from "react-redux";
 import { IconButton } from "../settings/buttons/IconButton";
 
 export const NextEventButton: React.FC = () => {
-  const { isPaused, playerEventIndex, playerEventCount } =
-    useSelector(selectSettings);
+  const { isPaused, isLastEvent } = useSelector(selectSettings);
   if (!isPaused) {
     return null;
   }
   return (
     <IconButton
-      disabled={!isPaused || playerEventIndex === playerEventCount - 1}
+      disabled={!isPaused || isLastEvent}
       isActive={false}
       tooltip={"Next event"}
       icon={<ChevronRight />}

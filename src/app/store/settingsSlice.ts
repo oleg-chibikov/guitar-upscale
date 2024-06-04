@@ -97,8 +97,8 @@ interface SettingsState
   chordIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
-  playerEventIndex: number;
-  playerEventCount: number;
+  isFirstEvent: boolean;
+  isLastEvent: boolean;
 }
 
 const initialState: SettingsState = {
@@ -132,8 +132,8 @@ const initialState: SettingsState = {
   isRecording: false,
   toggleMetronomeWhenRecording: true,
   guitarSettingsUpdatedTrigger: false,
-  playerEventIndex: 0,
-  playerEventCount: 0,
+  isFirstEvent: false,
+  isLastEvent: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -174,6 +174,8 @@ export let isRecordingValue: boolean = initialState.isRecording;
 export let toggleMetronomeWhenRecordingValue: boolean =
   initialState.toggleMetronomeWhenRecording;
 export let wipeExampleCacheTriggerValue: boolean = false;
+export let isLastEventValue: boolean = false;
+export let isFirstEventValue: boolean = false;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -355,6 +357,8 @@ export const settingsSlice = createSlice({
       isRecordingValue = state.isRecording;
       playbackTypeValue = state.playbackType;
       tuningValue = state.tuning;
+      isLastEventValue = state.isLastEvent;
+      isFirstEventValue = state.isFirstEvent;
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -370,11 +374,13 @@ export const settingsSlice = createSlice({
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
     },
-    setPlayerEventIndex: (state, action: PayloadAction<number>) => {
-      state.playerEventIndex = action.payload;
+    setIsFirstEvent: (state, action: PayloadAction<boolean>) => {
+      state.isFirstEvent = action.payload;
+      isFirstEventValue = action.payload;
     },
-    setPlayerEventCount: (state, action: PayloadAction<number>) => {
-      state.playerEventCount = action.payload;
+    setIsLastEvent: (state, action: PayloadAction<boolean>) => {
+      state.isLastEvent = action.payload;
+      isLastEventValue = action.payload;
     },
     setScale: (state, action: PayloadAction<string>) => {
       state.scale = action.payload;
@@ -573,8 +579,8 @@ export const {
   setIsRecording,
   setToggleMetronomeWhenRecording,
   refreshSettings,
-  setPlayerEventIndex,
-  setPlayerEventCount,
+  setIsFirstEvent,
+  setIsLastEvent,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;
