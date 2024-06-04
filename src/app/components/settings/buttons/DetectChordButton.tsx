@@ -24,7 +24,9 @@ export const DetectChordButton: React.FC = (props) => {
       activeBg="bg-red-500"
       onPress={async () => {
         if (chordIsBeingDetected) {
-          const { mainDetector } = await import("@/app/engine/chordDetector");
+          const { mainDetector } = await import(
+            "@/app/engine/chords/chordDetector"
+          );
           mainDetector.clearDetector();
         } else {
           await setupChordDetector();

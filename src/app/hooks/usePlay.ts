@@ -69,7 +69,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
       }
     } else {
-      await import("@/app/engine/play/scaleDecoder");
+      await import("@/app/engine/decoders/scaleDecoder");
     }
 
     // the instrument should be initialized before waiting for the first note
@@ -135,7 +135,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         }`;
 
         const { getWholeScale } = await import(
-          "@/app/engine/play/scaleDecoder"
+          "@/app/engine/decoders/scaleDecoder"
         );
         eventsToPlay = getWholeScale(neck, isFullStringScalePlayback);
       }

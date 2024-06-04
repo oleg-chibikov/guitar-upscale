@@ -6,7 +6,7 @@ import {
   setIsMetronomeActive,
   toggleInterval,
   toggleMetronomeWhenRecordingValue,
-} from "../store/settingsSlice";
+} from "../../store/settingsSlice";
 import { LooperRecorder } from "./looperRecorder";
 import {
   currentlyPlayingLooperChannels,

@@ -17,7 +17,7 @@ import {
   getClosestVariation,
   getModeText,
   NoteChords,
-} from "../engine/chordsGenerator";
+} from "../engine/chords/chordsGenerator";
 import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
@@ -28,7 +28,7 @@ import { MAX_VOLUME } from "@/app/data/volume";
 import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
-} from "../engine/looperShared";
+} from "../engine/looper/looperShared";
 import {
   isMainClockActive,
   resolveNextTick,

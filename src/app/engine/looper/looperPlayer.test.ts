@@ -1,12 +1,12 @@
 import { Note, StringOctaveNote } from "@/app/data/notes";
 import { ChordOrNote, LooperNoteEvent } from "@/app/engine/eventsByTick";
-import { ChordEventBus, NotePlayEventBus } from "./eventBus";
-import { LooperPlayer, LooperPlayerOptions } from "./looperPlayer";
+import { ChordEventBus, NotePlayEventBus } from "../eventBus";
 import {
   getCurrentRelativeTick,
   waitForNextBar,
   waitForNextTick,
-} from "./mainClock";
+} from "../mainClock";
+import { LooperPlayer, LooperPlayerOptions } from "./looperPlayer";
 
 // Mocking external dependencies
 jest.mock("./eventBus");

@@ -6,7 +6,7 @@ import {
   setRecordingInLooperChannel,
   startMetronomeIfNeeded,
   stopMetronomeIfNeeded,
-} from "@/app/engine/looper";
+} from "@/app/engine/looper/looper";
 import { IconButton } from "../settings/buttons/IconButton";
 
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";

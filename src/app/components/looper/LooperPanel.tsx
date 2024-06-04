@@ -10,7 +10,7 @@ import {
   clearLooperState,
   looperState,
   stopMetronomeIfNeeded,
-} from "@/app/engine/looper";
+} from "@/app/engine/looper/looper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { useEffect, useState } from "react";

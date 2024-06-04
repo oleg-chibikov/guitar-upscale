@@ -5,7 +5,7 @@ import {
   StringOctaveNote,
   serializeOctaveNote,
 } from "@/app/data/notes";
-import { mainDetector } from "@/app/engine/chordDetector";
+import { mainDetector } from "@/app/engine/chords/chordDetector";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   NOTE_COUNT,

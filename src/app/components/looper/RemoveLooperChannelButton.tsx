@@ -3,7 +3,7 @@ import {
   CanSetLooperState,
   looperState,
   removeChannel,
-} from "@/app/engine/looper";
+} from "@/app/engine/looper/looper";
 import Remove from "@mui/icons-material/Remove";
 
 export const RemoveLooperChannelButton: React.FC<CanSetLooperState> = ({

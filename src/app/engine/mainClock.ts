@@ -173,13 +173,13 @@ export const startInterval = (afresh: boolean) => {
 export const waitForTick = async (
   tickToWaitFor: number,
   currentTick: number,
-  abortSignal: AbortSignal,
+  checkFinished: () => boolean,
   logPrefix: string
 ) => {
   const ticksToWait = tickToWaitFor - currentTick;
   console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
   for (let i = 0; i < ticksToWait; i++) {
-    if (abortSignal.aborted) {
+    if (checkFinished()) {
       return Promise.resolve();
     }
     await waitForNextTick();

@@ -1,8 +1,8 @@
-import { Chord } from "../data/notes";
-import { sleep } from "../helpers/sleep";
-import { chordNotesToPlayValue } from "../store/settingsSlice";
+import { Chord } from "../../data/notes";
+import { sleep } from "../../helpers/sleep";
+import { chordNotesToPlayValue } from "../../store/settingsSlice";
+import { ChordMetadata, NotePlayEventBus } from "../eventBus";
 import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
-import { ChordMetadata, NotePlayEventBus } from "./eventBus";
 
 export type ChordPlayParameters = ChordMetadata & {
   chordName: string;

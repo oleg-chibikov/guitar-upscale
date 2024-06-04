@@ -3,7 +3,7 @@ import {
   CanSetLooperState,
   addChannel,
   looperState,
-} from "@/app/engine/looper";
+} from "@/app/engine/looper/looper";
 import Add from "@mui/icons-material/Add";
 
 export const AddLooperChannelButton: React.FC<CanSetLooperState> = ({

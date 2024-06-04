@@ -9,7 +9,7 @@ import {
   ChordMode,
   NoteChordMode,
   getModeText,
-} from "@/app/engine/chordsGenerator";
+} from "@/app/engine/chords/chordsGenerator";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";

@@ -8,7 +8,7 @@ import {
   tempoBpmValue,
   volumeValue,
 } from "../store/settingsSlice";
-import { currentlyRecordingLooperChannel } from "./looperShared";
+import { currentlyRecordingLooperChannel } from "./looper/looperShared";
 import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
@@ -114,7 +114,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     noteMetadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {
-    const { looperState } = await import("./looper");
+    const { looperState } = await import("./looper/looper");
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordNote(
       noteMetadata.stringOctaveNote,
       trackNumber,
@@ -157,7 +157,7 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
     metadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {
-    const { looperState } = await import("./looper");
+    const { looperState } = await import("./looper/looper");
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordChord(
       chordWithMetadata
     );

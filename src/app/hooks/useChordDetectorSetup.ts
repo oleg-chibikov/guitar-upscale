@@ -16,7 +16,7 @@ export const useChordDetectorSetup = () => {
     }
 
     // async load detector module and set its functions to settings on the first detect action.
-    const { mainDetector } = await import("@/app/engine/chordDetector");
+    const { mainDetector } = await import("@/app/engine/chords/chordDetector");
     setChordDetectorFunctions(
       mainDetector.addChordToDetectorLookup.bind(mainDetector)
     );

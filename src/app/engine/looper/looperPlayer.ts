@@ -6,7 +6,7 @@ import {
   waitForNextBar,
   waitForNextTick,
   waitForTick,
-} from "./mainClock";
+} from "../mainClock";
 
 const LOG_PREFIX = "LooperPlayer: ";
 

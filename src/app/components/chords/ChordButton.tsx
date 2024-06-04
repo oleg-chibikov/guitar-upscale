@@ -7,8 +7,8 @@ import {
   playFirstChordVariation,
   playRandomChordVariation,
   playRoundRobin,
-} from "@/app/engine/chordPlayer";
-import { NoteChordMode } from "@/app/engine/chordsGenerator";
+} from "@/app/engine/chords/chordPlayer";
+import { NoteChordMode } from "@/app/engine/chords/chordsGenerator";
 import {
   ChordMetadata,
   ChordToChordButtonEventMap,
@@ -59,7 +59,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       }
 
       if (chordIsBeingDetectedValue) {
-        const { mainDetector } = await import("@/app/engine/chordDetector");
+        const { mainDetector } = await import(
+          "@/app/engine/chords/chordDetector"
+        );
         // to make sure chords are always detected when played
         mainDetector.clearDetector();
       }

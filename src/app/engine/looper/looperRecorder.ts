@@ -1,9 +1,9 @@
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
+import { currentlyRecordingLooperChannel } from "@/app/engine/looper/looperShared";
 import { LooperPlayer, LooperPlayerOptions } from "@/app/engine/looperPlayer";
-import { currentlyRecordingLooperChannel } from "@/app/engine/looperShared";
-import { Instrument } from "../data/instruments";
-import { StringOctaveNote } from "../data/notes";
-import { ChordWithPlayMetadata } from "./eventBus";
+import { Instrument } from "../../data/instruments";
+import { StringOctaveNote } from "../../data/notes";
+import { ChordWithPlayMetadata } from "../eventBus";
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
@@ -11,7 +11,7 @@ import {
   getCurrentRelativeTick,
   globalCurrentLastBarTick,
   globalCurrentTick,
-} from "./mainClock";
+} from "../mainClock";
 
 const LOG_PREFIX = "LooperRecorder: ";
 
