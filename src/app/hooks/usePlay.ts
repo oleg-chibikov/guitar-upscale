@@ -1,5 +1,7 @@
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { Neck } from "@/app/engine/generateNeckRepresentation";
 import { MidiPlayer } from "@/app/engine/midiPlayer";
+import { asyncTimeout } from "@/app/helpers/asyncTimeout";
 import { useCallback, useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
@@ -88,6 +90,19 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       action: "Playback started",
     });
 
+    let {
+      eventsToPlay,
+      message,
+    }: { eventsToPlay: EventsByTick; message: string } = await decode(
+      decodeExample,
+      example,
+      neck
+    );
+
+    if (!eventsToPlay.hasItems) {
+      return;
+    }
+
     // Start playback
     if (isMainClockActive()) {
       setIsWaiting(true);
@@ -114,37 +129,24 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       setIsWaiting(false);
     }
 
-    try {
+    const player = new MidiPlayer(eventsToPlay);
+
+    const playMidi = async () => {
       console.log("Start playing");
       dispatch(setIsPlaying(true));
-
-      let eventsToPlay: EventsByTick;
-      let message: string;
-      if (decodeExample && example && playbackTypeValue === melodyType) {
-        // this sets decoded melody in the example
-        eventsToPlay = await decodeExample({
-          example,
-          neck,
-        });
-        message = `${example.band} - ${example.title}`;
-      } else {
-        const isFullStringScalePlayback =
-          playbackTypeValue === fullStringScaleType;
-        message = `${getNoteText(baseNoteValue)} ${scaleValue} ${
-          isFullStringScalePlayback ? " (full string)" : ""
-        }`;
-
-        const { getWholeScale } = await import(
-          "@/app/engine/decoders/scaleDecoder"
-        );
-        eventsToPlay = getWholeScale(neck, isFullStringScalePlayback);
+      try {
+        await player.play();
+      } finally {
+        dispatch(setIsPlaying(false));
       }
-
-      dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
-      const player = new MidiPlayer(eventsToPlay);
-      await player.play();
-    } finally {
+    };
+    dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
+    if (isPlayingValue) {
       dispatch(setIsPlaying(false));
+      // a timeout is needed to properly stop the current playback
+      await asyncTimeout(playMidi, 1);
+    } else {
+      await playMidi();
     }
   }, [dispatch, neck, decodeExample]);
 
@@ -172,3 +174,32 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   return { isWaiting, handlePlay };
 };
+async function decode(
+  decodeExample:
+    | ((params: PlayExampleParameters) => Promise<EventsByTick>)
+    | undefined,
+  example: Example | undefined,
+  neck: Neck
+) {
+  let eventsToPlay: EventsByTick;
+  let message: string;
+  if (decodeExample && example && playbackTypeValue === melodyType) {
+    // this sets decoded melody in the example
+    eventsToPlay = await decodeExample({
+      example,
+      neck,
+    });
+    message = `${example.band} - ${example.title}`;
+  } else {
+    const isFullStringScalePlayback = playbackTypeValue === fullStringScaleType;
+    message = `${getNoteText(baseNoteValue)} ${scaleValue} ${
+      isFullStringScalePlayback ? " (full string)" : ""
+    }`;
+
+    const { getWholeScale } = await import(
+      "@/app/engine/decoders/scaleDecoder"
+    );
+    eventsToPlay = getWholeScale(neck, isFullStringScalePlayback);
+  }
+  return { eventsToPlay, message };
+}

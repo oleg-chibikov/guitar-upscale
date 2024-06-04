@@ -2,8 +2,13 @@
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser";
 import { MidiPlayer } from "@/app/engine/midiPlayer";
+import { asyncTimeout } from "@/app/helpers/asyncTimeout";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
-import { setIsPlaying, setTempoBpm } from "@/app/store/settingsSlice";
+import {
+  isPlayingValue,
+  setIsPlaying,
+  setTempoBpm,
+} from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { read } from "midifile-ts";
 import React, { Fragment, useRef } from "react";
@@ -20,20 +25,32 @@ export const MidiUploadButton: React.FC = () => {
       const reader = new FileReader();
       reader.onload = async (event) => {
         console.log("File loaded");
-        await setupChordDetector();
         if (event.target?.result) {
           const arrayBuffer = event.target.result as ArrayBuffer;
+          await setupChordDetector();
           const byteArray = new Uint8Array(arrayBuffer);
           const midiData = read(byteArray);
           const eventsByTick = await parseMidiData(midiData, (bpm) => {
             dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
           });
 
-          if (eventsByTick.hasItems) {
+          if (!eventsByTick.hasItems) {
+            return;
+          }
+          const midiPlayer = new MidiPlayer(eventsByTick);
+
+          const playMidi = async () => {
             dispatch(setIsPlaying(true));
-            const midiPlayer = new MidiPlayer(eventsByTick);
             await midiPlayer.play();
             dispatch(setIsPlaying(false));
+          };
+          // stop current playback
+          if (isPlayingValue) {
+            dispatch(setIsPlaying(false));
+            // a timeout is needed to properly stop the current playback
+            await asyncTimeout(playMidi, 1);
+          } else {
+            await playMidi();
           }
         } else {
           console.warn("No result in onload handler");

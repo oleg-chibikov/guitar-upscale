@@ -10,5 +10,5 @@ get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
 High string at the bottom mode
 
-Play on scale - the whole scale played initially in one tick
+G# +4 doesn't play chords in Aeolian
 WaitForNextHalfBeat could make the melody offbeat - we need to store what tick to wait for
