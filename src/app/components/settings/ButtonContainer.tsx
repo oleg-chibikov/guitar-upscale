@@ -57,7 +57,9 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
       >
         <OpenStrummingSettingsButton />
         <AboutButton />
-        {/* <MidiUploadButton /> */}
+        {(premiumComponents.get("midiUpload") as ReactNode) ?? (
+          <DisabledDetectChordButton />
+        )}
       </div>
     </section>
   );

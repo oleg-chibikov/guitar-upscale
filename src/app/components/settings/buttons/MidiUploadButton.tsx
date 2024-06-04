@@ -1,3 +1,4 @@
+"use client";
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser";
 import { MidiPlayer } from "@/app/engine/midiPlayer";

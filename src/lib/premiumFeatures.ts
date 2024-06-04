@@ -21,6 +21,7 @@ export type PremiumFeatures = {
   skinSelection?: boolean;
   melodies?: boolean;
   chordDetection?: boolean;
+  midiUpload?: boolean;
   toggleMetronomeWhenRecordingCheckbox?: boolean;
 };
 
@@ -41,6 +42,7 @@ export const composerPremiumFeatures: PremiumFeatures = {
   looper: true,
   toggleMetronomeWhenRecordingCheckbox: true,
   skinSelection: true,
+  midiUpload: true,
 };
 
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {

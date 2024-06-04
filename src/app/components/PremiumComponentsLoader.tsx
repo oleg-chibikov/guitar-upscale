@@ -1,5 +1,6 @@
 import "server-only";
 
+import { MidiUploadButton } from "@/app/components/settings/buttons/MidiUploadButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
 import {
@@ -81,6 +82,8 @@ export const premiumFeaturesToMap = (
         return <SkinSelector />;
       case "chordDetection":
         return <DetectChordButton />;
+      case "midiUpload":
+        return <MidiUploadButton />;
       case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
       case "advancedChords":
