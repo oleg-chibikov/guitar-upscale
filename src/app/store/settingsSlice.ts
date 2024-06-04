@@ -391,6 +391,7 @@ export const settingsSlice = createSlice({
       state.baseNote = action.payload;
       onGuitarSettingsUpdate(state);
       baseNoteValue = action.payload;
+      wipeExampleCacheTriggerValue = true;
     },
     setTuning(state, action: PayloadAction<Tuning>) {
       const previousShift = getCurrentShift();
