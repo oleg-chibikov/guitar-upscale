@@ -23,9 +23,9 @@ export const Alert: React.FC = () => {
           alertType === AlertType.Error
             ? "bg-red-500"
             : alertType === AlertType.Warning
-            ? "bg-yellow-400"
+            ? "bg-yellow-500"
             : alertType === AlertType.Success
-            ? "bg-green-400"
+            ? "bg-green-500"
             : "bg-teal-500"
         } opacity-90`}
         style={{ zIndex: 9999 }}

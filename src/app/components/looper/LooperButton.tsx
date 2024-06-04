@@ -74,6 +74,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
         <IconButton
           icon={isPlaying ? <Pause /> : <PlayArrow />}
           disabled={isDisabled}
+          activeBg="bg-green-500"
           isActive={isPlaying || hasRecording}
           tooltip={
             isPlaying
