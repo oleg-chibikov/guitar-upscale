@@ -1,3 +1,5 @@
+import { sortChords } from "@/app/engine/chords/chordsSorter";
+import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import { Chord, StringOctaveNote } from "../../data/notes";
 import { trailingDebounce } from "../../helpers/debounce";
 import { Trie } from "../../helpers/trie";
@@ -7,12 +9,14 @@ type NoteWithClearCallback = {
   clear?: () => void;
 };
 
-type MissingChar = "x" | "?";
+type MissingChar = "_" | "?";
+
+const START_ASCII_CODE = "a".charCodeAt(0);
 
 class ChordDetector {
   private stringNotes: (NoteWithClearCallback | null)[];
   private trie: Trie;
-  private reverseChordsMap: Map<string, string>;
+  private reverseChordsMap: Map<string, string[]>;
   private debouncedFindMatches: () => void;
   private findMatchesAutomatically: boolean;
   private showChord?: (name: string) => void;
@@ -23,7 +27,7 @@ class ChordDetector {
   ) {
     this.stringNotes = [];
     this.trie = new Trie();
-    this.reverseChordsMap = new Map<string, string>();
+    this.reverseChordsMap = new Map<string, string[]>();
     this.debouncedFindMatches = trailingDebounce(
       this.findMatches.bind(this),
       200
@@ -46,9 +50,9 @@ class ChordDetector {
   }
 
   addChordToDetectorLookup(chord: Chord, fullKey: string) {
-    const serializedChord = this.serializeChord(chord, "x");
+    const serializedChord = this.serializeChord(chord, "_");
     this.trie.add(serializedChord);
-    this.reverseChordsMap.set(serializedChord, fullKey);
+    addOrUpdateMapArray(this.reverseChordsMap, serializedChord, fullKey);
   }
 
   addNoteToDetector(note: NoteWithClearCallback) {
@@ -83,12 +87,14 @@ class ChordDetector {
     );
     const matchedValues = this.trie.wildcardMatches(serializedChord);
     console.log("Matched values from trie", matchedValues);
-    const chordNames = Array.from(matchedValues).map((x) =>
-      this.reverseChordsMap.get(x)
-    );
-    console.log("Matched chord names", chordNames);
-    this.showChord?.(chordNames.join(", "));
-    return chordNames;
+    const chordNames = Array.from(matchedValues)
+      .flatMap((x) => this.reverseChordsMap.get(x))
+      .filter((x) => x) as string[];
+    const deduplicatedChordNames = Array.from(new Set(chordNames));
+    const sortedChordNames = sortChords(deduplicatedChordNames);
+    console.log("Matched chord names", sortedChordNames);
+    this.showChord?.(sortedChordNames.join(", "));
+    return sortedChordNames;
   }
 
   clearDetector() {
@@ -111,8 +117,13 @@ class ChordDetector {
     });
 
     // Convert note values to string and return the serialized chord
+    // to keep each value 1 char length - the numeric values are converted to corresponding char codes starting from 'a'
     return serializedChord
-      .map((item) => (typeof item === "number" ? item.toString() : item))
+      .map((item) =>
+        typeof item === "number"
+          ? String.fromCharCode(item + START_ASCII_CODE)
+          : item
+      )
       .join("");
   }
 }

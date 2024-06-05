@@ -95,6 +95,25 @@ export function getModeText(mode: ChordMode): string {
   }
 }
 
+function buildModeOrder(): string[] {
+  return Object.values(ChordMode)
+    .filter((value) => typeof value === "number")
+    .map((value) => getModeText(value as ChordMode));
+}
+
+export const chordModeOrder = buildModeOrder();
+
+export function getModeSuffix(chord: string): string {
+  // Remove the root part of the chord (the first character and an optional '#')
+  let rootEndIndex = 1;
+  if (chord[1] === "#") {
+    rootEndIndex = 2;
+  }
+
+  // Extract the suffix
+  return chord.substring(rootEndIndex);
+}
+
 export const chordModes = new Map<ChordMode, number[][]>([
   [
     ChordMode.Major,

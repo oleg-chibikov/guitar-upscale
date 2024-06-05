@@ -139,7 +139,7 @@ const generateChordVariations = (
 
     // Find the first note in the chord on the current string - limit at 12 to avoid unrealistic chords
 
-    const endFretForLookup = Math.min(capo + NOTE_COUNT, FRET_COUNT);
+    const endFretForLookup = Math.min(capo + NOTE_COUNT + 1, FRET_COUNT);
 
     for (let fretIndex = capo; fretIndex < endFretForLookup; fretIndex++) {
       const stringOctaveNote = string[fretIndex];

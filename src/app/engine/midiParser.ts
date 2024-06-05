@@ -146,9 +146,9 @@ function matchChordForToleranceGroup(
     for (const stringOctaveNote of matchedNotes) {
       chordDetector.addNoteToDetector({ stringOctaveNote });
     }
-    // TODO: Check why it doesn't find matches
     const matchedChords = chordDetector.findMatches();
     if (matchedChords?.length) {
+      // Taking the first value as they are already sorted
       return { chord: matchedChords[0], individualNotes: notMatchedNotes };
     }
   }
