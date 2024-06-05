@@ -1,8 +1,9 @@
+import { NoteChordMode } from "@/app/data/chordModes";
+import { getClosestVariation } from "@/app/engine/chords/chordsGenerator";
 import { Chord } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
 import { chordNotesToPlayValue } from "../../store/settingsSlice";
 import { ChordMetadata, NotePlayEventBus } from "../eventBus";
-import { NoteChordMode, getClosestVariation } from "./chordsGenerator";
 
 export type ChordPlayParameters = ChordMetadata & {
   chordName: string;
