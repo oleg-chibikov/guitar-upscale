@@ -1,20 +1,10 @@
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
-import { MidiPlayer } from "@/app/engine/midiPlayer";
-import { asyncTimeout } from "@/app/helpers/asyncTimeout";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
-import { PlayExampleParameters } from "../data/playExampleParameters";
 import { PlaybackType } from "../data/playbackType";
 import {
   HALF_BEATS_IN_BAR,
@@ -41,24 +31,39 @@ import { setAndShowAlert } from "../store/uiSlice";
 
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
+const LOG_PREFIX = "usePlay: ";
 
 export interface UsePlayParams {
-  decodeExample?: (params: PlayExampleParameters) => Promise<EventsByTick>;
+  decodeExample?: (example: Example) => Promise<EventsByTick>;
 }
 
 export const usePlay = ({ decodeExample }: UsePlayParams) => {
-  const { neck } = useSelector(selectSettings);
+  const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
   const [isWaiting, setIsWaiting] = useState(false);
+  // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
+  const isWaitingRef = useRef<boolean>();
+
+  const updateWaiting = (value: boolean) => {
+    setIsWaiting(value);
+    isWaitingRef.current = value;
+  };
+
   const dispatch = useDispatch();
 
   const handlePlay = useCallback(async () => {
-    if (!neck) {
+    if (isWaitingRef.current) {
+      console.log(
+        LOG_PREFIX +
+          "Already waiting for playback to start, skipping new request"
+      );
       return;
     }
-
+    console.log(LOG_PREFIX, "Loading examples");
+    updateWaiting(true);
+    const { playMidi, stopPlayback } = await import("@/app/engine/midiPlayer");
     if (isPlayingValue) {
-      // If already playing, stop playback
-      dispatch(setIsPlaying(false));
+      await stopPlayback(dispatch, LOG_PREFIX);
+      updateWaiting(false);
       return;
     }
 
@@ -92,50 +97,42 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     await Promise.all(trackInstrumentPromises);
 
     let {
-      eventsToPlay,
+      eventsByTick,
       message,
-    }: { eventsToPlay: EventsByTick; message: string } = await decode(
+    }: { eventsByTick: EventsByTick; message: string } = await decode(
       decodeExample,
-      example,
-      neck
+      example
     );
 
-    if (!eventsToPlay.hasItems) {
+    if (!eventsByTick.hasItems) {
       return;
     }
 
-    const player = new MidiPlayer(eventsToPlay);
+    // Start playback
+    console.log(LOG_PREFIX + "Waiting for playback to start...");
+    await waitForStart(example);
+    console.log(LOG_PREFIX + "Start playing");
+    ReactGA.event({
+      category: "Playback",
+      action: "Playback started",
+    });
 
-    const playMidi = async () => {
-      // Start playback
-      console.log("Waiting for playback to start...");
-      await waitForStart(setIsWaiting, example);
-      console.log("Start playing");
-      ReactGA.event({
-        category: "Playback",
-        action: "Playback started",
-      });
-      dispatch(setIsPlaying(true));
-      try {
-        await player.play();
-      } finally {
-        dispatch(setIsPlaying(false));
-      }
-    };
     dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
-    if (isPlayingValue) {
-      dispatch(setIsPlaying(false));
-      // a timeout is needed to properly stop the current playback
-      await asyncTimeout(playMidi, 10);
-    } else {
-      await playMidi();
-    }
-  }, [dispatch, neck, decodeExample]);
+
+    await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
+      // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
+      console.log(
+        LOG_PREFIX + "The playback has started. Removing the waiting mark"
+      );
+
+      updateWaiting(false);
+    });
+  }, [dispatch, decodeExample]);
 
   useEffect(() => {
     // stop playing when any of dependencies changes
     dispatch(setIsPlaying(false));
-  }, [neck, dispatch]);
+  }, [guitarSettingsUpdatedTrigger, dispatch]);
 
   useEffect(() => {
     const handleKeyPress = async (event: KeyboardEvent) => {
@@ -156,14 +153,10 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   return { isWaiting, handlePlay };
 };
-async function waitForStart(
-  setIsWaiting: Dispatch<SetStateAction<boolean>>,
-  example: Example | undefined
-) {
+async function waitForStart(example: Example | undefined) {
   if (isMainClockActive()) {
-    setIsWaiting(true);
     // if metronome or chord strumming is already playing then wait for the bar, other
-    console.log("Waiting for the next bar");
+    console.log(LOG_PREFIX + "Waiting for the next bar");
     if (example?.halfBeatShift !== undefined && example.halfBeatShift) {
       // wait for the remainder of the beats till desired value
       const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
@@ -173,7 +166,8 @@ async function waitForStart(
         halfBeatsToWait = HALF_BEATS_IN_BAR + halfBeatsToWait;
       }
       console.log(
-        `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
+        LOG_PREFIX +
+          `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
       );
       for (let i = 0; i < halfBeatsToWait; i++) {
         await waitForNextHalfBeat();
@@ -181,26 +175,18 @@ async function waitForStart(
     } else {
       await waitForNextBar();
     }
-
-    setIsWaiting(false);
   }
 }
 
 async function decode(
-  decodeExample:
-    | ((params: PlayExampleParameters) => Promise<EventsByTick>)
-    | undefined,
-  example: Example | undefined,
-  neck: Neck
+  decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
+  example: Example | undefined
 ) {
-  let eventsToPlay: EventsByTick;
+  let eventsByTick: EventsByTick;
   let message: string;
   if (decodeExample && example && playbackTypeValue === melodyType) {
     // this sets decoded melody in the example
-    eventsToPlay = await decodeExample({
-      example,
-      neck,
-    });
+    eventsByTick = await decodeExample(example);
     message = `${example.band} - ${example.title}`;
   } else {
     const isFullStringScalePlayback = playbackTypeValue === fullStringScaleType;
@@ -211,7 +197,7 @@ async function decode(
     const { getWholeScale } = await import(
       "@/app/engine/decoders/scaleDecoder"
     );
-    eventsToPlay = getWholeScale(neck, isFullStringScalePlayback);
+    eventsByTick = getWholeScale(isFullStringScalePlayback);
   }
-  return { eventsToPlay, message };
+  return { eventsByTick, message };
 }

@@ -25,7 +25,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
       activeBg="bg-red-500"
       tooltip={
         isWaiting
-          ? "Waiting for the next bar..."
+          ? "Waiting for player to get ready..."
           : isPlaying
           ? "Stop playing scale"
           : "Play scale"

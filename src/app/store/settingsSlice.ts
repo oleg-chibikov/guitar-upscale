@@ -141,6 +141,8 @@ const initialState: SettingsState = {
 // They are controlling how it behaves - NOT how it looks like
 // For settings affecting the UI use the state values, not these. State values are triggering rerender when changing
 
+export let neckValue: Neck | null = initialState.neck;
+export let chordsValue: NoteChords[] | null = initialState.chords;
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
@@ -174,8 +176,8 @@ export let isRecordingValue: boolean = initialState.isRecording;
 export let toggleMetronomeWhenRecordingValue: boolean =
   initialState.toggleMetronomeWhenRecording;
 export let wipeExampleCacheTriggerValue: boolean = false;
-export let isLastEventValue: boolean = false;
-export let isFirstEventValue: boolean = false;
+export let isLastEventValue: boolean = initialState.isLastEvent;
+export let isFirstEventValue: boolean = initialState.isFirstEvent;
 
 export let chordsMap = new Map<string, Chord>();
 
@@ -193,6 +195,7 @@ const onGuitarSettingsUpdate = (
     getShiftedNote(state.baseNote)
   );
   state.neck = neck;
+  neckValue = neck;
   setChords(state);
   clearPreviousChords();
   // this can notify all the controls that use this prop to rerender
@@ -213,6 +216,7 @@ export const setChordDetectorFunctions = (
   addChord: (chord: Chord, fullKey: string) => void
 ) => {
   addChordToDetectorLookup = addChord;
+  rebuildChordDetectorLookup(); // we need to re-scan all chords after setting the function
 };
 
 export let addChordToDetectorLookup:
@@ -220,26 +224,37 @@ export let addChordToDetectorLookup:
   | undefined;
 
 const setChords = (state: WithNeck) => {
-  if (state.neck) {
-    // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
-    const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
-    state.chords = chordsForNeck;
-    chordsMap = new Map<string, Chord>(); // name to chord (notes)
-    for (const chord of chordsForNeck) {
-      const key = getNoteText(chord.note);
-      for (const mode of chord.modes) {
-        const modeKey = getModeText(mode.mode);
-        const fullKey = key + modeKey;
-        const closestVariation = getClosestVariation(mode);
-        mode.variations.map((variation) => {
-          // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
-          //   debugger;
-          // }
-          addChordToDetectorLookup?.(variation, fullKey);
-        });
-        if (closestVariation) {
-          chordsMap.set(fullKey, closestVariation);
-        }
+  if (!state.neck) {
+    return;
+  }
+
+  // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
+  const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
+  state.chords = chordsForNeck;
+  chordsValue = chordsForNeck;
+  rebuildChordDetectorLookup();
+};
+
+export const rebuildChordDetectorLookup = () => {
+  if (!chordsValue) {
+    return;
+  }
+
+  chordsMap = new Map<string, Chord>(); // name to chord (notes)
+  for (const chord of chordsValue) {
+    const key = getNoteText(chord.note);
+    for (const mode of chord.modes) {
+      const modeKey = getModeText(mode.mode);
+      const fullKey = key + modeKey;
+      const closestVariation = getClosestVariation(mode);
+      mode.variations.map((variation) => {
+        // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
+        //   debugger;
+        // }
+        addChordToDetectorLookup?.(variation, fullKey);
+      });
+      if (closestVariation) {
+        chordsMap.set(fullKey, closestVariation);
       }
     }
   }
@@ -360,12 +375,11 @@ export const settingsSlice = createSlice({
       isLastEventValue = state.isLastEvent;
       isFirstEventValue = state.isFirstEvent;
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
+      neckValue = state.neck;
+      chordsValue = state.chords;
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
       void loadMetronome();
-    },
-    refreshSettings: (state) => {
-      onGuitarSettingsUpdate(state);
     },
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
@@ -413,7 +427,7 @@ export const settingsSlice = createSlice({
       if (tempoBpmValue === newValue) {
         return;
       }
-      console.log("setting tempo to", newValue);
+      console.log("Setting tempo to", newValue);
       state.tempoBpm = newValue;
       tempoBpmValue = newValue;
 
@@ -579,7 +593,6 @@ export const {
   setChordIsBeingDetected,
   setIsRecording,
   setToggleMetronomeWhenRecording,
-  refreshSettings,
   setIsFirstEvent,
   setIsLastEvent,
 } = settingsSlice.actions;

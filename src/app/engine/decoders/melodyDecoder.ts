@@ -3,7 +3,11 @@ import { Note, OctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
-import { baseNoteValue, tuningValue } from "@/app/store/settingsSlice";
+import {
+  baseNoteValue,
+  neckValue,
+  tuningValue,
+} from "@/app/store/settingsSlice";
 import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
 
 export class MelodyDecoder {
@@ -13,9 +17,12 @@ export class MelodyDecoder {
   private tuningShift = tunings[tuningValue].shift ?? 0;
   private currentTuning = parseStringToNotes(tuningValue);
 
-  constructor(track: TrackWithNumber, neck: Neck, scriptTuning: OctaveNote[]) {
+  constructor(track: TrackWithNumber, scriptTuning: OctaveNote[]) {
     this.track = track;
-    this.neck = neck;
+    if (!neckValue) {
+      throw new Error("Neck is not set up");
+    }
+    this.neck = neckValue;
     this.scriptTuning = scriptTuning;
   }
 

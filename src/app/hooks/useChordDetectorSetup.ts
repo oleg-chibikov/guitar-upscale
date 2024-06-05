@@ -1,7 +1,6 @@
 import { AlertType } from "@/app/data/alertType";
 import {
   addChordToDetectorLookup,
-  refreshSettings,
   setChordDetectorFunctions,
 } from "@/app/store/settingsSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
@@ -28,6 +27,5 @@ export const useChordDetectorSetup = () => {
         })
       );
     });
-    dispatch(refreshSettings());
   };
 };

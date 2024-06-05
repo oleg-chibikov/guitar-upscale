@@ -1,3 +1,4 @@
+import { createPromise } from "@/app/helpers/promiseHelper";
 import { tempoBpmValue } from "../store/settingsSlice";
 import { MetronomeEventBus } from "./eventBus";
 
@@ -12,42 +13,15 @@ export const microsecondsToBpm = (microsecondsPerBeat: number): number =>
 export const beatToMilliseconds = (bpm: number): number =>
   bpmToMilliseconds(bpm) * 4;
 
-const createPromise = () => {
-  let resolveCurrentPromise: (value: void | PromiseLike<void>) => void;
-  let promise: Promise<void>;
-  const recreatePromise = () => {
-    promise = new Promise<void>((resolve) => {
-      resolveCurrentPromise = resolve;
-    });
-  };
-
-  recreatePromise();
-
-  const waitForNext = async () => {
-    await promise;
-  };
-
-  return {
-    waitForNext,
-    recreate: (stopOnly: boolean = false) => {
-      resolveCurrentPromise();
-      if (!stopOnly) {
-        recreatePromise();
-      }
-    },
-  };
-};
-
-const { waitForNext: waitForNextTick, recreate: recreateNextTick } =
+const { waitFor: waitForNextTick, recreate: recreateNextTick } =
   createPromise();
-const { waitForNext: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
+const { waitFor: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
   createPromise();
-const { waitForNext: waitForNextBeat, recreate: recreateNextBeat } =
+const { waitFor: waitForNextBeat, recreate: recreateNextBeat } =
   createPromise();
-const { waitForNext: waitForNextHalfBar, recreate: recreateNextHalfBar } =
+const { waitFor: waitForNextHalfBar, recreate: recreateNextHalfBar } =
   createPromise();
-const { waitForNext: waitForNextBar, recreate: recreateNextBar } =
-  createPromise();
+const { waitFor: waitForNextBar, recreate: recreateNextBar } = createPromise();
 
 const resolveAll = () => {
   recreateNextTick(true);

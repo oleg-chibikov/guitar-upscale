@@ -1,15 +1,14 @@
 import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
-import { isPlayingValue } from "@/app/store/settingsSlice";
-import { Neck } from "../generateNeckRepresentation";
+import { isPlayingValue, neckValue } from "@/app/store/settingsSlice";
 
-export const getWholeScale = (
-  neck: Neck,
-  playFullString: boolean
-): EventsByTick => {
+export const getWholeScale = (playFullString: boolean): EventsByTick => {
+  if (!neckValue) {
+    throw new Error("Neck is not set up");
+  }
+  const neckCopy = [...neckValue];
   const reverse = Math.random() < 0.5;
-  const neckCopy = [...neck];
   if (reverse) {
     neckCopy.reverse();
   }
