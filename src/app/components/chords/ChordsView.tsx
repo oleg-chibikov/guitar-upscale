@@ -1,15 +1,11 @@
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
+import { ChordMode, NoteChordMode, getModeText } from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
 import { SHARP_NOTE_COUNT, getNoteText } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
-import {
-  ChordMode,
-  NoteChordMode,
-  getModeText,
-} from "@/app/engine/chords/chordsGenerator";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";

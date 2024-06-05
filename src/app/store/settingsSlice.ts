@@ -15,8 +15,6 @@ import {
 import {
   generateAllChords,
   getClosestVariation,
-  getModeText,
-  NoteChords,
 } from "../engine/chords/chordsGenerator";
 import { clearPreviousChords } from "../engine/eventBus";
 import {
@@ -24,6 +22,7 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 
+import { getModeText, NoteChords } from "@/app/data/chordModes";
 import { MAX_VOLUME } from "@/app/data/volume";
 import {
   currentlyPlayingLooperChannels,

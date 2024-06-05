@@ -1,3 +1,4 @@
+import { NoteChordMode } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { Theme } from "@/app/data/theme";
 import {
@@ -8,7 +9,6 @@ import {
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
-import { NoteChordMode } from "@/app/engine/chords/chordsGenerator";
 import {
   ChordMetadata,
   ChordToChordButtonEventMap,
