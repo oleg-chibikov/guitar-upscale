@@ -123,9 +123,6 @@ const generateChordVariations = (
 
   const minConsecutiveNotesInValidChord = getMinNotesInChord();
   const chordNotes = generateChord(baseNote, interval);
-  // if (chordNotes[0] === Note["C"] && mode === ChordMode.Major) {
-  //   debugger;
-  // }
   const chordVariations: Chord[] = getChordVariations(
     neck,
     capo,
@@ -134,14 +131,18 @@ const generateChordVariations = (
     minConsecutiveNotesInValidChord
   );
 
+  // if (chordNotes[0] === Note["C"] && mode === ChordMode.Major) {
+  //   const tuning = tuningValue;
+  //   debugger;
+  // }
   return chordVariations;
 };
 
-export const getClosestVariation = (mode: NoteChordMode) => {
-  if (!mode.variations.length) {
+export const getClosestVariation = (chordVariations: Chord[]) => {
+  if (!chordVariations.length) {
     return null;
   }
-  const variationAvgDistances = mode.variations.map((variation) => {
+  const variationAvgDistances = chordVariations.map((variation) => {
     const distances = variation.map(
       // lower strings get more priority
       // TODO: Hardcoded string count

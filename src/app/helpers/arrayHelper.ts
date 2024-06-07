@@ -17,10 +17,13 @@ export function findObjectWithMinValue<T>(
   return minObject;
 }
 
-export function arrayToMap<T>(array: T[], keyFn: (value: T)=>string): Map<string, T> {
+export function arrayToMap<T, TKey>(
+  array: T[],
+  keyFn: (value: T) => TKey
+): Map<TKey, T> {
   return array.reduce((map, item) => {
     const key = keyFn(item);
     map.set(key, item);
     return map;
-  }, new Map<string, T>());
+  }, new Map<TKey, T>());
 }

@@ -12,10 +12,7 @@ import {
   parseStringToNotes,
   Tuning,
 } from "../data/tunings";
-import {
-  generateAllChords,
-  getClosestVariation,
-} from "../engine/chords/chordsGenerator";
+import { generateAllChords } from "../engine/chords/chordsGenerator";
 import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
@@ -178,8 +175,6 @@ export let wipeExampleCacheTriggerValue: boolean = false;
 export let isLastEventValue: boolean = initialState.isLastEvent;
 export let isFirstEventValue: boolean = initialState.isFirstEvent;
 
-export let chordsMap = new Map<string, Chord>();
-
 const onGuitarSettingsUpdate = (
   state: WithControls & WithNeck & CanUpdateGuitarSettings
 ) => {
@@ -239,22 +234,17 @@ export const rebuildChordDetectorLookup = () => {
     return;
   }
 
-  chordsMap = new Map<string, Chord>(); // name to chord (notes)
   for (const chord of chordsValue) {
     const key = getNoteText(chord.note);
     for (const mode of chord.modes) {
       const modeKey = getModeText(mode.mode);
       const fullKey = key + modeKey;
-      const closestVariation = getClosestVariation(mode);
       mode.variations.map((variation) => {
         // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
         //   debugger;
         // }
         addChordToDetectorLookup?.(variation, fullKey);
       });
-      if (closestVariation) {
-        chordsMap.set(fullKey, closestVariation);
-      }
     }
   }
 };

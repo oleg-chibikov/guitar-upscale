@@ -59,7 +59,7 @@ export const playFirstChordVariation = async (params: ChordPlayParameters) => {
 export const playClosestChordVariation = async (
   params: ChordPlayParameters
 ) => {
-  const closestVariation = getClosestVariation(params.noteChordMode);
+  const closestVariation = getClosestVariation(params.noteChordMode.variations);
   if (closestVariation) {
     await playVariation(closestVariation, "closest", params);
   }

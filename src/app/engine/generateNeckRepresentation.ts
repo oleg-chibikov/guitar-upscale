@@ -1,3 +1,4 @@
+import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import {
   Note,
   OctaveNote,
@@ -55,12 +56,10 @@ export const generateNeckRepresentation = (
 
       if (stringOctaveNote !== null) {
         const serializedOctaveNote = serializeOctaveNote({ note, octave });
-        const stringOctaveNotesArray =
-          octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote) ?? [];
-        stringOctaveNotesArray.push(stringOctaveNote);
-        octaveNoteToStringOctaveNoteMap.set(
+        addOrUpdateMapArray(
+          octaveNoteToStringOctaveNoteMap,
           serializedOctaveNote,
-          stringOctaveNotesArray
+          stringOctaveNote
         );
       }
     }
