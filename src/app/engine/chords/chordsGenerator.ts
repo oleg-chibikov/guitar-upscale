@@ -5,12 +5,15 @@ import {
   chordModesArray,
   isAdvancedMode,
 } from "@/app/data/chordModes";
+import { cartesian } from "@/app/helpers/cartesian";
 import { Chord, Note, StringOctaveNote } from "../../data/notes";
 import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../../helpers/arrayHelper";
 import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
+
+export const MAX_DISTANCE_IN_CHORD = 4;
 
 // Function to generate a chord based on the root note and the intervals
 function generateChord(note: Note, intervals: number[]): Note[] {
@@ -28,7 +31,6 @@ const findNextNotesInChord = (
   baseFretIndex: number, // we allow not more than maxFretDistance distance from this fret in any direction unless it's 0 (then any can suit)
   noteToFind: Note,
   neck: Neck,
-  maxFretDistance: number,
   capo: number
 ): StringOctaveNote[] => {
   const notes = [];
@@ -42,10 +44,15 @@ const findNextNotesInChord = (
   }
 
   for (
-    let j = Math.max(openStringFretIndex + 1, baseFretIndex - maxFretDistance);
+    let j = Math.max(
+      openStringFretIndex + 1,
+      baseFretIndex - MAX_DISTANCE_IN_CHORD
+    );
     j <=
     Math.min(
-      baseFretIndex === 0 ? NOTE_COUNT - 1 : baseFretIndex + maxFretDistance, // if the note on the previous string was open (fret index === 0) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
+      baseFretIndex === 0
+        ? NOTE_COUNT - 1
+        : baseFretIndex + MAX_DISTANCE_IN_CHORD, // if the note on the previous string was open (fret index === 0) - then we search for the next base fret index on the next string (therefore allowing any fret of the first octave 0 - 11)
       neck[stringIndex].length - 1
     );
     j++
@@ -88,21 +95,6 @@ export const generateAllChords = (
   return allChords;
 };
 
-// https://stackoverflow.com/questions/12303989/cartesian-product-of-multiple-arrays-in-javascript
-const cartesian = <T>(...args: T[][]): (T | null)[][] =>
-  args.reduce<(T | null)[][]>(
-    (acc, curr) => {
-      if (!curr.length) {
-        for (const item of acc) {
-          item.push(null);
-        }
-        return acc;
-      }
-      return acc.flatMap((x) => curr.map((y) => [...x, y]));
-    },
-    [[]]
-  );
-
 // Function to generate all the variations of a chord on the guitar neck
 const generateChordVariations = (
   capo: number, // chords cannot got below this index
@@ -131,81 +123,16 @@ const generateChordVariations = (
 
   const minConsecutiveNotesInValidChord = getMinNotesInChord();
   const chordNotes = generateChord(baseNote, interval);
-  const chordVariations: Chord[] = [];
-
-  // Iterate through each string from bottom to top
-  for (let stringIndex = neck.length - 1; stringIndex >= 0; stringIndex--) {
-    const string = neck[stringIndex];
-
-    // Find the first note in the chord on the current string - limit at 12 to avoid unrealistic chords
-
-    const endFretForLookup = Math.min(capo + NOTE_COUNT + 1, FRET_COUNT);
-
-    for (let fretIndex = capo; fretIndex < endFretForLookup; fretIndex++) {
-      const stringOctaveNote = string[fretIndex];
-      if (stringOctaveNote !== null && stringOctaveNote.note === baseNote) {
-        const possibleNotesForThisBaseNote: StringOctaveNote[][] = [];
-        possibleNotesForThisBaseNote.push([stringOctaveNote]);
-
-        let baseFretIndex = fretIndex;
-
-        // Find the next notes in the chord on the upper strings
-
-        // if (chordNotes[0] === Note["G#"] && mode === ChordMode.Major) {
-        //   debugger;
-        // }
-        for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
-          const notesOnHigherString = findNextNotesInChord(
-            stringIndex - i, // search for the next note on the next string
-            baseFretIndex,
-            chordNotes[i],
-            neck,
-            4,
-            capo
-          );
-
-          // If the previous fret index was an open string (0) then we need to set a new base fret index on a higher string to arrange fingers
-          // Once the index is found - it remains base for the whole chord
-          // Without this it's not possible to arrange fingers for a Hendrix chord whic is 0 on last string and 7 on last but one
-
-          if (baseFretIndex === capo) {
-            for (const note of notesOnHigherString) {
-              if (note.fret > capo && note.fret < endFretForLookup) {
-                baseFretIndex = note.fret;
-                break;
-              }
-            }
-          }
-          possibleNotesForThisBaseNote.push(notesOnHigherString);
-        }
-
-        if (
-          possibleNotesForThisBaseNote.length < minConsecutiveNotesInValidChord
-        ) {
-          continue;
-        }
-
-        // cartesianProductOf([1, 2], [3, 4], ['a'])
-        // -> [[1,3,"a"],[1,3,"b"],[1,4,"a"],[1,4,"b"],[2,3,"a"],[2,3,"b"],[2,4,"a"],[2,4,"b"]]
-        const cartesianProduct = cartesian(...possibleNotesForThisBaseNote);
-        // console.log(cartesianProduct);
-        if (cartesianProduct?.length) {
-          for (const combination of cartesianProduct) {
-            if (
-              combination.length >= minConsecutiveNotesInValidChord &&
-              // first n notes of the chord should be present to consider it valid
-              // TODO: different modes of chord might require more notes
-              [...combination]
-                .slice(0, minConsecutiveNotesInValidChord)
-                .every((element) => element !== null)
-            ) {
-              chordVariations.push(combination.filter((x) => x) as Chord);
-            }
-          }
-        }
-      }
-    }
-  }
+  // if (chordNotes[0] === Note["C"] && mode === ChordMode.Major) {
+  //   debugger;
+  // }
+  const chordVariations: Chord[] = getChordVariations(
+    neck,
+    capo,
+    baseNote,
+    chordNotes,
+    minConsecutiveNotesInValidChord
+  );
 
   return chordVariations;
 };
@@ -224,4 +151,118 @@ export const getClosestVariation = (mode: NoteChordMode) => {
     return { object: variation, number: avgDistance };
   });
   return findObjectWithMinValue(variationAvgDistances);
+};
+
+const getPossibleNotes = (
+  stringOctaveNote: StringOctaveNote,
+  fretIndex: number,
+  chordNotes: Note[],
+  stringIndex: number,
+  neck: Neck,
+  capo: number,
+  endFretForLookup: number
+) => {
+  const possibleNotesForThisBaseNote: StringOctaveNote[][] = [];
+  possibleNotesForThisBaseNote.push([stringOctaveNote]);
+
+  // This variable will be changing for each new string
+  let baseFretIndex = fretIndex;
+
+  // Find the next notes in the chord on the upper strings
+  for (let i = 1; i < chordNotes.length && stringIndex - i >= 0; i++) {
+    const notesOnHigherString = findNextNotesInChord(
+      stringIndex - i, // search for the next note on the next string
+      baseFretIndex,
+      chordNotes[i],
+      neck,
+      capo
+    );
+
+    // If the previous fret index was an open string (0) then we need to set a new base fret index on a higher string to arrange fingers
+    // Once the index is found - it remains base for the whole chord
+    // Without this it's not possible to arrange fingers for a Hendrix chord which is 0 on last string and 7 on last but one
+    if (baseFretIndex === capo) {
+      for (const note of notesOnHigherString) {
+        if (note.fret > capo && note.fret < endFretForLookup) {
+          baseFretIndex = note.fret;
+          break;
+        }
+      }
+    }
+    possibleNotesForThisBaseNote.push(notesOnHigherString);
+  }
+  return possibleNotesForThisBaseNote;
+};
+
+const applyCartesianProduct = (
+  possibleNotesForThisBaseNote: StringOctaveNote[][],
+  minConsecutiveNotesInValidChord: number,
+  chordVariations: Chord[]
+) => {
+  // cartesianProductOf([1, 2], [3, 4], ['a'])
+  // -> [[1,3,"a"],[1,3,"b"],[1,4,"a"],[1,4,"b"],[2,3,"a"],[2,3,"b"],[2,4,"a"],[2,4,"b"]]
+  const cartesianProduct = cartesian(...possibleNotesForThisBaseNote);
+  // console.log(cartesianProduct);
+  if (cartesianProduct?.length) {
+    for (const combination of cartesianProduct) {
+      if (
+        combination.length >= minConsecutiveNotesInValidChord &&
+        // first n notes of the chord should be present to consider it valid
+        // TODO: different modes of chord might require more notes
+        [...combination]
+          .slice(0, minConsecutiveNotesInValidChord)
+          .every((element) => element !== null)
+      ) {
+        chordVariations.push(combination.filter((x) => x) as Chord);
+      }
+    }
+  }
+};
+
+const getChordVariations = (
+  neck: Neck,
+  capo: number,
+  baseNote: Note,
+  chordNotes: Note[],
+  minConsecutiveNotesInValidChord: number
+) => {
+  const chordVariations: Chord[] = [];
+
+  // Iterate through each string from bottom to top
+  for (let stringIndex = neck.length - 1; stringIndex >= 0; stringIndex--) {
+    const string = neck[stringIndex];
+
+    // Find the first note in the chord on the current string - limit at 12 to avoid unrealistic chords
+    // const endFretForLookup = Math.min(capo + NOTE_COUNT + 1, FRET_COUNT);
+    const endFretForLookup = FRET_COUNT; // allow all notes instead. Disregard the above comment
+
+    for (let fretIndex = capo; fretIndex < endFretForLookup; fretIndex++) {
+      const stringOctaveNote = string[fretIndex];
+      if (stringOctaveNote !== null && stringOctaveNote.note === baseNote) {
+        const possibleNotesForThisBaseNote: StringOctaveNote[][] =
+          getPossibleNotes(
+            stringOctaveNote,
+            fretIndex,
+            chordNotes,
+            stringIndex,
+            neck,
+            capo,
+            endFretForLookup
+          );
+
+        if (
+          possibleNotesForThisBaseNote.length < minConsecutiveNotesInValidChord
+        ) {
+          continue;
+        }
+
+        applyCartesianProduct(
+          possibleNotesForThisBaseNote,
+          minConsecutiveNotesInValidChord,
+          chordVariations
+        );
+      }
+    }
+  }
+  return chordVariations;
 };

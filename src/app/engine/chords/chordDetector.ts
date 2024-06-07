@@ -12,6 +12,7 @@ type NoteWithClearCallback = {
 type MissingChar = "_" | "?";
 
 const START_ASCII_CODE = "a".charCodeAt(0);
+export const MIN_NOTES_TO_DETECT_CHORD = 3;
 
 class ChordDetector {
   private stringNotes: (NoteWithClearCallback | null)[];
@@ -78,7 +79,7 @@ class ChordDetector {
   findMatches() {
     console.log("Detecting chord");
     const usedNotes = this.stringNotes.filter((x) => x);
-    if (usedNotes.length <= 2) {
+    if (usedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
       return;
     }
     const serializedChord = this.serializeChord(

@@ -8,6 +8,7 @@ import {
 export type Neck = (StringOctaveNote | null)[][];
 export const NOTE_COUNT: number = 12;
 export const FRET_COUNT: number = NOTE_COUNT * 2;
+export const STRING_COUNT: number = 6;
 
 // This map helps getting the notes on the fret based on just notes.
 // Each note has several positions on the fret. The map contains them all

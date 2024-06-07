@@ -5,7 +5,11 @@ import {
   StringOctaveNote,
   serializeOctaveNote,
 } from "@/app/data/notes";
-import { mainDetector } from "@/app/engine/chords/chordDetector";
+import {
+  MIN_NOTES_TO_DETECT_CHORD,
+  mainDetector,
+} from "@/app/engine/chords/chordDetector";
+import { MAX_DISTANCE_IN_CHORD } from "@/app/engine/chords/chordsGenerator";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   NOTE_COUNT,
@@ -17,6 +21,7 @@ import {
   microsecondsToBpm,
 } from "@/app/engine/mainClock";
 import {
+  baseNoteValue,
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
@@ -35,7 +40,6 @@ import {
 //TODO: Set tempo:
 
 // TODO: detect scale and set it. Use trie similar to chords.
-// TODO: If a tick inside the track has more than 3 notes - detect chord.
 // TODO: Enable chord detector while playing (or add the setting)
 // TODO: UI - play, next note prev note. pause. restart. Maybe send to looper
 // TODO: How to distribute notes on the neck? we need to check the previous note and put the next note on the string above
@@ -141,7 +145,7 @@ function matchChordForToleranceGroup(
 ): ChordMatchResult {
   const { matchedNotes, notMatchedNotes } =
     getChordNotesFromToleranceGroup(toleranceGroup);
-  if (matchedNotes.length) {
+  if (matchedNotes.length > MIN_NOTES_TO_DETECT_CHORD) {
     const chordDetector = mainDetector.clone(false); // TODO: await import
     for (const stringOctaveNote of matchedNotes) {
       chordDetector.addNoteToDetector({ stringOctaveNote });
@@ -160,6 +164,10 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
   const notMatchedNotes: NotePlayEvent[] = [];
   const sortedByNote = toleranceGroup.sort(compareOctaveNotes);
   let lastString: number | undefined;
+  // TODO: this function is similar to getPossibleNotes in chordsGenerator, but still slightly different. Can we merge them somehow?
+
+  // this variable is needed to track the distance between notes in chord. It's set to the first note that is not an open string. Then the algorithm only allows taking notes not farther then maxDistance at any direction from this baseFretIndex
+  let baseFretIndex: number | undefined = undefined;
   for (const noteOfPossibleChordToCheck of sortedByNote) {
     const serializedOctaveNote = serializeOctaveNote(
       noteOfPossibleChordToCheck.octaveNote
@@ -175,6 +183,17 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
     for (const stringOctaveNote of possibleStringOctaveNotes) {
       if (lastString !== undefined && stringOctaveNote.string >= lastString) {
         continue; // skip all the strings that are lower or equal to the string of last note from the chord
+      }
+      if (baseFretIndex !== undefined) {
+        if (
+          Math.abs(stringOctaveNote.fret - baseFretIndex) >
+          MAX_DISTANCE_IN_CHORD
+        ) {
+          // validate that the chord can be played - the note shouldn't be far away from the base fret index
+          continue;
+        }
+      } else if (baseFretIndex !== baseNoteValue) {
+        baseFretIndex = stringOctaveNote.fret; // set base fret index to a first non-open string index
       }
       firstMatchingNote = stringOctaveNote;
       break;
