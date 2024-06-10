@@ -138,6 +138,7 @@ const initializeChannel = (
 ) => {
   setPlayingInLooperChannel(channel, false);
   looperChannel.looperRecorder.clear();
+  looperChannel.hasRecording = false;
   stopRecording(looperChannel);
   // we need to explicitly check if interval should be stopped
   toggleInterval(false);
