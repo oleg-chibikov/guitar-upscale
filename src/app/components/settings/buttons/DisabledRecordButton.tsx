@@ -1,29 +1,15 @@
 "use client";
-import { AlertType } from "@/app/data/alertType";
-import { setAndShowAlert } from "@/app/store/uiSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { IconButton } from "./IconButton";
+import { NoPremiumButton } from "./NoPremiumButton";
 
-const noPremiumWarning = "Please subscribe to a Composer plan to record MIDI";
-export const DisabledRecordButton: React.FC = (props) => {
-  const dispatch = useDispatch();
+export const DisabledDetectChordButton: React.FC = (props) => {
   return (
-    <IconButton
+    <NoPremiumButton
       {...props}
+      planName="a Composer"
+      functionalityDescription="record MIDI"
       icon={<FiberManualRecord />}
-      disabled
-      allowHandlerInDisabledState
-      tooltip={noPremiumWarning}
-      onPress={() =>
-        dispatch(
-          setAndShowAlert({
-            message: noPremiumWarning,
-            alertType: AlertType.Warning,
-          })
-        )
-      }
     />
   );
 };
