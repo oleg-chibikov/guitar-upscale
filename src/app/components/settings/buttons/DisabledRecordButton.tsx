@@ -3,7 +3,7 @@ import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import React from "react";
 import { NoPremiumButton } from "./NoPremiumButton";
 
-export const DisabledDetectChordButton: React.FC = (props) => {
+export const DisabledRecordButton: React.FC = (props) => {
   return (
     <NoPremiumButton
       {...props}
