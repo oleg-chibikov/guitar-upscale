@@ -13,12 +13,6 @@ interface ButtonContainerProps extends WithPremiumComponents {
   style?: CSSProperties;
 }
 
-const DisabledRecordButton = dynamic(
-  async () =>
-    (await import("@/app/components/settings/buttons/DisabledRecordButton"))
-      .DisabledRecordButton
-);
-
 const DisabledDetectChordButton = dynamic(
   async () =>
     (
