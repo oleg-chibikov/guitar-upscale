@@ -22,7 +22,7 @@ export function parseMidiFile(
   const getGuitarUpscaleTicks = (midiTicks: number) =>
     (midiTicks / midiData.header.ticksPerBeat) * TICKS_IN_BEAT;
   midiData.header.ticksPerBeat;
-  midiData.tracks.forEach((track: any, trackIndex: number) => {
+  midiData.tracks.forEach((track: any) => {
     let currentPosition = 0;
     const data: TrackData = { events: [] };
 

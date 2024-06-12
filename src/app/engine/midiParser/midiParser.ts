@@ -1,3 +1,4 @@
+import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
 import { StringOctaveNote } from "@/app/data/notes";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
@@ -66,7 +67,7 @@ function processTrack(
 }
 
 function processToleranceGroup(
-  toleranceGroup: import("c:/ProjectsTemp/guitar-upscale/src/app/data/midiParser/notePlayEvent").NotePlayEvent[],
+  toleranceGroup: NotePlayEvent[],
   eventsByTick: EventsByTick,
   toleranceWindowStart: number,
   trackIndex: number,
