@@ -1,29 +1,35 @@
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
-import { StringOctaveNote } from "@/app/data/notes";
+import { OctaveNote, StringOctaveNote } from "@/app/data/notes";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
-import { matchChordForToleranceGroup } from "@/app/engine/midiParser/chordMatcher";
+import { extractChordFromNotes } from "@/app/engine/midiParser/chordMatcher";
 import { groupEventsByTickWithTolerance } from "@/app/engine/midiParser/groupSplitter";
 import { addIndividualNote } from "@/app/engine/midiParser/individualNoteMapper";
 import { parseMidiFile } from "@/app/engine/midiParser/midiFileParser";
+import { arrayToMap } from "@/app/helpers/arrayHelper";
+import { FunctionCache } from "@/app/helpers/functionCache";
 import {
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
-import { MidiFile } from "midifile-ts";
+import { read } from "midifile-ts";
 
 //TODO: Set tempo:
 
 // TODO: detect scale and set it. Use trie similar to chords.
-// TODO: Enable chord detector while playing (or add the setting)
-// TODO: UI - play, next note prev note. pause. restart. Maybe send to looper
-// TODO: How to distribute notes on the neck? we need to check the previous note and put the next note on the string above
+// TODO: UI - restart. Maybe send to looper
+
+const matchChordForToleranceGroupWithCache = new FunctionCache(
+  extractChordFromNotes
+);
 
 export const parseMidiData = async (
-  midiData: MidiFile,
+  arrayBuffer: ArrayBuffer,
   setTempo: (bpm: number) => void
 ) => {
+  const byteArray = new Uint8Array(arrayBuffer);
+  const midiData = read(byteArray);
   console.log(midiData);
   const trackDataArray = parseMidiFile(midiData, setTempo);
   // TODO: First, determine and set the scale and base note. Once it's set wait for neck to update.
@@ -66,6 +72,15 @@ function processTrack(
   }
 }
 
+function compareOctaveNotesDescending(a: OctaveNote, b: OctaveNote) {
+  if (a.octave === b.octave) {
+    // If octaves are the same, sort by note in descending order
+    return b.note - a.note;
+  }
+  // Otherwise, sort by octave in descending order
+  return b.octave - a.octave;
+}
+
 function processToleranceGroup(
   toleranceGroup: NotePlayEvent[],
   eventsByTick: EventsByTick,
@@ -74,12 +89,27 @@ function processToleranceGroup(
   previousNote: StringOctaveNote | undefined,
   instrument: string
 ) {
-  const { chord, individualNotes } =
-    matchChordForToleranceGroup(toleranceGroup);
+  const sortedNotes = toleranceGroup
+    .map((x) => x.octaveNote)
+    .sort(compareOctaveNotesDescending);
 
-  if (chord !== undefined) {
+  const chordMatchResult =
+    matchChordForToleranceGroupWithCache.execute(sortedNotes);
+
+  let individualNotes = toleranceGroup;
+
+  if (chordMatchResult !== undefined) {
+    const { chordName, notes } = chordMatchResult;
+
+    // within a toleranceGroup each octave note can occur only once (tolerance groups are built this way that if the note re-occurs - a new group is created).
+    // therefore we can keep a 1 to 1 map of octave notes -> events
+    const toleranceGroupMap = arrayToMap(toleranceGroup, (x) => x.octaveNote);
+    // deleting the chord notes from the map - the rest should be individual notes
+    for (const octaveNote of notes) {
+      toleranceGroupMap.delete(octaveNote);
+    }
     eventsByTick.addOrUpdateEvent(toleranceWindowStart, {
-      chord,
+      chord: chordName,
       metadata: {
         trackNumber: trackIndex,
         notesToPlay: chordNotesToPlayValue,
@@ -87,6 +117,9 @@ function processToleranceGroup(
         trackInstrument: chordInstrumentValue,
       },
     });
+    individualNotes = Array.from(toleranceGroupMap.values()).sort(
+      (a, b) => a.tick - b.tick
+    ); // all the notes excluding the chord, sorted
   }
 
   for (const event of individualNotes) {

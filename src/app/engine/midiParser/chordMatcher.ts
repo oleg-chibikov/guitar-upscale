@@ -1,5 +1,8 @@
-import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
-import { StringOctaveNote, serializeOctaveNote } from "@/app/data/notes";
+import {
+  OctaveNote,
+  StringOctaveNote,
+  serializeOctaveNote,
+} from "@/app/data/notes";
 import {
   MIN_NOTES_TO_DETECT_CHORD,
   mainDetector,
@@ -8,77 +11,54 @@ import {
   STRING_COUNT,
   octaveNoteToStringOctaveNoteMap,
 } from "@/app/engine/generateNeckRepresentation";
-import { arrayToMap } from "@/app/helpers/arrayHelper";
 
-type ChordMatchResult = { chord?: string; individualNotes: NotePlayEvent[] };
-
-type MatchedChordData = {
-  stringOctaveNote: StringOctaveNote;
-  noteEvent: NotePlayEvent;
+type ChordMatchResult = {
+  chordName: string;
+  notes: StringOctaveNote[];
 };
 
-function compareOctaveNotesDescending(a: NotePlayEvent, b: NotePlayEvent) {
-  if (a.octaveNote.octave === b.octaveNote.octave) {
-    // If octaves are the same, sort by note in descending order
-    return b.octaveNote.note - a.octaveNote.note;
+export function extractChordFromNotes(
+  sortedNotes: OctaveNote[]
+): ChordMatchResult | undefined {
+  if (sortedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
+    return undefined;
   }
-  // Otherwise, sort by octave in descending order
-  return b.octaveNote.octave - a.octaveNote.octave;
-}
-
-export function matchChordForToleranceGroup(
-  toleranceGroup: NotePlayEvent[]
-): ChordMatchResult {
-  if (toleranceGroup.length < MIN_NOTES_TO_DETECT_CHORD) {
-    return { individualNotes: toleranceGroup };
-  }
-  const variations = getChordNotesFromToleranceGroup(toleranceGroup)
-    .map((variation) => variation.filter((x) => x) as MatchedChordData[])
+  const variations = getPossibleNotesArrangementOnNeck(sortedNotes)
+    .map((variation) => variation.filter((x) => x) as StringOctaveNote[])
     .sort(
       // sorting to put the variations with the highest number of notes first (it might give the better matching chord if different variations are matching different chords)
-      (a: MatchedChordData[], b: MatchedChordData[]) => b.length - a.length
+      (a: StringOctaveNote[], b: StringOctaveNote[]) => b.length - a.length
     );
   for (const variation of variations) {
     console.log(
       "Detecting chord for",
 
       variation.map((x) =>
-        x
-          ? x.stringOctaveNote.string + "_" + x.stringOctaveNote.fret
-          : "no value for this string"
+        x ? x.string + "_" + x.fret : "no value for this string"
       )
     );
     const chordDetector = mainDetector.clone(false); // TODO: await import
-    for (const data of variation) {
+    for (const stringOctaveNote of variation) {
       chordDetector.addNoteToDetector({
-        stringOctaveNote: data.stringOctaveNote,
+        stringOctaveNote,
       });
     }
     const matchedChords = chordDetector.findMatches();
     if (matchedChords?.length) {
-      // Taking the first value as they are already sorted
-
-      const toleranceGroupMap = arrayToMap(toleranceGroup, (x) => x);
-      // deleting the chord notes from the map - the rest should be individual notes
-      for (const data of variation) {
-        toleranceGroupMap.delete(data.noteEvent);
-      }
-      const individualNotes = Array.from(toleranceGroupMap.values());
-      return { chord: matchedChords[0], individualNotes };
+      return { chordName: matchedChords[0], notes: variation };
     }
   }
-  return { individualNotes: toleranceGroup };
+  return undefined;
 }
 
-function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
-  const sortedByNote = toleranceGroup.sort(compareOctaveNotesDescending);
+function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
   // TODO: this function is similar to getPossibleNotes in chordsGenerator, but still slightly different. Can we merge them somehow?
 
   const appendNextNoteRecursive = (
     indexOfNoteEvent: number,
     stringToPutNextNote: number,
-    array: (MatchedChordData | null)[]
-  ): (MatchedChordData | null)[][] => {
+    array: (StringOctaveNote | null)[]
+  ): (StringOctaveNote | null)[][] => {
     if (stringToPutNextNote >= STRING_COUNT) {
       console.log(
         "Index of note event: %d, index of string to put current event: %d. Strings exceeded. Returning the result without further processing",
@@ -87,8 +67,8 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
       );
       return [array];
     }
-    const noteEvent = sortedByNote[indexOfNoteEvent];
-    const serializedOctaveNote = serializeOctaveNote(noteEvent.octaveNote);
+    const noteEvent = sortedNotes[indexOfNoteEvent];
+    const serializedOctaveNote = serializeOctaveNote(noteEvent);
     const possibleStringOctaveNotes =
       octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote); // these notes should be already sorted from lowest to highest string
     if (!possibleStringOctaveNotes?.length) {
@@ -127,16 +107,13 @@ function getChordNotesFromToleranceGroup(toleranceGroup: NotePlayEvent[]) {
       indexOfNoteEvent,
       stringToPutNextNote
     );
-    const possibleBranches: (MatchedChordData | null)[][] = [];
+    const possibleBranches: (StringOctaveNote | null)[][] = [];
     while (highestNote.string <= stringToPutNextNote) {
       // if we already have a note on the string of highest note then add a new recursive branch
       const arrayCopy =
         highestNote.string < stringToPutNextNote ? [...array] : array; // reuse original array for the last iteration
-      arrayCopy[highestNote.string] = {
-        stringOctaveNote: highestNote,
-        noteEvent,
-      };
-      if (indexOfNoteEvent === sortedByNote.length - 1) {
+      arrayCopy[highestNote.string] = highestNote;
+      if (indexOfNoteEvent === sortedNotes.length - 1) {
         // for the last note in the sequence add the array to result
         possibleBranches.push(arrayCopy);
       } else {

@@ -4,7 +4,6 @@ import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { read } from "midifile-ts";
 import React, { Fragment, useRef } from "react";
 import { useDispatch } from "react-redux";
 const LOG_PREFIX = "Midi upload button: ";
@@ -20,13 +19,13 @@ export const MidiUploadButton: React.FC = () => {
       reader.onload = async (event) => {
         console.log(LOG_PREFIX + "File loaded");
         if (event.target?.result) {
-          const arrayBuffer = event.target.result as ArrayBuffer;
           await setupChordDetector();
-          const byteArray = new Uint8Array(arrayBuffer);
-          const midiData = read(byteArray);
-          const eventsByTick = await parseMidiData(midiData, (bpm) => {
-            dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
-          });
+          const eventsByTick = await parseMidiData(
+            event.target.result as ArrayBuffer,
+            (bpm) => {
+              dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
+            }
+          );
 
           if (!eventsByTick.hasItems) {
             return;
