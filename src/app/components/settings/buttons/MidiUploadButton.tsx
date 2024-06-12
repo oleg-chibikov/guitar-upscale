@@ -1,6 +1,6 @@
 "use client";
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
-import { parseMidiData } from "@/app/engine/midiParser";
+import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
