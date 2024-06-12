@@ -21,6 +21,7 @@ export type PremiumFeatures = {
   skinSelection?: boolean;
   melodies?: boolean;
   chordDetection?: boolean;
+  scaleDetection?: boolean;
   midiUpload?: boolean;
   toggleMetronomeWhenRecordingCheckbox?: boolean;
 };
@@ -34,6 +35,7 @@ export const explorerPremiumFeatures: PremiumFeatures = {
   reverbStrength: true,
   playbackTypeSelection: true,
   chordDetection: true,
+  scaleDetection: true,
 };
 
 export const composerPremiumFeatures: PremiumFeatures = {

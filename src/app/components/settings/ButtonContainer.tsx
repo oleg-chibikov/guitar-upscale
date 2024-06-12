@@ -22,6 +22,21 @@ const DisabledDetectChordButton = dynamic(
     ).DisabledDetectChordButton
 );
 
+const DisabledMidiUploadButton = dynamic(
+  async () =>
+    (await import("@/app/components/settings/buttons/DisabledMidiUploadButton"))
+      .DisabledMidiUploadButton
+);
+
+const DisabledDetectScaleButton = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/buttons/DisabledDetectScaleButton"
+      )
+    ).DisabledDetectScaleButton
+);
+
 export const ButtonContainer: React.FC<ButtonContainerProps> = ({
   style,
   premiumComponents,
@@ -41,6 +56,9 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         {(premiumComponents.get("chordDetection") as ReactNode) ?? (
           <DisabledDetectChordButton />
         )}
+        {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
+          <DisabledDetectScaleButton />
+        )}
       </div>
       <div
         className={`flex flex-row gap-1 ${
@@ -52,7 +70,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         <OpenStrummingSettingsButton />
         <AboutButton />
         {(premiumComponents.get("midiUpload") as ReactNode) ?? (
-          <DisabledDetectChordButton />
+          <DisabledMidiUploadButton />
         )}
       </div>
     </section>

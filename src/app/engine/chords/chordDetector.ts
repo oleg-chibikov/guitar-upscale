@@ -99,7 +99,7 @@ class ChordDetector {
   }
 
   clearDetector() {
-    console.log("Clearing note detector");
+    console.log("Clearing chord detector");
     this.stringNotes.forEach((note) => note?.clear?.());
     this.stringNotes = [];
   }

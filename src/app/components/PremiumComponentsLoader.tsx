@@ -1,5 +1,6 @@
 import "server-only";
 
+import { DetectScaleButton } from "@/app/components/settings/buttons/DetectScaleButton";
 import { MidiUploadButton } from "@/app/components/settings/buttons/MidiUploadButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
@@ -82,6 +83,8 @@ export const premiumFeaturesToMap = (
         return <SkinSelector />;
       case "chordDetection":
         return <DetectChordButton />;
+      case "scaleDetection":
+        return <DetectScaleButton />;
       case "midiUpload":
         return <MidiUploadButton />;
       case "playbackTypeSelection":

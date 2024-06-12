@@ -91,6 +91,7 @@ interface SettingsState
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
   chordIsBeingDetected: boolean;
+  scaleIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
   isFirstEvent: boolean;
@@ -125,6 +126,7 @@ const initialState: SettingsState = {
   isPlaying: false,
   isPaused: false,
   chordIsBeingDetected: false,
+  scaleIsBeingDetected: false,
   isRecording: false,
   toggleMetronomeWhenRecording: true,
   guitarSettingsUpdatedTrigger: false,
@@ -161,6 +163,8 @@ export let chordStrummingDelayMsValue: number =
   initialState.chordStrummingDelayMs;
 export let chordIsBeingDetectedValue: boolean =
   initialState.chordIsBeingDetected;
+export let scaleIsBeingDetectedValue: boolean =
+  initialState.scaleIsBeingDetected;
 export let chordPlayModeValue: ChordPlayMode = initialState.chordPlayMode;
 export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let scaleGroupValue: string = initialState.scaleGroup;
@@ -217,6 +221,17 @@ export let addChordToDetectorLookup:
   | ((chord: Chord, fullKey: string) => void)
   | undefined;
 
+export const setScaleDetectorFunctions = (
+  addScale: (scale: Note[], fullKey: string) => void
+) => {
+  addScaleToDetectorLookup = addScale;
+  rebuildScaleDetectorLookup(); // we need to re-scan all chords after setting the function
+};
+
+export let addScaleToDetectorLookup:
+  | ((scale: Note[], fullKey: string) => void)
+  | undefined;
+
 const setChords = (state: WithNeck) => {
   if (!state.neck) {
     return;
@@ -227,6 +242,10 @@ const setChords = (state: WithNeck) => {
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;
   rebuildChordDetectorLookup();
+};
+
+export const rebuildScaleDetectorLookup = () => {
+  // TODO:
 };
 
 export const rebuildChordDetectorLookup = () => {
@@ -351,6 +370,7 @@ export const settingsSlice = createSlice({
       isMetronomeActiveValue = state.isMetronomeActive;
       chordStrummingDelayMsValue = state.chordStrummingDelayMs;
       chordIsBeingDetectedValue = state.chordIsBeingDetected;
+      scaleIsBeingDetectedValue = state.scaleIsBeingDetected;
       chordPlayModeValue = state.chordPlayMode;
       chordNotesToPlayValue = state.chordNotesToPlay;
       isPlayingValue = state.isPlaying;
@@ -515,6 +535,10 @@ export const settingsSlice = createSlice({
       state.chordIsBeingDetected = action.payload;
       chordIsBeingDetectedValue = action.payload;
     },
+    setScaleIsBeingDetected(state, action: PayloadAction<boolean>) {
+      state.scaleIsBeingDetected = action.payload;
+      scaleIsBeingDetectedValue = action.payload;
+    },
     setToggleMetronomeWhenRecording(state, action: PayloadAction<boolean>) {
       state.toggleMetronomeWhenRecording = action.payload;
       toggleMetronomeWhenRecordingValue = action.payload;
@@ -580,6 +604,7 @@ export const {
   setIsPlaying,
   setIsPaused,
   setChordIsBeingDetected,
+  setScaleIsBeingDetected,
   setIsRecording,
   setToggleMetronomeWhenRecording,
   setIsFirstEvent,

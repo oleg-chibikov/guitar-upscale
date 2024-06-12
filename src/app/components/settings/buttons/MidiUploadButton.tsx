@@ -3,7 +3,7 @@ import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { setTempoBpm } from "@/app/store/settingsSlice";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import UploadFile from "@mui/icons-material/UploadFile";
 import React, { Fragment, useRef } from "react";
 import { useDispatch } from "react-redux";
 const LOG_PREFIX = "Midi upload button: ";
@@ -57,7 +57,7 @@ export const MidiUploadButton: React.FC = () => {
         onChange={handleFileChange}
       />
       <IconButton
-        icon={<UploadFileIcon />}
+        icon={<UploadFile />}
         onPress={() => {
           ref.current?.click();
         }}
