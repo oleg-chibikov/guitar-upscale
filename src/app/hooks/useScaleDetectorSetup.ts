@@ -2,7 +2,7 @@ import { AlertType } from "@/app/data/alertType";
 import {
   addScaleToDetectorLookup,
   setScaleDetectorFunctions,
-} from "@/app/store/settingsSlice";
+} from "@/app/engine/scales/scaleLookupBuilder";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { useDispatch } from "react-redux";
 
@@ -15,11 +15,14 @@ export const useScaleDetectorSetup = () => {
     }
 
     // async load detector module and set its functions to settings on the first detect action.
-    const { mainDetector } = await import("@/app/engine/scales/scaleDetector");
-    setScaleDetectorFunctions(
-      mainDetector.addScaleToDetectorLookup.bind(mainDetector)
+    const { mainScaleDetector } = await import(
+      "@/app/engine/scales/scaleDetector"
     );
-    mainDetector.setScaleFoundCallback((scaleNames) => {
+    setScaleDetectorFunctions(
+      mainScaleDetector.clearDetector.bind(mainScaleDetector),
+      mainScaleDetector.addScaleToDetectorLookup.bind(mainScaleDetector)
+    );
+    mainScaleDetector.setScaleFoundCallback((scaleNames) => {
       dispatch(
         setAndShowAlert({
           message: scaleNames || "No matching scales",

@@ -19,6 +19,7 @@ import {
   baseNoteValue,
   chordIsBeingDetectedValue,
   chordStrummingDelayMsValue,
+  scaleIsBeingDetectedValue,
   selectSettings,
 } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
@@ -75,7 +76,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     useState<boolean>(false);
   const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
-  const [isBeingDetected, setIsBeingDetected] = useState<boolean>(false);
+  const [isChordBeingDetected, setIsChordBeingDetected] =
+    useState<boolean>(false);
+  const [isScaleBeingDetected, setIsScaleBeingDetected] =
+    useState<boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -99,14 +103,31 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             stringOctaveNote !== null &&
             noteMetadata.skipChordDetection !== true
           ) {
-            const { mainDetector } = await import(
+            const { mainChordDetector } = await import(
               "@/app/engine/chords/chordDetector"
             );
-            setIsBeingDetected(true);
-            mainDetector.addNoteToDetector({
+            setIsChordBeingDetected(true);
+            mainChordDetector.addNoteToDetector({
               stringOctaveNote: stringOctaveNote,
               clear: () => {
-                setIsBeingDetected(false);
+                setIsChordBeingDetected(false);
+              },
+            });
+          }
+
+          if (
+            scaleIsBeingDetectedValue &&
+            stringOctaveNote !== null &&
+            noteMetadata.skipChordDetection !== true
+          ) {
+            const { mainScaleDetector } = await import(
+              "@/app/engine/scales/scaleDetector"
+            );
+            setIsScaleBeingDetected(true);
+            mainScaleDetector.addNoteToDetector({
+              note: stringOctaveNote.note,
+              clear: () => {
+                setIsScaleBeingDetected(false);
               },
             });
           }
@@ -251,81 +272,98 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <span
             className={`flex justify-center items-center select-none font-mono
-                    ${!isHeader ? "rounded-full w-7 h-7" : ""}
-                    ${
-                      isBeingDetected
-                        ? `border-4 shadow-glow ${
-                            theme === Theme.Light
-                              ? "border-chord_detection-light shadow-chord_detection_glow-light"
-                              : "border-chord_detection-dark shadow-chord_detection_glow-dark"
-                          }`
-                        : ""
-                    }
-                    ${
-                      !isHeader
-                        ? isFromPreviousChord
-                          ? ` ${
-                              theme === Theme.Light
-                                ? "text-background-light"
-                                : "text-background-dark"
-                            } ${
-                              !isBeingDetected
-                                ? `border-4 ${
-                                    theme === Theme.Light
-                                      ? "border-accent_stronger-light"
-                                      : "border-accent_stronger-dark"
-                                  }`
-                                : ""
-                            } ${
-                              isColored
-                                ? `${
-                                    theme === Theme.Light
-                                      ? "bg-previous_fret_marker_match-light"
-                                      : "bg-previous_fret_marker_match-dark"
-                                  }`
-                                : `${
-                                    theme === Theme.Light
-                                      ? "bg-previous_fret_marker-light"
-                                      : "bg-previous_fret_marker-dark"
-                                  }`
-                            }`
-                          : `${
-                              theme === Theme.Light
-                                ? "text-foreground-light"
-                                : "text-foreground-dark"
-                            } ${
-                              isColored
-                                ? isBehindCapo
-                                  ? theme === Theme.Light
-                                    ? "bg-disabled_match-light"
-                                    : "bg-disabled_match-dark"
-                                  : theme === Theme.Light
-                                  ? "bg-fret_marker_match-light"
-                                  : "bg-fret_marker_match-dark"
-                                : isBehindCapo
-                                ? theme === Theme.Light
-                                  ? "bg-disabled-light"
-                                  : "bg-disabled-dark"
-                                : theme === Theme.Light
-                                ? "bg-fret_marker-light"
-                                : "bg-fret_marker-dark"
-                            }`
-                        : ""
-                    }
-                    ${isHeader ? "text-xl" : "text-md"}
-                    ${
-                      isHeader
-                        ? theme === Theme.Light
-                          ? "text-foreground-light"
-                          : "text-foreground-dark"
-                        : ""
-                    }
-                    ${
-                      isNoteClicked
-                        ? "fret-note-circle-animation-" +
-                          (theme === Theme.Light ? "light" : "dark")
-                        : ""
-                    }`}
+${!isHeader ? "rounded-full w-7 h-7" : ""}
+${
+  isChordBeingDetected
+    ? `border-4 shadow-glow ${
+        theme === Theme.Light
+          ? "border-chord_detection-light shadow-chord_detection_glow-light"
+          : "border-chord_detection-dark shadow-chord_detection_glow-dark"
+      }`
+    : ""
+}
+${
+  isScaleBeingDetected
+    ? `border-4 shadow-glow ${
+        theme === Theme.Light
+          ? "border-scale_detection-light shadow-scale_detection_glow-light"
+          : "border-scale_detection-dark shadow-scale_detection_glow-dark"
+      }`
+    : ""
+}
+${
+  !isHeader
+    ? isFromPreviousChord
+      ? `
+${theme === Theme.Light ? "text-background-light" : "text-background-dark"}
+${
+  isChordBeingDetected
+    ? ""
+    : `border-4 ${
+        theme === Theme.Light
+          ? "border-accent_stronger-light"
+          : "border-accent_stronger-dark"
+      }`
+}
+${
+  isScaleBeingDetected
+    ? ""
+    : `border-4 ${
+        theme === Theme.Light
+          ? "border-accent_strongest-light"
+          : "border-accent_strongest-dark"
+      }`
+}
+${
+  isColored
+    ? `${
+        theme === Theme.Light
+          ? "bg-previous_fret_marker_match-light"
+          : "bg-previous_fret_marker_match-dark"
+      }`
+    : `${
+        theme === Theme.Light
+          ? "bg-previous_fret_marker-light"
+          : "bg-previous_fret_marker-dark"
+      }`
+}`
+      : `${
+          theme === Theme.Light
+            ? "text-foreground-light"
+            : "text-foreground-dark"
+        }
+${
+  isColored
+    ? isBehindCapo
+      ? theme === Theme.Light
+        ? "bg-disabled_match-light"
+        : "bg-disabled_match-dark"
+      : theme === Theme.Light
+      ? "bg-fret_marker_match-light"
+      : "bg-fret_marker_match-dark"
+    : isBehindCapo
+    ? theme === Theme.Light
+      ? "bg-disabled-light"
+      : "bg-disabled-dark"
+    : theme === Theme.Light
+    ? "bg-fret_marker-light"
+    : "bg-fret_marker-dark"
+}`
+    : ""
+}
+${isHeader ? "text-xl" : "text-md"}
+${
+  isHeader
+    ? theme === Theme.Light
+      ? "text-foreground-light"
+      : "text-foreground-dark"
+    : ""
+}
+${
+  isNoteClicked
+    ? "fret-note-circle-animation-" + (theme === Theme.Light ? "light" : "dark")
+    : ""
+}`}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
             }}

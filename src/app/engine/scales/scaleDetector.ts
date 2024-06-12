@@ -1,20 +1,21 @@
+import { Scale } from "@/app/data/scales";
+import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { Note, StringOctaveNote } from "../../data/notes";
+import { Note } from "../../data/notes";
 import { trailingDebounce } from "../../helpers/debounce";
 import { Trie } from "../../helpers/trie";
 
 type NoteWithClearCallback = {
-  stringOctaveNote: StringOctaveNote;
-  clear?: () => void;
+  note: Note;
+  clear: () => void; // clear the note
 };
 
 type MissingChar = "_" | "?";
 
-const START_ASCII_CODE = "a".charCodeAt(0);
-export const MIN_NOTES_TO_DETECT_SCALE = 3;
+export const MIN_NOTES_TO_DETECT_SCALE = 5;
 
 class ScaleDetector {
-  private stringNotes: (NoteWithClearCallback | null)[];
+  private currentlyDetectedNotes: Map<Note, () => void>;
   private trie: Trie;
   private reverseScalesMap: Map<string, string[]>;
   private debouncedFindMatches: () => void;
@@ -25,7 +26,7 @@ class ScaleDetector {
     findMatchesAutomatically: boolean = true,
     showScale?: (name: string) => void
   ) {
-    this.stringNotes = [];
+    this.currentlyDetectedNotes = new Map<Note, () => void>();
     this.trie = new Trie();
     this.reverseScalesMap = new Map<string, string[]>();
     this.debouncedFindMatches = trailingDebounce(
@@ -49,25 +50,27 @@ class ScaleDetector {
     return cloned;
   }
 
-  addScaleToDetectorLookup(scale: Note[], fullKey: string) {
+  addScaleToDetectorLookup(scale: Scale, fullKey: string) {
+    // if (fullKey.indexOf("omati") > -1) {
+    //   debugger;
+    // }
     const serializedScale = this.serializeScale(scale, "_");
     this.trie.add(serializedScale);
     addOrUpdateMapArray(this.reverseScalesMap, serializedScale, fullKey);
   }
 
   addNoteToDetector(note: NoteWithClearCallback) {
-    console.log("Adding note to scaleDetector", note);
     // index in this array corresponds to the string of the note
-    const index = note.stringOctaveNote.string;
-    const existing = this.stringNotes[index];
-    // only one note per string allowed
-    existing?.clear?.();
-
-    // clicked on the marked note
-    if (existing?.stringOctaveNote.fret === note.stringOctaveNote.fret) {
-      this.stringNotes[index] = null;
+    const existingNoteClearCallback = this.currentlyDetectedNotes.get(
+      note.note
+    );
+    if (existingNoteClearCallback !== undefined) {
+      console.log("Deleting note to scaleDetector", note);
+      existingNoteClearCallback();
+      this.currentlyDetectedNotes.delete(note.note);
     } else {
-      this.stringNotes[index] = note;
+      console.log("Adding note to scaleDetector", note);
+      this.currentlyDetectedNotes.set(note.note, note.clear);
     }
 
     if (this.findMatchesAutomatically) {
@@ -77,26 +80,47 @@ class ScaleDetector {
 
   findMatches() {
     console.log("Detecting scale");
-    // TODO
+    const usedNotes = this.currentlyDetectedNotes;
+    if (usedNotes.size < MIN_NOTES_TO_DETECT_SCALE) {
+      return;
+    }
+    const serializedScale = this.serializeScale(
+      Array.from(usedNotes.keys()),
+      "?"
+    );
+    const matchedValues = this.trie.wildcardMatches(serializedScale);
+    console.log("Matched values from trie", matchedValues);
+    const scaleNames = Array.from(matchedValues)
+      .flatMap((x) => this.reverseScalesMap.get(x))
+      .filter((x) => x) as string[];
+    const deduplicatedScaleNames = Array.from(new Set(scaleNames)).sort();
+    console.log("Matched scale names", deduplicatedScaleNames);
+    this.showScale?.(deduplicatedScaleNames.join(", "));
+    return deduplicatedScaleNames;
   }
 
   clearDetector() {
     console.log("Clearing scale detector");
-    this.stringNotes.forEach((note) => note?.clear?.());
-    this.stringNotes = [];
+
+    this.currentlyDetectedNotes.forEach((clearCallback) => clearCallback());
+    this.currentlyDetectedNotes = new Map<Note, () => void>();
   }
 
-  private serializeScale(scale: Note[], missingChar: MissingChar) {
-    // Convert note values to string and return the serialized scale
-    // to keep each value 1 char length - the numeric values are converted to corresponding char codes starting from 'a'
-    return scale
-      .map((item) =>
-        typeof item === "number"
-          ? String.fromCharCode(item + START_ASCII_CODE)
-          : item
-      )
-      .join("");
+  private serializeScale(scale: Scale, missingChar: MissingChar) {
+    const serializedScale: (number | MissingChar)[] = [];
+
+    // Initialize the serializedScale with the placeholder for each position
+    for (let i = 0; i < NOTE_COUNT; i++) {
+      serializedScale.push(missingChar);
+    }
+
+    // Populate serializedScale with the set note values
+    scale.forEach((note) => {
+      serializedScale[note] = 1;
+    });
+
+    return serializedScale.join("");
   }
 }
 
-export const mainDetector = new ScaleDetector();
+export const mainScaleDetector = new ScaleDetector();

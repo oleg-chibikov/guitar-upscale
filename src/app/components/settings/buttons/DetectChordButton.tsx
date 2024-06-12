@@ -4,6 +4,7 @@ import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import {
   selectSettings,
   setChordIsBeingDetected,
+  setScaleIsBeingDetected,
 } from "@/app/store/settingsSlice";
 import SearchOff from "@mui/icons-material/SearchOff";
 import Troubleshoot from "@mui/icons-material/Troubleshoot";
@@ -23,13 +24,9 @@ export const DetectChordButton: React.FC = (props) => {
       isActive={chordIsBeingDetected}
       activeBg="bg-red-500"
       onPress={async () => {
-        if (chordIsBeingDetected) {
-          const { mainDetector } = await import(
-            "@/app/engine/chords/chordDetector"
-          );
-          mainDetector.clearDetector();
-        } else {
+        if (!chordIsBeingDetected) {
           await setupChordDetector();
+          dispatch(setScaleIsBeingDetected(false));
         }
         dispatch(setChordIsBeingDetected(!chordIsBeingDetected));
       }}

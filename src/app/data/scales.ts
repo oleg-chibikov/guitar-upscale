@@ -1,33 +1,5 @@
 export type Scale = number[];
 
-// Debug - check duplicates
-export const checkDuplicateScales = (
-  scalesMap: Map<string, Map<string, Scale>>
-): void => {
-  // Create a Map to store encountered scales and their names
-  const encounteredScales = new Map<string, string>();
-
-  // Iterate through each group
-  for (const [group, groupMap] of Array.from(scalesMap.entries())) {
-    // Iterate through each scale within the group
-    for (const [scaleName, scaleNotes] of Array.from(groupMap.entries())) {
-      const scaleString = JSON.stringify(scaleNotes);
-
-      // If the scale is encountered more than once, log the duplicate
-      if (encounteredScales.has(scaleString)) {
-        console.log(
-          `Duplicate found: Scale '${scaleName}' in '${group}' duplicates '${encounteredScales.get(
-            scaleString
-          )}'`
-        );
-      } else {
-        // Otherwise, add the scale to the map
-        encounteredScales.set(scaleString, scaleName);
-      }
-    }
-  }
-};
-
 // examples follow these rules:
 
 // They are written for EBGDAE tuning, converting to other tunings will require shifting notes

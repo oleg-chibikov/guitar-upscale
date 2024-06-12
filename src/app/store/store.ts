@@ -62,6 +62,7 @@ const persistConfig = {
         delete newState.alertType;
         delete newState.isMetronomeActive;
         delete newState.chordIsBeingDetected;
+        delete newState.scaleIsBeingDetected;
         delete newState.isRecording;
         delete newState.subscriptionTier;
         delete newState.premiumFeatures;

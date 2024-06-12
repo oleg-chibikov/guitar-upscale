@@ -3,6 +3,7 @@
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
   selectSettings,
+  setChordIsBeingDetected,
   setScaleIsBeingDetected,
 } from "@/app/store/settingsSlice";
 import ManageSearch from "@mui/icons-material/ManageSearch";
@@ -23,13 +24,9 @@ export const DetectScaleButton: React.FC = (props) => {
       isActive={scaleIsBeingDetected}
       activeBg="bg-red-500"
       onPress={async () => {
-        if (scaleIsBeingDetected) {
-          const { mainDetector } = await import(
-            "@/app/engine/scales/scaleDetector"
-          );
-          mainDetector.clearDetector();
-        } else {
+        if (!scaleIsBeingDetected) {
           await setupScaleDetector();
+          dispatch(setChordIsBeingDetected(false));
         }
         dispatch(setScaleIsBeingDetected(!scaleIsBeingDetected));
       }}

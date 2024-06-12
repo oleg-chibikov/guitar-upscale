@@ -79,6 +79,14 @@ const config: Config = {
           light: "#F6E7D2",
           dark: "#a2cef5",
         },
+        scale_detection: {
+          light: "#9B3320",
+          dark: "#001b2e",
+        },
+        scale_detection_glow: {
+          light: "#9B3320",
+          dark: "#B103BC",
+        },
         accent: {
           light: "#D48CA7",
           dark: "#9567DB",

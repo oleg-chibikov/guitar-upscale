@@ -2,7 +2,7 @@ import { AlertType } from "@/app/data/alertType";
 import {
   addChordToDetectorLookup,
   setChordDetectorFunctions,
-} from "@/app/store/settingsSlice";
+} from "@/app/engine/chords/chordLookupBuilder";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { useDispatch } from "react-redux";
 
@@ -15,11 +15,14 @@ export const useChordDetectorSetup = () => {
     }
 
     // async load detector module and set its functions to settings on the first detect action.
-    const { mainDetector } = await import("@/app/engine/chords/chordDetector");
-    setChordDetectorFunctions(
-      mainDetector.addChordToDetectorLookup.bind(mainDetector)
+    const { mainChordDetector } = await import(
+      "@/app/engine/chords/chordDetector"
     );
-    mainDetector.setChordFoundCallback((chordNames) => {
+    setChordDetectorFunctions(
+      mainChordDetector.clearDetector.bind(mainChordDetector),
+      mainChordDetector.addChordToDetectorLookup.bind(mainChordDetector)
+    );
+    mainChordDetector.setChordFoundCallback((chordNames) => {
       dispatch(
         setAndShowAlert({
           message: chordNames || "No matching chords",

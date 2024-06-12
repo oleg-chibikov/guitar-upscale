@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
-import { Chord, getNoteText, Note } from "../data/notes";
+import { Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { scalesMap } from "../data/scales";
 import {
@@ -19,8 +19,13 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 
-import { getModeText, NoteChords } from "@/app/data/chordModes";
+import { NoteChords } from "@/app/data/chordModes";
 import { MAX_VOLUME } from "@/app/data/volume";
+import {
+  clearChordDetector,
+  rebuildChordDetectorLookup,
+} from "@/app/engine/chords/chordLookupBuilder";
+import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
 import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
@@ -182,11 +187,11 @@ export let isFirstEventValue: boolean = initialState.isFirstEvent;
 const onGuitarSettingsUpdate = (
   state: WithControls & WithNeck & CanUpdateGuitarSettings
 ) => {
-  const scaleNotes = scalesMap.get(state.scaleGroup)!.get(state.scale);
-  const scalePattern = new Set(scaleNotes?.concat([0]));
+  const scaleNotesWithoutZero = scalesMap
+    .get(state.scaleGroup)!
+    .get(state.scale);
+  const scalePattern = new Set(scaleNotesWithoutZero?.concat([0])); // all scales include 0, so it's omitted from the scales themselves
 
-  // Just for debug
-  // checkDuplicateScales(scalesMap);
   const neck = generateNeckRepresentation(
     scalePattern,
     parseStringToNotes(tuningValue),
@@ -196,6 +201,7 @@ const onGuitarSettingsUpdate = (
   neckValue = neck;
   setChords(state);
   clearPreviousChords();
+  clearScaleDetector?.();
   // this can notify all the controls that use this prop to rerender
   state.guitarSettingsUpdatedTrigger = !state.guitarSettingsUpdatedTrigger;
 };
@@ -210,28 +216,6 @@ export const clearWipeExampleCacheTrigger = () => {
   wipeExampleCacheTriggerValue = false;
 };
 
-export const setChordDetectorFunctions = (
-  addChord: (chord: Chord, fullKey: string) => void
-) => {
-  addChordToDetectorLookup = addChord;
-  rebuildChordDetectorLookup(); // we need to re-scan all chords after setting the function
-};
-
-export let addChordToDetectorLookup:
-  | ((chord: Chord, fullKey: string) => void)
-  | undefined;
-
-export const setScaleDetectorFunctions = (
-  addScale: (scale: Note[], fullKey: string) => void
-) => {
-  addScaleToDetectorLookup = addScale;
-  rebuildScaleDetectorLookup(); // we need to re-scan all chords after setting the function
-};
-
-export let addScaleToDetectorLookup:
-  | ((scale: Note[], fullKey: string) => void)
-  | undefined;
-
 const setChords = (state: WithNeck) => {
   if (!state.neck) {
     return;
@@ -241,31 +225,8 @@ const setChords = (state: WithNeck) => {
   const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;
+  clearChordDetector?.();
   rebuildChordDetectorLookup();
-};
-
-export const rebuildScaleDetectorLookup = () => {
-  // TODO:
-};
-
-export const rebuildChordDetectorLookup = () => {
-  if (!chordsValue) {
-    return;
-  }
-
-  for (const chord of chordsValue) {
-    const key = getNoteText(chord.note);
-    for (const mode of chord.modes) {
-      const modeKey = getModeText(mode.mode);
-      const fullKey = key + modeKey;
-      mode.variations.map((variation) => {
-        // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
-        //   debugger;
-        // }
-        addChordToDetectorLookup?.(variation, fullKey);
-      });
-    }
-  }
 };
 
 export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
@@ -534,10 +495,16 @@ export const settingsSlice = createSlice({
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.chordIsBeingDetected = action.payload;
       chordIsBeingDetectedValue = action.payload;
+      if (!action.payload) {
+        clearChordDetector?.();
+      }
     },
     setScaleIsBeingDetected(state, action: PayloadAction<boolean>) {
       state.scaleIsBeingDetected = action.payload;
       scaleIsBeingDetectedValue = action.payload;
+      if (!action.payload) {
+        clearScaleDetector?.();
+      }
     },
     setToggleMetronomeWhenRecording(state, action: PayloadAction<boolean>) {
       state.toggleMetronomeWhenRecording = action.payload;
