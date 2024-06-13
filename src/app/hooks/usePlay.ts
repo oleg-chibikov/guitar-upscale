@@ -60,73 +60,78 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     }
     console.log(LOG_PREFIX, "Loading examples");
     updateWaiting(true);
-    const { playMidi, stopPlayback } = await import("@/app/engine/midiPlayer");
-    if (isPlayingValue) {
-      await stopPlayback(dispatch, LOG_PREFIX);
-      updateWaiting(false);
-      return;
-    }
-
-    let example: Example | undefined;
-    if (decodeExample && playbackTypeValue === melodyType) {
-      const { getRandomScaleExample, wipeExamplesCache } = await import(
-        "@/app/data/scaleExamples"
+    try {
+      const { playMidi, stopPlayback } = await import(
+        "@/app/engine/midiPlayer"
       );
-      if (wipeExampleCacheTriggerValue) {
-        wipeExamplesCache();
-        clearWipeExampleCacheTrigger();
+      if (isPlayingValue) {
+        await stopPlayback(dispatch, LOG_PREFIX);
+        return;
       }
-      example = await getRandomScaleExample();
-      const tempo = example?.tempo;
-      if (tempo !== undefined && tempo !== tempoBpmValue) {
-        dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
+
+      let example: Example | undefined;
+      if (decodeExample && playbackTypeValue === melodyType) {
+        const { getRandomScaleExample, wipeExamplesCache } = await import(
+          "@/app/data/scaleExamples"
+        );
+        if (wipeExampleCacheTriggerValue) {
+          wipeExamplesCache();
+          clearWipeExampleCacheTrigger();
+        }
+        example = await getRandomScaleExample();
+        const tempo = example?.tempo;
+        if (tempo !== undefined && tempo !== tempoBpmValue) {
+          dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
+        }
+      } else {
+        await import("@/app/engine/decoders/scaleDecoder");
       }
-    } else {
-      await import("@/app/engine/decoders/scaleDecoder");
-    }
 
-    // the instrument should be initialized before waiting for the first note
-    // init metronome here as we don't want to get glitches if it gets turned on during playing
-    const trackInstrumentPromises =
-      example?.tracks.map((track) =>
-        track.instrument !== undefined
-          ? loadInstrument(track.instrument, reverbStrengthValue)
-          : Promise.resolve()
-      ) ?? [];
+      // the instrument should be initialized before waiting for the first note
+      // init metronome here as we don't want to get glitches if it gets turned on during playing
+      const trackInstrumentPromises =
+        example?.tracks.map((track) =>
+          track.instrument !== undefined
+            ? loadInstrument(track.instrument, reverbStrengthValue)
+            : Promise.resolve()
+        ) ?? [];
 
-    await Promise.all(trackInstrumentPromises);
+      await Promise.all(trackInstrumentPromises);
 
-    let {
-      eventsByTick,
-      message,
-    }: { eventsByTick: EventsByTick; message: string } = await decode(
-      decodeExample,
-      example
-    );
-
-    if (!eventsByTick.hasItems) {
-      return;
-    }
-
-    // Start playback
-    console.log(LOG_PREFIX + "Waiting for playback to start...");
-    await waitForStart(example);
-    console.log(LOG_PREFIX + "Start playing");
-    ReactGA.event({
-      category: "Playback",
-      action: "Playback started",
-    });
-
-    dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
-
-    await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
-      // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
-      console.log(
-        LOG_PREFIX + "The playback has started. Removing the waiting mark"
+      let {
+        eventsByTick,
+        message,
+      }: { eventsByTick: EventsByTick; message: string } = await decode(
+        decodeExample,
+        example
       );
 
+      if (!eventsByTick.hasItems) {
+        return;
+      }
+
+      // Start playback
+      console.log(LOG_PREFIX + "Waiting for playback to start...");
+      await waitForStart(example);
+      console.log(LOG_PREFIX + "Start playing");
+      ReactGA.event({
+        category: "Playback",
+        action: "Playback started",
+      });
+
+      dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
+
+      await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
+        // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
+        console.log(
+          LOG_PREFIX + "The playback has started. Removing the waiting mark"
+        );
+
+        updateWaiting(false);
+      });
+    } finally {
       updateWaiting(false);
-    });
+    }
   }, [dispatch, decodeExample]);
 
   useEffect(() => {
