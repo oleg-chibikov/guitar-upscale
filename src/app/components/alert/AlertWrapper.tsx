@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-// only load chords module when expanded
+// only load module when expanded
 const Alert = dynamic(async () => (await import("./Alert")).Alert);
 
 export const AlertWrapper: FC = () => {

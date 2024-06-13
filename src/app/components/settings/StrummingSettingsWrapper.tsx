@@ -4,7 +4,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import React, { FC, Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-// only load StrummingSettings module when expanded
+// only load module when expanded
 const StrummingSettings = React.lazy(() =>
   import("./StrummingSettings").then((module) => ({
     default: module.StrummingSettings,

@@ -1,6 +1,7 @@
 import { AlertType } from "@/app/data/alertType";
 import { Skin } from "@/app/data/skin";
 import { Theme } from "@/app/data/theme";
+import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
@@ -23,6 +24,8 @@ interface UiState {
   alertType: AlertType;
   alertTimeout: number;
   alertMessage: string;
+  suggestedScales: ScaleAndGroup[] | undefined;
+  showScalesAlert: boolean;
   theme: Theme;
   fretboardScaleX: number;
   fretboardScaleY: number;
@@ -43,6 +46,8 @@ const initialState: UiState = {
   alertTimeout: 2000,
   alertType: AlertType.Neutral,
   alertMessage: "",
+  suggestedScales: undefined,
+  showScalesAlert: false,
   theme: initialTheme,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
@@ -106,6 +111,14 @@ export const uiSlice = createSlice({
     },
     hideAlert(state) {
       state.showAlert = false;
+    },
+    setSuggestedScales(state, action: PayloadAction<ScaleAndGroup[]>) {
+      state.suggestedScales = action.payload;
+      state.showScalesAlert = true;
+      state.showAlert = false; // hide any existing alert when showing scales
+    },
+    hideScalesAlert(state) {
+      state.showScalesAlert = false;
     },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;
@@ -177,6 +190,8 @@ export const {
   setSettingsExpanded,
   setAndShowAlert,
   hideAlert,
+  setSuggestedScales,
+  hideScalesAlert,
   setTheme,
   setChordsExpanded,
   setFretboardScaleX,

@@ -1,9 +1,8 @@
-import { AlertType } from "@/app/data/alertType";
 import {
   addScaleToDetectorLookup,
   setScaleDetectorFunctions,
 } from "@/app/engine/scales/scaleLookupBuilder";
-import { setAndShowAlert } from "@/app/store/uiSlice";
+import { setAndShowAlert, setSuggestedScales } from "@/app/store/uiSlice";
 import { useDispatch } from "react-redux";
 
 // returns a function to setup scale detector
@@ -22,15 +21,18 @@ export const useScaleDetectorSetup = () => {
       mainScaleDetector.clearDetector.bind(mainScaleDetector),
       mainScaleDetector.addScaleToDetectorLookup.bind(mainScaleDetector)
     );
-    mainScaleDetector.setScaleFoundCallback((scaleNames, alertType) => {
-      dispatch(
-        setAndShowAlert({
-          message: scaleNames || "No matching scales",
-          alertType:
-            alertType ?? (scaleNames ? AlertType.Success : AlertType.Warning),
-          alertTimeout: 5000,
-        })
-      );
+    mainScaleDetector.setScaleFoundCallback(({ text, scales, alertType }) => {
+      if (scales === undefined) {
+        dispatch(
+          setAndShowAlert({
+            message: text,
+            alertType: alertType,
+            alertTimeout: 5000,
+          })
+        );
+      } else {
+        dispatch(setSuggestedScales(scales));
+      }
     });
   };
 };

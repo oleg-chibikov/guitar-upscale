@@ -5,7 +5,6 @@ import { MIN_NOTES_TO_DETECT_SCALE } from "@/app/engine/scales/scaleDetector";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
   selectSettings,
-  setChordIsBeingDetected,
   setScale,
   setScaleGroup,
   setScaleIsBeingDetected,
@@ -31,7 +30,6 @@ export const DetectScaleButton: React.FC = (props) => {
       onPress={async () => {
         if (!scaleIsBeingDetected) {
           await setupScaleDetector();
-          dispatch(setChordIsBeingDetected(false));
           dispatch(setScaleGroup("Special"));
           dispatch(setScale("Chromatic (All notes)"));
           dispatch(

@@ -1,12 +1,15 @@
 import { AlertType } from "@/app/data/alertType";
-import { getNoteText, serializeStringOctaveNote } from "@/app/data/notes";
+import { serializeStringOctaveNote } from "@/app/data/notes";
 import { Scale } from "@/app/data/scales";
 import {
   MissingChar,
   NoteWithClearCallback,
 } from "@/app/engine/detectorShared";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import {
+  ScaleAndGroup,
+  ScaleDetectorCallback,
+} from "@/app/engine/scales/scaleLookupBuilder";
 import { sortScales } from "@/app/engine/scales/scaleSorter";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import { trailingDebounce } from "../../helpers/debounce";
@@ -22,11 +25,11 @@ class ScaleDetector {
   private reverseScalesMap: Map<string, ScaleAndGroup[]>;
   private debouncedFindMatches: () => void;
   private findMatchesAutomatically: boolean;
-  private alert?: (name: string, alertType?: AlertType) => void;
+  private alert?: (data: ScaleDetectorCallback) => void;
 
   constructor(
     findMatchesAutomatically: boolean = true,
-    alert?: (name: string, alertType?: AlertType) => void
+    alert?: (data: ScaleDetectorCallback) => void
   ) {
     this.currentlyDetectedNotes = this.initArray();
     this.trie = new Trie();
@@ -39,9 +42,7 @@ class ScaleDetector {
     this.alert = alert;
   }
 
-  setScaleFoundCallback = (
-    alert?: (name: string, alertType?: AlertType) => void
-  ) => {
+  setScaleFoundCallback = (alert?: (data: ScaleDetectorCallback) => void) => {
     this.alert = alert;
   };
 
@@ -100,10 +101,10 @@ class ScaleDetector {
 
     if (this.usedNotesCount < MIN_NOTES_TO_DETECT_SCALE) {
       const remaining = MIN_NOTES_TO_DETECT_SCALE - this.usedNotesCount;
-      this.alert?.(
-        "Select " + remaining + " more notes to detect the scale",
-        AlertType.Neutral
-      );
+      this.alert?.({
+        text: "Select " + remaining + " more notes to detect the scale",
+        alertType: AlertType.Neutral,
+      });
       return;
     }
     const serializedScale = this.currentlyDetectedNotes
@@ -114,13 +115,17 @@ class ScaleDetector {
     const nameData = Array.from(matchedValues)
       .flatMap((x) => this.reverseScalesMap.get(x))
       .filter((x) => x) as ScaleAndGroup[];
+    if (!nameData.length) {
+      this.alert?.({
+        text: "No scales matched",
+        alertType: AlertType.Warning,
+      });
+      console.warn("No scales matched to the values from trie");
+      return;
+    }
     const sortedData = sortScales(nameData);
-    const transformedNames = sortedData.map(
-      (x) => `${x.group}: ` + getNoteText(x.note) + " " + x.scale
-    );
-    console.log("Matched scale names", transformedNames);
-    this.alert?.(transformedNames.join("\n"));
-    return transformedNames;
+    console.log("Matched scales", sortedData);
+    this.alert?.({ scales: sortedData });
   }
 
   clearDetector() {

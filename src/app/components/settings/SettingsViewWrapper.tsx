@@ -3,7 +3,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import React, { FC, Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-// only load Settings module when expanded
+// only load module when expanded
 const SettingsView = React.lazy(() =>
   import("./SettingsView").then((module) => ({ default: module.SettingsView }))
 );

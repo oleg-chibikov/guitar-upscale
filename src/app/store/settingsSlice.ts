@@ -70,12 +70,21 @@ interface WithControls {
   tuning: Tuning;
 }
 
+interface WithChordIsBeingDetected {
+  chordIsBeingDetected: boolean;
+}
+interface WithScaleIsBeingDetected {
+  scaleIsBeingDetected: boolean;
+}
+
 interface SettingsState
   extends WithMetronome,
     WithIsPaused,
     WithNeck,
     WithControls,
-    CanUpdateGuitarSettings {
+    CanUpdateGuitarSettings,
+    WithChordIsBeingDetected,
+    WithScaleIsBeingDetected {
   tempoBpm: number;
   chordStrummingDelayMs: number;
   volume: number;
@@ -95,8 +104,6 @@ interface SettingsState
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
-  chordIsBeingDetected: boolean;
-  scaleIsBeingDetected: boolean;
   isRecording: boolean;
   toggleMetronomeWhenRecording: boolean;
   isFirstEvent: boolean;
@@ -184,8 +191,17 @@ export let wipeExampleCacheTriggerValue: boolean = false;
 export let isLastEventValue: boolean = initialState.isLastEvent;
 export let isFirstEventValue: boolean = initialState.isFirstEvent;
 
+export let preventScaleDetectorFlush: boolean = false;
+export const setPreventScaleDetectorFlush = (value: boolean) => {
+  preventScaleDetectorFlush = value;
+};
+
 const onGuitarSettingsUpdate = (
-  state: WithControls & WithNeck & CanUpdateGuitarSettings
+  state: WithControls &
+    WithNeck &
+    CanUpdateGuitarSettings &
+    WithChordIsBeingDetected &
+    WithScaleIsBeingDetected
 ) => {
   const scaleNotesWithoutZero = scalesMap
     .get(state.scaleGroup)!
@@ -201,7 +217,10 @@ const onGuitarSettingsUpdate = (
   neckValue = neck;
   setChords(state);
   clearPreviousChords();
-  clearScaleDetector?.();
+  if (!preventScaleDetectorFlush) {
+    updateScaleIsBeingDetected(state, false);
+    clearScaleDetector?.();
+  }
   // this can notify all the controls that use this prop to rerender
   state.guitarSettingsUpdatedTrigger = !state.guitarSettingsUpdatedTrigger;
 };
@@ -216,7 +235,7 @@ export const clearWipeExampleCacheTrigger = () => {
   wipeExampleCacheTriggerValue = false;
 };
 
-const setChords = (state: WithNeck) => {
+const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
   if (!state.neck) {
     return;
   }
@@ -226,6 +245,7 @@ const setChords = (state: WithNeck) => {
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;
   clearChordDetector?.();
+  updateChordIsBeingDetected(state, false);
   rebuildChordDetectorLookup();
 };
 
@@ -274,6 +294,28 @@ const updateIsPaused = (value: boolean, state: WithIsPaused) => {
   state.isPaused = isPausedValue;
   resolvePause(undefined);
   recreatePausePromise();
+};
+
+const updateChordIsBeingDetected = (
+  state: WithChordIsBeingDetected,
+  value: boolean
+) => {
+  state.chordIsBeingDetected = value;
+  chordIsBeingDetectedValue = value;
+  if (!value) {
+    clearChordDetector?.();
+  }
+};
+
+const updateScaleIsBeingDetected = (
+  state: WithScaleIsBeingDetected,
+  value: boolean
+) => {
+  state.scaleIsBeingDetected = value;
+  scaleIsBeingDetectedValue = value;
+  if (!value) {
+    clearScaleDetector?.();
+  }
 };
 
 export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
@@ -493,18 +535,10 @@ export const settingsSlice = createSlice({
       updateIsPaused(action.payload, state);
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
-      state.chordIsBeingDetected = action.payload;
-      chordIsBeingDetectedValue = action.payload;
-      if (!action.payload) {
-        clearChordDetector?.();
-      }
+      updateChordIsBeingDetected(state, action.payload);
     },
     setScaleIsBeingDetected(state, action: PayloadAction<boolean>) {
-      state.scaleIsBeingDetected = action.payload;
-      scaleIsBeingDetectedValue = action.payload;
-      if (!action.payload) {
-        clearScaleDetector?.();
-      }
+      updateScaleIsBeingDetected(state, action.payload);
     },
     setToggleMetronomeWhenRecording(state, action: PayloadAction<boolean>) {
       state.toggleMetronomeWhenRecording = action.payload;

@@ -53,7 +53,18 @@ export const getShiftedNote = (note: Note) => {
       ? NOTE_COUNT + note + currentTuningShift
       : note;
 
-  return (withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
+  return (NOTE_COUNT + withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
+};
+
+export const getUnshiftedNote = (note: Note) => {
+  const currentTuningShift = getCurrentShift();
+
+  const withTuningShift =
+    currentTuningShift !== undefined
+      ? NOTE_COUNT + note - currentTuningShift
+      : note;
+
+  return (NOTE_COUNT + withTuningShift - BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
 
 export const getCurrentShift = () => tunings[tuningValue].shift;

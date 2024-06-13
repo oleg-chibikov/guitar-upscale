@@ -1,5 +1,6 @@
 "use client";
 
+import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
 import { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
@@ -26,6 +27,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
     <>
       <Initializer />
       <AlertWrapper />
+      <ScaleDetectionAlertWrapper />
       {loadingMessage !== undefined ? (
         <main
           className={`flex flex-col gap-2 justify-center align-middle items-center text-center text-2xl ${

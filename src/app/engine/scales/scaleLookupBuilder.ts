@@ -1,8 +1,21 @@
+import { AlertType } from "@/app/data/alertType";
 import { Note } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 
 export type ScaleAndGroup = { scale: string; group: string; note: Note };
+
+export type ScaleDetectorCallback =
+  | {
+      text: string;
+      alertType?: AlertType;
+      scales?: undefined;
+    }
+  | {
+      scales: ScaleAndGroup[];
+      text?: undefined;
+      alertType?: undefined;
+    };
 
 export const rebuildScaleDetectorLookup = () => {
   if (!addScaleToDetectorLookup) {

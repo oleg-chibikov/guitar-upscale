@@ -60,6 +60,8 @@ const persistConfig = {
         delete newState.showAlert;
         delete newState.alertMessage;
         delete newState.alertType;
+        delete newState.suggestedScales;
+        delete newState.showScalesAlert;
         delete newState.isMetronomeActive;
         delete newState.chordIsBeingDetected;
         delete newState.scaleIsBeingDetected;
