@@ -21,6 +21,7 @@ interface UiState {
   chordsExpanded: boolean;
   showAlert: boolean;
   alertType: AlertType;
+  alertTimeout: number;
   alertMessage: string;
   theme: Theme;
   fretboardScaleX: number;
@@ -39,6 +40,7 @@ const initialState: UiState = {
   settingsExpanded: false,
   chordsExpanded: true,
   showAlert: false,
+  alertTimeout: 2000,
   alertType: AlertType.Neutral,
   alertMessage: "",
   theme: initialTheme,
@@ -91,11 +93,16 @@ export const uiSlice = createSlice({
     },
     setAndShowAlert(
       state,
-      action: PayloadAction<{ message: string; alertType?: AlertType }>
+      action: PayloadAction<{
+        message: string;
+        alertType?: AlertType;
+        alertTimeout?: number;
+      }>
     ) {
       state.showAlert = true;
       state.alertMessage = action.payload.message;
       state.alertType = action.payload.alertType ?? AlertType.Neutral;
+      state.alertTimeout = action.payload.alertTimeout ?? 2000;
     },
     hideAlert(state) {
       state.showAlert = false;

@@ -125,7 +125,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             );
             setIsScaleBeingDetected(true);
             mainScaleDetector.addNoteToDetector({
-              note: stringOctaveNote.note,
+              stringOctaveNote,
               clear: () => {
                 setIsScaleBeingDetected(false);
               },

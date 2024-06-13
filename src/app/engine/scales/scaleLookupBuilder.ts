@@ -1,6 +1,8 @@
-import { getNoteText } from "@/app/data/notes";
+import { Note } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+
+export type ScaleAndGroup = { scale: string; group: string; note: Note };
 
 export const rebuildScaleDetectorLookup = () => {
   if (!addScaleToDetectorLookup) {
@@ -41,10 +43,11 @@ export const rebuildScaleDetectorLookup = () => {
         const shiftedScale = fullScaleNotes
           .map((x) => (x + note) % NOTE_COUNT)
           .sort((a, b) => a - b);
-        addScaleToDetectorLookup(
-          shiftedScale,
-          `${getNoteText(note)} ${scaleName}`
-        );
+        addScaleToDetectorLookup(shiftedScale, {
+          group,
+          note,
+          scale: scaleName,
+        });
       }
     }
   }
@@ -52,7 +55,7 @@ export const rebuildScaleDetectorLookup = () => {
 
 export const setScaleDetectorFunctions = (
   clear: () => void,
-  addScale: (scale: Scale, fullKey: string) => void
+  addScale: (scale: Scale, scaleData: ScaleAndGroup) => void
 ) => {
   clearScaleDetector = clear;
   addScaleToDetectorLookup = addScale;
@@ -62,5 +65,5 @@ export const setScaleDetectorFunctions = (
 export let clearScaleDetector: () => void | undefined;
 
 export let addScaleToDetectorLookup:
-  | ((scale: Scale, fullKey: string) => void)
+  | ((scale: Scale, scaleData: ScaleAndGroup) => void)
   | undefined;

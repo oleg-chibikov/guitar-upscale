@@ -1,17 +1,16 @@
+import { AlertType } from "@/app/data/alertType";
 import { sortChords } from "@/app/engine/chords/chordsSorter";
+import {
+  MissingChar,
+  NoteWithClearCallback,
+} from "@/app/engine/detectorShared";
 import { STRING_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { Chord, StringOctaveNote } from "../../data/notes";
+import { Chord } from "../../data/notes";
 import { trailingDebounce } from "../../helpers/debounce";
 import { Trie } from "../../helpers/trie";
 
-type NoteWithClearCallback = {
-  stringOctaveNote: StringOctaveNote;
-  clear?: () => void; // clear the previous note on the same string
-};
-
-type MissingChar = "_" | "?";
-
+// TODO: Merge class with scaleDetector
 const START_ASCII_CODE = "a".charCodeAt(0);
 export const MIN_NOTES_TO_DETECT_CHORD = 3;
 
@@ -21,11 +20,11 @@ class ChordDetector {
   private reverseChordsMap: Map<string, string[]>;
   private debouncedFindMatches: () => void;
   private findMatchesAutomatically: boolean;
-  private showChord?: (name: string) => void;
+  private alert?: (name: string, alertType?: AlertType) => void;
 
   constructor(
     findMatchesAutomatically: boolean = true,
-    showChord?: (name: string) => void
+    alert?: (name: string, alertType?: AlertType) => void
   ) {
     this.currentlyDetectedNotesByString = [];
     this.trie = new Trie();
@@ -35,11 +34,13 @@ class ChordDetector {
       200
     );
     this.findMatchesAutomatically = findMatchesAutomatically;
-    this.showChord = showChord;
+    this.alert = alert;
   }
 
-  setChordFoundCallback = (showChord?: (name: string) => void) => {
-    this.showChord = showChord;
+  setChordFoundCallback = (
+    alert?: (name: string, alertType?: AlertType) => void
+  ) => {
+    this.alert = alert;
   };
 
   clone(findMatchesAutomatically: boolean) {
@@ -84,6 +85,12 @@ class ChordDetector {
     console.log("Detecting chord");
     const usedNotes = this.currentlyDetectedNotesByString.filter((x) => x);
     if (usedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
+      this.alert?.(
+        "Select " +
+          (MIN_NOTES_TO_DETECT_CHORD - usedNotes.length) +
+          " more notes to detect the chord",
+        AlertType.Neutral
+      );
       return;
     }
     const serializedChord = this.serializeChord(
@@ -98,7 +105,7 @@ class ChordDetector {
     const deduplicatedChordNames = Array.from(new Set(chordNames));
     const sortedChordNames = sortChords(deduplicatedChordNames);
     console.log("Matched chord names", sortedChordNames);
-    this.showChord?.(sortedChordNames.join(", "));
+    this.alert?.(sortedChordNames.join("\n"));
     return sortedChordNames;
   }
 

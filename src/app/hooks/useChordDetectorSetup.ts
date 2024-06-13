@@ -22,11 +22,13 @@ export const useChordDetectorSetup = () => {
       mainChordDetector.clearDetector.bind(mainChordDetector),
       mainChordDetector.addChordToDetectorLookup.bind(mainChordDetector)
     );
-    mainChordDetector.setChordFoundCallback((chordNames) => {
+    mainChordDetector.setChordFoundCallback((chordNames, alertType) => {
       dispatch(
         setAndShowAlert({
           message: chordNames || "No matching chords",
-          alertType: !chordNames ? AlertType.Warning : AlertType.Success,
+          alertType:
+            alertType ?? (chordNames ? AlertType.Success : AlertType.Warning),
+          alertTimeout: 5000,
         })
       );
     });

@@ -22,11 +22,13 @@ export const useScaleDetectorSetup = () => {
       mainScaleDetector.clearDetector.bind(mainScaleDetector),
       mainScaleDetector.addScaleToDetectorLookup.bind(mainScaleDetector)
     );
-    mainScaleDetector.setScaleFoundCallback((scaleNames) => {
+    mainScaleDetector.setScaleFoundCallback((scaleNames, alertType) => {
       dispatch(
         setAndShowAlert({
           message: scaleNames || "No matching scales",
-          alertType: !scaleNames ? AlertType.Warning : AlertType.Success,
+          alertType:
+            alertType ?? (scaleNames ? AlertType.Success : AlertType.Warning),
+          alertTimeout: 5000,
         })
       );
     });
