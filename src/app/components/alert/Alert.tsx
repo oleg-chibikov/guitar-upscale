@@ -20,7 +20,7 @@ export const Alert: React.FC = () => {
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>
       <div
         onClick={() => dispatch(hideAlert())}
-        className={`fixed cursor-pointer top-3 left-0 right-0 m-auto flex items-center justify-center w-72 p-4 ${
+        className={`fixed cursor-pointer top-3 left-0 right-0 m-auto flex items-center justify-center w-96 p-4 ${
           alertType === AlertType.Error
             ? "bg-red-500"
             : alertType === AlertType.Warning

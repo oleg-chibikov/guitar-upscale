@@ -7,6 +7,7 @@ import {
 } from "@/app/engine/detectorShared";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import { sortScales } from "@/app/engine/scales/scaleSorter";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import { trailingDebounce } from "../../helpers/debounce";
 import { Trie } from "../../helpers/trie";
@@ -110,19 +111,16 @@ class ScaleDetector {
       .join("");
     const matchedValues = this.trie.wildcardMatches(serializedScale);
     console.log("Matched values from trie", matchedValues);
-    const scaleNames = Array.from(matchedValues)
+    const nameData = Array.from(matchedValues)
       .flatMap((x) => this.reverseScalesMap.get(x))
       .filter((x) => x) as ScaleAndGroup[];
-    const deduplicatedScaleNames = Array.from(
-      new Set(
-        scaleNames.map(
-          (x) => `${x.group}: ` + getNoteText(x.note) + " " + x.scale
-        )
-      )
-    ).sort();
-    console.log("Matched scale names", deduplicatedScaleNames);
-    this.alert?.(deduplicatedScaleNames.join("\n"));
-    return deduplicatedScaleNames;
+    const sortedData = sortScales(nameData);
+    const transformedNames = sortedData.map(
+      (x) => `${x.group}: ` + getNoteText(x.note) + " " + x.scale
+    );
+    console.log("Matched scale names", transformedNames);
+    this.alert?.(transformedNames.join("\n"));
+    return transformedNames;
   }
 
   clearDetector() {
