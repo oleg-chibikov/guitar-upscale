@@ -21,21 +21,22 @@ export const octaveNoteToStringOctaveNoteMap = new Map<
 export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
   stringTuning: OctaveNote[],
-  baseNote: Note
+  baseNote: Note,
+  capo: number
 ): Neck => {
   octaveNoteToStringOctaveNoteMap.clear();
   const neck: Neck = [];
 
   // going from the lowest string to the highest one
-  for (let i = stringTuning.length - 1; i >= 0; i--) {
-    const octaveNoteForString = stringTuning[i];
+  for (let string = stringTuning.length - 1; string >= 0; string--) {
+    const octaveNoteForString = stringTuning[string];
     const stringModifier = octaveNoteForString.note;
-    neck[i] = [];
+    neck[string] = [];
     let octave = octaveNoteForString.octave;
 
-    for (let j = 0; j <= FRET_COUNT; j++) {
+    for (let fret = 0; fret <= FRET_COUNT; fret++) {
       // Calculate the position on the neck for the current fret and string
-      let position = (j + stringModifier - baseNote) % NOTE_COUNT;
+      let position = (fret + stringModifier - baseNote) % NOTE_COUNT;
 
       // Ensure position is non-negative
       position = position < 0 ? NOTE_COUNT + position : position;
@@ -50,17 +51,19 @@ export const generateNeckRepresentation = (
       }
 
       const stringOctaveNote = isInScale
-        ? { note, octave, string: i, fret: j }
+        ? { note, octave, string: string, fret: fret }
         : null;
-      neck[i][j] = stringOctaveNote;
+      neck[string][fret] = stringOctaveNote;
 
       if (stringOctaveNote !== null) {
         const serializedOctaveNote = serializeOctaveNote({ note, octave });
-        addOrUpdateMapArray(
-          octaveNoteToStringOctaveNoteMap,
-          serializedOctaveNote,
-          stringOctaveNote
-        );
+        if (fret >= capo) {
+          addOrUpdateMapArray(
+            octaveNoteToStringOctaveNoteMap,
+            serializedOctaveNote,
+            stringOctaveNote
+          );
+        }
       }
     }
   }

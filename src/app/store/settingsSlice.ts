@@ -208,10 +208,12 @@ const onGuitarSettingsUpdate = (
     .get(state.scale);
   const scalePattern = new Set(scaleNotesWithoutZero?.concat([0])); // all scales include 0, so it's omitted from the scales themselves
 
+  const baseNote = state.baseNote;
   const neck = generateNeckRepresentation(
     scalePattern,
     parseStringToNotes(tuningValue),
-    getShiftedNote(state.baseNote)
+    getShiftedNote(baseNote),
+    baseNote
   );
   state.neck = neck;
   neckValue = neck;
@@ -356,7 +358,6 @@ export const settingsSlice = createSlice({
   initialState,
   reducers: {
     init: (state) => {
-      onGuitarSettingsUpdate(state);
       // update initial settings after they got loaded from redux persist
       volumeValue = state.volume;
       metronomeVolumeValue = state.metronomeVolume;
@@ -389,6 +390,7 @@ export const settingsSlice = createSlice({
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       neckValue = state.neck;
       chordsValue = state.chords;
+      onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
       void loadMetronome();
@@ -396,9 +398,9 @@ export const settingsSlice = createSlice({
     setScaleGroup: (state, action: PayloadAction<string>) => {
       state.scaleGroup = action.payload;
       state.scale = getFirstScaleForGroup(action.payload);
-      onGuitarSettingsUpdate(state);
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
+      onGuitarSettingsUpdate(state);
     },
     setIsFirstEvent: (state, action: PayloadAction<boolean>) => {
       state.isFirstEvent = action.payload;
@@ -410,26 +412,26 @@ export const settingsSlice = createSlice({
     },
     setScale: (state, action: PayloadAction<string>) => {
       state.scale = action.payload;
-      onGuitarSettingsUpdate(state);
       scaleValue = state.scale;
+      onGuitarSettingsUpdate(state);
     },
     setBaseNote: (state, action: PayloadAction<Note>) => {
       state.baseNote = action.payload;
-      onGuitarSettingsUpdate(state);
       baseNoteValue = action.payload;
       wipeExampleCacheTriggerValue = true;
+      onGuitarSettingsUpdate(state);
     },
     setTuning(state, action: PayloadAction<Tuning>) {
       const previousShift = getCurrentShift();
       state.tuning = action.payload;
       tuningValue = action.payload;
-      onGuitarSettingsUpdate(state);
       const newShift = getCurrentShift();
       if (previousShift !== newShift) {
         // all the decoded examples should be deleted if the scale shift changes.
         // They will be deleted async right before the next example is played. (this is needed to avoid loading examples module here)
         wipeExampleCacheTriggerValue = true;
       }
+      onGuitarSettingsUpdate(state);
     },
     setTempoBpm: (
       state,
