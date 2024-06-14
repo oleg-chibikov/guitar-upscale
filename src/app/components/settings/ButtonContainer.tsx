@@ -1,5 +1,6 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { isMobileDevice } from "@/app/helpers/deviceHelper";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";
@@ -52,7 +53,7 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         }`}
       >
         <OpenSettingsButton />
-        <FullscreenButton />
+        {!isMobileDevice() && <FullscreenButton />}
         {(premiumComponents.get("chordDetection") as ReactNode) ?? (
           <DisabledDetectChordButton />
         )}
