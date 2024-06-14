@@ -19,7 +19,7 @@ export const ScaleAndGroupSelector: React.FC = () => {
           : "text-foreground-dark bg-accented_background-dark"
       }`}
       style={{
-        gridTemplateColumns: "auto minmax(100px, auto)",
+        gridTemplateColumns: "auto auto",
       }}
     >
       <span>Style:</span>

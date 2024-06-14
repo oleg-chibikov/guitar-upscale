@@ -1,4 +1,3 @@
-import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueModalControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueModalControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
@@ -18,12 +17,12 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <section
-      className={`z-30 flex ${
+      className={`flex ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left
           ? "flex-row-reverse"
           : "flex-row"
-      } gap-1 items-center p-1 overflow-auto overscroll-contain fixed top-1 border-2 ${
+      } gap-1 items-center p-1 overflow-auto overscroll-contain z-30 fixed top-1 border-2 ${
         theme === Theme.Light
           ? "bg-panel-light border-border-light"
           : "bg-panel-dark border-border-dark"
@@ -46,7 +45,6 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
         <TempoControl />
         <ChordStrummingDelayControl />
       </div>
-      <PlayPanel premiumComponents={premiumComponents} />
     </section>
   );
 };

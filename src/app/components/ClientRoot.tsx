@@ -1,6 +1,7 @@
 "use client";
 
 import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
+import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
@@ -41,6 +42,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
       ) : (
         <main>
           <ControlPanel premiumComponents={premiumComponents} />
+          <PlayPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           <ChordsView />
