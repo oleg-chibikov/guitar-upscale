@@ -2,6 +2,7 @@ import { AlertType } from "@/app/data/alertType";
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
 import { OctaveNote, StringOctaveNote, getNoteText } from "@/app/data/notes";
+import { CHROMATIC, SPECIAL } from "@/app/data/scales";
 import { getShiftedNote } from "@/app/data/tunings";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import { extractChordFromNotes } from "@/app/engine/midiParser/chordMatcher";
@@ -60,13 +61,14 @@ export const parseMidiData = async (
               " " +
               firstMatchingScale.scale +
               " scale",
+            alertType: AlertType.Success,
           })
         );
       } else {
         setCurrentScaleAndGroup(
           {
-            group: "Special",
-            scale: "Chromatic (All notes)",
+            group: SPECIAL,
+            scale: CHROMATIC,
             note: currentBaseNote,
           },
           store.dispatch

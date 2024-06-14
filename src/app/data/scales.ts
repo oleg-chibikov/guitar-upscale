@@ -11,6 +11,9 @@ export type Scale = number[];
 // (<melody>)3 play <melody> for 3 times
 // <Asus4> - play Asus4 chord immediately. It uses the variation closest to the neck head and the strumming delay from settings
 
+export const SPECIAL = "Special";
+export const CHROMATIC = "Chromatic (All notes)";
+
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
     "Common Minor",
@@ -115,9 +118,9 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
     ]),
   ],
   [
-    "Special",
+    SPECIAL,
     new Map([
-      ["Chromatic (All notes)", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+      [CHROMATIC, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
       ["Whole tone", [2, 4, 6, 8, 10]],
       ["Leading whole tone", [2, 4, 6, 8, 10, 11]],
       ["Diminished", [2, 3, 5, 6, 8, 9, 11]],

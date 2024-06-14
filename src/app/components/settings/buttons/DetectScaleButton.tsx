@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertType } from "@/app/data/alertType";
+import { CHROMATIC, SPECIAL } from "@/app/data/scales";
 import { MIN_NOTES_TO_DETECT_SCALE } from "@/app/engine/scales/scaleDetector";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
@@ -30,8 +31,8 @@ export const DetectScaleButton: React.FC = (props) => {
       onPress={async () => {
         if (!scaleIsBeingDetected) {
           await setupScaleDetector();
-          dispatch(setScaleGroup("Special"));
-          dispatch(setScale("Chromatic (All notes)"));
+          dispatch(setScaleGroup(SPECIAL));
+          dispatch(setScale(CHROMATIC));
           dispatch(
             setAndShowAlert({
               message:

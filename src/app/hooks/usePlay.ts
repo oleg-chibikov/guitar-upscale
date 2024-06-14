@@ -119,7 +119,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         action: "Playback started",
       });
 
-      dispatch(setAndShowAlert({ message, alertType: AlertType.Neutral }));
+      dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
 
       await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
         // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
