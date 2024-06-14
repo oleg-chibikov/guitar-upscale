@@ -111,7 +111,7 @@ interface SettingsState
 }
 
 const initialState: SettingsState = {
-  scaleGroup: "Common Minor",
+  scaleGroup: "Minor",
   scale: "Aeolian / Natural",
   baseNote: Note.E,
   neck: null,

@@ -16,6 +16,7 @@ const ScaleGroupSelector: React.FC = () => {
       onChange={(value) => {
         dispatch(setScaleGroup(value as string));
       }}
+      className="w-20"
       options={Array.from(scalesMap.entries()).map(([groupName]) => {
         const examples = examplesMap?.get(groupName);
         return {

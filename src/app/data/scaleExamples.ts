@@ -8,7 +8,7 @@ import { Example } from "./example";
 
 export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
   [
-    "Common Minor",
+    "Minor",
     new Map([
       [
         "Aeolian / Natural",

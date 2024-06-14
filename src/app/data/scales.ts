@@ -16,7 +16,7 @@ export const CHROMATIC = "Chromatic (All notes)";
 
 export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   [
-    "Common Minor",
+    "Minor",
     new Map([
       ["Aeolian / Natural", [2, 3, 5, 7, 8, 10]],
       ["Phrygian", [1, 3, 5, 7, 8, 10]],
@@ -29,7 +29,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
     ]),
   ],
   [
-    "Common Major",
+    "Major",
     new Map([
       ["Ionian", [2, 4, 5, 7, 9, 11]],
       ["Pentatonic Major", [2, 4, 7, 9]],
