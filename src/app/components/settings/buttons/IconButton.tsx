@@ -1,5 +1,5 @@
 import { Theme } from "@/app/data/theme";
-import { WithClassName } from "@/app/helpers/WithClassName";
+import { WithClassName } from "@/app/helpers/withClassName";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { ReactNode } from "react";

@@ -1,4 +1,4 @@
-import { WithClassName } from "@/app/helpers/WithClassName";
+import { WithClassName } from "@/app/helpers/withClassName";
 import { Avatar } from "@mui/material";
 import { DefaultSession } from "next-auth";
 import { CSSProperties, FC } from "react";

@@ -1,4 +1,4 @@
-import { WithClassName } from "@/app/helpers/WithClassName";
+import { WithClassName } from "@/app/helpers/withClassName";
 import { SelectWrapper } from "./SelectWrapper";
 
 interface EnumSelectorProps<T extends Record<string | number, string | number>>

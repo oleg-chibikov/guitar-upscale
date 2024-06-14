@@ -1,4 +1,4 @@
-import { WithClassName } from "@/app/helpers/WithClassName";
+import { WithClassName } from "@/app/helpers/withClassName";
 import React from "react";
 
 interface GuitarImageProps extends WithClassName {

@@ -1,5 +1,5 @@
 import { Theme } from "@/app/data/theme";
-import { WithClassName } from "@/app/helpers/WithClassName";
+import { WithClassName } from "@/app/helpers/withClassName";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
