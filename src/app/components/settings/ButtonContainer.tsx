@@ -1,6 +1,6 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";

@@ -1,4 +1,4 @@
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { FC, Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";

@@ -1,10 +1,11 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
+import { WithClassName } from "@/app/helpers/WithClassName";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
 
-export interface SliderProps {
+export interface SliderProps extends WithClassName {
   onValueChange: (value: number) => void;
   value: number;
   minimumValue: number;
@@ -12,7 +13,6 @@ export interface SliderProps {
   minimumTrackTintColor?: string;
   maximumTrackTintColor?: string;
   step?: number;
-  className?: string;
   isVertical?: boolean;
   label?: string;
   labelClass?: string;

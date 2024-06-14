@@ -1,10 +1,11 @@
+import { BaseNoteAndTuningSelector } from "@/app/components/settings/selectors/BaseNoteAndTuningSelector";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueModalControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueModalControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueModalControls/VolumeControl";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -36,6 +37,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
       }}
     >
       <ScaleAndGroupSelector />
+      <BaseNoteAndTuningSelector />
       <ButtonContainer premiumComponents={premiumComponents} />
       <div className="flex flex-col gap-1">
         <VolumeControl />

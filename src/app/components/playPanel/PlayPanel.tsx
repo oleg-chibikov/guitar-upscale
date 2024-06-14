@@ -5,7 +5,7 @@ import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
+import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import React, { CSSProperties, ReactNode } from "react";

@@ -5,7 +5,7 @@ import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
-import { WithPremiumComponents } from "../helpers/WithPremiumFeatures";
+import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { selectUi } from "../store/uiSlice";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";

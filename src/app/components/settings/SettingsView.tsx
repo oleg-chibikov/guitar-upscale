@@ -1,7 +1,7 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { WithPremiumComponents } from "@/app/helpers/WithPremiumFeatures";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
 import { ReactNode } from "react";
@@ -9,12 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
-import { BaseNoteSelector } from "./selectors/BaseNoteSelector";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
 import { ChordsDisplayModeSelector } from "./selectors/ChordsDisplayModeSelector";
 import { NoteDisplayModeSelector } from "./selectors/NoteDisplayModeSelector";
 import { ThemeSelector } from "./selectors/ThemeSelector";
-import { TuningSelector } from "./selectors/TuningSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
 import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
 import { MetronomeVolumeSlider } from "./sliders/MetronomeVolumeSlider";
@@ -68,8 +66,6 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           }}
         >
           <ThemeSelector />
-          <TuningSelector />
-          <BaseNoteSelector />
           <NoteDisplayModeSelector />
           <ChordsDisplayModeSelector />
           <ChordPlayModeSelector />

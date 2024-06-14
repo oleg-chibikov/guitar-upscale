@@ -1,8 +1,8 @@
+import { WithClassName } from "@/app/helpers/WithClassName";
 import { SelectWrapper } from "./SelectWrapper";
 
-interface EnumSelectorProps<
-  T extends Record<string | number, string | number>
-> {
+interface EnumSelectorProps<T extends Record<string | number, string | number>>
+  extends WithClassName {
   enumObj: T;
   selectedValue: T[keyof T];
   onValueChange: (value: T[keyof T]) => void;
@@ -16,6 +16,7 @@ export function EnumSelector<
   selectedValue,
   onValueChange,
   customLabel,
+  className,
 }: EnumSelectorProps<T>) {
   const options = Object.entries(enumObj)
     .filter(([key]) => isNaN(Number(key)))
@@ -28,6 +29,7 @@ export function EnumSelector<
 
   return (
     <SelectWrapper
+      className={className}
       options={options}
       value={selectedValue.toString()}
       onChange={(value: string | number) =>

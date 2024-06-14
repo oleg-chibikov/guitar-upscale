@@ -1,9 +1,9 @@
+import { WithClassName } from "@/app/helpers/WithClassName";
 import React from "react";
 
-interface GuitarImageProps {
+interface GuitarImageProps extends WithClassName {
   asset: string;
   onLoad?: () => void; // Define onLoad as an optional prop
-  className?: string;
 }
 
 export const GuitarImage: React.FC<GuitarImageProps> = ({

@@ -28,7 +28,6 @@ const ScaleSelector: React.FC = () => {
           };
         }
       )}
-      className="w-20"
       value={scale}
       onChange={(value) => {
         dispatch(setScale(value as string));

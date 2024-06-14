@@ -1,10 +1,10 @@
+import { WithClassName } from "@/app/helpers/WithClassName";
 import { Avatar } from "@mui/material";
 import { DefaultSession } from "next-auth";
 import { CSSProperties, FC } from "react";
 
-interface UserAvatarProps {
+interface UserAvatarProps extends WithClassName {
   user: DefaultSession["user"];
-  className?: string;
   style?: CSSProperties | undefined;
 }
 

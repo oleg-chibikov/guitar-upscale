@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import {
   PremiumComponent,
   WithPremiumFeatures,
-} from "../helpers/WithPremiumFeatures";
+} from "../helpers/withPremiumFeatures";
 import { ClientRoot } from "./ClientRoot";
 import { LooperPanel } from "./looper/LooperPanel";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
