@@ -1,5 +1,5 @@
 import { TrackData } from "@/app/data/midiParser/trackData";
-import { Note, OctaveNote } from "@/app/data/notes";
+import { Note, OctaveNote, initNotesArray } from "@/app/data/notes";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { TICKS_IN_BEAT, microsecondsToBpm } from "@/app/engine/mainClock";
 import {
@@ -19,6 +19,7 @@ export function parseMidiFile(
 ) {
   console.log("Parsing midi file");
   const dataByTrack: TrackData[] = [];
+  const distinctNotes = initNotesArray();
   const getGuitarUpscaleTicks = (midiTicks: number) =>
     (midiTicks / midiData.header.ticksPerBeat) * TICKS_IN_BEAT;
   midiData.header.ticksPerBeat;
@@ -65,6 +66,7 @@ export function parseMidiFile(
                     duration: convertedPosition - matchedNoteOnPosition,
                     velocity: noteOffEvent.velocity,
                   });
+                  distinctNotes[octaveNote.note] = 1;
                 }
               }
               break;
@@ -94,5 +96,5 @@ export function parseMidiFile(
     dataByTrack.push(data);
   });
 
-  return dataByTrack;
+  return { dataByTrack, distinctNotes };
 }

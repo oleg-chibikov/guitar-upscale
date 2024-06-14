@@ -1,21 +1,26 @@
-import { AlertType } from "@/app/data/alertType";
-import { Note } from "@/app/data/notes";
+import { Note, getNoteText } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
+import { getUnshiftedNote } from "@/app/data/tunings";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+import {
+  setBaseNote,
+  setScale,
+  setScaleGroup,
+} from "@/app/store/settingsSlice";
+import { Dispatch, UnknownAction } from "redux";
 
 export type ScaleAndGroup = { scale: string; group: string; note: Note };
 
-export type ScaleDetectorCallback =
-  | {
-      text: string;
-      alertType?: AlertType;
-      scales?: undefined;
-    }
-  | {
-      scales: ScaleAndGroup[];
-      text?: undefined;
-      alertType?: undefined;
-    };
+export const setCurrentScaleAndGroup = (
+  data: ScaleAndGroup,
+  dispatch: Dispatch<UnknownAction>
+) => {
+  dispatch(setScaleGroup(data.group));
+  dispatch(setScale(data.scale));
+  const unshiftedNote = getUnshiftedNote(data.note);
+  console.log("New base note", getNoteText(unshiftedNote));
+  dispatch(setBaseNote(unshiftedNote));
+};
 
 export const rebuildScaleDetectorLookup = () => {
   if (!addScaleToDetectorLookup) {

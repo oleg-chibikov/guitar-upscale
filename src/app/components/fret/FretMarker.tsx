@@ -120,11 +120,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             stringOctaveNote !== null &&
             noteMetadata.skipChordDetection !== true
           ) {
-            const { mainScaleDetector } = await import(
-              "@/app/engine/scales/scaleDetector"
+            const { scaleDetectorBuilder } = await import(
+              "@/app/engine/scales/scaleDetectorBuilder"
             );
             setIsScaleBeingDetected(true);
-            mainScaleDetector.addNoteToDetector({
+            scaleDetectorBuilder.addNote({
               stringOctaveNote,
               clear: () => {
                 setIsScaleBeingDetected(false);

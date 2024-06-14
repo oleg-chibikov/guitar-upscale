@@ -1,3 +1,5 @@
+import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+
 export enum Note {
   C = 0,
   "C#" = 1,
@@ -57,3 +59,6 @@ export const serializeStringOctaveNote = (note: StringOctaveNote) =>
   [note.string, note.octave, note.note].join("_");
 
 export type Chord = StringOctaveNote[];
+
+export const initNotesArray = <T>() =>
+  Array.from({ length: NOTE_COUNT }, (_) => undefined as T);

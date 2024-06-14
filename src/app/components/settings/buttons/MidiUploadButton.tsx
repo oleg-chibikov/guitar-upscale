@@ -2,6 +2,7 @@
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
+import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFile from "@mui/icons-material/UploadFile";
 import React, { Fragment, useRef } from "react";
@@ -11,6 +12,7 @@ export const MidiUploadButton: React.FC = () => {
   const ref = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
   const setupChordDetector = useChordDetectorSetup();
+  const setupScaleDetector = useScaleDetectorSetup();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(LOG_PREFIX + "Processing midi file");
     const file = e.target.files?.[0];
@@ -20,6 +22,7 @@ export const MidiUploadButton: React.FC = () => {
         console.log(LOG_PREFIX + "File loaded");
         if (event.target?.result) {
           await setupChordDetector();
+          await setupScaleDetector();
           const eventsByTick = await parseMidiData(
             event.target.result as ArrayBuffer,
             (bpm) => {

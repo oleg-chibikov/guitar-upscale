@@ -1,58 +1,34 @@
 import { AlertType } from "@/app/data/alertType";
-import { serializeStringOctaveNote } from "@/app/data/notes";
 import { Scale } from "@/app/data/scales";
-import {
-  MissingChar,
-  NoteWithClearCallback,
-} from "@/app/engine/detectorShared";
+import { MissingChar } from "@/app/engine/detectorShared";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import {
-  ScaleAndGroup,
-  ScaleDetectorCallback,
-} from "@/app/engine/scales/scaleLookupBuilder";
+import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { sortScales } from "@/app/engine/scales/scaleSorter";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { trailingDebounce } from "../../helpers/debounce";
 import { Trie } from "../../helpers/trie";
 
 // TODO: Merge with ChordDetector
 export const MIN_NOTES_TO_DETECT_SCALE = 5;
 
+export type ScaleDetectorCallbackData =
+  | {
+      text: string;
+      alertType?: AlertType;
+      scales?: undefined;
+    }
+  | {
+      scales: ScaleAndGroup[];
+      text?: undefined;
+      alertType?: undefined;
+    };
+
 class ScaleDetector {
-  private usedNotesCount: number = 0;
-  private currentlyDetectedNotes: (NoteWithClearCallback | undefined)[];
   private trie: Trie;
   private reverseScalesMap: Map<string, ScaleAndGroup[]>;
-  private debouncedFindMatches: () => void;
-  private findMatchesAutomatically: boolean;
-  private alert?: (data: ScaleDetectorCallback) => void;
 
-  constructor(
-    findMatchesAutomatically: boolean = true,
-    alert?: (data: ScaleDetectorCallback) => void
-  ) {
-    this.currentlyDetectedNotes = this.initArray();
+  constructor() {
     this.trie = new Trie();
     this.reverseScalesMap = new Map<string, ScaleAndGroup[]>();
-    this.debouncedFindMatches = trailingDebounce(
-      this.findMatches.bind(this),
-      200
-    );
-    this.findMatchesAutomatically = findMatchesAutomatically;
-    this.alert = alert;
-  }
-
-  setScaleFoundCallback = (alert?: (data: ScaleDetectorCallback) => void) => {
-    this.alert = alert;
-  };
-
-  clone(findMatchesAutomatically: boolean) {
-    // use this function to avoid populating the new detector afresh
-    const cloned = new ScaleDetector(findMatchesAutomatically);
-    cloned.trie = this.trie;
-    cloned.reverseScalesMap = this.reverseScalesMap;
-    //  cloned.alert = this.alert;
-    return cloned;
   }
 
   addScaleToDetectorLookup(scale: Scale, scaleData: ScaleAndGroup) {
@@ -64,80 +40,41 @@ class ScaleDetector {
     addOrUpdateMapArray(this.reverseScalesMap, serializedScale, scaleData);
   }
 
-  addNoteToDetector(noteData: NoteWithClearCallback) {
-    const serializedNote = serializeStringOctaveNote(noteData.stringOctaveNote);
-    // index in this array corresponds to the string of the note
-    const note = noteData.stringOctaveNote.note;
-    const existingNoteMetadata = this.currentlyDetectedNotes[note];
-    if (existingNoteMetadata !== undefined) {
-      const currentlyMappedStringOctaveNote =
-        existingNoteMetadata.stringOctaveNote;
-      existingNoteMetadata.clear?.();
-      if (
-        serializedNote ===
-        serializeStringOctaveNote(currentlyMappedStringOctaveNote)
-      ) {
-        // exactly the same note exists - just remove
-        console.log("Deleting note from scaleDetector", noteData);
-        this.currentlyDetectedNotes[note] = undefined;
-        this.usedNotesCount--;
-      } else {
-        console.log("Moving existing note in scaleDetector", noteData);
-        this.currentlyDetectedNotes[note] = noteData;
-      }
-    } else {
-      console.log("Adding note to scaleDetector", noteData);
-      this.currentlyDetectedNotes[note] = noteData;
-      this.usedNotesCount++;
-    }
-
-    if (this.findMatchesAutomatically) {
-      this.debouncedFindMatches();
-    }
-  }
-
-  findMatches() {
+  findMatches(
+    notes: (unknown | undefined)[],
+    usedNotesCount: number,
+    callback: (data: ScaleDetectorCallbackData) => void
+  ) {
     console.log("Detecting scale");
 
-    if (this.usedNotesCount < MIN_NOTES_TO_DETECT_SCALE) {
-      const remaining = MIN_NOTES_TO_DETECT_SCALE - this.usedNotesCount;
-      this.alert?.({
-        text: "Select " + remaining + " more notes to detect the scale",
+    if (usedNotesCount < MIN_NOTES_TO_DETECT_SCALE) {
+      const remaining = MIN_NOTES_TO_DETECT_SCALE - usedNotesCount;
+      callback({
+        text:
+          "Select " +
+          (remaining === 1 ? "one more note" : `${remaining} more notes`) +
+          " to detect the scale",
         alertType: AlertType.Neutral,
       });
       return;
     }
-    const serializedScale = this.currentlyDetectedNotes
-      .map((x) => (x ? 1 : "?"))
-      .join("");
+    const serializedScale = notes.map((x) => (x ? 1 : "?")).join("");
     const matchedValues = this.trie.wildcardMatches(serializedScale);
     console.log("Matched values from trie", matchedValues);
     const nameData = Array.from(matchedValues)
       .flatMap((x) => this.reverseScalesMap.get(x))
       .filter((x) => x) as ScaleAndGroup[];
     if (!nameData.length) {
-      this.alert?.({
+      console.warn("No scales matched to the values from trie");
+      callback({
         text: "No scales matched",
         alertType: AlertType.Warning,
       });
-      console.warn("No scales matched to the values from trie");
       return;
     }
     const sortedData = sortScales(nameData);
     console.log("Matched scales", sortedData);
-    this.alert?.({ scales: sortedData });
-  }
-
-  clearDetector() {
-    console.log("Clearing scale detector");
-
-    this.currentlyDetectedNotes.forEach((data) => data?.clear?.());
-    this.currentlyDetectedNotes = this.initArray();
-    this.usedNotesCount = 0;
-  }
-
-  private initArray() {
-    return Array.from({ length: NOTE_COUNT }, (_, index) => undefined);
+    callback({ scales: sortedData });
   }
 
   private serializeScale(scale: Scale, missingChar: MissingChar) {
@@ -157,4 +94,4 @@ class ScaleDetector {
   }
 }
 
-export const mainScaleDetector = new ScaleDetector();
+export const scaleDetector = new ScaleDetector();

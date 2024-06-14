@@ -5,14 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "@/app/components/CloseIcon";
 import { getNoteText } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
-import { getUnshiftedNote } from "@/app/data/tunings";
-import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import {
-  setBaseNote,
-  setPreventScaleDetectorFlush,
-  setScale,
-  setScaleGroup,
-} from "@/app/store/settingsSlice";
+  ScaleAndGroup,
+  setCurrentScaleAndGroup,
+} from "@/app/engine/scales/scaleLookupBuilder";
+import { setPreventScaleDetectorFlush } from "@/app/store/settingsSlice";
 import { FC } from "react";
 
 export const ScaleDetectionAlert: FC = () => {
@@ -26,11 +23,7 @@ export const ScaleDetectionAlert: FC = () => {
   const handleButtonClick = (data: ScaleAndGroup) => {
     setPreventScaleDetectorFlush(true);
     try {
-      dispatch(setScaleGroup(data.group));
-      dispatch(setScale(data.scale));
-      const unshiftedNote = getUnshiftedNote(data.note);
-      console.log("New base note", getNoteText(unshiftedNote));
-      dispatch(setBaseNote(unshiftedNote));
+      setCurrentScaleAndGroup(data, dispatch);
     } finally {
       setPreventScaleDetectorFlush(false);
     }

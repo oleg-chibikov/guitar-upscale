@@ -1,23 +1,26 @@
+import { AlertType } from "@/app/data/alertType";
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
-import { OctaveNote, StringOctaveNote } from "@/app/data/notes";
+import { OctaveNote, StringOctaveNote, getNoteText } from "@/app/data/notes";
+import { getShiftedNote } from "@/app/data/tunings";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import { extractChordFromNotes } from "@/app/engine/midiParser/chordMatcher";
 import { groupEventsByTickWithTolerance } from "@/app/engine/midiParser/groupSplitter";
 import { addIndividualNote } from "@/app/engine/midiParser/individualNoteMapper";
 import { parseMidiFile } from "@/app/engine/midiParser/midiFileParser";
+import { setCurrentScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { arrayToMap } from "@/app/helpers/arrayHelper";
 import { FunctionCache } from "@/app/helpers/functionCache";
 import {
+  baseNoteValue,
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
+import { store } from "@/app/store/store";
+import { setAndShowAlert } from "@/app/store/uiSlice";
 import { read } from "midifile-ts";
 
-//TODO: Set tempo:
-
-// TODO: detect scale and set it. Use trie similar to chords.
 // TODO: UI - restart. Maybe send to looper
 
 const matchChordForToleranceGroupWithCache = new FunctionCache(
@@ -31,14 +34,57 @@ export const parseMidiData = async (
   const byteArray = new Uint8Array(arrayBuffer);
   const midiData = read(byteArray);
   console.log(midiData);
-  const trackDataArray = parseMidiFile(midiData, setTempo);
-  // TODO: First, determine and set the scale and base note. Once it's set wait for neck to update.
-  // then continue with assigning notes to strings
+  const { dataByTrack, distinctNotes } = parseMidiFile(midiData, setTempo);
+  const { scaleDetector } = await import("@/app/engine/scales/scaleDetector");
+
+  scaleDetector.findMatches(
+    distinctNotes,
+    distinctNotes.filter((x) => x !== undefined).length,
+    (result) => {
+      const currentBaseNote = getShiftedNote(baseNoteValue);
+      if (result.scales?.length) {
+        const scalesInSameBaseNote = result.scales.filter(
+          (x) => x.note === currentBaseNote
+        );
+
+        const firstMatchingScale = scalesInSameBaseNote.length
+          ? scalesInSameBaseNote[0]
+          : result.scales[0];
+        setCurrentScaleAndGroup(firstMatchingScale, store.dispatch);
+        store.dispatch(
+          setAndShowAlert({
+            message:
+              "Playing the MIDI file in " +
+              getNoteText(firstMatchingScale.note) +
+              " " +
+              firstMatchingScale.scale +
+              " scale",
+          })
+        );
+      } else {
+        setCurrentScaleAndGroup(
+          {
+            group: "Special",
+            scale: "Chromatic (All notes)",
+            note: currentBaseNote,
+          },
+          store.dispatch
+        );
+        store.dispatch(
+          setAndShowAlert({
+            message:
+              "Cannot detect scale for the MIDI file. Playing in the Chromatic scale",
+            alertType: AlertType.Warning,
+          })
+        );
+      }
+    }
+  );
 
   const eventsByTick = new EventsByTick();
 
   let trackIndex = 0;
-  for (const track of trackDataArray) {
+  for (const track of dataByTrack) {
     processTrack(track, eventsByTick, trackIndex);
 
     trackIndex++;
