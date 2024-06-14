@@ -10,7 +10,7 @@ export const TwoSelectors: React.FC<WithChildren> = ({ children }) => {
 
   return (
     <section
-      className={`p-1 gap-3 grid ${
+      className={`p-1 gap-x-2 gap-y-3 grid ${
         theme === Theme.Light
           ? "text-foreground-light bg-accented_background-light"
           : "text-foreground-dark bg-accented_background-dark"
