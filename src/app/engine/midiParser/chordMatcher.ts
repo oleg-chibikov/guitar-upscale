@@ -5,7 +5,7 @@ import {
 } from "@/app/data/notes";
 import {
   MIN_NOTES_TO_DETECT_CHORD,
-  mainChordDetector,
+  chordDetector,
 } from "@/app/engine/chords/chordDetector";
 import {
   STRING_COUNT,
@@ -37,15 +37,14 @@ export function extractChordFromNotes(
         x ? x.string + "_" + x.fret : "no value for this string"
       )
     );
-    const chordDetector = mainChordDetector.clone(false); // TODO: await import
-    for (const stringOctaveNote of variation) {
-      chordDetector.addNoteToDetector({
-        stringOctaveNote,
-      });
-    }
-    const matchedChords = chordDetector.findMatches();
-    if (matchedChords?.length) {
-      return { chordName: matchedChords[0], notes: variation };
+    let chordName: string | undefined = undefined;
+    chordDetector.findMatches(variation, (data) => {
+      if (data.chords?.length) {
+        chordName = data.chords[0];
+      }
+    });
+    if (chordName !== undefined) {
+      return { chordName, notes: variation };
     }
   }
   return undefined;

@@ -1,55 +1,34 @@
 import { AlertType } from "@/app/data/alertType";
 import { sortChords } from "@/app/engine/chords/chordsSorter";
-import {
-  MissingChar,
-  NoteWithClearCallback,
-} from "@/app/engine/detectorShared";
+import { MissingChar } from "@/app/engine/detectorShared";
 import { STRING_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { Chord } from "../../data/notes";
-import { trailingDebounce } from "../../helpers/debounce";
+import { Chord, StringOctaveNote } from "../../data/notes";
 import { Trie } from "../../helpers/trie";
+
+export type ChordDetectorCallbackData =
+  | {
+      text: string;
+      alertType?: AlertType;
+      chords?: undefined;
+    }
+  | {
+      chords: string[];
+      text?: undefined;
+      alertType?: undefined;
+    };
 
 // TODO: Merge class with scaleDetector
 const START_ASCII_CODE = "a".charCodeAt(0);
 export const MIN_NOTES_TO_DETECT_CHORD = 3;
 
 class ChordDetector {
-  private currentlyDetectedNotesByString: (NoteWithClearCallback | null)[];
   private trie: Trie;
   private reverseChordsMap: Map<string, string[]>;
-  private debouncedFindMatches: () => void;
-  private findMatchesAutomatically: boolean;
-  private alert?: (name: string, alertType?: AlertType) => void;
 
-  constructor(
-    findMatchesAutomatically: boolean = true,
-    alert?: (name: string, alertType?: AlertType) => void
-  ) {
-    this.currentlyDetectedNotesByString = [];
+  constructor() {
     this.trie = new Trie();
     this.reverseChordsMap = new Map<string, string[]>();
-    this.debouncedFindMatches = trailingDebounce(
-      this.findMatches.bind(this),
-      200
-    );
-    this.findMatchesAutomatically = findMatchesAutomatically;
-    this.alert = alert;
-  }
-
-  setChordFoundCallback = (
-    alert?: (name: string, alertType?: AlertType) => void
-  ) => {
-    this.alert = alert;
-  };
-
-  clone(findMatchesAutomatically: boolean) {
-    // use this function to avoid populating the new detector afresh
-    const cloned = new ChordDetector(findMatchesAutomatically);
-    cloned.trie = this.trie;
-    cloned.reverseChordsMap = this.reverseChordsMap;
-    //  cloned.showChord = this.showChord;
-    return cloned;
   }
 
   addChordToDetectorLookup(chord: Chord, fullKey: string) {
@@ -58,43 +37,23 @@ class ChordDetector {
     addOrUpdateMapArray(this.reverseChordsMap, serializedChord, fullKey);
   }
 
-  addNoteToDetector(note: NoteWithClearCallback) {
-    // index in this array corresponds to the string of the note
-    const index = note.stringOctaveNote.string;
-    const existing = this.currentlyDetectedNotesByString[index];
-    // only one note per string allowed
-    if (existing?.clear) {
-      existing.clear();
-    }
-
-    // clicked on the marked note
-    if (existing?.stringOctaveNote.fret === note.stringOctaveNote.fret) {
-      console.log("Deleting note from chordDetector", note);
-      this.currentlyDetectedNotesByString[index] = null;
-    } else {
-      console.log("Adding note to chordDetector", note);
-      this.currentlyDetectedNotesByString[index] = note;
-    }
-
-    if (this.findMatchesAutomatically) {
-      this.debouncedFindMatches();
-    }
-  }
-
-  findMatches() {
+  findMatches(
+    notes: StringOctaveNote[],
+    callback: (data: ChordDetectorCallbackData) => void
+  ) {
     console.log("Detecting chord");
-    const usedNotes = this.currentlyDetectedNotesByString.filter((x) => x);
-    if (usedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
-      this.alert?.(
-        "Select " +
-          (MIN_NOTES_TO_DETECT_CHORD - usedNotes.length) +
+    if (notes.length < MIN_NOTES_TO_DETECT_CHORD) {
+      callback({
+        text:
+          "Select " +
+          (MIN_NOTES_TO_DETECT_CHORD - notes.length) +
           " more notes to detect the chord",
-        AlertType.Neutral
-      );
+        alertType: AlertType.Neutral,
+      });
       return;
     }
     const serializedChord = this.serializeChord(
-      usedNotes.map((x) => (x as NoteWithClearCallback).stringOctaveNote),
+      notes,
       "?" // wildcard - any char
     );
     const matchedValues = this.trie.wildcardMatches(serializedChord);
@@ -102,17 +61,18 @@ class ChordDetector {
     const chordNames = Array.from(matchedValues)
       .flatMap((x) => this.reverseChordsMap.get(x))
       .filter((x) => x) as string[];
+    if (!chordNames.length) {
+      console.warn("No chords matched to the values from trie");
+      callback({
+        text: "No chords matched",
+        alertType: AlertType.Warning,
+      });
+      return;
+    }
     const deduplicatedChordNames = Array.from(new Set(chordNames));
     const sortedChordNames = sortChords(deduplicatedChordNames);
     console.log("Matched chord names", sortedChordNames);
-    this.alert?.(sortedChordNames.join("\n"));
-    return sortedChordNames;
-  }
-
-  clearDetector() {
-    console.log("Clearing chord detector");
-    this.currentlyDetectedNotesByString.forEach((note) => note?.clear?.());
-    this.currentlyDetectedNotesByString = [];
+    callback({ chords: sortedChordNames });
   }
 
   private serializeChord(chord: Chord, missingChar: MissingChar) {
@@ -140,4 +100,4 @@ class ChordDetector {
   }
 }
 
-export const mainChordDetector = new ChordDetector();
+export const chordDetector = new ChordDetector();

@@ -103,11 +103,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             stringOctaveNote !== null &&
             noteMetadata.skipChordDetection !== true
           ) {
-            const { mainChordDetector } = await import(
-              "@/app/engine/chords/chordDetector"
+            // this module is only loaded when chordIsBeingDetectedValue is true (meaning the chord detection button was pressed)
+            const { chordDetectorBuilder } = await import(
+              "@/app/engine/chords/chordDetectorBuilder"
             );
             setIsChordBeingDetected(true);
-            mainChordDetector.addNoteToDetector({
+            chordDetectorBuilder.addNote({
               stringOctaveNote: stringOctaveNote,
               clear: () => {
                 setIsChordBeingDetected(false);
