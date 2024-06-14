@@ -57,8 +57,8 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         {(premiumComponents.get("chordDetection") as ReactNode) ?? (
           <DisabledDetectChordButton />
         )}
-        {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
-          <DisabledDetectScaleButton />
+        {(premiumComponents.get("midiUpload") as ReactNode) ?? (
+          <DisabledMidiUploadButton />
         )}
       </div>
       <div
@@ -69,10 +69,10 @@ export const ButtonContainer: React.FC<ButtonContainerProps> = ({
         }`}
       >
         <OpenStrummingSettingsButton />
-        <AboutButton />
-        {(premiumComponents.get("midiUpload") as ReactNode) ?? (
-          <DisabledMidiUploadButton />
+        {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
+          <DisabledDetectScaleButton />
         )}
+        <AboutButton />
       </div>
     </section>
   );
