@@ -1,7 +1,12 @@
 import { AlertType } from "@/app/data/alertType";
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
-import { OctaveNote, StringOctaveNote, getNoteText } from "@/app/data/notes";
+import {
+  OctaveNote,
+  StringOctaveNote,
+  getNoteText,
+  serializeOctaveNote,
+} from "@/app/data/notes";
 import { CHROMATIC, SPECIAL } from "@/app/data/scales";
 import { getShiftedNote } from "@/app/data/tunings";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
@@ -145,17 +150,21 @@ function processToleranceGroup(
   const chordMatchResult =
     matchChordForToleranceGroupWithCache.execute(sortedNotes);
 
-  let individualNotes = toleranceGroup;
+  let individualNotes: NotePlayEvent[];
 
-  if (chordMatchResult !== undefined) {
+  if (chordMatchResult === undefined) {
+    individualNotes = toleranceGroup;
+  } else {
     const { chordName, notes } = chordMatchResult;
 
     // within a toleranceGroup each octave note can occur only once (tolerance groups are built this way that if the note re-occurs - a new group is created).
     // therefore we can keep a 1 to 1 map of octave notes -> events
-    const toleranceGroupMap = arrayToMap(toleranceGroup, (x) => x.octaveNote);
+    const toleranceGroupMap = arrayToMap(toleranceGroup, (x) =>
+      serializeOctaveNote(x.octaveNote)
+    );
     // deleting the chord notes from the map - the rest should be individual notes
     for (const octaveNote of notes) {
-      toleranceGroupMap.delete(octaveNote);
+      toleranceGroupMap.delete(serializeOctaveNote(octaveNote));
     }
     eventsByTick.addOrUpdateEvent(toleranceWindowStart, {
       chord: chordName,
