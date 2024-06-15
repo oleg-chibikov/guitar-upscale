@@ -1,12 +1,17 @@
-import { hideScalesAlert, selectUi } from "@/app/store/uiSlice";
+import {
+  hideScalesAlert,
+  selectUi,
+  setAndShowAlert,
+} from "@/app/store/uiSlice";
 import { Button, Modal, Slide, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CloseIcon } from "@/app/components/CloseIcon";
-import { getNoteText } from "@/app/data/notes";
+import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import {
   ScaleAndGroup,
+  formatScale,
   setCurrentScaleAndGroup,
 } from "@/app/engine/scales/scaleLookupBuilder";
 import { setPreventScaleDetectorFlush } from "@/app/store/settingsSlice";
@@ -24,6 +29,12 @@ export const ScaleDetectionAlert: FC = () => {
     setPreventScaleDetectorFlush(true);
     try {
       setCurrentScaleAndGroup(data, dispatch);
+      dispatch(
+        setAndShowAlert({
+          message: "Switched to " + formatScale(data),
+          alertType: AlertType.Success,
+        })
+      );
     } finally {
       setPreventScaleDetectorFlush(false);
     }
@@ -65,9 +76,7 @@ export const ScaleDetectionAlert: FC = () => {
                 onClick={() => handleButtonClick(scaleAndGroup)}
               >
                 <Typography variant="body1" noWrap>
-                  {`${scaleAndGroup.group}: ${getNoteText(
-                    scaleAndGroup.note
-                  )} ${scaleAndGroup.scale}`}
+                  {formatScale(scaleAndGroup)}
                 </Typography>
               </Button>
             ))}

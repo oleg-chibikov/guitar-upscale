@@ -11,6 +11,11 @@ import { Dispatch, UnknownAction } from "redux";
 
 export type ScaleAndGroup = { scale: string; group: string; note: Note };
 
+export const formatScale = (scaleAndGroup: ScaleAndGroup) =>
+  `${scaleAndGroup.group}: ${getNoteText(scaleAndGroup.note)} ${
+    scaleAndGroup.scale
+  }`;
+
 export const setCurrentScaleAndGroup = (
   data: ScaleAndGroup,
   dispatch: Dispatch<UnknownAction>
