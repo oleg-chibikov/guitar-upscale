@@ -115,7 +115,16 @@ export const ChordsView: React.FC = () => {
         disableGutters
       >
         <AccordionSummary
-          expandIcon={<ExpandLess />}
+          sx={{
+            pointerEvents: "none",
+          }}
+          expandIcon={
+            <ExpandLess
+              sx={{
+                pointerEvents: "auto",
+              }}
+            />
+          }
           style={{
             minHeight: 0,
           }}
@@ -128,7 +137,7 @@ export const ChordsView: React.FC = () => {
           className="flex flex-col gap-2"
           style={{
             padding: 0,
-            paddingTop: 10, // give area to tap top chords
+            // paddingTop: 10, // give area to tap top chords
           }}
         >
           <section
