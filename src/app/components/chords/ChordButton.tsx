@@ -134,7 +134,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             }
           : undefined
       }
-      className={`text-center w-16 ${useSharpChords ? "h-6" : "h-10"} ${
+      className={`text-center w-16 font-mono ${
+        useSharpChords ? "text-xs h-4" : "text-md h-7"
+      } ${
         (isPlaying || isGracePeriod || isClicked) && "border-2"
       } items-center justify-center content-center ${
         isGracePeriod
@@ -176,7 +178,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
                 ? "bg-secondary-dark"
                 : "bg-button-dark"
             }`
-      } font-mono select-none ${
+      } select-none ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       } transition-transform transform origin-center`}
     >
