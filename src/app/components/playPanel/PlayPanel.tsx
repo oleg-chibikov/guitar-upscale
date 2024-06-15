@@ -28,13 +28,13 @@ export const PlayPanel: React.FC<PlayPanelProps> = ({
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
     <section
-      className={`flex flex-col gap-1 top-24 overflow-auto overscroll-contain z-30 fixed border-2 ${
+      className={`flex flex-row bottom-1 gap-1 overflow-auto overscroll-contain z-30 fixed border-2 ${
         theme === Theme.Light
           ? "bg-panel-light border-border-light"
           : "bg-panel-dark border-border-dark"
       } ${
         // it should be on the opposite side of chords to avoid overlapping
-        chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+        chordsDisplayMode === ChordsDisplayMode.Right ? "right-52" : "left-52"
       }`}
       style={style}
     >

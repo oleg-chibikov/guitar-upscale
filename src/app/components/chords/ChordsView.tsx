@@ -94,8 +94,8 @@ export const ChordsView: React.FC = () => {
     <section
       id="chords-view"
       className={`opacity-95 fixed touch-none ${
-        chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } z-20 bottom-1 ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "left-12" : "right-12"
+      } z-20 bottom-12 ${
         theme === Theme.Light
           ? "bg-accented_background-light"
           : "bg-accented_background-dark"

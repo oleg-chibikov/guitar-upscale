@@ -6,7 +6,7 @@ import {
 } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Slider } from "./Slider";
+import { Slider } from "../settings/sliders/Slider";
 
 export const FretboardScaleYSlider: React.FC = () => {
   const { fretboardScaleY } = useSelector(selectUi);
@@ -23,7 +23,7 @@ export const FretboardScaleYSlider: React.FC = () => {
       minimumValue={minYZoom * 10}
       maximumValue={maxYZoom * 10}
       step={1}
-      className="h-10 px-2 py-1"
+      className="h-48 px-3 py-1"
       isVertical
     />
   );

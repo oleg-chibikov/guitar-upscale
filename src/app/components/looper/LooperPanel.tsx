@@ -17,8 +17,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LooperButton } from "./LooperButton";
 
-const MARGIN = 32;
-
 export const LooperPanel: React.FC = () => {
   const [state, setState] = useState<LooperState>(looperState);
   const { chordsDisplayMode } = useSelector(selectUi);
@@ -33,12 +31,9 @@ export const LooperPanel: React.FC = () => {
   }, [dispatch, guitarSettingsUpdatedTrigger]);
   return (
     <div
-      className="flex p-1 bg-panel-dark fixed bottom-8 gap-1 justify-between"
-      style={
-        chordsDisplayMode === ChordsDisplayMode.Left
-          ? { right: MARGIN }
-          : { left: MARGIN }
-      }
+      className={`flex p-1 bg-panel-dark fixed bottom-1 gap-1 justify-between ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
+      }`}
     >
       <RemoveLooperChannelButton
         setState={setState}
