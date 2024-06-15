@@ -38,9 +38,13 @@ export const Expander: FC<ExpanderProps> = ({
       disableGutters
     >
       <AccordionSummary
-        sx={{
-          pointerEvents: "none",
-        }}
+        sx={
+          expandOnlyOnIcon
+            ? {
+                pointerEvents: "none",
+              }
+            : undefined
+        }
         expandIcon={
           reverseIcon ? (
             <ExpandMore
