@@ -18,14 +18,14 @@ export const AspectRatioControl: React.FC = () => {
         } ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Right
-            ? "right-12 rounded-l-md"
-            : "left-12 rounded-r-md"
+            ? "right-10 rounded-l-md"
+            : "left-10 rounded-r-md"
         }`}
       >
         <FretboardScaleXSlider />
       </div>
       <div
-        className={`z-30 fixed bottom-12 py-1 rounded-t-md ${
+        className={`z-30 fixed bottom-10 py-1 rounded-t-md ${
           theme === Theme.Light
             ? " bg-accented_background-light"
             : " bg-accented_background-dark"

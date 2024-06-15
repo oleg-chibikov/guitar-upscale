@@ -3,6 +3,7 @@
 import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
 import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import { Theme } from "@/app/data/theme";
 import {
   LooperState,
   canAddChannel,
@@ -23,6 +24,7 @@ export const LooperPanel: React.FC = () => {
   const showPlay = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
 
   const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
+  const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   useEffect(() => {
     clearLooperState();
@@ -31,7 +33,11 @@ export const LooperPanel: React.FC = () => {
   }, [dispatch, guitarSettingsUpdatedTrigger]);
   return (
     <div
-      className={`flex p-1 bg-panel-dark fixed bottom-1 gap-1 justify-between ${
+      className={`flex border-2 ${
+        theme === Theme.Light
+          ? "bg-panel-light border-border-light"
+          : "bg-panel-dark border-border-dark"
+      } fixed bottom-1 gap-1 justify-between ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}
     >

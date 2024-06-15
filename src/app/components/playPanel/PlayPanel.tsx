@@ -34,7 +34,7 @@ export const PlayPanel: React.FC<PlayPanelProps> = ({
           : "bg-panel-dark border-border-dark"
       } ${
         // it should be on the opposite side of chords to avoid overlapping
-        chordsDisplayMode === ChordsDisplayMode.Right ? "right-52" : "left-52"
+        chordsDisplayMode === ChordsDisplayMode.Right ? "right-28" : "left-28"
       }`}
       style={style}
     >
