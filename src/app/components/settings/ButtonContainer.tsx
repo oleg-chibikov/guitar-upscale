@@ -1,18 +1,15 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { isMobileDevice } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
+import { WithStyle } from "@/app/helpers/withStyle";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
-import React, { CSSProperties, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { AboutButton } from "./buttons/AboutButton";
 import { FullscreenButton } from "./buttons/FullscreenButton";
 import { OpenSettingsButton } from "./buttons/OpenSettingsButton";
 import { OpenStrummingSettingsButton } from "./buttons/OpenStrummingSettingsButton";
-
-interface ButtonContainerProps extends WithPremiumComponents {
-  style?: CSSProperties;
-}
 
 const DisabledDetectChordButton = dynamic(
   async () =>
@@ -38,7 +35,7 @@ const DisabledDetectScaleButton = dynamic(
     ).DisabledDetectScaleButton
 );
 
-export const ButtonContainer: React.FC<ButtonContainerProps> = ({
+export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
   style,
   premiumComponents,
 }) => {

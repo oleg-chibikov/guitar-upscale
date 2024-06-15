@@ -1,8 +1,8 @@
 "use client";
 
+import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
-import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
-import { ReactNode } from "react";
+import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
@@ -11,7 +11,6 @@ import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
 import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
 import { AlertWrapper } from "./alert/AlertWrapper";
-import { AspectRatioControl } from "./aspectRatio/AspectRatioControl";
 import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
@@ -42,15 +41,14 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
       ) : (
         <main>
           <ControlPanel premiumComponents={premiumComponents} />
-          <PlayPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           <ChordsView />
-          <AspectRatioControl />
           <AuthPanel />
           <StrummingSettings />
           <MenuOutsideClickHandler />
-          {premiumComponents.get("looper") as ReactNode}
+          <BottomZone premiumComponents={premiumComponents} />
+          <AspectRatioModalWrapper />
         </main>
       )}
     </>

@@ -34,6 +34,7 @@ interface UiState {
   useAdvancedChords: boolean;
   useSharpChords: boolean;
   loadingMessage?: string;
+  showAspectRatio: boolean;
 }
 
 const initialState: UiState = {
@@ -55,6 +56,7 @@ const initialState: UiState = {
   strummingSettingsExpanded: false,
   useAdvancedChords: true,
   useSharpChords: true,
+  showAspectRatio: false,
 };
 
 const calculatePercentage = (
@@ -73,8 +75,7 @@ const getValueFromPercentage = (
   percentage: number
 ): number => {
   const range = maximum - minimum;
-  const valueInRange = (percentage / 100) * range + minimum;
-  return valueInRange;
+  return (percentage / 100) * range + minimum;
 };
 
 export const uiSlice = createSlice({
@@ -180,6 +181,9 @@ export const uiSlice = createSlice({
     setLoadingMessage(state, action: PayloadAction<string | undefined>) {
       state.loadingMessage = action.payload;
     },
+    setShowAspectRatio(state, action: PayloadAction<boolean>) {
+      state.showAspectRatio = action.payload;
+    },
   },
 });
 
@@ -201,6 +205,7 @@ export const {
   setUseAdvancedChords,
   setUseSharpChords,
   setLoadingMessage,
+  setShowAspectRatio,
 } = uiSlice.actions;
 
 export const selectUi = (state: RootState) => state.ui;

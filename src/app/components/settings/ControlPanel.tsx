@@ -1,10 +1,10 @@
+import { Panel } from "@/app/components/layout/Panel";
 import { BaseNoteAndTuningSelector } from "@/app/components/settings/selectors/BaseNoteAndTuningSelector";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueModalControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueModalControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueModalControls/VolumeControl";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { Theme } from "@/app/data/theme";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
@@ -15,19 +15,10 @@ import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 export const ControlPanel: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const { chordsDisplayMode } = useSelector(selectUi);
   return (
-    <section
-      className={`flex ${
-        // it should be on the opposite side of chords to avoid overlapping
-        chordsDisplayMode === ChordsDisplayMode.Left
-          ? "flex-row-reverse"
-          : "flex-row"
-      } gap-1 items-center p-1 overflow-auto overscroll-contain z-30 fixed top-1 border-2 ${
-        theme === Theme.Light
-          ? "bg-panel-light border-border-light"
-          : "bg-panel-dark border-border-dark"
-      } ${
+    <Panel
+      className={`z-30 fixed top-1 ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}
@@ -47,6 +38,6 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
         <TempoControl />
         <ChordStrummingDelayControl />
       </div>
-    </section>
+    </Panel>
   );
 };

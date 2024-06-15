@@ -17,7 +17,7 @@ export const AspectRatioControl: React.FC = () => {
             : " bg-accented_background-dark"
         } ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Right
+          chordsDisplayMode === ChordsDisplayMode.Left
             ? "right-10 rounded-l-md"
             : "left-10 rounded-r-md"
         }`}
@@ -31,7 +31,7 @@ export const AspectRatioControl: React.FC = () => {
             : " bg-accented_background-dark"
         } ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Right ? "right-1" : "left-1"
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
         }`}
       >
         <FretboardScaleYSlider />
@@ -39,7 +39,7 @@ export const AspectRatioControl: React.FC = () => {
       <div
         className={`z-30 fixed bottom-1  ${
           // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Right ? "right-1" : "left-1"
+          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
         }`}
       >
         <LockRatioButton />

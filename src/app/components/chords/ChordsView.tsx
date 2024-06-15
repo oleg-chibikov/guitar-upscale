@@ -15,9 +15,9 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
-const TOP_RESERVED_HEIGHT = 170;
+const TOP_RESERVED_HEIGHT = 120;
 const HORIZONTAL_RESERVED_WIDTH = 400;
-const COMPACT_CHORDS_WIDTH = 190;
+const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
   const { neck, chords } = useSelector(selectSettings);
@@ -62,12 +62,12 @@ export const ChordsView: React.FC = () => {
       setWidth(window.innerWidth);
       setupScrollbar();
     };
-    const debouncedHandeResize = trailingDebounce(handleResize, 200);
+    const debouncedHandleResize = trailingDebounce(handleResize, 200);
     setupScrollbar();
 
-    window.addEventListener("resize", debouncedHandeResize);
+    window.addEventListener("resize", debouncedHandleResize);
     return () => {
-      window.removeEventListener("resize", debouncedHandeResize);
+      window.removeEventListener("resize", debouncedHandleResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -94,8 +94,8 @@ export const ChordsView: React.FC = () => {
     <section
       id="chords-view"
       className={`opacity-95 fixed touch-none ${
-        chordsDisplayMode === ChordsDisplayMode.Left ? "left-10" : "right-10"
-      } z-20 bottom-10 ${
+        chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
+      } z-20 bottom-1 ${
         theme === Theme.Light
           ? "bg-accented_background-light"
           : "bg-accented_background-dark"

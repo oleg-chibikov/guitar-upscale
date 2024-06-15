@@ -23,7 +23,7 @@ export const FretboardScaleXSlider: React.FC = () => {
       minimumValue={minXZoom * 10}
       maximumValue={maxXZoom * 10}
       step={1}
-      className={`w-14 py-3 px-1`}
+      className={`w-full py-2 px-1`}
     />
   );
 };

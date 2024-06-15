@@ -31,7 +31,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         className={`flex flex-col opacity-95 overflow-auto overscroll-contain fixed ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
-        } z-40 top-24 border-2 ${
+        } z-40 top-20 border-2 ${
           theme === Theme.Light
             ? "bg-accented_background-light border-border-light text-foreground-light"
             : "bg-accented_background-dark border-border-dark text-foreground-dark"

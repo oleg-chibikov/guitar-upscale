@@ -66,9 +66,8 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
             : "Record loop at channel " + (channel + 1)
         }
         activeBg="bg-red-500"
-        onPress={() => {
-          handleRecordClick();
-        }}
+        onPress={handleRecordClick}
+        textContent={isRecording ? undefined : (channel + 1).toString()}
       />
       {showPlay ? (
         <IconButton
