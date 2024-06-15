@@ -21,6 +21,7 @@ export const UserAvatar: FC<UserAvatarProps> = ({ user, className, style }) => {
 
   return (
     <Avatar
+      sx={{ width: 24, height: 24 }}
       className={className}
       style={style} // override MUI attributes such as position (which is relative) - can't do with tailwind
       alt={user.name}
