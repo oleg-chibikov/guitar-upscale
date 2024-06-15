@@ -9,8 +9,6 @@ import { setAndShowAlert, setSuggestedScales } from "@/app/store/uiSlice";
 import { trailingDebounce } from "../../helpers/debounce";
 
 // TODO: Merge with ChordDetector
-export const MIN_NOTES_TO_DETECT_SCALE = 5;
-
 class ScaleDetectorBuilder {
   private usedNotesCount: number = 0;
   private currentlyDetectedNotes: (NoteWithClearCallback | undefined)[];

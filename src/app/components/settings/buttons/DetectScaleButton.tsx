@@ -6,6 +6,7 @@ import { MIN_NOTES_TO_DETECT_SCALE } from "@/app/engine/scales/scaleDetector";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
   selectSettings,
+  setChordIsBeingDetected,
   setScale,
   setScaleGroup,
   setScaleIsBeingDetected,
@@ -31,6 +32,8 @@ export const DetectScaleButton: React.FC = (props) => {
       onPress={async () => {
         if (!scaleIsBeingDetected) {
           await setupScaleDetector();
+          // Only one thing can be detected at a time - either chord or scale
+          dispatch(setChordIsBeingDetected(false));
           dispatch(setScaleGroup(SPECIAL));
           dispatch(setScale(CHROMATIC));
           dispatch(
@@ -38,7 +41,7 @@ export const DetectScaleButton: React.FC = (props) => {
               message:
                 "Chromatic scale has been selected. Please tap on at least " +
                 MIN_NOTES_TO_DETECT_SCALE +
-                " different notes to detect the scale",
+                " different notes to detect a scale",
               alertType: AlertType.Neutral,
               alertTimeout: 5000,
             })
