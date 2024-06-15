@@ -11,6 +11,7 @@ interface ExpanderProps extends WithChildren {
   id: string;
   title: string;
   reverseIcon?: boolean;
+  expandOnlyOnIcon?: boolean;
 }
 
 export const Expander: FC<ExpanderProps> = ({
@@ -19,6 +20,7 @@ export const Expander: FC<ExpanderProps> = ({
   id,
   title,
   reverseIcon,
+  expandOnlyOnIcon,
   children,
 }) => {
   return (
@@ -42,15 +44,23 @@ export const Expander: FC<ExpanderProps> = ({
         expandIcon={
           reverseIcon ? (
             <ExpandMore
-              sx={{
-                pointerEvents: "auto",
-              }}
+              sx={
+                expandOnlyOnIcon
+                  ? {
+                      pointerEvents: "auto",
+                    }
+                  : undefined
+              }
             />
           ) : (
             <ExpandLess
-              sx={{
-                pointerEvents: "auto",
-              }}
+              sx={
+                expandOnlyOnIcon
+                  ? {
+                      pointerEvents: "auto",
+                    }
+                  : undefined
+              }
             />
           )
         }
