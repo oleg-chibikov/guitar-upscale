@@ -1,6 +1,7 @@
 "use client";
 
 import { selectSettings, setReverbStrength } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -15,7 +16,7 @@ export const ReverbStrengthSlider: React.FC = () => {
 
   return (
     <>
-      <span>Reverb strength:</span>
+      <Typography variant="body2">Reverb strength:</Typography>
       <Slider
         onValueChange={handleSliderChange}
         value={reverbStrength * 10}

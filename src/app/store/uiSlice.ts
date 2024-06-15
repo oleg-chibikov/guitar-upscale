@@ -20,6 +20,8 @@ interface UiState {
   skin: Skin;
   settingsExpanded: boolean;
   chordsExpanded: boolean;
+  controlPanelExpanded: boolean;
+  strummingSettingsExpanded: boolean;
   showAlert: boolean;
   alertType: AlertType;
   alertTimeout: number;
@@ -30,7 +32,6 @@ interface UiState {
   fretboardScaleX: number;
   fretboardScaleY: number;
   lockRatio: boolean;
-  strummingSettingsExpanded: boolean;
   useAdvancedChords: boolean;
   useSharpChords: boolean;
   loadingMessage?: string;
@@ -43,6 +44,8 @@ const initialState: UiState = {
   skin: Skin.Yamaha_SLG200NW,
   settingsExpanded: false,
   chordsExpanded: true,
+  controlPanelExpanded: true,
+  strummingSettingsExpanded: false,
   showAlert: false,
   alertTimeout: 2000,
   alertType: AlertType.Neutral,
@@ -53,7 +56,6 @@ const initialState: UiState = {
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
-  strummingSettingsExpanded: false,
   useAdvancedChords: true,
   useSharpChords: true,
   showAspectRatio: false,
@@ -96,6 +98,12 @@ export const uiSlice = createSlice({
     },
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
+    },
+    setControlPanelExpanded(state, action: PayloadAction<boolean>) {
+      state.controlPanelExpanded = action.payload;
+    },
+    setStrummingSettingsExpanded(state, action: PayloadAction<boolean>) {
+      state.strummingSettingsExpanded = action.payload;
     },
     setAndShowAlert(
       state,
@@ -169,9 +177,6 @@ export const uiSlice = createSlice({
         );
       }
     },
-    setStrummingSettingsExpanded(state, action: PayloadAction<boolean>) {
-      state.strummingSettingsExpanded = action.payload;
-    },
     setUseAdvancedChords(state, action: PayloadAction<boolean>) {
       state.useAdvancedChords = action.payload;
     },
@@ -192,16 +197,17 @@ export const {
   setChordsDisplayMode,
   setSkin,
   setSettingsExpanded,
+  setChordsExpanded,
+  setControlPanelExpanded,
+  setStrummingSettingsExpanded,
   setAndShowAlert,
   hideAlert,
   setSuggestedScales,
   hideScalesAlert,
   setTheme,
-  setChordsExpanded,
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,
-  setStrummingSettingsExpanded,
   setUseAdvancedChords,
   setUseSharpChords,
   setLoadingMessage,

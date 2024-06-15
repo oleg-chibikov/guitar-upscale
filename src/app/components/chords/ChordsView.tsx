@@ -1,3 +1,4 @@
+import { Expander } from "@/app/components/layout/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { ChordMode, NoteChordMode, getModeText } from "@/app/data/chordModes";
 import {
@@ -9,8 +10,6 @@ import { Theme } from "@/app/data/theme";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
@@ -101,81 +100,47 @@ export const ChordsView: React.FC = () => {
           : "bg-accented_background-dark"
       } p-1`}
     >
-      <Accordion
+      <Expander
         expanded={chordsExpanded}
-        onChange={handleExpansion}
-        // slots={{ transition: Fade as AccordionSlots["transition"] }}
-        // slotProps={{ transition: { timeout: 400 } }}
-        sx={{
-          "& .MuiAccordionSummary-content": {
-            margin: 0,
-            marginY: 0.5,
-          },
-        }}
-        disableGutters
+        handleExpansion={handleExpansion}
+        id="chords-view"
+        title="Chords"
       >
-        <AccordionSummary
-          sx={{
-            pointerEvents: "none",
-          }}
-          expandIcon={
-            <ExpandLess
-              sx={{
-                pointerEvents: "auto",
-              }}
-            />
-          }
+        <section
+          ref={ref}
+          className={`grid ${
+            scrollBarVisible ? "overscroll-contain" : "touch-none"
+          } gap-0.5 overflow-auto grid-cols-2`}
           style={{
-            minHeight: 0,
-          }}
-          id="panel-header"
-          aria-controls="panel-content"
-        >
-          Chords
-        </AccordionSummary>
-        <AccordionDetails
-          className="flex flex-col gap-2"
-          style={{
-            padding: 0,
-            // paddingTop: 10, // give area to tap top chords
+            maxWidth:
+              height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+                ? COMPACT_CHORDS_WIDTH
+                : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
+            maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
+            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
         >
-          <section
-            ref={ref}
-            className={`grid ${
-              scrollBarVisible ? "overscroll-contain" : "touch-none"
-            } gap-0.5 overflow-auto grid-cols-2`}
-            style={{
-              maxWidth:
-                height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
-                  ? COMPACT_CHORDS_WIDTH
-                  : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
-              maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-              gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-              gridTemplateRows: `repeat(${totalRows}, 1fr)`,
-            }}
-          >
-            {chords.flatMap((noteChord) =>
-              noteChord.modes.map((noteChordMode) => {
-                const text = getNoteText(noteChord.note);
-                const isHidden =
-                  checkIsHiddenMode(noteChordMode) ||
-                  (!useSharpChords && text.endsWith("#"));
-                const title = text + getModeText(noteChordMode.mode);
+          {chords.flatMap((noteChord) =>
+            noteChord.modes.map((noteChordMode) => {
+              const text = getNoteText(noteChord.note);
+              const isHidden =
+                checkIsHiddenMode(noteChordMode) ||
+                (!useSharpChords && text.endsWith("#"));
+              const title = text + getModeText(noteChordMode.mode);
 
-                return (
-                  <ChordButton
-                    key={title}
-                    isHidden={isHidden}
-                    noteChordMode={noteChordMode}
-                    chordName={title}
-                  />
-                );
-              })
-            )}
-          </section>
-        </AccordionDetails>
-      </Accordion>
+              return (
+                <ChordButton
+                  key={title}
+                  isHidden={isHidden}
+                  noteChordMode={noteChordMode}
+                  chordName={title}
+                />
+              );
+            })
+          )}
+        </section>
+      </Expander>
     </section>
   );
 };

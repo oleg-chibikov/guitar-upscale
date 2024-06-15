@@ -121,8 +121,8 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
         className={`flex flex-row gap-1 justify-around items-center w-16 p-1 ${
           theme === Theme.Light
-            ? "bg-select_background-light"
-            : "bg-select_background-dark"
+            ? "text-select_foreground-light bg-select_background-light"
+            : "text-select_foreground-dark bg-select_background-dark"
         } text-xs h-8 cursor-pointer ${highlight ? "highlight" : ""}`}
       >
         <div>{icon}</div>

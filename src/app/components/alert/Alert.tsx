@@ -1,6 +1,6 @@
 import { AlertType } from "@/app/data/alertType";
 import { hideAlert, selectUi } from "@/app/store/uiSlice";
-import { Slide } from "@mui/material";
+import { Slide, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -31,9 +31,12 @@ export const Alert: React.FC = () => {
         } opacity-90`}
         style={{ zIndex: 9999 }}
       >
-        <span className="flex items-center text-base text-center text-gray-800 whitespace-pre-wrap">
+        <Typography
+          variant="body2"
+          className="flex items-center text-base text-center text-gray-800 whitespace-pre-wrap"
+        >
           {alertMessage}
-        </span>
+        </Typography>
       </div>
     </Slide>
   );

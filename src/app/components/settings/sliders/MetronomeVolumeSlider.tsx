@@ -1,5 +1,6 @@
 import { MAX_VOLUME } from "@/app/data/volume";
 import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -18,7 +19,7 @@ export const MetronomeVolumeSlider: React.FC = () => {
 
   return (
     <>
-      <span>Metronome volume:</span>
+      <Typography variant="body2">Metronome volume:</Typography>
       <Slider
         onValueChange={handleSliderChange}
         value={metronomeVolume}

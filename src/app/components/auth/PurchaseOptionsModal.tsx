@@ -8,7 +8,7 @@ import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
-import { Alert, Modal, Slide } from "@mui/material";
+import { Alert, Modal, Slide, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
@@ -139,15 +139,15 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
               {session?.user && (
                 <div className="flex flex-col gap-1 items-center justify-center">
                   <strong>{session.user.name}</strong>
-                  <span>{session.user.email}</span>
+                  <Typography variant="body2">{session.user.email}</Typography>
                 </div>
               )}
 
               <>
-                <span>
+                <Typography variant="body2">
                   {"Subscription level:"}{" "}
                   <strong>{subscriptionTier?.tier ?? "Not subscribed"}</strong>
-                </span>
+                </Typography>
                 {
                   <ul className="flex flex-col items-start">
                     {Object.entries(featureNames).map(([key, value]) => (

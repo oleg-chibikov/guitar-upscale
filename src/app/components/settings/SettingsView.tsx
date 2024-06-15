@@ -14,9 +14,7 @@ import { ChordsDisplayModeSelector } from "./selectors/ChordsDisplayModeSelector
 import { NoteDisplayModeSelector } from "./selectors/NoteDisplayModeSelector";
 import { ThemeSelector } from "./selectors/ThemeSelector";
 import { ChordNotesToPlaySlider } from "./sliders/ChordNotesToPlaySlider";
-import { ChordStrummingDelaySlider } from "./sliders/ChordStrummingSlider";
 import { MetronomeVolumeSlider } from "./sliders/MetronomeVolumeSlider";
-import { TempoSlider } from "./sliders/TempoSlider";
 import { VolumeSlider } from "./sliders/VolumeSlider";
 
 export const SettingsView: React.FC<WithPremiumComponents> = ({
@@ -31,7 +29,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         className={`flex flex-col opacity-95 overflow-auto overscroll-contain fixed ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
-        } z-40 top-20 border-2 ${
+        } z-40 top-28 border-2 ${
           theme === Theme.Light
             ? "bg-accented_background-light border-border-light text-foreground-light"
             : "bg-accented_background-dark border-border-dark text-foreground-dark"
@@ -71,8 +69,8 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           <ChordPlayModeSelector />
           {premiumComponents.get("skinSelection") as ReactNode}
           {premiumComponents.get("playbackTypeSelection") as ReactNode}
-          <TempoSlider />
-          <ChordStrummingDelaySlider />
+          {/* <TempoSlider />
+          <ChordStrummingDelaySlider /> */}
           <ChordNotesToPlaySlider />
           <VolumeSlider />
           <MetronomeVolumeSlider />

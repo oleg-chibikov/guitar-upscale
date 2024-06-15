@@ -3,7 +3,7 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
 import Login from "@mui/icons-material/Login";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { AuthButtonProps } from "./AuthButtonProps";
@@ -27,7 +27,8 @@ export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
       } gap-2`}
     >
       <Login />
-      <span
+      <Typography
+        variant="body2"
         className={`hidden sm:block ${
           theme === Theme.Light
             ? "text-foreground-light"
@@ -35,7 +36,7 @@ export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
         }`}
       >
         {text}
-      </span>
+      </Typography>
     </Button>
   );
 };

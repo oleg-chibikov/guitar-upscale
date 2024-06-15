@@ -13,6 +13,7 @@ import {
   selectSettings,
   volumeValue,
 } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import { SelectWrapper } from "../SelectWrapper";
@@ -58,7 +59,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
   const group: Instrument[] = instrumentGroups[instrumentGroup];
   return (
     <>
-      <span>{label}:</span>
+      <Typography variant="body2">{label}:</Typography>
       <SelectWrapper
         value={instrumentGroup}
         onChange={(value) => handleGroupChange(value as InstrumentGroup)}

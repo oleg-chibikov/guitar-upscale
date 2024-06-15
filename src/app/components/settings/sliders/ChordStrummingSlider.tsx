@@ -3,6 +3,7 @@ import {
   selectSettings,
   setChordStrummingDelayMs,
 } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { StepSlider } from "./StepSlider";
@@ -17,7 +18,7 @@ export const ChordStrummingDelaySlider: React.FC = () => {
 
   return (
     <>
-      <span>Chord strumming delay:</span>
+      <Typography variant="body2">Chord strumming delay:</Typography>
       <StepSlider
         onValueChange={handleSliderChange}
         value={chordStrummingDelayMs}

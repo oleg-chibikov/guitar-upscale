@@ -2,6 +2,7 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { selectUi } from "@/app/store/uiSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -68,7 +69,8 @@ export const Slider: React.FC<SliderProps> = ({
         />
       </div>
       {label !== undefined && (
-        <span
+        <Typography
+          variant="body2"
           className={`text-nowrap ${
             theme === Theme.Light
               ? "text-foreground-light"
@@ -76,7 +78,7 @@ export const Slider: React.FC<SliderProps> = ({
           } ${labelClass}`}
         >
           {label}
-        </span>
+        </Typography>
       )}
     </div>
   );

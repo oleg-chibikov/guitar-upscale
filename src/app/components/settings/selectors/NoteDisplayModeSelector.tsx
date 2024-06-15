@@ -1,5 +1,6 @@
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import { selectUi, setNoteDisplayMode } from "@/app/store/uiSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -10,7 +11,7 @@ export const NoteDisplayModeSelector: React.FC = () => {
 
   return (
     <>
-      <span>Note display mode:</span>
+      <Typography variant="body2">Note display mode:</Typography>
       <EnumSelector
         enumObj={NoteDisplayMode}
         selectedValue={noteDisplayMode}

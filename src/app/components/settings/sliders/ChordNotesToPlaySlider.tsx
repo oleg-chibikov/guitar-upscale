@@ -1,4 +1,5 @@
 import { selectSettings, setChordNotesToPlay } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -13,7 +14,7 @@ export const ChordNotesToPlaySlider: React.FC = () => {
 
   return (
     <>
-      <span>Notes to play in chord:</span>
+      <Typography variant="body2">Notes to play in chord:</Typography>
       <Slider
         onValueChange={handleSliderChange}
         value={chordNotesToPlay}

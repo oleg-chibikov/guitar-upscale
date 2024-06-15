@@ -7,6 +7,7 @@ interface EnumSelectorProps<T extends Record<string | number, string | number>>
   selectedValue: T[keyof T];
   onValueChange: (value: T[keyof T]) => void;
   customLabel?: (key: string, value: T[keyof T]) => string;
+  large?: boolean;
 }
 
 export function EnumSelector<
@@ -17,6 +18,7 @@ export function EnumSelector<
   onValueChange,
   customLabel,
   className,
+  large,
 }: EnumSelectorProps<T>) {
   const options = Object.entries(enumObj)
     .filter(([key]) => isNaN(Number(key)))
@@ -29,6 +31,7 @@ export function EnumSelector<
 
   return (
     <SelectWrapper
+      large={large}
       className={className}
       options={options}
       value={selectedValue.toString()}

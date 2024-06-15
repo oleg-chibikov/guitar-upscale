@@ -3,7 +3,7 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Session } from "next-auth";
 import { FC } from "react";
 import { useSelector } from "react-redux";
@@ -28,7 +28,8 @@ export const SignedInButton: FC<
       }
       onClick={openModal} // Open modal on avatar click
     >
-      <span
+      <Typography
+        variant="caption"
         className={`hidden px-2 sm:block ${
           theme === Theme.Light
             ? "text-foreground-light"
@@ -36,7 +37,7 @@ export const SignedInButton: FC<
         }`}
       >
         {subscriptionTier?.tier ?? "Go premium"}
-      </span>
+      </Typography>
 
       <UserAvatar user={user} />
     </Button>

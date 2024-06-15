@@ -23,6 +23,7 @@ import {
   selectSettings,
 } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
+import { Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -271,9 +272,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       {stringOctaveNote && (
         <>
           {/* The marker itself */}
-          <span
+          <Typography
+            variant="body2"
             className={`flex justify-center items-center select-none font-mono
-${!isHeader ? "rounded-full w-7 h-7" : ""}
+${isHeader ? "" : "rounded-full w-7 h-7"}
 ${
   isChordBeingDetected
     ? `border-4 shadow-glow ${
@@ -370,7 +372,7 @@ ${
             }}
           >
             {getMarkerText(stringOctaveNote)}
-          </span>
+          </Typography>
           {/* Clickable area */}
           <div
             className="absolute cursor-pointer z-20 bg-transparent h-9"

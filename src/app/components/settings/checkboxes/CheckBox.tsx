@@ -1,5 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -38,7 +39,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
         }
         htmlFor={label}
       >
-        {label}
+        <Typography variant="body2">{label}</Typography>
       </label>
     </div>
   );

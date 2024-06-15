@@ -3,6 +3,7 @@ import { MAX_VOLUME } from "@/app/data/volume";
 import { beatToMilliseconds } from "@/app/engine/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectSettings, setVolume } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -25,7 +26,7 @@ export const VolumeSlider: React.FC = () => {
 
   return (
     <>
-      <span>Playback volume:</span>
+      <Typography variant="body2">Playback volume:</Typography>
       <Slider
         onValueChange={handleSliderChange}
         value={volume}

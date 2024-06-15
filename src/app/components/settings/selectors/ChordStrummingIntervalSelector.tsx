@@ -3,6 +3,7 @@ import {
   selectSettings,
   setChordStrummingInterval,
 } from "@/app/store/settingsSlice";
+import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -13,7 +14,7 @@ export const ChordStrummingIntervalSelector: React.FC = () => {
 
   return (
     <>
-      <span>Chord Strumming Interval:</span>
+      <Typography variant="body2">Chord Strumming Interval:</Typography>
       <EnumSelector
         enumObj={ChordStrummingInterval}
         selectedValue={chordStrummingInterval}
