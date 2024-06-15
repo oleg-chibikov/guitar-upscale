@@ -7,11 +7,9 @@ import { selectUi } from "@/app/store/uiSlice";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 
-export const Panel: FC<WithChildren & WithClassName & WithStyle> = ({
-  children,
-  className,
-  style,
-}) => {
+export const Panel: FC<
+  WithChildren & WithClassName & WithStyle & { enableReverse?: boolean }
+> = ({ children, className, style, enableReverse = false }) => {
   const { theme, chordsDisplayMode } = useSelector(selectUi);
   return (
     <section
@@ -22,7 +20,7 @@ export const Panel: FC<WithChildren & WithClassName & WithStyle> = ({
           : "bg-panel-dark border-border-dark"
       } flex ${
         // it should be on the opposite side of chords to avoid overlapping
-        chordsDisplayMode === ChordsDisplayMode.Left
+        chordsDisplayMode === ChordsDisplayMode.Left && enableReverse
           ? "flex-row-reverse"
           : "flex-row"
       } gap-1 items-center overflow-auto overscroll-contain`}

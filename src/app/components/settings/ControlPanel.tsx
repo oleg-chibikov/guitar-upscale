@@ -18,6 +18,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
   const { chordsDisplayMode } = useSelector(selectUi);
   return (
     <Panel
+      enableReverse
       className={`z-30 fixed top-1 ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
