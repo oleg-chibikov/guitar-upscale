@@ -24,7 +24,7 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
       onChange={(event) =>
         onChange !== undefined && onChange(event.target.value)
       }
-      className={`${
+      className={`h-7 text-xs p-1 ${
         theme === Theme.Light
           ? "text-select_foreground-light bg-select_background-light"
           : "text-select_foreground-dark bg-select_background-dark"

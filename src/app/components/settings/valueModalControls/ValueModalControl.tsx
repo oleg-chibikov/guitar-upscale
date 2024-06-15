@@ -123,7 +123,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
           theme === Theme.Light
             ? "bg-select_background-light"
             : "bg-select_background-dark"
-        } text-sm h-8 cursor-pointer ${highlight ? "highlight" : ""}`}
+        } text-xs h-8 cursor-pointer ${highlight ? "highlight" : ""}`}
       >
         <div>{icon}</div>
         <div className="flex flex-col items-center gap-0.5 leading-none">
