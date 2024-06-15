@@ -17,7 +17,7 @@ import { ChordButton } from "./ChordButton";
 
 const TOP_RESERVED_HEIGHT = 170;
 const HORIZONTAL_RESERVED_WIDTH = 400;
-const COMPACT_CHORDS_WIDTH = 220;
+const COMPACT_CHORDS_WIDTH = 190;
 
 export const ChordsView: React.FC = () => {
   const { neck, chords } = useSelector(selectSettings);
