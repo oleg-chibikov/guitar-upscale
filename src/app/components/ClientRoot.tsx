@@ -3,6 +3,7 @@
 import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
+import { StrummingSettingsWrapper } from "@/app/components/settings/StrummingSettingsWrapper";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
@@ -16,7 +17,6 @@ import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
-import { StrummingSettings } from "./settings/StrummingSettings";
 
 export const ClientRoot: React.FC<WithPremiumComponents> = ({
   premiumComponents,
@@ -45,7 +45,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           <ChordsView />
           <AuthPanel />
-          <StrummingSettings />
+          <StrummingSettingsWrapper />
           <MenuOutsideClickHandler />
           <BottomZone premiumComponents={premiumComponents} />
           <AspectRatioModalWrapper />

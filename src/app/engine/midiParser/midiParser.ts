@@ -27,7 +27,7 @@ import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { read } from "midifile-ts";
 
-// TODO: UI - restart. Maybe send to looper
+// TODO: UI - restart playback. Maybe send to looper
 
 // TODO: Match scale for Sliding Window rather than for the whole midi file. Can be useful when the song changes baseNote
 const matchChordForToleranceGroupWithCache = new FunctionCache(

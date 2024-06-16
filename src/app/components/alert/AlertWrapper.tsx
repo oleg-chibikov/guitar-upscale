@@ -1,22 +1,13 @@
+import { LazyLoadWrapper } from "@/app/components/layout/LazyLoadWrapper";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
-import { FC, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { FC } from "react";
 
-// only load module when expanded
 const Alert = dynamic(async () => (await import("./Alert")).Alert);
 
-export const AlertWrapper: FC = () => {
-  const [opened, setOpened] = useState(false);
-  const { showAlert } = useSelector(selectUi);
-  useEffect(() => {
-    if (showAlert) {
-      setOpened(true);
-    }
-  }, [showAlert]);
-  if (!opened) {
-    return null;
-  }
-
-  return <Alert />;
-};
+export const AlertWrapper: FC = () => (
+  <LazyLoadWrapper
+    renderComponent={() => <Alert />}
+    selector={(state) => selectUi(state).showAlert}
+  />
+);

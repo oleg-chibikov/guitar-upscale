@@ -7,7 +7,6 @@ import { sortScales } from "@/app/engine/scales/scaleSorter";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import { Trie } from "../../helpers/trie";
 
-// TODO: Merge with ChordDetector
 export const MIN_NOTES_TO_DETECT_SCALE = 5;
 
 export type ScaleDetectorCallbackData =

@@ -333,8 +333,6 @@ export const useStrumming = (
           initialWait = () => Promise.all(otherChordsGracePeriodPromises);
           intervalsToSkip = GRACE_INTERVALS;
         } else if (isOtherChordStrumming) {
-          // TODO: If there is NO strumming currently - play the pattern from the next beat (but not from the beginning - see how much needed to skip)
-
           console.log(
             STRUMMING_LOG_PREFIX +
               "WAITING - Waiting for current strumming pattern to finish before beginning strumming new chord",
@@ -428,7 +426,6 @@ export const useStrumming = (
           chordName,
           clickNumber
         );
-        // TODO: delete the previous chord
         setPlaying(true);
         try {
           let currentIndex = startIndex; // skip first as it was played already

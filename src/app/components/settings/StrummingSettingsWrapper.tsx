@@ -1,32 +1,15 @@
-"use client";
-import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
+import { LazyLoadWrapper } from "@/app/components/layout/LazyLoadWrapper";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { FC, Suspense, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import dynamic from "next/dynamic";
+import { FC } from "react";
 
-// only load module when expanded
-const StrummingSettings = React.lazy(() =>
-  import("./StrummingSettings").then((module) => ({
-    default: module.StrummingSettings,
-  }))
+const StrummingSettings = dynamic(
+  async () => (await import("./StrummingSettings")).StrummingSettings
 );
 
-export const StrummingSettingsWrapper: FC<WithPremiumComponents> = () => {
-  const [opened, setOpened] = useState(false);
-  const { strummingSettingsExpanded } = useSelector(selectUi);
-  useEffect(() => {
-    if (strummingSettingsExpanded) {
-      setOpened(true);
-    }
-  }, [strummingSettingsExpanded]);
-
-  if (!opened) {
-    return null;
-  }
-
-  return (
-    <Suspense fallback={null}>
-      <StrummingSettings />
-    </Suspense>
-  );
-};
+export const StrummingSettingsWrapper: FC = () => (
+  <LazyLoadWrapper
+    renderComponent={() => <StrummingSettings />}
+    selector={(state) => selectUi(state).strummingSettingsExpanded}
+  />
+);

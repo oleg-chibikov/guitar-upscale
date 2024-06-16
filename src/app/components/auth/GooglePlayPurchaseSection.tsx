@@ -63,12 +63,12 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
 
   const isOnline = useOnlineStatus();
 
-  const handleOpenCancelScubscriptionModal = () => {
+  const handleOpenCancelSubscriptionModal = () => {
     setCancelSubscriptionModalOpen(true);
     setCancelSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
 
-  const handleOpenChangeScubscriptionModal = () => {
+  const handleOpenChangeSubscriptionModal = () => {
     setChangeSubscriptionModalOpen(true);
     setChangeSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
   };
@@ -216,11 +216,11 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
             allPurchasedOptions={allPurchasedOptions}
             showCancellationModal={() => {
               setSelectedOption(purchaseOption);
-              handleOpenCancelScubscriptionModal();
+              handleOpenCancelSubscriptionModal();
             }}
             showChangeSubscriptionModal={() => {
               setSelectedOption(purchaseOption);
-              handleOpenChangeScubscriptionModal();
+              handleOpenChangeSubscriptionModal();
             }}
             disabledMessage={disabledMessage}
             isSelected={selectedOption === purchaseOption}

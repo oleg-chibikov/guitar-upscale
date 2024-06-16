@@ -9,8 +9,6 @@ import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { trailingDebounce } from "../../helpers/debounce";
 
-// TODO: Merge class with scaleDetector
-
 class ChordDetectorBuilder {
   private currentlyDetectedNotesByString: (NoteWithClearCallback | null)[];
   private debouncedFindMatches: (

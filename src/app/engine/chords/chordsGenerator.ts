@@ -11,7 +11,12 @@ import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../../helpers/arrayHelper";
-import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
+import {
+  FRET_COUNT,
+  NOTE_COUNT,
+  Neck,
+  STRING_COUNT,
+} from "../generateNeckRepresentation";
 
 export const MAX_DISTANCE_IN_CHORD = 4;
 
@@ -145,8 +150,7 @@ export const getClosestVariation = (chordVariations: Chord[]) => {
   const variationAvgDistances = chordVariations.map((variation) => {
     const distances = variation.map(
       // lower strings get more priority
-      // TODO: Hardcoded string count
-      (note) => note.fret + (6 - note.string * 0.5)
+      (note) => note.fret + (STRING_COUNT - note.string * 0.5)
     );
     const avgDistance = calculateAverage(distances);
     return { object: variation, number: avgDistance };

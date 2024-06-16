@@ -8,7 +8,6 @@ import { store } from "@/app/store/store";
 import { setAndShowAlert, setSuggestedScales } from "@/app/store/uiSlice";
 import { trailingDebounce } from "../../helpers/debounce";
 
-// TODO: Merge with ChordDetector
 class ScaleDetectorBuilder {
   private usedNotesCount: number = 0;
   private currentlyDetectedNotes: (NoteWithClearCallback | undefined)[];

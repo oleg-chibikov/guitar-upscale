@@ -18,7 +18,6 @@ export type ChordDetectorCallbackData =
       alertType?: undefined;
     };
 
-// TODO: Merge class with scaleDetector
 const START_ASCII_CODE = "a".charCodeAt(0);
 export const MIN_NOTES_TO_DETECT_CHORD = 3;
 

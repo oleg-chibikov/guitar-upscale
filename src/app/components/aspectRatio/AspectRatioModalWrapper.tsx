@@ -1,24 +1,15 @@
+import { LazyLoadWrapper } from "@/app/components/layout/LazyLoadWrapper";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
-import { FC, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { FC } from "react";
 
-// only load module when expanded
 const AspectRatioModal = dynamic(
   async () => (await import("./AspectRatioModal")).AspectRatioModal
 );
 
-export const AspectRatioModalWrapper: FC = () => {
-  const [opened, setOpened] = useState(false);
-  const { showAspectRatio } = useSelector(selectUi);
-  useEffect(() => {
-    if (showAspectRatio) {
-      setOpened(true);
-    }
-  }, [showAspectRatio]);
-  if (!opened) {
-    return null;
-  }
-
-  return <AspectRatioModal />;
-};
+export const AspectRatioModalWrapper: FC = () => (
+  <LazyLoadWrapper
+    renderComponent={() => <AspectRatioModal />}
+    selector={(state) => selectUi(state).showAspectRatio}
+  />
+);

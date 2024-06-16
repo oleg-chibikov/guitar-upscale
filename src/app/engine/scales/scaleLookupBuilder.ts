@@ -32,7 +32,6 @@ export const rebuildScaleDetectorLookup = () => {
     throw new Error("addScaleToDetectorLookup is not set");
   }
   const allScales = scalesMap.entries();
-  // TODO:
   // for each of notes we go through all the scales and add them to the lookup
 
   // Create a Map to store encountered scales and their names
