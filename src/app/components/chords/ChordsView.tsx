@@ -112,10 +112,10 @@ export const ChordsView: React.FC = () => {
         <section
           ref={ref}
           className={`grid ${
-            scrollBarVisible && allowScrolling
-              ? "overscroll-contain overflow-auto"
-              : "touch-none overflow-hidden"
-          } gap-0.5 grid-cols-2`}
+            scrollBarVisible ? "overscroll-contain" : "touch-none"
+          } gap-0.5 ${
+            allowScrolling ? "overflow-auto" : "overflow-hidden"
+          } grid-cols-2`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
