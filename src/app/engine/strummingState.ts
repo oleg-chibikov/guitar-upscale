@@ -29,6 +29,7 @@ type StrummingData = {
 };
 
 export const strummingChordsMap = new Map<string, StrummingData>();
+export const strummingClickedChords = new Set<string>(); // set of chords currently clicked
 
 const createStrummingPromise = (): PromiseAndResolve => {
   let resolve: ((value: void | PromiseLike<void>) => void) | undefined;
@@ -43,6 +44,8 @@ const createStrummingPromise = (): PromiseAndResolve => {
 };
 
 export const isAnythingStrumming = (): boolean => strummingChordsMap.size > 0;
+export const isAnyStrummingClicked = (): boolean =>
+  strummingClickedChords.size > 0;
 
 export const areOtherChordsStrumming = (chordName: string): boolean =>
   Array.from(strummingChordsMap).filter((x) => x[0] !== chordName).length > 0;
@@ -101,6 +104,8 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
     isClicked: true,
   });
 
+  strummingClickedChords.add(chordName);
+
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming registered",
     chordName,
@@ -122,6 +127,8 @@ export const releaseChordClick = (chordName: string, clickNumber: number) => {
     isClicked: false,
     clickPromiseAndResolve: undefined,
   });
+
+  strummingClickedChords.delete(chordName);
 
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming click released",
@@ -151,6 +158,8 @@ export const markChordAsPendingStrumming = (
     strummingPromiseAndResolve: createStrummingPromise(),
     isClicked: true,
   });
+
+  strummingClickedChords.add(chordName);
 
   toggleInterval(true);
   console.log(

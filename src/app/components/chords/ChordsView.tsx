@@ -7,7 +7,7 @@ import {
 } from "@/app/data/chordsDisplayMode";
 import { SHARP_NOTE_COUNT, getNoteText } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
-import { isAnythingStrumming } from "@/app/engine/strummingState";
+import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
@@ -140,8 +140,8 @@ export const ChordsView: React.FC = () => {
                   isHidden={isHidden}
                   noteChordMode={noteChordMode}
                   chordName={title}
-                  onStrummingChange={(value) => {
-                    setAllowScrolling(!value && !isAnythingStrumming()); // only allow scrolling when nothing is strumming
+                  onStrummingClickedChange={(value) => {
+                    setAllowScrolling(!value && !isAnyStrummingClicked()); // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
                   }}
                 />
               );

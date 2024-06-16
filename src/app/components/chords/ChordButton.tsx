@@ -29,14 +29,14 @@ interface ChordButtonProps {
   chordName: string;
   noteChordMode: NoteChordMode;
   isHidden: boolean;
-  onStrummingChange: (value: boolean) => void;
+  onStrummingClickedChange: (value: boolean) => void;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   noteChordMode,
   isHidden,
-  onStrummingChange,
+  onStrummingClickedChange,
 }) => {
   const hasTouchInput = useInputChecker();
   const isDisabled = !noteChordMode.variations.length;
@@ -47,9 +47,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     useStrumming(chordName, isDisabled, hasTouchInput);
 
   useEffect(() => {
-    // let the parent component know that the strumming state has changed
-    onStrummingChange(isPlaying);
-  }, [isPlaying]);
+    // let the parent component know that the strumming clicked state has changed
+    onStrummingClickedChange(isClicked);
+  }, [isClicked]);
 
   const { theme, useSharpChords } = useSelector(selectUi);
 
