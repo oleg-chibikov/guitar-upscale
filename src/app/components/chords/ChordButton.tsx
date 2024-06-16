@@ -185,7 +185,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
                 ? "bg-secondary-dark"
                 : "bg-button-dark"
             }`
-      } select-none ${
+      } ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       } transition-transform transform origin-center`}
     >

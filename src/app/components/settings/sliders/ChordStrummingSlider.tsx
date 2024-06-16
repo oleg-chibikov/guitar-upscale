@@ -1,9 +1,9 @@
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { chordStrummingDelaySteps } from "@/app/data/chordStrummingInterval";
 import {
   selectSettings,
   setChordStrummingDelayMs,
 } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { StepSlider } from "./StepSlider";
@@ -17,8 +17,7 @@ export const ChordStrummingDelaySlider: React.FC = () => {
   };
 
   return (
-    <>
-      <Typography variant="body2">Chord strumming delay:</Typography>
+    <ControlWithLabel label="Chord strumming delay">
       <StepSlider
         onValueChange={handleSliderChange}
         value={chordStrummingDelayMs}
@@ -26,6 +25,6 @@ export const ChordStrummingDelaySlider: React.FC = () => {
         label={`${chordStrummingDelayMs}ms`}
         labelClass="w-20"
       />
-    </>
+    </ControlWithLabel>
   );
 };

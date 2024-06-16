@@ -1,7 +1,7 @@
 "use client";
 
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { selectSettings, setReverbStrength } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -15,8 +15,7 @@ export const ReverbStrengthSlider: React.FC = () => {
   };
 
   return (
-    <>
-      <Typography variant="body2">Reverb strength:</Typography>
+    <ControlWithLabel label="Reverb strength">
       <Slider
         onValueChange={handleSliderChange}
         value={reverbStrength * 10}
@@ -25,6 +24,6 @@ export const ReverbStrengthSlider: React.FC = () => {
         step={1}
         label={reverbStrength.toString()}
       />
-    </>
+    </ControlWithLabel>
   );
 };

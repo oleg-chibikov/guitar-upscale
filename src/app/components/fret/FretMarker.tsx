@@ -274,7 +274,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <Typography
             variant="body2"
-            className={`flex justify-center items-center select-none font-mono
+            className={`flex justify-center items-center font-mono
 ${isHeader ? "" : "rounded-full w-7 h-7"}
 ${
   isChordBeingDetected

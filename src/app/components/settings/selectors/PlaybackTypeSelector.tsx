@@ -1,7 +1,7 @@
 "use client";
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { PlaybackType } from "@/app/data/playbackType";
 import { selectSettings, setPlaybackType } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -11,8 +11,7 @@ export const PlaybackTypeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <>
-      <Typography variant="body2">Playback type:</Typography>
+    <ControlWithLabel label="Playback type">
       <EnumSelector
         enumObj={PlaybackType}
         selectedValue={playbackType}
@@ -20,6 +19,6 @@ export const PlaybackTypeSelector: React.FC = () => {
           dispatch(setPlaybackType(value));
         }}
       />
-    </>
+    </ControlWithLabel>
   );
 };

@@ -1,6 +1,6 @@
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { tempoSteps } from "@/app/data/tempo";
 import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { StepSlider } from "./StepSlider";
@@ -14,8 +14,7 @@ export const TempoSlider: React.FC = () => {
   };
 
   return (
-    <>
-      <Typography variant="body2">Tempo:</Typography>
+    <ControlWithLabel label="Tempo">
       <StepSlider
         onValueChange={handleSliderChange}
         value={tempoBpm}
@@ -23,6 +22,6 @@ export const TempoSlider: React.FC = () => {
         label={`${tempoBpm} BPM`}
         labelClass="w-20"
       />
-    </>
+    </ControlWithLabel>
   );
 };

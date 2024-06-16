@@ -1,7 +1,7 @@
 "use client";
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { Skin } from "@/app/data/skin";
 import { selectUi, setSkin } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -11,8 +11,7 @@ export const SkinSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <>
-      <Typography variant="body2">Skin:</Typography>
+    <ControlWithLabel label="Skin">
       <EnumSelector
         enumObj={Skin}
         selectedValue={skin}
@@ -20,6 +19,6 @@ export const SkinSelector: React.FC = () => {
           dispatch(setSkin(value));
         }}
       />
-    </>
+    </ControlWithLabel>
   );
 };

@@ -5,9 +5,9 @@ import { selectSettings } from "@/app/store/settingsSlice";
 import { ScaleGroupSelector } from "./ScaleGroupSelector";
 import { ScaleSelector } from "./ScaleSelector";
 
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
 
 export const ScaleAndGroupSelector: React.FC = () => {
   const { scaleGroup } = useSelector(selectSettings);
@@ -24,17 +24,13 @@ export const ScaleAndGroupSelector: React.FC = () => {
         gridTemplateColumns: "auto 75px",
       }}
     >
-      <Typography className="flex items-center" variant="body2">
-        Style:
-      </Typography>
-      <ScaleGroupSelector />
+      <ControlWithLabel label="Style">
+        <ScaleGroupSelector />
+      </ControlWithLabel>
       {scaleGroup && (
-        <>
-          <Typography className="flex items-center" variant="body2">
-            Scale:
-          </Typography>
+        <ControlWithLabel label="Scale">
           <ScaleSelector />
-        </>
+        </ControlWithLabel>
       )}
     </section>
   );

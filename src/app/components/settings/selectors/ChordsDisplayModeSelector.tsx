@@ -1,6 +1,6 @@
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { selectUi, setChordsDisplayMode } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -10,8 +10,7 @@ export const ChordsDisplayModeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <>
-      <Typography variant="body2">Chords display mode:</Typography>
+    <ControlWithLabel label="Chords display mode">
       <EnumSelector
         enumObj={ChordsDisplayMode}
         selectedValue={chordsDisplayMode}
@@ -19,6 +18,6 @@ export const ChordsDisplayModeSelector: React.FC = () => {
           dispatch(setChordsDisplayMode(value));
         }}
       />
-    </>
+    </ControlWithLabel>
   );
 };

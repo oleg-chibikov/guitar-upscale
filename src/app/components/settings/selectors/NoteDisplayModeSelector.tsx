@@ -1,6 +1,6 @@
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import { selectUi, setNoteDisplayMode } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "./EnumSelector";
@@ -10,8 +10,7 @@ export const NoteDisplayModeSelector: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <>
-      <Typography variant="body2">Note display mode:</Typography>
+    <ControlWithLabel label="Note display mode">
       <EnumSelector
         enumObj={NoteDisplayMode}
         selectedValue={noteDisplayMode}
@@ -19,6 +18,6 @@ export const NoteDisplayModeSelector: React.FC = () => {
           dispatch(setNoteDisplayMode(value));
         }}
       />
-    </>
+    </ControlWithLabel>
   );
 };

@@ -1,6 +1,6 @@
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { MAX_VOLUME } from "@/app/data/volume";
 import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "./Slider";
@@ -18,8 +18,7 @@ export const MetronomeVolumeSlider: React.FC = () => {
   };
 
   return (
-    <>
-      <Typography variant="body2">Metronome volume:</Typography>
+    <ControlWithLabel label="Metronome volume">
       <Slider
         onValueChange={handleSliderChange}
         value={metronomeVolume}
@@ -28,6 +27,6 @@ export const MetronomeVolumeSlider: React.FC = () => {
         step={1}
         label={metronomeVolume.toString()}
       />
-    </>
+    </ControlWithLabel>
   );
 };

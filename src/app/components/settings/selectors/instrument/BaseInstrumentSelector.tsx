@@ -1,4 +1,5 @@
 "use client";
+import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import {
   Instrument,
   InstrumentGroup,
@@ -13,7 +14,6 @@ import {
   selectSettings,
   volumeValue,
 } from "@/app/store/settingsSlice";
-import { Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import { SelectWrapper } from "../SelectWrapper";
@@ -58,8 +58,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
 
   const group: Instrument[] = instrumentGroups[instrumentGroup];
   return (
-    <>
-      <Typography variant="body2">{label}:</Typography>
+    <ControlWithLabel label={label}>
       <SelectWrapper
         value={instrumentGroup}
         onChange={(value) => handleGroupChange(value as InstrumentGroup)}
@@ -80,7 +79,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
             : []
         }
       />
-    </>
+    </ControlWithLabel>
   );
 };
 

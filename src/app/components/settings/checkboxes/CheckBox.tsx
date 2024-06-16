@@ -39,7 +39,9 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
         }
         htmlFor={label}
       >
-        <Typography variant="body2">{label}</Typography>
+        <Typography variant="body2" className="select-text">
+          {label}
+        </Typography>
       </label>
     </div>
   );
