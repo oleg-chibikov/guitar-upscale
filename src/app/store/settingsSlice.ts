@@ -39,7 +39,7 @@ import {
 } from "../engine/mainClock";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
-import { strummingChordsMap } from "../engine/strummingState";
+import { isAnythingStrumming } from "../engine/strummingState";
 import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>
@@ -252,7 +252,7 @@ const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
 };
 
 export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
-  strummingChordsMap.size > 0 ||
+  isAnythingStrumming() ||
   isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||

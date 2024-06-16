@@ -7,6 +7,7 @@ import {
 } from "@/app/data/chordsDisplayMode";
 import { SHARP_NOTE_COUNT, getNoteText } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
+import { isAnythingStrumming } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
@@ -36,6 +37,7 @@ export const ChordsView: React.FC = () => {
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
   const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
+  const [allowScrolling, setAllowScrolling] = useState<boolean>(true);
   const ref = useRef<HTMLDivElement>(null);
 
   const getScrollbarVisible = () => {
@@ -111,7 +113,9 @@ export const ChordsView: React.FC = () => {
           ref={ref}
           className={`grid ${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } gap-0.5 overflow-auto grid-cols-2`}
+          } gap-0.5 ${
+            allowScrolling ? "overflow-auto" : "overflow-hidden"
+          } grid-cols-2`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -136,6 +140,9 @@ export const ChordsView: React.FC = () => {
                   isHidden={isHidden}
                   noteChordMode={noteChordMode}
                   chordName={title}
+                  onStrummingChange={(value) => {
+                    setAllowScrolling(!value && !isAnythingStrumming()); // only allow scrolling when nothing is strumming
+                  }}
                 />
               );
             })

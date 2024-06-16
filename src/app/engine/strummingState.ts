@@ -42,6 +42,8 @@ const createStrummingPromise = (): PromiseAndResolve => {
   };
 };
 
+export const isAnythingStrumming = (): boolean => strummingChordsMap.size > 0;
+
 export const areOtherChordsStrumming = (chordName: string): boolean =>
   Array.from(strummingChordsMap).filter((x) => x[0] !== chordName).length > 0;
 
