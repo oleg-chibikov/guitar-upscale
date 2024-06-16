@@ -142,7 +142,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           : undefined
       }
       className={`text-center w-16 font-mono ${
-        useSharpChords ? "text-xs h-5" : "text-md h-7"
+        useSharpChords ? "text-xs h-5" : "text-md h-8"
       } ${
         (isPlaying || isGracePeriod || isClicked) && "border-2"
       } items-center justify-center content-center ${
