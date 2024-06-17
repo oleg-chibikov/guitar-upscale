@@ -1,4 +1,4 @@
-import { Chord, Note } from "@/app/data/notes";
+import { Chord, Note, getNoteText } from "@/app/data/notes";
 
 export enum ChordMode {
   Major,
@@ -243,4 +243,9 @@ export type NoteChordMode = {
 export type NoteChords = {
   note: Note;
   modes: NoteChordMode[];
+};
+
+export const getChordName = (note: Note, mode: ChordMode) => {
+  const text = getNoteText(note);
+  return text + getModeText(mode);
 };

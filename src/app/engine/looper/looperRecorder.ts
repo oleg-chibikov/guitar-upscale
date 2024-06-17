@@ -1,12 +1,14 @@
+import { chordNotesByName } from "@/app/engine/chords/chordsGenerator";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   LooperPlayer,
   LooperPlayerOptions,
 } from "@/app/engine/looper/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looper/looperShared";
+import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import { Instrument } from "../../data/instruments";
 import { StringOctaveNote } from "../../data/notes";
-import { ChordWithPlayMetadata } from "../eventBus";
+import { ChordWithPlayMetadata, DEFAULT_CHORD_TRACK_NUMBER } from "../eventBus";
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
@@ -24,6 +26,48 @@ export class LooperRecorder {
   private absoluteTickAtTheBeginningOfFirstEventBar: number | undefined;
   private lastBarTickForLastRecordedEvent: number | undefined;
   private looperPlayer: LooperPlayer | undefined;
+
+  /**
+   * Get the collection of all events.
+   */
+  get items() {
+    return this.eventsByTick;
+  }
+
+  addAllItemsToNoteRecorder(noteRecorder: NoteRecorder) {
+    if (!this.hasRecording()) {
+      return;
+    }
+    for (const eventsAtTick of this.eventsByTick!.items) {
+      for (const event of eventsAtTick.events) {
+        const note = event.note;
+        const chord = event.chord;
+        if (note) {
+          noteRecorder.addNoteAtTick(
+            note.note,
+            note.looperChannel ?? note.trackNumber,
+            note.instrument ?? "acoustic_guitar_nylon",
+            eventsAtTick.tick
+          );
+        }
+        if (chord) {
+          const notes = chordNotesByName.get(chord.chord);
+          if (notes) {
+            for (const chordNote of notes) {
+              noteRecorder.addNoteAtTick(
+                chordNote,
+                chord.metadata.looperChannel ??
+                  chord.metadata.trackNumber ??
+                  DEFAULT_CHORD_TRACK_NUMBER,
+                chord.metadata.trackInstrument ?? "acoustic_guitar_nylon",
+                eventsAtTick.tick
+              );
+            }
+          }
+        }
+      }
+    }
+  }
 
   hasRecording = () => {
     return this.eventsByTick?.hasItems ?? false;

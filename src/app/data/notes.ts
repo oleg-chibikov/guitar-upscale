@@ -15,6 +15,16 @@ export enum Note {
   B = 11,
 }
 
+const sharpNotes = new Set<Note>([
+  Note["C#"],
+  Note["D#"],
+  Note["F#"],
+  Note["G#"],
+  Note["A#"],
+]);
+
+export const isSharp = (note: Note): boolean => sharpNotes.has(note);
+
 export type OctaveNote = {
   octave: number;
   note: Note;

@@ -1,11 +1,11 @@
 import { Expander } from "@/app/components/layout/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import { ChordMode, NoteChordMode, getModeText } from "@/app/data/chordModes";
+import { ChordMode, NoteChordMode, getChordName } from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
-import { SHARP_NOTE_COUNT, getNoteText } from "@/app/data/notes";
+import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
@@ -128,11 +128,10 @@ export const ChordsView: React.FC = () => {
         >
           {chords.flatMap((noteChord) =>
             noteChord.modes.map((noteChordMode) => {
-              const text = getNoteText(noteChord.note);
               const isHidden =
                 checkIsHiddenMode(noteChordMode) ||
-                (!useSharpChords && text.endsWith("#"));
-              const title = text + getModeText(noteChordMode.mode);
+                (!useSharpChords && isSharp(noteChord.note));
+              const title = getChordName(noteChord.note, noteChordMode.mode);
 
               return (
                 <ChordButton

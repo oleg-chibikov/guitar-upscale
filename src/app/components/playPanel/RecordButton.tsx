@@ -25,8 +25,9 @@ export const RecordButton: React.FC = (props) => {
             theme === Theme.Light ? "bg-disabled-light" : "bg-disabled-dark"
           }
           onPress={async () => {
-            const midiRecorder = (await import("@/app/engine/midiRecorder"))
-              .midiRecorder;
+            const midiRecorder = (
+              await import("@/app/engine/midiRecorder/midiRecorder")
+            ).midiRecorder;
             midiRecorder.stopRecording(false);
             dispatch(
               setIsRecording({
@@ -48,8 +49,9 @@ export const RecordButton: React.FC = (props) => {
         activeBg="bg-red-500"
         onPress={async () => {
           const newValue = !isRecording;
-          const midiRecorder = (await import("@/app/engine/midiRecorder"))
-            .midiRecorder;
+          const midiRecorder = (
+            await import("@/app/engine/midiRecorder/midiRecorder")
+          ).midiRecorder;
           dispatch(
             setIsRecording({
               value: newValue,

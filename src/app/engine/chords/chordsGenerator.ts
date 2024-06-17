@@ -3,6 +3,7 @@ import {
   NoteChordMode,
   NoteChords,
   chordModesArray,
+  getChordName,
   isAdvancedMode,
 } from "@/app/data/chordModes";
 import { cartesian } from "@/app/helpers/cartesian";
@@ -19,6 +20,8 @@ import {
 } from "../generateNeckRepresentation";
 
 export const MAX_DISTANCE_IN_CHORD = 4;
+
+export const chordNotesByName = new Map<string, Chord>();
 
 // Function to generate a chord based on the root note and the intervals
 function generateChord(note: Note, intervals: number[]): Note[] {
@@ -90,6 +93,12 @@ export const generateAllChords = (
       const chordVariations = intervals.flatMap((interval) =>
         generateChordVariations(capo, note, interval, neck, mode)
       );
+
+      if (chordVariations.length) {
+        const firstVariation = getClosestVariation(chordVariations);
+        const chordName = getChordName(note, mode);
+        chordNotesByName.set(chordName, firstVariation);
+      }
       noteChords.push({ mode, variations: chordVariations });
     }
 
@@ -144,9 +153,6 @@ const generateChordVariations = (
 };
 
 export const getClosestVariation = (chordVariations: Chord[]) => {
-  if (!chordVariations.length) {
-    return null;
-  }
   const variationAvgDistances = chordVariations.map((variation) => {
     const distances = variation.map(
       // lower strings get more priority

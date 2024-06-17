@@ -12,7 +12,10 @@ import {
   parseStringToNotes,
   Tuning,
 } from "../data/tunings";
-import { generateAllChords } from "../engine/chords/chordsGenerator";
+import {
+  chordNotesByName,
+  generateAllChords,
+} from "../engine/chords/chordsGenerator";
 import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
@@ -243,6 +246,7 @@ const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
   }
 
   // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
+  chordNotesByName.clear();
   const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;

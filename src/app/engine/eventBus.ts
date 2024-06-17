@@ -12,6 +12,9 @@ import { currentlyRecordingLooperChannel } from "./looper/looperShared";
 import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
+export const DEFAULT_NOTE_TRACK_NUMBER = 0;
+export const DEFAULT_CHORD_TRACK_NUMBER = 1;
+
 export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
   volume?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
@@ -98,12 +101,15 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     fretMarkersFromPreviousChord.add(serialized);
   }
 
-  const midiRecorder = (await import("./midiRecorder")).midiRecorder;
-  const trackNumber = noteMetadata.trackNumber ?? (fromChord ? 1 : 0);
+  const midiRecorder = (await import("./midiRecorder/midiRecorder"))
+    .midiRecorder;
+  const trackNumber =
+    noteMetadata.trackNumber ??
+    (fromChord ? DEFAULT_CHORD_TRACK_NUMBER : DEFAULT_NOTE_TRACK_NUMBER);
   const trackInstrument =
     noteMetadata.trackInstrument ??
     (fromChord ? chordInstrumentValue : instrumentValue);
-  midiRecorder.addNoteToMidiTrack(
+  midiRecorder.addNoteAtGlobalTick(
     noteMetadata.stringOctaveNote,
     trackNumber,
     trackInstrument

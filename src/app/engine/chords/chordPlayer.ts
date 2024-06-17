@@ -45,6 +45,9 @@ const playVariation = async (
 };
 
 export const playRandomChordVariation = async (params: ChordPlayParameters) => {
+  if (!params.noteChordMode.variations.length) {
+    return;
+  }
   const randomVariation = selectRandomVariation(
     params.noteChordMode.variations
   );
@@ -52,13 +55,19 @@ export const playRandomChordVariation = async (params: ChordPlayParameters) => {
 };
 
 export const playFirstChordVariation = async (params: ChordPlayParameters) => {
-  const randomVariation = params.noteChordMode.variations[0];
-  await playVariation(randomVariation, "first", params);
+  if (!params.noteChordMode.variations.length) {
+    return;
+  }
+  const variation = params.noteChordMode.variations[0];
+  await playVariation(variation, "first", params);
 };
 
 export const playClosestChordVariation = async (
   params: ChordPlayParameters
 ) => {
+  if (!params.noteChordMode.variations.length) {
+    return;
+  }
   const closestVariation = getClosestVariation(params.noteChordMode.variations);
   if (closestVariation) {
     await playVariation(closestVariation, "closest", params);
