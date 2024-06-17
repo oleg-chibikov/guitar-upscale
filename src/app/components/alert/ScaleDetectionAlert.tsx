@@ -68,7 +68,7 @@ export const ScaleDetectionAlert: FC = () => {
           </Typography>
           <CloseIcon onPress={handleCloseModal} />
           <div className="max-h-96 mt-2 overflow-auto flex flex-col gap-2">
-            {suggestedScales?.map((scaleAndGroup, index) => (
+            {suggestedScales?.map((scaleAndGroup) => (
               <Button
                 className="w-full"
                 variant="contained"

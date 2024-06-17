@@ -9,10 +9,7 @@ import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
-import {
-  selectSettings,
-  setIsStrummingClicked,
-} from "@/app/store/settingsSlice";
+import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +20,7 @@ const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
-  const { chords, isStrummingClicked } = useSelector(selectSettings);
+  const { chords } = useSelector(selectSettings);
   const {
     theme,
     chordsExpanded,
@@ -115,7 +112,7 @@ export const ChordsView: React.FC = () => {
           ref={ref}
           className={`grid grid-cols-2 gap-0.5 ${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } ${isStrummingClicked ? "overflow-auto" : "overflow-hidden"}`}
+          } overflow-auto`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -140,9 +137,15 @@ export const ChordsView: React.FC = () => {
                   noteChordMode={noteChordMode}
                   chordName={title}
                   onStrummingClickedChange={(value) => {
-                    dispatch(
-                      setIsStrummingClicked(!value && !isAnyStrummingClicked())
-                    ); // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+                    const isStrummingClicked = value || isAnyStrummingClicked();
+                    if (isStrummingClicked) {
+                      // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+                      ref.current?.classList.remove("overflow-auto");
+                      ref.current?.classList.add("overflow-hidden");
+                    } else {
+                      ref.current?.classList.add("overflow-auto");
+                      ref.current?.classList.remove("overflow-hidden");
+                    }
                   }}
                 />
               );
