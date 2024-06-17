@@ -36,7 +36,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
         reverseIcon
         expanded={controlPanelExpanded}
         handleExpansion={handleExpansion}
-        id="control-panel"
+        id="control-panel-expander"
         title="Control Panel"
       >
         <Panel enableReverse>
