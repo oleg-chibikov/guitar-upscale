@@ -19,6 +19,14 @@ const TOP_RESERVED_HEIGHT = 120;
 const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
+const handleTouchStart = (e: TouchEvent) => {
+  e.preventDefault();
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+  e.preventDefault();
+};
+
 export const ChordsView: React.FC = () => {
   const { neck, chords } = useSelector(selectSettings);
   const {
@@ -37,12 +45,10 @@ export const ChordsView: React.FC = () => {
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
   const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
-  const [allowScrolling, setAllowScrolling] = useState<boolean>(true);
   const ref = useRef<HTMLDivElement>(null);
 
   const getScrollbarVisible = () => {
     const el = ref.current;
-
     return el
       ? el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
       : false;
@@ -53,6 +59,29 @@ export const ChordsView: React.FC = () => {
     setTimeout(() => {
       setScrollBarVisible(getScrollbarVisible());
     }, 1);
+  };
+
+  const changeScrollingPreventHandler = (allowScrolling: boolean) => {
+    // we need to prevent the touch events programmatically as touch-none won't work when the touchStart has already happened
+    // explanation: we don't want any scrolling to happen while strumming. Strumming starts on touchStart event - we need to prevent the further events
+    // it works only in passive mode - and therefore these events cannot be registered with onTouchMove react attribute
+    const element = ref.current;
+
+    if (!element) {
+      return;
+    }
+
+    if (allowScrolling) {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+    } else {
+      element.addEventListener("touchstart", handleTouchStart, {
+        passive: false,
+      });
+      element.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+    }
   };
 
   useEffect(setupScrollbar, [useAdvancedChords, useSharpChords]);
@@ -113,9 +142,7 @@ export const ChordsView: React.FC = () => {
           ref={ref}
           className={`grid ${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } gap-0.5 ${
-            allowScrolling ? "overflow-auto" : "overflow-hidden"
-          } grid-cols-2`}
+          } overflow-auto gap-0.5 grid-cols-2`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -140,7 +167,10 @@ export const ChordsView: React.FC = () => {
                   noteChordMode={noteChordMode}
                   chordName={title}
                   onStrummingClickedChange={(value) => {
-                    setAllowScrolling(!value && !isAnyStrummingClicked()); // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+                    // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+                    changeScrollingPreventHandler(
+                      !value && !isAnyStrummingClicked()
+                    );
                   }}
                 />
               );
