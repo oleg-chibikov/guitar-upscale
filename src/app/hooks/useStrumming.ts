@@ -124,63 +124,58 @@ export const useStrumming = (
 
     const handlePressReleased = (event: MouseEvent | TouchEvent) => {
       let target = event.target as Node | null;
-      let clickIgnored = false;
 
       while (target && target !== document) {
         const id = (target as HTMLElement)?.id;
         // keep playing chord when clicking notes simultaneously
-        if (id === "fretboard") {
-          clickIgnored = true;
-          break;
+        if (id === "chords-view") {
+          try {
+            console.log(
+              STRUMMING_LOG_PREFIX + "Chord press released",
+              chordName,
+              clickNumber
+            );
+            if (!isChordClicked(chordName) || isDisabled) {
+              console.log(
+                STRUMMING_LOG_PREFIX + "Chord not clicked yet - ignoring",
+                chordName,
+                clickNumber
+              );
+              return;
+            }
+
+            if (!isChordStrumming(chordName)) {
+              console.log(
+                STRUMMING_LOG_PREFIX +
+                  "Not playing when press released - stop strumming",
+                chordName,
+                clickNumber
+              );
+
+              // release clicked promise before removing chord data
+              setClicked(false);
+              // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
+              setPlaying(false);
+            } else {
+              setClicked(false);
+            }
+          } finally {
+            unregister();
+          }
+
+          return;
         }
         target = target.parentNode;
       }
 
-      if (clickIgnored) {
-        console.log(
-          STRUMMING_LOG_PREFIX +
-            "Clicked on fretboard - ignoring press release",
-          chordName,
-          clickNumber
-        );
+      console.log(
+        STRUMMING_LOG_PREFIX +
+          "Clicked outside of chords view - ignoring press release",
+        chordName,
+        clickNumber
+      );
 
-        // don't unregister the handler in this case
-        return;
-      }
-
-      try {
-        console.log(
-          STRUMMING_LOG_PREFIX + "Chord press released",
-          chordName,
-          clickNumber
-        );
-        if (!isChordClicked(chordName) || isDisabled) {
-          console.log(
-            STRUMMING_LOG_PREFIX + "Chord not clicked yet - ignoring",
-            chordName,
-            clickNumber
-          );
-          return;
-        }
-
-        if (!isChordStrumming(chordName)) {
-          console.log(
-            STRUMMING_LOG_PREFIX +
-              "Not playing when press released - stop strumming",
-            chordName,
-            clickNumber
-          );
-
-          // release clicked promise before removing chord data
-          setClicked(false);
-          // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
-          setPlaying(false);
-        } else {
-          setClicked(false);
-        }
-      } finally {
-        unregister();
-      }
+      // don't unregister the handler in this case
     };
 
     const setClicked = (value: boolean) => {
