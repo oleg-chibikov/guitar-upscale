@@ -66,10 +66,10 @@ export const Initializer: React.FC = () => {
       console.log("Loaded sounds");
     };
 
-    document.body.addEventListener("scroll", handleFirstInteraction);
-    document.body.addEventListener("keydown", handleFirstInteraction);
-    document.body.addEventListener("click", handleFirstInteraction);
-    document.body.addEventListener("touchstart", handleFirstInteraction);
+    document.body.addEventListener("scroll", handleFirstInteraction, true);
+    document.body.addEventListener("keydown", handleFirstInteraction, true);
+    document.body.addEventListener("click", handleFirstInteraction, true);
+    document.body.addEventListener("touchstart", handleFirstInteraction, true);
 
     return () => {
       remove();

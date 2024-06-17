@@ -218,12 +218,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   };
 
   const clickAttrs = {
-    onTouchStart: async () => {
+    onTouchStartCapture: async () => {
       if (stringOctaveNote && hasTouchInput) {
         await handlePress();
       }
     },
-    onMouseDown: async () => {
+    onMouseDownCapture: async () => {
       if (stringOctaveNote && !hasTouchInput) {
         await handlePress();
       }

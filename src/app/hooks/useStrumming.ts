@@ -105,9 +105,9 @@ export const useStrumming = (
         clickNumber
       );
       !hasTouchInput &&
-        document.addEventListener("mouseup", handlePressReleased);
+        document.addEventListener("mouseup", handlePressReleased, true);
       hasTouchInput &&
-        document.addEventListener("touchend", handlePressReleased);
+        document.addEventListener("touchend", handlePressReleased, true);
     };
 
     const unregister = () => {

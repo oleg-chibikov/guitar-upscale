@@ -38,12 +38,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   // this allows clicking the buttons while the other buttons are being pressed (for example, during strumming)
   const clickAttrs = {
-    onTouchStart: async () => {
+    onTouchStartCapture: async () => {
       if (hasTouchInput) {
         await onPress();
       }
     },
-    onMouseDown: async () => {
+    onMouseDownCapture: async () => {
       if (!hasTouchInput) {
         await onPress();
       }
