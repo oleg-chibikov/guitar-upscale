@@ -9,7 +9,10 @@ import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
-import { selectSettings } from "@/app/store/settingsSlice";
+import {
+  selectSettings,
+  setIsStrummingClicked,
+} from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +23,7 @@ const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC = () => {
-  const { neck, chords } = useSelector(selectSettings);
+  const { chords, isStrummingClicked } = useSelector(selectSettings);
   const {
     theme,
     chordsExpanded,
@@ -37,7 +40,6 @@ export const ChordsView: React.FC = () => {
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
   const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
-  const [allowScrolling, setAllowScrolling] = useState<boolean>(true);
   const ref = useRef<HTMLDivElement>(null);
 
   const getScrollbarVisible = () => {
@@ -73,7 +75,7 @@ export const ChordsView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!neck || !chords) {
+  if (!chords) {
     return null;
   }
 
@@ -113,7 +115,7 @@ export const ChordsView: React.FC = () => {
           ref={ref}
           className={`grid grid-cols-2 gap-0.5 ${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } ${allowScrolling ? "overflow-auto" : "overflow-hidden"}`}
+          } ${isStrummingClicked ? "overflow-auto" : "overflow-hidden"}`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -138,7 +140,9 @@ export const ChordsView: React.FC = () => {
                   noteChordMode={noteChordMode}
                   chordName={title}
                   onStrummingClickedChange={(value) => {
-                    setAllowScrolling(!value && !isAnyStrummingClicked()); // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+                    dispatch(
+                      setIsStrummingClicked(!value && !isAnyStrummingClicked())
+                    ); // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
                   }}
                 />
               );

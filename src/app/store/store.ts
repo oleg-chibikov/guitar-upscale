@@ -71,6 +71,7 @@ const persistConfig = {
         delete newState.isLastEvent;
         delete newState.isFirstEvent;
         delete newState.showAspectRatio;
+        delete newState.isStrummingClicked;
         return newState;
       },
       out: (state: PersistedState) => state, // No transformation needed when deserializing

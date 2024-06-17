@@ -111,6 +111,7 @@ interface SettingsState
   toggleMetronomeWhenRecording: boolean;
   isFirstEvent: boolean;
   isLastEvent: boolean;
+  isStrummingClicked: boolean;
 }
 
 const initialState: SettingsState = {
@@ -147,6 +148,7 @@ const initialState: SettingsState = {
   guitarSettingsUpdatedTrigger: false,
   isFirstEvent: false,
   isLastEvent: false,
+  isStrummingClicked: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -581,6 +583,9 @@ export const settingsSlice = createSlice({
         }
       }
     },
+    setIsStrummingClicked(state, action: PayloadAction<boolean>) {
+      state.isStrummingClicked = action.payload;
+    },
   },
 });
 
@@ -616,6 +621,7 @@ export const {
   setToggleMetronomeWhenRecording,
   setIsFirstEvent,
   setIsLastEvent,
+  setIsStrummingClicked,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;
