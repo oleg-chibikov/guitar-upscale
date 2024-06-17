@@ -11,7 +11,7 @@ import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
@@ -19,7 +19,9 @@ const TOP_RESERVED_HEIGHT = 120;
 const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
-export const ChordsView: React.FC = () => {
+export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
+  mainRef,
+}) => {
   const { chords } = useSelector(selectSettings);
   const {
     theme,
@@ -138,14 +140,8 @@ export const ChordsView: React.FC = () => {
                   chordName={title}
                   onStrummingClickedChange={(value) => {
                     const isStrummingClicked = value || isAnyStrummingClicked();
-                    if (isStrummingClicked) {
-                      // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
-                      ref.current?.classList.remove("overflow-auto");
-                      ref.current?.classList.add("overflow-hidden");
-                    } else {
-                      ref.current?.classList.add("overflow-auto");
-                      ref.current?.classList.remove("overflow-hidden");
-                    }
+                    toggleOverflow(isStrummingClicked, ref);
+                    toggleOverflow(isStrummingClicked, mainRef);
                   }}
                 />
               );
@@ -156,3 +152,17 @@ export const ChordsView: React.FC = () => {
     </section>
   );
 };
+
+function toggleOverflow(
+  isStrummingClicked: boolean,
+  ref: RefObject<HTMLElement>
+) {
+  if (isStrummingClicked) {
+    // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll
+    ref.current?.classList.remove("overflow-auto");
+    ref.current?.classList.add("overflow-hidden");
+  } else {
+    ref.current?.classList.add("overflow-auto");
+    ref.current?.classList.remove("overflow-hidden");
+  }
+}

@@ -4,6 +4,7 @@ import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/settings/StrummingSettingsWrapper";
+import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
@@ -22,6 +23,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
   const { loadingMessage, theme } = useSelector(selectUi);
+  const mainRef = useRef<HTMLElement>(null);
 
   return (
     <>
@@ -39,11 +41,11 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           {loadingMessage} <GradientCircularProgress />
         </main>
       ) : (
-        <main>
+        <main ref={mainRef}>
           <ControlPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
-          <ChordsView />
+          <ChordsView mainRef={mainRef} />
           <AuthPanel />
           <StrummingSettingsWrapper />
           <MenuOutsideClickHandler />
