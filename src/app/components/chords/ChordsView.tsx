@@ -106,7 +106,7 @@ export const ChordsView: React.FC = () => {
         expanded={chordsExpanded}
         expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
         handleExpansion={handleExpansion}
-        id="chords-view"
+        id="chords-view-expander"
         title="Chords"
       >
         <section
