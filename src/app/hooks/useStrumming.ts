@@ -300,8 +300,6 @@ export const useStrumming = (
     };
 
     const waitAndStrum = async () => {
-      let initialWait: () => Promise<void | void[]>;
-
       if (!isChordClicked(chordName)) {
         console.log(
           STRUMMING_LOG_PREFIX +
@@ -311,69 +309,80 @@ export const useStrumming = (
         );
         return;
       }
-      if (wasMainClockActiveWhenStrummingStarted) {
-        console.log(
-          STRUMMING_LOG_PREFIX + "Clock was active when clicked",
-          chordName,
-          clickNumber
-        );
 
-        if (clickedInOtherChordGracePeriod) {
+      const getInitialWait = () => {
+        let skipIntervals: number | undefined;
+        let initialWait: () => Promise<void | void[]>;
+        if (wasMainClockActiveWhenStrummingStarted) {
           console.log(
-            STRUMMING_LOG_PREFIX +
-              `WAITING - Clicked in grace period. Waiting for it to finish to start strumming. Skipping ${GRACE_INTERVALS} intervals`,
+            STRUMMING_LOG_PREFIX + "Clock was active when clicked",
             chordName,
             clickNumber
           );
-          initialWait = () => Promise.all(otherChordsGracePeriodPromises);
-          intervalsToSkip = GRACE_INTERVALS;
-        } else if (isOtherChordStrumming) {
-          console.log(
-            STRUMMING_LOG_PREFIX +
-              "WAITING - Waiting for current strumming pattern to finish before beginning strumming new chord",
-            chordName,
-            clickNumber
-          );
-          initialWait = () => Promise.all(otherChordsStrummingPromises);
-        } else if (wasStrummingWhenChordPressed) {
-          console.log(
-            STRUMMING_LOG_PREFIX +
-              "WAITING - Strumming not over - waiting for the next interval to strum",
-            chordName,
-            clickNumber
-          );
-          initialWait = waitBetween;
-        } else if (
-          isAnyTimerSpecificActivityRunning() &&
-          !isOtherChordStrumming
-        ) {
-          intervalsToSkip = getIntervalsToSkip();
-          console.log(
-            STRUMMING_LOG_PREFIX +
-              "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
-            intervalsToSkip,
-            chordName,
-            clickNumber
-          );
-          initialWait = waitBetween;
+
+          if (clickedInOtherChordGracePeriod) {
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                `WAITING - Clicked in grace period. Waiting for it to finish to start strumming. Skipping ${GRACE_INTERVALS} intervals`,
+              chordName,
+              clickNumber
+            );
+            initialWait = () => Promise.all(otherChordsGracePeriodPromises);
+            skipIntervals = GRACE_INTERVALS;
+          } else if (isOtherChordStrumming) {
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                "WAITING - Waiting for current strumming pattern to finish before beginning strumming new chord",
+              chordName,
+              clickNumber
+            );
+            initialWait = () => Promise.all(otherChordsStrummingPromises);
+          } else if (wasStrummingWhenChordPressed) {
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                "WAITING - Strumming not over - waiting for the next interval to strum",
+              chordName,
+              clickNumber
+            );
+            initialWait = waitBetween;
+          } else if (
+            isAnyTimerSpecificActivityRunning() &&
+            !isOtherChordStrumming
+          ) {
+            skipIntervals = getIntervalsToSkip();
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
+              skipIntervals,
+              chordName,
+              clickNumber
+            );
+            initialWait = waitBetween;
+          } else {
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                "WAITING - Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
+              chordName,
+              clickNumber
+            );
+            initialWait = waitBetween;
+          }
         } else {
           console.log(
             STRUMMING_LOG_PREFIX +
-              "WAITING - Clock active but the only activity is strumming from this chord - waiting for the next interval to strum",
+              "WAITING - Clock not active - waiting for the next interval to strum and skip one interval",
             chordName,
             clickNumber
           );
           initialWait = waitBetween;
+          skipIntervals = 1;
         }
-      } else {
-        console.log(
-          STRUMMING_LOG_PREFIX +
-            "WAITING - Clock not active - waiting for the next interval to strum and skip one interval",
-          chordName,
-          clickNumber
-        );
-        initialWait = waitBetween;
-        intervalsToSkip = 1;
+        return { initialWait, skipIntervals };
+      };
+
+      const { initialWait, skipIntervals } = getInitialWait();
+      if (skipIntervals !== undefined) {
+        intervalsToSkip = skipIntervals;
       }
 
       const currentClickPromise = getChordClickedPromise(chordName)?.then(
