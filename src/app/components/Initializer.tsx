@@ -31,10 +31,18 @@ export const Initializer: React.FC = () => {
 
   useEffect(() => {
     const remove = () => {
-      document.body.removeEventListener("scroll", handleFirstInteraction);
-      document.body.removeEventListener("keydown", handleFirstInteraction);
-      document.body.removeEventListener("click", handleFirstInteraction);
-      document.body.removeEventListener("touchstart", handleFirstInteraction);
+      document.body.removeEventListener("scroll", handleFirstInteraction, true);
+      document.body.removeEventListener(
+        "keydown",
+        handleFirstInteraction,
+        true
+      );
+      document.body.removeEventListener("click", handleFirstInteraction, true);
+      document.body.removeEventListener(
+        "touchstart",
+        handleFirstInteraction,
+        true
+      );
     };
 
     const handleFirstInteraction = async () => {
