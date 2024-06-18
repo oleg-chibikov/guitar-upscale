@@ -53,27 +53,25 @@ export const areOtherChordsStrumming = (chordName: string): boolean =>
 export const getOtherChordsStrummingPromises = (
   chordName: string
 ): Promise<void>[] => {
-  const promises = Array.from(strummingChordsMap)
+  return Array.from(strummingChordsMap)
     .map(([name, data]) => {
       if (name !== chordName) {
         return data.strummingPromiseAndResolve?.promise; // There are other chords strumming
       }
     })
     .filter((x) => x) as Promise<void>[];
-  return promises;
 };
 
 export const getOtherChordsGracePeriodPromises = (
   chordName: string
 ): Promise<void>[] => {
-  const promises = Array.from(strummingChordsMap)
+  return Array.from(strummingChordsMap)
     .map(([name, data]) => {
       if (name !== chordName) {
         return data.gracePeriodPromiseAndResolve?.promise; // There are other chords strumming
       }
     })
     .filter((x) => x) as Promise<void>[];
-  return promises;
 };
 
 export const isChordClicked = (chordName: string) =>
@@ -99,7 +97,7 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
   strummingChordsMap.set(chordName, {
     state: data ? data.state : StrummingState.Clicked,
     strummingPromiseAndResolve: data?.strummingPromiseAndResolve,
-    clickPromiseAndResolve: clickPromiseAndResolve,
+    clickPromiseAndResolve,
     gracePeriodPromiseAndResolve: data?.gracePeriodPromiseAndResolve,
     isClicked: true,
   });
