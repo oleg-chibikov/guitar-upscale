@@ -68,6 +68,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   stringOctaveNote,
   isHeader,
 }) => {
+  const typographyRef = useRef<HTMLParagraphElement>(null);
+  const blastRef = useRef<HTMLDivElement>(null);
   const { neck } = useSelector(selectSettings);
   const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
     useSelector(selectUi);
@@ -75,7 +77,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const hasTouchInput = useInputChecker();
   const [isFromPreviousChord, setIsFromPreviousChord] =
     useState<boolean>(false);
-  const [isNoteClicked, setIsNoteClicked] = useState<boolean>(false);
   const trackNumberRef = useRef<number>();
   const [isChordBeingDetected, setIsChordBeingDetected] =
     useState<boolean>(false);
@@ -87,8 +88,21 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   useEffect(() => {
     // Function to play note and start animation
     const animate = () => {
-      if (stringOctaveNote) {
-        setIsNoteClicked(true);
+      if (stringOctaveNote && typographyRef.current) {
+        typographyRef.current.classList.remove(
+          "fret-note-circle-animation-light",
+          "fret-note-circle-animation-dark"
+        );
+        void typographyRef.current.offsetWidth; // trigger reflow
+        typographyRef.current.classList.add(
+          "fret-note-circle-animation-" +
+            (theme === Theme.Light ? "light" : "dark")
+        );
+        if (blastRef.current) {
+          blastRef.current.classList.add("hidden");
+          void blastRef.current.offsetWidth; // trigger reflow
+          blastRef.current.classList.remove("hidden");
+        }
       }
     };
 
@@ -274,99 +288,99 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <Typography
             variant="body2"
-            className={`flex justify-center items-center font-mono
-${isHeader ? "" : "rounded-full w-7 h-7"}
-${
-  isChordBeingDetected
-    ? `border-4 shadow-glow ${
-        theme === Theme.Light
-          ? "border-chord_detection-light shadow-chord_detection_glow-light"
-          : "border-chord_detection-dark shadow-chord_detection_glow-dark"
-      }`
-    : ""
-}
-${
-  isScaleBeingDetected
-    ? `border-4 shadow-glow ${
-        theme === Theme.Light
-          ? "border-scale_detection-light shadow-scale_detection_glow-light"
-          : "border-scale_detection-dark shadow-scale_detection_glow-dark"
-      }`
-    : ""
-}
-${
-  !isHeader
-    ? isFromPreviousChord
-      ? `
-${theme === Theme.Light ? "text-background-light" : "text-background-dark"}
-${
-  isChordBeingDetected
-    ? ""
-    : `border-4 ${
-        theme === Theme.Light
-          ? "border-accent_stronger-light"
-          : "border-accent_stronger-dark"
-      }`
-}
-${
-  isScaleBeingDetected
-    ? ""
-    : `border-4 ${
-        theme === Theme.Light
-          ? "border-accent_strongest-light"
-          : "border-accent_strongest-dark"
-      }`
-}
-${
-  isColored
-    ? `${
-        theme === Theme.Light
-          ? "bg-previous_fret_marker_match-light"
-          : "bg-previous_fret_marker_match-dark"
-      }`
-    : `${
-        theme === Theme.Light
-          ? "bg-previous_fret_marker-light"
-          : "bg-previous_fret_marker-dark"
-      }`
-}`
-      : `${
-          theme === Theme.Light
-            ? "text-foreground-light"
-            : "text-foreground-dark"
-        }
-${
-  isColored
-    ? isBehindCapo
-      ? theme === Theme.Light
-        ? "bg-disabled_match-light"
-        : "bg-disabled_match-dark"
-      : theme === Theme.Light
-      ? "bg-fret_marker_match-light"
-      : "bg-fret_marker_match-dark"
-    : isBehindCapo
-    ? theme === Theme.Light
-      ? "bg-disabled-light"
-      : "bg-disabled-dark"
-    : theme === Theme.Light
-    ? "bg-fret_marker-light"
-    : "bg-fret_marker-dark"
-}`
-    : ""
-}
-${isHeader ? "text-xl" : "text-md"}
-${
-  isHeader
-    ? theme === Theme.Light
-      ? "text-foreground-light"
-      : "text-foreground-dark"
-    : ""
-}
-${
-  isNoteClicked
-    ? "fret-note-circle-animation-" + (theme === Theme.Light ? "light" : "dark")
-    : ""
-}`}
+            className={`flex justify-center items-center font-mono contain-content
+                      ${isHeader ? "" : "rounded-full w-7 h-7"}
+                      ${
+                        isChordBeingDetected
+                          ? `border-4 shadow-glow ${
+                              theme === Theme.Light
+                                ? "border-chord_detection-light shadow-chord_detection_glow-light"
+                                : "border-chord_detection-dark shadow-chord_detection_glow-dark"
+                            }`
+                          : ""
+                      }
+                      ${
+                        isScaleBeingDetected
+                          ? `border-4 shadow-glow ${
+                              theme === Theme.Light
+                                ? "border-scale_detection-light shadow-scale_detection_glow-light"
+                                : "border-scale_detection-dark shadow-scale_detection_glow-dark"
+                            }`
+                          : ""
+                      }
+                      ${
+                        !isHeader
+                          ? isFromPreviousChord
+                            ? `
+                      ${
+                        theme === Theme.Light
+                          ? "text-background-light"
+                          : "text-background-dark"
+                      }
+                      ${
+                        isChordBeingDetected
+                          ? ""
+                          : `border-4 ${
+                              theme === Theme.Light
+                                ? "border-accent_stronger-light"
+                                : "border-accent_stronger-dark"
+                            }`
+                      }
+                      ${
+                        isScaleBeingDetected
+                          ? ""
+                          : `border-4 ${
+                              theme === Theme.Light
+                                ? "border-accent_strongest-light"
+                                : "border-accent_strongest-dark"
+                            }`
+                      }
+                      ${
+                        isColored
+                          ? `${
+                              theme === Theme.Light
+                                ? "bg-previous_fret_marker_match-light"
+                                : "bg-previous_fret_marker_match-dark"
+                            }`
+                          : `${
+                              theme === Theme.Light
+                                ? "bg-previous_fret_marker-light"
+                                : "bg-previous_fret_marker-dark"
+                            }`
+                      }`
+                            : `${
+                                theme === Theme.Light
+                                  ? "text-foreground-light"
+                                  : "text-foreground-dark"
+                              }
+                      ${
+                        isColored
+                          ? isBehindCapo
+                            ? theme === Theme.Light
+                              ? "bg-disabled_match-light"
+                              : "bg-disabled_match-dark"
+                            : theme === Theme.Light
+                            ? "bg-fret_marker_match-light"
+                            : "bg-fret_marker_match-dark"
+                          : isBehindCapo
+                          ? theme === Theme.Light
+                            ? "bg-disabled-light"
+                            : "bg-disabled-dark"
+                          : theme === Theme.Light
+                          ? "bg-fret_marker-light"
+                          : "bg-fret_marker-dark"
+                      }`
+                          : ""
+                      }
+                      ${isHeader ? "text-xl" : "text-md"}
+                      ${
+                        isHeader
+                          ? theme === Theme.Light
+                            ? "text-foreground-light"
+                            : "text-foreground-dark"
+                          : ""
+                      }`}
+            ref={typographyRef}
             style={{
               transform: `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`,
             }}
@@ -375,28 +389,28 @@ ${
           </Typography>
           {/* Clickable area */}
           <div
-            className="absolute cursor-pointer z-20 bg-transparent h-9"
+            className="absolute contain-content cursor-pointer z-20 bg-transparent h-9"
             style={{ width }}
             {...clickAttrs}
           />
-          {isNoteClicked && (
+          {
             // Blast animation element
             <div
-              key={Date.now()} // Use a unique key to trigger re-render and start animation
+              ref={blastRef}
               style={{
                 width: `${5 * fretboardScaleX}px`, // Set width based on fretboard scaling
                 height: `${5 * fretboardScaleY}px`, // Set height based on fretboard scaling
               }}
               onAnimationEnd={() => {
-                setIsNoteClicked(false);
+                // TODO: does it work?
                 trackNumberRef.current = undefined; // reset color after the note has finished animation
               }}
               className={`${getColorClass(
                 trackNumberRef.current,
                 theme
-              )} opacity-0 animate-blast absolute z-10 rounded-full`}
+              )} opacity-0 contain-content animate-blast absolute z-10 rounded-full hidden`}
             />
-          )}
+          }
         </>
       )}
     </div>
