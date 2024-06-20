@@ -1,3 +1,4 @@
+import { HALF_BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
@@ -7,12 +8,11 @@ import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import {
-  HALF_BEATS_IN_BAR,
   currentHalfBeat,
-  isMainClockActive,
+  isMainClockActiveValue,
   waitForNextBar,
   waitForNextHalfBeat,
-} from "../engine/mainClock";
+} from "../engine/clock/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   baseNoteValue,
@@ -159,7 +159,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   return { isWaiting, handlePlay };
 };
 async function waitForStart(example: Example | undefined) {
-  if (isMainClockActive()) {
+  if (isMainClockActiveValue) {
     // if metronome or chord strumming is already playing then wait for the bar, other
     console.log(LOG_PREFIX + "Waiting for the next bar");
     if (example?.halfBeatShift !== undefined && example.halfBeatShift) {

@@ -1,12 +1,13 @@
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
+import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../../data/instruments";
 import { StringOctaveNote, getNoteText } from "../../data/notes";
+import { globalCurrentTick } from "../clock/mainClock";
 import { NOTE_COUNT } from "../generateNeckRepresentation";
-import { TICKS_IN_BEAT, globalCurrentTick } from "../mainClock";
 
 export enum NoteOrigin {
   Separate,

@@ -1,7 +1,8 @@
 import { TrackData } from "@/app/data/midiParser/trackData";
 import { Note, OctaveNote, initNotesArray } from "@/app/data/notes";
+import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
+import { microsecondsToBpm } from "@/app/engine/clock/mainClock";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { TICKS_IN_BEAT, microsecondsToBpm } from "@/app/engine/mainClock";
 import {
   ChannelEvent,
   Event,

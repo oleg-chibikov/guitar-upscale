@@ -1,6 +1,6 @@
 import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
+import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
 import { neckValue } from "@/app/store/settingsSlice";
 
 export const getWholeScale = (playFullString: boolean): EventsByTick => {

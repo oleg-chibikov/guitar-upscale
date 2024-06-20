@@ -1,11 +1,11 @@
 import { Note, StringOctaveNote } from "@/app/data/notes";
 import { ChordOrNote, LooperNoteEvent } from "@/app/engine/eventsByTick";
-import { ChordEventBus, NotePlayEventBus } from "../eventBus";
 import {
   getCurrentRelativeTick,
   waitForNextBar,
   waitForNextTick,
-} from "../mainClock";
+} from "../clock/mainClock";
+import { ChordEventBus, NotePlayEventBus } from "../eventBus";
 import { LooperPlayer, LooperPlayerOptions } from "./looperPlayer";
 
 // Mocking external dependencies

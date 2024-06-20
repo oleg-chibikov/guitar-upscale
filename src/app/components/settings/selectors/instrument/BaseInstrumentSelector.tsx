@@ -6,7 +6,7 @@ import {
   instrumentGroups,
 } from "@/app/data/instruments";
 import { Note } from "@/app/data/notes";
-import { beatToMilliseconds } from "@/app/engine/mainClock";
+import { beatToMilliseconds } from "@/app/engine/clock/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {

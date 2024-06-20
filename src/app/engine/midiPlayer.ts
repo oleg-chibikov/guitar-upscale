@@ -17,7 +17,7 @@ import {
 import { store } from "@/app/store/store";
 import { Dispatch } from "react";
 import { UnknownAction } from "redux";
-import { waitForTick } from "./mainClock";
+import { waitForTick } from "./clock/mainClock";
 
 const checkFinished = () => !isPlayingValue;
 

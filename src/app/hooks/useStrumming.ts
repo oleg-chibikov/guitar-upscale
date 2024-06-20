@@ -1,20 +1,22 @@
-import { useCallback, useRef, useState } from "react";
-import { ChordStrummingInterval } from "../data/chordStrummingInterval";
-import { ChordEventBus } from "../engine/eventBus";
 import {
   TICKS_IN_BAR,
   TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
+} from "@/app/engine/clock/clockConstants";
+import { useCallback, useRef, useState } from "react";
+import { ChordStrummingInterval } from "../data/chordStrummingInterval";
+import {
   bpmToMilliseconds,
   getCurrentRelativeTick,
-  isMainClockActive,
+  isMainClockActiveValue,
   waitForNextBar,
   waitForNextBeat,
   waitForNextHalfBar,
   waitForNextHalfBeat,
   waitForNextTick,
-} from "../engine/mainClock";
+} from "../engine/clock/mainClock";
+import { ChordEventBus } from "../engine/eventBus";
 import {
   STRUMMING_LOG_PREFIX,
   areOtherChordsStrumming,
@@ -216,7 +218,7 @@ export const useStrumming = (
     }
 
     // this is true when the clock is active (eg metronome or example is playing or recording is enabled)
-    const wasMainClockActiveWhenStrummingStarted = isMainClockActive();
+    const wasMainClockActiveWhenStrummingStarted = isMainClockActiveValue;
 
     if (isChordClicked(chordName)) {
       console.log(

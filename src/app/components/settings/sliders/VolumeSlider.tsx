@@ -1,7 +1,7 @@
 import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
 import { Note } from "@/app/data/notes";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { beatToMilliseconds } from "@/app/engine/mainClock";
+import { beatToMilliseconds } from "@/app/engine/clock/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { selectSettings, setVolume } from "@/app/store/settingsSlice";
 import React from "react";

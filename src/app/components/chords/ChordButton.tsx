@@ -9,11 +9,11 @@ import {
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
+import { getCurrentRelativeTick } from "@/app/engine/clock/mainClock";
 import {
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
-import { getCurrentRelativeTick } from "@/app/engine/mainClock";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {

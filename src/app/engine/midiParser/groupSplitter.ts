@@ -1,6 +1,6 @@
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { serializeOctaveNote } from "@/app/data/notes";
-import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
+import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 
 const TOLERANCE_TICKS = TICKS_IN_HALF_BEAT / 2; // we assume a chord consists of notes that are close to each other within half beat
 

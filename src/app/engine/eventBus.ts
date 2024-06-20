@@ -8,8 +8,8 @@ import {
   tempoBpmValue,
   volumeValue,
 } from "../store/settingsSlice";
+import { beatToMilliseconds } from "./clock/mainClock";
 import { currentlyRecordingLooperChannel } from "./looper/looperShared";
-import { beatToMilliseconds } from "./mainClock";
 import { playNote } from "./sound/soundProvider";
 
 export const DEFAULT_NOTE_TRACK_NUMBER = 0;

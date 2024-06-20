@@ -30,16 +30,16 @@ import {
 } from "@/app/engine/chords/chordLookupBuilder";
 import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
 import {
-  currentlyPlayingLooperChannels,
-  currentlyRecordingLooperChannel,
-} from "../engine/looper/looperShared";
-import {
-  isMainClockActive,
+  isMainClockActiveValue,
   resolveNextTick,
   startInterval,
   stopInterval,
   waitForNextHalfBeat,
-} from "../engine/mainClock";
+} from "../engine/clock/mainClock";
+import {
+  currentlyPlayingLooperChannels,
+  currentlyRecordingLooperChannel,
+} from "../engine/looper/looperShared";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import { isAnythingStrumming } from "../engine/strummingState";
@@ -339,7 +339,7 @@ export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
 export const toggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
-    if (!isMainClockActive()) {
+    if (!isMainClockActiveValue) {
       console.log("Clock not active - starting it");
       startInterval(true);
     }

@@ -5,6 +5,7 @@ import {
   serializeStringOctaveNote,
 } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
+import { getCurrentRelativeTick } from "@/app/engine/clock/mainClock";
 import {
   ClearNoteMetadata,
   NoteMetadata,
@@ -12,7 +13,6 @@ import {
   NoteToFretMarkerEventMap,
 } from "@/app/engine/eventBus";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { getCurrentRelativeTick } from "@/app/engine/mainClock";
 import { sleep } from "@/app/helpers/sleep";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {

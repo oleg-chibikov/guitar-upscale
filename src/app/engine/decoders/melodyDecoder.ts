@@ -1,8 +1,8 @@
 import { TrackWithNumber } from "@/app/data/example";
 import { Note, OctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
+import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { TICKS_IN_HALF_BEAT } from "@/app/engine/mainClock";
 import {
   baseNoteValue,
   neckValue,
