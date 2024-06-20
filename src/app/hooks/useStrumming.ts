@@ -1,4 +1,15 @@
 import {
+  AUTH_PANEL_ID,
+  CHORDS_VIEW_EXPANDER_ID,
+  CHORDS_VIEW_ID,
+  CONTROL_PANEL_EXPANDER_ID,
+  CONTROL_PANEL_ID,
+  LOOPER_PANEL_ID,
+  PLAY_PANEL_ID,
+  SETTINGS_PANEL_ID,
+  STRUMMING_SETTINGS_PANEL_ID,
+} from "@/app/data/elementIds";
+import {
   TICKS_IN_BAR,
   TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
@@ -44,6 +55,18 @@ import {
   tempoBpmValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
+
+const stopStrummingElementIds = [
+  CHORDS_VIEW_ID,
+  CHORDS_VIEW_EXPANDER_ID,
+  CONTROL_PANEL_ID,
+  CONTROL_PANEL_EXPANDER_ID,
+  STRUMMING_SETTINGS_PANEL_ID,
+  LOOPER_PANEL_ID,
+  AUTH_PANEL_ID,
+  PLAY_PANEL_ID,
+  SETTINGS_PANEL_ID,
+];
 
 const GRACE_INTERVALS = 2;
 
@@ -130,7 +153,7 @@ export const useStrumming = (
       while (target && target !== document) {
         const id = (target as HTMLElement)?.id;
         // keep playing chord when clicking notes simultaneously
-        if (id === "chords-view") {
+        if (stopStrummingElementIds.includes(id)) {
           try {
             console.log(
               STRUMMING_LOG_PREFIX + "Chord press released",

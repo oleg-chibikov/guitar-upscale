@@ -2,17 +2,22 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
+import { WithId } from "@/app/helpers/withId";
 import { WithStyle } from "@/app/helpers/withStyle";
 import { selectUi } from "@/app/store/uiSlice";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 
 export const Panel: FC<
-  WithChildren & WithClassName & WithStyle & { enableReverse?: boolean }
-> = ({ children, className, style, enableReverse = false }) => {
+  WithChildren &
+    WithClassName &
+    WithStyle &
+    WithId & { enableReverse?: boolean }
+> = ({ children, className, style, id, enableReverse = false }) => {
   const { theme, chordsDisplayMode } = useSelector(selectUi);
   return (
     <section
+      id={id}
       style={style}
       className={`${className ? `${className} ` : ""}border-2 ${
         theme === Theme.Light

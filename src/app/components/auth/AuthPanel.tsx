@@ -1,4 +1,5 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import { AUTH_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
@@ -33,6 +34,7 @@ export const AuthPanel: React.FC = () => {
 
   return (
     <div
+      id={AUTH_PANEL_ID}
       className={`fixed flex flex-col justify-center ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       }

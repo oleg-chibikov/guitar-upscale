@@ -1,3 +1,4 @@
+import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Alert, Slide } from "@mui/material";
@@ -21,7 +22,7 @@ export const StrummingSettings: FC = () => {
       unmountOnExit
     >
       <section
-        id="strumming-settings"
+        id={STRUMMING_SETTINGS_PANEL_ID}
         className={"z-40 fixed bottom-1 left-1/2 pointer-events-none"}
       >
         <div

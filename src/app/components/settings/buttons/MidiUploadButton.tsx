@@ -55,7 +55,6 @@ export const MidiUploadButton: React.FC = () => {
         ref={ref}
         className="hidden"
         accept=".mid"
-        id="icon-button-file"
         type="file"
         onChange={handleFileChange}
       />

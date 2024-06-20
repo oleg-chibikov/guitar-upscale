@@ -1,4 +1,5 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import { SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
@@ -25,7 +26,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
   return (
     <Slide direction="down" in={settingsExpanded} mountOnEnter unmountOnExit>
       <section
-        id="settings"
+        id={SETTINGS_PANEL_ID}
         className={`flex flex-col opacity-95 overflow-auto overscroll-contain fixed ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"

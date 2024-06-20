@@ -1,4 +1,5 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
+import { FRETBOARD } from "@/app/data/elementIds";
 import { Skin } from "@/app/data/skin";
 import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
@@ -164,7 +165,7 @@ export const Fretboard: React.FC = () => {
             // }}
           />
         </div>
-        <div id="fretboard">
+        <div id={FRETBOARD}>
           {/* Header */}
           <Fretline
             isHeader

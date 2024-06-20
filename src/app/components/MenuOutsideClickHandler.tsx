@@ -1,3 +1,8 @@
+import {
+  CHORDS_VIEW_ID,
+  SETTINGS_PANEL_ID,
+  STRUMMING_SETTINGS_PANEL_ID,
+} from "@/app/data/elementIds";
 import { FC, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,14 +24,14 @@ export const MenuOutsideClickHandler: FC = () => {
       // if the user clicks on any button or on chords - don't hide the settings, use standard action for this button
       while (target && target !== document) {
         const id = (target as HTMLElement)?.getAttribute("id");
-        if (target.nodeName === "BUTTON" || id === "chords-view") {
+        if (target.nodeName === "BUTTON" || id === CHORDS_VIEW_ID) {
           isInsideButton = true;
           break;
         }
-        if (id === "settings") {
+        if (id === SETTINGS_PANEL_ID) {
           isInsideSettings = true;
           break;
-        } else if (id === "strumming-settings") {
+        } else if (id === STRUMMING_SETTINGS_PANEL_ID) {
           isInsideStrummingSettings = true;
           break;
         }

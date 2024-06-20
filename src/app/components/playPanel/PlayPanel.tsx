@@ -4,6 +4,7 @@ import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
 import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
+import { PLAY_PANEL_ID } from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
 import dynamic from "next/dynamic";
@@ -19,7 +20,7 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
   premiumComponents,
 }) => {
   return (
-    <Panel>
+    <Panel id={PLAY_PANEL_ID}>
       <PreviousEventButton />
       {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       <PauseButton />

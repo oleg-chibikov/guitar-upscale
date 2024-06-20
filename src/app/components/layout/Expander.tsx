@@ -1,14 +1,14 @@
 import { WithChildren } from "@/app/helpers/withChildren";
+import { WithId } from "@/app/helpers/withId";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import { FC } from "react";
 
-interface ExpanderProps extends WithChildren {
+interface ExpanderProps extends WithChildren, WithId {
   expanded: boolean;
   handleExpansion: (event: React.SyntheticEvent, expanded: boolean) => void;
-  id: string;
   title: string;
   reverseIcon?: boolean;
   expandOnlyOnIcon?: boolean;

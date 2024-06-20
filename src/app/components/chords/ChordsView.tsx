@@ -5,6 +5,7 @@ import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
+import { CHORDS_VIEW_EXPANDER_ID, CHORDS_VIEW_ID } from "@/app/data/elementIds";
 import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
@@ -95,7 +96,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
 
   return (
     <section
-      id="chords-view"
+      id={CHORDS_VIEW_ID}
       className={`opacity-95 fixed touch-none ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } z-20 bottom-1 ${
@@ -108,7 +109,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
         expanded={chordsExpanded}
         expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
         handleExpansion={handleExpansion}
-        id="chords-view-expander"
+        id={CHORDS_VIEW_EXPANDER_ID}
         title="Chords"
       >
         <section

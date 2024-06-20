@@ -1,0 +1,10 @@
+export const PLAY_PANEL_ID = "play-panel";
+export const STRUMMING_SETTINGS_PANEL_ID = "strumming-settings";
+export const SETTINGS_PANEL_ID = "settings-panel";
+export const CHORDS_VIEW_ID = "chords-view";
+export const CHORDS_VIEW_EXPANDER_ID = "chords-view-expander";
+export const CONTROL_PANEL_ID = "control-panel";
+export const CONTROL_PANEL_EXPANDER_ID = "control-panel-expander";
+export const LOOPER_PANEL_ID = "looper-panel";
+export const AUTH_PANEL_ID = "auth-panel";
+export const FRETBOARD = "fretboard";

@@ -6,6 +6,10 @@ import { MetronomeVolumeControl } from "@/app/components/settings/valueModalCont
 import { TempoControl } from "@/app/components/settings/valueModalControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueModalControls/VolumeControl";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
+import {
+  CONTROL_PANEL_EXPANDER_ID,
+  CONTROL_PANEL_ID,
+} from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi, setControlPanelExpanded } from "@/app/store/uiSlice";
 import React from "react";
@@ -36,10 +40,10 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
         reverseIcon
         expanded={controlPanelExpanded}
         handleExpansion={handleExpansion}
-        id="control-panel-expander"
+        id={CONTROL_PANEL_EXPANDER_ID}
         title="Control Panel"
       >
-        <Panel enableReverse>
+        <Panel enableReverse id={CONTROL_PANEL_ID}>
           <ScaleAndGroupSelector />
           <BaseNoteAndTuningSelector />
           <ButtonContainer premiumComponents={premiumComponents} />

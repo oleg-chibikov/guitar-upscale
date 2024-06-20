@@ -1,12 +1,13 @@
 import { Theme } from "@/app/data/theme";
 import { WithClassName } from "@/app/helpers/withClassName";
+import { WithId } from "@/app/helpers/withId";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
 
-export interface IconButtonProps extends WithClassName {
+export interface IconButtonProps extends WithClassName, WithId {
   onPress: () => void;
   textContent?: string;
   icon: ReactNode;
@@ -14,7 +15,6 @@ export interface IconButtonProps extends WithClassName {
   activeBg?: string;
   inactiveBg?: string;
   tooltip: string;
-  id?: string;
   disabled?: boolean;
   allowHandlerInDisabledState?: boolean;
 }

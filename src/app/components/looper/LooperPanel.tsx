@@ -4,6 +4,7 @@ import { Panel } from "@/app/components/layout/Panel";
 import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
 import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
 import { SaveLooperRecordingButton } from "@/app/components/looper/SaveLooperRecordingButton";
+import { LOOPER_PANEL_ID } from "@/app/data/elementIds";
 import {
   LooperState,
   canAddChannel,
@@ -29,7 +30,7 @@ export const LooperPanel: React.FC = () => {
     stopMetronomeIfNeeded(dispatch);
   }, [dispatch, guitarSettingsUpdatedTrigger]);
   return (
-    <Panel>
+    <Panel id={LOOPER_PANEL_ID}>
       <RemoveLooperChannelButton
         setState={setState}
         disabled={!canRemoveChannel()}
