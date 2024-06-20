@@ -17,7 +17,7 @@ import {
   instrumentValue,
   reverbStrengthValue,
 } from "../store/settingsSlice";
-import { selectUi } from "../store/uiSlice";
+import { initUi, selectUi } from "../store/uiSlice";
 
 export const Initializer: React.FC = () => {
   const { theme } = useSelector(selectUi);
@@ -27,6 +27,7 @@ export const Initializer: React.FC = () => {
 
   useEffect(() => {
     dispatch(init());
+    dispatch(initUi());
   }, [dispatch]);
 
   useEffect(() => {

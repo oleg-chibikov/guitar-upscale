@@ -86,6 +86,9 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    initUi: (state) => {
+      themeValue = state.theme;
+    },
     setNoteDisplayMode: (state, action: PayloadAction<NoteDisplayMode>) => {
       state.noteDisplayMode = action.payload;
     },
@@ -196,6 +199,7 @@ export const uiSlice = createSlice({
 });
 
 export const {
+  initUi,
   setNoteDisplayMode,
   setChordsDisplayMode,
   setSkin,
