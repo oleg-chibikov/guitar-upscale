@@ -83,7 +83,6 @@ export const startInterval = (afresh: boolean) => {
   }
 
   isMainClockActiveValue = true;
-  onTick(); // first tick starts immediately
 
   worker.postMessage({ type: "start", tempoBpm: tempoBpmValue });
 };

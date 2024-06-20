@@ -9,6 +9,7 @@ import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
+import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import { RefObject, useEffect, useRef, useState } from "react";
@@ -139,6 +140,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
                   noteChordMode={noteChordMode}
                   chordName={title}
                   onStrummingClickedChange={(value) => {
+                    if (!isMobileDeviceValue) {
+                      return;
+                    }
                     const isStrummingClicked = value || isAnyStrummingClicked();
                     toggleOverflow(isStrummingClicked, ref);
                     toggleOverflow(isStrummingClicked, mainRef);

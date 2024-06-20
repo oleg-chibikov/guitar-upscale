@@ -1,6 +1,6 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote, getNoteText } from "@/app/data/notes";
-import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { Soundfont, SplendidGrandPiano } from "smplr";
 
 export const playSound = (
@@ -40,7 +40,7 @@ export const loadInstrument = async (
     });
   }
 
-  if (reverbStrength && !isMobileDevice()) {
+  if (reverbStrength && !isMobileDeviceValue) {
     const Reverb = (await import("smplr")).Reverb;
     // very glitchy on the phone but works fine on web
     soundfont.output.addEffect("reverb", new Reverb(context), reverbStrength);

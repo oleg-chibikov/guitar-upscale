@@ -1,4 +1,5 @@
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
+// Web worker is used so that no other code interrupts the interval. Without it sometimes the interval slows down, but it is a time-critical thing and should be as precise as possible
 
 const bpmToMilliseconds = (bpm: number): number => 60_000 / bpm / 2;
 
@@ -22,6 +23,7 @@ self.onmessage = (event: MessageEvent<WorkerMessage>) => {
 
 const startInterval = (tempoBpm: number) => {
   stopInterval();
+  onTick(); // first tick starts immediately
   timer = setInterval(onTick, bpmToMilliseconds(tempoBpm) / TICKS_IN_HALF_BEAT);
 };
 

@@ -1,5 +1,5 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
-import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
 import { selectUi } from "@/app/store/uiSlice";
@@ -50,7 +50,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
         }`}
       >
         <OpenSettingsButton />
-        {!isMobileDevice() && <FullscreenButton />}
+        {!isMobileDeviceValue && <FullscreenButton />}
         {(premiumComponents.get("chordDetection") as ReactNode) ?? (
           <DisabledDetectChordButton />
         )}

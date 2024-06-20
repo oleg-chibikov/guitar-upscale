@@ -1,6 +1,6 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { isMobileDevice } from "@/app/helpers/deviceHelper";
+import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Slide } from "@mui/material";
@@ -74,7 +74,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           <ChordNotesToPlaySlider />
           <VolumeSlider />
           <MetronomeVolumeSlider />
-          {!isMobileDevice() &&
+          {!isMobileDeviceValue &&
             (premiumComponents.get("reverbStrength") as ReactNode)}
         </div>
       </section>
