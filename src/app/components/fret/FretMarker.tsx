@@ -227,7 +227,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           );
         } else {
           classList.add(
-            theme === Theme.Light
+            themeValue === Theme.Light
               ? "bg-fret_marker_match-light"
               : "bg-fret_marker_match-dark"
           );
@@ -241,7 +241,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           );
         } else {
           classList.add(
-            theme === Theme.Light
+            themeValue === Theme.Light
               ? "bg-fret_marker-light"
               : "bg-fret_marker-dark"
           );
