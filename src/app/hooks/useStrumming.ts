@@ -204,12 +204,12 @@ export const useStrumming = (
     };
 
     const setClicked = (value: boolean) => {
-      setClickedState(value);
       if (value) {
         registerChordClick(chordName, clickNumber);
       } else {
         releaseChordClick(chordName, clickNumber);
       }
+      setClickedState(value);
     };
 
     const setPlaying = (value: boolean) => {
