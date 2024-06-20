@@ -276,7 +276,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             }
       }
       className={`flex items-center justify-center content-center text-center w-16 font-mono transition-all duration-100 ease-in-out transform origin-center
-      ${useSharpChords ? "text-xs h-5" : "text-md h-8"}
+      ${useSharpChords ? "text-xs h-6" : "text-md h-8"}
       ${
         isDisabled
           ? theme === Theme.Light
