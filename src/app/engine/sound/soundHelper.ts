@@ -22,7 +22,7 @@ export const loadInstrument = async (
   instrument: Instrument,
   reverbStrength: number
 ) => {
-  const key = instrument + "_" + reverbStrength;
+  const key = `${instrument}_${reverbStrength}`;
   let soundfont = soundfontMap.get(key);
   if (soundfont) {
     return soundfont;

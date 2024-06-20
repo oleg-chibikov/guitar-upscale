@@ -6,8 +6,8 @@ import {
   instrumentGroups,
 } from "@/app/data/instruments";
 import { Note } from "@/app/data/notes";
-import { beatToMilliseconds } from "@/app/engine/clock/mainClock";
 import { playNote } from "@/app/engine/sound/soundProvider";
+import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   reverbStrengthValue,

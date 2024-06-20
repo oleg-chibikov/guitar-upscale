@@ -1,3 +1,4 @@
+import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
@@ -8,7 +9,6 @@ import {
   tempoBpmValue,
   volumeValue,
 } from "../store/settingsSlice";
-import { beatToMilliseconds, currentTick } from "./clock/mainClock";
 import { currentlyRecordingLooperChannel } from "./looper/looperShared";
 import { playNote } from "./sound/soundProvider";
 
@@ -148,11 +148,7 @@ export const clearPreviousChords = () => {
 };
 
 ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
-  console.log(
-    "EventBus: Chord play requested. Current tick: %d",
-    currentTick,
-    chordWithMetadata
-  );
+  console.log("EventBus: Chord play requested", chordWithMetadata);
 
   // don't check for the same chord here - we need to clear the previous variation of the same chord (they might differ)
   clearPreviousChords();

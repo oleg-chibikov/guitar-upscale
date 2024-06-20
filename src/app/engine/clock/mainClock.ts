@@ -8,17 +8,6 @@ import { createPromise } from "@/app/helpers/promiseHelper";
 import { tempoBpmValue } from "../../store/settingsSlice";
 import { MetronomeEventBus } from "../eventBus";
 
-const MILLISECONDS_PER_MINUTE = 60_000;
-const MICROSECONDS_PER_MINUTE = MILLISECONDS_PER_MINUTE * 1000;
-
-export const bpmToMilliseconds = (bpm: number): number => 60_000 / bpm / 2;
-
-export const microsecondsToBpm = (microsecondsPerBeat: number): number =>
-  Math.floor(MICROSECONDS_PER_MINUTE / microsecondsPerBeat);
-
-export const beatToMilliseconds = (bpm: number): number =>
-  bpmToMilliseconds(bpm) * 4;
-
 const { waitFor: waitForNextTick, recreate: recreateNextTick } =
   createPromise();
 const { waitFor: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
@@ -45,7 +34,10 @@ export {
   waitForNextTick,
 };
 
-const worker = new Worker(new URL("./mainClockWorker.ts", import.meta.url));
+const worker =
+  typeof window !== "undefined"
+    ? new Worker(new URL("./mainClockWorker.ts", import.meta.url))
+    : undefined;
 
 export let currentTick = 0; // this tick is reset on every MAX_TICKS
 export let globalCurrentTick = 0; // this tick keeps incrementing while clock is active
@@ -61,7 +53,7 @@ export const getCurrentRelativeTick = () =>
   globalCurrentTick - globalCurrentLastBarTick;
 
 export const stopInterval = (resolvePreviousPromises: boolean) => {
-  worker.postMessage({ type: "stop", tempoBpm: tempoBpmValue });
+  worker?.postMessage({ type: "stop", tempoBpm: tempoBpmValue });
   isMainClockActiveValue = false;
   if (resolvePreviousPromises) {
     // any wait for the next interval will finish straight away
@@ -84,7 +76,7 @@ export const startInterval = (afresh: boolean) => {
 
   isMainClockActiveValue = true;
 
-  worker.postMessage({ type: "start", tempoBpm: tempoBpmValue });
+  worker?.postMessage({ type: "start", tempoBpm: tempoBpmValue });
 };
 
 export const waitForTick = async (
@@ -156,9 +148,11 @@ const onTick = () => {
   globalCurrentTick++;
 };
 
-worker.onmessage = (event: MessageEvent) => {
-  const { type } = event.data;
-  if (type === "tick") {
-    onTick();
-  }
-};
+if (worker) {
+  worker.onmessage = (event: MessageEvent) => {
+    const { type } = event.data;
+    if (type === "tick") {
+      onTick();
+    }
+  };
+}

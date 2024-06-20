@@ -15,10 +15,10 @@ import {
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
+import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef, useState } from "react";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import {
-  bpmToMilliseconds,
   getCurrentRelativeTick,
   isMainClockActiveValue,
   waitForNextBar,
