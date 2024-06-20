@@ -81,7 +81,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         example = await getRandomScaleExample();
         const tempo = example?.tempo;
         if (tempo !== undefined && tempo !== tempoBpmValue) {
-          dispatch(setTempoBpm({ tempo: tempo, updateInterval: false }));
+          dispatch(setTempoBpm({ tempo: tempo, updateInterval: true }));
         }
       } else {
         await import("@/app/engine/decoders/scaleDecoder");

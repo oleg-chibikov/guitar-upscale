@@ -116,10 +116,11 @@ const reset = () => {
 };
 
 const onTick = () => {
-  const isBar = currentTick === TICKS_IN_BAR; // Bar is every 8 * BPM_MODIFIER ticks
+  const isBar = currentTick % TICKS_IN_BAR === 0; // Bar is every 8 * BPM_MODIFIER ticks
   const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
   const isBeat = currentTick % TICKS_IN_BEAT === 0;
   const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
+  MetronomeEventBus.next({ isBar, isBeat, tick: currentTick });
 
   if (isBar) {
     reset();
@@ -151,7 +152,6 @@ const onTick = () => {
     currentHalfBeat++;
   }
   recreateNextTick();
-  MetronomeEventBus.next({ isBar, isBeat, tick: currentTick });
   currentTick++;
   globalCurrentTick++;
 };
