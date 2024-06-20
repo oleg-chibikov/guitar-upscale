@@ -22,7 +22,7 @@ import {
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
 interface ChordButtonProps {
@@ -38,22 +38,145 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   isHidden,
   onStrummingClickedChange,
 }) => {
+  const elementRef = useRef<HTMLUListElement>(null);
   const hasTouchInput = useInputChecker();
   const isDisabled = !noteChordMode.variations.length;
+  const isClickedRef = useRef<boolean>(false);
+  const isPlayingRef = useRef<boolean>(false);
+  const isGracePeriodRef = useRef<boolean>(false);
 
-  const [wasPlayedLast, setWasPlayedLast] = useState<boolean>(false);
-  const [animate, setAnimate] = useState(false);
-  const { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef } =
-    useStrumming(chordName, isDisabled, hasTouchInput);
+  const toggleCursor = () => {
+    const element = elementRef.current;
+    if (!element) {
+      return;
+    }
+    const classList = element.classList;
+    classList.remove("cursor-progress", "cursor-pointer");
+    if (isClickedRef.current && !isPlayingRef.current) {
+      classList.add("cursor-progress");
+    } else if (isPlayingRef.current || (!isDisabled && !isClickedRef.current)) {
+      classList.add("cursor-pointer");
+    }
+  };
 
-  useEffect(() => {
+  const toggleBorder = () => {
+    const element = elementRef.current;
+    if (!element) {
+      return;
+    }
+    const classList = element.classList;
+    classList.remove(
+      "border-2",
+      "border-accent_stronger-light",
+      "border-accent_stronger-dark",
+      "border-accent_strongest-light",
+      "border-accent_strongest-dark",
+      "border-accent-light",
+      "border-accent-dark"
+    );
+    if (
+      isClickedRef.current ||
+      isPlayingRef.current ||
+      isGracePeriodRef.current
+    ) {
+      classList.add("border-2");
+
+      if (isGracePeriodRef.current) {
+        classList.add(
+          theme === Theme.Light
+            ? "border-accent_stronger-light"
+            : "border-accent_stronger-dark"
+        );
+      } else if (isPlayingRef.current) {
+        classList.add(
+          theme === Theme.Light
+            ? "border-accent_strongest-light"
+            : "border-accent_strongest-dark"
+        );
+      } else {
+        classList.add(
+          theme === Theme.Light ? "border-accent-light" : "border-accent-dark"
+        );
+      }
+    }
+  };
+
+  const toggleBackground = () => {
+    const element = elementRef.current;
+    if (!element) {
+      return;
+    }
+    const classList = element.classList;
+    classList.remove(
+      "bg-button_pressed-light",
+      "bg-button_pressed-dark",
+      "bg-secondary-light",
+      "bg-secondary-dark",
+      "bg-button-light",
+      "bg-button-dark"
+    );
+    if (isClickedRef.current) {
+      classList.add(
+        theme === Theme.Light
+          ? "bg-button_pressed-light"
+          : "bg-button_pressed-dark"
+      );
+    } else if (wasPlayedLastRef.current) {
+      classList.add(
+        theme === Theme.Light ? "bg-secondary-light" : "bg-secondary-dark"
+      );
+    } else {
+      classList.add(
+        theme === Theme.Light ? "bg-button-light" : "bg-button-dark"
+      );
+    }
+  };
+
+  const onClickedChange = (value: boolean) => {
+    isClickedRef.current = value;
     // let the parent component know that the strumming clicked state has changed
-    onStrummingClickedChange(isClicked);
-  }, [isClicked]);
+    onStrummingClickedChange(value);
+    toggleBorder();
+    toggleCursor();
+    toggleBackground();
+  };
+
+  const onPlayingChange = (value: boolean) => {
+    isPlayingRef.current = value;
+    toggleBorder();
+    toggleCursor();
+  };
+
+  const onGracePeriodChange = (value: boolean) => {
+    isGracePeriodRef.current = value;
+    toggleBorder();
+  };
+
+  const wasPlayedLastRef = useRef<boolean>(false);
+  const { onChordPress, isAlternateRef } = useStrumming(
+    chordName,
+    isDisabled,
+    hasTouchInput,
+    onClickedChange,
+    onPlayingChange,
+    onGracePeriodChange
+  );
 
   const { theme, useSharpChords } = useSelector(selectUi);
 
   useEffect(() => {
+    const animate = () => {
+      if (!elementRef.current) {
+        return;
+      }
+
+      elementRef.current.classList.add("scale-50");
+      void elementRef.current.offsetWidth; // trigger reflow
+      setTimeout(() => {
+        elementRef.current?.classList.remove("scale-50");
+      }, 150);
+    };
+
     const handleChordEvent = async (metadata: ChordMetadata) => {
       if (isDisabled) {
         return;
@@ -61,7 +184,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       if (metadata.clear === true) {
         console.log("Clear previous chord marker: " + chordName);
-        setWasPlayedLast(false);
+        wasPlayedLastRef.current = false;
+        toggleBackground();
         return;
       }
 
@@ -79,10 +203,11 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         chordName,
         getCurrentRelativeTick()
       );
-      setWasPlayedLast(true);
+      wasPlayedLastRef.current = true;
+      toggleBackground();
+
       // Start the animation sequence
-      setAnimate(true);
-      setTimeout(() => setAnimate(false), 150);
+      animate();
 
       const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
       const params: ChordPlayParameters = {
@@ -127,6 +252,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   return (
     <ul
+      ref={elementRef}
       onTouchStartCapture={
         hasTouchInput
           ? async () => {
@@ -135,59 +261,26 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           : undefined
       }
       onMouseDownCapture={
-        !hasTouchInput
-          ? async () => {
+        hasTouchInput
+          ? undefined
+          : async () => {
               await onChordPress();
             }
-          : undefined
       }
-      className={`text-center w-16 font-mono ${
-        useSharpChords ? "text-xs h-5" : "text-md h-8"
-      } ${
-        (isPlaying || isGracePeriod || isClicked) && "border-2"
-      } items-center justify-center content-center ${
-        isGracePeriod
-          ? theme === Theme.Light
-            ? "border-accent_stronger-light"
-            : " border-accent_stronger-dark"
-          : isPlaying
-          ? theme === Theme.Light
-            ? "border-accent_strongest-light"
-            : " border-accent_strongest-dark"
-          : isClicked
-          ? theme === Theme.Light
-            ? "border-accent-light"
-            : "border-accent-dark"
-          : undefined
-      } ${
+      className={`flex items-center justify-center content-center text-center w-16 font-mono transition-transform transform origin-center
+      ${useSharpChords ? "text-xs h-5" : "text-md h-8"}
+      ${
         isDisabled
           ? theme === Theme.Light
             ? "bg-disabled-light text-gray-500"
             : "bg-disabled-dark text-gray-500"
-          : animate
-          ? `scale-50 ${
-              theme === Theme.Light
-                ? "bg-button_pressed-light"
-                : "bg-button_pressed-dark"
-            }`
-          : `scale-100 ${
-              isClicked && !isPlaying
-                ? "cursor-progress"
-                : isPlaying || (!isDisabled && !isClicked)
-                ? " cursor-pointer"
-                : undefined
-            } ${
-              theme === Theme.Light
-                ? wasPlayedLast
-                  ? "bg-secondary-light"
-                  : "bg-button-light"
-                : wasPlayedLast
-                ? "bg-secondary-dark"
-                : "bg-button-dark"
-            }`
-      } ${
+          : theme === Theme.Light
+          ? "bg-button-light"
+          : "bg-button-dark"
+      }
+      ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
-      } transition-transform transform origin-center`}
+      }`}
     >
       {chordName}
     </ul>

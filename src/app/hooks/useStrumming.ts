@@ -16,7 +16,7 @@ import {
   TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import {
   getCurrentRelativeTick,
@@ -93,11 +93,11 @@ const getWaitBetweenFunc = () => {
 export const useStrumming = (
   chordName: string,
   isDisabled: boolean,
-  hasTouchInput: boolean
+  hasTouchInput: boolean,
+  setClickedState: (value: boolean) => void,
+  setPlayingState: (value: boolean) => void,
+  setGracePeriodState: (value: boolean) => void
 ) => {
-  const [isClicked, setIsClicked] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
 
@@ -204,7 +204,7 @@ export const useStrumming = (
     };
 
     const setClicked = (value: boolean) => {
-      setIsClicked(value);
+      setClickedState(value);
       if (value) {
         registerChordClick(chordName, clickNumber);
       } else {
@@ -217,9 +217,9 @@ export const useStrumming = (
         markChordAsStrumming(chordName, clickNumber);
       } else {
         finishChordGracePeriod(chordName, clickNumber);
-        setIsGracePeriod(false);
+        setGracePeriodState(false);
       }
-      setIsPlaying(value);
+      setPlayingState(value);
     };
 
     console.log(STRUMMING_LOG_PREFIX + "Pressed chord", chordName, clickNumber);
@@ -495,7 +495,7 @@ export const useStrumming = (
           }
 
           if (chordCustomStrummingWaitForPatternFinishValue) {
-            setIsGracePeriod(true);
+            setGracePeriodState(true);
             startChordGracePeriod(chordName, clickNumber);
             // Wait GRACE_INTERVALS intervals - This gives additional opportunity to press another chord and repeat the pattern
             if (!areOtherChordsStrumming(chordName)) {
@@ -558,5 +558,5 @@ export const useStrumming = (
     }
   };
 
-  return { onChordPress, isPlaying, isClicked, isGracePeriod, isAlternateRef };
+  return { onChordPress, isAlternateRef };
 };
