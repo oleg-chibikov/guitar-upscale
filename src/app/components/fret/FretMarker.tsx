@@ -22,7 +22,7 @@ import {
   scaleIsBeingDetectedValue,
   selectSettings,
 } from "@/app/store/settingsSlice";
-import { selectUi } from "@/app/store/uiSlice";
+import { selectUi, themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -88,22 +88,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   useEffect(() => {
     // Function to play note and start animation
     const animate = () => {
-      if (stringOctaveNote && typographyRef.current) {
-        typographyRef.current.classList.remove(
-          "fret-note-circle-animation-light",
-          "fret-note-circle-animation-dark"
-        );
-        void typographyRef.current.offsetWidth; // trigger reflow
-        typographyRef.current.classList.add(
-          "fret-note-circle-animation-" +
-            (theme === Theme.Light ? "light" : "dark")
-        );
-        if (blastRef.current) {
-          blastRef.current.classList.add("hidden");
-          void blastRef.current.offsetWidth; // trigger reflow
-          blastRef.current.classList.remove("hidden");
-        }
+      if (!(stringOctaveNote && typographyRef.current)) {
+        return;
       }
+      typographyRef.current.classList.remove(
+        "fret-note-circle-animation-light",
+        "fret-note-circle-animation-dark"
+      );
+      void typographyRef.current.offsetWidth; // trigger reflow
+      typographyRef.current.classList.add(
+        "fret-note-circle-animation-" +
+          (themeValue === Theme.Light ? "light" : "dark")
+      );
+      if (!blastRef.current) {
+        return;
+      }
+      blastRef.current.classList.add("hidden");
+      void blastRef.current.offsetWidth; // trigger reflow
+      blastRef.current.classList.remove("hidden");
     };
 
     if (stringOctaveNote) {
@@ -111,58 +113,58 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       NoteToFretMarkerEventMap.set(key, async (metadata) => {
         if ((metadata as ClearNoteMetadata).clearChordMarker === true) {
           setIsFromPreviousChord(false);
-        } else {
-          const noteMetadata = metadata as NoteMetadata;
-          if (
-            chordIsBeingDetectedValue &&
-            stringOctaveNote !== null &&
-            noteMetadata.skipChordDetection !== true
-          ) {
-            // this module is only loaded when chordIsBeingDetectedValue is true (meaning the chord detection button was pressed)
-            const { chordDetectorBuilder } = await import(
-              "@/app/engine/chords/chordDetectorBuilder"
-            );
-            setIsChordBeingDetected(true);
-            chordDetectorBuilder.addNote({
-              stringOctaveNote: stringOctaveNote,
-              clear: () => {
-                setIsChordBeingDetected(false);
-              },
-            });
-          }
+          return;
+        }
+        const noteMetadata = metadata as NoteMetadata;
+        if (
+          chordIsBeingDetectedValue &&
+          stringOctaveNote !== null &&
+          noteMetadata.skipChordDetection !== true
+        ) {
+          // this module is only loaded when chordIsBeingDetectedValue is true (meaning the chord detection button was pressed)
+          const { chordDetectorBuilder } = await import(
+            "@/app/engine/chords/chordDetectorBuilder"
+          );
+          setIsChordBeingDetected(true);
+          chordDetectorBuilder.addNote({
+            stringOctaveNote,
+            clear: () => {
+              setIsChordBeingDetected(false);
+            },
+          });
+        }
 
-          if (
-            scaleIsBeingDetectedValue &&
-            stringOctaveNote !== null &&
-            noteMetadata.skipChordDetection !== true
-          ) {
-            const { scaleDetectorBuilder } = await import(
-              "@/app/engine/scales/scaleDetectorBuilder"
-            );
-            setIsScaleBeingDetected(true);
-            scaleDetectorBuilder.addNote({
-              stringOctaveNote,
-              clear: () => {
-                setIsScaleBeingDetected(false);
-              },
-            });
-          }
+        if (
+          scaleIsBeingDetectedValue &&
+          stringOctaveNote !== null &&
+          noteMetadata.skipChordDetection !== true
+        ) {
+          const { scaleDetectorBuilder } = await import(
+            "@/app/engine/scales/scaleDetectorBuilder"
+          );
+          setIsScaleBeingDetected(true);
+          scaleDetectorBuilder.addNote({
+            stringOctaveNote,
+            clear: () => {
+              setIsScaleBeingDetected(false);
+            },
+          });
+        }
 
-          // it may come from several tracks for the same note simultaneously
-          if (
-            noteMetadata.looperChannel !== undefined ||
-            noteMetadata.trackNumber !== undefined
-          ) {
-            trackNumberRef.current =
-              noteMetadata.looperChannel ?? noteMetadata.trackNumber;
-          } else if (noteMetadata.fromChord === true) {
-            trackNumberRef.current = 5; // another color for chords
-          }
+        // it may come from several tracks for the same note simultaneously
+        if (
+          noteMetadata.looperChannel !== undefined ||
+          noteMetadata.trackNumber !== undefined
+        ) {
+          trackNumberRef.current =
+            noteMetadata.looperChannel ?? noteMetadata.trackNumber;
+        } else if (noteMetadata.fromChord === true) {
+          trackNumberRef.current = 5; // another color for chords
+        }
 
-          animate();
-          if (noteMetadata.fromChord === true) {
-            setIsFromPreviousChord(true);
-          }
+        animate();
+        if (noteMetadata.fromChord === true) {
+          setIsFromPreviousChord(true);
         }
       });
       return () => {

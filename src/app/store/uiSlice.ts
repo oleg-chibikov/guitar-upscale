@@ -61,6 +61,8 @@ const initialState: UiState = {
   showAspectRatio: false,
 };
 
+export let themeValue: Theme = initialState.theme;
+
 const calculatePercentage = (
   minimum: number,
   maximum: number,
@@ -131,6 +133,7 @@ export const uiSlice = createSlice({
     },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;
+      themeValue = action.payload;
     },
     setFretboardScaleX(state, action: PayloadAction<number>) {
       state.fretboardScaleX = action.payload;

@@ -21,7 +21,7 @@ import {
   chordPlayModeValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
-import { selectUi } from "@/app/store/uiSlice";
+import { selectUi, themeValue } from "@/app/store/uiSlice";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
@@ -83,19 +83,21 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
       if (isGracePeriodRef.current) {
         classList.add(
-          theme === Theme.Light
+          themeValue === Theme.Light
             ? "border-accent_stronger-light"
             : "border-accent_stronger-dark"
         );
       } else if (isPlayingRef.current) {
         classList.add(
-          theme === Theme.Light
+          themeValue === Theme.Light
             ? "border-accent_strongest-light"
             : "border-accent_strongest-dark"
         );
       } else {
         classList.add(
-          theme === Theme.Light ? "border-accent-light" : "border-accent-dark"
+          themeValue === Theme.Light
+            ? "border-accent-light"
+            : "border-accent-dark"
         );
       }
     }
@@ -117,17 +119,17 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     );
     if (isClickedRef.current) {
       classList.add(
-        theme === Theme.Light
+        themeValue === Theme.Light
           ? "bg-button_pressed-light"
           : "bg-button_pressed-dark"
       );
     } else if (wasPlayedLastRef.current) {
       classList.add(
-        theme === Theme.Light ? "bg-secondary-light" : "bg-secondary-dark"
+        themeValue === Theme.Light ? "bg-secondary-light" : "bg-secondary-dark"
       );
     } else {
       classList.add(
-        theme === Theme.Light ? "bg-button-light" : "bg-button-dark"
+        themeValue === Theme.Light ? "bg-button-light" : "bg-button-dark"
       );
     }
   };
@@ -163,6 +165,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   );
 
   const { theme, useSharpChords } = useSelector(selectUi);
+
+  useEffect(() => {
+    toggleBackground();
+    toggleBorder();
+    toggleCursor();
+  }, [theme]);
 
   useEffect(() => {
     const animate = () => {
