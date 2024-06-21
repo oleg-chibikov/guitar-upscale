@@ -17,7 +17,7 @@ import { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
-const TOP_RESERVED_HEIGHT = 90;
+const TOP_RESERVED_HEIGHT = 80;
 const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
@@ -114,7 +114,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
       >
         <section
           ref={ref}
-          className={`grid grid-cols-2 gap-0.5 ${
+          className={`${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
           } overflow-auto`}
           style={{
@@ -123,35 +123,43 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
                 ? COMPACT_CHORDS_WIDTH
                 : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
             maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
         >
-          {chords.flatMap((noteChord) =>
-            noteChord.modes.map((noteChordMode) => {
-              const isHidden =
-                checkIsHiddenMode(noteChordMode) ||
-                (!useSharpChords && isSharp(noteChord.note));
-              const title = getChordName(noteChord.note, noteChordMode.mode);
+          <div
+            className={`grid grid-cols-2 gap-0.5`}
+            style={{
+              gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+              gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+            }}
+          >
+            {chords.flatMap((noteChord) =>
+              noteChord.modes.map((noteChordMode) => {
+                const isHidden =
+                  checkIsHiddenMode(noteChordMode) ||
+                  (!useSharpChords && isSharp(noteChord.note));
+                const title = getChordName(noteChord.note, noteChordMode.mode);
 
-              return (
-                <ChordButton
-                  key={title}
-                  isHidden={isHidden}
-                  noteChordMode={noteChordMode}
-                  chordName={title}
-                  onStrummingClickedChange={(value) => {
-                    if (!isMobileDeviceValue) {
-                      return;
-                    }
-                    const isStrummingClicked = value || isAnyStrummingClicked();
-                    toggleOverflow(isStrummingClicked, ref);
-                    toggleOverflow(isStrummingClicked, mainRef);
-                  }}
-                />
-              );
-            })
-          )}
+                return (
+                  <ChordButton
+                    key={title}
+                    isHidden={isHidden}
+                    noteChordMode={noteChordMode}
+                    chordName={title}
+                    onStrummingClickedChange={(value) => {
+                      if (!isMobileDeviceValue) {
+                        return;
+                      }
+                      const isStrummingClicked =
+                        value || isAnyStrummingClicked();
+                      toggleOverflow(isStrummingClicked, ref);
+                      toggleOverflow(isStrummingClicked, mainRef);
+                    }}
+                  />
+                );
+              })
+            )}
+          </div>
+          {scrollBarVisible && <div className="w-full h-5"></div>}
         </section>
       </Expander>
     </section>
