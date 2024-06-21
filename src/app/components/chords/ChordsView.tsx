@@ -159,7 +159,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
               })
             )}
           </div>
-          {scrollBarVisible && <div className="w-full h-5"></div>}
+          {/* this div's purpose is to add some empty space that can be used for scrolling (since the scrollbar gets disabled when the chord is playing) */}
+          {scrollBarVisible && <div className="w-full h-4" />}
         </section>
       </Expander>
     </section>
