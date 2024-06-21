@@ -17,7 +17,7 @@ import { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
-const TOP_RESERVED_HEIGHT = 120;
+const TOP_RESERVED_HEIGHT = 90;
 const HORIZONTAL_RESERVED_WIDTH = 400;
 const COMPACT_CHORDS_WIDTH = 220;
 
