@@ -116,7 +116,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
           ref={ref}
           className={`grid grid-cols-2 gap-0.5 ${
             scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } overflow-auto py-4`} // vertical padding is added to allow some space for the non-interrupted scrolling
+          } overflow-auto`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -140,7 +140,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
                   isHidden={isHidden}
                   noteChordMode={noteChordMode}
                   chordName={title}
-                  onStrummingClickedChange={(value) => {
+                  onStrummingStateChange={(value) => {
                     if (!isMobileDeviceValue) {
                       return;
                     }

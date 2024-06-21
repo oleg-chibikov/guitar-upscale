@@ -29,14 +29,14 @@ interface ChordButtonProps {
   chordName: string;
   noteChordMode: NoteChordMode;
   isHidden: boolean;
-  onStrummingClickedChange: (value: boolean) => void;
+  onStrummingStateChange: (value: boolean) => void;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   noteChordMode,
   isHidden,
-  onStrummingClickedChange,
+  onStrummingStateChange,
 }) => {
   const elementRef = useRef<HTMLUListElement>(null);
   const hasTouchInput = useInputChecker();
@@ -136,8 +136,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const onClickedChange = (value: boolean) => {
     isClickedRef.current = value;
-    // let the parent component know that the strumming clicked state has changed
-    onStrummingClickedChange(value);
+    // let the parent component know that the strumming has finished (and enable overflow))
+    if (!value) {
+      onStrummingStateChange(false);
+    }
     toggleBorder();
     toggleCursor();
     toggleBackground();
@@ -145,6 +147,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const onPlayingChange = (value: boolean) => {
     isPlayingRef.current = value;
+    if (value) {
+      // let the parent component know that the strumming has started (and disable overflow)
+      onStrummingStateChange(true);
+    }
     toggleBorder();
     toggleCursor();
   };
