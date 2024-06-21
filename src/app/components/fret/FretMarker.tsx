@@ -454,9 +454,10 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       {stringOctaveNote && (
         <>
           {/* The marker itself */}
+          {/* We can add transition-colors, but it slows down the playback */}
           <Typography
             variant="body2"
-            className={`flex justify-center items-center font-mono contain-content transition-colors
+            className={`flex justify-center items-center font-mono contain-content
                       ${
                         isHeader
                           ? `text-xl ${
