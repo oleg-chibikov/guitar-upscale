@@ -53,11 +53,11 @@ const darkColors = [
   "bg-purple-600",
 ];
 
-const getColorClass = (trackNumber: number | undefined, theme: Theme) => {
+const getColorClass = (trackNumber: number | undefined) => {
   const colorIndex = (trackNumber ?? 0) % lightColors.length; // Map trackNumber to index in the colors array
-  const colorClass =
-    theme === Theme.Light ? lightColors[colorIndex] : darkColors[colorIndex];
-  return colorClass;
+  return themeValue === Theme.Light
+    ? lightColors[colorIndex]
+    : darkColors[colorIndex];
 };
 
 export const FretMarker: React.FC<FretMarkerProps> = ({
@@ -89,7 +89,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const classList = blastElement.classList;
 
     classList.remove(...lightColors.concat(darkColors));
-    classList.add(getColorClass(trackNumberRef.current, theme));
+    classList.add(getColorClass(trackNumberRef.current));
   };
 
   const setTrackNumber = (noteMetadata: NoteMetadata) => {
