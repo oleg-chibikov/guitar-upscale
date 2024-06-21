@@ -456,7 +456,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           <Typography
             variant="body2"
-            className={`flex justify-center items-center font-mono contain-content transition-all duration-100 ease-in-out
+            className={`flex justify-center items-center font-mono contain-content transition-colors
                       ${
                         isHeader
                           ? `text-xl ${

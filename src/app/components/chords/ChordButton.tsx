@@ -275,7 +275,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
               await onChordPress();
             }
       }
-      className={`flex items-center justify-center content-center text-center w-16 font-mono transition-all duration-100 ease-in-out transform origin-center
+      className={`flex items-center justify-center content-center text-center w-16 font-mono transition-transform transform origin-center
       ${useSharpChords ? "text-xs h-6" : "text-md h-8"}
       ${
         isDisabled
