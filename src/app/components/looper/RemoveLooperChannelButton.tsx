@@ -13,8 +13,7 @@ export const RemoveLooperChannelButton: React.FC<CanSetLooperState> = ({
   return (
     <IconButton
       disabled={disabled}
-      className="scale-75 origin-center"
-      icon={<Remove fontSize="small" />}
+      icon={<Remove />}
       tooltip={"Remove looper channel"}
       isActive={true}
       onPress={() => {

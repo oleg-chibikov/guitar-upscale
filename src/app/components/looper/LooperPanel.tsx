@@ -2,6 +2,7 @@
 
 import { Panel } from "@/app/components/layout/Panel";
 import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
+import { ClearLooperButton } from "@/app/components/looper/ClearLooperButton";
 import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
 import { SaveLooperRecordingButton } from "@/app/components/looper/SaveLooperRecordingButton";
 import { LOOPER_PANEL_ID } from "@/app/data/elementIds";
@@ -20,7 +21,7 @@ import { LooperButton } from "./LooperButton";
 
 export const LooperPanel: React.FC = () => {
   const [state, setState] = useState<LooperState>(looperState);
-  const showPlay = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
+  const hasAnyRecordings = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
 
   const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
   const dispatch = useDispatch();
@@ -41,12 +42,17 @@ export const LooperPanel: React.FC = () => {
             channel={index}
             state={state[index]}
             setState={setState}
-            showPlay={showPlay}
+            showPlay={hasAnyRecordings}
           />
         </div>
       ))}
       <AddLooperChannelButton setState={setState} disabled={!canAddChannel()} />
-      {showPlay && <SaveLooperRecordingButton state={state} />}
+      {hasAnyRecordings && (
+        <>
+          <SaveLooperRecordingButton state={state} />
+          <ClearLooperButton setState={setState} />
+        </>
+      )}
     </Panel>
   );
 };

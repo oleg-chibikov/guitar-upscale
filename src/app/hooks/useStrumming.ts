@@ -479,8 +479,6 @@ export const useStrumming = (
           };
 
           while (isChordClicked(chordName)) {
-            const currentPattern = chordCustomStrummingPatternValue;
-
             for (; currentIndex < currentPattern.length; currentIndex++) {
               if (!chordCustomStrummingWaitForPatternFinishValue) {
                 // early break pattern only when the checkbox is off
