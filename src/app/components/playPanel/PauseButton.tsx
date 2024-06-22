@@ -1,5 +1,4 @@
 "use client";
-import { UsePlayParams } from "@/app/hooks/usePlay";
 import { selectSettings, setIsPaused } from "@/app/store/settingsSlice";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -7,12 +6,10 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "../settings/buttons/IconButton";
 
-type PlayButtonProps = UsePlayParams;
-
-export const PauseButton: React.FC<PlayButtonProps> = (params) => {
-  const { isPaused, isPlaying } = useSelector(selectSettings);
+export const PauseButton: React.FC = () => {
+  const { isPaused, isPlaying, isLooperPlaying } = useSelector(selectSettings);
   const dispatch = useDispatch();
-  if (!isPlaying) {
+  if (!isPlaying || isLooperPlaying) {
     return null;
   }
   return (

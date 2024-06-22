@@ -1,5 +1,6 @@
 import { HALF_BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { isLooperPlaying } from "@/app/engine/looper/looperShared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,10 +62,17 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     console.log(LOG_PREFIX, "Loading examples");
     updateWaiting(true);
     try {
-      const { playMidi, stopPlayback } = await import(
-        "@/app/engine/midiPlayer"
-      );
       if (isPlayingValue) {
+        if (isLooperPlaying()) {
+          console.log(LOG_PREFIX + "Stopping looper playback");
+          const { stopLooperPlayback } = await import(
+            "@/app/engine/looper/looper"
+          );
+          stopLooperPlayback();
+          return;
+        }
+
+        const { stopPlayback } = await import("@/app/engine/midiPlayer");
         await stopPlayback(dispatch, LOG_PREFIX);
         return;
       }
@@ -121,6 +129,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
       dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
 
+      const { playMidi } = await import("@/app/engine/midiPlayer");
       await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
         // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
         console.log(
@@ -158,6 +167,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   return { isWaiting, handlePlay };
 };
+
 async function waitForStart(example: Example | undefined) {
   if (isMainClockActiveValue) {
     // if metronome or chord strumming is already playing then wait for the bar, other

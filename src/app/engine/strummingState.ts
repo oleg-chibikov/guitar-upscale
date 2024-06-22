@@ -1,4 +1,4 @@
-import { toggleInterval } from "../store/settingsSlice";
+import { tryToggleInterval } from "../store/settingsSlice";
 
 export const STRUMMING_LOG_PREFIX = "Strumming: ";
 
@@ -159,7 +159,7 @@ export const markChordAsPendingStrumming = (
 
   strummingClickedChords.add(chordName);
 
-  toggleInterval(true);
+  tryToggleInterval(true);
   console.log(
     STRUMMING_LOG_PREFIX + "---> Chord pending strumming start",
     chordName,
@@ -236,7 +236,7 @@ export const finishChordGracePeriod = (
     strummingChordsMap.get(chordName)?.gracePeriodPromiseAndResolve;
   gracePeriodPromiseAndResolve?.resolve();
   strummingChordsMap.delete(chordName);
-  toggleInterval(false);
+  tryToggleInterval(false);
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming finished. Grace period ended",
     chordName,

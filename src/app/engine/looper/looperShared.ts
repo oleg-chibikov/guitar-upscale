@@ -6,3 +6,5 @@ export const setCurrentlyRecordingLooperChannel = (
 ) => {
   currentlyRecordingLooperChannel = channel;
 };
+
+export const isLooperPlaying = () => currentlyPlayingLooperChannels.size > 0;

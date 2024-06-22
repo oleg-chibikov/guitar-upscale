@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
 const TOP_RESERVED_HEIGHT = 80;
-const HORIZONTAL_RESERVED_WIDTH = 400;
+const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({

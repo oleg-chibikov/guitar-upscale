@@ -23,13 +23,18 @@ export const LooperPanel: React.FC = () => {
   const [state, setState] = useState<LooperState>(looperState);
   const hasAnyRecordings = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
 
-  const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
+  const { guitarSettingsUpdatedTrigger, looperStateUpdateTrigger } =
+    useSelector(selectSettings);
   const dispatch = useDispatch();
   useEffect(() => {
     clearLooperState();
     setState({ ...looperState });
     stopMetronomeIfNeeded(dispatch);
   }, [dispatch, guitarSettingsUpdatedTrigger]);
+
+  useEffect(() => {
+    setState({ ...looperState });
+  }, [dispatch, looperStateUpdateTrigger]);
   return (
     <Panel id={LOOPER_PANEL_ID}>
       <RemoveLooperChannelButton

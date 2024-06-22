@@ -37,8 +37,8 @@ import {
   waitForNextHalfBeat,
 } from "../engine/clock/mainClock";
 import {
-  currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
+  isLooperPlaying,
 } from "../engine/looper/looperShared";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -111,6 +111,8 @@ interface SettingsState
   toggleMetronomeWhenRecording: boolean;
   isFirstEvent: boolean;
   isLastEvent: boolean;
+  looperStateUpdateTrigger: boolean;
+  isLooperPlaying: boolean;
 }
 
 const initialState: SettingsState = {
@@ -147,6 +149,8 @@ const initialState: SettingsState = {
   guitarSettingsUpdatedTrigger: false,
   isFirstEvent: false,
   isLastEvent: false,
+  looperStateUpdateTrigger: false,
+  isLooperPlaying: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -233,7 +237,7 @@ const onGuitarSettingsUpdate = (
 const toggleMetronome = (state: WithMetronome, value: boolean) => {
   state.isMetronomeActive = value;
   isMetronomeActiveValue = value;
-  toggleInterval(value);
+  tryToggleInterval(value);
 };
 
 export const clearWipeExampleCacheTrigger = () => {
@@ -260,7 +264,7 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
   isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||
-  currentlyPlayingLooperChannels.size > 0;
+  isLooperPlaying();
 
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
@@ -336,7 +340,7 @@ export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
   }, 1);
 };
 
-export const toggleInterval = (toggle: boolean) => {
+export const tryToggleInterval = (toggle: boolean) => {
   if (toggle) {
     // starting time-based activity
     if (!isMainClockActiveValue) {
@@ -535,7 +539,7 @@ export const settingsSlice = createSlice({
       if (!isPlayingValue) {
         updateIsPaused(false, state);
       }
-      toggleInterval(isPlayingValue);
+      tryToggleInterval(isPlayingValue);
     },
     setIsPaused(state, action: PayloadAction<boolean>) {
       updateIsPaused(action.payload, state);
@@ -561,7 +565,7 @@ export const settingsSlice = createSlice({
       const value = action.payload.value;
       state.isRecording = value;
       isRecordingValue = value;
-      toggleInterval(value);
+      tryToggleInterval(value);
 
       const canTriggerMetronome =
         toggleMetronomeWhenRecordingValue && isMetronomeActiveValue !== value;
@@ -580,6 +584,12 @@ export const settingsSlice = createSlice({
           toggleMetronome(state, false);
         }
       }
+    },
+    triggerLooperStateUpdate(state) {
+      state.looperStateUpdateTrigger = !state.looperStateUpdateTrigger;
+    },
+    setIsLooperPlaying(state, action: PayloadAction<boolean>) {
+      state.isLooperPlaying = action.payload;
     },
   },
 });
@@ -616,6 +626,8 @@ export const {
   setToggleMetronomeWhenRecording,
   setIsFirstEvent,
   setIsLastEvent,
+  triggerLooperStateUpdate,
+  setIsLooperPlaying,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

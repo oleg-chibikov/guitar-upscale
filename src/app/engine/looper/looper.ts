@@ -1,16 +1,21 @@
+import { store } from "@/app/store/store";
 import { UnknownAction } from "@reduxjs/toolkit";
 import { Dispatch } from "react";
 import {
   isAnyTimerSpecificActivityBesidesMetronomeRunning,
   isMetronomeActiveValue,
+  setIsLooperPlaying,
   setIsMetronomeActive,
-  toggleInterval,
+  setIsPlaying,
   toggleMetronomeWhenRecordingValue,
+  triggerLooperStateUpdate,
+  tryToggleInterval,
 } from "../../store/settingsSlice";
 import { LooperRecorder } from "./looperRecorder";
 import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
+  isLooperPlaying,
   setCurrentlyRecordingLooperChannel,
 } from "./looperShared";
 
@@ -33,6 +38,19 @@ export const clearLooperState = () => {
   looperState.forEach(initializeChannel);
 };
 
+export const stopLooperPlayback = () => {
+  currentlyPlayingLooperChannels.clear();
+  store.dispatch(setIsPlaying(false));
+  looperState.forEach((looperChannel) => {
+    looperChannel.isPlaying = false;
+    looperChannel.looperRecorder.stopPlaying();
+  });
+  tryToggleInterval(false);
+  stopMetronomeIfNeeded(store.dispatch);
+  store.dispatch(triggerLooperStateUpdate()); // this will update all the buttons in the looper panel
+  store.dispatch(setIsLooperPlaying(false)); // this will show the pause button
+};
+
 export const setRecordingInLooperChannel = (
   channel: number,
   value: boolean
@@ -53,7 +71,7 @@ export const setRecordingInLooperChannel = (
     setPlayingInLooperChannel(channel, false);
     setCurrentlyRecordingLooperChannel(channel);
     looperChannel.looperRecorder.startRecording();
-    toggleInterval(true);
+    tryToggleInterval(true);
   } else {
     // stop recording
     stopRecording(looperChannel);
@@ -76,7 +94,8 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
     }
 
     currentlyPlayingLooperChannels.add(channel);
-    toggleInterval(true);
+    store.dispatch(setIsPlaying(true));
+    store.dispatch(setIsLooperPlaying(true)); // this will hide the pause button
     void looperChannel.looperRecorder?.startPlaying(); // don't wait for it
   } else {
     if (!looperChannel.isPlaying) {
@@ -84,8 +103,12 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
       return;
     }
     currentlyPlayingLooperChannels.delete(channel);
+    if (!isLooperPlaying()) {
+      store.dispatch(setIsPlaying(false));
+      store.dispatch(setIsLooperPlaying(false)); // this will show the pause button
+    }
     looperChannel.looperRecorder.stopPlaying();
-    toggleInterval(false);
+    tryToggleInterval(false);
   }
   looperChannel.isPlaying = value;
 };
@@ -141,7 +164,7 @@ const initializeChannel = (
   looperChannel.hasRecording = false;
   stopRecording(looperChannel);
   // we need to explicitly check if interval should be stopped
-  toggleInterval(false);
+  tryToggleInterval(false);
 };
 
 const createChannelState = () => {

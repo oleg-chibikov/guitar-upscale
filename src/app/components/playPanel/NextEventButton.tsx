@@ -10,8 +10,9 @@ import { useSelector } from "react-redux";
 import { IconButton } from "../settings/buttons/IconButton";
 
 export const NextEventButton: React.FC = () => {
-  const { isPaused, isLastEvent } = useSelector(selectSettings);
-  if (!isPaused) {
+  const { isPaused, isLastEvent, isLooperPlaying } =
+    useSelector(selectSettings);
+  if (!isPaused || isLooperPlaying) {
     return null;
   }
   return (
