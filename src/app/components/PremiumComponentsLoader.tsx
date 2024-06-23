@@ -61,11 +61,11 @@ const ReverbStrengthSlider = dynamic(
     (await import("@/app/components/settings/sliders/ReverbStrengthSlider"))
       .ReverbStrengthSlider
 );
-const ErudaConsoleControl = dynamic(
-  async () =>
-    (await import("@/app/components/settings/ErudaConsoleControl"))
-      .ErudaConsoleControl
-);
+// const ErudaConsoleControl = dynamic(
+//   async () =>
+//     (await import("@/app/components/settings/ErudaConsoleControl"))
+//       .ErudaConsoleControl
+// );
 
 export const premiumFeaturesToMap = (
   features: PremiumFeatures
@@ -131,7 +131,7 @@ export const PremiumComponentsLoader: React.FC<WithPremiumFeatures> = ({
   return (
     <>
       <ClientRoot premiumComponents={premiumComponents} />
-      {process.env.ENABLE_ERUDA_CONSOLE === "true" && <ErudaConsoleControl />}
+      {/* {process.env.ENABLE_ERUDA_CONSOLE === "true" && <ErudaConsoleControl />} */}
     </>
   );
 };

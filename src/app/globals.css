@@ -122,7 +122,7 @@ main {
   background-color: var(--tertiary);
 }
 
-.eruda-entry-btn {
+/* .eruda-entry-btn {
   top: calc(100vh - 80px) !important;
   left: calc(100vw - 80px) !important;
 }
@@ -132,4 +132,4 @@ main {
   .eruda-entry-btn {
     top: calc(100vh - 90px) !important;
   }
-}
+} */
