@@ -13,6 +13,11 @@ import {
   NoteToFretMarkerEventMap,
 } from "@/app/engine/eventBus";
 import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+import {
+  darkColors,
+  fretMarkerPossibleClasses,
+  lightColors,
+} from "@/app/helpers/components/fretMarkerPossibleClasses";
 import { sleep } from "@/app/helpers/sleep";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
@@ -36,22 +41,6 @@ interface FretMarkerProps {
   stringOctaveNote: StringOctaveNote | null;
   isHeader: boolean;
 }
-const lightColors = [
-  "bg-amber-400",
-  "bg-slate-400",
-  "bg-violet-400",
-  "bg-fuchsia-400",
-  "bg-pink-400",
-  "bg-rose-400",
-];
-const darkColors = [
-  "bg-sky-600",
-  "bg-teal-600",
-  "bg-emerald-600",
-  "bg-indigo-600",
-  "bg-cyan-600",
-  "bg-purple-600",
-];
 
 const getColorClass = (trackNumber: number | undefined) => {
   const colorIndex = (trackNumber ?? 0) % lightColors.length; // Map trackNumber to index in the colors array
@@ -77,36 +66,50 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const isFromPreviousChordRef = useRef<boolean>(false);
   const isChordBeingDetectedRef = useRef<boolean>(false);
   const isScaleBeingDetectedRef = useRef<boolean>(false);
-  const trackNumberRef = useRef<number>();
+  const blastAnimationColorRef = useRef<string>();
 
   const dispatch = useDispatch();
 
-  const toggleBlastAnimationColor = () => {
+  const setTrackNumber = (noteMetadata: NoteMetadata) => {
+    const blastElement = blastRef.current;
+    if (!blastElement) {
+      return;
+    }
+
+    const classList = blastElement.classList;
+    let trackNumber: number = 0;
+    if (
+      noteMetadata.looperChannel !== undefined ||
+      noteMetadata.trackNumber !== undefined
+    ) {
+      trackNumber = noteMetadata.looperChannel ?? noteMetadata.trackNumber ?? 0;
+    } else if (noteMetadata.fromChord === true) {
+      trackNumber = 5;
+    }
+
+    if (blastAnimationColorRef.current) {
+      classList.remove(blastAnimationColorRef.current);
+    }
+
+    const color = getColorClass(trackNumber);
+    blastAnimationColorRef.current = color;
+    classList.add(color);
+  };
+
+  const resetTrackNumber = () => {
+    if (!blastAnimationColorRef.current) {
+      return;
+    }
     const blastElement = blastRef.current;
     if (!blastElement) {
       return;
     }
     const classList = blastElement.classList;
+    classList.remove(blastAnimationColorRef.current);
 
-    classList.remove(...lightColors.concat(darkColors));
-    classList.add(getColorClass(trackNumberRef.current));
-  };
-
-  const setTrackNumber = (noteMetadata: NoteMetadata) => {
-    if (
-      noteMetadata.looperChannel !== undefined ||
-      noteMetadata.trackNumber !== undefined
-    ) {
-      trackNumberRef.current =
-        noteMetadata.looperChannel ?? noteMetadata.trackNumber;
-    } else if (noteMetadata.fromChord === true) {
-      trackNumberRef.current = 5;
-    }
-  };
-
-  const resetTrackNumber = () => {
     // reset color after the note has finished animation
-    trackNumberRef.current = undefined;
+
+    blastAnimationColorRef.current = undefined;
   };
 
   const toggleClasses = () => {
@@ -114,70 +117,39 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     if (!typographyElement) {
       return;
     }
-    const classList = typographyElement.classList;
-    classList.remove(
-      "border-4",
-      "shadow-glow",
-      "border-chord_detection-light",
-      "shadow-chord_detection_glow-light",
-      "border-chord_detection-dark",
-      "shadow-chord_detection_glow-dark",
-      "border-scale_detection-light",
-      "shadow-scale_detection_glow-light",
-      "border-scale_detection-dark",
-      "shadow-scale_detection_glow-dark",
-      "border-accent_stronger-light",
-      "border-accent_stronger-dark",
-      "border-accent_strongest-light",
-      "border-accent_strongest-dark",
-      "text-background-light",
-      "text-background-dark",
-      "text-foreground-light",
-      "text-foreground-dark",
-      "bg-previous_fret_marker_match-light",
-      "bg-previous_fret_marker_match-dark",
-      "bg-previous_fret_marker-light",
-      "bg-previous_fret_marker-dark",
-      "bg-disabled_match-light",
-      "bg-disabled_match-dark",
-      "bg-fret_marker_match-light",
-      "bg-fret_marker_match-dark",
-      "bg-disabled-light",
-      "bg-disabled-dark",
-      "bg-fret_marker-light",
-      "bg-fret_marker-dark"
-    );
+
+    const neededClasses: string[] = [];
 
     if (
       isChordBeingDetectedRef.current ||
       isScaleBeingDetectedRef.current ||
       isFromPreviousChordRef.current
     ) {
-      classList.add("border-4");
+      neededClasses.push("border-4");
     }
 
     if (isChordBeingDetectedRef.current || isScaleBeingDetectedRef.current) {
-      classList.add("shadow-glow");
+      neededClasses.push("shadow-glow");
       if (isChordBeingDetectedRef.current) {
         if (themeValue === Theme.Light) {
-          classList.add(
+          neededClasses.push(
             "border-chord_detection-light",
             "shadow-chord_detection_glow-light"
           );
         } else {
-          classList.add(
+          neededClasses.push(
             "border-chord_detection-dark",
             "shadow-chord_detection_glow-dark"
           );
         }
       } else if (isScaleBeingDetectedRef.current) {
         if (themeValue === Theme.Light) {
-          classList.add(
+          neededClasses.push(
             "border-scale_detection-light",
             "shadow-scale_detection_glow-light"
           );
         } else {
-          classList.add(
+          neededClasses.push(
             "border-scale_detection-dark",
             "shadow-scale_detection_glow-dark"
           );
@@ -185,7 +157,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       }
     } else if (isFromPreviousChordRef.current) {
       // only if chord and scale are not being detected
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light
           ? "border-accent_strongest-light"
           : "border-accent_strongest-dark"
@@ -193,26 +165,26 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
 
     if (isFromPreviousChordRef.current) {
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light
           ? "text-background-light"
           : "text-background-dark"
       );
       if (isColored) {
-        classList.add(
+        neededClasses.push(
           themeValue === Theme.Light
             ? "bg-previous_fret_marker_match-light"
             : "bg-previous_fret_marker_match-dark"
         );
       } else {
-        classList.add(
+        neededClasses.push(
           themeValue === Theme.Light
             ? "bg-previous_fret_marker-light"
             : "bg-previous_fret_marker-dark"
         );
       }
     } else {
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light
           ? "text-foreground-light"
           : "text-foreground-dark"
@@ -220,13 +192,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
       if (isColored) {
         if (isBehindCapo) {
-          classList.add(
+          neededClasses.push(
             themeValue === Theme.Light
               ? "bg-disabled_match-light"
               : "bg-disabled_match-dark"
           );
         } else {
-          classList.add(
+          neededClasses.push(
             themeValue === Theme.Light
               ? "bg-fret_marker_match-light"
               : "bg-fret_marker_match-dark"
@@ -234,13 +206,13 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         }
       } else {
         if (isBehindCapo) {
-          classList.add(
+          neededClasses.push(
             themeValue === Theme.Light
               ? "bg-disabled-light"
               : "bg-disabled-dark"
           );
         } else {
-          classList.add(
+          neededClasses.push(
             themeValue === Theme.Light
               ? "bg-fret_marker-light"
               : "bg-fret_marker-dark"
@@ -248,6 +220,15 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         }
       }
     }
+
+    const neededClassesSet = new Set<string>(neededClasses);
+    const notNeededClasses = fretMarkerPossibleClasses.filter(
+      (element) => !neededClassesSet.has(element)
+    );
+
+    const classList = typographyElement.classList;
+    classList.remove(...notNeededClasses);
+    classList.add(...neededClasses);
   };
 
   useEffect(toggleClasses, [theme, neck]);
@@ -323,7 +304,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
           // it may come from several tracks for the same note simultaneously
           setTrackNumber(noteMetadata);
-          toggleBlastAnimationColor();
 
           if (noteMetadata.fromChord === true) {
             isFromPreviousChordRef.current = true;
@@ -490,7 +470,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               }}
               onAnimationEnd={() => {
                 resetTrackNumber();
-                toggleBlastAnimationColor();
               }}
               className="opacity-0 contain-content animate-blast absolute z-10 rounded-full hidden"
             />

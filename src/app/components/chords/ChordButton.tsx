@@ -14,6 +14,7 @@ import {
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
+import { chordButtonPossibleClasses } from "@/app/helpers/components/chordButtonPossibleClasses";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {
@@ -45,93 +46,74 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
 
-  const toggleCursor = () => {
+  const toggleClasses = () => {
     const element = elementRef.current;
     if (!element) {
       return;
     }
-    const classList = element.classList;
-    classList.remove("cursor-progress", "cursor-pointer");
-    if (isClickedRef.current && !isPlayingRef.current) {
-      classList.add("cursor-progress");
-    } else if (isPlayingRef.current || (!isDisabled && !isClickedRef.current)) {
-      classList.add("cursor-pointer");
-    }
-  };
 
-  const toggleBorder = () => {
-    const element = elementRef.current;
-    if (!element) {
-      return;
+    // cursor
+    const neededClasses: string[] = [];
+    if (isClickedRef.current && !isPlayingRef.current) {
+      neededClasses.push("cursor-progress");
+    } else if (isPlayingRef.current || (!isDisabled && !isClickedRef.current)) {
+      neededClasses.push("cursor-pointer");
     }
-    const classList = element.classList;
-    classList.remove(
-      "border-2",
-      "border-accent_stronger-light",
-      "border-accent_stronger-dark",
-      "border-accent_strongest-light",
-      "border-accent_strongest-dark",
-      "border-accent-light",
-      "border-accent-dark"
-    );
+
+    // border
     if (
       isClickedRef.current ||
       isPlayingRef.current ||
       isGracePeriodRef.current
     ) {
-      classList.add("border-2");
+      neededClasses.push("border-2");
 
       if (isGracePeriodRef.current) {
-        classList.add(
+        neededClasses.push(
           themeValue === Theme.Light
             ? "border-accent_stronger-light"
             : "border-accent_stronger-dark"
         );
       } else if (isPlayingRef.current) {
-        classList.add(
+        neededClasses.push(
           themeValue === Theme.Light
             ? "border-accent_strongest-light"
             : "border-accent_strongest-dark"
         );
       } else {
-        classList.add(
+        neededClasses.push(
           themeValue === Theme.Light
             ? "border-accent-light"
             : "border-accent-dark"
         );
       }
     }
-  };
 
-  const toggleBackground = () => {
-    const element = elementRef.current;
-    if (!element) {
-      return;
-    }
-    const classList = element.classList;
-    classList.remove(
-      "bg-button_pressed-light",
-      "bg-button_pressed-dark",
-      "bg-secondary-light",
-      "bg-secondary-dark",
-      "bg-button-light",
-      "bg-button-dark"
-    );
+    // background
     if (isClickedRef.current) {
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light
           ? "bg-button_pressed-light"
           : "bg-button_pressed-dark"
       );
     } else if (wasPlayedLastRef.current) {
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light ? "bg-secondary-light" : "bg-secondary-dark"
       );
     } else {
-      classList.add(
+      neededClasses.push(
         themeValue === Theme.Light ? "bg-button-light" : "bg-button-dark"
       );
     }
+
+    const neededClassesSet = new Set<string>(neededClasses);
+    const notNeededClasses = chordButtonPossibleClasses.filter(
+      (element) => !neededClassesSet.has(element)
+    );
+
+    const classList = element.classList;
+    classList.remove(...notNeededClasses);
+    classList.add(...neededClasses);
   };
 
   const onClickedChange = (value: boolean) => {
@@ -140,9 +122,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     if (!value) {
       onStrummingStateChange(false);
     }
-    toggleBorder();
-    toggleCursor();
-    toggleBackground();
+    toggleClasses();
   };
 
   const onPlayingChange = (value: boolean) => {
@@ -151,13 +131,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       // let the parent component know that the strumming has started (and disable overflow)
       onStrummingStateChange(true);
     }
-    toggleBorder();
-    toggleCursor();
+    toggleClasses();
   };
 
   const onGracePeriodChange = (value: boolean) => {
     isGracePeriodRef.current = value;
-    toggleBorder();
+    toggleClasses();
   };
 
   const wasPlayedLastRef = useRef<boolean>(false);
@@ -173,9 +152,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const { theme, useSharpChords } = useSelector(selectUi);
 
   useEffect(() => {
-    toggleBackground();
-    toggleBorder();
-    toggleCursor();
+    toggleClasses();
   }, [theme]);
 
   useEffect(() => {
@@ -199,7 +176,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       if (metadata.clear === true) {
         console.log("Clear previous chord marker: " + chordName);
         wasPlayedLastRef.current = false;
-        toggleBackground();
+        toggleClasses();
         return;
       }
 
@@ -218,7 +195,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         getCurrentRelativeTick()
       );
       wasPlayedLastRef.current = true;
-      toggleBackground();
+      toggleClasses();
 
       // Start the animation sequence
       animate();

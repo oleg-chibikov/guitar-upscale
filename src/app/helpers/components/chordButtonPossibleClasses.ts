@@ -1,0 +1,17 @@
+export const chordButtonPossibleClasses = [
+  "cursor-progress",
+  "cursor-pointer",
+  "border-2",
+  "border-accent_stronger-light",
+  "border-accent_stronger-dark",
+  "border-accent_strongest-light",
+  "border-accent_strongest-dark",
+  "border-accent-light",
+  "border-accent-dark",
+  "bg-button_pressed-light",
+  "bg-button_pressed-dark",
+  "bg-secondary-light",
+  "bg-secondary-dark",
+  "bg-button-light",
+  "bg-button-dark",
+];
