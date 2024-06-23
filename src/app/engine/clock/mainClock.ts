@@ -79,22 +79,6 @@ export const startInterval = (afresh: boolean) => {
   worker?.postMessage({ type: "start", tempoBpm: tempoBpmValue });
 };
 
-export const waitForTick = async (
-  tickToWaitFor: number,
-  currentTick: number,
-  checkFinished: () => boolean,
-  logPrefix: string
-) => {
-  const ticksToWait = tickToWaitFor - currentTick;
-  console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
-  for (let i = 0; i < ticksToWait; i++) {
-    if (checkFinished()) {
-      return Promise.resolve();
-    }
-    await waitForNextTick();
-  }
-};
-
 export const resolveNextTick = () => {
   recreateNextTick(true);
 };

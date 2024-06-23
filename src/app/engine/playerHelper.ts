@@ -1,3 +1,4 @@
+import { waitForNextTick } from "@/app/engine/clock/mainClock";
 import { ChordEventBus, NotePlayEventBus } from "@/app/engine/eventBus";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
 
@@ -21,4 +22,20 @@ export const playAllNotes = (
       ChordEventBus.next(chord);
     }
   });
+};
+
+export const waitForTick = async (
+  tickToWaitFor: number,
+  currentTick: number,
+  checkFinished: () => boolean,
+  logPrefix: string
+) => {
+  const ticksToWait = tickToWaitFor - currentTick;
+  console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
+  for (let i = 0; i < ticksToWait; i++) {
+    if (checkFinished()) {
+      return Promise.resolve();
+    }
+    await waitForNextTick();
+  }
 };

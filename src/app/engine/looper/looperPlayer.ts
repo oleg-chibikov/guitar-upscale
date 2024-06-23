@@ -1,11 +1,10 @@
 import { TICKS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { playAllNotes } from "@/app/engine/playerHelper";
+import { playAllNotes, waitForTick } from "@/app/engine/playerHelper";
 import {
   getCurrentRelativeTick,
   waitForNextBar,
   waitForNextTick,
-  waitForTick,
 } from "../clock/mainClock";
 
 const LOG_PREFIX = "LooperPlayer: ";
