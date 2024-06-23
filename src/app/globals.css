@@ -121,15 +121,3 @@ main {
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--tertiary);
 }
-
-/* .eruda-entry-btn {
-  top: calc(100vh - 80px) !important;
-  left: calc(100vw - 80px) !important;
-}
-
-/* Override for mobile */
-@media (pointer: fine) {
-  .eruda-entry-btn {
-    top: calc(100vh - 90px) !important;
-  }
-} */
