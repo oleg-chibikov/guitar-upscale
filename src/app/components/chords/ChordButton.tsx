@@ -14,6 +14,7 @@ import {
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
+import { areOtherChordsStrumming } from "@/app/engine/strummingState";
 import { chordButtonPossibleClasses } from "@/app/helpers/components/chordButtonPossibleClasses";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
@@ -121,6 +122,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     // let the parent component know that the strumming has finished (and enable overflow))
     if (!value) {
       onStrummingStateChange(false);
+    } else {
+      if (areOtherChordsStrumming(chordName)) {
+        onStrummingStateChange(true);
+      }
     }
     toggleClasses();
   };
