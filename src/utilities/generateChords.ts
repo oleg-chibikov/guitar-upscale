@@ -1,5 +1,3 @@
-import { generateNeck } from "@/app/store/settingsSlice";
-
 type Chord = {
   name: string;
   triad: number[];
@@ -76,5 +74,3 @@ function generateChords(stringCount: number): Chord[] {
 // const stringCount = 6;
 // const generatedChords = generateChords(stringCount);
 // console.log(generatedChords);
-
-const neck = generateNeck();
