@@ -1,10 +1,14 @@
 {
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "paths": {
+        "@/*": ["./src/*"]
+      }
+    }
+  },
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -22,9 +26,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -32,9 +34,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "dist/types/**/*.ts"
-, "src/pages/_app.tsx"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "dist/types/**/*.ts",
+    "src/pages/_app.tsx"
+  ],
+  "exclude": ["node_modules"]
 }

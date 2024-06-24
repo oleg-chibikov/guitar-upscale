@@ -7,17 +7,12 @@ import {
   isAdvancedMode,
 } from "@/app/data/chordModes";
 import { cartesian } from "@/app/helpers/cartesian";
-import { Chord, Note, StringOctaveNote } from "../../data/notes";
+import { Chord, NOTE_COUNT, Note, StringOctaveNote } from "../../data/notes";
 import {
   calculateAverage,
   findObjectWithMinValue,
 } from "../../helpers/arrayHelper";
-import {
-  FRET_COUNT,
-  NOTE_COUNT,
-  Neck,
-  STRING_COUNT,
-} from "../generateNeckRepresentation";
+import { FRET_COUNT, Neck, STRING_COUNT } from "../generateNeckRepresentation";
 
 export const MAX_DISTANCE_IN_CHORD = 4;
 

@@ -1,4 +1,5 @@
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
+export const NOTE_COUNT: number = 12;
+export const SHARP_NOTE_COUNT = 5;
 
 export enum Note {
   C = 0,
@@ -34,8 +35,6 @@ export type StringOctaveNote = OctaveNote & {
   string: number;
   fret: number;
 };
-
-export const SHARP_NOTE_COUNT = 5;
 
 // Reverse mapping object
 const noteReverseMapping: { [key: number]: string } = {};

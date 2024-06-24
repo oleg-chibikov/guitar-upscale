@@ -1,6 +1,5 @@
-import { NOTE_COUNT } from "../engine/generateNeckRepresentation";
 import { tuningValue } from "../store/settingsSlice";
-import { Note, OctaveNote } from "./notes";
+import { NOTE_COUNT, Note, OctaveNote } from "./notes";
 
 const OCTAVES_STING = "544433"; // octaves for notes in tuning
 const BASE_TUNING_SHIFT = Note.E - Note.C;

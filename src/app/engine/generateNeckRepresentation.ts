@@ -1,5 +1,6 @@
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import {
+  NOTE_COUNT,
   Note,
   OctaveNote,
   StringOctaveNote,
@@ -7,7 +8,6 @@ import {
 } from "../data/notes";
 
 export type Neck = (StringOctaveNote | null)[][];
-export const NOTE_COUNT: number = 12;
 export const FRET_COUNT: number = NOTE_COUNT * 2;
 export const STRING_COUNT: number = 6;
 

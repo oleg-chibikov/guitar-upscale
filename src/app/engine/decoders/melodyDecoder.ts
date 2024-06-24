@@ -1,5 +1,5 @@
 import { TrackWithNumber } from "@/app/data/example";
-import { Note, OctaveNote } from "@/app/data/notes";
+import { NOTE_COUNT, Note, OctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
@@ -8,7 +8,7 @@ import {
   neckValue,
   tuningValue,
 } from "@/app/store/settingsSlice";
-import { FRET_COUNT, NOTE_COUNT, Neck } from "../generateNeckRepresentation";
+import { FRET_COUNT, Neck } from "../generateNeckRepresentation";
 
 export class MelodyDecoder {
   private track: TrackWithNumber;

@@ -1,6 +1,5 @@
-import { StringOctaveNote } from "@/app/data/notes";
+import { NOTE_COUNT, StringOctaveNote } from "@/app/data/notes";
 import { Skin } from "@/app/data/skin";
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";

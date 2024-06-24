@@ -1,7 +1,6 @@
-import { Note, getNoteText } from "@/app/data/notes";
+import { NOTE_COUNT, Note, getNoteText } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
 import { getUnshiftedNote } from "@/app/data/tunings";
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import {
   setBaseNote,
   setScale,

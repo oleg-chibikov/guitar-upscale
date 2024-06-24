@@ -1,5 +1,6 @@
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import {
+  NOTE_COUNT,
   StringOctaveNote,
   getNoteText,
   serializeStringOctaveNote,
@@ -12,7 +13,6 @@ import {
   NotePlayEventBus,
   NoteToFretMarkerEventMap,
 } from "@/app/engine/eventBus";
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import {
   darkColors,
   fretMarkerPossibleClasses,

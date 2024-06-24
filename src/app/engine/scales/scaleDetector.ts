@@ -1,7 +1,7 @@
 import { AlertType } from "@/app/data/alertType";
+import { NOTE_COUNT } from "@/app/data/notes";
 import { Scale } from "@/app/data/scales";
 import { MissingChar } from "@/app/engine/detectorShared";
-import { NOTE_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { sortScales } from "@/app/engine/scales/scaleSorter";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
