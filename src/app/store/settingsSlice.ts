@@ -5,7 +5,7 @@ import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
-import { scalesMap } from "../data/scales";
+import { getScalePattern, scalesMap } from "../data/scales";
 import {
   getCurrentShift,
   getShiftedNote,
@@ -210,16 +210,13 @@ const onGuitarSettingsUpdate = (
     WithChordIsBeingDetected &
     WithScaleIsBeingDetected
 ) => {
-  const scaleNotesWithoutZero = scalesMap
-    .get(state.scaleGroup)!
-    .get(state.scale);
-  const scalePattern = new Set(scaleNotesWithoutZero?.concat([0])); // all scales include 0, so it's omitted from the scales themselves
+  const scalePattern = getScalePattern(state.scaleGroup, state.scale); // all scales include 0, so it's omitted from the scales themselves
 
   const baseNote = state.baseNote;
   const neck = generateNeckRepresentation(
     scalePattern,
     parseStringToNotes(tuningValue),
-    getShiftedNote(baseNote),
+    getShiftedNote(baseNote, tuningValue),
     baseNote
   );
   state.neck = neck;
@@ -430,10 +427,10 @@ export const settingsSlice = createSlice({
       onGuitarSettingsUpdate(state);
     },
     setTuning(state, action: PayloadAction<Tuning>) {
-      const previousShift = getCurrentShift();
+      const previousShift = getCurrentShift(tuningValue);
       state.tuning = action.payload;
       tuningValue = action.payload;
-      const newShift = getCurrentShift();
+      const newShift = getCurrentShift(tuningValue);
       if (previousShift !== newShift) {
         // all the decoded examples should be deleted if the scale shift changes.
         // They will be deleted async right before the next example is played. (this is needed to avoid loading examples module here)

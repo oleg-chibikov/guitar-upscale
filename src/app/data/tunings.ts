@@ -1,4 +1,3 @@
-import { tuningValue } from "../store/settingsSlice";
 import { NOTE_COUNT, Note, OctaveNote } from "./notes";
 
 const OCTAVES_STING = "544433"; // octaves for notes in tuning
@@ -44,8 +43,8 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
   return notes;
 }
 
-export const getShiftedNote = (note: Note) => {
-  const currentTuningShift = getCurrentShift();
+export const getShiftedNote = (note: Note, tuning: Tuning) => {
+  const currentTuningShift = getCurrentShift(tuning);
 
   const withTuningShift =
     currentTuningShift !== undefined
@@ -55,8 +54,8 @@ export const getShiftedNote = (note: Note) => {
   return (NOTE_COUNT + withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
 
-export const getUnshiftedNote = (note: Note) => {
-  const currentTuningShift = getCurrentShift();
+export const getUnshiftedNote = (note: Note, tuning: Tuning) => {
+  const currentTuningShift = getCurrentShift(tuning);
 
   const withTuningShift =
     currentTuningShift !== undefined
@@ -66,7 +65,7 @@ export const getUnshiftedNote = (note: Note) => {
   return (NOTE_COUNT + withTuningShift - BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
 
-export const getCurrentShift = () => tunings[tuningValue].shift;
+export const getCurrentShift = (tuning: Tuning) => tunings[tuning].shift;
 
 interface TuningData {
   name: string;

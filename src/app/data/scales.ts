@@ -142,3 +142,9 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
     ]),
   ],
 ]);
+
+export const getScalePattern = (scaleGroup: string, scale: string) => {
+  const scaleNotesWithoutZero = scalesMap.get(scaleGroup)!.get(scale);
+  const scalePattern = new Set(scaleNotesWithoutZero?.concat([0])); // all scales include 0, so it's omitted from the scales themselves
+  return scalePattern;
+};

@@ -18,15 +18,63 @@ export const MAX_DISTANCE_IN_CHORD = 4;
 
 export const chordNotesByName = new Map<string, Chord>();
 
+export const generateAllChords = (
+  neck: Neck,
+  useAdvancedChords: boolean,
+  capo: number
+): NoteChords[] => {
+  const allChords: NoteChords[] = [];
+
+  // Loop through all notes
+  for (let note = 0; note < NOTE_COUNT; note++) {
+    const noteChords: NoteChordMode[] = [];
+
+    // Generate all chord variations for the current note
+    for (const [mode, intervals] of chordModesArray) {
+      if (!useAdvancedChords && isAdvancedMode(mode)) {
+        continue;
+      }
+
+      const chordVariations = intervals.flatMap((interval) =>
+        generateChordVariations(capo, note, interval, neck, mode)
+      );
+
+      if (chordVariations.length) {
+        const firstVariation = getClosestVariation(chordVariations);
+        const chordName = getChordName(note, mode);
+        chordNotesByName.set(chordName, firstVariation);
+      }
+      noteChords.push({ mode, variations: chordVariations });
+    }
+
+    // Add the generated chords for the current note to the result
+    allChords.push({ note, modes: noteChords });
+  }
+
+  return allChords;
+};
+
+export const getClosestVariation = (chordVariations: Chord[]) => {
+  const variationAvgDistances = chordVariations.map((variation) => {
+    const distances = variation.map(
+      // lower strings get more priority
+      (note) => note.fret + (STRING_COUNT - note.string * 0.5)
+    );
+    const avgDistance = calculateAverage(distances);
+    return { object: variation, number: avgDistance };
+  });
+  return findObjectWithMinValue(variationAvgDistances);
+};
+
 // Function to generate a chord based on the root note and the intervals
-function generateChord(note: Note, intervals: number[]): Note[] {
+const generateChord = (note: Note, intervals: number[]): Note[] => {
   const chordNotes: Note[] = [];
   for (const interval of intervals) {
     const noteIndex = (note + interval) % 12;
     chordNotes.push(noteIndex);
   }
   return chordNotes;
-}
+};
 
 // Function to find the next occurrence of a note in the chord on the given string within the specified range
 const findNextNotesInChord = (
@@ -66,42 +114,6 @@ const findNextNotesInChord = (
     }
   }
   return notes;
-};
-
-export const generateAllChords = (
-  neck: Neck,
-  useAdvancedChords: boolean,
-  capo: number
-): NoteChords[] => {
-  const allChords: NoteChords[] = [];
-
-  // Loop through all notes
-  for (let note = 0; note < NOTE_COUNT; note++) {
-    const noteChords: NoteChordMode[] = [];
-
-    // Generate all chord variations for the current note
-    for (const [mode, intervals] of chordModesArray) {
-      if (!useAdvancedChords && isAdvancedMode(mode)) {
-        continue;
-      }
-
-      const chordVariations = intervals.flatMap((interval) =>
-        generateChordVariations(capo, note, interval, neck, mode)
-      );
-
-      if (chordVariations.length) {
-        const firstVariation = getClosestVariation(chordVariations);
-        const chordName = getChordName(note, mode);
-        chordNotesByName.set(chordName, firstVariation);
-      }
-      noteChords.push({ mode, variations: chordVariations });
-    }
-
-    // Add the generated chords for the current note to the result
-    allChords.push({ note, modes: noteChords });
-  }
-
-  return allChords;
 };
 
 // Function to generate all the variations of a chord on the guitar neck
@@ -145,18 +157,6 @@ const generateChordVariations = (
   //   debugger;
   // }
   return chordVariations;
-};
-
-export const getClosestVariation = (chordVariations: Chord[]) => {
-  const variationAvgDistances = chordVariations.map((variation) => {
-    const distances = variation.map(
-      // lower strings get more priority
-      (note) => note.fret + (STRING_COUNT - note.string * 0.5)
-    );
-    const avgDistance = calculateAverage(distances);
-    return { object: variation, number: avgDistance };
-  });
-  return findObjectWithMinValue(variationAvgDistances);
 };
 
 const getPossibleNotes = (

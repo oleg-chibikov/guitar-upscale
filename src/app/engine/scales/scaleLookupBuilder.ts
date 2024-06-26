@@ -5,6 +5,7 @@ import {
   setBaseNote,
   setScale,
   setScaleGroup,
+  tuningValue,
 } from "@/app/store/settingsSlice";
 import { Dispatch, UnknownAction } from "redux";
 
@@ -21,7 +22,7 @@ export const setCurrentScaleAndGroup = (
 ) => {
   dispatch(setScaleGroup(data.group));
   dispatch(setScale(data.scale));
-  const unshiftedNote = getUnshiftedNote(data.note);
+  const unshiftedNote = getUnshiftedNote(data.note, tuningValue);
   console.log("New base note", getNoteText(unshiftedNote));
   dispatch(setBaseNote(unshiftedNote));
 };

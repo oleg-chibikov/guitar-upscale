@@ -22,6 +22,7 @@ import {
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
+  tuningValue,
 } from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
@@ -48,7 +49,7 @@ export const parseMidiData = async (
     distinctNotes,
     distinctNotes.filter((x) => x !== undefined).length,
     (result) => {
-      const currentBaseNote = getShiftedNote(baseNoteValue);
+      const currentBaseNote = getShiftedNote(baseNoteValue, tuningValue);
       if (result.scales?.length) {
         const scalesInSameBaseNote = result.scales.filter(
           (x) => x.note === currentBaseNote
