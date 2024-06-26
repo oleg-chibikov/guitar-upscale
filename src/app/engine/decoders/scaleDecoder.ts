@@ -5,31 +5,35 @@ import {
 } from "@/app/data/notes";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { neckValue } from "@/app/store/settingsSlice";
+import { baseNoteValue, neckValue } from "@/app/store/settingsSlice";
 
 export const getWholeScale = (playFullString: boolean): EventsByTick => {
-  if (!neckValue) {
+  const neck = neckValue;
+  if (!neck) {
     throw new Error("Neck is not set up");
   }
-  const neckCopy = [...neckValue];
+
+  const neckCopy: StringOctaveNote[][] = [];
   const reverse = Math.random() < 0.5;
-  if (reverse) {
-    neckCopy.reverse();
-  }
+  const capo = baseNoteValue;
+  neck.forEach((neckString, index) => {
+    const stringCopy = [...neckString].filter(
+      (x) => x && x.fret >= capo
+    ) as StringOctaveNote[];
+    neckCopy[reverse ? neck.length - 1 - index : index] = stringCopy;
+  });
 
   let tickIndex = 0;
   const result = new EventsByTick();
   // used to be stored in StringOctaveNotes
   let realStringIndex = reverse ? neckCopy.length - 1 : 0;
   let orderedStringIndex = 0;
-  for (const string of neckCopy) {
-    const stringCopy = [...string].filter((x) => x) as StringOctaveNote[];
-
+  for (const neckString of neckCopy) {
     realStringIndex = reverse ? realStringIndex - 1 : realStringIndex + 1; //incrementing string index here
     orderedStringIndex++;
 
     if (!reverse) {
-      stringCopy.reverse();
+      neckString.reverse();
     }
 
     let boundaryNote: string | undefined = undefined;
@@ -48,7 +52,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
       }
     }
 
-    for (const note of stringCopy) {
+    for (const note of neckString) {
       if (boundaryNote !== undefined) {
         const serializedNote = serializeOctaveNote(note);
 
