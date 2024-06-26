@@ -123,7 +123,7 @@ const initialState: SettingsState = {
   volume: MAX_VOLUME,
   metronomeVolume: MAX_VOLUME,
   playbackType: PlaybackType.Melody,
-  chordPlayMode: ChordPlayMode.Closest_Variation,
+  chordPlayMode: ChordPlayMode.Preferred_Variation,
   chordNotesToPlay: 6,
   tuning: "EBGDAE",
   instrumentGroup: "Guitar",

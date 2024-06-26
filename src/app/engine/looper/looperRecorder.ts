@@ -57,7 +57,7 @@ export class LooperRecorder {
             chord.chord
           );
           if (preferredVariations) {
-            for (const chordNote of preferredVariations.closest) {
+            for (const chordNote of preferredVariations.preferred) {
               if (!chordNote) {
                 continue;
               }

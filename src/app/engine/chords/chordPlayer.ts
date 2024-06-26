@@ -65,7 +65,7 @@ export const playFirstChordVariation = async (params: ChordPlayParameters) => {
   await playVariation(variation, "first", params);
 };
 
-export const playClosestChordVariation = async (
+export const playPreferredChordVariation = async (
   params: ChordPlayParameters
 ) => {
   if (!params.noteChordMode.variations.length) {
@@ -75,7 +75,43 @@ export const playClosestChordVariation = async (
     params.chordName
   );
   if (preferredVariations) {
-    await playVariation(preferredVariations.closest, "closest", params);
+    await playVariation(preferredVariations.preferred, "preferred", params);
+  }
+};
+
+export const playPreferredChordVariationWithMinimumNotes = async (
+  params: ChordPlayParameters
+) => {
+  if (!params.noteChordMode.variations.length) {
+    return;
+  }
+  const preferredVariations = chordsGenerator.chordNotesByName.get(
+    params.chordName
+  );
+  if (preferredVariations) {
+    await playVariation(
+      preferredVariations.preferredWithMinNotes,
+      "preferred min notes",
+      params
+    );
+  }
+};
+
+export const playPreferredChordVariationWithMaximumNotes = async (
+  params: ChordPlayParameters
+) => {
+  if (!params.noteChordMode.variations.length) {
+    return;
+  }
+  const preferredVariations = chordsGenerator.chordNotesByName.get(
+    params.chordName
+  );
+  if (preferredVariations) {
+    await playVariation(
+      preferredVariations.preferredWithMaxNotes,
+      "preferred max notes",
+      params
+    );
   }
 };
 

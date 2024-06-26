@@ -362,8 +362,8 @@ class ChordsGenerator {
       );
     }
 
-    // after the mode has been processed we need to find the closest variation for it and put into the dedicated map
-    this.findClosestVariationForChordMode(modeIndex, chordMode);
+    // after the mode has been processed we need to find the preferred variation for it and put into the dedicated map
+    this.findAndStorePreferredVariationsForChordMode(modeIndex, chordMode);
   };
 
   private processFret = (
@@ -402,7 +402,7 @@ class ChordsGenerator {
     );
   };
 
-  private findClosestVariationForChordMode(
+  private findAndStorePreferredVariationsForChordMode(
     modeIndex: number,
     chordMode: ChordMode
   ) {

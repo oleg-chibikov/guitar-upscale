@@ -2,8 +2,9 @@ import { Chord, StringOctaveNote } from "@/app/data/notes";
 import { calculateAverage } from "@/app/helpers/arrayHelper";
 
 export type ChordPreferredVariations = {
-  closest: Chord;
-  closestWithMinNotes: Chord;
+  preferred: Chord;
+  preferredWithMinNotes: Chord;
+  preferredWithMaxNotes: Chord;
 };
 
 type StringPreference = "high" | "low";
@@ -103,25 +104,62 @@ export const getPreferredChordVariations = (
   stringPreference: StringPreference = "high",
   numberOfStrings: number
 ): ChordPreferredVariations => {
-  const preferredVariation = getPreferredChordVariation(
+  const preferred = getPreferredChordVariation(
     chordVariations,
     stringPreference,
     numberOfStrings
   );
 
+  const preferredWithMinNotes = getPreferredChordVariationWithMinNotes(
+    chordVariations,
+    stringPreference,
+    numberOfStrings
+  );
+  const preferredWithMaxNotes = getPreferredChordVariationWithMaxNotes(
+    chordVariations,
+    stringPreference,
+    numberOfStrings
+  );
+
+  return {
+    preferred,
+    preferredWithMinNotes,
+    preferredWithMaxNotes,
+  };
+};
+
+const getPreferredChordVariationWithMinNotes = (
+  chordVariations: Chord[],
+  stringPreference: StringPreference,
+  numberOfStrings: number
+) => {
   const minPlayedNotes = Math.min(
     ...chordVariations.map((v) => v.filter((note) => note !== undefined).length)
   );
   const variationsWithMinNotes = chordVariations.filter(
     (v) => v.filter((note) => note !== undefined).length === minPlayedNotes
   );
+  return getPreferredChordVariation(
+    variationsWithMinNotes,
+    stringPreference,
+    numberOfStrings
+  );
+};
 
-  return {
-    closest: preferredVariation,
-    closestWithMinNotes: getPreferredChordVariation(
-      variationsWithMinNotes,
-      stringPreference,
-      numberOfStrings
-    ),
-  };
+const getPreferredChordVariationWithMaxNotes = (
+  chordVariations: Chord[],
+  stringPreference: StringPreference,
+  numberOfStrings: number
+) => {
+  const maxPlayedNotes = Math.max(
+    ...chordVariations.map((v) => v.filter((note) => note !== undefined).length)
+  );
+  const variationsWithMinNotes = chordVariations.filter(
+    (v) => v.filter((note) => note !== undefined).length === maxPlayedNotes
+  );
+  return getPreferredChordVariation(
+    variationsWithMinNotes,
+    stringPreference,
+    numberOfStrings
+  );
 };

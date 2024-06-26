@@ -9,7 +9,7 @@ export type Scale = number[];
 // ^51 - immediately play 1st fret on 5th string without pausing (useful for chords)
 // ^41-2 - immediately play 12th fret on 4th string following the same rules
 // (<melody>)3 play <melody> for 3 times
-// <Asus4> - play Asus4 chord immediately. It uses the variation closest to the neck head and the strumming delay from settings
+// <Asus4> - play Asus4 chord immediately. It uses the preferred variation head and the strumming delay from settings
 
 export const SPECIAL = "Special";
 export const CHROMATIC = "Chromatic (All notes)";
