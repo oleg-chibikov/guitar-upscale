@@ -145,7 +145,7 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
               },
               {
                 melody:
-                  "*5(<E>________<G#dim>________<Am>________<G#dim>____4___)2 <Caug>___7____<Bdim>___5____<E6>____<E6>____<E6>__1_0",
+                  "*5(<E>________<G#dim>________<Am>________<G#dim>____4___)2 <Caug>___7____<Bdim>___5____<E7>____<E7>____<E7>__1_0",
               },
             ],
           },
