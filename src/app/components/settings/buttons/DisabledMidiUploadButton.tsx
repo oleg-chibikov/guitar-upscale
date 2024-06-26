@@ -7,7 +7,7 @@ export const DisabledMidiUploadButton: React.FC = (props) => {
   return (
     <NoPremiumButton
       {...props}
-      planName="composer"
+      planName="a Composer"
       functionalityDescription="upload and play MIDI"
       icon={<UploadFile />}
     />
