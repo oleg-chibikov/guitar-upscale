@@ -84,7 +84,6 @@ const getTierFromPatreonApi = async (accessToken: string) => {
 };
 
 const getTierFromWhitelist = (email?: string) => {
-  return "Composer";
   if (email !== undefined && email.length) {
     if (composerWhitelist.has(email)) {
       return "Composer";

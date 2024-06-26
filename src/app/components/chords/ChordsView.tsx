@@ -1,6 +1,10 @@
 import { Expander } from "@/app/components/layout/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import { ChordMode, NoteChordMode, getChordName } from "@/app/data/chordModes";
+import {
+  NoteChordMode,
+  getChordName,
+  isAdvancedMode,
+} from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
@@ -85,9 +89,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     : false; // TODO: so-so protection:)
 
   const checkIsHiddenMode = (noteChordMode: NoteChordMode) =>
-    !hasAdvancedChords &&
-    noteChordMode.mode !== ChordMode.Major &&
-    noteChordMode.mode !== ChordMode.Minor;
+    !hasAdvancedChords && isAdvancedMode(noteChordMode.mode);
 
   const totalRows = chords.length - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
   const totalColumns = chords[0].modes.filter(

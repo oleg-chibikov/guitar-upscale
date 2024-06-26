@@ -1,239 +1,396 @@
 import { Chord, Note, getNoteText } from "@/app/data/notes";
 
-export enum ChordMode {
-  Major,
-  Minor,
-  Diminished,
-  Augmented,
-  Augmented7,
-  Suspended4,
-  Suspended2,
-  Fifth, // Power chord
-  Sixth,
-  SixthMinorMajor,
-  SixthAdd9,
-  SixthMinorAdd9,
-  Seventh,
-  SeventhMajor,
-  SeventhMinor,
-  SeventhMinorMajor,
-  Ninth,
-  NinthMajor,
-  NinthMinor,
-  NinthMinorMajor,
-  Eleventh,
-  EleventhMajor,
-  EleventhMinor,
-  EleventhMinorMajor,
-  Add2,
-  Add9,
-  MinorAdd9,
-  Hendrix,
+export interface ChordMode {
+  description: string; // Description of the chord
+  intervals: number[]; // List of intervals in semitones from the root note
+  name: string; // Commonly used name for the chord
+  triad: string; // Type of triad (e.g., Major, Minor, Diminished, Augmented, Suspended)
+  extensions: string[]; // List of extensions (e.g., "maj7", "9")
+  canSkipPerfectFifth: boolean; // Indicates if the perfect fifth can be omitted
 }
 
-export const isAdvancedMode = (mode: ChordMode) =>
-  mode !== ChordMode.Major && mode !== ChordMode.Minor;
+export const chordModes: ChordMode[] = [
+  {
+    description: "Major",
+    intervals: [0, 4, 7],
+    name: "",
+    triad: "Major",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor",
+    intervals: [0, 3, 7],
+    name: "m",
+    triad: "Minor",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Diminished",
+    intervals: [0, 3, 6],
+    name: "dim",
+    triad: "Diminished",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Augmented",
+    intervals: [0, 4, 8],
+    name: "aug",
+    triad: "Augmented",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Suspended 2nd",
+    intervals: [0, 2, 7],
+    name: "sus2",
+    triad: "Suspended",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Suspended 4th",
+    intervals: [0, 5, 7],
+    name: "sus4",
+    triad: "Suspended",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Major 7th",
+    intervals: [0, 4, 7, 11],
+    name: "maj7",
+    triad: "Major",
+    extensions: ["maj7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor 7th",
+    intervals: [0, 3, 7, 10],
+    name: "m7",
+    triad: "Minor",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Dominant 7th",
+    intervals: [0, 4, 7, 10],
+    name: "7",
+    triad: "Major",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Diminished 7th",
+    intervals: [0, 3, 6, 9],
+    name: "dim7",
+    triad: "Diminished",
+    extensions: ["dim7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Half-Diminished 7th",
+    intervals: [0, 3, 6, 10],
+    name: "m7b5",
+    triad: "Diminished",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Augmented 7th",
+    intervals: [0, 4, 8, 10],
+    name: "aug7",
+    triad: "Augmented",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor Major 7",
+    intervals: [0, 3, 7, 11],
+    name: "mMaj7",
+    triad: "Minor",
+    extensions: ["maj7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Major 9th",
+    intervals: [0, 4, 7, 11, 14],
+    name: "maj9",
+    triad: "Major",
+    extensions: ["maj7", "9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor 9th",
+    intervals: [0, 3, 7, 10, 14],
+    name: "m9",
+    triad: "Minor",
+    extensions: ["7", "9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Dominant 9th",
+    intervals: [0, 4, 7, 10, 14],
+    name: "9",
+    triad: "Major",
+    extensions: ["7", "9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor Major 9",
+    intervals: [0, 3, 7, 11, 14],
+    name: "mMaj9",
+    triad: "Minor",
+    extensions: ["maj7", "9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Major 11th",
+    intervals: [0, 4, 7, 11, 14, 17],
+    name: "maj11",
+    triad: "Major",
+    extensions: ["maj7", "9", "11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "Minor 11th",
+    intervals: [0, 3, 7, 10, 14, 17],
+    name: "m11",
+    triad: "Minor",
+    extensions: ["7", "9", "11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "Dominant 11th",
+    intervals: [0, 4, 7, 10, 14, 17],
+    name: "11",
+    triad: "Major",
+    extensions: ["7", "9", "11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "Major 13th",
+    intervals: [0, 4, 7, 11, 14, 17, 21],
+    name: "maj13",
+    triad: "Major",
+    extensions: ["maj7", "9", "11", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "Minor 13th",
+    intervals: [0, 3, 7, 10, 14, 17, 21],
+    name: "m13",
+    triad: "Minor",
+    extensions: ["7", "9", "11", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "Dominant 13th",
+    intervals: [0, 4, 7, 10, 14, 17, 21],
+    name: "13",
+    triad: "Major",
+    extensions: ["7", "9", "11", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "6th",
+    intervals: [0, 4, 7, 9],
+    name: "6",
+    triad: "Major",
+    extensions: ["6"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "Minor 6th",
+    intervals: [0, 3, 7, 9],
+    name: "m6",
+    triad: "Minor",
+    extensions: ["6"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "6/9",
+    intervals: [0, 4, 7, 9, 14],
+    name: "6/9",
+    triad: "Major",
+    extensions: ["6", "9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "7sus4",
+    intervals: [0, 5, 7, 10],
+    name: "7sus4",
+    triad: "Suspended",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "9sus4",
+    intervals: [0, 5, 7, 10, 14],
+    name: "9sus4",
+    triad: "Suspended",
+    extensions: ["7", "9"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "13sus4",
+    intervals: [0, 5, 7, 10, 14, 17, 21],
+    name: "13sus4",
+    triad: "Suspended",
+    extensions: ["7", "9", "11", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "7b5",
+    intervals: [0, 4, 6, 10],
+    name: "7b5",
+    triad: "Major",
+    extensions: ["7", "b5"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "7#5",
+    intervals: [0, 4, 8, 10],
+    name: "7#5",
+    triad: "Augmented",
+    extensions: ["7"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "7b9",
+    intervals: [0, 4, 7, 10, 13],
+    name: "7b9",
+    triad: "Major",
+    extensions: ["7", "b9"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "7#9",
+    intervals: [0, 4, 7, 10, 15],
+    name: "7#9",
+    triad: "Major",
+    extensions: ["7", "#9"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "7#11",
+    intervals: [0, 4, 7, 10, 18],
+    name: "7#11",
+    triad: "Major",
+    extensions: ["7", "#11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "7b13",
+    intervals: [0, 4, 7, 10, 20],
+    name: "7b13",
+    triad: "Major",
+    extensions: ["7", "b13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "7 Sharp 9 Sharp 11",
+    intervals: [0, 4, 7, 10, 15, 18],
+    name: "7#9#11",
+    triad: "Major",
+    extensions: ["7", "#9", "#11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "9#11",
+    intervals: [0, 4, 7, 10, 14, 18],
+    name: "9#11",
+    triad: "Major",
+    extensions: ["7", "9", "#11"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "9 Flat 13",
+    intervals: [0, 4, 7, 10, 14, 20],
+    name: "9b13",
+    triad: "Major",
+    extensions: ["7", "9", "b13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "13#11",
+    intervals: [0, 4, 7, 10, 14, 18, 21],
+    name: "13#11",
+    triad: "Major",
+    extensions: ["7", "9", "#11", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "13 Flat 9",
+    intervals: [0, 4, 7, 10, 13, 21],
+    name: "13b9",
+    triad: "Major",
+    extensions: ["7", "b9", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "13 Sharp 9",
+    intervals: [0, 4, 7, 10, 15, 21],
+    name: "13#9",
+    triad: "Major",
+    extensions: ["7", "#9", "13"],
+    canSkipPerfectFifth: true,
+  },
+  {
+    description: "MajorAdd9",
+    intervals: [0, 4, 7, 14],
+    name: "add9",
+    triad: "Major",
+    extensions: ["9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "MinorAdd9",
+    intervals: [0, 3, 7, 14],
+    name: "madd9",
+    triad: "Minor",
+    extensions: ["9"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "MajorAdd11",
+    intervals: [0, 4, 7, 17],
+    name: "add11",
+    triad: "Major",
+    extensions: ["11"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "MinorAdd11",
+    intervals: [0, 3, 7, 17],
+    name: "madd11",
+    triad: "Minor",
+    extensions: ["11"],
+    canSkipPerfectFifth: false,
+  },
+  {
+    description: "5 (Power Chord)",
+    intervals: [0, 7],
+    name: "5",
+    triad: "Power",
+    extensions: [],
+    canSkipPerfectFifth: false,
+  },
+];
 
-export function getModeText(mode: ChordMode): string {
-  switch (mode) {
-    case ChordMode.Major:
-      return "";
-    case ChordMode.Minor:
-      return "m";
-    case ChordMode.Diminished:
-      return "dim";
-    case ChordMode.Augmented:
-      return "aug";
-    case ChordMode.Augmented7:
-      return "aug7";
-    case ChordMode.Suspended4:
-      return "sus4";
-    case ChordMode.Suspended2:
-      return "sus2";
-    case ChordMode.Fifth:
-      return "5";
-    case ChordMode.Sixth:
-      return "6";
-    case ChordMode.SixthMinorMajor:
-      return "mM6";
-    case ChordMode.SixthAdd9:
-      return "6/9";
-    case ChordMode.SixthMinorAdd9:
-      return "6m/9";
-    case ChordMode.Seventh:
-      return "7";
-    case ChordMode.SeventhMajor:
-      return "M7";
-    case ChordMode.SeventhMinor:
-      return "m7";
-    case ChordMode.SeventhMinorMajor:
-      return "mM7";
-    case ChordMode.Ninth:
-      return "9";
-    case ChordMode.NinthMajor:
-      return "M9";
-    case ChordMode.NinthMinor:
-      return "m9";
-    case ChordMode.NinthMinorMajor:
-      return "mM9";
-    case ChordMode.Eleventh:
-      return "11";
-    case ChordMode.EleventhMajor:
-      return "M11";
-    case ChordMode.EleventhMinor:
-      return "m11";
-    case ChordMode.EleventhMinorMajor:
-      return "mM11";
-    case ChordMode.Add2:
-      return "/2";
-    case ChordMode.Add9:
-      return "/9";
-    case ChordMode.MinorAdd9:
-      return "m/9";
-    case ChordMode.Hendrix:
-      return "7#9";
-  }
-}
+export const isAdvancedMode = (mode: ChordMode) => mode.extensions.length > 0;
 
-function buildModeOrder(): string[] {
-  return Object.values(ChordMode)
-    .filter((value) => typeof value === "number")
-    .map((value) => getModeText(value as ChordMode));
-}
+export const getModeText = (mode: ChordMode): string => mode.name;
+
+const buildModeOrder = (): string[] => chordModes.map((x) => x.name);
 
 export const chordModeOrder = buildModeOrder();
 
-export function getModeSuffix(chord: string): string {
-  // Remove the root part of the chord (the first character and an optional '#')
-  let rootEndIndex = 1;
-  if (chord[1] === "#") {
-    rootEndIndex = 2;
-  }
-
-  // Extract the suffix
-  return chord.substring(rootEndIndex);
-}
-
-export const chordModes = new Map<ChordMode, number[][]>([
-  [
-    ChordMode.Major,
-    [
-      [0, 7, 0, 4, 7, 0],
-      [0, 4, 7, 0, 4, 0], // the first option doesn't cover standard C chord but this does
-    ],
-  ],
-  [ChordMode.Minor, [[0, 7, 0, 3, 7, 0]]],
-  [ChordMode.Diminished, [[0, 6, 0, 3, 7, 0]]],
-  [ChordMode.Augmented, [[0, 8, 0, 4, 7, 0]]],
-  [
-    ChordMode.Augmented7,
-    [
-      [0, 8, 10, 4, 7, 0],
-      [0, 8, 10, 4, 10, 0],
-      [0, 8, 0, 4, 10, 0],
-    ],
-  ],
-  [ChordMode.Suspended4, [[0, 5, 0, 5, 7, 0]]],
-  [
-    ChordMode.Suspended2,
-    [
-      [0, 7, 0, 2, 7, 0],
-      [0, 7, 4, 2, 7, 0],
-    ],
-  ],
-  [ChordMode.Fifth, [[0, 7, 0, 7, 7, 0]]],
-  [
-    ChordMode.Sixth,
-    [
-      [0, 7, 0, 4, 9, 0],
-      [0, 7, 0, 7, 9, 3],
-    ],
-  ],
-  [
-    ChordMode.SixthMinorMajor,
-    [
-      [0, 7, 0, 3, 9, 0],
-      [0, 7, 0, 3, 9, 3],
-      [0, 9, 0, 3, 7, 0],
-    ],
-  ],
-  [ChordMode.SixthAdd9, [[0, 7, 2, 7, 9, 4]]],
-  [ChordMode.SixthMinorAdd9, [[0, 7, 2, 7, 9, 3]]],
-  [
-    ChordMode.Seventh,
-    [
-      [0, 7, 10, 4, 7, 0],
-      [0, 7, 0, 4, 10, 0],
-    ],
-  ],
-  [
-    ChordMode.SeventhMajor,
-    [
-      [0, 7, 11, 4, 7, 0],
-      [0, 7, 0, 7, 11, 4],
-      [0, 8, 0, 3, 7, 0],
-    ],
-  ],
-  [ChordMode.SeventhMinor, [[0, 7, 10, 3, 7, 0]]],
-  [ChordMode.SeventhMinorMajor, [[0, 7, 11, 3, 7, 0]]],
-  [
-    ChordMode.Ninth,
-    [
-      [0, 7, 10, 4, 7, 2],
-      [0, 7, 2, 7, 10, 4],
-    ],
-  ],
-  [ChordMode.NinthMajor, [[0, 7, 11, 4, 7, 2]]],
-  [
-    ChordMode.NinthMinor,
-    [
-      [0, 7, 10, 3, 7, 2],
-      [0, 7, 10, 3, 10, 2],
-      [0, 7, 0, 3, 10, 2],
-    ],
-  ],
-  [ChordMode.NinthMinorMajor, [[0, 7, 11, 3, 7, 2]]],
-  [
-    ChordMode.Eleventh,
-    [
-      [0, 5, 10, 4, 7, 2],
-      [0, 5, 2, 7, 10, 4],
-    ],
-  ],
-  [ChordMode.EleventhMajor, [[0, 5, 11, 4, 7, 2]]],
-  [
-    ChordMode.EleventhMinor,
-    [
-      [0, 5, 10, 3, 7, 2],
-      [0, 7, 2, 5, 10, 3],
-    ],
-  ],
-  [ChordMode.EleventhMinorMajor, [[0, 5, 11, 3, 7, 2]]],
-  [ChordMode.Add2, [[0, 7, 2, 4, 7, 0]]],
-  [
-    ChordMode.Add9,
-    [
-      [0, 7, 0, 4, 7, 2],
-      [0, 7, 2, 7, 7, 4],
-    ],
-  ],
-  [
-    ChordMode.MinorAdd9,
-    [
-      [0, 7, 0, 3, 7, 2],
-      [0, 7, 2, 7, 7, 3],
-    ],
-  ],
-  [
-    ChordMode.Hendrix,
-    [
-      [0, 0, 4, 10, 3, 0],
-      [0, 7, 10, 4, 10, 3],
-    ],
-  ], // [0, 7, 0, 4, 7, 0],
-]);
-
-export const chordModesArray = Array.from(chordModes);
+// Remove the root part of the chord (the first character and an optional '#')
+export const getModeSuffix = (chord: string): string =>
+  chord.substring(chord[1] === "#" ? 2 : 1);
 
 export type NoteChordMode = {
   mode: ChordMode;

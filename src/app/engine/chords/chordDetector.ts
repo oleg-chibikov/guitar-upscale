@@ -83,7 +83,11 @@ class ChordDetector {
     }
 
     // Populate serializedChord with note values where string is set
+    // TODO: Chord is already generated as an array by string - can we utilize it here?
     chord.forEach((stringOctaveNote) => {
+      if (!stringOctaveNote) {
+        return;
+      }
       serializedChord[stringOctaveNote.string] = stringOctaveNote.fret;
     });
 

@@ -49,6 +49,7 @@ Object.keys(Note)
   });
 
 export const getNoteText = (noteNumber: number): string => {
+  // TODO: Note[noteNumber] should work
   if (noteNumber < 0 || noteNumber > 11) {
     throw new Error("Invalid note number");
   }
@@ -67,7 +68,8 @@ export const serializeOctaveNote = (note: OctaveNote) =>
 export const serializeStringOctaveNote = (note: StringOctaveNote) =>
   [note.string, note.octave, note.note].join("_");
 
-export type Chord = StringOctaveNote[];
+export type Chord = FingerPosition[];
+export type FingerPosition = StringOctaveNote | undefined; // represents a note in a chord on a particular string. Undefined means there is no note on that string
 
 export const initNotesArray = <T>() =>
   Array.from({ length: NOTE_COUNT }, (_) => undefined as T);

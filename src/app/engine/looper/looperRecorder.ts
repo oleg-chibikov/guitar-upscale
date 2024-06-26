@@ -1,4 +1,4 @@
-import { chordNotesByName } from "@/app/engine/chords/chordsGenerator";
+import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
@@ -53,9 +53,14 @@ export class LooperRecorder {
           );
         }
         if (chord) {
-          const notes = chordNotesByName.get(chord.chord);
-          if (notes) {
-            for (const chordNote of notes) {
+          const preferredVariations = chordsGenerator.chordNotesByName.get(
+            chord.chord
+          );
+          if (preferredVariations) {
+            for (const chordNote of preferredVariations.closest) {
+              if (!chordNote) {
+                continue;
+              }
               noteRecorder.addNoteAtTick(
                 chordNote,
                 chord.metadata.looperChannel ??

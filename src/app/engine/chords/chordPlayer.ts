@@ -1,5 +1,5 @@
 import { NoteChordMode } from "@/app/data/chordModes";
-import { getClosestVariation } from "@/app/engine/chords/chordsGenerator";
+import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import { Chord } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
 import { chordNotesToPlayValue } from "../../store/settingsSlice";
@@ -30,6 +30,9 @@ const playVariation = async (
   console.log(`Playing ${variationKey} variation of ${chordName}`);
   const toPlay = reverse ? [...variation].reverse() : variation;
   for (const note of toPlay) {
+    if (!note) {
+      continue;
+    }
     NotePlayEventBus.next({
       ...rest, // track metadata and strumming metadata
       stringOctaveNote: note,
@@ -68,9 +71,11 @@ export const playClosestChordVariation = async (
   if (!params.noteChordMode.variations.length) {
     return;
   }
-  const closestVariation = getClosestVariation(params.noteChordMode.variations);
-  if (closestVariation) {
-    await playVariation(closestVariation, "closest", params);
+  const preferredVariations = chordsGenerator.chordNotesByName.get(
+    params.chordName
+  );
+  if (preferredVariations) {
+    await playVariation(preferredVariations.closest, "closest", params);
   }
 };
 

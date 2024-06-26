@@ -12,10 +12,6 @@ import {
   parseStringToNotes,
   Tuning,
 } from "../data/tunings";
-import {
-  chordNotesByName,
-  generateAllChords,
-} from "../engine/chords/chordsGenerator";
 import { clearPreviousChords } from "../engine/eventBus";
 import {
   generateNeckRepresentation,
@@ -28,6 +24,7 @@ import {
   clearChordDetector,
   rebuildChordDetectorLookup,
 } from "@/app/engine/chords/chordLookupBuilder";
+import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
 import {
   isMainClockActiveValue,
@@ -247,8 +244,11 @@ const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
   }
 
   // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
-  chordNotesByName.clear();
-  const chordsForNeck = generateAllChords(state.neck, true, state.baseNote);
+  const chordsForNeck = chordsGenerator.process(
+    state.neck,
+    true,
+    state.baseNote
+  );
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;
   clearChordDetector?.();

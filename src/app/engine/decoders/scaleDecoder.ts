@@ -1,4 +1,8 @@
-import { Chord, OctaveNote, serializeOctaveNote } from "@/app/data/notes";
+import {
+  OctaveNote,
+  StringOctaveNote,
+  serializeOctaveNote,
+} from "@/app/data/notes";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { neckValue } from "@/app/store/settingsSlice";
@@ -19,7 +23,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
   let realStringIndex = reverse ? neckCopy.length - 1 : 0;
   let orderedStringIndex = 0;
   for (const string of neckCopy) {
-    const stringCopy = [...string].filter((x) => x) as Chord;
+    const stringCopy = [...string].filter((x) => x) as StringOctaveNote[];
 
     realStringIndex = reverse ? realStringIndex - 1 : realStringIndex + 1; //incrementing string index here
     orderedStringIndex++;
