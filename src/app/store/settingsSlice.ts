@@ -118,7 +118,7 @@ const initialState: SettingsState = {
   baseNote: Note.E,
   neck: null,
   chords: null,
-  tempoBpm: 140,
+  tempoBpm: 120,
   chordStrummingDelayMs: 3,
   volume: MAX_VOLUME,
   metronomeVolume: MAX_VOLUME,
