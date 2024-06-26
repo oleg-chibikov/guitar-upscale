@@ -57,9 +57,14 @@ const persistConfig = {
         const newState = { ...state } as any; // TODO: I don't understand it fully, but it works like this
         delete newState.neck;
         delete newState.chords;
+        delete newState.settingsExpanded;
+        delete newState.chordsExpanded;
+        delete newState.controlPanelExpanded;
+        delete newState.strummingSettingsExpanded;
         delete newState.showAlert;
-        delete newState.alertMessage;
         delete newState.alertType;
+        delete newState.alertTimeout;
+        delete newState.alertMessage;
         delete newState.suggestedScales;
         delete newState.showScalesAlert;
         delete newState.isMetronomeActive;
