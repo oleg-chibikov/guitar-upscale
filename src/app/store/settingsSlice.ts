@@ -119,7 +119,7 @@ const initialState: SettingsState = {
   neck: null,
   chords: null,
   tempoBpm: 140,
-  chordStrummingDelayMs: 20,
+  chordStrummingDelayMs: 3,
   volume: MAX_VOLUME,
   metronomeVolume: MAX_VOLUME,
   playbackType: PlaybackType.Melody,
