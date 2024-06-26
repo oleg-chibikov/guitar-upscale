@@ -36,6 +36,7 @@ export const looperState: LooperState = [];
 
 export const clearLooperState = () => {
   looperState.forEach(initializeChannel);
+  stopMetronomeIfNeeded(store.dispatch);
 };
 
 export const stopLooperPlayback = () => {
