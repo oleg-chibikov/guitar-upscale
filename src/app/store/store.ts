@@ -58,8 +58,8 @@ const persistConfig = {
         delete newState.neck;
         delete newState.chords;
         delete newState.settingsExpanded;
-        delete newState.chordsExpanded;
-        delete newState.controlPanelExpanded;
+        // delete newState.chordsExpanded; // chords could stay expanded
+        // delete newState.controlPanelExpanded; // control panel could stay expanded
         delete newState.strummingSettingsExpanded;
         delete newState.showAlert;
         delete newState.alertType;

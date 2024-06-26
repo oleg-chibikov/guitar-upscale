@@ -7,7 +7,7 @@ import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { RootState } from "./store"; // Define RootState type
 
-const initialTheme = Theme.Dark;
+const initialTheme = Theme.MatchOS;
 
 export const minXZoom = 1;
 export const maxXZoom = 3;

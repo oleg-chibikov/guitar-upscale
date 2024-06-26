@@ -1,3 +1,4 @@
+import { ResetSettingsButton } from "@/app/components/settings/buttons/ResetSettingsButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
@@ -77,6 +78,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           <MetronomeVolumeSlider />
           {!isMobileDeviceValue &&
             (premiumComponents.get("reverbStrength") as ReactNode)}
+          <ResetSettingsButton />
         </div>
       </section>
     </Slide>
