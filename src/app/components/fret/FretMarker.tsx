@@ -6,6 +6,7 @@ import {
   serializeStringOctaveNote,
 } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
+import { getShiftedNote } from "@/app/data/tunings";
 import { getCurrentRelativeTick } from "@/app/engine/clock/mainClock";
 import {
   ClearNoteMetadata,
@@ -26,6 +27,7 @@ import {
   chordStrummingDelayMsValue,
   scaleIsBeingDetectedValue,
   selectSettings,
+  tuningValue,
 } from "@/app/store/settingsSlice";
 import { selectUi, themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
@@ -331,7 +333,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       case NoteDisplayMode.Note:
         return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
       case NoteDisplayMode.Note_Shift: {
-        const result = (stringOctaveNote.note - baseNoteValue) % NOTE_COUNT;
+        const result =
+          (stringOctaveNote.note - getShiftedNote(baseNoteValue, tuningValue)) %
+          NOTE_COUNT;
         return result >= 0 ? result : result + NOTE_COUNT;
       }
       default:
@@ -343,7 +347,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     (isHeader &&
       stringOctaveNote &&
       coloredHeaders.has(stringOctaveNote?.fret)) ||
-    stringOctaveNote?.note === baseNoteValue;
+    stringOctaveNote?.note === getShiftedNote(baseNoteValue, tuningValue);
 
   const handlePress = async () => {
     if (isHeader) {
