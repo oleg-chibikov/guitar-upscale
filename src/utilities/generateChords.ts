@@ -3,64 +3,7 @@ import { CHROMATIC, SPECIAL, getScalePattern } from "@/app/data/scales";
 import { getShiftedNote, parseStringToNotes } from "@/app/data/tunings";
 import { generateNeckRepresentation } from "@/app/engine/generateNeckRepresentation";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-
-type ChordStructure = {
-  name: string;
-  intervals: number[];
-  prefix: string;
-};
-
-type ChordExtensionStructure = {
-  name: string;
-  addedInterval?: number;
-  prefix: string;
-};
-
-// TODO: Perfect fifth can be omitted when having extensions!
-// add CanOmitPerfectFifth to the ChordStructure below and use it when building the chord
-
-const triads: ChordStructure[] = [
-  { name: "Major", intervals: [0, 4, 7], prefix: "" },
-  { name: "Minor", intervals: [0, 3, 7], prefix: "m" },
-  { name: "Diminished", intervals: [0, 3, 6], prefix: "dim" },
-  { name: "Augmented", intervals: [0, 4, 8], prefix: "aug" },
-  { name: "Sustained 2", intervals: [0, 2, 7], prefix: "sus2" },
-  { name: "Sustained 4", intervals: [0, 5, 7], prefix: "sus4" },
-  { name: "Power", intervals: [0, 7], prefix: "5" }, // Power chord has only root and perfect fifth
-];
-
-const sixthExtensions: ChordExtensionStructure[] = [
-  { name: "", prefix: "" },
-  { name: "Sixth", addedInterval: 9, prefix: "6" },
-  { name: "Minor Sixth", addedInterval: 8, prefix: "m6" },
-];
-
-const seventhExtensions: ChordExtensionStructure[] = [
-  { name: "", prefix: "" },
-  { name: "Major Seventh", addedInterval: 11, prefix: "maj7" },
-  { name: "Minor / Dominant Seventh", addedInterval: 10, prefix: "7" },
-];
-
-const ninthExtensions: ChordExtensionStructure[] = [
-  { name: "", prefix: "" },
-  { name: "Ninth", addedInterval: 14, prefix: "9" },
-  { name: "Flat Ninth", addedInterval: 13, prefix: "b9" },
-  { name: "Sharp Ninth", addedInterval: 15, prefix: "#9" },
-];
-
-const eleventhExtensions: ChordExtensionStructure[] = [
-  { name: "", prefix: "" },
-  { name: "Eleventh", addedInterval: 17, prefix: "11" },
-  { name: "Flat Eleventh", addedInterval: 16, prefix: "b11" },
-  { name: "Sharp Eleventh", addedInterval: 18, prefix: "#11" },
-];
-
-const thirteensExtensions: ChordExtensionStructure[] = [
-  { name: "", prefix: "" },
-  { name: "Thirteens", addedInterval: 21, prefix: "13" },
-  { name: "Flat Thirteens", addedInterval: 20, prefix: "b13" },
-  { name: "Sharp Thirteens", addedInterval: 22, prefix: "#13" },
-];
+import { ChordMode, chordModes } from "@/utilities/chordModes";
 
 const capo = 0;
 const MAX_DISTANCE_IN_CHORD = 4;
@@ -75,16 +18,19 @@ const neck = generateNeckRepresentation(
   getShiftedNote(baseNote, tuning),
   baseNote
 );
+const absoluteMaxFretIndex = neck[0].length - 1;
 
 type FingerPosition = StringOctaveNote | undefined;
 
 type UltimateChordInfoVariation = {
-  name: string;
-  triad: ChordStructure;
-  extensions: ChordExtensionStructure[];
-  bassNote: StringOctaveNote;
+  chordMode: ChordMode;
   fingerPositions: FingerPosition[];
   fingerPositionsString: string;
+};
+
+type UltimateSlashChordInfoVariation = UltimateChordInfoVariation & {
+  bassNote: StringOctaveNote;
+  name: string;
 };
 
 type ChordBuilderInfo = {
@@ -93,28 +39,21 @@ type ChordBuilderInfo = {
   maxAllowedFretIndex?: number;
 };
 
-const getFretLimitsForTheFirstTime = (
-  fretIndex: number,
-  absoluteMaxFretIndex: number
-) => {
-  const newMin = Math.max(capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
+const buildIntervalsWithoutPerfectFifth = (chordMode: ChordMode) => {
+  if (!chordMode.canSkipPerfectFifth) {
+    return;
+  }
+  const intervalsSet = new Set(chordMode.intervals);
+  if (intervalsSet.has(7)) {
+    intervalsSet.delete(7); // 7th interval is the perfect fifth
+    return Array.from(intervalsSet);
+  }
 
-  const newMax = Math.min(
-    absoluteMaxFretIndex,
-    fretIndex + MAX_DISTANCE_IN_CHORD
+  console.warn(
+    "Chord %s doesn't have a perfect fifth, developer to adjust",
+    chordMode.name
   );
-  return { newMin, newMax };
 };
-
-const getChordName = (
-  triad: ChordStructure,
-  extensions: ChordExtensionStructure[],
-  slashNote: Note,
-  rootNote: Note
-) =>
-  `${Note[rootNote]}${triad.prefix}${extensions
-    .map((x) => x.prefix)
-    .join("add")}${rootNote === slashNote ? "" : `/${Note[slashNote]}`}`;
 
 const findChordNotesRecursive = (
   stringIndex: number,
@@ -125,7 +64,6 @@ const findChordNotesRecursive = (
   maxAllowedFretIndex?: number
 ): ChordBuilderInfo[] => {
   const currentString = neck[stringIndex];
-  const absoluteMaxFretIndex = neck[stringIndex].length - 1; // last fret on guitar
 
   const matchingNotesOnThisString: FingerPosition[] = []; // these are the positions of the chord notes on the current string
   // Always take the open note into account
@@ -172,10 +110,7 @@ const findChordNotesRecursive = (
 
           if (fret > capo) {
             // we use a fret on non open string and need to adjust the limits for the next string
-            ({ newMin, newMax } = getFretLimitsForTheFirstTime(
-              fret,
-              absoluteMaxFretIndex
-            ));
+            ({ newMin, newMax } = getFretLimitsForTheFirstTime(fret));
           }
           // else they are left undefined
         } else if (fret === capo) {
@@ -227,182 +162,190 @@ const findChordNotesRecursive = (
     .filter((x) => x) as ChordBuilderInfo[]; // exclude incomplete chords;
 };
 
+const getSlashChordsForVariation = (
+  variationInfo: ChordBuilderInfo,
+  neckString: (StringOctaveNote | null)[],
+  chordInfo: UltimateChordInfoVariation
+) => {
+  const minAllowedFretIndex = variationInfo.minAllowedFretIndex ?? capo + 1;
+  const maxAllowedFretIndex =
+    variationInfo.maxAllowedFretIndex ?? absoluteMaxFretIndex;
+  // get the variation of chord with open string;
+  const openStringNote = neckString[capo];
+  if (openStringNote !== null) {
+    applySlashChord(chordInfo, openStringNote);
+  }
+
+  for (
+    let fretIndex = minAllowedFretIndex;
+    fretIndex <= maxAllowedFretIndex;
+    fretIndex++
+  ) {
+    const noteAtFret = neckString[fretIndex];
+    if (noteAtFret !== null) {
+      applySlashChord(chordInfo, noteAtFret);
+    }
+  }
+};
+
+const applySlashChord = (
+  chordInfo: UltimateChordInfoVariation,
+  bassNote: StringOctaveNote
+) => {
+  const originalVariation = chordInfo.fingerPositions;
+  if (originalVariation[bassNote.string]?.note === bassNote.note) {
+    // no need to apply a slash chord when the bass note is the same as in the original chord
+    return;
+  }
+
+  const chordCopy = [...originalVariation];
+  chordCopy[bassNote.string] = bassNote; // prepend open string note
+  const slashChordInfo = getUltimateSlashChord(
+    chordInfo.chordMode,
+    chordCopy,
+    bassNote
+  );
+  addOrUpdateMapArray(allSlashChords, slashChordInfo.name, slashChordInfo);
+};
+
+const getUltimateChord = (
+  chordMode: ChordMode,
+  fingerPositions: FingerPosition[]
+): UltimateChordInfoVariation => {
+  const fingerPositionsString = fingerPositions
+    .reverse()
+    .map((x) => x?.fret ?? "x")
+    .join(",");
+  return {
+    chordMode,
+    fingerPositions,
+    fingerPositionsString,
+  } as UltimateChordInfoVariation;
+};
+
+const getUltimateSlashChord = (
+  chordMode: ChordMode,
+  fingerPositions: FingerPosition[],
+  bassNote: StringOctaveNote
+): UltimateSlashChordInfoVariation => {
+  const fingerPositionsString = fingerPositions
+    .reverse()
+    .map((x) => x?.fret ?? "x")
+    .join(",");
+
+  const chordName = chordMode.name || chordMode.description;
+  const bassNoteName = Note[bassNote.note];
+  const slashChordName = `${chordName}/${bassNoteName}`;
+  return {
+    chordMode,
+    fingerPositions,
+    fingerPositionsString,
+    bassNote,
+    name: slashChordName,
+  } as UltimateSlashChordInfoVariation;
+};
+
+const getFretLimitsForTheFirstTime = (fretIndex: number) => {
+  const newMin = Math.max(capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
+
+  const newMax = Math.min(
+    absoluteMaxFretIndex,
+    fretIndex + MAX_DISTANCE_IN_CHORD
+  );
+  return { newMin, newMax };
+};
+
+const processIntervalsInChordMode = (
+  chordMode: ChordMode,
+  intervalsToUse: number[]
+) => {
+  for (
+    let stringIndex = tuning.length - 1; // starting from the lowest (thickest) string
+    stringIndex >= intervalsToUse.length;
+    stringIndex--
+  ) {
+    const neckString = neck[stringIndex];
+    // loop through the strings starting from the lowest, ensuring there are strings to put all the notes of the chordIntervals
+    for (let fretIndex = capo; fretIndex < absoluteMaxFretIndex; fretIndex++) {
+      const currentStringOctaveNote = neckString[fretIndex];
+      if (currentStringOctaveNote === null) {
+        continue;
+      }
+
+      processFret(chordMode, intervalsToUse, currentStringOctaveNote);
+    }
+  }
+};
+
+const processChordMode = (chordMode: ChordMode) => {
+  processIntervalsInChordMode(chordMode, chordMode.intervals);
+  const intervalsWithoutPerfectFifth =
+    buildIntervalsWithoutPerfectFifth(chordMode);
+  if (intervalsWithoutPerfectFifth) {
+    processIntervalsInChordMode(chordMode, intervalsWithoutPerfectFifth);
+  }
+};
+
+const processFret = (
+  chordMode: ChordMode,
+  intervalsToUse: number[],
+  stringOctaveNote: StringOctaveNote
+) => {
+  const notesInChord: Set<Note> = new Set(
+    intervalsToUse.map((x) => (stringOctaveNote.note + x) % NOTE_COUNT)
+  );
+  const fretIndex = stringOctaveNote.fret;
+  // console.log("Processing", currentStringOctaveNote);
+  const chordBuilder: FingerPosition[] = [...Array(neck.length)];
+  chordBuilder[stringOctaveNote.string] = stringOctaveNote;
+  const usedNotesSet = new Set<Note>();
+  usedNotesSet.add(stringOctaveNote.note);
+
+  // fret limits for the first
+  let newMin: number | undefined;
+  let newMax: number | undefined;
+
+  if (fretIndex !== capo) {
+    // if we are not on the open string - then we can use only the adjacent several frets in each direction
+    ({ newMin, newMax } = getFretLimitsForTheFirstTime(fretIndex));
+  }
+
+  const stringIndex = stringOctaveNote.string;
+  // otherwise we are on the open string then we can use any fret for the next note
+  // for each note and chord mode we build the realistic finger positions
+  const realisticChordFingerPositions = findChordNotesRecursive(
+    stringIndex - 1,
+    notesInChord,
+    chordBuilder,
+    usedNotesSet,
+    newMin,
+    newMax
+  );
+
+  // finally we take the baseFretIndex and within the reasonable reach we change the first note of the chord with a different note - this way we get a slash chord
+  // slash chords are variations of a chord with different bass note
+  for (const variationInfo of realisticChordFingerPositions) {
+    const chordInfo = getUltimateChord(chordMode, variationInfo.variation);
+    addOrUpdateMapArray(allChords, chordInfo.chordMode.name, chordInfo);
+
+    getSlashChordsForVariation(variationInfo, neck[stringIndex], chordInfo);
+  }
+};
+
 const allChords = new Map<string, UltimateChordInfoVariation[]>();
-triads.forEach((triad) => {
-  sixthExtensions.forEach((sixthExtension) => {
-    seventhExtensions.forEach((seventhExtension) => {
-      ninthExtensions.forEach((ninthExtension) => {
-        eleventhExtensions.forEach((eleventhExtension) => {
-          thirteensExtensions.forEach((thirteensExtension) => {
-            const extensions = [
-              sixthExtension,
-              seventhExtension,
-              ninthExtension,
-              eleventhExtension,
-              thirteensExtension,
-            ].filter((x) => x.addedInterval !== undefined);
+const allSlashChords = new Map<string, UltimateSlashChordInfoVariation[]>();
+chordModes.forEach((chordMode) => {
+  if (chordMode.intervals.length > neck.length) {
+    // cannot build this chord on the given guitar - it has more notes that the strings guitar has
+    return;
+  }
 
-            const chordIntervals = [
-              ...triad.intervals,
-              ...(extensions.map((x) => x.addedInterval) as number[]),
-            ];
-
-            if (chordIntervals.length > neck.length) {
-              // cannot build this chord on the given guitar - it has more notes that the strings guitar has
-              return;
-            }
-
-            for (
-              let stringIndex = tuning.length - 1; // starting from the lowest (thickest) string
-              stringIndex >= chordIntervals.length;
-              stringIndex--
-            ) {
-              const neckString = neck[stringIndex];
-              const absoluteMaxFretIndex = neckString.length - 1;
-              // loop through the strings starting from the lowest, ensuring there are strings to put all the notes of the chordIntervals
-              for (
-                let fretIndex = capo;
-                fretIndex < absoluteMaxFretIndex;
-                fretIndex++
-              ) {
-                const currentStringOctaveNote = neckString[fretIndex];
-                if (currentStringOctaveNote === null) {
-                  continue;
-                }
-
-                const getUltimateChord = (
-                  bassNote: StringOctaveNote,
-                  fingerPositions: FingerPosition[]
-                ): UltimateChordInfoVariation => {
-                  const fingerPositionsString = fingerPositions
-                    .reverse()
-                    .map((x) => x?.fret ?? "x")
-                    .join(",");
-                  return {
-                    bassNote,
-                    extensions,
-                    triad,
-                    fingerPositions,
-                    fingerPositionsString,
-                    name: getChordName(
-                      triad,
-                      extensions,
-                      bassNote.note,
-                      currentStringOctaveNote.note
-                    ),
-                  };
-                };
-
-                const notesInChord: Set<Note> = new Set(
-                  chordIntervals.map(
-                    (x) => (currentStringOctaveNote.note + x) % NOTE_COUNT
-                  )
-                );
-                // console.log("Processing", currentStringOctaveNote);
-                const chordBuilder: FingerPosition[] = [...Array(neck.length)];
-                chordBuilder[currentStringOctaveNote.string] =
-                  currentStringOctaveNote;
-                const usedNotesSet = new Set<Note>();
-                usedNotesSet.add(currentStringOctaveNote.note);
-
-                // fret limits for the first
-                let newMin: number | undefined;
-                let newMax: number | undefined;
-
-                if (fretIndex !== capo) {
-                  // if we are not on the open string - then we can use only the adjacent several frets in each direction
-                  ({ newMin, newMax } = getFretLimitsForTheFirstTime(
-                    fretIndex,
-                    absoluteMaxFretIndex
-                  ));
-                }
-                // otherwise we are on the open string then we can use any fret for the next note
-
-                // for each note and chord mode we build the realistic finger positions
-                const realisticChordFingerPositions = findChordNotesRecursive(
-                  stringIndex - 1,
-                  notesInChord,
-                  chordBuilder,
-                  usedNotesSet,
-                  newMin,
-                  newMax
-                );
-
-                // finally we take the baseFretIndex and within the reasonable reach we change the first note of the chord with a different note - this way we get a slash chord
-                // slash chords are variations of a chord with different bass note
-                for (const variationInfo of realisticChordFingerPositions) {
-                  const minAllowedFretIndex =
-                    variationInfo.minAllowedFretIndex ?? capo + 1;
-                  const maxAllowedFretIndex =
-                    variationInfo.maxAllowedFretIndex ?? absoluteMaxFretIndex;
-                  // get the variation of chord with open string;
-
-                  const openStringNote = neckString[capo];
-                  if (openStringNote !== null) {
-                    const openStringSlashChord = [...variationInfo.variation];
-
-                    openStringSlashChord[openStringNote.string] =
-                      openStringNote; // prepend open string note
-                    const chordInfo = getUltimateChord(
-                      openStringNote,
-                      openStringSlashChord
-                    );
-                    addOrUpdateMapArray(allChords, chordInfo.name, chordInfo);
-                  }
-
-                  for (
-                    let fretIndex = minAllowedFretIndex;
-                    fretIndex <= maxAllowedFretIndex;
-                    fretIndex++
-                  ) {
-                    const slashChord = [...variationInfo.variation];
-                    const noteAtFret = neckString[fretIndex];
-                    if (noteAtFret !== null) {
-                      slashChord[noteAtFret.string] = noteAtFret; // prepend current note that is within finger reach defined by the chord
-                      const chordInfo = getUltimateChord(
-                        noteAtFret,
-                        slashChord
-                      );
-                      addOrUpdateMapArray(allChords, chordInfo.name, chordInfo);
-                    }
-                  }
-                }
-              }
-            }
-            // Generate all possible combinations of intervals on the given number of strings
-
-            // for each note on the fret (only on the strings lower than the length of the intervals - for example if there are 4 intervals - no need to try building this chord from the 3rd strings - we need at least 4)
-            // recursively go for each higher string:
-            // get all the notes matching all the given intervals on the next string including Muting that string.
-            // check if they are within the reach from the first note (if it wasn't open) - set the startingFret only when taking the first non-open string
-            // if the note is within reach - do the same on the higher string.
-            // after all is done - leave only the chords which have all the notes from the interval (each of them should be at least once). the rest are incomplete.
-            // slash chords - for each of variations shift the bass note - it can be open string or it should be within the reach of the startingFret
-
-            // build that for each note
-
-            // chords.push({
-            //   name: `${triad.prefix}${extension.name}`,
-            //   triad,
-            //   extension
-            //   intervals: chordVoicing,
-            // });
-          });
-        });
-      });
-    });
-  });
+  processChordMode(chordMode);
 });
 
-console.log("done");
-// console.log(
-//   Array.from(allChords.entries()).map(
-//     ([key, value]) =>
-//       `${key}: ${value.map((x) => x.fingerPositionsString).join(" | ")}`
-//   )
-// );
-
-// Example usage:
-// const stringCount = 6;
-// const generatedChords = generateChords(stringCount);
-// console.log(generatedChords);
+console.log(
+  Array.from(allChords.entries()).map(
+    ([key, value]) =>
+      `${key}: ${value.map((x) => x.fingerPositionsString).join(" | ")}`
+  )
+);
