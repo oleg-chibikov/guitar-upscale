@@ -2,13 +2,12 @@ import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { FRETBOARD } from "@/app/data/elementIds";
 import { Skin } from "@/app/data/skin";
 import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
-import { useScreenOrientation } from "@/app/engine/useScreenOrientation";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
 import { getAssetsForSkin } from "@/app/helpers/skinHelper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
@@ -56,7 +55,6 @@ export const Fretboard: React.FC = () => {
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
   const [position, setPosition] = useState(getPositionForSkin(skin));
-  const orientation = useScreenOrientation();
 
   const [retrigger, setRetrigger] = useState<boolean>(false);
 
@@ -71,29 +69,13 @@ export const Fretboard: React.FC = () => {
       setWidth(window.innerWidth);
     };
 
-    const debouncedHandeResize = trailingDebounce(handleResize, 200);
+    const debouncedHandleResize = trailingDebounce(handleResize, 200);
 
-    window.addEventListener("resize", debouncedHandeResize);
+    window.addEventListener("resize", debouncedHandleResize);
     return () => {
-      window.removeEventListener("resize", debouncedHandeResize);
+      window.removeEventListener("resize", debouncedHandleResize);
     };
   }, []);
-
-  const repostion = useCallback(() => {
-    const scrollX = interpolate(fretboardScaleX, 1, 2.2, 500, 0); // max value is 3 but setting 2 gives better outcome
-    const scrollY = interpolate(fretboardScaleY, 0.7, 1, 100, 40);
-    // scroll a bit right and up to see the notes straight away
-    setTimeout(() => {
-      // doesn't apply well without timeout
-      window.scrollTo(scrollX, scrollY);
-    }, 200);
-  }, [fretboardScaleX, fretboardScaleY]);
-
-  useEffect(repostion, [repostion, orientation]);
-
-  // useEffect(() => {
-  //   setHighResLoaded(false);
-  // }, [skin]);
 
   useEffect(() => {
     const skinPosition = getPositionForSkin(skin);
@@ -121,7 +103,7 @@ export const Fretboard: React.FC = () => {
       style={{
         height:
           height * fretboardScaleY +
-          (isHeightEnoughToShowLargeChords ? -100 : 100),
+          (isHeightEnoughToShowLargeChords ? -100 : 0),
         transform: `scaleX(${1 / fretboardScaleX}) scaleY(${
           1 / fretboardScaleY
         })`,
@@ -132,7 +114,9 @@ export const Fretboard: React.FC = () => {
         style={{
           left:
             position.xShift +
-            (useAdvancedChords && !isHeightEnoughToShowLargeChords ? 250 : 0),
+            (!isHeightEnoughToShowLargeChords
+              ? interpolate(fretboardScaleX, 1, 3, -250, 250)
+              : 0),
           top: needYShift ? -100 : 0,
         }}
       >

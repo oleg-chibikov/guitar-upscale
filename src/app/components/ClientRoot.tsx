@@ -41,7 +41,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           {loadingMessage} <GradientCircularProgress />
         </main>
       ) : (
-        <main ref={mainRef}>
+        <main ref={mainRef} className="overflow-auto">
           <ControlPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
