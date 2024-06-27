@@ -3,7 +3,7 @@
 import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
-import { StrummingSettingsWrapper } from "@/app/components/settings/StrummingSettingsWrapper";
+import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";

@@ -75,7 +75,7 @@ export const ScaleDetectionAlert: FC = () => {
                 color="primary"
                 onClick={() => handleButtonClick(scaleAndGroup)}
               >
-                <Typography variant="body1" noWrap>
+                <Typography variant="body2" noWrap>
                   {formatScale(scaleAndGroup)}
                 </Typography>
               </Button>

@@ -8,3 +8,4 @@ export const CONTROL_PANEL_EXPANDER_ID = "control-panel-expander";
 export const LOOPER_PANEL_ID = "looper-panel";
 export const AUTH_PANEL_ID = "auth-panel";
 export const FRETBOARD = "fretboard";
+export const STRUMMING_PATTERN_EDITOR = "strumming-pattern-editor-dialog";

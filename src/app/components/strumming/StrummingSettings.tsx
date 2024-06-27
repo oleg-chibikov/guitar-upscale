@@ -1,3 +1,4 @@
+import { StrummingPatternEditor } from "@/app/components/strumming/StrummingPatternEditor";
 import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
@@ -5,9 +6,9 @@ import { Alert, Slide } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
-import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "./checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
-import { SeamlessChordSwitchingCheckbox } from "./checkboxes/SeamlessChordSwitchingCheckbox";
-import { StrummingPatternSelector } from "./selectors/StrummingPatternSelector";
+import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "../settings/checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
+import { SeamlessChordSwitchingCheckbox } from "../settings/checkboxes/SeamlessChordSwitchingCheckbox";
+import { StrummingPatternSelector } from "../settings/selectors/StrummingPatternSelector";
 
 export const StrummingSettings: FC = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ export const StrummingSettings: FC = () => {
     >
       <section
         id={STRUMMING_SETTINGS_PANEL_ID}
-        className={"z-40 fixed bottom-1 left-1/2 pointer-events-none"}
+        className={"z-40 fixed bottom-1 left-1/2 w-1/2 pointer-events-none"}
       >
         <div
           className={`flex flex-col gap-2 translate-x-[-50%] p-4 border-2 pointer-events-auto ${
@@ -40,6 +41,7 @@ export const StrummingSettings: FC = () => {
           <SeamlessChordSwitchingCheckbox />
           <Alert severity="info">Long press the chord to strum</Alert>
           <StrummingPatternSelector />
+          <StrummingPatternEditor />
         </div>
       </section>
     </Slide>
