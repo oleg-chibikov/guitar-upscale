@@ -29,7 +29,6 @@ export const LooperPanel: React.FC = () => {
   useEffect(() => {
     clearLooperState();
     setState({ ...looperState });
-    stopMetronomeIfNeeded(dispatch);
   }, [dispatch, guitarSettingsUpdatedTrigger]);
 
   useEffect(() => {
