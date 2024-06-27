@@ -26,6 +26,7 @@ import {
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
 import { selectUi, themeValue } from "@/app/store/uiSlice";
+import { Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
@@ -286,7 +287,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       }`}
     >
-      {chordName}
+      <Typography noWrap variant="button" textTransform={"none"}>
+        {chordName}
+      </Typography>
     </ul>
   );
 };

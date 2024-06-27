@@ -70,7 +70,6 @@ export const Slider: React.FC<SliderProps> = ({
       </div>
       {label !== undefined && (
         <Typography
-          variant="body2"
           className={`text-nowrap ${
             theme === Theme.Light
               ? "text-foreground-light"

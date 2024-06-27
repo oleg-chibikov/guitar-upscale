@@ -74,7 +74,7 @@ export const Expander: FC<ExpanderProps> = ({
         id={id}
         aria-controls={id}
       >
-        <Typography variant="caption">{title}</Typography>
+        <Typography variant="h6">{title}</Typography>
       </AccordionSummary>
       <AccordionDetails
         className="flex flex-col gap-2"

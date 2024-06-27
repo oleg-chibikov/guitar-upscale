@@ -77,7 +77,6 @@ export const IconButton: React.FC<IconButtonProps> = ({
     >
       {textContent && (
         <Typography
-          variant="body2"
           className={` ${
             theme === Theme.Light
               ? "text-background-light"

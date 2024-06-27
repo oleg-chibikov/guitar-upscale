@@ -1,11 +1,22 @@
+import { CloseIcon } from "@/app/components/CloseIcon";
 import { STRUMMING_PATTERN_EDITOR } from "@/app/data/elementIds";
 import {
   Pattern,
   STRUMMING_PLACEHOLDER,
   getTicksForTimeSignature,
 } from "@/app/data/strummingData";
-import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { selectUi } from "@/app/store/uiSlice";
+import AddIcon from "@mui/icons-material/Add";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
 import { PatternList } from "./PatternList";
 
@@ -20,6 +31,7 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
 }) => {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [currentPattern, setCurrentPattern] = useState<Pattern | null>(null);
+  const { theme } = useSelector(selectUi);
 
   useEffect(() => {
     const savedPatterns = localStorage.getItem("strummingPatterns");
@@ -60,9 +72,15 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      className=""
     >
-      <DialogTitle>Strumming Pattern Editor</DialogTitle>
-      <DialogContent>
+      <CloseIcon onPress={onClose} />
+      <DialogTitle>
+        <Typography variant="h2" align="center">
+          Strumming Pattern Editor
+        </Typography>
+      </DialogTitle>
+      <DialogContent className="flex flex-col gap-2">
         {currentPattern ? (
           <PatternEditor
             pattern={currentPattern}
@@ -71,9 +89,13 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
           />
         ) : (
           <>
-            <Button variant="contained" onClick={handleNewPattern}>
-              New Pattern
-            </Button>
+            <div>
+              <Tooltip title="Create New Pattern">
+                <IconButton onClick={handleNewPattern}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
             <PatternList
               patterns={patterns}
               onEdit={setCurrentPattern}

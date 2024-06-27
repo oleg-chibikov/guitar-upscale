@@ -8,7 +8,7 @@ export const formatStrums = (strums: StrumDirection[]): string =>
         if ((index + 1) % 8 === 0) {
           separator = "|";
         } else if ((index + 1) % 4 === 0) {
-          separator = ":";
+          separator = " ";
         }
       }
       return strum + separator;

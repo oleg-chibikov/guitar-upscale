@@ -24,6 +24,47 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
         contrastText: theme === Theme.Light ? "#2E1F1B" : "#F2F2F2",
       },
     },
+    typography: {
+      h1: {
+        fontSize: "1.5rem",
+      },
+      h2: {
+        fontSize: "1.25rem",
+      },
+      h3: {
+        fontSize: "1.125rem",
+      },
+      h4: {
+        fontSize: "1rem",
+      },
+      h5: {
+        fontSize: "0.875rem",
+      },
+      h6: {
+        fontSize: "0.75rem",
+      },
+      subtitle1: {
+        fontSize: "0.75rem",
+      },
+      subtitle2: {
+        fontSize: "0.625rem",
+      },
+      body1: {
+        fontSize: "0.75rem",
+      },
+      body2: {
+        fontSize: "0.65rem",
+      },
+      button: {
+        fontSize: "0.75rem",
+      },
+      caption: {
+        fontSize: "0.625rem",
+      },
+      overline: {
+        fontSize: "0.625rem",
+      },
+    },
   });
 
   return <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>;

@@ -28,7 +28,6 @@ export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
     >
       <Login />
       <Typography
-        variant="body2"
         className={`hidden sm:block ${
           theme === Theme.Light
             ? "text-foreground-light"

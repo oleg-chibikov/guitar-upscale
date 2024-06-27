@@ -12,7 +12,7 @@ export const ControlWithLabel: FC<ControlWithLabelProps> = ({
 }) => {
   return (
     <>
-      <Typography className="flex items-center select-text" variant="body2">
+      <Typography className="flex items-center select-text">
         {label}:
       </Typography>
       {children}

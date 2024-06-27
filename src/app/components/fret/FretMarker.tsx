@@ -440,7 +440,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           {/* The marker itself */}
           {/* We can add transition-colors, but it slows down the playback */}
           <Typography
-            variant="body2"
+            variant="button"
             className={`flex justify-center items-center font-mono contain-content
                       ${
                         isHeader

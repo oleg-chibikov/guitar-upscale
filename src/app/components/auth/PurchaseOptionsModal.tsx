@@ -139,12 +139,12 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
               {session?.user && (
                 <div className="flex flex-col gap-1 items-center justify-center">
                   <strong>{session.user.name}</strong>
-                  <Typography variant="body2">{session.user.email}</Typography>
+                  <Typography>{session.user.email}</Typography>
                 </div>
               )}
 
               <>
-                <Typography variant="body2">
+                <Typography>
                   {"Subscription level:"}{" "}
                   <strong>{subscriptionTier?.tier ?? "Not subscribed"}</strong>
                 </Typography>

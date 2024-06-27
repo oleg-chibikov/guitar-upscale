@@ -31,10 +31,7 @@ export const Alert: React.FC = () => {
         } opacity-90`}
         style={{ zIndex: 9999 }}
       >
-        <Typography
-          variant="body2"
-          className="flex items-center text-base text-center text-gray-800 whitespace-pre-wrap"
-        >
+        <Typography className="flex items-center text-base text-center text-gray-800 whitespace-pre-wrap">
           {alertMessage}
         </Typography>
       </div>
