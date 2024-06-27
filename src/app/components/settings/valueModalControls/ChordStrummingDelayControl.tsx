@@ -1,4 +1,4 @@
-import { chordStrummingDelaySteps } from "@/app/data/chordStrummingInterval";
+import { chordStrummingDelaySteps } from "@/app/data/chordStrummingDelaySteps";
 import {
   selectSettings,
   setChordStrummingDelayMs,

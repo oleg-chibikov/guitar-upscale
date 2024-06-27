@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "./checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
 import { SeamlessChordSwitchingCheckbox } from "./checkboxes/SeamlessChordSwitchingCheckbox";
-import { ChordStrummingIntervalSelector } from "./selectors/ChordStrummingIntervalSelector";
 import { StrummingPatternSelector } from "./selectors/StrummingPatternSelector";
 
 export const StrummingSettings: FC = () => {
@@ -41,7 +40,6 @@ export const StrummingSettings: FC = () => {
           <SeamlessChordSwitchingCheckbox />
           <Alert severity="info">Long press the chord to strum</Alert>
           <StrummingPatternSelector />
-          <ChordStrummingIntervalSelector />
         </div>
       </section>
     </Slide>

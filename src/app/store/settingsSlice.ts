@@ -1,6 +1,5 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Note } from "../data/notes";
@@ -98,7 +97,6 @@ interface SettingsState
   chordInstrumentGroup: InstrumentGroup;
   chordInstrument: Instrument;
   reverbStrength: number;
-  chordStrummingInterval: ChordStrummingInterval;
   useChordAlteration: boolean;
   chordCustomStrummingPattern: string;
   chordCustomStrummingWaitForPatternFinish: boolean;
@@ -131,7 +129,6 @@ const initialState: SettingsState = {
   chordInstrumentGroup: "Strings Orchestra",
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
-  chordStrummingInterval: ChordStrummingInterval.HalfBeat,
   useChordAlteration: false,
   chordCustomStrummingPattern: chordStrummingPatterns[5], // 5 is a pattern of a medium difficulty - not that simple as 0
   chordCustomStrummingWaitForPatternFinish: true,
@@ -163,8 +160,6 @@ export let tempoBpmValue: number = initialState.tempoBpm;
 export let instrumentValue: Instrument = initialState.instrument;
 export let chordInstrumentValue: Instrument = initialState.chordInstrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
-export let chordStrummingIntervalValue: ChordStrummingInterval =
-  initialState.chordStrummingInterval;
 export let useChordAlterationValue: boolean = initialState.useChordAlteration;
 export let chordCustomStrummingPatternValue: string =
   initialState.chordCustomStrummingPattern;
@@ -370,7 +365,6 @@ export const settingsSlice = createSlice({
       instrumentValue = state.instrument;
       chordInstrumentValue = state.chordInstrument;
       reverbStrengthValue = state.reverbStrength;
-      chordStrummingIntervalValue = state.chordStrummingInterval;
       useChordAlterationValue = state.useChordAlteration;
       chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
       chordCustomStrummingWaitForPatternFinishValue =
@@ -501,13 +495,6 @@ export const settingsSlice = createSlice({
       state.reverbStrength = action.payload;
       reverbStrengthValue = action.payload;
     },
-    setChordStrummingInterval(
-      state,
-      action: PayloadAction<ChordStrummingInterval>
-    ) {
-      state.chordStrummingInterval = action.payload;
-      chordStrummingIntervalValue = action.payload;
-    },
     setUseChordAlteration(state, action: PayloadAction<boolean>) {
       state.useChordAlteration = action.payload;
       useChordAlterationValue = action.payload;
@@ -609,7 +596,6 @@ export const {
   setChordInstrument,
   setChordInstrumentGroup,
   setReverbStrength,
-  setChordStrummingInterval,
   setUseChordAlteration,
   setChordCustomStrummingPattern,
   setChordCustomStrummingWaitForPatternFinish,

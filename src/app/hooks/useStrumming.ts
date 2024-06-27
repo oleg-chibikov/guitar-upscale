@@ -11,19 +11,13 @@ import {
 } from "@/app/data/elementIds";
 import {
   TICKS_IN_BAR,
-  TICKS_IN_BEAT,
-  TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef } from "react";
-import { ChordStrummingInterval } from "../data/chordStrummingInterval";
 import {
   getCurrentRelativeTick,
   isMainClockActiveValue,
-  waitForNextBar,
-  waitForNextBeat,
-  waitForNextHalfBar,
   waitForNextHalfBeat,
   waitForNextTick,
 } from "../engine/clock/mainClock";
@@ -49,7 +43,6 @@ import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
   chordCustomStrummingPatternValue,
   chordCustomStrummingWaitForPatternFinishValue,
-  chordStrummingIntervalValue,
   isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
   tempoBpmValue,
@@ -75,19 +68,18 @@ enum PromiseType {
   WaitTimeOver = 2,
 }
 
-const getWaitBetweenFunc = () => {
-  switch (chordStrummingIntervalValue) {
-    case ChordStrummingInterval.Bar:
-      return waitForNextBar;
-    case ChordStrummingInterval.HalfBar:
-      return waitForNextHalfBar;
-    case ChordStrummingInterval.Beat:
-      return waitForNextBeat;
-    case ChordStrummingInterval.HalfBeat:
-      return waitForNextHalfBeat;
-    default:
-      return waitForNextTick;
+const getTicksInInterval = (patternLength: number) => {
+  if (patternLength >= TICKS_IN_BAR) {
+    return TICKS_IN_BAR; // each symbol is a tick
   }
+  return TICKS_IN_HALF_BEAT; // each symbol is a half beat
+};
+
+const getWaitBetweenFunc = (patternLength: number) => {
+  if (patternLength >= TICKS_IN_BAR) {
+    return waitForNextTick; // each symbol is a tick
+  }
+  return waitForNextHalfBeat; // each symbol is a half beat
 };
 
 export const useStrumming = (
@@ -267,7 +259,10 @@ export const useStrumming = (
     const otherChordsGracePeriodPromises =
       getOtherChordsGracePeriodPromises(chordName);
 
-    const waitBetween = getWaitBetweenFunc();
+    const currentPattern = chordCustomStrummingPatternValue;
+    const patternLength = currentPattern.length;
+
+    const waitBetween = getWaitBetweenFunc(patternLength);
 
     const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
     const clickedInOtherChordGracePeriod =
@@ -296,26 +291,10 @@ export const useStrumming = (
       );
     }
 
-    const getNumberOfTicks = () => {
-      switch (chordStrummingIntervalValue) {
-        case ChordStrummingInterval.Bar:
-          return TICKS_IN_BAR;
-        case ChordStrummingInterval.HalfBar:
-          return TICKS_IN_HALF_BAR;
-        case ChordStrummingInterval.Beat:
-          return TICKS_IN_BEAT;
-        case ChordStrummingInterval.HalfBeat:
-          return TICKS_IN_HALF_BEAT;
-        default:
-          return 1;
-      }
-    };
-
     const getIntervalsToSkip = () => {
       // get the tick number since the last bar
       const currentTick = getCurrentRelativeTick();
-      // get the value of
-      const ticksInInterval = getNumberOfTicks();
+      const ticksInInterval = getTicksInInterval(patternLength);
       const ticksRemainingToTheNextInterval = currentTick % ticksInInterval;
       if (ticksRemainingToTheNextInterval === 0) {
         return 1;
@@ -458,7 +437,6 @@ export const useStrumming = (
         setPlaying(true);
         try {
           let currentIndex = startIndex; // skip first as it was played already
-          const currentPattern = chordCustomStrummingPatternValue;
 
           const playChordOnce = async () => {
             const char = currentPattern[currentIndex];
@@ -473,6 +451,8 @@ export const useStrumming = (
                 break;
               case "_":
                 break;
+              default:
+                return; // ignore all the other symbols
             }
 
             await waitBetweenChords();
