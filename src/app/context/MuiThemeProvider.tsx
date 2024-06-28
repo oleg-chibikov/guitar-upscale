@@ -63,25 +63,25 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
         fontSize: "0.75rem",
       },
       subtitle1: {
-        fontSize: "0.75rem",
+        fontSize: "0.85rem",
       },
       subtitle2: {
-        fontSize: "0.625rem",
-      },
-      body1: {
         fontSize: "0.75rem",
       },
+      body1: {
+        fontSize: "0.85rem",
+      },
       body2: {
-        fontSize: "0.65rem",
+        fontSize: "0.80rem",
       },
       button: {
         fontSize: "0.75rem",
       },
       caption: {
-        fontSize: "0.625rem",
+        fontSize: "0.65rem",
       },
       overline: {
-        fontSize: "0.625rem",
+        fontSize: "0.65rem",
       },
     },
   });

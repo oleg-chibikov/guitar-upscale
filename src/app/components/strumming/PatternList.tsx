@@ -64,7 +64,12 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
             <thead>
               <tr>
                 {["Pattern", "Time", "Edit", "Delete"].map((header, index) => (
-                  <th key={index}>
+                  <th
+                    key={index}
+                    className={`px-4 py-2 ${
+                      index === 0 ? "text-start" : "text-center"
+                    }`}
+                  >
                     <Typography variant="overline" noWrap>
                       {header}
                     </Typography>
@@ -86,22 +91,22 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
                       : "bg-panel-dark"
                   }`}
                 >
-                  <td className={`px-4 py-2`}>
+                  <td className={`px-4 py-1`}>
                     <Typography textOverflow="clip" overflow="auto" noWrap>
                       {formatStrums(pattern.strums)}
                     </Typography>
                   </td>
-                  <td className={`px-4 py-2`}>
+                  <td className={`px-4 py-1 text-center`}>
                     <Typography noWrap>{pattern.timeSignature}</Typography>
                   </td>
-                  <td className={`px-4 py-2 text-center`}>
+                  <td className={`px-4 py-1 text-center`}>
                     <Tooltip title="Edit pattern">
                       <MuiIconButton onClick={() => onEdit(pattern)}>
                         <EditIcon fontSize="small" />
                       </MuiIconButton>
                     </Tooltip>
                   </td>
-                  <td className={`px-4 py-2 text-center`}>
+                  <td className={`px-4 py-1 text-center`}>
                     <Tooltip title="Delete pattern">
                       <MuiIconButton
                         onClick={() => handleDeleteClick(pattern.id)}

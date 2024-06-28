@@ -1,6 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
+import { Checkbox, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -21,9 +21,9 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
 
   const { theme } = useSelector(selectUi);
   return (
-    <div className="flex flex-row gap-2">
-      <input
-        type="checkbox"
+    <div className="flex flex-row gap-2 items-center">
+      <Checkbox
+        size="small"
         className={`mr-2 ${
           theme === Theme.Light ? "accent-primary-light" : "accent-primary-dark"
         }`}
