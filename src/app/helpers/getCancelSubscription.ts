@@ -44,6 +44,7 @@ export const getCancelSubscription = (
         dispatch(
           setAndShowAlert({
             message: "Success",
+            alertType: AlertType.Success,
           })
         );
         await incrementAndReload(

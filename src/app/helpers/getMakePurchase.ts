@@ -115,6 +115,7 @@ export const getMakePurchase = (
         dispatch(
           setAndShowAlert({
             message: "Success",
+            alertType: AlertType.Success,
           })
         );
         await incrementAndReload(
