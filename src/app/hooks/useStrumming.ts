@@ -21,7 +21,6 @@ import {
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
-import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef } from "react";
 import {
   currentTick,
@@ -58,7 +57,6 @@ import {
   chordCustomStrummingWaitForPatternFinishValue,
   isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
-  tempoBpmValue,
   useChordAlterationValue,
 } from "../store/settingsSlice";
 
@@ -156,11 +154,11 @@ const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
       return waitForNextBeat;
     case TimeSignature.HALF_BEAT:
       return waitForNextHalfBeat;
-    case TimeSignature.ONE_SIXTEENS:
+    case TimeSignature.SIXTEENTH:
       return waitForNextSixteenth;
-    case TimeSignature.ONE_THIRTY_SECOND:
+    case TimeSignature.THIRTY_SECOND:
       return waitForNextThirtySecond;
-    case TimeSignature.ONE_SIXTY_FOURTH:
+    case TimeSignature.SIXTY_FOURTH:
       return waitForNextSixtyFourth;
     default:
       throw new Error(`Unsupported time signature: ${timeSignature}`);
@@ -392,7 +390,6 @@ export const useStrumming = (
         return;
       }
 
-      // TODO: Bug! sometimes it plays the pattern with shift. Not matching the correct ticks
       const getInitialWait = () => {
         let skipIntervals: number | undefined;
         let initialWait: () => Promise<void | void[]>;
@@ -613,23 +610,13 @@ export const useStrumming = (
       );
     };
 
-    if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
-      console.log(
-        STRUMMING_LOG_PREFIX + "Wait and strum with delay",
-        chordName,
-        clickNumber
-      );
-      // Add timeout of one beat in order to allow single click chords. There should be enough time to release the mouse even if clicked very close to the bar
-      await asyncTimeout(waitAndStrum, bpmToMilliseconds(tempoBpmValue) / 2);
-    } else {
-      console.log(
-        STRUMMING_LOG_PREFIX + "Wait and strum immediately",
-        chordName,
-        clickNumber
-      );
-      // if currently strumming there is usually no need to play additional chords, so it's better to not add additional wait time - it's good for smoother switch between strumming chords
-      await waitAndStrum();
-    }
+    console.log(
+      STRUMMING_LOG_PREFIX + "Wait and strum",
+      chordName,
+      clickNumber
+    );
+    // Add a zero timeout to switch context - otherwise it plays the next chord even if strumming was released
+    await asyncTimeout(waitAndStrum, 0);
   };
 
   return { onChordPress, isAlternateRef };

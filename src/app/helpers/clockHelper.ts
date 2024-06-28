@@ -1,3 +1,5 @@
+import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
+
 const MILLISECONDS_PER_MINUTE = 60_000;
 const MICROSECONDS_PER_MINUTE = MILLISECONDS_PER_MINUTE * 1000;
 
@@ -8,3 +10,9 @@ export const microsecondsToBpm = (microsecondsPerBeat: number): number =>
 
 export const beatToMilliseconds = (bpm: number): number =>
   bpmToMilliseconds(bpm) * 4;
+
+export const tickToMilliseconds = (tick: number, bpm: number): number => {
+  const millisecondsPerBeat = beatToMilliseconds(bpm);
+  const millisecondsPerTick = millisecondsPerBeat / TICKS_IN_BEAT;
+  return tick * millisecondsPerTick;
+};

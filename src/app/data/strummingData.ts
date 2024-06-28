@@ -16,9 +16,9 @@ export enum TimeSignature {
   HALF_BAR = "1/2",
   ONE_BEAT = "1/4",
   HALF_BEAT = "1/8",
-  ONE_SIXTEENS = "1/16",
-  ONE_THIRTY_SECOND = "1/32",
-  ONE_SIXTY_FOURTH = "1/64",
+  SIXTEENTH = "1/16",
+  THIRTY_SECOND = "1/32",
+  SIXTY_FOURTH = "1/64",
 }
 
 export const DEFAULT_TIME_SIGNATURE = TimeSignature.HALF_BEAT;
@@ -36,11 +36,11 @@ export const getDefaultSlotsForTimeSignature = (
       return 8;
     case TimeSignature.HALF_BEAT:
       return 8;
-    case TimeSignature.ONE_SIXTEENS:
+    case TimeSignature.SIXTEENTH:
       return 16;
-    case TimeSignature.ONE_THIRTY_SECOND:
+    case TimeSignature.THIRTY_SECOND:
       return 32;
-    case TimeSignature.ONE_SIXTY_FOURTH:
+    case TimeSignature.SIXTY_FOURTH:
       return 64;
     // case "1/4 triplet":
     //   return 16;
@@ -66,11 +66,11 @@ export const getTicksForTimeSignature = (
       return TICKS_IN_BEAT;
     case TimeSignature.HALF_BEAT:
       return TICKS_IN_HALF_BEAT;
-    case TimeSignature.ONE_SIXTEENS:
+    case TimeSignature.SIXTEENTH:
       return TICKS_IN_SIXTEENTH;
-    case TimeSignature.ONE_THIRTY_SECOND:
+    case TimeSignature.THIRTY_SECOND:
       return TICKS_IN_THIRTY_SECOND;
-    case TimeSignature.ONE_SIXTY_FOURTH:
+    case TimeSignature.SIXTY_FOURTH:
       return TICKS_IN_SIXTY_FOURTH;
     // case "1/4 triplet":
     //   return 16;
