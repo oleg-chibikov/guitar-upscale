@@ -4,10 +4,17 @@ import {
   Pattern,
   StrumDirection,
   TimeSignature,
-  getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingData";
-import { Button, DialogActions, Typography } from "@mui/material";
-import React, { useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import {
+  Button,
+  DialogActions,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import React, { useCallback, useState } from "react";
 
 interface PatternEditorProps {
   pattern: Pattern;
@@ -24,18 +31,38 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
 
   const handleTimeSignatureChange = (value: string | number) => {
     const timeSignature = value as TimeSignature;
-    setCurrentPattern({
-      ...currentPattern,
+    setCurrentPattern((prevPattern) => ({
+      ...prevPattern,
       timeSignature,
-      strums: Array(getDefaultSlotsForTimeSignature(timeSignature)).fill(""),
-    });
+    }));
   };
 
-  const handleStrum = (index: number, newValue: StrumDirection) => {
-    const newStrums = [...currentPattern.strums];
-    newStrums[index] = newValue;
-    setCurrentPattern({ ...currentPattern, strums: newStrums });
-  };
+  const handleStrum = useCallback((index: number, newValue: StrumDirection) => {
+    setCurrentPattern((prevPattern) => {
+      const newStrums = [...prevPattern.strums];
+      newStrums[index] = newValue;
+      return { ...prevPattern, strums: newStrums };
+    });
+  }, []);
+
+  const handleAddCells = useCallback(() => {
+    setCurrentPattern((prevPattern) => {
+      const cellsToAdd = prevPattern.strums.length >= 4 ? 4 : 1;
+      const newStrums = [...prevPattern.strums, ...Array(cellsToAdd).fill("")];
+      return { ...prevPattern, strums: newStrums };
+    });
+  }, []);
+
+  const handleRemoveCells = useCallback(() => {
+    setCurrentPattern((prevPattern) => {
+      if (prevPattern.strums.length <= 1) {
+        return prevPattern;
+      }
+      const cellsToRemove = prevPattern.strums.length > 4 ? 4 : 1;
+      const newStrums = prevPattern.strums.slice(0, -cellsToRemove);
+      return { ...prevPattern, strums: newStrums };
+    });
+  }, []);
 
   return (
     <>
@@ -46,6 +73,22 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
           selectedValue={currentPattern.timeSignature}
           onValueChange={handleTimeSignatureChange}
         />
+      </div>
+
+      <div className="mt-4 flex justify-start gap-2">
+        <Tooltip title="Remove Cells">
+          <IconButton
+            disabled={pattern.strums.length <= 1}
+            onClick={handleRemoveCells}
+          >
+            <RemoveIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Add Cells">
+          <IconButton onClick={handleAddCells}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       </div>
       <StrumGrid pattern={currentPattern} onStrum={handleStrum} />
       <DialogActions>

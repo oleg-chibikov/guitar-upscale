@@ -7,7 +7,7 @@ import {
 import { Theme } from "@/app/data/theme";
 import { BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { selectUi } from "@/app/store/uiSlice";
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface StrumGridProps {
@@ -19,10 +19,10 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
   ({ pattern, onStrum }) => {
     const { theme } = useSelector(selectUi);
 
-    const groupSize = 4; //timeSignature.includes("triplet") ? 3 : 4;
-    const totalSlots = getDefaultSlotsForTimeSignature(pattern.timeSignature);
+    const groupSize = 4;
+    const totalSlots = pattern.strums.length;
 
-    const getGridTemplateColumns = (): string => {
+    const getGridTemplateColumns = useMemo((): string => {
       const groups = Math.ceil(totalSlots / groupSize);
 
       return (
@@ -31,21 +31,22 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
           ? ` repeat(${totalSlots % groupSize}, 1fr)`
           : "")
       );
-    };
+    }, [totalSlots]);
 
-    const slotsPerBeat =
-      pattern.timeSignature === TimeSignature.ONE_BEAT ||
-      pattern.timeSignature === TimeSignature.ONE_BAR ||
-      pattern.timeSignature === TimeSignature.HALF_BAR
+    const slotsPerBeat = useMemo(() => {
+      return pattern.timeSignature === TimeSignature.ONE_BEAT ||
+        pattern.timeSignature === TimeSignature.ONE_BAR ||
+        pattern.timeSignature === TimeSignature.HALF_BAR
         ? 1
-        : totalSlots / BEATS_IN_BAR;
+        : getDefaultSlotsForTimeSignature(pattern.timeSignature) / BEATS_IN_BAR;
+    }, [pattern.timeSignature]);
 
     return (
       <div className="overflow-x-auto py-4">
         <div
           className="grid gap-x-1 w-full"
           style={{
-            gridTemplateColumns: getGridTemplateColumns(),
+            gridTemplateColumns: getGridTemplateColumns,
             width: "max-content",
           }}
         >

@@ -15,8 +15,6 @@ import {
   getTicksForTimeSignature,
 } from "@/app/data/strummingData";
 import {
-  TICKS_IN_BAR,
-  TICKS_IN_HALF_BEAT,
   TICKS_PER_SIXTEENTH,
   TICKS_PER_SIXTY_FOURTH,
   TICKS_PER_THIRTY_SECOND,
@@ -79,13 +77,6 @@ enum PromiseType {
   WaitTimeOver = 2,
 }
 
-const getTicksInInterval = (patternLength: number) => {
-  if (patternLength >= TICKS_IN_BAR) {
-    return TICKS_IN_BAR; // each symbol is a tick
-  }
-  return TICKS_IN_HALF_BEAT; // each symbol is a half beat
-};
-
 async function waitForTicks(ticks: number): Promise<void> {
   for (let i = 0; i < ticks; i++) {
     await waitForNextTick();
@@ -113,6 +104,7 @@ const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
   }
 };
 
+// TODO: Bug! sometimes it plays the pattern with shift. Not matching the correct ticks
 export const useStrumming = (
   chordName: string,
   isDisabled: boolean,
