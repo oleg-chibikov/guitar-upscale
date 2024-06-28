@@ -121,7 +121,7 @@ interface SettingsState
 const initialState: SettingsState = {
   scaleGroup: "Minor",
   scale: "Aeolian / Natural",
-  baseNote: Note.E,
+  baseNote: Note.C,
   neck: null,
   chords: null,
   tempoBpm: 120,
