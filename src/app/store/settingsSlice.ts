@@ -98,7 +98,7 @@ interface SettingsState
   chordInstrument: Instrument;
   reverbStrength: number;
   useChordAlteration: boolean;
-  chordCustomStrummingPattern: string;
+  chordCustomStrummingPatternId: number;
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
@@ -108,6 +108,7 @@ interface SettingsState
   isLastEvent: boolean;
   looperStateUpdateTrigger: boolean;
   isLooperPlaying: boolean;
+  customStrummingPatternChangedTrigger: boolean;
 }
 
 const initialState: SettingsState = {
@@ -130,7 +131,7 @@ const initialState: SettingsState = {
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
   useChordAlteration: false,
-  chordCustomStrummingPattern: chordStrummingPatterns[5], // 5 is a pattern of a medium difficulty - not that simple as 0
+  chordCustomStrummingPatternId: chordStrummingPatterns[5].id, // 5 is a pattern of a medium difficulty - not that simple as 0
   chordCustomStrummingWaitForPatternFinish: true,
   seamlessChordSwitching: true,
   isMetronomeActive: false,
@@ -145,6 +146,7 @@ const initialState: SettingsState = {
   isLastEvent: false,
   looperStateUpdateTrigger: false,
   isLooperPlaying: false,
+  customStrummingPatternChangedTrigger: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -161,8 +163,8 @@ export let instrumentValue: Instrument = initialState.instrument;
 export let chordInstrumentValue: Instrument = initialState.chordInstrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
 export let useChordAlterationValue: boolean = initialState.useChordAlteration;
-export let chordCustomStrummingPatternValue: string =
-  initialState.chordCustomStrummingPattern;
+export let chordCustomStrummingPatternIdValue: number =
+  initialState.chordCustomStrummingPatternId;
 export let chordCustomStrummingWaitForPatternFinishValue: boolean =
   initialState.chordCustomStrummingWaitForPatternFinish;
 export let seamlessChordSwitchingValue: boolean =
@@ -366,7 +368,7 @@ export const settingsSlice = createSlice({
       chordInstrumentValue = state.chordInstrument;
       reverbStrengthValue = state.reverbStrength;
       useChordAlterationValue = state.useChordAlteration;
-      chordCustomStrummingPatternValue = state.chordCustomStrummingPattern;
+      chordCustomStrummingPatternIdValue = state.chordCustomStrummingPatternId;
       chordCustomStrummingWaitForPatternFinishValue =
         state.chordCustomStrummingWaitForPatternFinish;
       seamlessChordSwitchingValue = state.seamlessChordSwitching;
@@ -499,9 +501,9 @@ export const settingsSlice = createSlice({
       state.useChordAlteration = action.payload;
       useChordAlterationValue = action.payload;
     },
-    setChordCustomStrummingPattern(state, action: PayloadAction<string>) {
-      state.chordCustomStrummingPattern = action.payload;
-      chordCustomStrummingPatternValue = action.payload;
+    setChordCustomStrummingPatternId(state, action: PayloadAction<number>) {
+      state.chordCustomStrummingPatternId = action.payload;
+      chordCustomStrummingPatternIdValue = action.payload;
     },
     setChordCustomStrummingWaitForPatternFinish(
       state,
@@ -575,6 +577,10 @@ export const settingsSlice = createSlice({
     setIsLooperPlaying(state, action: PayloadAction<boolean>) {
       state.isLooperPlaying = action.payload;
     },
+    triggerCustomStrummingPatternChanged(state) {
+      state.customStrummingPatternChangedTrigger =
+        !state.customStrummingPatternChangedTrigger;
+    },
   },
 });
 
@@ -597,7 +603,7 @@ export const {
   setChordInstrumentGroup,
   setReverbStrength,
   setUseChordAlteration,
-  setChordCustomStrummingPattern,
+  setChordCustomStrummingPatternId,
   setChordCustomStrummingWaitForPatternFinish,
   setSeamlessChordSwitching,
   setIsMetronomeActive,
@@ -611,6 +617,7 @@ export const {
   setIsLastEvent,
   triggerLooperStateUpdate,
   setIsLooperPlaying,
+  triggerCustomStrummingPatternChanged,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

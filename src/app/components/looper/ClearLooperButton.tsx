@@ -1,3 +1,4 @@
+import { ConfirmationDialog } from "@/app/components/layout/ConfirmationDialog";
 import { IconButton } from "@/app/components/settings/buttons/IconButton";
 import {
   CanSetLooperState,
@@ -5,14 +6,6 @@ import {
   looperState,
 } from "@/app/engine/looper/looper";
 import Clear from "@mui/icons-material/Clear";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
 import React, { useState } from "react";
 
 export const ClearLooperButton: React.FC<CanSetLooperState> = ({
@@ -45,27 +38,13 @@ export const ClearLooperButton: React.FC<CanSetLooperState> = ({
         isActive={true}
         onPress={handleClickOpen}
       />
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Confirm Clear</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to clear the looper state? This action cannot
-            be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmClear}
-            color="error"
-            variant="contained"
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog
+        open={open}
+        onClose={handleClose}
+        onConfirm={handleConfirmClear}
+        title="Confirm clear"
+        content="Are you sure you want to clear the looper state? This action cannot be undone."
+      />
     </>
   );
 };

@@ -2,7 +2,7 @@ import {
   Pattern,
   StrumDirection,
   TimeSignature,
-  getTicksForTimeSignature,
+  getSlotsForTimeSignature,
 } from "@/app/data/strummingData";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
@@ -18,21 +18,22 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
   ({ pattern, onStrum }) => {
     const { theme } = useSelector(selectUi);
 
+    const groupSize = 4; //timeSignature.includes("triplet") ? 3 : 4;
+
     const getGridTemplateColumns = (timeSignature: TimeSignature): string => {
-      const totalTicks = getTicksForTimeSignature(timeSignature);
-      const groupSize = timeSignature.includes("triplet") ? 3 : 4;
-      const groups = Math.ceil(totalTicks / groupSize);
+      const totalSlots = getSlotsForTimeSignature(timeSignature);
+      const groups = Math.ceil(totalSlots / groupSize);
 
       return (
         Array(groups).fill(`repeat(${groupSize}, 1fr) 8px`).join(" ").trim() +
-        (totalTicks % groupSize
-          ? ` repeat(${totalTicks % groupSize}, 1fr)`
+        (totalSlots % groupSize
+          ? ` repeat(${totalSlots % groupSize}, 1fr)`
           : "")
       );
     };
 
     return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto py-4">
         <div
           className="grid gap-x-1 w-full"
           style={{
@@ -48,9 +49,7 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
                 onStrum={onStrum}
                 theme={theme}
               />
-              {(index + 1) %
-                (pattern.timeSignature.includes("triplet") ? 3 : 4) ===
-                0 &&
+              {(index + 1) % groupSize === 0 &&
                 index !== pattern.strums.length - 1 && <div className="w-2" />}
             </React.Fragment>
           ))}

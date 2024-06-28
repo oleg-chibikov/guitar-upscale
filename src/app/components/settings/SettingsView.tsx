@@ -5,8 +5,8 @@ import { Theme } from "@/app/data/theme";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
-import { Slide } from "@mui/material";
-import { ReactNode } from "react";
+import { Drawer } from "@mui/material";
+import { ReactNode, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseIcon } from "../CloseIcon";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
@@ -24,21 +24,27 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
 }) => {
   const { theme, chordsDisplayMode, settingsExpanded } = useSelector(selectUi);
   const dispatch = useDispatch();
+  const [open, setOpen] = useState<boolean>(false); // this is needed to use animation when loaded first time
+
+  useEffect(() => {
+    setOpen(settingsExpanded);
+  }, [settingsExpanded]);
+
   return (
-    <Slide direction="down" in={settingsExpanded} mountOnEnter unmountOnExit>
-      <section
+    <Drawer
+      anchor={chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left"}
+      open={open}
+      onClose={() => dispatch(setSettingsExpanded(false))}
+    >
+      <div
         id={SETTINGS_PANEL_ID}
-        className={`flex flex-col opacity-95 overflow-auto overscroll-contain fixed ${
-          // it should be on the opposite side of chords to avoid overlapping
-          chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
-        } z-40 top-28 border-2 ${
+        className={`flex flex-col overflow-auto overscroll-contain border-2 h-full ${
           theme === Theme.Light
             ? "bg-accented_background-light border-border-light text-foreground-light"
             : "bg-accented_background-dark border-border-dark text-foreground-dark"
         } p-4 gap-2`}
         style={{
           maxWidth: "80vw",
-          maxHeight: "60vh",
         }}
       >
         <CloseIcon
@@ -80,8 +86,9 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
             (premiumComponents.get("reverbStrength") as ReactNode)}
           <ResetSettingsButton />
         </div>
-      </section>
-    </Slide>
+      </div>
+    </Drawer>
   );
 };
+
 SettingsView.displayName = "SettingsView";

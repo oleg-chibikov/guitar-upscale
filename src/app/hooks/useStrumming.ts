@@ -1,3 +1,4 @@
+import { getPatternById } from "@/app/data/chordStrummingPatterns";
 import {
   AUTH_PANEL_ID,
   CHORDS_VIEW_EXPANDER_ID,
@@ -10,14 +11,24 @@ import {
   STRUMMING_SETTINGS_PANEL_ID,
 } from "@/app/data/elementIds";
 import {
+  TimeSignature,
+  getTicksForTimeSignature,
+} from "@/app/data/strummingData";
+import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BEAT,
+  TICKS_PER_SIXTEENTH,
+  TICKS_PER_SIXTY_FOURTH,
+  TICKS_PER_THIRTY_SECOND,
 } from "@/app/engine/clock/clockConstants";
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef } from "react";
 import {
   getCurrentRelativeTick,
   isMainClockActiveValue,
+  waitForNextBar,
+  waitForNextBeat,
+  waitForNextHalfBar,
   waitForNextHalfBeat,
   waitForNextTick,
 } from "../engine/clock/mainClock";
@@ -41,7 +52,7 @@ import {
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
-  chordCustomStrummingPatternValue,
+  chordCustomStrummingPatternIdValue,
   chordCustomStrummingWaitForPatternFinishValue,
   isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
@@ -75,11 +86,31 @@ const getTicksInInterval = (patternLength: number) => {
   return TICKS_IN_HALF_BEAT; // each symbol is a half beat
 };
 
-const getWaitBetweenFunc = (patternLength: number) => {
-  if (patternLength >= TICKS_IN_BAR) {
-    return waitForNextTick; // each symbol is a tick
+async function waitForTicks(ticks: number): Promise<void> {
+  for (let i = 0; i < ticks; i++) {
+    await waitForNextTick();
   }
-  return waitForNextHalfBeat; // each symbol is a half beat
+}
+
+const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
+  switch (timeSignature) {
+    case TimeSignature.ONE_BAR:
+      return waitForNextBar;
+    case TimeSignature.HALF_BAR:
+      return waitForNextHalfBar;
+    case TimeSignature.ONE_BEAT:
+      return waitForNextBeat;
+    case TimeSignature.HALF_BEAT:
+      return waitForNextHalfBeat;
+    case TimeSignature.ONE_SIXTEENS:
+      return () => waitForTicks(TICKS_PER_SIXTEENTH);
+    case TimeSignature.ONE_THIRTY_SECOND:
+      return () => waitForTicks(TICKS_PER_THIRTY_SECOND);
+    case TimeSignature.ONE_SIXTY_FOURTH:
+      return () => waitForTicks(TICKS_PER_SIXTY_FOURTH);
+    default:
+      throw new Error(`Unsupported time signature: ${timeSignature}`);
+  }
 };
 
 export const useStrumming = (
@@ -112,6 +143,13 @@ export const useStrumming = (
   const onChordPress = async () => {
     const clickNumber = clickNumberRef.current++;
     if (isDisabled) {
+      return;
+    }
+
+    const currentPatternId = chordCustomStrummingPatternIdValue;
+    const patternObject = getPatternById(currentPatternId);
+    if (!patternObject) {
+      console.error("No strumming pattern selected!");
       return;
     }
 
@@ -259,10 +297,8 @@ export const useStrumming = (
     const otherChordsGracePeriodPromises =
       getOtherChordsGracePeriodPromises(chordName);
 
-    const currentPattern = chordCustomStrummingPatternValue;
-    const patternLength = currentPattern.length;
-
-    const waitBetween = getWaitBetweenFunc(patternLength);
+    const patternTimeSignature = patternObject.timeSignature;
+    const waitBetween = getWaitBetweenFunc(patternTimeSignature);
 
     const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
     const clickedInOtherChordGracePeriod =
@@ -294,7 +330,9 @@ export const useStrumming = (
     const getIntervalsToSkip = () => {
       // get the tick number since the last bar
       const currentTick = getCurrentRelativeTick();
-      const ticksInInterval = getTicksInInterval(patternLength);
+      const ticksInInterval = getTicksForTimeSignature(
+        patternObject.timeSignature
+      );
       const ticksRemainingToTheNextInterval = currentTick % ticksInInterval;
       if (ticksRemainingToTheNextInterval === 0) {
         return 1;
@@ -439,7 +477,7 @@ export const useStrumming = (
           let currentIndex = startIndex; // skip first as it was played already
 
           const playChordOnce = async () => {
-            const char = currentPattern[currentIndex];
+            const char = patternObject.strums[currentIndex];
             switch (char) {
               case "↑":
                 isAlternateRef.current = false;
@@ -449,7 +487,7 @@ export const useStrumming = (
                 isAlternateRef.current = true;
                 play(clickedInGracePeriod);
                 break;
-              case "_":
+              case "":
                 break;
               default:
                 return; // ignore all the other symbols
@@ -459,7 +497,7 @@ export const useStrumming = (
           };
 
           while (isChordClicked(chordName)) {
-            for (; currentIndex < currentPattern.length; currentIndex++) {
+            for (; currentIndex < patternObject.strums.length; currentIndex++) {
               if (!chordCustomStrummingWaitForPatternFinishValue) {
                 // early break pattern only when the checkbox is off
                 if (!isChordClicked(chordName)) {
@@ -491,7 +529,7 @@ export const useStrumming = (
                   await waitBetweenChords();
                 }
                 currentIndex++;
-                if (currentIndex === currentPattern.length) {
+                if (currentIndex === patternObject.strums.length) {
                   currentIndex = 0;
                 }
               }

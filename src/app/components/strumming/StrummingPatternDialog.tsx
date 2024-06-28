@@ -1,22 +1,16 @@
 import { CloseIcon } from "@/app/components/CloseIcon";
+import { DialogHeader } from "@/app/components/layout/DialogHeader";
 import { STRUMMING_PATTERN_EDITOR } from "@/app/data/elementIds";
 import {
+  DEFAULT_TIME_SIGNATURE,
   Pattern,
-  STRUMMING_PLACEHOLDER,
-  getTicksForTimeSignature,
+  getSlotsForTimeSignature,
 } from "@/app/data/strummingData";
-import { selectUi } from "@/app/store/uiSlice";
+import { triggerCustomStrummingPatternChanged } from "@/app/store/settingsSlice";
 import AddIcon from "@mui/icons-material/Add";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Dialog, DialogContent, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
 import { PatternList } from "./PatternList";
 
@@ -31,7 +25,7 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
 }) => {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [currentPattern, setCurrentPattern] = useState<Pattern | null>(null);
-  const { theme } = useSelector(selectUi);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const savedPatterns = localStorage.getItem("strummingPatterns");
@@ -47,21 +41,21 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
     setPatterns(updatedPatterns);
     localStorage.setItem("strummingPatterns", JSON.stringify(updatedPatterns));
     setCurrentPattern(null);
+    dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     const newPatterns = patterns.filter((p) => p.id !== id);
     setPatterns(newPatterns);
     localStorage.setItem("strummingPatterns", JSON.stringify(newPatterns));
+    dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
   const handleNewPattern = () => {
     setCurrentPattern({
-      id: Date.now().toString(),
-      timeSignature: "1/1",
-      strums: Array(getTicksForTimeSignature("1/1")).fill(
-        STRUMMING_PLACEHOLDER
-      ),
+      id: Date.now(),
+      timeSignature: DEFAULT_TIME_SIGNATURE,
+      strums: Array(getSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE)).fill(""),
     });
   };
 
@@ -75,11 +69,7 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
       className=""
     >
       <CloseIcon onPress={onClose} />
-      <DialogTitle>
-        <Typography variant="h2" align="center">
-          Strumming Pattern Editor
-        </Typography>
-      </DialogTitle>
+      <DialogHeader text="Strumming pattern editor" />
       <DialogContent className="flex flex-col gap-2">
         {currentPattern ? (
           <PatternEditor

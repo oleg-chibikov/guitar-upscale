@@ -10,7 +10,7 @@ export const CloseIcon: FC<CloseIconProps> = ({ onPress }) => {
   return (
     <IconButton
       inactiveBg="bg-transparent"
-      className="right-2 top-2 absolute"
+      className="right-2 top-2 absolute z-20"
       icon={<Cancel />}
       tooltip="Close"
       onPress={onPress}

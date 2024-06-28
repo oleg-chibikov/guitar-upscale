@@ -1,14 +1,12 @@
-import { SelectWrapper } from "@/app/components/settings/selectors/SelectWrapper";
+import { EnumSelector } from "@/app/components/settings/selectors/EnumSelector";
 import { StrumGrid } from "@/app/components/strumming/StrumGrid";
 import {
   Pattern,
-  STRUMMING_PLACEHOLDER,
   StrumDirection,
   TimeSignature,
-  getTicksForTimeSignature,
-  timeSignatureOptions,
+  getSlotsForTimeSignature,
 } from "@/app/data/strummingData";
-import { Button } from "@mui/material";
+import { Button, DialogActions, Typography } from "@mui/material";
 import React, { useState } from "react";
 
 interface PatternEditorProps {
@@ -25,13 +23,11 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
   const [currentPattern, setCurrentPattern] = useState(pattern);
 
   const handleTimeSignatureChange = (value: string | number) => {
-    const newTimeSignature = value as TimeSignature;
+    const timeSignature = value as TimeSignature;
     setCurrentPattern({
       ...currentPattern,
-      timeSignature: newTimeSignature,
-      strums: Array(getTicksForTimeSignature(newTimeSignature)).fill(
-        STRUMMING_PLACEHOLDER
-      ),
+      timeSignature,
+      strums: Array(getSlotsForTimeSignature(timeSignature)).fill(""),
     });
   };
 
@@ -43,24 +39,23 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
 
   return (
     <>
-      <SelectWrapper
-        options={timeSignatureOptions}
-        value={currentPattern.timeSignature}
-        onChange={handleTimeSignatureChange}
-      />
+      <div className="flex flex-row gap-2 items-center">
+        <Typography>Each cell represents</Typography>
+        <EnumSelector
+          enumObj={TimeSignature}
+          selectedValue={currentPattern.timeSignature}
+          onValueChange={handleTimeSignatureChange}
+        />
+      </div>
       <StrumGrid pattern={currentPattern} onStrum={handleStrum} />
-      <div className="flex flex-row gap-2">
-        <Button
-          variant="contained"
-          onClick={() => onSave(currentPattern)}
-          className="mr-2"
-        >
-          Save
-        </Button>
-        <Button variant="outlined" onClick={onCancel}>
+      <DialogActions>
+        <Button color="primary" onClick={onCancel}>
           Cancel
         </Button>
-      </div>
+        <Button variant="contained" onClick={() => onSave(currentPattern)}>
+          Save
+        </Button>
+      </DialogActions>
     </>
   );
 };

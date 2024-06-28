@@ -16,7 +16,6 @@ const ScaleSelector: React.FC = () => {
 
   return (
     <SelectWrapper
-      large
       options={Array.from(scalesMap.get(scaleGroup)!.entries()).map(
         ([scaleName]) => {
           const examples = examplesMap?.get(scaleGroup)?.get(scaleName);

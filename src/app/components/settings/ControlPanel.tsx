@@ -27,7 +27,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
   };
   return (
     <section
-      className={`z-30 fixed top-1 ${
+      className={`z-30 opacity-95 fixed top-1 ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}

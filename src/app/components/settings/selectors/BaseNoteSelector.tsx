@@ -15,7 +15,6 @@ export const BaseNoteSelector: React.FC = () => {
 
   return (
     <EnumSelector
-      large
       enumObj={Note}
       selectedValue={baseNote}
       onValueChange={(value) => {

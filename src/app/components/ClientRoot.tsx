@@ -11,7 +11,6 @@ import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { selectUi } from "../store/uiSlice";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
-import { MenuOutsideClickHandler } from "./MenuOutsideClickHandler";
 import { AlertWrapper } from "./alert/AlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
@@ -48,7 +47,6 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <ChordsView mainRef={mainRef} />
           <AuthPanel />
           <StrummingSettingsWrapper />
-          <MenuOutsideClickHandler />
           <BottomZone premiumComponents={premiumComponents} />
           <AspectRatioModalWrapper />
         </main>

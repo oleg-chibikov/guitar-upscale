@@ -10,7 +10,6 @@ const TuningSelector: React.FC = () => {
 
   return (
     <SelectWrapper
-      large
       value={tuning}
       onChange={(value) => {
         dispatch(setTuning(value as Tuning));
