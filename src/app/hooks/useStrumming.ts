@@ -22,6 +22,7 @@ import {
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef } from "react";
 import {
+  currentTick,
   getCurrentRelativeTick,
   isMainClockActiveValue,
   waitForNextBar,
@@ -104,7 +105,6 @@ const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
   }
 };
 
-// TODO: Bug! sometimes it plays the pattern with shift. Not matching the correct ticks
 export const useStrumming = (
   chordName: string,
   isDisabled: boolean,
@@ -344,6 +344,7 @@ export const useStrumming = (
         return;
       }
 
+      // TODO: Bug! sometimes it plays the pattern with shift. Not matching the correct ticks
       const getInitialWait = () => {
         let skipIntervals: number | undefined;
         let initialWait: () => Promise<void | void[]>;
@@ -460,7 +461,8 @@ export const useStrumming = (
         clickNumber: number
       ): Promise<void> => {
         console.log(
-          STRUMMING_LOG_PREFIX + "----> Started actual strumming",
+          STRUMMING_LOG_PREFIX + "----> Started actual strumming at tick",
+          currentTick,
           chordName,
           clickNumber
         );
