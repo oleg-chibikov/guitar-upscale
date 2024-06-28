@@ -1,3 +1,4 @@
+import { DialogHeader } from "@/app/components/layout/DialogHeader";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { Theme } from "@/app/data/theme";
 import {
@@ -84,14 +85,16 @@ export const ChangeSubscriptionModal: FC<
       aria-labelledby="change-subscription-modal"
     >
       <section
-        className={`relative flex overflow-auto max-h-full justify-center text-center items-stretch flex-col gap-2 border-2 p-2 ${
+        className={`flex overflow-auto max-h-full justify-center text-center items-stretch flex-col gap-2 border-2 p-4 ${
           theme === Theme.Light
             ? "bg-accented_background-light border-border-light text-foreground-light"
             : "bg-accented_background-dark  border-border-dark text-foreground-dark"
         }`}
       >
         <CloseIcon onPress={handleCloseModal} />
-        <div>{`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}</div>
+        <DialogHeader
+          text={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
+        />
 
         <Alert severity="info">
           {existingSubscriptionCancellationMode === CancellationMode.Revoke
