@@ -89,7 +89,7 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
     return (
       <button
         onClick={handleClick}
-        className={`w-4 h-4 border border-gray-300 flex items-center justify-center text-xs
+        className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs
         ${
           isBeatCell
             ? theme === Theme.Light
