@@ -4,38 +4,127 @@
 import {
   DEFAULT_TIME_SIGNATURE,
   Pattern,
-  StrumDirection,
+  TimeSignature,
 } from "@/app/data/strummingData";
 
-const strummingPatterns: StrumDirection[][] = [
-  ["↑"],
-  ["↑", ""],
-  ["↑", "↓"],
-  ["↑", "", "↓", ""],
-  ["↑", "", "↓", ""],
-  ["↑", "", "↓", "", "↑", "", "↓", ""],
-  ["↑", "↓", "", "↑", "↓", "↑", "", ""],
-  ["↑", "", "", "↓", "↑", "", "", "↓"],
-  ["↑", "", "↑", "↓", "", "↓", "↑", "↓"],
-  ["↑", "", "↑", "↓", "", "↓", "", "↓"],
-  ["↑", "↓", "↑", "↓", "", "↓", "↑", "↓"],
-  ["↑", "↓", "↑", "↓", "", "↓", "", "↓"],
-  ["↑", "", "", "↓", "", "", "↑", ""],
-  ["↑", "", "↑", "↓", "", "↑", "↓", "", "↑", "", "↑", "↓", "↑", "", "↑", "↓"],
-  ["↑", "", "↑", "↓", "↑", "↓", "", "↑", "", "↑", "", "↓", "↑", "↓", "", "↓"],
-  ["↑", "", "↓", "", "↑", "", "", "↓", "", "↓", "", "↑", "", "↑", "↓", "↑"],
+let i = 0;
+export const chordStrummingPatterns: Pattern[] = [
+  { id: ++i, timeSignature: DEFAULT_TIME_SIGNATURE, strums: ["↑"] },
+  { id: ++i, timeSignature: DEFAULT_TIME_SIGNATURE, strums: ["↑", "↓"] },
+  {
+    id: ++i,
+    timeSignature: TimeSignature.SIXTEENTH,
+    strums: ["", "↑", "↑", "↑"],
+  },
+  {
+    id: ++i,
+    timeSignature: TimeSignature.SIXTEENTH,
+    strums: ["↑", "↑", "↑", ""],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "↓", "", "↑", "↓", "↑", "", ""],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "", "", "↓", "↑", "", "", "↓"],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "", "↑", "↓", "", "↓", "↑", "↓"],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "", "↑", "↓", "", "↓", "", "↓"],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "↓", "↑", "↓", "", "↓", "↑", "↓"],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "↓", "↑", "↓", "", "↓", "", "↓"],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: ["↑", "", "", "↓", "", "", "↑", ""],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: [
+      "↑",
+      "",
+      "↑",
+      "↓",
+      "",
+      "↑",
+      "↓",
+      "",
+      "↑",
+      "",
+      "↑",
+      "↓",
+      "↑",
+      "",
+      "↑",
+      "↓",
+    ],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: [
+      "↑",
+      "",
+      "↑",
+      "↓",
+      "↑",
+      "↓",
+      "",
+      "↑",
+      "",
+      "↑",
+      "",
+      "↓",
+      "↑",
+      "↓",
+      "",
+      "↓",
+    ],
+  },
+  {
+    id: ++i,
+    timeSignature: DEFAULT_TIME_SIGNATURE,
+    strums: [
+      "↑",
+      "",
+      "↓",
+      "",
+      "↑",
+      "",
+      "",
+      "↓",
+      "",
+      "↓",
+      "",
+      "↑",
+      "",
+      "↑",
+      "↓",
+      "↑",
+    ],
+  },
 ];
 
-export const chordStrummingPatterns: Pattern[] = strummingPatterns.map(
-  (strums, index) => ({
-    id: index + 1,
-    timeSignature: DEFAULT_TIME_SIGNATURE,
-    strums,
-  })
-);
-
-const lastStrummingPatternId =
-  chordStrummingPatterns[chordStrummingPatterns.length - 1].id;
+const lastStrummingPatternId = i;
 
 const isIdSmallerThanLastStrummingPatternId = (id: number): boolean =>
   id < lastStrummingPatternId;
