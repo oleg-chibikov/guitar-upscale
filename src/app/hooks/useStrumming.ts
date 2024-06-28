@@ -11,25 +11,28 @@ import {
   STRUMMING_SETTINGS_PANEL_ID,
 } from "@/app/data/elementIds";
 import {
+  Pattern,
   TimeSignature,
   getTicksForTimeSignature,
 } from "@/app/data/strummingData";
 import {
-  TICKS_PER_SIXTEENTH,
-  TICKS_PER_SIXTY_FOURTH,
-  TICKS_PER_THIRTY_SECOND,
+  TICKS_IN_BAR,
+  TICKS_IN_BEAT,
+  TICKS_IN_HALF_BAR,
+  TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 import { useCallback, useRef } from "react";
 import {
   currentTick,
-  getCurrentRelativeTick,
   isMainClockActiveValue,
   waitForNextBar,
   waitForNextBeat,
   waitForNextHalfBar,
   waitForNextHalfBeat,
-  waitForNextTick,
+  waitForNextSixteenth,
+  waitForNextSixtyFourth,
+  waitForNextThirtySecond,
 } from "../engine/clock/mainClock";
 import { ChordEventBus } from "../engine/eventBus";
 import {
@@ -78,11 +81,70 @@ enum PromiseType {
   WaitTimeOver = 2,
 }
 
-async function waitForTicks(ticks: number): Promise<void> {
-  for (let i = 0; i < ticks; i++) {
-    await waitForNextTick();
+const getIntervalsToSkip = (patternObject: Pattern) => {
+  // Get the tick number since the last bar
+  const ticksSinceLastBar = currentTick;
+
+  // Get the number of ticks in one interval of the pattern
+  const ticksInInterval = getTicksForTimeSignature(patternObject.timeSignature);
+
+  // Calculate the total ticks in the pattern
+  const totalTicksInPattern = ticksInInterval * patternObject.strums.length;
+
+  let targetTicks, nextEventName;
+
+  if (totalTicksInPattern >= TICKS_IN_BAR) {
+    // Pattern is at least one bar long, wait for next bar
+    targetTicks = TICKS_IN_BAR;
+    nextEventName = "bar";
+  } else if (totalTicksInPattern >= TICKS_IN_HALF_BAR) {
+    // Pattern is at least half bar long, wait for next half bar
+    targetTicks = TICKS_IN_HALF_BAR;
+    nextEventName = "half bar";
+  } else if (totalTicksInPattern >= TICKS_IN_BEAT) {
+    // Pattern is at least one beat long, wait for next beat
+    targetTicks = TICKS_IN_BEAT;
+    nextEventName = "beat";
+  } else {
+    // Pattern is shorter than one beat, wait for next half beat
+    targetTicks = TICKS_IN_HALF_BEAT;
+    nextEventName = "half beat";
   }
-}
+
+  // Calculate the tick of the next event
+  const nextEventTick =
+    Math.ceil(ticksSinceLastBar / targetTicks) * targetTicks;
+
+  // Calculate how many ticks remain until the next target event
+  const ticksRemainingToNextEvent = nextEventTick - ticksSinceLastBar;
+
+  // Calculate how many full intervals remain until the next target event
+  const intervalsRemainingToNextEvent = Math.floor(
+    ticksRemainingToNextEvent / ticksInInterval
+  );
+
+  // Calculate how many strums to skip
+  const totalStrumsInPattern = patternObject.strums.length;
+  const strumsToSkip = totalStrumsInPattern - intervalsRemainingToNextEvent;
+
+  console.log(
+    STRUMMING_LOG_PREFIX +
+      "Ticks in interval %s: %d, Ticks since last bar: %d, next %s starts at %d tick, ticks remaining to next %s: %d, intervals remaining: %d, intervals to skip: %d",
+    patternObject.timeSignature,
+    ticksInInterval,
+    ticksSinceLastBar,
+    nextEventName,
+    nextEventTick,
+    nextEventName,
+    ticksRemainingToNextEvent,
+    intervalsRemainingToNextEvent,
+    strumsToSkip
+  );
+
+  // Ensure we don't return a negative number
+  // One interval should be skipped for sure as we played the chord immediately
+  return Math.max(1, strumsToSkip);
+};
 
 const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
   switch (timeSignature) {
@@ -95,11 +157,11 @@ const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
     case TimeSignature.HALF_BEAT:
       return waitForNextHalfBeat;
     case TimeSignature.ONE_SIXTEENS:
-      return () => waitForTicks(TICKS_PER_SIXTEENTH);
+      return waitForNextSixteenth;
     case TimeSignature.ONE_THIRTY_SECOND:
-      return () => waitForTicks(TICKS_PER_THIRTY_SECOND);
+      return waitForNextThirtySecond;
     case TimeSignature.ONE_SIXTY_FOURTH:
-      return () => waitForTicks(TICKS_PER_SIXTY_FOURTH);
+      return waitForNextSixtyFourth;
     default:
       throw new Error(`Unsupported time signature: ${timeSignature}`);
   }
@@ -319,20 +381,6 @@ export const useStrumming = (
       );
     }
 
-    const getIntervalsToSkip = () => {
-      // get the tick number since the last bar
-      const currentTick = getCurrentRelativeTick();
-      const ticksInInterval = getTicksForTimeSignature(
-        patternObject.timeSignature
-      );
-      const ticksRemainingToTheNextInterval = currentTick % ticksInInterval;
-      if (ticksRemainingToTheNextInterval === 0) {
-        return 1;
-      }
-      const intervalsToSkip = Math.floor(currentTick / ticksInInterval);
-      return intervalsToSkip + 1;
-    };
-
     const waitAndStrum = async () => {
       if (!isChordClicked(chordName)) {
         console.log(
@@ -384,7 +432,7 @@ export const useStrumming = (
             isAnyTimerSpecificActivityRunning() &&
             !isOtherChordStrumming
           ) {
-            skipIntervals = getIntervalsToSkip();
+            skipIntervals = getIntervalsToSkip(patternObject);
             console.log(
               STRUMMING_LOG_PREFIX +
                 "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
@@ -410,7 +458,7 @@ export const useStrumming = (
             clickNumber
           );
           initialWait = waitBetween;
-          skipIntervals = 1;
+          skipIntervals = 1; // skipping one as we already played one chord immediately
         }
         return { initialWait, skipIntervals };
       };
@@ -461,8 +509,10 @@ export const useStrumming = (
         clickNumber: number
       ): Promise<void> => {
         console.log(
-          STRUMMING_LOG_PREFIX + "----> Started actual strumming at tick",
+          STRUMMING_LOG_PREFIX +
+            "----> Started actual strumming at tick %d skipping %d intervals",
           currentTick,
+          startIndex,
           chordName,
           clickNumber
         );
@@ -490,6 +540,19 @@ export const useStrumming = (
             await waitBetweenChords();
           };
 
+          const resetStrummingPosition = () => {
+            console.log(
+              STRUMMING_LOG_PREFIX +
+                "Start over the strumming pattern. Current tick",
+              currentTick
+            );
+            currentIndex = 0;
+          };
+
+          if (currentIndex === 0) {
+            resetStrummingPosition(); // just to log
+          }
+
           while (isChordClicked(chordName)) {
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
               if (!chordCustomStrummingWaitForPatternFinishValue) {
@@ -501,7 +564,8 @@ export const useStrumming = (
               }
               await playChordOnce();
             }
-            currentIndex = 0; // reset to start pattern afresh
+
+            resetStrummingPosition();
           }
 
           if (chordCustomStrummingWaitForPatternFinishValue) {
@@ -524,7 +588,7 @@ export const useStrumming = (
                 }
                 currentIndex++;
                 if (currentIndex === patternObject.strums.length) {
-                  currentIndex = 0;
+                  resetStrummingPosition();
                 }
               }
             }

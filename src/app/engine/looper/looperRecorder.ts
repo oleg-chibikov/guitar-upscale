@@ -14,7 +14,7 @@ import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import { Instrument } from "../../data/instruments";
 import { StringOctaveNote } from "../../data/notes";
 import {
-  getCurrentRelativeTick,
+  currentTick,
   globalCurrentLastBarTick,
   globalCurrentTick,
 } from "../clock/mainClock";
@@ -108,7 +108,7 @@ export class LooperRecorder {
     const endTick =
       globalCurrentTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
     const recordingStoppedInTheFirstHalfOfLastBar =
-      getCurrentRelativeTick() < TICKS_IN_HALF_BAR;
+      currentTick < TICKS_IN_HALF_BAR;
 
     const recordingEndedInFurtherBar =
       lastBarTickWhenStoppedRecording > this.lastBarTickForLastRecordedEvent;

@@ -30,6 +30,7 @@ import {
 } from "../store/settingsSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 
+// TODO: First note is played shifted often! see billie jean
 const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 const LOG_PREFIX = "usePlay: ";

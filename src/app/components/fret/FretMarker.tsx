@@ -7,7 +7,7 @@ import {
 } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import { getShiftedNote } from "@/app/data/tunings";
-import { getCurrentRelativeTick } from "@/app/engine/clock/mainClock";
+import { currentTick } from "@/app/engine/clock/mainClock";
 import {
   ClearNoteMetadata,
   NoteMetadata,
@@ -357,7 +357,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       console.log(
         "Playing all the notes on fret at tick %d",
         fret,
-        getCurrentRelativeTick()
+        currentTick
       );
       for (let stringIndex = 0; stringIndex < neck.length; stringIndex++) {
         const string = neck[stringIndex];
@@ -374,7 +374,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     console.log(
       "Playing note (manual) %o at tick %d",
       stringOctaveNote,
-      getCurrentRelativeTick()
+      currentTick
     );
     if (stringOctaveNote) {
       NotePlayEventBus.next({

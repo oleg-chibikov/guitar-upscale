@@ -11,7 +11,7 @@ import {
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
-import { getCurrentRelativeTick } from "@/app/engine/clock/mainClock";
+import { currentTick } from "@/app/engine/clock/mainClock";
 import {
   ChordMetadata,
   ChordToChordButtonEventMap,
@@ -197,11 +197,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         chordDetectorBuilder.clear();
       }
 
-      console.log(
-        "Playing chord: %s at tick %d",
-        chordName,
-        getCurrentRelativeTick()
-      );
+      console.log("Playing chord: %s at tick %d", chordName, currentTick);
       wasPlayedLastRef.current = true;
       toggleClasses();
 

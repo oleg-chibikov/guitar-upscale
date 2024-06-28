@@ -3,9 +3,9 @@ import {
   TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
-  TICKS_PER_SIXTEENTH,
-  TICKS_PER_SIXTY_FOURTH,
-  TICKS_PER_THIRTY_SECOND,
+  TICKS_IN_SIXTEENTH,
+  TICKS_IN_SIXTY_FOURTH,
+  TICKS_IN_THIRTY_SECOND,
 } from "@/app/engine/clock/clockConstants";
 
 // TODO: Partially merge with clock constants. Move both to data
@@ -67,11 +67,11 @@ export const getTicksForTimeSignature = (
     case TimeSignature.HALF_BEAT:
       return TICKS_IN_HALF_BEAT;
     case TimeSignature.ONE_SIXTEENS:
-      return TICKS_PER_SIXTEENTH;
+      return TICKS_IN_SIXTEENTH;
     case TimeSignature.ONE_THIRTY_SECOND:
-      return TICKS_PER_THIRTY_SECOND;
+      return TICKS_IN_THIRTY_SECOND;
     case TimeSignature.ONE_SIXTY_FOURTH:
-      return TICKS_PER_SIXTY_FOURTH;
+      return TICKS_IN_SIXTY_FOURTH;
     // case "1/4 triplet":
     //   return 16;
     // case "1/8 triplet":

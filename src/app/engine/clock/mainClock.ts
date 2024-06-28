@@ -3,27 +3,39 @@ import {
   TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
+  TICKS_IN_SIXTEENTH,
+  TICKS_IN_SIXTY_FOURTH,
+  TICKS_IN_THIRTY_SECOND,
 } from "@/app/engine/clock/clockConstants";
 import { createPromise } from "@/app/helpers/promiseHelper";
 import { tempoBpmValue } from "../../store/settingsSlice";
 import { MetronomeEventBus } from "../eventBus";
 
-const { waitFor: waitForNextTick, recreate: recreateNextTick } =
-  createPromise();
-const { waitFor: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
+const { waitFor: waitForNextBar, recreate: recreateNextBar } = createPromise();
+const { waitFor: waitForNextHalfBar, recreate: recreateNextHalfBar } =
   createPromise();
 const { waitFor: waitForNextBeat, recreate: recreateNextBeat } =
   createPromise();
-const { waitFor: waitForNextHalfBar, recreate: recreateNextHalfBar } =
+const { waitFor: waitForNextHalfBeat, recreate: recreateNextHalfBeat } =
   createPromise();
-const { waitFor: waitForNextBar, recreate: recreateNextBar } = createPromise();
+const { waitFor: waitForNextSixteenth, recreate: recreateNextSixteenth } =
+  createPromise();
+const { waitFor: waitForNextThirtySecond, recreate: recreateNextThirtySecond } =
+  createPromise();
+const { waitFor: waitForNextSixtyFourth, recreate: recreateNextSixtyFourth } =
+  createPromise();
+const { waitFor: waitForNextTick, recreate: recreateNextTick } =
+  createPromise();
 
 const resolveAll = () => {
-  recreateNextTick(true);
   recreateNextBar(true);
   recreateNextHalfBar(true);
   recreateNextBeat(true);
   recreateNextHalfBeat(true);
+  recreateNextSixteenth(true);
+  recreateNextThirtySecond(true);
+  recreateNextSixtyFourth(true);
+  recreateNextTick(true);
 };
 
 export {
@@ -31,6 +43,9 @@ export {
   waitForNextBeat,
   waitForNextHalfBar,
   waitForNextHalfBeat,
+  waitForNextSixteenth,
+  waitForNextSixtyFourth,
+  waitForNextThirtySecond,
   waitForNextTick,
 };
 
@@ -43,14 +58,15 @@ export let currentTick = 0; // this tick is reset on every MAX_TICKS
 export let globalCurrentTick = 0; // this tick keeps incrementing while clock is active
 export let globalCurrentLastBarTick = 0;
 export let globalCurrentLastBeatTick = 0;
-export let currentHalfBeat = 0;
-export let currentBeat = 0;
-export let currentHalfBar = 0;
-export let currentBar = 0;
-export let isMainClockActiveValue: boolean = false;
 
-export const getCurrentRelativeTick = () =>
-  globalCurrentTick - globalCurrentLastBarTick;
+export let currentBar = 0;
+export let currentHalfBar = 0;
+export let currentBeat = 0;
+export let currentHalfBeat = 0;
+export let currentSixteenth = 0;
+export let currentThirtySecond = 0;
+export let currentSixtyFourth = 0;
+export let isMainClockActiveValue: boolean = false;
 
 export const stopInterval = (resolvePreviousPromises: boolean) => {
   worker?.postMessage({ type: "stop", tempoBpm: tempoBpmValue });
@@ -63,14 +79,17 @@ export const stopInterval = (resolvePreviousPromises: boolean) => {
 
 export const startInterval = (afresh: boolean) => {
   if (afresh) {
-    globalCurrentTick = 0;
-    globalCurrentLastBeatTick = 0;
     globalCurrentLastBarTick = 0;
+    globalCurrentLastBeatTick = 0;
+    globalCurrentTick = 0;
     reset();
     recreateNextBar();
     recreateNextHalfBar();
     recreateNextBeat();
     recreateNextHalfBeat();
+    recreateNextSixteenth();
+    recreateNextThirtySecond();
+    recreateNextSixtyFourth();
     recreateNextTick();
   }
 
@@ -84,11 +103,14 @@ export const resolveNextTick = () => {
 };
 
 const reset = () => {
-  currentTick = 0;
-  currentHalfBeat = 0;
-  currentBeat = 0;
-  currentHalfBar = 0;
   currentBar = 0;
+  currentHalfBar = 0;
+  currentBeat = 0;
+  currentHalfBeat = 0;
+  currentSixteenth = 0;
+  currentThirtySecond = 0;
+  currentSixtyFourth = 0;
+  currentTick = 0;
 };
 
 const onTick = () => {
@@ -96,6 +118,9 @@ const onTick = () => {
   const isHalfBar = currentTick % TICKS_IN_HALF_BAR === 0;
   const isBeat = currentTick % TICKS_IN_BEAT === 0;
   const isHalfBeat = currentTick % TICKS_IN_HALF_BEAT === 0;
+  const isSixteenth = currentTick % TICKS_IN_SIXTEENTH === 0;
+  const isThirtySecond = currentTick % TICKS_IN_THIRTY_SECOND === 0;
+  const isSixtyFourth = currentTick % TICKS_IN_SIXTY_FOURTH === 0;
   MetronomeEventBus.next({ isBar, isBeat, tick: currentTick });
 
   if (isBar) {
@@ -126,6 +151,18 @@ const onTick = () => {
   if (isHalfBeat) {
     recreateNextHalfBeat();
     currentHalfBeat++;
+  }
+  if (isSixteenth) {
+    recreateNextSixteenth();
+    currentSixteenth++;
+  }
+  if (isThirtySecond) {
+    recreateNextThirtySecond();
+    currentThirtySecond++;
+  }
+  if (isSixtyFourth) {
+    recreateNextSixtyFourth();
+    currentSixtyFourth++;
   }
   recreateNextTick();
   currentTick++;

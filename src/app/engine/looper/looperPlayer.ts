@@ -2,7 +2,7 @@ import { TICKS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { playAllNotes, waitForTick } from "@/app/engine/playerHelper";
 import {
-  getCurrentRelativeTick,
+  currentTick,
   waitForNextBar,
   waitForNextTick,
 } from "../clock/mainClock";
@@ -123,7 +123,7 @@ export class LooperPlayer {
   }
 
   private async getStartingPosition(firstEventTick: number) {
-    const ticksPassedSinceLastBar = getCurrentRelativeTick();
+    const ticksPassedSinceLastBar = currentTick;
     const mod = ticksPassedSinceLastBar % TICKS_IN_BAR;
 
     if (mod > firstEventTick) {
@@ -156,7 +156,7 @@ export class LooperPlayer {
   }
 
   private verifyTickIsCorrect(tick: number) {
-    const realTick = getCurrentRelativeTick();
+    const realTick = currentTick;
     const tickInBar = tick % TICKS_IN_BAR;
     if (tickInBar !== realTick) {
       console.error(
