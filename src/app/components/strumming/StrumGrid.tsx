@@ -2,9 +2,10 @@ import {
   Pattern,
   StrumDirection,
   TimeSignature,
-  getSlotsForTimeSignature,
+  getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingData";
 import { Theme } from "@/app/data/theme";
+import { BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -19,9 +20,9 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
     const { theme } = useSelector(selectUi);
 
     const groupSize = 4; //timeSignature.includes("triplet") ? 3 : 4;
+    const totalSlots = getDefaultSlotsForTimeSignature(pattern.timeSignature);
 
-    const getGridTemplateColumns = (timeSignature: TimeSignature): string => {
-      const totalSlots = getSlotsForTimeSignature(timeSignature);
+    const getGridTemplateColumns = (): string => {
       const groups = Math.ceil(totalSlots / groupSize);
 
       return (
@@ -32,12 +33,19 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
       );
     };
 
+    const slotsPerBeat =
+      pattern.timeSignature === TimeSignature.ONE_BEAT ||
+      pattern.timeSignature === TimeSignature.ONE_BAR ||
+      pattern.timeSignature === TimeSignature.HALF_BAR
+        ? 1
+        : totalSlots / BEATS_IN_BAR;
+
     return (
       <div className="overflow-x-auto py-4">
         <div
           className="grid gap-x-1 w-full"
           style={{
-            gridTemplateColumns: getGridTemplateColumns(pattern.timeSignature),
+            gridTemplateColumns: getGridTemplateColumns(),
             width: "max-content",
           }}
         >
@@ -48,6 +56,7 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
                 index={index}
                 onStrum={onStrum}
                 theme={theme}
+                isBeatCell={index % slotsPerBeat === 0}
               />
               {(index + 1) % groupSize === 0 &&
                 index !== pattern.strums.length - 1 && <div className="w-2" />}
@@ -64,10 +73,11 @@ interface StrumCellProps {
   index: number;
   onStrum: (index: number, newValue: StrumDirection) => void;
   theme: Theme;
+  isBeatCell: boolean;
 }
 
 const StrumCell: React.FC<StrumCellProps> = React.memo(
-  ({ strum, index, onStrum, theme }) => {
+  ({ strum, index, onStrum, theme, isBeatCell }) => {
     const handleClick = () => {
       const newValue: StrumDirection =
         strum === "↑" ? "↓" : strum === "↓" ? "" : "↑";
@@ -79,9 +89,18 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
         onClick={handleClick}
         className={`w-4 h-4 border border-gray-300 flex items-center justify-center text-xs
         ${
+          isBeatCell
+            ? theme === Theme.Light
+              ? "bg-primary-light"
+              : "bg-primary-dark"
+            : theme === Theme.Light
+            ? "bg-secondary-light"
+            : "bg-secondary-dark"
+        }
+        ${
           theme === Theme.Light
-            ? "bg-white text-black"
-            : "bg-gray-800 text-white"
+            ? "text-foreground-light"
+            : "text-foreground-dark"
         }`}
       >
         {strum}

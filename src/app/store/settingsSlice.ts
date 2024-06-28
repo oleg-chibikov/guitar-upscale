@@ -1,6 +1,9 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { chordStrummingPatterns } from "../data/chordStrummingPatterns";
+import {
+  chordStrummingPatterns,
+  getPatternById,
+} from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
@@ -76,6 +79,10 @@ interface WithScaleIsBeingDetected {
   scaleIsBeingDetected: boolean;
 }
 
+interface WithCustomStrummingPatternId {
+  chordCustomStrummingPatternId: number;
+}
+
 interface SettingsState
   extends WithMetronome,
     WithIsPaused,
@@ -83,7 +90,8 @@ interface SettingsState
     WithControls,
     CanUpdateGuitarSettings,
     WithChordIsBeingDetected,
-    WithScaleIsBeingDetected {
+    WithScaleIsBeingDetected,
+    WithCustomStrummingPatternId {
   tempoBpm: number;
   chordStrummingDelayMs: number;
   volume: number;
@@ -98,7 +106,6 @@ interface SettingsState
   chordInstrument: Instrument;
   reverbStrength: number;
   useChordAlteration: boolean;
-  chordCustomStrummingPatternId: number;
   chordCustomStrummingWaitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
@@ -322,6 +329,14 @@ const updateScaleIsBeingDetected = (
   }
 };
 
+const updateStrummingPatternId = (
+  state: WithCustomStrummingPatternId,
+  id: number
+) => {
+  state.chordCustomStrummingPatternId = id;
+  chordCustomStrummingPatternIdValue = id;
+};
+
 export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
   console.log("Resolving next tick");
   resolveNextTick();
@@ -502,8 +517,7 @@ export const settingsSlice = createSlice({
       useChordAlterationValue = action.payload;
     },
     setChordCustomStrummingPatternId(state, action: PayloadAction<number>) {
-      state.chordCustomStrummingPatternId = action.payload;
-      chordCustomStrummingPatternIdValue = action.payload;
+      updateStrummingPatternId(state, action.payload);
     },
     setChordCustomStrummingWaitForPatternFinish(
       state,
@@ -581,6 +595,14 @@ export const settingsSlice = createSlice({
       state.customStrummingPatternChangedTrigger =
         !state.customStrummingPatternChangedTrigger;
     },
+    checkCustomStrummingPatternAfterDeletion(state) {
+      if (!getPatternById(state.chordCustomStrummingPatternId)) {
+        updateStrummingPatternId(
+          state,
+          initialState.chordCustomStrummingPatternId
+        );
+      }
+    },
   },
 });
 
@@ -618,6 +640,7 @@ export const {
   triggerLooperStateUpdate,
   setIsLooperPlaying,
   triggerCustomStrummingPatternChanged,
+  checkCustomStrummingPatternAfterDeletion,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

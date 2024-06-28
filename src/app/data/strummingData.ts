@@ -24,7 +24,7 @@ export enum TimeSignature {
 export const DEFAULT_TIME_SIGNATURE = TimeSignature.HALF_BEAT;
 
 // this function gets the number of slots for the patternEditorUI
-export const getSlotsForTimeSignature = (
+export const getDefaultSlotsForTimeSignature = (
   timeSignature: TimeSignature
 ): number => {
   switch (timeSignature) {

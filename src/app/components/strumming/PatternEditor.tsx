@@ -4,7 +4,7 @@ import {
   Pattern,
   StrumDirection,
   TimeSignature,
-  getSlotsForTimeSignature,
+  getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingData";
 import { Button, DialogActions, Typography } from "@mui/material";
 import React, { useState } from "react";
@@ -27,7 +27,7 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
     setCurrentPattern({
       ...currentPattern,
       timeSignature,
-      strums: Array(getSlotsForTimeSignature(timeSignature)).fill(""),
+      strums: Array(getDefaultSlotsForTimeSignature(timeSignature)).fill(""),
     });
   };
 

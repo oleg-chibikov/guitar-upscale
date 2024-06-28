@@ -4,9 +4,13 @@ import { STRUMMING_PATTERN_EDITOR } from "@/app/data/elementIds";
 import {
   DEFAULT_TIME_SIGNATURE,
   Pattern,
-  getSlotsForTimeSignature,
+  getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingData";
-import { triggerCustomStrummingPatternChanged } from "@/app/store/settingsSlice";
+import {
+  checkCustomStrummingPatternAfterDeletion,
+  setChordCustomStrummingPatternId,
+  triggerCustomStrummingPatternChanged,
+} from "@/app/store/settingsSlice";
 import AddIcon from "@mui/icons-material/Add";
 import { Dialog, DialogContent, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -41,6 +45,7 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
     setPatterns(updatedPatterns);
     localStorage.setItem("strummingPatterns", JSON.stringify(updatedPatterns));
     setCurrentPattern(null);
+    dispatch(setChordCustomStrummingPatternId(pattern.id)); // select the new pattern automatically
     dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
@@ -48,15 +53,21 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
     const newPatterns = patterns.filter((p) => p.id !== id);
     setPatterns(newPatterns);
     localStorage.setItem("strummingPatterns", JSON.stringify(newPatterns));
+    dispatch(checkCustomStrummingPatternAfterDeletion()); // if the current pattern was deleted - set a default one
     dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
   const handleNewPattern = () => {
+    const newId = Date.now();
     setCurrentPattern({
-      id: Date.now(),
+      id: newId,
       timeSignature: DEFAULT_TIME_SIGNATURE,
-      strums: Array(getSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE)).fill(""),
+      strums: Array(
+        getDefaultSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE)
+      ).fill(""),
     });
+    dispatch(setChordCustomStrummingPatternId(newId)); // select the new pattern automatically
+    dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
   return (
