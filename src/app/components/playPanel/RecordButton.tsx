@@ -46,7 +46,7 @@ export const RecordButton: React.FC = (props) => {
         icon={isRecording ? <StopCircle /> : <FiberManualRecord />}
         isActive={isRecording}
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
-        activeBg="bg-red-500"
+        activeBg="error"
         onPress={async () => {
           const newValue = !isRecording;
           const midiRecorder = (

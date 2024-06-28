@@ -14,8 +14,7 @@ import { ModalProps } from "../ModalProps";
 export const CancelSubscriptionModal: FC<
   ModalProps & GetSubscriptionActionParams
 > = (params) => {
-  const { openModal, handleCloseModal, purchaseOption, disabledMessage } =
-    params;
+  const { isOpen, handleCloseModal, purchaseOption, disabledMessage } = params;
   const { theme } = useSelector(selectUi);
   const title = purchaseOption.tier;
 
@@ -41,11 +40,11 @@ export const CancelSubscriptionModal: FC<
       slotProps={{
         backdrop: { style: { backgroundColor: "rgba(0,0,0,0.9)" } },
       }}
-      open={openModal}
+      open={isOpen}
       onClose={handleCloseModal}
       aria-labelledby="cancel-subscription-modal"
     >
-      <Slide direction="down" in={openModal} mountOnEnter unmountOnExit>
+      <Slide direction="down" in={isOpen} mountOnEnter unmountOnExit>
         <section
           className={`relative flex overflow-auto max-h-full justify-center text-center items-stretch flex-col gap-2 border-2 p-2 ${
             theme === Theme.Light

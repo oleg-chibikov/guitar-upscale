@@ -28,7 +28,7 @@ export const DetectScaleButton: React.FC = (props) => {
       icon={scaleIsBeingDetected ? <SearchOff /> : <ManageSearch />}
       tooltip={scaleIsBeingDetected ? "Stop detecting scale" : "Detect scale"}
       isActive={scaleIsBeingDetected}
-      activeBg="bg-red-500"
+      activeBg="error"
       onPress={async () => {
         if (!scaleIsBeingDetected) {
           await setupScaleDetector();

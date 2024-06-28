@@ -7,6 +7,7 @@ import { Button, Modal, Slide, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CloseIcon } from "@/app/components/CloseIcon";
+import { DialogHeader } from "@/app/components/layout/DialogHeader";
 import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import {
@@ -55,17 +56,7 @@ export const ScaleDetectionAlert: FC = () => {
           }`}
           style={{ zIndex: 9998 }}
         >
-          <Typography
-            variant="caption"
-            noWrap
-            className={
-              theme === Theme.Light
-                ? "text-foreground-light"
-                : "text-foreground-dark"
-            }
-          >
-            Matching scales
-          </Typography>
+          <DialogHeader text=" Matching scales" />
           <CloseIcon onPress={handleCloseModal} />
           <div className="max-h-96 mt-2 overflow-auto flex flex-col gap-2">
             {suggestedScales?.map((scaleAndGroup) => (

@@ -72,7 +72,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
             ? "Stop recording loop at channel " + (channel + 1)
             : "Record loop at channel " + (channel + 1)
         }
-        activeBg="bg-red-500"
+        activeBg="error"
         onPress={handleRecordClick}
         textContent={isRecording ? undefined : (channel + 1).toString()}
       />
@@ -80,12 +80,12 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
         <IconButtonWrapper
           icon={isPlaying ? <Pause /> : <PlayArrow />}
           disabled={isDisabled}
-          activeBg={isPlaying ? "bg-green-500" : undefined}
+          activeBg={isPlaying ? "success" : undefined}
           isActive={isPlaying || hasRecording}
           tooltip={
             isPlaying
-              ? "Pause loop at channel " + (channel + 1)
-              : "Play loop at channel " + (channel + 1)
+              ? `Pause loop at channel ${channel + 1}`
+              : `Play loop at channel ${channel + 1}`
           }
           onPress={() => {
             if (isDisabled) {

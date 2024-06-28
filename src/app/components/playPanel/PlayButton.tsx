@@ -22,13 +22,13 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   return (
     <IconButtonWrapper
       isActive={isPlaying}
-      activeBg="bg-red-500"
+      activeBg="error"
       tooltip={
         isWaiting
           ? "Waiting for player to get ready..."
           : isPlaying
-          ? "Stop playing scale"
-          : "Play scale"
+          ? "Stop playing"
+          : "Play"
       }
       icon={
         isWaiting ? <HourglassTopIcon /> : isPlaying ? <Stop /> : <PlayArrow />

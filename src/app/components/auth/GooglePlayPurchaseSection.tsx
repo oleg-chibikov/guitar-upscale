@@ -187,7 +187,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       )}
       {selectedOption && cancelSubscriptionModalOpened && (
         <CancelSubscriptionModal
-          openModal={cancelSubscriptionModalOpen}
+          isOpen={cancelSubscriptionModalOpen}
           handleCloseModal={() => setCancelSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={selectedOption}
@@ -197,7 +197,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       )}
       {selectedOption && changeSubscriptionModalOpened && (
         <ChangeSubscriptionModal
-          openModal={changeSubscriptionModalOpen}
+          isOpen={changeSubscriptionModalOpen}
           handleCloseModal={() => setChangeSubscriptionModalOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={selectedOption}

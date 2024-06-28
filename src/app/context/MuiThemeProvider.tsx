@@ -11,6 +11,13 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
 
   const muiTheme = createTheme({
     components: {
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            backgroundColor: theme === Theme.Light ? "#e5cdbf" : "#333333",
+          },
+        },
+      },
       MuiSelect: {
         styleOverrides: {
           select: {

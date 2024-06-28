@@ -2,10 +2,10 @@ import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { IconButtonProps, IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper, IconButtonWrapperProps } from "./IconButton";
 
 interface NoPremiumButtonProps
-  extends Omit<IconButtonProps, "icon" | "tooltip" | "onPress"> {
+  extends Omit<IconButtonWrapperProps, "icon" | "tooltip" | "onPress"> {
   planName: string;
   functionalityDescription: string;
   icon: React.ReactElement;

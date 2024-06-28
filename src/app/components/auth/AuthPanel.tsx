@@ -53,7 +53,7 @@ export const AuthPanel: React.FC = () => {
 
       {modalOpened && (
         <SubscriptionStatusModal
-          openModal={openModal}
+          isOpen={openModal}
           handleCloseModal={handleCloseModal}
         />
       )}

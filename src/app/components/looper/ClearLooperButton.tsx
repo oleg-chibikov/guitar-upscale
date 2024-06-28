@@ -33,7 +33,7 @@ export const ClearLooperButton: React.FC<CanSetLooperState> = ({
       <IconButtonWrapper
         disabled={disabled}
         icon={<Clear />}
-        activeBg="bg-red-500"
+        activeBg="error"
         tooltip={"Clear looper"}
         isActive={true}
         onPress={handleClickOpen}

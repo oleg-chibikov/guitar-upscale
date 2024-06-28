@@ -9,8 +9,7 @@ interface CloseIconProps {
 export const CloseIcon: FC<CloseIconProps> = ({ onPress }) => {
   return (
     <IconButtonWrapper
-      inactiveBg="bg-transparent"
-      className="right-2 top-2 absolute z-20"
+      className="right-4 top-4 absolute z-20"
       icon={<Cancel />}
       tooltip="Close"
       onPress={onPress}

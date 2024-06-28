@@ -36,7 +36,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       open={open}
       onClose={() => dispatch(setSettingsExpanded(false))}
     >
-      <div
+      <section
         id={SETTINGS_PANEL_ID}
         className={`flex flex-col overflow-auto overscroll-contain border-2 h-full ${
           theme === Theme.Light
@@ -86,7 +86,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
             (premiumComponents.get("reverbStrength") as ReactNode)}
           <ResetSettingsButton />
         </div>
-      </div>
+      </section>
     </Drawer>
   );
 };

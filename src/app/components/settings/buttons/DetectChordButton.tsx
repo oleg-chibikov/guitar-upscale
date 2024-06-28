@@ -25,7 +25,7 @@ export const DetectChordButton: React.FC = (props) => {
       icon={chordIsBeingDetected ? <SearchOff /> : <Troubleshoot />}
       tooltip={chordIsBeingDetected ? "Stop detecting chord" : "Detect chord"}
       isActive={chordIsBeingDetected}
-      activeBg="bg-red-500"
+      activeBg="error"
       onPress={async () => {
         if (!chordIsBeingDetected) {
           await setupChordDetector();
