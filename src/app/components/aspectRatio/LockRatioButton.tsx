@@ -1,4 +1,4 @@
-import { IconButton } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
 import { selectUi, setLockRatio } from "@/app/store/uiSlice";
 import Lock from "@mui/icons-material/Lock";
 import LockOpen from "@mui/icons-material/LockOpen";
@@ -9,7 +9,7 @@ export const LockRatioButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { lockRatio } = useSelector(selectUi);
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={
         lockRatio ? <Lock fontSize="small" /> : <LockOpen fontSize="small" />

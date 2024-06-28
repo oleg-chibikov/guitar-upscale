@@ -3,13 +3,13 @@ import Tune from "@mui/icons-material/Tune";
 import React from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButtonWrapper } from "./IconButton";
 
 export const OpenStrummingSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { strummingSettingsExpanded } = useSelector(selectUi);
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={<Tune />}
       tooltip={

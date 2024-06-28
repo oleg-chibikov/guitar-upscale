@@ -6,7 +6,7 @@ import PlayArrow from "@mui/icons-material/PlayArrow";
 import Stop from "@mui/icons-material/Stop";
 import React from "react";
 import { useSelector } from "react-redux";
-import { IconButton } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../settings/buttons/IconButton";
 
 type PlayButtonProps = UsePlayParams;
 
@@ -20,7 +20,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   }
 
   return (
-    <IconButton
+    <IconButtonWrapper
       isActive={isPlaying}
       activeBg="bg-red-500"
       tooltip={

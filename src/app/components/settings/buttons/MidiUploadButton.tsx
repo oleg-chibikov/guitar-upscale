@@ -1,5 +1,5 @@
 "use client";
-import { IconButton } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
@@ -58,13 +58,13 @@ export const MidiUploadButton: React.FC = () => {
         type="file"
         onChange={handleFileChange}
       />
-      <IconButton
+      <IconButtonWrapper
         icon={<UploadFile />}
         onPress={() => {
           ref.current?.click();
         }}
         tooltip={"Play midi file"}
-      ></IconButton>
+      ></IconButtonWrapper>
     </Fragment>
   );
 };

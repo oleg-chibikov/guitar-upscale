@@ -13,14 +13,14 @@ import SearchOff from "@mui/icons-material/SearchOff";
 import Troubleshoot from "@mui/icons-material/Troubleshoot";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButtonWrapper } from "./IconButton";
 
 export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { chordIsBeingDetected } = useSelector(selectSettings);
   const setupChordDetector = useChordDetectorSetup();
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={chordIsBeingDetected ? <SearchOff /> : <Troubleshoot />}
       tooltip={chordIsBeingDetected ? "Stop detecting chord" : "Detect chord"}

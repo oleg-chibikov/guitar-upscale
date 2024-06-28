@@ -7,7 +7,7 @@ import {
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import React from "react";
 import { useSelector } from "react-redux";
-import { IconButton } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../settings/buttons/IconButton";
 
 export const PreviousEventButton: React.FC = () => {
   const { isPaused, isFirstEvent, isLooperPlaying } =
@@ -16,7 +16,7 @@ export const PreviousEventButton: React.FC = () => {
     return null;
   }
   return (
-    <IconButton
+    <IconButtonWrapper
       disabled={!isPaused || isFirstEvent}
       isActive={false}
       tooltip={"Previous event"}

@@ -1,5 +1,5 @@
 import { LooperState } from "@/app/engine/looper/looper";
-import { IconButton } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../settings/buttons/IconButton";
 
 import Download from "@mui/icons-material/Download";
 
@@ -27,7 +27,7 @@ export const SaveLooperRecordingButton: React.FC<
   };
 
   return (
-    <IconButton
+    <IconButtonWrapper
       icon={<Download />}
       isActive={true}
       tooltip={"Combine recording from all channels and save as a MIDI file"}

@@ -1,5 +1,5 @@
 import { ConfirmationDialog } from "@/app/components/layout/ConfirmationDialog";
-import { IconButton } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
 import {
   CanSetLooperState,
   clearLooperState,
@@ -30,7 +30,7 @@ export const ClearLooperButton: React.FC<CanSetLooperState> = ({
 
   return (
     <>
-      <IconButton
+      <IconButtonWrapper
         disabled={disabled}
         icon={<Clear />}
         activeBg="bg-red-500"

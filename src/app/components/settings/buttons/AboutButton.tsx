@@ -1,10 +1,10 @@
 import Help from "@mui/icons-material/Help";
 import { FC } from "react";
-import { IconButton } from "./IconButton";
+import { IconButtonWrapper } from "./IconButton";
 
 export const AboutButton: FC = () => {
   return (
-    <IconButton
+    <IconButtonWrapper
       icon={<Help />}
       tooltip={"About Guitar Upscale"}
       isActive={false}

@@ -1,4 +1,4 @@
-import { IconButton } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
 import {
   CanSetLooperState,
   addChannel,
@@ -11,7 +11,7 @@ export const AddLooperChannelButton: React.FC<CanSetLooperState> = ({
   disabled,
 }) => {
   return (
-    <IconButton
+    <IconButtonWrapper
       disabled={disabled}
       icon={<Add />}
       tooltip={"Add looper channel"}

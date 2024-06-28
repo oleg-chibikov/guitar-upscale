@@ -3,13 +3,13 @@ import SettingsApplications from "@mui/icons-material/SettingsApplications";
 import React from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "./IconButton";
+import { IconButtonWrapper } from "./IconButton";
 
 export const OpenSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { settingsExpanded } = useSelector(selectUi);
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={<SettingsApplications />}
       tooltip={

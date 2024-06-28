@@ -2,7 +2,7 @@ import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { IconButton, IconButtonProps } from "./IconButton";
+import { IconButtonProps, IconButtonWrapper } from "./IconButton";
 
 interface NoPremiumButtonProps
   extends Omit<IconButtonProps, "icon" | "tooltip" | "onPress"> {
@@ -21,7 +21,7 @@ export const NoPremiumButton: React.FC<NoPremiumButtonProps> = ({
   const warningMessage = `Please subscribe to ${planName} plan in order to ${functionalityDescription}`;
 
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={icon}
       disabled

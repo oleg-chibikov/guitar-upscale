@@ -1,4 +1,4 @@
-import { IconButton } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
 import { selectUi, setShowAspectRatio } from "@/app/store/uiSlice";
 import AspectRatio from "@mui/icons-material/AspectRatio";
 import React from "react";
@@ -8,7 +8,7 @@ export const AspectRatioButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const { showAspectRatio } = useSelector(selectUi);
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={<AspectRatio />}
       tooltip={"Change fretboard aspect ratio"}

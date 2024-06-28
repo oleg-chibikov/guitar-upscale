@@ -19,7 +19,7 @@ export interface IconButtonProps extends WithClassName, WithId {
   allowHandlerInDisabledState?: boolean;
 }
 
-export const IconButton: React.FC<IconButtonProps> = ({
+export const IconButtonWrapper: React.FC<IconButtonProps> = ({
   onPress,
   textContent,
   icon,

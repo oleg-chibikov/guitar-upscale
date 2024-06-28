@@ -7,7 +7,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButton } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../settings/buttons/IconButton";
 
 export function MdiMetronome() {
   return (
@@ -54,7 +54,7 @@ export const MetronomeButton: React.FC = (props) => {
   };
 
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       tooltip={isMetronomeActive ? "Stop metronome" : "Start metronome"}
       isActive={isMetronomeActive}

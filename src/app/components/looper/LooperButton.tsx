@@ -7,7 +7,7 @@ import {
   startMetronomeIfNeeded,
   stopMetronomeIfNeeded,
 } from "@/app/engine/looper/looper";
-import { IconButton } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../settings/buttons/IconButton";
 
 import { isLooperPlaying } from "@/app/engine/looper/looperShared";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
@@ -64,7 +64,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
 
   return (
     <div className="flex flex-col gap-1 items-center">
-      <IconButton
+      <IconButtonWrapper
         icon={isRecording ? <StopCircle /> : <FiberManualRecord />}
         isActive={isRecording}
         tooltip={
@@ -77,7 +77,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
         textContent={isRecording ? undefined : (channel + 1).toString()}
       />
       {showPlay ? (
-        <IconButton
+        <IconButtonWrapper
           icon={isPlaying ? <Pause /> : <PlayArrow />}
           disabled={isDisabled}
           activeBg={isPlaying ? "bg-green-500" : undefined}

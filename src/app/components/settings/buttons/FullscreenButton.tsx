@@ -2,7 +2,7 @@ import CloseFullscreen from "@mui/icons-material/CloseFullscreen";
 import OpenInFull from "@mui/icons-material/OpenInFull";
 import React, { useEffect, useState } from "react";
 import screenfull from "screenfull";
-import { IconButton } from "./IconButton";
+import { IconButtonWrapper } from "./IconButton";
 
 export const FullscreenButton: React.FC = (props) => {
   const [, setIsFullscreen] = useState(false);
@@ -20,7 +20,7 @@ export const FullscreenButton: React.FC = (props) => {
     return false;
   }
   return (
-    <IconButton
+    <IconButtonWrapper
       {...props}
       icon={!screenfull.isFullscreen ? <OpenInFull /> : <CloseFullscreen />}
       tooltip={!screenfull.isFullscreen ? "Go fullscreen" : "Exit fullscreen"}
