@@ -1,4 +1,4 @@
-import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { selectUi, setShowAspectRatio } from "@/app/store/uiSlice";
 import AspectRatio from "@mui/icons-material/AspectRatio";
 import React from "react";

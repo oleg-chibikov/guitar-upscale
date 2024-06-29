@@ -1,5 +1,5 @@
-import { EnumSelector } from "@/app/components/settings/selectors/EnumSelector";
 import { StrumGrid } from "@/app/components/strumming/StrumGrid";
+import { EnumSelector } from "@/app/components/uiFramework/EnumSelector";
 import {
   Pattern,
   StrumDirection,

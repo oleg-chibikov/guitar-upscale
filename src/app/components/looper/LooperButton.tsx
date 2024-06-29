@@ -7,7 +7,7 @@ import {
   startMetronomeIfNeeded,
   stopMetronomeIfNeeded,
 } from "@/app/engine/looper/looper";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 import { isLooperPlaying } from "@/app/engine/looper/looperShared";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";

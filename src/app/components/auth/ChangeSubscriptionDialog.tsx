@@ -1,4 +1,4 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { CHANGE_SUBSCRIPTION_DIALOG } from "@/app/data/elementIds";
 import {

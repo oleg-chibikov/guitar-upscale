@@ -1,4 +1,4 @@
-import { LazyLoadWrapper } from "@/app/components/layout/LazyLoadWrapper";
+import { LazyLoadWrapper } from "@/app/components/uiFramework/LazyLoadWrapper";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import { FC } from "react";

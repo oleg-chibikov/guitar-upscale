@@ -1,4 +1,4 @@
-import { ConfirmationDialog } from "@/app/components/layout/ConfirmationDialog";
+import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
 import { persistor } from "@/app/store/store";
 import { Button } from "@mui/material";
 import React, { useState } from "react";

@@ -13,7 +13,7 @@ import SearchOff from "@mui/icons-material/SearchOff";
 import Troubleshoot from "@mui/icons-material/Troubleshoot";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();

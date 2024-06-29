@@ -1,14 +1,11 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
-import { StepSlider } from "@/app/components/settings/sliders/StepSlider";
-import {
-  StartPosition,
-  ValueDialogControlProps,
-} from "@/app/components/settings/valueDialogControls/ValueDialogControl";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Alert } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { DialogWrapper } from "./DialogWrapper";
+import { StepSlider } from "./StepSlider";
+import { StartPosition, ValueDialogControlProps } from "./ValueDialogControl";
 
 interface ValueDialogControlDialogProps
   extends Omit<ValueDialogControlProps, "icon"> {

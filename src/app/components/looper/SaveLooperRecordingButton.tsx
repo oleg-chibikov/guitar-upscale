@@ -1,5 +1,5 @@
 import { LooperState } from "@/app/engine/looper/looper";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 import Download from "@mui/icons-material/Download";
 

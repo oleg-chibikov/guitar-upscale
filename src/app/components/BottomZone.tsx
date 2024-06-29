@@ -1,6 +1,6 @@
 import { AspectRatioButton } from "@/app/components/aspectRatio/AspectRatioButton";
-import { Panel } from "@/app/components/layout/Panel";
 import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
+import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";

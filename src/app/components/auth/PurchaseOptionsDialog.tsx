@@ -1,5 +1,5 @@
 import { UserAvatar } from "@/app/components/auth/UserAvatar";
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { PURCHASE_OPTIONS_DIALOG } from "@/app/data/elementIds";

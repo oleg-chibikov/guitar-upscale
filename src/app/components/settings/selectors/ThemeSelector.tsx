@@ -1,9 +1,9 @@
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Theme } from "@/app/data/theme";
 import { selectUi, setTheme } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 const convertOSTheme = (theme: Theme) => {
   let tempTheme = theme;

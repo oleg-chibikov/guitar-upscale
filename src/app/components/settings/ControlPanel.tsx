@@ -1,10 +1,10 @@
-import { Expander } from "@/app/components/layout/Expander";
-import { Panel } from "@/app/components/layout/Panel";
 import { BaseNoteAndTuningSelector } from "@/app/components/settings/selectors/BaseNoteAndTuningSelector";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueDialogControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueDialogControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueDialogControls/VolumeControl";
+import { Expander } from "@/app/components/uiFramework/Expander";
+import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { CONTROL_PANEL_ID } from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";

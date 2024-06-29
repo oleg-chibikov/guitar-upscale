@@ -1,4 +1,4 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { STRUMMING_PATTERN_EDITOR_DIALOG } from "@/app/data/elementIds";
 import {
   DEFAULT_TIME_SIGNATURE,

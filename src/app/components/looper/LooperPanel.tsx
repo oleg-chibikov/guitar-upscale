@@ -1,10 +1,10 @@
 "use client";
 
-import { Panel } from "@/app/components/layout/Panel";
 import { AddLooperChannelButton } from "@/app/components/looper/AddLooperChannelButton";
 import { ClearLooperButton } from "@/app/components/looper/ClearLooperButton";
 import { RemoveLooperChannelButton } from "@/app/components/looper/RemoveLooperChannelButton";
 import { SaveLooperRecordingButton } from "@/app/components/looper/SaveLooperRecordingButton";
+import { Panel } from "@/app/components/uiFramework/Panel";
 import { LOOPER_PANEL_ID } from "@/app/data/elementIds";
 import {
   LooperState,
@@ -12,7 +12,6 @@ import {
   canRemoveChannel,
   clearLooperState,
   looperState,
-  stopMetronomeIfNeeded,
 } from "@/app/engine/looper/looper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import React, { useEffect, useState } from "react";

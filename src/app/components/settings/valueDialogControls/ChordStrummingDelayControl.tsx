@@ -1,3 +1,4 @@
+import { ValueDialogControl } from "@/app/components/uiFramework/ValueDialogControl";
 import { chordStrummingDelaySteps } from "@/app/data/chordStrummingDelaySteps";
 import {
   selectSettings,
@@ -6,7 +7,6 @@ import {
 import Schedule from "@mui/icons-material/Schedule";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueDialogControl } from "./ValueDialogControl";
 
 export const ChordStrummingDelayControl: React.FC = () => {
   const { chordStrummingDelayMs } = useSelector(selectSettings);

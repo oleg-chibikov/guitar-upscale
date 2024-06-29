@@ -1,4 +1,4 @@
-import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import {
   CanSetLooperState,
   looperState,

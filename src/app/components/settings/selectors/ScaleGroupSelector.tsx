@@ -3,7 +3,7 @@ import { useExamples } from "@/app/hooks/useExamples";
 import { selectSettings, setScaleGroup } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SelectWrapper } from "./SelectWrapper";
+import { SelectWrapper } from "../../uiFramework/SelectWrapper";
 
 const ScaleGroupSelector: React.FC = () => {
   const { scaleGroup } = useSelector(selectSettings);

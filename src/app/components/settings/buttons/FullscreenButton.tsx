@@ -2,7 +2,7 @@ import CloseFullscreen from "@mui/icons-material/CloseFullscreen";
 import OpenInFull from "@mui/icons-material/OpenInFull";
 import React, { useEffect, useState } from "react";
 import screenfull from "screenfull";
-import { IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const FullscreenButton: React.FC = (props) => {
   const [, setIsFullscreen] = useState(false);

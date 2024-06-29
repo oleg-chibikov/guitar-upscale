@@ -1,6 +1,6 @@
 import Help from "@mui/icons-material/Help";
 import { FC } from "react";
-import { IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const AboutButton: FC = () => {
   return (

@@ -5,7 +5,7 @@ import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export const RecordButton: React.FC = (props) => {
   const { isRecording } = useSelector(selectSettings);

@@ -7,7 +7,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const BaseNoteSelector: React.FC = () => {
   const { baseNote } = useSelector(selectSettings);

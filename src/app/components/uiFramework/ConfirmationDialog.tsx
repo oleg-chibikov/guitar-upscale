@@ -1,4 +1,4 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { CONFIRMATION_DIALOG } from "@/app/data/elementIds";
 import { Alert, Button, DialogActions } from "@mui/material";
 import React from "react";

@@ -4,7 +4,7 @@ import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export const PauseButton: React.FC = () => {
   const { isPaused, isPlaying, isLooperPlaying } = useSelector(selectSettings);

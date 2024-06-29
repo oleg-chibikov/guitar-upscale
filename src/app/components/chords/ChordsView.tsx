@@ -1,4 +1,4 @@
-import { Expander } from "@/app/components/layout/Expander";
+import { Expander } from "@/app/components/uiFramework/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import {
   NoteChordMode,

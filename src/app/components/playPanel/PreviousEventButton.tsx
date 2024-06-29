@@ -7,7 +7,7 @@ import {
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import React from "react";
 import { useSelector } from "react-redux";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export const PreviousEventButton: React.FC = () => {
   const { isPaused, isFirstEvent, isLooperPlaying } =

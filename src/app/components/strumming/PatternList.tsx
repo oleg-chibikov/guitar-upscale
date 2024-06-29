@@ -7,7 +7,7 @@ import {
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-import { ConfirmationDialog } from "@/app/components/layout/ConfirmationDialog";
+import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
 import { Pattern } from "@/app/data/strummingData";
 import { Theme } from "@/app/data/theme";
 import { formatStrums } from "@/app/helpers/strummingHelper";

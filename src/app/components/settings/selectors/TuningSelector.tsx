@@ -2,7 +2,7 @@ import { Tuning, tunings } from "@/app/data/tunings";
 import { selectSettings, setTuning } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SelectWrapper } from "./SelectWrapper";
+import { SelectWrapper } from "../../uiFramework/SelectWrapper";
 
 const TuningSelector: React.FC = () => {
   const { tuning } = useSelector(selectSettings);

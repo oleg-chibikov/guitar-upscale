@@ -1,4 +1,4 @@
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Note } from "@/app/data/notes";
 import { MAX_VOLUME } from "@/app/data/volume";
 import { playNote } from "@/app/engine/sound/soundProvider";
@@ -6,7 +6,7 @@ import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { selectSettings, setVolume } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Slider } from "./Slider";
+import { Slider } from "../../uiFramework/Slider";
 
 export const VolumeSlider: React.FC = () => {
   const { volume, reverbStrength, instrument, tempoBpm } =

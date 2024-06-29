@@ -1,5 +1,5 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
 import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Alert } from "@mui/material";

@@ -6,7 +6,7 @@ import PlayArrow from "@mui/icons-material/PlayArrow";
 import Stop from "@mui/icons-material/Stop";
 import React from "react";
 import { useSelector } from "react-redux";
-import { IconButtonWrapper } from "../settings/buttons/IconButton";
+import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 type PlayButtonProps = UsePlayParams;
 

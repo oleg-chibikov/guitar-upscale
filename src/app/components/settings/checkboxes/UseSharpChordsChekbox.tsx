@@ -3,7 +3,7 @@
 import { selectUi, setUseSharpChords } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CheckBox } from "./CheckBox";
+import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const UseSharpChordsCheckbox: React.FC = (props) => {
   const { useSharpChords } = useSelector(selectUi);

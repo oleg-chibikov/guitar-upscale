@@ -1,4 +1,4 @@
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { chordStrummingDelaySteps } from "@/app/data/chordStrummingDelaySteps";
 import {
   selectSettings,
@@ -6,7 +6,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { StepSlider } from "./StepSlider";
+import { StepSlider } from "../../uiFramework/StepSlider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
   const { chordStrummingDelayMs } = useSelector(selectSettings);

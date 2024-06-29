@@ -1,4 +1,4 @@
-import { CloseIcon } from "@/app/components/layout/CloseIcon";
+import { CloseIcon } from "@/app/components/uiFramework/CloseIcon";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
 import { Box, DialogTitle, Typography } from "@mui/material";

@@ -1,5 +1,5 @@
-import { ConfirmationDialog } from "@/app/components/layout/ConfirmationDialog";
-import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
+import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
+import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import {
   CanSetLooperState,
   clearLooperState,

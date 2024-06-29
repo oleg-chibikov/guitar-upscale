@@ -6,7 +6,7 @@ import {
 } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Slider } from "../settings/sliders/Slider";
+import { Slider } from "../uiFramework/Slider";
 
 export const FretboardScaleYSlider: React.FC = () => {
   const { fretboardScaleY } = useSelector(selectUi);

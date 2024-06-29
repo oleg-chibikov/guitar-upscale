@@ -6,7 +6,7 @@ import {
 import { Button, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { AlertType } from "@/app/data/alertType";
 import { SCALE_DETECTION_DIALOG } from "@/app/data/elementIds";
 import {

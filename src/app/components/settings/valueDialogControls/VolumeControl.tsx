@@ -1,3 +1,4 @@
+import { ValueDialogControl } from "@/app/components/uiFramework/ValueDialogControl";
 import { volumeSteps } from "@/app/data/volume";
 import { selectSettings, setVolume } from "@/app/store/settingsSlice";
 import VolumeDown from "@mui/icons-material/VolumeDown";
@@ -6,7 +7,6 @@ import VolumeOff from "@mui/icons-material/VolumeOff";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueDialogControl } from "./ValueDialogControl";
 
 export const VolumeControl: React.FC = () => {
   const { volume } = useSelector(selectSettings);

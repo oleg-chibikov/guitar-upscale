@@ -4,7 +4,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CheckBox } from "./CheckBox";
+import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const UseChordAlterationCheckbox: React.FC = (props) => {
   const { useChordAlteration } = useSelector(selectSettings);

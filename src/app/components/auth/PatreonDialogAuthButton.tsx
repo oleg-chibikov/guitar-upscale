@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import React, { FC, Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { CheckBox } from "../settings/checkboxes/CheckBox";
+import { CheckBox } from "../uiFramework/CheckBox";
 import { DialogAuthButtonProps } from "./AuthButtonProps";
 
 const PatreonSubscribeButton = React.lazy(() =>

@@ -1,10 +1,10 @@
-import { ValueDialogControlDialog } from "@/app/components/settings/valueDialogControls/ValueDialogControlDialog";
 import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { ValueDialogControlDialog } from "./ValueDialogControlDialog";
 
 export interface ValueDialogControlProps {
   value: number;

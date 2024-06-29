@@ -1,5 +1,5 @@
-import { CloseIcon } from "@/app/components/layout/CloseIcon";
-import { DialogHeader } from "@/app/components/layout/DialogHeader";
+import { CloseIcon } from "@/app/components/uiFramework/CloseIcon";
+import { DialogHeader } from "@/app/components/uiFramework/DialogHeader";
 import { Theme } from "@/app/data/theme";
 import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";

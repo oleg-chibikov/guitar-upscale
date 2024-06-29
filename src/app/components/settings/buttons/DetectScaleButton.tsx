@@ -16,7 +16,7 @@ import ManageSearch from "@mui/icons-material/ManageSearch";
 import SearchOff from "@mui/icons-material/SearchOff";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const DetectScaleButton: React.FC = (props) => {
   const dispatch = useDispatch();

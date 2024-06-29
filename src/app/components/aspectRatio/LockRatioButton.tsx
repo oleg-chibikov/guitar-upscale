@@ -1,4 +1,4 @@
-import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { selectUi, setLockRatio } from "@/app/store/uiSlice";
 import Lock from "@mui/icons-material/Lock";
 import LockOpen from "@mui/icons-material/LockOpen";

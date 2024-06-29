@@ -1,5 +1,5 @@
 "use client";
-import { IconButtonWrapper } from "@/app/components/settings/buttons/IconButton";
+import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";

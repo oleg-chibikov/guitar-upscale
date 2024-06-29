@@ -2,7 +2,10 @@ import { AlertType } from "@/app/data/alertType";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { IconButtonWrapper, IconButtonWrapperProps } from "./IconButton";
+import {
+  IconButtonWrapper,
+  IconButtonWrapperProps,
+} from "../../uiFramework/IconButton";
 
 interface NoPremiumButtonProps
   extends Omit<IconButtonWrapperProps, "icon" | "tooltip" | "onPress"> {

@@ -1,4 +1,4 @@
-import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
+import { DialogContentWrapper } from "@/app/components/uiFramework/DialogContentWrapper";
 import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";

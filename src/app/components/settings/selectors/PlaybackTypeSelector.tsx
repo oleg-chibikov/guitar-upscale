@@ -1,10 +1,10 @@
 "use client";
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { PlaybackType } from "@/app/data/playbackType";
 import { selectSettings, setPlaybackType } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { EnumSelector } from "./EnumSelector";
+import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const PlaybackTypeSelector: React.FC = () => {
   const { playbackType } = useSelector(selectSettings);

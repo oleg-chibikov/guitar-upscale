@@ -1,4 +1,4 @@
-import { SelectWrapper } from "@/app/components/settings/selectors/SelectWrapper";
+import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
 import { Pattern } from "@/app/data/strummingData";
 import { chordStrummingPatterns } from "@/app/data/strummingPatterns";
 import { getAllPatterns } from "@/app/engine/strummingPatternsStorage";

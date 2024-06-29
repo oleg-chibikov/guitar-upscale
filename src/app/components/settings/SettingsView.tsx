@@ -1,5 +1,5 @@
-import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
 import { ResetSettingsButton } from "@/app/components/settings/buttons/ResetSettingsButton";
+import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";

@@ -5,7 +5,7 @@ import { selectSettings } from "@/app/store/settingsSlice";
 import { ScaleGroupSelector } from "./ScaleGroupSelector";
 import { ScaleSelector } from "./ScaleSelector";
 
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
 

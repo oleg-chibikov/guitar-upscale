@@ -3,7 +3,7 @@ import SettingsApplications from "@mui/icons-material/SettingsApplications";
 import React from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
-import { IconButtonWrapper } from "./IconButton";
+import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const OpenSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();

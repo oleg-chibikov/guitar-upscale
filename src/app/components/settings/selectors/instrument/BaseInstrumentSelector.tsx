@@ -1,5 +1,5 @@
 "use client";
-import { ControlWithLabel } from "@/app/components/layout/ControlWithLabel";
+import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import {
   Instrument,
   InstrumentGroup,
@@ -16,7 +16,7 @@ import {
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useSelector } from "react-redux";
-import { SelectWrapper } from "../SelectWrapper";
+import { SelectWrapper } from "../../../uiFramework/SelectWrapper";
 
 interface BaseInstrumentSelectorProps {
   label: string;
