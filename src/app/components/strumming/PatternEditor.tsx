@@ -66,15 +66,6 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
 
   return (
     <>
-      <div className="flex flex-row gap-2 items-center">
-        <Typography>Each cell represents</Typography>
-        <EnumSelector
-          enumObj={TimeSignature}
-          selectedValue={currentPattern.timeSignature}
-          onValueChange={handleTimeSignatureChange}
-        />
-      </div>
-
       <div className="mt-4 flex justify-start gap-2">
         <Tooltip title="Remove Cells">
           <IconButton
@@ -91,6 +82,14 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
         </Tooltip>
       </div>
       <StrumGrid pattern={currentPattern} onStrum={handleStrum} />
+      <div className="flex flex-row gap-2 items-center">
+        <Typography>Each cell represents</Typography>
+        <EnumSelector
+          enumObj={TimeSignature}
+          selectedValue={currentPattern.timeSignature}
+          onValueChange={handleTimeSignatureChange}
+        />
+      </div>
       <DialogActions>
         <Button color="primary" onClick={onCancel}>
           Cancel

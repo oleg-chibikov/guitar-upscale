@@ -9,9 +9,8 @@ import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
-import { CHORDS_VIEW_EXPANDER_ID, CHORDS_VIEW_ID } from "@/app/data/elementIds";
+import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
 import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
-import { Theme } from "@/app/data/theme";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
@@ -97,66 +96,58 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   ).length;
 
   return (
-    <section
+    <Expander
       id={CHORDS_VIEW_ID}
       className={`opacity-95 fixed touch-none ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } z-20 bottom-1 ${
-        theme === Theme.Light
-          ? "bg-accented_background-light"
-          : "bg-accented_background-dark"
-      } p-1`}
+      } z-20 bottom-1`}
+      expanded={chordsExpanded}
+      expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
+      handleExpansion={handleExpansion}
+      title="Chords"
     >
-      <Expander
-        expanded={chordsExpanded}
-        expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
-        handleExpansion={handleExpansion}
-        id={CHORDS_VIEW_EXPANDER_ID}
-        title="Chords"
+      <section
+        ref={ref}
+        className={`grid grid-cols-2 gap-0.5 ${
+          scrollBarVisible ? "overscroll-contain" : "touch-none"
+        } overflow-auto`}
+        style={{
+          maxWidth:
+            height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+              ? COMPACT_CHORDS_WIDTH
+              : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
+          maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
+          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+          gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+        }}
       >
-        <section
-          ref={ref}
-          className={`grid grid-cols-2 gap-0.5 ${
-            scrollBarVisible ? "overscroll-contain" : "touch-none"
-          } overflow-auto`}
-          style={{
-            maxWidth:
-              height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
-                ? COMPACT_CHORDS_WIDTH
-                : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
-            maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
-          }}
-        >
-          {chords.flatMap((noteChord) =>
-            noteChord.modes.map((noteChordMode) => {
-              const isHidden =
-                checkIsHiddenMode(noteChordMode) ||
-                (!useSharpChords && isSharp(noteChord.note));
-              const title = getChordName(noteChord.note, noteChordMode.mode);
+        {chords.flatMap((noteChord) =>
+          noteChord.modes.map((noteChordMode) => {
+            const isHidden =
+              checkIsHiddenMode(noteChordMode) ||
+              (!useSharpChords && isSharp(noteChord.note));
+            const title = getChordName(noteChord.note, noteChordMode.mode);
 
-              return (
-                <ChordButton
-                  key={title}
-                  isHidden={isHidden}
-                  noteChordMode={noteChordMode}
-                  chordName={title}
-                  onStrummingStateChange={(value) => {
-                    if (!isMobileDeviceValue) {
-                      return;
-                    }
-                    const isStrummingClicked = value || isAnyStrummingClicked();
-                    toggleOverflow(isStrummingClicked, ref);
-                    toggleOverflow(isStrummingClicked, mainRef);
-                  }}
-                />
-              );
-            })
-          )}
-        </section>
-      </Expander>
-    </section>
+            return (
+              <ChordButton
+                key={title}
+                isHidden={isHidden}
+                noteChordMode={noteChordMode}
+                chordName={title}
+                onStrummingStateChange={(value) => {
+                  if (!isMobileDeviceValue) {
+                    return;
+                  }
+                  const isStrummingClicked = value || isAnyStrummingClicked();
+                  toggleOverflow(isStrummingClicked, ref);
+                  toggleOverflow(isStrummingClicked, mainRef);
+                }}
+              />
+            );
+          })
+        )}
+      </section>
+    </Expander>
   );
 };
 

@@ -14,7 +14,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({ text }) => {
   return (
     <DialogTitle>
       <Typography
-        variant="h2"
+        variant="h4"
         align="center"
         className={
           theme === Theme.Light

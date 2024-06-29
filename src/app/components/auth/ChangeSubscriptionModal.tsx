@@ -1,6 +1,5 @@
-import { DialogHeader } from "@/app/components/layout/DialogHeader";
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
-import { Theme } from "@/app/data/theme";
 import {
   GetSubscriptionActionParams,
   getMakePurchase,
@@ -15,7 +14,6 @@ import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button, Drawer } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 
 export const ChangeSubscriptionModal: FC<
@@ -84,18 +82,11 @@ export const ChangeSubscriptionModal: FC<
       onClose={handleCloseModal}
       aria-labelledby="change-subscription-modal"
     >
-      <section
-        className={`flex overflow-auto max-h-full justify-center text-center items-stretch flex-col gap-2 border-2 p-4 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light border-border-light text-foreground-light"
-            : "bg-accented_background-dark  border-border-dark text-foreground-dark"
-        }`}
+      <DialogContentWrapper
+        headerText={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
+        className="justify-center text-center items-stretch"
+        onClose={handleCloseModal}
       >
-        <CloseIcon onPress={handleCloseModal} />
-        <DialogHeader
-          text={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
-        />
-
         <Alert severity="info">
           {existingSubscriptionCancellationMode === CancellationMode.Revoke
             ? `Subscription was purchased recently${existingSubscriptionSubscribedDateText}. It will be revoked immediately and refunded, the new subscription will take effect immediately`
@@ -125,7 +116,7 @@ export const ChangeSubscriptionModal: FC<
         >
           {`${changeAction} subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
         </Button>
-      </section>
+      </DialogContentWrapper>
     </Drawer>
   );
 };

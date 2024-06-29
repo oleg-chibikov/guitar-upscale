@@ -1,12 +1,11 @@
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { StrummingPatternEditor } from "@/app/components/strumming/StrummingPatternEditor";
 import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
-import { Theme } from "@/app/data/theme";
 import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import { Alert } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CloseIcon } from "../CloseIcon";
 import { ChordCustomStrummingWaitForPatternFinishCheckbox } from "../settings/checkboxes/ChordCustomStrummingWaitForPatternFinishCheckbox";
 import { SeamlessChordSwitchingCheckbox } from "../settings/checkboxes/SeamlessChordSwitchingCheckbox";
 import { StrummingPatternSelector } from "./StrummingPatternSelector";
@@ -26,25 +25,18 @@ export const StrummingSettings: FC = () => {
       open={open}
       onClose={() => dispatch(setStrummingSettingsExpanded(false))}
     >
-      <div
+      <DialogContentWrapper
         id={STRUMMING_SETTINGS_PANEL_ID}
-        className={`flex flex-col gap-2 p-4 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light text-foreground-light"
-            : "bg-accented_background-dark text-foreground-dark"
-        }`}
+        onClose={() => {
+          dispatch(setStrummingSettingsExpanded(false));
+        }}
       >
-        <CloseIcon
-          onPress={() => {
-            dispatch(setStrummingSettingsExpanded(false));
-          }}
-        />
         <ChordCustomStrummingWaitForPatternFinishCheckbox />
         <SeamlessChordSwitchingCheckbox />
         <Alert severity="info">Long press the chord to strum</Alert>
         <StrummingPatternSelector />
         <StrummingPatternEditor />
-      </div>
+      </DialogContentWrapper>
     </Drawer>
   );
 };

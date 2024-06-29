@@ -1,5 +1,4 @@
-import { CloseIcon } from "@/app/components/CloseIcon";
-import { DialogHeader } from "@/app/components/layout/DialogHeader";
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { STRUMMING_PATTERN_EDITOR } from "@/app/data/elementIds";
 import {
   DEFAULT_TIME_SIGNATURE,
@@ -12,7 +11,7 @@ import {
   triggerCustomStrummingPatternChanged,
 } from "@/app/store/settingsSlice";
 import AddIcon from "@mui/icons-material/Add";
-import { Dialog, DialogContent, IconButton, Tooltip } from "@mui/material";
+import { Dialog, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
@@ -71,17 +70,12 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
   };
 
   return (
-    <Dialog
-      id={STRUMMING_PATTERN_EDITOR}
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      className=""
-    >
-      <CloseIcon onPress={onClose} />
-      <DialogHeader text="Strumming pattern editor" />
-      <DialogContent className="flex flex-col gap-2">
+    <Dialog open={open} onClose={onClose} maxWidth="md">
+      <DialogContentWrapper
+        id={STRUMMING_PATTERN_EDITOR}
+        onClose={onClose}
+        headerText="Strumming pattern editor"
+      >
         {currentPattern ? (
           <PatternEditor
             pattern={currentPattern}
@@ -104,7 +98,7 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
             />
           </>
         )}
-      </DialogContent>
+      </DialogContentWrapper>
     </Dialog>
   );
 };

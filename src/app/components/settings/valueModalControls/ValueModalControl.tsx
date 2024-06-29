@@ -1,8 +1,9 @@
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { StepSlider } from "@/app/components/settings/sliders/StepSlider";
 import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
-import { Box, Fade, Modal } from "@mui/material";
+import { Alert, Box, Fade, Modal } from "@mui/material";
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -134,38 +135,39 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         </div>
       </div>
       <Modal
+        slotProps={{
+          backdrop: { style: { backgroundColor: "rgba(0,0,0,0.9)" } },
+        }}
         open={modalOpen}
         className="cursor-move"
         onClose={() => setModalOpen(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         closeAfterTransition
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
         <Fade in={modalOpen} mountOnEnter unmountOnExit>
           <Box
-            className={`absolute text-center text-sm top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-72 p-4 ${
+            className={`absolute text-center text-sm top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 ${
               theme === Theme.Light
-                ? "bg-panel-light text-foreground-light"
-                : "bg-panel-dark text-foreground-dark"
+                ? "bg-accented_background-light text-foreground-light"
+                : "bg-accented_background-dark text-foreground-dark"
             } shadow-xl transition-opacity duration-300 ${
               modalOpen ? "opacity-100" : "opacity-0"
             }`}
           >
-            <strong>{label}</strong>
-            <div>
-              {(hasTouchInput ? "Swipe" : "Move the mouse") +
-                " around while pressed"}
-            </div>
-            <StepSlider
-              onValueChange={() => null}
-              value={value}
-              steps={steps}
-              label={value + (postfix !== undefined ? " " + postfix : "")}
-              labelClass="w-20"
-            />
+            <DialogContentWrapper headerText={label}>
+              <Alert severity="info">
+                {(hasTouchInput ? "Swipe" : "Move the mouse") +
+                  " around while pressed"}
+              </Alert>
+              <StepSlider
+                onValueChange={() => null}
+                value={value}
+                steps={steps}
+                label={value + (postfix !== undefined ? " " + postfix : "")}
+                labelClass="w-20"
+              />
+            </DialogContentWrapper>
           </Box>
         </Fade>
       </Modal>

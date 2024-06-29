@@ -1,7 +1,7 @@
 import { UserAvatar } from "@/app/components/auth/UserAvatar";
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import { Theme } from "@/app/data/theme";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
@@ -12,7 +12,6 @@ import { Alert, Drawer, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { CloseIcon } from "../CloseIcon";
 import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
 
@@ -112,7 +111,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     }
 
     return (
-      <div className={className + " " + additionalClassName}>
+      <div className={`${className} ${additionalClassName}`}>
         {isTick ? "✓" : "⨯"}
       </div>
     );
@@ -125,13 +124,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
       onClose={handleCloseModal}
       aria-labelledby="purchase-options-modal"
     >
-      <section
-        className={`flex overflow-auto max-h-full flex-col gap-2 border-2 p-2 ${
-          theme === Theme.Light
-            ? "bg-accented_background-light border-border-light text-foreground-light"
-            : "bg-accented_background-dark  border-border-dark text-foreground-dark"
-        }`}
-      >
+      <DialogContentWrapper onClose={handleCloseModal}>
         <div className="flex flex-row gap-4 items-center justify-center">
           {session !== null ? (
             <UserAvatar
@@ -140,7 +133,6 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
               style={{ position: "absolute" }}
             />
           ) : null}
-          <CloseIcon onPress={handleCloseModal} />
           <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
             {session?.user && (
               <div className="flex flex-col gap-1 items-center justify-center">
@@ -189,7 +181,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
             {"Subscription options will be loaded when you're back online"}
           </Alert>
         )}
-      </section>
+      </DialogContentWrapper>
     </Drawer>
   );
 };

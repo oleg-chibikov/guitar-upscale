@@ -1,3 +1,4 @@
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
 import { ResetSettingsButton } from "@/app/components/settings/buttons/ResetSettingsButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { SETTINGS_PANEL_ID } from "@/app/data/elementIds";
@@ -8,7 +9,6 @@ import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
 import { Drawer } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CloseIcon } from "../CloseIcon";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
@@ -36,22 +36,16 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       open={open}
       onClose={() => dispatch(setSettingsExpanded(false))}
     >
-      <section
+      <DialogContentWrapper
         id={SETTINGS_PANEL_ID}
-        className={`flex flex-col overflow-auto overscroll-contain border-2 h-full ${
-          theme === Theme.Light
-            ? "bg-accented_background-light border-border-light text-foreground-light"
-            : "bg-accented_background-dark border-border-dark text-foreground-dark"
-        } p-4 gap-2`}
+        className={`h-full`}
         style={{
           maxWidth: "80vw",
         }}
+        onClose={() => {
+          dispatch(setSettingsExpanded(false));
+        }}
       >
-        <CloseIcon
-          onPress={() => {
-            dispatch(setSettingsExpanded(false));
-          }}
-        />
         {premiumComponents.get("advancedChords") as ReactNode}
         <UseSharpChordsCheckbox />
         <UseChordAlterationCheckbox />
@@ -86,7 +80,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
             (premiumComponents.get("reverbStrength") as ReactNode)}
           <ResetSettingsButton />
         </div>
-      </section>
+      </DialogContentWrapper>
     </Drawer>
   );
 };

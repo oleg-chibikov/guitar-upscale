@@ -1,12 +1,5 @@
-// ConfirmationDialog.tsx
-import { DialogHeader } from "@/app/components/layout/DialogHeader";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-} from "@mui/material";
+import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
+import { Alert, Button, Dialog, DialogActions } from "@mui/material";
 import React from "react";
 
 interface ConfirmationDialogProps {
@@ -30,18 +23,17 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogHeader text={title} />
-      <DialogContent>
-        <DialogContentText>{content}</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          {cancelButtonText}
-        </Button>
-        <Button onClick={onConfirm} color="error" variant="contained">
-          {confirmButtonText}
-        </Button>
-      </DialogActions>
+      <DialogContentWrapper headerText={title}>
+        <Alert severity="warning">{content}</Alert>
+        <DialogActions>
+          <Button onClick={onClose} color="primary">
+            {cancelButtonText}
+          </Button>
+          <Button onClick={onConfirm} color="error" variant="contained">
+            {confirmButtonText}
+          </Button>
+        </DialogActions>
+      </DialogContentWrapper>
     </Dialog>
   );
 };
