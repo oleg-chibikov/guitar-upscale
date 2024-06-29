@@ -1,24 +1,21 @@
-import { RootState } from "@/app/store/store";
 import { FC, ReactNode, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 interface LazyLoadWrapperProps {
   renderComponent: () => ReactNode;
-  selector: (state: RootState) => boolean;
+  isOpen: boolean;
 }
 
 export const LazyLoadWrapper: FC<LazyLoadWrapperProps> = ({
   renderComponent,
-  selector,
+  isOpen,
 }) => {
   const [opened, setOpened] = useState(false);
-  const showComponent = useSelector(selector);
 
   useEffect(() => {
-    if (showComponent) {
+    if (isOpen) {
       setOpened(true);
     }
-  }, [showComponent]);
+  }, [isOpen]);
 
   if (!opened) {
     return null;

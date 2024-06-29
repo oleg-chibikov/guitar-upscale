@@ -3,6 +3,7 @@ import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { selectUi } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
 import { FC } from "react";
+import { useSelector } from "react-redux";
 
 const SettingsView = dynamic(
   async () => (await import("./SettingsView")).SettingsView
@@ -10,11 +11,14 @@ const SettingsView = dynamic(
 
 export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
   premiumComponents,
-}) => (
-  <LazyLoadWrapper
-    renderComponent={() => (
-      <SettingsView premiumComponents={premiumComponents} />
-    )}
-    selector={(state) => selectUi(state).settingsExpanded}
-  />
-);
+}) => {
+  const { settingsExpanded } = useSelector(selectUi);
+  return (
+    <LazyLoadWrapper
+      renderComponent={() => (
+        <SettingsView premiumComponents={premiumComponents} />
+      )}
+      isOpen={settingsExpanded}
+    />
+  );
+};

@@ -1,21 +1,9 @@
+import { ValueDialogControlDialogProps } from "@/app/components/uiFramework/ValueDialogControl";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
-import { selectUi } from "@/app/store/uiSlice";
 import { Alert } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { DialogWrapper } from "./DialogWrapper";
 import { StepSlider } from "./StepSlider";
-import { StartPosition, ValueDialogControlProps } from "./ValueDialogControl";
-
-interface ValueDialogControlDialogProps
-  extends Omit<ValueDialogControlProps, "icon"> {
-  startIndex: number;
-  setHighlight: (value: boolean) => void;
-  isOpen: boolean;
-  close: () => void;
-  startPosition: StartPosition;
-  setStartPosition: (value: StartPosition) => void;
-}
 
 export const ValueDialogControlDialog: React.FC<
   ValueDialogControlDialogProps
@@ -32,7 +20,6 @@ export const ValueDialogControlDialog: React.FC<
   startPosition,
   setStartPosition,
 }) => {
-  const { theme } = useSelector(selectUi);
   const hasTouchInput = useInputChecker();
 
   const handleMove = useCallback(

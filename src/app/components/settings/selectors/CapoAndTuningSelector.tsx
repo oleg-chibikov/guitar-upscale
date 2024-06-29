@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CapoSelector } from "@/app/components/settings/selectors/BaseNoteSelector";
+import { CapoSelector } from "@/app/components/settings/selectors/CapoSelector";
 import { TuningSelector } from "@/app/components/settings/selectors/TuningSelector";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";

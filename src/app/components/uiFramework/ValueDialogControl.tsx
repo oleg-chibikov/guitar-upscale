@@ -1,18 +1,28 @@
+import { ValueDialogControlDialogWrapper } from "@/app/components/uiFramework/ValueDialogControlDialogWrapper";
 import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { ValueDialogControlDialog } from "./ValueDialogControlDialog";
 
-export interface ValueDialogControlProps {
+interface ValueDialogControlProps {
   value: number;
   setValue: (value: number) => void;
   steps: number[];
   icon: ReactNode;
   label: string;
   postfix?: string;
+}
+
+export interface ValueDialogControlDialogProps
+  extends Omit<ValueDialogControlProps, "icon"> {
+  startIndex: number;
+  setHighlight: (value: boolean) => void;
+  isOpen: boolean;
+  close: () => void;
+  startPosition: StartPosition;
+  setStartPosition: (value: StartPosition) => void;
 }
 
 export type StartPosition = {
@@ -73,8 +83,7 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
           )}
         </div>
       </div>
-      {/* TODO: can we apply a lazyLoadWrapper? */}
-      <ValueDialogControlDialog
+      <ValueDialogControlDialogWrapper
         value={value}
         setValue={setValue}
         steps={steps}

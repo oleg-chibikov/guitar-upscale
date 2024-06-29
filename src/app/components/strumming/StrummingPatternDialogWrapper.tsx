@@ -6,7 +6,7 @@ import {
 import { Button } from "@mui/material";
 import dynamic from "next/dynamic";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const StrummingPatternDialog = dynamic(
   async () => (await import("./StrummingPatternDialog")).StrummingPatternDialog
@@ -14,6 +14,7 @@ const StrummingPatternDialog = dynamic(
 
 export const StrummingPatternDialogWrapper: React.FC = () => {
   const dispatch = useDispatch();
+  const { strummingPatternEditorExpanded } = useSelector(selectUi);
   return (
     <>
       <Button
@@ -25,7 +26,7 @@ export const StrummingPatternDialogWrapper: React.FC = () => {
 
       <LazyLoadWrapper
         renderComponent={() => <StrummingPatternDialog />}
-        selector={(state) => selectUi(state).strummingPatternEditorExpanded}
+        isOpen={strummingPatternEditorExpanded}
       />
     </>
   );
