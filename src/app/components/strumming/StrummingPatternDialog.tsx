@@ -4,7 +4,7 @@ import {
   DEFAULT_TIME_SIGNATURE,
   Pattern,
   getDefaultSlotsForTimeSignature,
-} from "@/app/data/strummingData";
+} from "@/app/data/strummingPatterns";
 import {
   addPattern,
   deletePattern,

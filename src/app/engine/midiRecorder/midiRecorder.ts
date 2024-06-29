@@ -1,6 +1,6 @@
+import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";

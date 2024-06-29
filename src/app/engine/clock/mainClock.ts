@@ -6,7 +6,7 @@ import {
   TICKS_IN_SIXTEENTH,
   TICKS_IN_SIXTY_FOURTH,
   TICKS_IN_THIRTY_SECOND,
-} from "@/app/engine/clock/clockConstants";
+} from "@/app/data/clockConstants";
 import { createPromise } from "@/app/helpers/promiseHelper";
 import { tempoBpmValue } from "../../store/settingsSlice";
 import { MetronomeEventBus } from "../eventBus";

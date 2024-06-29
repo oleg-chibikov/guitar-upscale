@@ -1,4 +1,4 @@
-import { TICKS_IN_BAR } from "@/app/engine/clock/clockConstants";
+import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { playAllNotes, waitForTick } from "@/app/engine/playerHelper";
 import {

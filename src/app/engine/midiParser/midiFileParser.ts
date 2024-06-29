@@ -1,6 +1,6 @@
+import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackData } from "@/app/data/midiParser/trackData";
 import { NOTE_COUNT, Note, OctaveNote, initNotesArray } from "@/app/data/notes";
-import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
 import { microsecondsToBpm } from "@/app/helpers/clockHelper";
 import {
   ChannelEvent,

@@ -1,4 +1,4 @@
-import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
+import { TICKS_IN_HALF_BEAT } from "@/app/data/clockConstants";
 import { bpmToMilliseconds } from "@/app/helpers/clockHelper";
 // Web worker is used so that no other code interrupts the interval. Without it sometimes the interval slows down, but it is a time-critical thing and should be as precise as possible
 

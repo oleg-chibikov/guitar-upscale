@@ -1,11 +1,10 @@
+import { BEATS_IN_BAR, TimeSignature } from "@/app/data/clockConstants";
 import {
   Pattern,
   StrumDirection,
-  TimeSignature,
   getDefaultSlotsForTimeSignature,
-} from "@/app/data/strummingData";
+} from "@/app/data/strummingPatterns";
 import { Theme } from "@/app/data/theme";
-import { BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { selectUi } from "@/app/store/uiSlice";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";

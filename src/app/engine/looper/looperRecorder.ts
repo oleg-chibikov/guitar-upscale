@@ -1,9 +1,9 @@
-import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
-} from "@/app/engine/clock/clockConstants";
+} from "@/app/data/clockConstants";
+import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   LooperPlayer,

@@ -1,4 +1,4 @@
-import { HALF_BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
+import { HALF_BEATS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { isLooperPlaying } from "@/app/engine/looper/looperShared";
 import { useCallback, useEffect, useRef, useState } from "react";

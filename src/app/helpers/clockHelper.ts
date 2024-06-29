@@ -1,4 +1,4 @@
-import { TICKS_IN_BEAT } from "@/app/engine/clock/clockConstants";
+import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 
 const MILLISECONDS_PER_MINUTE = 60_000;
 const MICROSECONDS_PER_MINUTE = MILLISECONDS_PER_MINUTE * 1000;

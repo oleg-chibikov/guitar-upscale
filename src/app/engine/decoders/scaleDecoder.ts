@@ -1,9 +1,9 @@
+import { TICKS_IN_HALF_BEAT } from "@/app/data/clockConstants";
 import {
   OctaveNote,
   StringOctaveNote,
   serializeOctaveNote,
 } from "@/app/data/notes";
-import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { capoValue, neckValue } from "@/app/store/settingsSlice";
 

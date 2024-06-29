@@ -1,4 +1,10 @@
 import {
+  TICKS_IN_BAR,
+  TICKS_IN_BEAT,
+  TICKS_IN_HALF_BAR,
+  TICKS_IN_HALF_BEAT,
+} from "@/app/data/clockConstants";
+import {
   AUTH_PANEL_ID,
   CHORDS_VIEW_ID,
   CONTROL_PANEL_ID,
@@ -12,12 +18,6 @@ import {
   TimeSignature,
   getTicksForTimeSignature,
 } from "@/app/data/strummingData";
-import {
-  TICKS_IN_BAR,
-  TICKS_IN_BEAT,
-  TICKS_IN_HALF_BAR,
-  TICKS_IN_HALF_BEAT,
-} from "@/app/engine/clock/clockConstants";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import { useCallback, useRef } from "react";
 import {
