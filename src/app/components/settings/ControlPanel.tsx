@@ -1,4 +1,4 @@
-import { BaseNoteAndTuningSelector } from "@/app/components/settings/selectors/BaseNoteAndTuningSelector";
+import { CapoAndTuningSelector } from "@/app/components/settings/selectors/CapoAndTuningSelector";
 import { ChordStrummingDelayControl } from "@/app/components/settings/valueDialogControls/ChordStrummingDelayControl";
 import { MetronomeVolumeControl } from "@/app/components/settings/valueDialogControls/MetronomeVolumeControl";
 import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
@@ -40,7 +40,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
     >
       <Panel enableReverse id={CONTROL_PANEL_ID}>
         <ScaleAndGroupSelector />
-        <BaseNoteAndTuningSelector />
+        <CapoAndTuningSelector />
         <ButtonContainer premiumComponents={premiumComponents} />
         <div className="flex flex-col gap-1">
           <VolumeControl />

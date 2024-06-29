@@ -3,11 +3,7 @@ import { NOTE_COUNT, Note, OctaveNote } from "@/app/data/notes";
 import { parseStringToNotes, tunings } from "@/app/data/tunings";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import {
-  baseNoteValue,
-  neckValue,
-  tuningValue,
-} from "@/app/store/settingsSlice";
+import { capoValue, neckValue, tuningValue } from "@/app/store/settingsSlice";
 import { FRET_COUNT, Neck } from "../generateNeckRepresentation";
 
 export class MelodyDecoder {
@@ -162,7 +158,7 @@ export class MelodyDecoder {
   }
 
   private convertChord(chord: string, tuningShift: number): string {
-    const baseNote = baseNoteValue;
+    const baseNote = capoValue;
     if (baseNote === 0 && !tuningShift) {
       return chord;
     }
@@ -203,7 +199,7 @@ export class MelodyDecoder {
     const scriptStringTuning = this.scriptTuning[stringNumber]; // Get the original tuning for the string (melody is written using this tuning)
     const tuningDifference =
       (NOTE_COUNT + scriptStringTuning.note - stringTuning.note) % NOTE_COUNT;
-    const shiftedBaseNote = baseNoteValue + this.tuningShift;
+    const shiftedBaseNote = capoValue + this.tuningShift;
 
     let fret = parseInt(fretNumberBuilder) + shiftedBaseNote + tuningDifference; // Adjust fret position based on tuning
     if (fret > FRET_COUNT) {

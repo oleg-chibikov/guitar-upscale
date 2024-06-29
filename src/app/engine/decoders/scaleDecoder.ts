@@ -5,7 +5,7 @@ import {
 } from "@/app/data/notes";
 import { TICKS_IN_HALF_BEAT } from "@/app/engine/clock/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { baseNoteValue, neckValue } from "@/app/store/settingsSlice";
+import { capoValue, neckValue } from "@/app/store/settingsSlice";
 
 export const getWholeScale = (playFullString: boolean): EventsByTick => {
   const neck = neckValue;
@@ -15,7 +15,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
 
   const neckCopy: StringOctaveNote[][] = [];
   const reverse = Math.random() < 0.5;
-  const capo = baseNoteValue;
+  const capo = capoValue;
   neck.forEach((neckString, index) => {
     const stringCopy = [...neckString].filter(
       (x) => x && x.fret >= capo

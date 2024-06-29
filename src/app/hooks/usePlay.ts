@@ -16,7 +16,7 @@ import {
 } from "../engine/clock/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
-  baseNoteValue,
+  capoValue,
   clearWipeExampleCacheTrigger,
   isPlayingValue,
   playbackTypeValue,
@@ -206,7 +206,7 @@ async function decode(
     message = `${example.band} - ${example.title}`;
   } else {
     const isFullStringScalePlayback = playbackTypeValue === fullStringScaleType;
-    message = `${getNoteText(baseNoteValue)} ${scaleValue} ${
+    message = `${getNoteText(capoValue)} ${scaleValue} ${
       isFullStringScalePlayback ? " (full string)" : ""
     }`;
 

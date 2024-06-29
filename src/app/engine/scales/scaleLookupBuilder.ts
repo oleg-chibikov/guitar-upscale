@@ -2,7 +2,7 @@ import { NOTE_COUNT, Note, getNoteText } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
 import { getUnshiftedNote } from "@/app/data/tunings";
 import {
-  setBaseNote,
+  setCapo,
   setScale,
   setScaleGroup,
   tuningValue,
@@ -24,7 +24,7 @@ export const setCurrentScaleAndGroup = (
   dispatch(setScale(data.scale));
   const unshiftedNote = getUnshiftedNote(data.note, tuningValue);
   console.log("New base note", getNoteText(unshiftedNote));
-  dispatch(setBaseNote(unshiftedNote));
+  dispatch(setCapo(unshiftedNote));
 };
 
 export const rebuildScaleDetectorLookup = () => {

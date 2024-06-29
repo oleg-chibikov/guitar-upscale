@@ -48,7 +48,7 @@ const getFirstScaleForGroup = (groupKey: string) =>
 interface WithNeck {
   neck: Neck | null;
   chords: NoteChords[] | null;
-  baseNote: Note;
+  capo: number;
 }
 
 interface WithIsPaused {
@@ -66,7 +66,7 @@ interface CanUpdateGuitarSettings {
 interface WithControls {
   scaleGroup: string;
   scale: string;
-  baseNote: Note;
+  capo: number;
   tuning: Tuning;
 }
 
@@ -119,7 +119,7 @@ interface SettingsState
 const initialState: SettingsState = {
   scaleGroup: "Minor",
   scale: "Aeolian / Natural",
-  baseNote: Note.C,
+  capo: 0,
   neck: null,
   chords: null,
   tempoBpm: 120,
@@ -186,7 +186,7 @@ export let chordPlayModeValue: ChordPlayMode = initialState.chordPlayMode;
 export let chordNotesToPlayValue: number = initialState.chordNotesToPlay;
 export let scaleGroupValue: string = initialState.scaleGroup;
 export let scaleValue: string = initialState.scale;
-export let baseNoteValue: Note = initialState.baseNote;
+export let capoValue: number = initialState.capo;
 export let playbackTypeValue: PlaybackType = initialState.playbackType;
 export let tuningValue: Tuning = initialState.tuning;
 export let isRecordingValue: boolean = initialState.isRecording;
@@ -210,12 +210,12 @@ const onGuitarSettingsUpdate = (
 ) => {
   const scalePattern = getScalePattern(state.scaleGroup, state.scale); // all scales include 0, so it's omitted from the scales themselves
 
-  const baseNote = state.baseNote;
+  const capo = state.capo;
   const neck = generateNeckRepresentation(
     scalePattern,
     parseStringToNotes(tuningValue),
-    getShiftedNote(baseNote, tuningValue),
-    baseNote
+    getShiftedNote(capo, tuningValue),
+    capo
   );
   state.neck = neck;
   neckValue = neck;
@@ -245,11 +245,7 @@ const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
   }
 
   // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
-  const chordsForNeck = chordsGenerator.process(
-    state.neck,
-    true,
-    state.baseNote
-  );
+  const chordsForNeck = chordsGenerator.process(state.neck, true, state.capo);
   state.chords = chordsForNeck;
   chordsValue = chordsForNeck;
   clearChordDetector?.();
@@ -393,7 +389,7 @@ export const settingsSlice = createSlice({
       isPausedValue = state.isPaused;
       scaleGroupValue = state.scaleGroup;
       scaleValue = state.scale;
-      baseNoteValue = state.baseNote;
+      capoValue = state.capo;
       isRecordingValue = state.isRecording;
       playbackTypeValue = state.playbackType;
       tuningValue = state.tuning;
@@ -427,9 +423,9 @@ export const settingsSlice = createSlice({
       scaleValue = state.scale;
       onGuitarSettingsUpdate(state);
     },
-    setBaseNote: (state, action: PayloadAction<Note>) => {
-      state.baseNote = action.payload;
-      baseNoteValue = action.payload;
+    setCapo: (state, action: PayloadAction<Note>) => {
+      state.capo = action.payload;
+      capoValue = action.payload;
       wipeExampleCacheTriggerValue = true;
       onGuitarSettingsUpdate(state);
     },
@@ -600,7 +596,7 @@ export const {
   init,
   setScale,
   setScaleGroup,
-  setBaseNote,
+  setCapo,
   setTempoBpm,
   setVolume,
   setMetronomeVolume,

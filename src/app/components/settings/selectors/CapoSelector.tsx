@@ -2,23 +2,23 @@ import { Note, getNoteText } from "@/app/data/notes";
 import { getShiftedNote } from "@/app/data/tunings";
 import {
   selectSettings,
-  setBaseNote,
+  setCapo,
   tuningValue,
 } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
-export const BaseNoteSelector: React.FC = () => {
-  const { baseNote } = useSelector(selectSettings);
+export const CapoSelector: React.FC = () => {
+  const { capo } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   return (
     <EnumSelector
       enumObj={Note}
-      selectedValue={baseNote}
+      selectedValue={capo}
       onValueChange={(value) => {
-        dispatch(setBaseNote(value));
+        dispatch(setCapo(value));
       }}
       customLabel={(_, value) => {
         const note = getShiftedNote(value, tuningValue);

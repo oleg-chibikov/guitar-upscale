@@ -4,7 +4,7 @@ import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../../data/instruments";
 import { getNoteText } from "../../data/notes";
 import {
-  baseNoteValue,
+  capoValue,
   scaleGroupValue,
   scaleValue,
   tempoBpmValue,
@@ -22,7 +22,7 @@ class MidiSaver {
     const link = document.createElement("a");
     link.href = url;
     link.download = `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
-      baseNoteValue
+      capoValue
     )} | ${this.getFormattedDateTime()}.mid`;
     document.body.appendChild(link);
     link.click();

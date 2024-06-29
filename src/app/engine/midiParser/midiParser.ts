@@ -18,7 +18,7 @@ import { setCurrentScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder"
 import { arrayToMap } from "@/app/helpers/arrayHelper";
 import { FunctionCache } from "@/app/helpers/functionCache";
 import {
-  baseNoteValue,
+  capoValue,
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
@@ -49,7 +49,7 @@ export const parseMidiData = async (
     distinctNotes,
     distinctNotes.filter((x) => x !== undefined).length,
     (result) => {
-      const currentBaseNote = getShiftedNote(baseNoteValue, tuningValue);
+      const currentBaseNote = getShiftedNote(capoValue, tuningValue);
       if (result.scales?.length) {
         const scalesInSameBaseNote = result.scales.filter(
           (x) => x.note === currentBaseNote

@@ -1,12 +1,12 @@
 import React from "react";
 
-import { BaseNoteSelector } from "@/app/components/settings/selectors/BaseNoteSelector";
+import { CapoSelector } from "@/app/components/settings/selectors/BaseNoteSelector";
 import { TuningSelector } from "@/app/components/settings/selectors/TuningSelector";
 import { Theme } from "@/app/data/theme";
 import { selectUi } from "@/app/store/uiSlice";
 import { useSelector } from "react-redux";
 
-export const BaseNoteAndTuningSelector: React.FC = () => {
+export const CapoAndTuningSelector: React.FC = () => {
   const { theme } = useSelector(selectUi);
   return (
     <section
@@ -16,7 +16,7 @@ export const BaseNoteAndTuningSelector: React.FC = () => {
           : "text-foreground-dark bg-accented_background-dark"
       }`}
     >
-      <BaseNoteSelector />
+      <CapoSelector />
       <TuningSelector />
     </section>
   );
