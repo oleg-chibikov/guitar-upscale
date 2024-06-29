@@ -38,7 +38,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
         theme === Theme.Light
           ? "bg-accented_background-light border-border-light text-foreground-light"
           : "bg-accented_background-dark border-border-dark text-foreground-dark"
-      } border-2`}
+      } border-2 flex flex-col gap-2`}
     >
       {headerText && <DialogHeader text={headerText} onClose={onClose} />}
       {!headerText && onClose && (

@@ -31,7 +31,9 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       isOpen={settingsExpanded}
       close={close}
       id={SETTINGS_PANEL_ID}
+      headerText="Settings"
       className="h-full"
+      contentClassName="flexGrow overflow-y-auto"
     >
       {premiumComponents.get("advancedChords") as ReactNode}
       <UseSharpChordsCheckbox />
