@@ -7,29 +7,29 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { OpenAuthModalButton } from "./OpenAuthModalButton";
+import { OpenAuthDialogButton } from "./OpenAuthDialogButton";
 import { SignedInButton } from "./SignedInButton";
 
-const SubscriptionStatusModal = dynamic(
-  async () => (await import("./PurchaseOptionsModal")).PurchaseOptionsModal
+const PurchaseOptionsDialog = dynamic(
+  async () => (await import("./PurchaseOptionsDialog")).PurchaseOptionsDialog
 );
 
 // https://docs.patreon.com/#oauth
 // https://dev.to/mlhassett/working-with-the-patreon-api-now-that-we-know-what-s-going-on-4pco
 export const AuthPanel: React.FC = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [modalOpened, setModalOpened] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogOpened, setDialogOpened] = useState(false);
   const { data: session } = useSession();
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   const { subscriptionTier } = useSelector(selectAuth);
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-    setModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+    setDialogOpened(true); // only set this once to true to enable code splitting for the dialog - it won't be loaded until this prop is true
   };
 
   return (
@@ -46,15 +46,15 @@ export const AuthPanel: React.FC = () => {
          z-20 top-1`}
     >
       {session?.user || subscriptionTier ? (
-        <SignedInButton openModal={handleOpenModal} user={session?.user} />
+        <SignedInButton openDialog={handleOpenDialog} user={session?.user} />
       ) : (
-        <OpenAuthModalButton openModal={handleOpenModal} />
+        <OpenAuthDialogButton openDialog={handleOpenDialog} />
       )}
 
-      {modalOpened && (
-        <SubscriptionStatusModal
-          isOpen={openModal}
-          handleCloseModal={handleCloseModal}
+      {dialogOpened && (
+        <PurchaseOptionsDialog
+          isOpen={openDialog}
+          handleCloseDialog={handleCloseDialog}
         />
       )}
     </div>

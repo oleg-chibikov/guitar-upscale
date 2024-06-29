@@ -9,7 +9,7 @@ export const AspectRatioModal: FC = () => {
   const dispatch = useDispatch();
   const { showAspectRatio } = useSelector(selectUi);
 
-  const handleCloseModal = () => {
+  const handleCloseDialog = () => {
     dispatch(setShowAspectRatio(false));
   };
 
@@ -19,7 +19,7 @@ export const AspectRatioModal: FC = () => {
         backdrop: { style: { backgroundColor: "rgba(0,0,0,0.8)" } },
       }}
       open={showAspectRatio}
-      onClose={handleCloseModal}
+      onClose={handleCloseDialog}
       className="relative"
       aria-labelledby="aspect-ratio-modal"
     >

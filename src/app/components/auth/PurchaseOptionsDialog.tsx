@@ -5,7 +5,6 @@ import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { PURCHASE_OPTIONS_DIALOG } from "@/app/data/elementIds";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { selectAuth } from "@/app/store/authSlice";
-import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
@@ -13,8 +12,8 @@ import { Alert, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
-import { ModalProps } from "../ModalProps";
-import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
+import { DialogProps } from "../DialogProps";
+import { PatreonDialogAuthButton } from "./PatreonDialogAuthButton";
 
 const GooglePlayPurchaseSection = React.lazy(() =>
   import("./GooglePlayPurchaseSection").then((module) => ({
@@ -41,9 +40,9 @@ const featureNames: Record<AllowedKeys, string> = {
   skinSelection: "Configurable skins",
 };
 
-export const PurchaseOptionsModal: FC<ModalProps> = ({
+export const PurchaseOptionsDialog: FC<DialogProps> = ({
   isOpen,
-  handleCloseModal,
+  handleCloseDialog,
 }) => {
   const { premiumFeatures, composerPremiumFeatures, explorerPremiumFeatures } =
     usePremiumFeatures();
@@ -55,7 +54,6 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     [key: string]: string;
   };
   const { data: session } = useSession();
-  const { theme } = useSelector(selectUi);
   const { subscriptionTier } = useSelector(selectAuth);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
@@ -116,7 +114,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
     <DialogWrapper
       anchor="top"
       isOpen={isOpen}
-      close={handleCloseModal}
+      close={handleCloseDialog}
       id={PURCHASE_OPTIONS_DIALOG}
       headerText={
         (session?.user &&
@@ -167,7 +165,7 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
             )}
           {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
-          <PatreonModalAuthButton closeModal={handleCloseModal} />
+          <PatreonDialogAuthButton closeDialog={handleCloseDialog} />
         </div>
       ) : (
         <Alert severity="warning">

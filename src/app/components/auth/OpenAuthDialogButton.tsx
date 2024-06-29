@@ -8,14 +8,14 @@ import { FC } from "react";
 import { useSelector } from "react-redux";
 import { AuthButtonProps } from "./AuthButtonProps";
 
-export const OpenAuthModalButton: FC<AuthButtonProps> = ({ openModal }) => {
+export const OpenAuthDialogButton: FC<AuthButtonProps> = ({ openDialog }) => {
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const text = hasDigitalGoodsService ? "Subscribe" : "Sign in";
   return (
     <Button
       size="small"
-      onClick={openModal}
+      onClick={openDialog}
       variant="contained"
       color="primary"
       title={text}

@@ -3,7 +3,7 @@ import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
 import Speed from "@mui/icons-material/Speed";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueModalControl } from "./ValueModalControl";
+import { ValueDialogControl } from "./ValueDialogControl";
 
 export const TempoControl: React.FC = () => {
   const { tempoBpm } = useSelector(selectSettings);
@@ -14,7 +14,7 @@ export const TempoControl: React.FC = () => {
   };
 
   return (
-    <ValueModalControl
+    <ValueDialogControl
       label="Tempo"
       icon={<Speed />}
       value={tempoBpm}

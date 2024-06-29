@@ -42,7 +42,7 @@ export const ScaleDetectionAlert: FC = () => {
       isOpen={showScalesAlert}
       close={() => dispatch(hideScalesAlert())}
       id={SCALE_DETECTION_DIALOG}
-      className="overflow-y-auto max-h-48"
+      contentClassName="overflow-y-auto max-h-48"
     >
       {suggestedScales?.map((scaleAndGroup) => (
         <Button

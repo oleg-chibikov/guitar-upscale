@@ -15,14 +15,14 @@ import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ModalProps } from "../ModalProps";
+import { DialogProps } from "../DialogProps";
 
-export const ChangeSubscriptionModal: FC<
-  ModalProps & GetSubscriptionActionParams
+export const ChangeSubscriptionDialog: FC<
+  DialogProps & GetSubscriptionActionParams
 > = (params) => {
   const {
     isOpen,
-    handleCloseModal,
+    handleCloseDialog,
     purchaseOption,
     disabledMessage,
     allPurchasedOptions,
@@ -73,7 +73,7 @@ export const ChangeSubscriptionModal: FC<
       darkBackdrop
       anchor="top"
       isOpen={isOpen}
-      close={handleCloseModal}
+      close={handleCloseDialog}
       headerText={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
       id={CHANGE_SUBSCRIPTION_DIALOG}
     >
@@ -89,7 +89,7 @@ export const ChangeSubscriptionModal: FC<
 
       <Button
         size="small"
-        onClick={handleCloseModal}
+        onClick={handleCloseDialog}
         variant="contained"
         color="secondary"
         title={`Don't ${changeAction.toLocaleLowerCase()} subscription`}

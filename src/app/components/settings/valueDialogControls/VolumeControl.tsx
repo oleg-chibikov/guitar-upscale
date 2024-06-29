@@ -6,7 +6,7 @@ import VolumeOff from "@mui/icons-material/VolumeOff";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueModalControl } from "./ValueModalControl";
+import { ValueDialogControl } from "./ValueDialogControl";
 
 export const VolumeControl: React.FC = () => {
   const { volume } = useSelector(selectSettings);
@@ -17,7 +17,7 @@ export const VolumeControl: React.FC = () => {
   };
 
   return (
-    <ValueModalControl
+    <ValueDialogControl
       label="Volume"
       icon={
         volume === 0 ? (

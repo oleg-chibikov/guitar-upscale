@@ -5,7 +5,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import React, { FC, Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { CheckBox } from "../settings/checkboxes/CheckBox";
-import { ModalAuthButtonProps } from "./AuthButtonProps";
+import { DialogAuthButtonProps } from "./AuthButtonProps";
 
 const PatreonSubscribeButton = React.lazy(() =>
   import("./PatreonSubscribeButton").then((module) => ({
@@ -13,8 +13,8 @@ const PatreonSubscribeButton = React.lazy(() =>
   }))
 );
 
-export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
-  closeModal,
+export const PatreonDialogAuthButton: FC<DialogAuthButtonProps> = ({
+  closeDialog,
 }) => {
   const dispatch = useDispatch();
   const { data: session } = useSession();
@@ -40,7 +40,7 @@ export const PatreonModalAuthButton: FC<ModalAuthButtonProps> = ({
     // This button should not be visible on Android due to Google play billing policy (only Google play Billing is allowed)
     <Fragment>
       {isSignedIn && !hasDigitalGoodsService && (
-        <PatreonSubscribeButton closeModal={closeModal} />
+        <PatreonSubscribeButton closeDialog={closeDialog} />
       )}
       {!isSignedIn && !userWantsToSignInWithPatreon && (
         <CheckBox

@@ -10,6 +10,8 @@ interface DialogWrapperProps extends WithChildren, WithClassName, WithId {
   close: () => void;
   anchor?: DrawerProps["anchor"];
   headerText?: string;
+  dialogClassName?: string;
+  contentClassName?: string;
   darkBackdrop?: boolean;
 }
 
@@ -21,6 +23,8 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
   id,
   headerText,
   className,
+  dialogClassName,
+  contentClassName,
   darkBackdrop,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -38,6 +42,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
   const content = (
     <DialogContentWrapper
       className={className}
+      contentClassName={contentClassName}
       id={id}
       onClose={close}
       headerText={headerText}
@@ -48,7 +53,13 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
 
   if (anchor) {
     return (
-      <Drawer slotProps={backdrop} anchor={anchor} open={open} onClose={close}>
+      <Drawer
+        className={dialogClassName}
+        slotProps={backdrop}
+        anchor={anchor}
+        open={open}
+        onClose={close}
+      >
         {content}
       </Drawer>
     );
@@ -56,6 +67,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
 
   return (
     <Dialog
+      className={className}
       slotProps={backdrop}
       open={open}
       onClose={close}

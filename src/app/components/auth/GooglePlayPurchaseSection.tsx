@@ -16,12 +16,16 @@ import { Alert, LinearProgress } from "@mui/material";
 import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { ChangeSubscriptionModal } from "./ChangeSubscriptionModal";
 import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton";
 
-const CancelSubscriptionModal = dynamic(
+const CancelSubscriptionDialog = dynamic(
   async () =>
-    (await import("./CancelSubscriptionModal")).CancelSubscriptionModal
+    (await import("./CancelSubscriptionDialog")).CancelSubscriptionDialog
+);
+
+const ChangeSubscriptionDialog = dynamic(
+  async () =>
+    (await import("./ChangeSubscriptionDialog")).ChangeSubscriptionDialog
 );
 
 interface GooglePlaySubscribeSectionProps {
@@ -51,26 +55,26 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
   const [allPurchasedOptions, setAllPurchasedOptions] = useState<
     PurchasedOption[]
   >([]);
-  const [cancelSubscriptionModalOpen, setCancelSubscriptionModalOpen] =
+  const [cancelSubscriptionDialogOpen, setCancelSubscriptionDialogOpen] =
     useState<boolean>(false);
-  const [cancelSubscriptionModalOpened, setCancelSubscriptionModalOpened] =
+  const [cancelSubscriptionDialogOpened, setCancelSubscriptionDialogOpened] =
     useState<boolean>(false);
-  const [changeSubscriptionModalOpen, setChangeSubscriptionModalOpen] =
+  const [changeSubscriptionDialogOpen, setChangeSubscriptionDialogOpen] =
     useState<boolean>(false);
-  const [changeSubscriptionModalOpened, setChangeSubscriptionModalOpened] =
+  const [changeSubscriptionDialogOpened, setChangeSubscriptionDialogOpened] =
     useState<boolean>(false);
   const [hasFailedOptions, setHasFailedOptions] = useState<boolean>(false);
 
   const isOnline = useOnlineStatus();
 
-  const handleOpenCancelSubscriptionModal = () => {
-    setCancelSubscriptionModalOpen(true);
-    setCancelSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  const handleOpenCancelSubscriptionDialog = () => {
+    setCancelSubscriptionDialogOpen(true);
+    setCancelSubscriptionDialogOpened(true); // only set this once to true to enable code splitting for the dialog - it won't be loaded until this prop is true
   };
 
-  const handleOpenChangeSubscriptionModal = () => {
-    setChangeSubscriptionModalOpen(true);
-    setChangeSubscriptionModalOpened(true); // only set this once to true to enable code splitting for the modal - it won't be loaded until this prop is true
+  const handleOpenChangeSubscriptionDialog = () => {
+    setChangeSubscriptionDialogOpen(true);
+    setChangeSubscriptionDialogOpened(true); // only set this once to true to enable code splitting for the dialog - it won't be loaded until this prop is true
   };
 
   useEffect(() => {
@@ -185,20 +189,20 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           Google Play subscription options cannot be loaded while offline
         </Alert>
       )}
-      {selectedOption && cancelSubscriptionModalOpened && (
-        <CancelSubscriptionModal
-          isOpen={cancelSubscriptionModalOpen}
-          handleCloseModal={() => setCancelSubscriptionModalOpen(false)}
+      {selectedOption && cancelSubscriptionDialogOpened && (
+        <CancelSubscriptionDialog
+          isOpen={cancelSubscriptionDialogOpen}
+          handleCloseDialog={() => setCancelSubscriptionDialogOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={selectedOption}
           disabledMessage={disabledMessage}
           allPurchasedOptions={allPurchasedOptions}
         />
       )}
-      {selectedOption && changeSubscriptionModalOpened && (
-        <ChangeSubscriptionModal
-          isOpen={changeSubscriptionModalOpen}
-          handleCloseModal={() => setChangeSubscriptionModalOpen(false)}
+      {selectedOption && changeSubscriptionDialogOpened && (
+        <ChangeSubscriptionDialog
+          isOpen={changeSubscriptionDialogOpen}
+          handleCloseDialog={() => setChangeSubscriptionDialogOpen(false)}
           setIsLoading={setIsLoading}
           purchaseOption={selectedOption}
           disabledMessage={disabledMessage}
@@ -214,13 +218,13 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         {purchaseOptions.map((purchaseOption) => (
           <GooglePlayPurchaseOptionButton
             allPurchasedOptions={allPurchasedOptions}
-            showCancellationModal={() => {
+            showCancellationDialog={() => {
               setSelectedOption(purchaseOption);
-              handleOpenCancelSubscriptionModal();
+              handleOpenCancelSubscriptionDialog();
             }}
-            showChangeSubscriptionModal={() => {
+            showChangeSubscriptionDialog={() => {
               setSelectedOption(purchaseOption);
-              handleOpenChangeSubscriptionModal();
+              handleOpenChangeSubscriptionDialog();
             }}
             disabledMessage={disabledMessage}
             isSelected={selectedOption === purchaseOption}

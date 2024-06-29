@@ -1,4 +1,4 @@
-import { ValueModalControlDialog } from "@/app/components/settings/valueModalControls/ValueModalControlDialog";
+import { ValueDialogControlDialog } from "@/app/components/settings/valueDialogControls/ValueDialogControlDialog";
 import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
@@ -6,7 +6,7 @@ import { Typography } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-export interface ValueModalControlProps {
+export interface ValueDialogControlProps {
   value: number;
   setValue: (value: number) => void;
   steps: number[];
@@ -20,7 +20,7 @@ export type StartPosition = {
   y: number;
 } | null;
 
-export const ValueModalControl: React.FC<ValueModalControlProps> = ({
+export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
   value,
   setValue,
   steps,
@@ -29,7 +29,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   postfix,
 }) => {
   const { theme } = useSelector(selectUi);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [startPosition, setStartPosition] = useState<StartPosition>(null);
   const [startIndex, setStartIndex] = useState<number>(steps.indexOf(value));
   const [highlight, setHighlight] = useState(false);
@@ -49,7 +49,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
     const { clientX, clientY } = "touches" in event ? event.touches[0] : event;
     setStartPosition({ x: clientX, y: clientY });
     setStartIndex(steps.indexOf(value));
-    setModalOpen(true);
+    setDialogOpen(true);
   };
 
   return (
@@ -73,7 +73,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
           )}
         </div>
       </div>
-      <ValueModalControlDialog
+      <ValueDialogControlDialog
         value={value}
         setValue={setValue}
         steps={steps}
@@ -81,8 +81,8 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         postfix={postfix}
         startIndex={startIndex}
         setHighlight={setHighlight}
-        isOpen={modalOpen}
-        close={() => setModalOpen(false)}
+        isOpen={dialogOpen}
+        close={() => setDialogOpen(false)}
         startPosition={startPosition}
         setStartPosition={setStartPosition}
       />

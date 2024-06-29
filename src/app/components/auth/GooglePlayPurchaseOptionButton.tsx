@@ -21,8 +21,8 @@ interface GooglePlayPurchaseOptionButtonProps
   extends GetSubscriptionActionParams {
   onClick: () => void;
   isSelected: boolean;
-  showCancellationModal: () => void;
-  showChangeSubscriptionModal: () => void;
+  showCancellationDialog: () => void;
+  showChangeSubscriptionDialog: () => void;
 }
 
 export const GooglePlayPurchaseOptionButton: FC<
@@ -32,8 +32,8 @@ export const GooglePlayPurchaseOptionButton: FC<
     purchaseOption,
     onClick,
     isSelected,
-    showCancellationModal,
-    showChangeSubscriptionModal,
+    showCancellationDialog,
+    showChangeSubscriptionDialog,
     disabledMessage,
     allPurchasedOptions,
   } = params;
@@ -45,7 +45,7 @@ export const GooglePlayPurchaseOptionButton: FC<
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const dispatch = useDispatch();
   const makePurchase = existingNonCancelledPurchaseOption
-    ? () => showChangeSubscriptionModal()
+    ? () => showChangeSubscriptionDialog()
     : getMakePurchase(params, hasDigitalGoodsService, dispatch);
 
   const title = purchaseOption.tier;
@@ -73,7 +73,7 @@ export const GooglePlayPurchaseOptionButton: FC<
       purchaseOption.purchaseData?.subscribedDateMs
     );
     buttonColor = "error";
-    buttonAction = async () => await showCancellationModal();
+    buttonAction = async () => await showCancellationDialog();
     purchaseStatusLine1 =
       "Owned" +
       (subscribedDate !== undefined ? " since " + subscribedDate : "");

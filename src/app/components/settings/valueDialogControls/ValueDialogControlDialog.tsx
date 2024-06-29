@@ -2,16 +2,16 @@ import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
 import { StepSlider } from "@/app/components/settings/sliders/StepSlider";
 import {
   StartPosition,
-  ValueModalControlProps,
-} from "@/app/components/settings/valueModalControls/ValueModalControl";
+  ValueDialogControlProps,
+} from "@/app/components/settings/valueDialogControls/ValueDialogControl";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
 import { Alert } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-interface ValueModalControlDialogProps
-  extends Omit<ValueModalControlProps, "icon"> {
+interface ValueDialogControlDialogProps
+  extends Omit<ValueDialogControlProps, "icon"> {
   startIndex: number;
   setHighlight: (value: boolean) => void;
   isOpen: boolean;
@@ -20,8 +20,8 @@ interface ValueModalControlDialogProps
   setStartPosition: (value: StartPosition) => void;
 }
 
-export const ValueModalControlDialog: React.FC<
-  ValueModalControlDialogProps
+export const ValueDialogControlDialog: React.FC<
+  ValueDialogControlDialogProps
 > = ({
   value,
   setValue,
@@ -100,7 +100,7 @@ export const ValueModalControlDialog: React.FC<
     <DialogWrapper
       darkBackdrop
       isOpen={isOpen}
-      className="cursor-move"
+      dialogClassName="cursor-move"
       close={close}
       headerText={label}
     >

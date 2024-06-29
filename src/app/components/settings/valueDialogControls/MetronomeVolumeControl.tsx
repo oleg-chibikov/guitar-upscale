@@ -3,7 +3,7 @@ import { volumeSteps } from "@/app/data/volume";
 import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueModalControl } from "./ValueModalControl";
+import { ValueDialogControl } from "./ValueDialogControl";
 
 export const MetronomeVolumeControl: React.FC = () => {
   const { metronomeVolume } = useSelector(selectSettings);
@@ -14,7 +14,7 @@ export const MetronomeVolumeControl: React.FC = () => {
   };
 
   return (
-    <ValueModalControl
+    <ValueDialogControl
       label="Metronome volume"
       icon={<MdiMetronome />}
       value={metronomeVolume}

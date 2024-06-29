@@ -8,12 +8,12 @@ import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch } from "react-redux";
-import { ModalProps } from "../ModalProps";
+import { DialogProps } from "../DialogProps";
 
-export const CancelSubscriptionModal: FC<
-  ModalProps & GetSubscriptionActionParams
+export const CancelSubscriptionDialog: FC<
+  DialogProps & GetSubscriptionActionParams
 > = (params) => {
-  const { isOpen, handleCloseModal, purchaseOption, disabledMessage } = params;
+  const { isOpen, handleCloseDialog, purchaseOption, disabledMessage } = params;
   const title = purchaseOption.tier;
 
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ export const CancelSubscriptionModal: FC<
       darkBackdrop
       anchor="top"
       isOpen={isOpen}
-      close={handleCloseModal}
+      close={handleCloseDialog}
       headerText={`Are you sure you would like to cancel your "${title}" subscription?`}
       id={CANCEL_SUBSCRIPTION_DIALOG}
     >
@@ -51,7 +51,7 @@ export const CancelSubscriptionModal: FC<
       ) : undefined}
       <Button
         size="small"
-        onClick={handleCloseModal}
+        onClick={handleCloseDialog}
         variant="contained"
         color="secondary"
         title="Don't cancel"

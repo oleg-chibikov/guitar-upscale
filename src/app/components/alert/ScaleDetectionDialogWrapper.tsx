@@ -4,10 +4,10 @@ import dynamic from "next/dynamic";
 import { FC } from "react";
 
 const ScaleDetectionAlert = dynamic(
-  async () => (await import("./ScaleDetectionAlert")).ScaleDetectionAlert
+  async () => (await import("./ScaleDetectionDialog")).ScaleDetectionAlert
 );
 
-export const ScaleDetectionAlertWrapper: FC = () => (
+export const ScaleDetectionDialogWrapper: FC = () => (
   <LazyLoadWrapper
     renderComponent={() => <ScaleDetectionAlert />}
     selector={(state) => selectUi(state).showScalesAlert}

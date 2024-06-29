@@ -6,7 +6,7 @@ import {
 import Schedule from "@mui/icons-material/Schedule";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ValueModalControl } from "./ValueModalControl";
+import { ValueDialogControl } from "./ValueDialogControl";
 
 export const ChordStrummingDelayControl: React.FC = () => {
   const { chordStrummingDelayMs } = useSelector(selectSettings);
@@ -17,7 +17,7 @@ export const ChordStrummingDelayControl: React.FC = () => {
   };
 
   return (
-    <ValueModalControl
+    <ValueDialogControl
       label="Delay between notes in chord"
       icon={<Schedule />}
       value={chordStrummingDelayMs}

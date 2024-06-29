@@ -1,7 +1,7 @@
 export interface AuthButtonProps {
-  openModal: () => void;
+  openDialog: () => void;
 }
 
-export interface ModalAuthButtonProps {
-  closeModal: () => void;
+export interface DialogAuthButtonProps {
+  closeDialog: () => void;
 }

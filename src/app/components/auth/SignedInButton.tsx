@@ -11,7 +11,7 @@ import { AuthButtonProps } from "./AuthButtonProps";
 
 export const SignedInButton: FC<
   AuthButtonProps & { user?: Session["user"] }
-> = ({ openModal, user }) => {
+> = ({ openDialog, user }) => {
   const { subscriptionTier } = useSelector(selectAuth);
   const { chordsDisplayMode, theme } = useSelector(selectUi);
   return (
@@ -26,7 +26,7 @@ export const SignedInButton: FC<
       title={
         (user ? `${user.name}: ${user.email} - ` : "") + subscriptionTier?.tier
       }
-      onClick={openModal} // Open modal on avatar click
+      onClick={openDialog} // Open dialog on avatar click
     >
       <Typography
         variant="caption"

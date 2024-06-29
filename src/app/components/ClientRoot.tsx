@@ -1,7 +1,7 @@
 "use client";
 
 import { BottomZone } from "@/app/components/BottomZone";
-import { ScaleDetectionAlertWrapper } from "@/app/components/alert/ScaleDetectionAlertWrapper";
+import { ScaleDetectionDialogWrapper } from "@/app/components/alert/ScaleDetectionDialogWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useRef } from "react";
@@ -28,7 +28,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
     <>
       <Initializer />
       <AlertWrapper />
-      <ScaleDetectionAlertWrapper />
+      <ScaleDetectionDialogWrapper />
       {loadingMessage !== undefined ? (
         <main
           className={`flex flex-col gap-2 justify-center align-middle items-center text-center text-2xl ${
