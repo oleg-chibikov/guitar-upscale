@@ -5,15 +5,7 @@ import {
   StrumDirection,
   TimeSignature,
 } from "@/app/data/strummingData";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import {
-  Button,
-  DialogActions,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Button, DialogActions, Typography } from "@mui/material";
 import React, { useCallback, useState } from "react";
 
 interface PatternEditorProps {
@@ -66,30 +58,22 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
 
   return (
     <>
-      <div className="mt-4 flex justify-start gap-2">
-        <Tooltip title="Remove Cells">
-          <IconButton
-            disabled={pattern.strums.length <= 1}
-            onClick={handleRemoveCells}
-          >
-            <RemoveIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Add Cells">
-          <IconButton onClick={handleAddCells}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      </div>
-      <StrumGrid pattern={currentPattern} onStrum={handleStrum} />
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row justify-start items-center gap-2">
         <Typography>Each cell represents</Typography>
         <EnumSelector
           enumObj={TimeSignature}
           selectedValue={currentPattern.timeSignature}
           onValueChange={handleTimeSignatureChange}
+          customLabel={(key, value) => value}
         />
+        <Typography>of a bar</Typography>
       </div>
+      <StrumGrid
+        pattern={currentPattern}
+        onStrum={handleStrum}
+        onAdd={handleAddCells}
+        onRemove={handleRemoveCells}
+      />
       <DialogActions>
         <Button color="primary" onClick={onCancel}>
           Cancel

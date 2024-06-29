@@ -7,17 +7,22 @@ import {
 import { Theme } from "@/app/data/theme";
 import { BEATS_IN_BAR } from "@/app/engine/clock/clockConstants";
 import { selectUi } from "@/app/store/uiSlice";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { IconButton, Tooltip } from "@mui/material";
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface StrumGridProps {
   pattern: Pattern;
   onStrum: (index: number, newValue: StrumDirection) => void;
+  onAdd: () => void;
+  onRemove: () => void;
 }
 
 // TODO: update rendering - changing a cell shouldn't rerender everything
 export const StrumGrid: React.FC<StrumGridProps> = React.memo(
-  ({ pattern, onStrum }) => {
+  ({ pattern, onStrum, onAdd, onRemove }) => {
     const { theme } = useSelector(selectUi);
 
     const groupSize = 4;
@@ -43,12 +48,16 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
     }, [pattern.timeSignature]);
 
     return (
-      <div className="overflow-x-auto py-4">
+      <div className="flex flex-row gap-2 items-center">
+        <Tooltip title="Remove Cells">
+          <IconButton disabled={pattern.strums.length <= 1} onClick={onRemove}>
+            <RemoveIcon />
+          </IconButton>
+        </Tooltip>
         <div
-          className="grid gap-x-1 w-full"
+          className="overflow-x-auto py-4 grid gap-x-1 w-full"
           style={{
             gridTemplateColumns: getGridTemplateColumns,
-            width: "max-content",
           }}
         >
           {pattern.strums.map((strum, index) => (
@@ -65,6 +74,11 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
             </React.Fragment>
           ))}
         </div>
+        <Tooltip title="Add Cells">
+          <IconButton onClick={onAdd}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       </div>
     );
   }
@@ -91,10 +105,10 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
         onClick={handleClick}
         className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs
         ${
-          isBeatCell
+          !isBeatCell
             ? theme === Theme.Light
-              ? "bg-primary-light"
-              : "bg-primary-dark"
+              ? "bg-panel-light"
+              : "bg-panel-dark"
             : theme === Theme.Light
             ? "bg-secondary-light"
             : "bg-secondary-dark"

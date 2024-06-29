@@ -73,6 +73,7 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
           )}
         </div>
       </div>
+      {/* TODO: can we apply a lazyLoadWrapper? */}
       <ValueDialogControlDialog
         value={value}
         setValue={setValue}

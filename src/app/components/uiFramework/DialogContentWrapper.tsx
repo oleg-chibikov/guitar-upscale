@@ -42,7 +42,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
     >
       {headerText && <DialogHeader text={headerText} onClose={onClose} />}
       {!headerText && onClose && (
-        <CloseIcon onPress={onClose} className="absolute top-5 right-5 z-10" />
+        <CloseIcon onPress={onClose} className="absolute top-6 right-6 z-10" />
       )}
       <DialogContent className={`${contentClassName} flex flex-col gap-2`}>
         {children}
