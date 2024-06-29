@@ -1,9 +1,7 @@
 import { getPatternById } from "@/app/data/chordStrummingPatterns";
 import {
   AUTH_PANEL_ID,
-  CHORDS_VIEW_EXPANDER_ID,
   CHORDS_VIEW_ID,
-  CONTROL_PANEL_EXPANDER_ID,
   CONTROL_PANEL_ID,
   LOOPER_PANEL_ID,
   PLAY_PANEL_ID,
@@ -62,9 +60,7 @@ import {
 
 const stopStrummingElementIds = [
   CHORDS_VIEW_ID,
-  CHORDS_VIEW_EXPANDER_ID,
   CONTROL_PANEL_ID,
-  CONTROL_PANEL_EXPANDER_ID,
   STRUMMING_SETTINGS_PANEL_ID,
   LOOPER_PANEL_ID,
   AUTH_PANEL_ID,
