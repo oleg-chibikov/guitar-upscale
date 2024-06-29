@@ -8,14 +8,13 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
-import { Pattern } from "@/app/data/strummingData";
+import { StrummingPattern, formatStrums } from "@/app/data/strummingPatterns";
 import { Theme } from "@/app/data/theme";
-import { formatStrums } from "@/app/helpers/strummingHelper";
 import { selectUi } from "@/app/store/uiSlice";
 
 interface PatternListProps {
-  patterns: Pattern[];
-  onEdit: (pattern: Pattern) => void;
+  patterns: StrummingPattern[];
+  onEdit: (pattern: StrummingPattern) => void;
   onDelete: (id: number) => void;
 }
 

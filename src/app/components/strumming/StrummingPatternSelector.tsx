@@ -1,8 +1,10 @@
 import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
-import { Pattern } from "@/app/data/strummingData";
-import { chordStrummingPatterns } from "@/app/data/strummingPatterns";
+import {
+  StrummingPattern,
+  chordStrummingPatterns,
+  formatStrums,
+} from "@/app/data/strummingPatterns";
 import { getAllPatterns } from "@/app/engine/strummingPatternsStorage";
-import { formatStrums } from "@/app/helpers/strummingHelper";
 import {
   selectSettings,
   setStrummingPatternId,
@@ -14,7 +16,9 @@ const StrummingPatternSelector: React.FC = () => {
   const { strummingPatternId, strummingPatternChangedTrigger } =
     useSelector(selectSettings);
   const dispatch = useDispatch();
-  const [patterns, setPatterns] = useState<Pattern[]>(chordStrummingPatterns);
+  const [patterns, setPatterns] = useState<StrummingPattern[]>(
+    chordStrummingPatterns
+  );
 
   useEffect(() => {
     const allPatterns = getAllPatterns();

@@ -1,11 +1,11 @@
-import { Pattern } from "@/app/data/strummingData";
 import {
+  StrummingPattern,
   chordStrummingPatterns,
   lastStrummingPatternId,
 } from "@/app/data/strummingPatterns";
 
 // Create a map to hold all strumming patterns
-export const strummingPatternsMap = new Map<number, Pattern>();
+export const strummingPatternsMap = new Map<number, StrummingPattern>();
 
 // Initialize the map with predefined patterns
 chordStrummingPatterns.forEach((pattern) => {
@@ -14,9 +14,12 @@ chordStrummingPatterns.forEach((pattern) => {
 
 // Function to load patterns from LocalStorage and add them to the map
 function loadPatternsFromLocalStorage() {
+  if (!localStorage) {
+    return;
+  }
   const savedPatternsString = localStorage.getItem("strummingPatterns");
   if (savedPatternsString) {
-    const savedPatterns: Pattern[] = JSON.parse(savedPatternsString);
+    const savedPatterns: StrummingPattern[] = JSON.parse(savedPatternsString);
     savedPatterns.forEach((pattern) => {
       strummingPatternsMap.set(pattern.id, pattern);
     });
@@ -28,7 +31,7 @@ loadPatternsFromLocalStorage();
 
 // API functions to work with patterns in local storage
 
-export function addPattern(pattern: Pattern): void {
+export function addPattern(pattern: StrummingPattern): void {
   strummingPatternsMap.set(pattern.id, pattern);
   savePatternsToLocalStorage();
 }
@@ -38,33 +41,39 @@ export function deletePattern(id: number): void {
   savePatternsToLocalStorage();
 }
 
-export function editPattern(pattern: Pattern): void {
+export function editPattern(pattern: StrummingPattern): void {
   strummingPatternsMap.set(pattern.id, pattern);
   savePatternsToLocalStorage();
 }
 
-export function getPatternById(id: number): Pattern | undefined {
+export function getPatternById(id: number): StrummingPattern | undefined {
   return strummingPatternsMap.get(id);
 }
 
 function savePatternsToLocalStorage(): void {
+  if (!localStorage) {
+    return;
+  }
   const customPatterns = Array.from(strummingPatternsMap.values()).filter(
     (pattern) => pattern.id > lastStrummingPatternId
   );
   localStorage.setItem("strummingPatterns", JSON.stringify(customPatterns));
 }
 
-export function getAllPatterns(): Pattern[] {
+export function getAllPatterns(): StrummingPattern[] {
   return Array.from(strummingPatternsMap.values());
 }
 
-export function getCustomPatterns(): Pattern[] {
+export function getCustomPatterns(): StrummingPattern[] {
   return Array.from(strummingPatternsMap.values()).filter(
     (pattern) => pattern.id > lastStrummingPatternId
   );
 }
 
 export function clearCustomPatterns(): void {
+  if (!localStorage) {
+    return;
+  }
   for (const id of Array.from(strummingPatternsMap.keys())) {
     if (id > lastStrummingPatternId) {
       strummingPatternsMap.delete(id);
