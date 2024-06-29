@@ -14,7 +14,7 @@ chordStrummingPatterns.forEach((pattern) => {
 
 // Function to load patterns from LocalStorage and add them to the map
 function loadPatternsFromLocalStorage() {
-  if (!localStorage) {
+  if (typeof window === "undefined") {
     return;
   }
   const savedPatternsString = localStorage.getItem("strummingPatterns");
@@ -51,7 +51,7 @@ export function getPatternById(id: number): StrummingPattern | undefined {
 }
 
 function savePatternsToLocalStorage(): void {
-  if (!localStorage) {
+  if (typeof window === "undefined") {
     return;
   }
   const customPatterns = Array.from(strummingPatternsMap.values()).filter(
@@ -71,7 +71,7 @@ export function getCustomPatterns(): StrummingPattern[] {
 }
 
 export function clearCustomPatterns(): void {
-  if (!localStorage) {
+  if (typeof window === "undefined") {
     return;
   }
   for (const id of Array.from(strummingPatternsMap.keys())) {
