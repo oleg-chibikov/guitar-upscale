@@ -3,6 +3,8 @@ import {
   TICKS_IN_BEAT,
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
+  TimeSignature,
+  getTicksForTimeSignature,
 } from "@/app/data/clockConstants";
 import {
   AUTH_PANEL_ID,
@@ -13,11 +15,8 @@ import {
   SETTINGS_PANEL_ID,
   STRUMMING_SETTINGS_PANEL_ID,
 } from "@/app/data/elementIds";
-import {
-  Pattern,
-  TimeSignature,
-  getTicksForTimeSignature,
-} from "@/app/data/strummingData";
+
+import { StrummingPattern } from "@/app/data/strummingPatterns";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import { useCallback, useRef } from "react";
 import {
@@ -75,7 +74,7 @@ enum PromiseType {
   WaitTimeOver = 2,
 }
 
-const getIntervalsToSkip = (patternObject: Pattern) => {
+const getIntervalsToSkip = (patternObject: StrummingPattern) => {
   // Get the tick number since the last bar
   const ticksSinceLastBar = currentTick;
 
