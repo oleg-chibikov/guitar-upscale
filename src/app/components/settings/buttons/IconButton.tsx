@@ -38,7 +38,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
 }) => {
   const getColor = (): MuiIconButtonProps["color"] => {
     if (disabled) {
-      return "default";
+      return "warning";
     }
     if (isActive) {
       return activeBg || "primary";
