@@ -21,7 +21,7 @@ export const ScaleAndGroupSelector: React.FC = () => {
           : "text-foreground-dark bg-accented_background-dark"
       }`}
       style={{
-        gridTemplateColumns: "auto 75px",
+        gridTemplateColumns: "auto 85px",
       }}
     >
       <ControlWithLabel label="Style">

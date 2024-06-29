@@ -47,11 +47,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   };
 
   return (
-    <div
-      className={`${className} flex items-center justify-center ${
-        textContent ? "relative" : ""
-      }`}
-    >
+    <div className={`${className} flex items-center justify-center`}>
       <Tooltip title={tooltip}>
         <IconButton
           id={id}
@@ -65,16 +61,18 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
           }}
           {...rest}
         >
-          {textContent && (
-            <Typography
-              color={"ButtonText"}
-              variant="caption"
-              className={`z-40 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`}
-            >
-              {textContent}
-            </Typography>
-          )}
-          {icon}
+          <div className="relative inline-flex items-center justify-center">
+            {icon}
+            {textContent && (
+              <Typography
+                color={"ButtonText"}
+                variant="body2"
+                className="absolute"
+              >
+                {textContent}
+              </Typography>
+            )}
+          </div>
         </IconButton>
       </Tooltip>
     </div>

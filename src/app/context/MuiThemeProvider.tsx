@@ -20,6 +20,10 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
       },
       MuiSelect: {
         styleOverrides: {
+          icon: {
+            color: "rgba(108, 122, 137, 0.5)",
+            right: 0,
+          },
           select: {
             color: "black", // Set font color to black
             backgroundColor: "white", // Set background color to white

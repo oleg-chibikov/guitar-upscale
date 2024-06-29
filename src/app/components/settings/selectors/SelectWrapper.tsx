@@ -21,6 +21,7 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
 
   return (
     <Select
+      SelectDisplayProps={{ style: { paddingRight: "20px" } }}
       value={value}
       onChange={(event) =>
         onChange !== undefined &&
