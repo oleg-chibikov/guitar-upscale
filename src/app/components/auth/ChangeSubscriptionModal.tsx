@@ -1,5 +1,6 @@
-import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
+import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
+import { CHANGE_SUBSCRIPTION_DIALOG } from "@/app/data/elementIds";
 import {
   GetSubscriptionActionParams,
   getMakePurchase,
@@ -11,8 +12,8 @@ import {
 import { selectUi } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
 import { msToFormattedDate } from "@/lib/dateHelper";
-import { Alert, Button, Drawer } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { Alert, Button } from "@mui/material";
+import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalProps } from "../ModalProps";
 
@@ -29,11 +30,6 @@ export const ChangeSubscriptionModal: FC<
   const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
-  const [open, setOpen] = useState<boolean>(false); // this is needed to use animation when loaded first time
-
-  useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
 
   const makePurchase = getMakePurchase(
     params,
@@ -73,49 +69,43 @@ export const ChangeSubscriptionModal: FC<
   const newSubscriptionTitle = purchaseOption.tier;
 
   return (
-    <Drawer
-      slotProps={{
-        backdrop: { style: { backgroundColor: "rgba(0,0,0,0.9)" } },
-      }}
+    <DialogWrapper
+      darkBackdrop
       anchor="top"
-      open={open}
-      onClose={handleCloseModal}
-      aria-labelledby="change-subscription-modal"
+      isOpen={isOpen}
+      close={handleCloseModal}
+      headerText={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
+      id={CHANGE_SUBSCRIPTION_DIALOG}
     >
-      <DialogContentWrapper
-        headerText={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
-        onClose={handleCloseModal}
-      >
-        <Alert severity="info">
-          {existingSubscriptionCancellationMode === CancellationMode.Revoke
-            ? `Subscription was purchased recently${existingSubscriptionSubscribedDateText}. It will be revoked immediately and refunded, the new subscription will take effect immediately`
-            : `Subscription was purchased a while ago${existingSubscriptionSubscribedDateText}. It will be cancelled but not refunded. ${
-                changeAction === "Upgrade"
-                  ? " As the new subscription upgrades existing it will take effect immediately"
-                  : ` As the new subscription is a downgrade from existing - you'll own the existing one till its expiration date${existingSubscriptionExpirationDateText}. Then the new subscription will take effect`
-              }`}
-        </Alert>
+      <Alert severity="info">
+        {existingSubscriptionCancellationMode === CancellationMode.Revoke
+          ? `Subscription was purchased recently${existingSubscriptionSubscribedDateText}. It will be revoked immediately and refunded, the new subscription will take effect immediately`
+          : `Subscription was purchased a while ago${existingSubscriptionSubscribedDateText}. It will be cancelled but not refunded. ${
+              changeAction === "Upgrade"
+                ? " As the new subscription upgrades existing it will take effect immediately"
+                : ` As the new subscription is a downgrade from existing - you'll own the existing one till its expiration date${existingSubscriptionExpirationDateText}. Then the new subscription will take effect`
+            }`}
+      </Alert>
 
-        <Button
-          size="small"
-          onClick={handleCloseModal}
-          variant="contained"
-          color="secondary"
-          title={`Don't ${changeAction.toLocaleLowerCase()} subscription`}
-        >
-          {`No, I'd prefer to keep my existing subscription "${existingSubscriptionTitle}"`}
-        </Button>
-        <Button
-          disabled={disabledMessage !== undefined}
-          size="small"
-          onClick={makePurchase}
-          variant="contained"
-          color="primary"
-          title={`${changeAction} subscription`}
-        >
-          {`${changeAction} subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
-        </Button>
-      </DialogContentWrapper>
-    </Drawer>
+      <Button
+        size="small"
+        onClick={handleCloseModal}
+        variant="contained"
+        color="secondary"
+        title={`Don't ${changeAction.toLocaleLowerCase()} subscription`}
+      >
+        {`No, I'd prefer to keep my existing subscription "${existingSubscriptionTitle}"`}
+      </Button>
+      <Button
+        disabled={disabledMessage !== undefined}
+        size="small"
+        onClick={makePurchase}
+        variant="contained"
+        color="primary"
+        title={`${changeAction} subscription`}
+      >
+        {`${changeAction} subscription from "${existingSubscriptionTitle}" to "${newSubscriptionTitle}"`}
+      </Button>
+    </DialogWrapper>
   );
 };

@@ -29,6 +29,8 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
 
   return (
     <section
+      id={id}
+      aria-labelledby={id}
       style={style}
       className={`${
         theme === Theme.Light
@@ -40,7 +42,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
       {!headerText && onClose && (
         <CloseIcon onPress={onClose} className="absolute top-5 right-5 z-10" />
       )}
-      <DialogContent id={id} className={`${className} flex flex-col gap-2`}>
+      <DialogContent className={`${className} flex flex-col gap-2`}>
         {children}
       </DialogContent>
     </section>

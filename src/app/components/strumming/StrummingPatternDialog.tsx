@@ -1,5 +1,5 @@
-import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
-import { STRUMMING_PATTERN_EDITOR } from "@/app/data/elementIds";
+import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
+import { STRUMMING_PATTERN_EDITOR_DIALOG } from "@/app/data/elementIds";
 import {
   DEFAULT_TIME_SIGNATURE,
   Pattern,
@@ -21,7 +21,7 @@ import {
   setStrummingPatternEditorExpanded,
 } from "@/app/store/uiSlice";
 import AddIcon from "@mui/icons-material/Add";
-import { Dialog, IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
@@ -33,11 +33,6 @@ export const StrummingPatternDialog: React.FC = () => {
   const dispatch = useDispatch();
   const { strummingPatternEditorExpanded } = useSelector(selectUi);
   const { strummingPatternChangedTrigger } = useSelector(selectSettings);
-  const [open, setOpen] = useState<boolean>(false); // this is needed to use animation when loaded first time
-
-  useEffect(() => {
-    setOpen(strummingPatternEditorExpanded);
-  }, [strummingPatternEditorExpanded]);
 
   useEffect(() => {
     const customPatterns = getCustomPatterns();
@@ -73,35 +68,34 @@ export const StrummingPatternDialog: React.FC = () => {
   const close = () => dispatch(setStrummingPatternEditorExpanded(false));
 
   return (
-    <Dialog open={open} onClose={close} maxWidth="md">
-      <DialogContentWrapper
-        id={STRUMMING_PATTERN_EDITOR}
-        onClose={close}
-        headerText="Strumming pattern editor"
-      >
-        {currentPattern ? (
-          <PatternEditor
-            pattern={currentPattern}
-            onSave={handleSave}
-            onCancel={() => setCurrentPattern(null)}
+    <DialogWrapper
+      isOpen={strummingPatternEditorExpanded}
+      close={close}
+      id={STRUMMING_PATTERN_EDITOR_DIALOG}
+      headerText="Strumming pattern editor"
+    >
+      {currentPattern ? (
+        <PatternEditor
+          pattern={currentPattern}
+          onSave={handleSave}
+          onCancel={() => setCurrentPattern(null)}
+        />
+      ) : (
+        <>
+          <div>
+            <Tooltip title="Create New Pattern">
+              <IconButton onClick={handleNewPattern}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+          <PatternList
+            patterns={patterns}
+            onEdit={setCurrentPattern}
+            onDelete={handleDelete}
           />
-        ) : (
-          <>
-            <div>
-              <Tooltip title="Create New Pattern">
-                <IconButton onClick={handleNewPattern}>
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-            <PatternList
-              patterns={patterns}
-              onEdit={setCurrentPattern}
-              onDelete={handleDelete}
-            />
-          </>
-        )}
-      </DialogContentWrapper>
-    </Dialog>
+        </>
+      )}
+    </DialogWrapper>
   );
 };

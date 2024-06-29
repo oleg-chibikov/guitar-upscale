@@ -1,13 +1,12 @@
-import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
-import { StepSlider } from "@/app/components/settings/sliders/StepSlider";
+import { ValueModalControlDialog } from "@/app/components/settings/valueModalControls/ValueModalControlDialog";
 import { Theme } from "@/app/data/theme";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { selectUi } from "@/app/store/uiSlice";
-import { Alert, Box, Fade, Modal } from "@mui/material";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { Typography } from "@mui/material";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-interface ValueModalControlProps {
+export interface ValueModalControlProps {
   value: number;
   setValue: (value: number) => void;
   steps: number[];
@@ -15,6 +14,11 @@ interface ValueModalControlProps {
   label: string;
   postfix?: string;
 }
+
+export type StartPosition = {
+  x: number;
+  y: number;
+} | null;
 
 export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   value,
@@ -26,78 +30,11 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
 }) => {
   const { theme } = useSelector(selectUi);
   const [modalOpen, setModalOpen] = useState(false);
-  const [startPosition, setStartPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [startPosition, setStartPosition] = useState<StartPosition>(null);
   const [startIndex, setStartIndex] = useState<number>(steps.indexOf(value));
   const [highlight, setHighlight] = useState(false);
 
   const hasTouchInput = useInputChecker();
-
-  const handleMove = useCallback(
-    (x: number, y: number) => {
-      if (startPosition) {
-        const deltaX = x - startPosition.x;
-        const deltaY = y - startPosition.y;
-        const deltaValue = deltaX / 10 - deltaY / 10;
-        let newIndex = startIndex + Math.round(deltaValue);
-        if (newIndex < 0) newIndex = 0;
-        if (newIndex >= steps.length) newIndex = steps.length - 1;
-        setValue(steps[newIndex]);
-        setHighlight(true); // Trigger highlight
-      }
-    },
-    [startPosition, startIndex, steps, setValue]
-  );
-
-  const handleMouseMove = useCallback(
-    (event: MouseEvent) => handleMove(event.clientX, event.clientY),
-    [handleMove]
-  );
-
-  const handleTouchMove = useCallback(
-    (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        handleMove(touch.clientX, touch.clientY);
-      }
-    },
-    [handleMove]
-  );
-
-  useEffect(() => {
-    const handleMouseUp = () => {
-      setModalOpen(false);
-      setStartPosition(null);
-    };
-
-    if (modalOpen && startPosition) {
-      if (hasTouchInput) {
-        window.addEventListener("touchmove", handleTouchMove);
-        window.addEventListener("touchend", handleMouseUp);
-      } else {
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-      }
-    }
-
-    return () => {
-      if (hasTouchInput) {
-        window.removeEventListener("touchmove", handleTouchMove);
-        window.removeEventListener("touchend", handleMouseUp);
-      } else {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mouseup", handleMouseUp);
-      }
-    };
-  }, [
-    modalOpen,
-    startPosition,
-    handleMouseMove,
-    handleTouchMove,
-    hasTouchInput,
-  ]);
 
   useEffect(() => {
     if (highlight) {
@@ -116,7 +53,7 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
   };
 
   return (
-    <div className="relative">
+    <>
       <div
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
@@ -130,47 +67,25 @@ export const ValueModalControl: React.FC<ValueModalControlProps> = ({
         <div className="flex flex-col items-center gap-0.5 leading-none">
           <div>{value}</div>
           {postfix !== undefined && (
-            <div style={{ fontSize: 9 }}>{postfix}</div>
+            <Typography lineHeight={1.1} variant="overline">
+              {postfix}
+            </Typography>
           )}
         </div>
       </div>
-      <Modal
-        slotProps={{
-          backdrop: { style: { backgroundColor: "rgba(0,0,0,0.9)" } },
-        }}
-        open={modalOpen}
-        className="cursor-move"
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        closeAfterTransition
-      >
-        <Fade in={modalOpen} mountOnEnter unmountOnExit>
-          <Box
-            className={`absolute text-center text-sm top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 ${
-              theme === Theme.Light
-                ? "bg-accented_background-light text-foreground-light"
-                : "bg-accented_background-dark text-foreground-dark"
-            } shadow-xl transition-opacity duration-300 ${
-              modalOpen ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <DialogContentWrapper headerText={label}>
-              <Alert severity="info">
-                {(hasTouchInput ? "Swipe" : "Move the mouse") +
-                  " around while pressed"}
-              </Alert>
-              <StepSlider
-                onValueChange={() => null}
-                value={value}
-                steps={steps}
-                label={value + (postfix !== undefined ? " " + postfix : "")}
-                labelClass="w-20"
-              />
-            </DialogContentWrapper>
-          </Box>
-        </Fade>
-      </Modal>
-    </div>
+      <ValueModalControlDialog
+        value={value}
+        setValue={setValue}
+        steps={steps}
+        label={label}
+        postfix={postfix}
+        startIndex={startIndex}
+        setHighlight={setHighlight}
+        isOpen={modalOpen}
+        close={() => setModalOpen(false)}
+        startPosition={startPosition}
+        setStartPosition={setStartPosition}
+      />
+    </>
   );
 };

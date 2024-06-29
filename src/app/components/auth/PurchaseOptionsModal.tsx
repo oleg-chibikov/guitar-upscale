@@ -1,16 +1,17 @@
 import { UserAvatar } from "@/app/components/auth/UserAvatar";
-import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
+import { DialogWrapper } from "@/app/components/layout/DialogWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
+import { PURCHASE_OPTIONS_DIALOG } from "@/app/data/elementIds";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { selectAuth } from "@/app/store/authSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
-import { Alert, Drawer, Typography } from "@mui/material";
+import { Alert, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
 import { ModalProps } from "../ModalProps";
 import { PatreonModalAuthButton } from "./PatreonModalAuthButton";
@@ -44,12 +45,6 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   isOpen,
   handleCloseModal,
 }) => {
-  const [open, setOpen] = useState<boolean>(false); // this is needed to use animation when loaded first time
-
-  useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
-
   const { premiumFeatures, composerPremiumFeatures, explorerPremiumFeatures } =
     usePremiumFeatures();
   const keyValueCurrentFeatures = premiumFeatures as { [key: string]: string };
@@ -118,70 +113,67 @@ export const PurchaseOptionsModal: FC<ModalProps> = ({
   };
 
   return (
-    <Drawer
+    <DialogWrapper
       anchor="top"
-      open={open}
-      onClose={handleCloseModal}
-      aria-labelledby="purchase-options-modal"
+      isOpen={isOpen}
+      close={handleCloseModal}
+      id={PURCHASE_OPTIONS_DIALOG}
+      headerText={
+        (session?.user &&
+          (session.user.name ?? "") +
+            (session.user.email ? ` (${session.user.email})` : "")) ||
+        undefined
+      }
     >
-      <DialogContentWrapper onClose={handleCloseModal}>
-        <div className="flex flex-row gap-4 items-center justify-center">
-          {session !== null ? (
-            <UserAvatar
-              user={session.user}
-              className="left-4 top-4"
-              style={{ position: "absolute" }}
-            />
-          ) : null}
-          <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
-            {session?.user && (
-              <div className="flex flex-col gap-1 items-center justify-center">
-                <strong>{session.user.name}</strong>
-                <Typography>{session.user.email}</Typography>
-              </div>
-            )}
-
-            <>
-              <Typography>
-                {"Subscription level:"}{" "}
-                <strong>{subscriptionTier?.tier ?? "Not subscribed"}</strong>
-              </Typography>
-              {
-                <ul className="flex flex-col items-start">
-                  {Object.entries(featureNames).map(([key, value]) => (
-                    <li key={key} className="flex flex-row gap-2">
-                      {renderCurrentFeature(key as PremiumFeatureKeys)}
-                      {value}
-                    </li>
-                  ))}
-                </ul>
-              }
-            </>
-          </div>
+      <div className="flex flex-row gap-4 items-center justify-center">
+        {session !== null ? (
+          <UserAvatar
+            user={session.user}
+            className="left-4 top-4"
+            style={{ position: "absolute" }}
+          />
+        ) : null}
+        <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
+          <>
+            <Typography>
+              {"Subscription level:"}{" "}
+              <strong>{subscriptionTier?.tier ?? "Not subscribed"}</strong>
+            </Typography>
+            {
+              <ul className="flex flex-col items-start">
+                {Object.entries(featureNames).map(([key, value]) => (
+                  <li key={key} className="flex flex-row gap-2">
+                    {renderCurrentFeature(key as PremiumFeatureKeys)}
+                    {value}
+                  </li>
+                ))}
+              </ul>
+            }
+          </>
         </div>
-        {isOnline ? (
-          <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
-            {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
-            {hasDigitalGoodsService &&
-              (!subscriptionTier ||
-                subscriptionTier.provider ===
-                  SubscriptionProvider.GooglePlay) && (
-                <GooglePlayPurchaseSection
-                  onOptionSelected={(tier) => {
-                    setHighlightedOption(tier);
-                  }}
-                />
-              )}
-            {/* There should be a way for users to sign in to Patreon if they are
+      </div>
+      {isOnline ? (
+        <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+          {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
+          {hasDigitalGoodsService &&
+            (!subscriptionTier ||
+              subscriptionTier.provider ===
+                SubscriptionProvider.GooglePlay) && (
+              <GooglePlayPurchaseSection
+                onOptionSelected={(tier) => {
+                  setHighlightedOption(tier);
+                }}
+              />
+            )}
+          {/* There should be a way for users to sign in to Patreon if they are
             already subscribed (they can do it on the Website) */}
-            <PatreonModalAuthButton closeModal={handleCloseModal} />
-          </div>
-        ) : (
-          <Alert severity="warning">
-            {"Subscription options will be loaded when you're back online"}
-          </Alert>
-        )}
-      </DialogContentWrapper>
-    </Drawer>
+          <PatreonModalAuthButton closeModal={handleCloseModal} />
+        </div>
+      ) : (
+        <Alert severity="warning">
+          {"Subscription options will be loaded when you're back online"}
+        </Alert>
+      )}
+    </DialogWrapper>
   );
 };
