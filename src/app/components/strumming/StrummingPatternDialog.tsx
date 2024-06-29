@@ -2,7 +2,7 @@ import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { STRUMMING_PATTERN_EDITOR_DIALOG } from "@/app/data/elementIds";
 import {
   DEFAULT_TIME_SIGNATURE,
-  Pattern,
+  StrummingPattern,
   getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingPatterns";
 import {
@@ -28,8 +28,10 @@ import { PatternEditor } from "./PatternEditor";
 import { PatternList } from "./PatternList";
 
 export const StrummingPatternDialog: React.FC = () => {
-  const [patterns, setPatterns] = useState<Pattern[]>([]);
-  const [currentPattern, setCurrentPattern] = useState<Pattern | null>(null);
+  const [patterns, setPatterns] = useState<StrummingPattern[]>([]);
+  const [currentPattern, setCurrentPattern] = useState<StrummingPattern | null>(
+    null
+  );
   const dispatch = useDispatch();
   const { strummingPatternEditorExpanded } = useSelector(selectUi);
   const { strummingPatternChangedTrigger } = useSelector(selectSettings);
@@ -39,7 +41,7 @@ export const StrummingPatternDialog: React.FC = () => {
     setPatterns(customPatterns);
   }, [strummingPatternChangedTrigger]);
 
-  const handleSave = (pattern: Pattern) => {
+  const handleSave = (pattern: StrummingPattern) => {
     addPattern(pattern);
     setCurrentPattern(null);
     dispatch(setStrummingPatternId(pattern.id)); // select the new pattern automatically

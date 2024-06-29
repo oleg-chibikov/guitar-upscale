@@ -1,16 +1,14 @@
 import { StrumGrid } from "@/app/components/strumming/StrumGrid";
 import { EnumSelector } from "@/app/components/uiFramework/EnumSelector";
-import {
-  Pattern,
-  StrumDirection,
-  TimeSignature,
-} from "@/app/data/strummingData";
+import { TimeSignature } from "@/app/data/clockConstants";
+import { StrumDirection, StrummingPattern } from "@/app/data/strummingPatterns";
+
 import { Button, DialogActions, Typography } from "@mui/material";
 import React, { useCallback, useState } from "react";
 
 interface PatternEditorProps {
-  pattern: Pattern;
-  onSave: (pattern: Pattern) => void;
+  pattern: StrummingPattern;
+  onSave: (pattern: StrummingPattern) => void;
   onCancel: () => void;
 }
 

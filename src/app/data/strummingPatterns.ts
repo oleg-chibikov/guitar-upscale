@@ -7,7 +7,7 @@ import { TimeSignature } from "@/app/data/clockConstants";
 export const DEFAULT_TIME_SIGNATURE = TimeSignature.HALF_BEAT;
 
 let i = 0;
-export const chordStrummingPatterns: Pattern[] = [
+export const chordStrummingPatterns: StrummingPattern[] = [
   { id: ++i, timeSignature: DEFAULT_TIME_SIGNATURE, strums: ["↑"] },
   { id: ++i, timeSignature: DEFAULT_TIME_SIGNATURE, strums: ["↑", "↓"] },
   {
@@ -158,7 +158,7 @@ export const getDefaultSlotsForTimeSignature = (
   }
 };
 
-export interface Pattern {
+export interface StrummingPattern {
   id: number;
   timeSignature: TimeSignature;
   strums: StrumDirection[];

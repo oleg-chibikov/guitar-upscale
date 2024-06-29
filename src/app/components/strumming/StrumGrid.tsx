@@ -1,7 +1,7 @@
 import { BEATS_IN_BAR, TimeSignature } from "@/app/data/clockConstants";
 import {
-  Pattern,
   StrumDirection,
+  StrummingPattern,
   getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingPatterns";
 import { Theme } from "@/app/data/theme";
@@ -13,7 +13,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 interface StrumGridProps {
-  pattern: Pattern;
+  pattern: StrummingPattern;
   onStrum: (index: number, newValue: StrumDirection) => void;
   onAdd: () => void;
   onRemove: () => void;
