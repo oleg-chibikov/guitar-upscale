@@ -328,7 +328,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
     // always show Note for the 0 fret (open string)
     const displayMode =
-      stringOctaveNote.fret === 0 ? NoteDisplayMode.Note : noteDisplayMode;
+      stringOctaveNote.fret === baseNoteValue
+        ? NoteDisplayMode.Note
+        : noteDisplayMode;
     switch (displayMode) {
       case NoteDisplayMode.Note:
         return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
