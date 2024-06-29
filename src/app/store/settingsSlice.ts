@@ -1,13 +1,10 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  chordStrummingPatterns,
-  getPatternById,
-} from "../data/chordStrummingPatterns";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { getScalePattern, scalesMap } from "../data/scales";
+import { chordStrummingPatterns } from "../data/strummingPatterns";
 import {
   getCurrentShift,
   getShiftedNote,
@@ -28,6 +25,7 @@ import {
 } from "@/app/engine/chords/chordLookupBuilder";
 import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
+import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import {
   isMainClockActiveValue,
   resolveNextTick,
@@ -80,7 +78,7 @@ interface WithScaleIsBeingDetected {
 }
 
 interface WithCustomStrummingPatternId {
-  chordCustomStrummingPatternId: number;
+  strummingPatternId: number;
 }
 
 interface SettingsState
@@ -106,7 +104,7 @@ interface SettingsState
   chordInstrument: Instrument;
   reverbStrength: number;
   useChordAlteration: boolean;
-  chordCustomStrummingWaitForPatternFinish: boolean;
+  waitForPatternFinish: boolean;
   seamlessChordSwitching: boolean;
   isPlaying: boolean;
   isRecording: boolean;
@@ -115,7 +113,7 @@ interface SettingsState
   isLastEvent: boolean;
   looperStateUpdateTrigger: boolean;
   isLooperPlaying: boolean;
-  customStrummingPatternChangedTrigger: boolean;
+  strummingPatternChangedTrigger: boolean;
 }
 
 const initialState: SettingsState = {
@@ -138,8 +136,8 @@ const initialState: SettingsState = {
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
   useChordAlteration: false,
-  chordCustomStrummingPatternId: chordStrummingPatterns[5].id, // 5 is a pattern of a medium difficulty - not that simple as 0
-  chordCustomStrummingWaitForPatternFinish: true,
+  strummingPatternId: chordStrummingPatterns[5].id, // 5 is a pattern of a medium difficulty - not that simple as 0
+  waitForPatternFinish: true,
   seamlessChordSwitching: true,
   isMetronomeActive: false,
   isPlaying: false,
@@ -153,7 +151,7 @@ const initialState: SettingsState = {
   isLastEvent: false,
   looperStateUpdateTrigger: false,
   isLooperPlaying: false,
-  customStrummingPatternChangedTrigger: false,
+  strummingPatternChangedTrigger: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -170,10 +168,9 @@ export let instrumentValue: Instrument = initialState.instrument;
 export let chordInstrumentValue: Instrument = initialState.chordInstrument;
 export let reverbStrengthValue: number = initialState.reverbStrength;
 export let useChordAlterationValue: boolean = initialState.useChordAlteration;
-export let chordCustomStrummingPatternIdValue: number =
-  initialState.chordCustomStrummingPatternId;
-export let chordCustomStrummingWaitForPatternFinishValue: boolean =
-  initialState.chordCustomStrummingWaitForPatternFinish;
+export let strummingPatternIdValue: number = initialState.strummingPatternId;
+export let waitForPatternFinishValue: boolean =
+  initialState.waitForPatternFinish;
 export let seamlessChordSwitchingValue: boolean =
   initialState.seamlessChordSwitching;
 export let isMetronomeActiveValue = initialState.isMetronomeActive;
@@ -333,8 +330,8 @@ const updateStrummingPatternId = (
   state: WithCustomStrummingPatternId,
   id: number
 ) => {
-  state.chordCustomStrummingPatternId = id;
-  chordCustomStrummingPatternIdValue = id;
+  state.strummingPatternId = id;
+  strummingPatternIdValue = id;
 };
 
 export const moveCurrentPlayPosition = (type: PauseResolveValue) => {
@@ -383,9 +380,8 @@ export const settingsSlice = createSlice({
       chordInstrumentValue = state.chordInstrument;
       reverbStrengthValue = state.reverbStrength;
       useChordAlterationValue = state.useChordAlteration;
-      chordCustomStrummingPatternIdValue = state.chordCustomStrummingPatternId;
-      chordCustomStrummingWaitForPatternFinishValue =
-        state.chordCustomStrummingWaitForPatternFinish;
+      strummingPatternIdValue = state.strummingPatternId;
+      waitForPatternFinishValue = state.waitForPatternFinish;
       seamlessChordSwitchingValue = state.seamlessChordSwitching;
       isMetronomeActiveValue = state.isMetronomeActive;
       chordStrummingDelayMsValue = state.chordStrummingDelayMs;
@@ -516,15 +512,12 @@ export const settingsSlice = createSlice({
       state.useChordAlteration = action.payload;
       useChordAlterationValue = action.payload;
     },
-    setChordCustomStrummingPatternId(state, action: PayloadAction<number>) {
+    setStrummingPatternId(state, action: PayloadAction<number>) {
       updateStrummingPatternId(state, action.payload);
     },
-    setChordCustomStrummingWaitForPatternFinish(
-      state,
-      action: PayloadAction<boolean>
-    ) {
-      state.chordCustomStrummingWaitForPatternFinish = action.payload;
-      chordCustomStrummingWaitForPatternFinishValue = action.payload;
+    setWaitForPatternFinish(state, action: PayloadAction<boolean>) {
+      state.waitForPatternFinish = action.payload;
+      waitForPatternFinishValue = action.payload;
     },
     setSeamlessChordSwitching(state, action: PayloadAction<boolean>) {
       state.seamlessChordSwitching = action.payload;
@@ -592,15 +585,12 @@ export const settingsSlice = createSlice({
       state.isLooperPlaying = action.payload;
     },
     triggerCustomStrummingPatternChanged(state) {
-      state.customStrummingPatternChangedTrigger =
-        !state.customStrummingPatternChangedTrigger;
+      state.strummingPatternChangedTrigger =
+        !state.strummingPatternChangedTrigger;
     },
     checkCustomStrummingPatternAfterDeletion(state) {
-      if (!getPatternById(state.chordCustomStrummingPatternId)) {
-        updateStrummingPatternId(
-          state,
-          initialState.chordCustomStrummingPatternId
-        );
+      if (!getPatternById(state.strummingPatternId)) {
+        updateStrummingPatternId(state, initialState.strummingPatternId);
       }
     },
   },
@@ -625,8 +615,8 @@ export const {
   setChordInstrumentGroup,
   setReverbStrength,
   setUseChordAlteration,
-  setChordCustomStrummingPatternId,
-  setChordCustomStrummingWaitForPatternFinish,
+  setStrummingPatternId,
+  setWaitForPatternFinish,
   setSeamlessChordSwitching,
   setIsMetronomeActive,
   setIsPlaying,

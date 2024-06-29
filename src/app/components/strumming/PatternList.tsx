@@ -60,9 +60,15 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
               : "bg-accented_background-dark"
           } shadow-md`}
         >
-          <table className="w-full">
-            <thead>
-              <tr>
+          <table className="w-full relative">
+            <thead className="sticky top-0 z-10">
+              <tr
+                className={
+                  theme === Theme.Light
+                    ? "bg-accented_background-light"
+                    : "bg-accented_background-dark"
+                }
+              >
                 {["Pattern", "Time", "Edit", "Delete"].map((header, index) => (
                   <th
                     key={index}

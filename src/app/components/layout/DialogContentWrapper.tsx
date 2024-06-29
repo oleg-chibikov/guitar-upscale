@@ -1,4 +1,4 @@
-import { CloseIcon } from "@/app/components/CloseIcon";
+import { CloseIcon } from "@/app/components/layout/CloseIcon";
 import { DialogHeader } from "@/app/components/layout/DialogHeader";
 import { Theme } from "@/app/data/theme";
 import { WithChildren } from "@/app/helpers/withChildren";
@@ -26,21 +26,23 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
   headerText,
 }) => {
   const { theme } = useSelector(selectUi);
-  const baseClasses = `flex flex-col max-h-full overflow-auto overscroll-contain border-2 gap-2`;
-  const themeClasses =
-    theme === Theme.Light
-      ? "bg-accented_background-light border-border-light text-foreground-light"
-      : "bg-accented_background-dark border-border-dark text-foreground-dark";
 
   return (
-    <DialogContent
-      id={id}
-      className={`${baseClasses} ${themeClasses} ${className}`.trim()}
+    <section
       style={style}
+      className={`${
+        theme === Theme.Light
+          ? "bg-accented_background-light border-border-light text-foreground-light"
+          : "bg-accented_background-dark border-border-dark text-foreground-dark"
+      } border-2`}
     >
-      {headerText && <DialogHeader text={headerText} />}
-      {onClose && <CloseIcon onPress={onClose} />}
-      {children}
-    </DialogContent>
+      {headerText && <DialogHeader text={headerText} onClose={onClose} />}
+      {!headerText && onClose && (
+        <CloseIcon onPress={onClose} className="absolute top-5 right-5 z-10" />
+      )}
+      <DialogContent id={id} className={`${className} flex flex-col gap-2`}>
+        {children}
+      </DialogContent>
+    </section>
   );
 };

@@ -84,7 +84,6 @@ export const ChangeSubscriptionModal: FC<
     >
       <DialogContentWrapper
         headerText={`Are you sure you would like to ${changeAction.toLocaleLowerCase()} your "${existingSubscriptionTitle}" subscription?`}
-        className="justify-center text-center items-stretch"
         onClose={handleCloseModal}
       >
         <Alert severity="info">

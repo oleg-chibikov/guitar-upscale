@@ -46,7 +46,6 @@ export const CancelSubscriptionModal: FC<
       <Slide direction="down" in={isOpen} mountOnEnter unmountOnExit>
         <DialogContentWrapper
           headerText={`Are you sure you would like to cancel your "${title}" subscription?`}
-          className="justify-center text-center items-stretch"
           onClose={handleCloseModal}
         >
           {cancellationMode !== undefined ? (

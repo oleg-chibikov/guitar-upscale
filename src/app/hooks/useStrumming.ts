@@ -1,4 +1,3 @@
-import { getPatternById } from "@/app/data/chordStrummingPatterns";
 import {
   AUTH_PANEL_ID,
   CHORDS_VIEW_ID,
@@ -19,6 +18,7 @@ import {
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/engine/clock/clockConstants";
+import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import { useCallback, useRef } from "react";
 import {
   currentTick,
@@ -51,11 +51,11 @@ import {
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
-  chordCustomStrummingPatternIdValue,
-  chordCustomStrummingWaitForPatternFinishValue,
   isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
+  strummingPatternIdValue,
   useChordAlterationValue,
+  waitForPatternFinishValue,
 } from "../store/settingsSlice";
 
 const stopStrummingElementIds = [
@@ -194,7 +194,7 @@ export const useStrumming = (
       return;
     }
 
-    const currentPatternId = chordCustomStrummingPatternIdValue;
+    const currentPatternId = strummingPatternIdValue;
     const patternObject = getPatternById(currentPatternId);
     if (!patternObject) {
       console.error("No strumming pattern selected!");
@@ -548,7 +548,7 @@ export const useStrumming = (
 
           while (isChordClicked(chordName)) {
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
-              if (!chordCustomStrummingWaitForPatternFinishValue) {
+              if (!waitForPatternFinishValue) {
                 // early break pattern only when the checkbox is off
                 if (!isChordClicked(chordName)) {
                   // already released mouse/touch - don't play the strumming
@@ -561,7 +561,7 @@ export const useStrumming = (
             resetStrummingPosition();
           }
 
-          if (chordCustomStrummingWaitForPatternFinishValue) {
+          if (waitForPatternFinishValue) {
             setGracePeriodState(true);
             startChordGracePeriod(chordName, clickNumber);
             // Wait GRACE_INTERVALS intervals - This gives additional opportunity to press another chord and repeat the pattern

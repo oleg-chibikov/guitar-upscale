@@ -11,3 +11,6 @@ WaitForNextHalfBeat could make the melody offbeat - we need to store what tick t
 
 Chord detector is poor comparing to the other guitar sites. It lacks music theory knowledge. Take inspiration from https://www.oolimo.com/en/guitar-chords/analyze
 or https://jguitar.com/chordname
+
+common component for drawers and dialogs
+rename layout folder in components

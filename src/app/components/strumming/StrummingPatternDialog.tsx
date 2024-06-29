@@ -6,52 +6,53 @@ import {
   getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingData";
 import {
+  addPattern,
+  deletePattern,
+  getCustomPatterns,
+} from "@/app/engine/strummingPatternsStorage";
+import {
   checkCustomStrummingPatternAfterDeletion,
-  setChordCustomStrummingPatternId,
+  selectSettings,
+  setStrummingPatternId,
   triggerCustomStrummingPatternChanged,
 } from "@/app/store/settingsSlice";
+import {
+  selectUi,
+  setStrummingPatternEditorExpanded,
+} from "@/app/store/uiSlice";
 import AddIcon from "@mui/icons-material/Add";
 import { Dialog, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
 import { PatternList } from "./PatternList";
 
-interface StrummingPatternDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
-  open,
-  onClose,
-}) => {
+export const StrummingPatternDialog: React.FC = () => {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [currentPattern, setCurrentPattern] = useState<Pattern | null>(null);
   const dispatch = useDispatch();
+  const { strummingPatternEditorExpanded } = useSelector(selectUi);
+  const { strummingPatternChangedTrigger } = useSelector(selectSettings);
+  const [open, setOpen] = useState<boolean>(false); // this is needed to use animation when loaded first time
 
   useEffect(() => {
-    const savedPatterns = localStorage.getItem("strummingPatterns");
-    if (savedPatterns) {
-      setPatterns(JSON.parse(savedPatterns));
-    }
-  }, []);
+    setOpen(strummingPatternEditorExpanded);
+  }, [strummingPatternEditorExpanded]);
+
+  useEffect(() => {
+    const customPatterns = getCustomPatterns();
+    setPatterns(customPatterns);
+  }, [strummingPatternChangedTrigger]);
 
   const handleSave = (pattern: Pattern) => {
-    const updatedPatterns = patterns.some((p) => p.id === pattern.id)
-      ? patterns.map((p) => (p.id === pattern.id ? pattern : p))
-      : [...patterns, pattern];
-    setPatterns(updatedPatterns);
-    localStorage.setItem("strummingPatterns", JSON.stringify(updatedPatterns));
+    addPattern(pattern);
     setCurrentPattern(null);
-    dispatch(setChordCustomStrummingPatternId(pattern.id)); // select the new pattern automatically
+    dispatch(setStrummingPatternId(pattern.id)); // select the new pattern automatically
     dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
   const handleDelete = (id: number) => {
-    const newPatterns = patterns.filter((p) => p.id !== id);
-    setPatterns(newPatterns);
-    localStorage.setItem("strummingPatterns", JSON.stringify(newPatterns));
+    deletePattern(id);
     dispatch(checkCustomStrummingPatternAfterDeletion()); // if the current pattern was deleted - set a default one
     dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
@@ -65,15 +66,17 @@ export const StrummingPatternDialog: React.FC<StrummingPatternDialogProps> = ({
         getDefaultSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE)
       ).fill(""),
     });
-    dispatch(setChordCustomStrummingPatternId(newId)); // select the new pattern automatically
+    dispatch(setStrummingPatternId(newId)); // select the new pattern automatically
     dispatch(triggerCustomStrummingPatternChanged()); // to refresh the patterns dropdown
   };
 
+  const close = () => dispatch(setStrummingPatternEditorExpanded(false));
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md">
+    <Dialog open={open} onClose={close} maxWidth="md">
       <DialogContentWrapper
         id={STRUMMING_PATTERN_EDITOR}
-        onClose={onClose}
+        onClose={close}
         headerText="Strumming pattern editor"
       >
         {currentPattern ? (

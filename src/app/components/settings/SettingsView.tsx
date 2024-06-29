@@ -38,10 +38,6 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
     >
       <DialogContentWrapper
         id={SETTINGS_PANEL_ID}
-        className={`h-full`}
-        style={{
-          maxWidth: "80vw",
-        }}
         onClose={() => {
           dispatch(setSettingsExpanded(false));
         }}

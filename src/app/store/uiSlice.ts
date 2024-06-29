@@ -22,6 +22,7 @@ interface UiState {
   chordsExpanded: boolean;
   controlPanelExpanded: boolean;
   strummingSettingsExpanded: boolean;
+  strummingPatternEditorExpanded: boolean;
   showAlert: boolean;
   alertType: AlertType;
   alertTimeout: number;
@@ -46,6 +47,7 @@ const initialState: UiState = {
   chordsExpanded: true,
   controlPanelExpanded: true,
   strummingSettingsExpanded: false,
+  strummingPatternEditorExpanded: false,
   showAlert: false,
   alertTimeout: 2000,
   alertType: AlertType.Neutral,
@@ -109,6 +111,9 @@ export const uiSlice = createSlice({
     },
     setStrummingSettingsExpanded(state, action: PayloadAction<boolean>) {
       state.strummingSettingsExpanded = action.payload;
+    },
+    setStrummingPatternEditorExpanded(state, action: PayloadAction<boolean>) {
+      state.strummingPatternEditorExpanded = action.payload;
     },
     setAndShowAlert(
       state,
@@ -207,6 +212,7 @@ export const {
   setChordsExpanded,
   setControlPanelExpanded,
   setStrummingSettingsExpanded,
+  setStrummingPatternEditorExpanded,
   setAndShowAlert,
   hideAlert,
   setSuggestedScales,

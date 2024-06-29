@@ -3,7 +3,7 @@ import {
   selectUi,
   setAndShowAlert,
 } from "@/app/store/uiSlice";
-import { Button, Drawer, Typography } from "@mui/material";
+import { Button, Dialog, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
 import { DialogContentWrapper } from "@/app/components/layout/DialogContentWrapper";
@@ -46,30 +46,27 @@ export const ScaleDetectionAlert: FC = () => {
   };
 
   return (
-    <Drawer
+    <Dialog
       open={open}
       onClose={handleCloseModal}
       aria-labelledby="suggested-scales-modal"
-      anchor="top"
     >
       <DialogContentWrapper
         headerText="Matching scales"
-        className={"text-center items-center justify-center w-96"}
         onClose={handleCloseModal}
+        className="overflow-y-auto max-h-48"
       >
-        <div className="max-h-96 mt-2 overflow-auto flex flex-col gap-2">
-          {suggestedScales?.map((scaleAndGroup) => (
-            <Button
-              className="w-full"
-              variant="contained"
-              color="primary"
-              onClick={() => handleButtonClick(scaleAndGroup)}
-            >
-              <Typography noWrap>{formatScale(scaleAndGroup)}</Typography>
-            </Button>
-          ))}
-        </div>
+        {suggestedScales?.map((scaleAndGroup) => (
+          <Button
+            className="w-full"
+            variant="contained"
+            color="primary"
+            onClick={() => handleButtonClick(scaleAndGroup)}
+          >
+            <Typography noWrap>{formatScale(scaleAndGroup)}</Typography>
+          </Button>
+        ))}
       </DialogContentWrapper>
-    </Drawer>
+    </Dialog>
   );
 };
