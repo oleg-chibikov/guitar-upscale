@@ -1,10 +1,6 @@
 import { Expander } from "@/app/components/uiFramework/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import {
-  NoteChordMode,
-  getChordName,
-  isAdvancedMode,
-} from "@/app/data/chordModes";
+import { ChordMode, getChordName, isAdvancedMode } from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
@@ -87,12 +83,12 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     ? premiumFeatures.advancedChords === true
     : false; // TODO: so-so protection:)
 
-  const checkIsHiddenMode = (noteChordMode: NoteChordMode) =>
-    !hasAdvancedChords && isAdvancedMode(noteChordMode.mode);
+  const checkIsHiddenMode = (mode: ChordMode) =>
+    !hasAdvancedChords && isAdvancedMode(mode);
 
   const totalRows = chords.length - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
   const totalColumns = chords[0].modes.filter(
-    (x) => !checkIsHiddenMode(x)
+    (x) => !checkIsHiddenMode(x.mode)
   ).length;
 
   return (
@@ -124,7 +120,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
         {chords.flatMap((noteChord) =>
           noteChord.modes.map((noteChordMode) => {
             const isHidden =
-              checkIsHiddenMode(noteChordMode) ||
+              checkIsHiddenMode(noteChordMode.mode) ||
               (!useSharpChords && isSharp(noteChord.note));
             const title = getChordName(noteChord.note, noteChordMode.mode);
 
@@ -132,7 +128,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
               <ChordButton
                 key={title}
                 isHidden={isHidden}
-                noteChordMode={noteChordMode}
+                variations={noteChordMode.variations}
                 chordName={title}
                 onStrummingStateChange={(value) => {
                   if (!isMobileDeviceValue) {
