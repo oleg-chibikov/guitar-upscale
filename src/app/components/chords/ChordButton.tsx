@@ -208,7 +208,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       const params: ChordPlayParameters = {
         ...metadata,
         chordName,
-        noteChordMode,
+        variations: noteChordMode.variations,
         delayMs,
         reverse: isAlternateRef.current,
       };

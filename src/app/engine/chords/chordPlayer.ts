@@ -1,4 +1,4 @@
-import { NoteChordMode } from "@/app/data/chordModes";
+import {} from "@/app/data/chordModes";
 import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
 import { Chord } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
@@ -7,7 +7,7 @@ import { ChordMetadata, NotePlayEventBus } from "../eventBus";
 
 export type ChordPlayParameters = ChordMetadata & {
   chordName: string;
-  noteChordMode: NoteChordMode;
+  variations: Chord[];
   delayMs?: number;
   notesToPlay?: number;
   reverse: boolean;
@@ -48,27 +48,25 @@ const playVariation = async (
 };
 
 export const playRandomChordVariation = async (params: ChordPlayParameters) => {
-  if (!params.noteChordMode.variations.length) {
+  if (!params.variations.length) {
     return;
   }
-  const randomVariation = selectRandomVariation(
-    params.noteChordMode.variations
-  );
+  const randomVariation = selectRandomVariation(params.variations);
   await playVariation(randomVariation, "random", params);
 };
 
 export const playFirstChordVariation = async (params: ChordPlayParameters) => {
-  if (!params.noteChordMode.variations.length) {
+  if (!params.variations.length) {
     return;
   }
-  const variation = params.noteChordMode.variations[0];
+  const variation = params.variations[0];
   await playVariation(variation, "first", params);
 };
 
 export const playPreferredChordVariation = async (
   params: ChordPlayParameters
 ) => {
-  if (!params.noteChordMode.variations.length) {
+  if (!params.variations.length) {
     return;
   }
   const preferredVariations = chordsGenerator.chordNotesByName.get(
@@ -82,7 +80,7 @@ export const playPreferredChordVariation = async (
 export const playPreferredChordVariationWithMinimumNotes = async (
   params: ChordPlayParameters
 ) => {
-  if (!params.noteChordMode.variations.length) {
+  if (!params.variations.length) {
     return;
   }
   const preferredVariations = chordsGenerator.chordNotesByName.get(
@@ -100,7 +98,7 @@ export const playPreferredChordVariationWithMinimumNotes = async (
 export const playPreferredChordVariationWithMaximumNotes = async (
   params: ChordPlayParameters
 ) => {
-  if (!params.noteChordMode.variations.length) {
+  if (!params.variations.length) {
     return;
   }
   const preferredVariations = chordsGenerator.chordNotesByName.get(
@@ -116,7 +114,7 @@ export const playPreferredChordVariationWithMaximumNotes = async (
 };
 
 export const playAllVariations = async (params: ChordPlayParameters) => {
-  for (const variation of params.noteChordMode.variations) {
+  for (const variation of params.variations) {
     await playVariation(variation, "combined", params);
     await sleep(1000);
   }
@@ -128,12 +126,12 @@ export const playRoundRobin = async (params: ChordPlayParameters) => {
     currentVariation = 0;
   } else {
     currentVariation++;
-    if (currentVariation >= params.noteChordMode.variations.length) {
+    if (currentVariation >= params.variations.length) {
       currentVariation = 0;
     }
   }
   await playVariation(
-    params.noteChordMode.variations[currentVariation],
+    params.variations[currentVariation],
     "round robin",
     params
   );
