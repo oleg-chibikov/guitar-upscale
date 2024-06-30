@@ -35,7 +35,6 @@ class ChordsGenerator {
   chordNotesByName = new Map<string, ChordPreferredVariations>();
 
   process(neck: Neck, useAdvancedChords: boolean, capo: number): NoteChords[] {
-    return []; // TODO: REMOVE!
     this.capo = capo;
     this.neck = neck;
     this.useAdvancedChords = useAdvancedChords;
