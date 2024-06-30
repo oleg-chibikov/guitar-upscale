@@ -14,3 +14,10 @@ or https://jguitar.com/chordname
 
 common component for drawers and dialogs
 rename layout folder in components
+
+change instruments and skins only online
+piano roll editor for looper/recording
+tunings - build them smart (not hardcode)
+skin selection based on number of strings
+slash chords
+async build chords

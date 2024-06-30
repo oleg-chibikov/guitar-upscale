@@ -151,7 +151,7 @@ export const Fretboard: React.FC = () => {
           <GuitarImage
             // className={!highResLoaded ? "collapse" : undefined}
             asset={
-              "https://cdn.statically.io/gh/oleg-chibikov/guitar-upscale-assets/main" +
+              "https://raw.githubusercontent.com/oleg-chibikov/guitar-upscale-assets/main/" +
               assets[1]
             }
             // onLoad={() => {

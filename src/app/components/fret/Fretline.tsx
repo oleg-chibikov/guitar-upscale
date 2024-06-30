@@ -16,7 +16,7 @@ const calculateTop = (string: number, fret: number, modifiers: number[]) => {
     return 0;
   }
 
-  const baseMultipliers = [-0.4, -0.3, -0.2, -0.1, 0.2, 0.3, 0.4, 0.5];
+  const baseMultipliers = [-0.4, -0.3, -0.2, -0.1, 0.2, 0.3, 0.35, 0.5];
   const multiplier =
     string < baseMultipliers.length ? baseMultipliers[string] : 0.3;
 
@@ -52,9 +52,9 @@ const getParametersForSkin = (skin?: Skin) => {
       };
     case Skin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
       return {
-        height: 25,
+        height: 23,
         widthStep: 10.34,
-        stringTiltModifiers: [2.5, 2, 1.4, -0.1, 1.7, 2.2, 2.5, 3],
+        stringTiltModifiers: [1.4, 0, -1.8, -7, 5, 5.5, 6, 5.5],
       };
     case Skin.Ibanez_RG9PB_TGF:
       return {
