@@ -1,11 +1,11 @@
 import {
   ChordMode,
-  NoteChords,
+  ChordModeVariationsContainer,
   chordModes,
-  getChordName,
   isAdvancedMode,
 } from "@/app/data/chordModes";
 import {
+  Chord,
   FingerPosition,
   NOTE_COUNT,
   Note,
@@ -24,7 +24,6 @@ type ChordBuilderInfo = {
 };
 
 class ChordsGenerator {
-  private chordsByNote: NoteChords[] = [];
   //private allSlashChords = new Map<string, UltimateSlashChordInfoVariation[]>();
   private useAdvancedChords = false;
   private capo = 0;
@@ -32,25 +31,12 @@ class ChordsGenerator {
   private absoluteMaxFretIndex = 0;
   private neck: Neck = [];
 
-  chordNotesByName = new Map<string, ChordPreferredVariations>();
-
-  process(neck: Neck, useAdvancedChords: boolean, capo: number): NoteChords[] {
+  processInWorker(neck: Neck, useAdvancedChords: boolean, capo: number): void {
     this.capo = capo;
     this.neck = neck;
     this.useAdvancedChords = useAdvancedChords;
     this.absoluteMaxFretIndex = neck[0].length - 1;
-    this.chordNotesByName.clear();
-    // init again for the new processing
-    this.chordsByNote = [];
-    // init all notes;
-    for (let note = 0; note < NOTE_COUNT; note++) {
-      const modes = chordModes.map((x) => ({
-        mode: x,
-        variations: [],
-      }));
-      this.chordsByNote[note] = { note, modes };
-    }
-    //this.allSlashChords = new Map<string, UltimateSlashChordInfoVariation[]>();
+
     chordModes.forEach((chordMode, index) => {
       if (chordMode.intervals.length > this.neck.length) {
         // cannot build this chord on the given guitar - it has more notes that the strings guitar has
@@ -62,10 +48,18 @@ class ChordsGenerator {
         return;
       }
 
-      this.processChordMode(chordMode, index);
+      const chordModeVariationsContainer = this.processChordMode(chordMode);
+
+      // Post a message for each processed chord mode
+      self.postMessage({
+        type: "chordModeProcessed",
+        chordModeVariationsContainer,
+        index,
+      });
     });
 
-    return this.chordsByNote;
+    // Post a message when all processing is complete
+    self.postMessage({ type: "processingComplete" });
   }
 
   private buildIntervalsWithoutPerfectFifth = (chordMode: ChordMode) => {
@@ -311,9 +305,8 @@ class ChordsGenerator {
   };
 
   private processIntervalsInChordMode = (
-    chordMode: ChordMode,
-    modeIndex: number,
-    intervalsToUse: number[]
+    intervalsToUse: number[],
+    variationsToFill: Chord[][]
   ) => {
     for (
       let stringIndex = this.neck.length - 1; // starting from the lowest (thickest) string
@@ -337,33 +330,51 @@ class ChordsGenerator {
           currentStringOctaveNote
         );
 
-        // these objects are pre-created in the process function, no need to worry that it might not exist
-        const noteMode = this.chordsByNote[currentStringOctaveNote.note];
-        const variationsContainer = noteMode.modes[modeIndex];
+        const variationsForNote =
+          variationsToFill[currentStringOctaveNote.note] ?? [];
 
         for (const builder of newVariationsForNoteAndMode) {
-          variationsContainer.variations.push(builder.variation);
+          variationsForNote.push(builder.variation);
         }
-        noteMode.modes[modeIndex] = variationsContainer;
-        this.chordsByNote[currentStringOctaveNote.note] = noteMode;
+
+        variationsToFill[currentStringOctaveNote.note] = variationsForNote;
       }
     }
   };
 
-  private processChordMode = (chordMode: ChordMode, modeIndex: number) => {
-    this.processIntervalsInChordMode(chordMode, modeIndex, chordMode.intervals);
+  private processChordMode = (chordMode: ChordMode) => {
+    const variationsByNote: Chord[][] = [];
+    const preferredVariationsByNote: (ChordPreferredVariations | undefined)[] =
+      [];
+    const dataForChordMode: ChordModeVariationsContainer = {
+      chordModeVariations: { chordMode, variationsByNote },
+      preferredVariationsByNote,
+    };
+    this.processIntervalsInChordMode(chordMode.intervals, variationsByNote);
     const intervalsWithoutPerfectFifth =
       this.buildIntervalsWithoutPerfectFifth(chordMode);
     if (intervalsWithoutPerfectFifth) {
       this.processIntervalsInChordMode(
-        chordMode,
-        modeIndex,
-        intervalsWithoutPerfectFifth
+        intervalsWithoutPerfectFifth,
+        variationsByNote
       );
     }
 
-    // after the mode has been processed we need to find the preferred variation for it and put into the dedicated map
-    this.findAndStorePreferredVariationsForChordMode(modeIndex, chordMode);
+    for (let note = 0; note < NOTE_COUNT; note++) {
+      const noteChords = variationsByNote[note];
+      if (!noteChords?.length) {
+        continue;
+      }
+
+      // after the mode has been processed we need to find the preferred variation for it and put into the dedicated map
+      preferredVariationsByNote[note] = getPreferredChordVariations(
+        noteChords,
+        chordMode.name === "5" ? "low" : "high", // Power chords prefer lower strings
+        this.neck.length
+      );
+    }
+
+    return dataForChordMode;
   };
 
   private processFret = (
@@ -401,37 +412,6 @@ class ChordsGenerator {
       newMax
     );
   };
-
-  private findAndStorePreferredVariationsForChordMode(
-    modeIndex: number,
-    chordMode: ChordMode
-  ) {
-    for (let note = 0; note < NOTE_COUNT; note++) {
-      const noteChords = this.chordsByNote[note];
-      const dataForCurrentMode = noteChords.modes[modeIndex];
-
-      const allVariationsForCurrentMode = dataForCurrentMode.variations;
-      // if (modeIndex === 0 && note === Note.E) {
-      //   const variations = allVariationsForCurrentMode.filter(
-      //     (x) =>
-      //       x.filter((x) => x).length === 6 &&
-      //       x[5]?.fret === 0 &&
-      //       x[4]?.fret === 2 &&
-      //       x[3]?.fret === 2
-      //   );
-      //   debugger;
-      // }
-      if (allVariationsForCurrentMode.length) {
-        const preferredVariations = getPreferredChordVariations(
-          allVariationsForCurrentMode,
-          chordMode.name === "5" ? "low" : "high", // Power chords prefer lower strings
-          this.neck.length
-        );
-        const chordName = getChordName(note, chordMode);
-        this.chordNotesByName.set(chordName, preferredVariations);
-      }
-    }
-  }
 }
 
 export const chordsGenerator = new ChordsGenerator();

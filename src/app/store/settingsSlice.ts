@@ -17,13 +17,9 @@ import {
   Neck,
 } from "../engine/generateNeckRepresentation";
 
-import { NoteChords } from "@/app/data/chordModes";
+import { ChordModeVariations } from "@/app/data/chordModes";
 import { MAX_VOLUME } from "@/app/data/volume";
-import {
-  clearChordDetector,
-  rebuildChordDetectorLookup,
-} from "@/app/engine/chords/chordLookupBuilder";
-import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
+import { clearChordDetector } from "@/app/engine/chords/chordLookupBuilder";
 import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import {
@@ -47,9 +43,9 @@ const getFirstScaleForGroup = (groupKey: string) =>
 
 interface WithNeck {
   neck: Neck | null;
-  chords: NoteChords[] | null;
   capo: number;
   stringCount: number;
+  chordModesCount: number;
 }
 
 interface WithIsPaused {
@@ -122,7 +118,6 @@ const initialState: SettingsState = {
   scale: "Aeolian / Natural",
   capo: 0,
   neck: null,
-  chords: null,
   tempoBpm: 120,
   chordStrummingDelayMs: 3,
   volume: MAX_VOLUME,
@@ -154,6 +149,7 @@ const initialState: SettingsState = {
   isLooperPlaying: false,
   strummingPatternChangedTrigger: false,
   stringCount: 6,
+  chordModesCount: 0,
 };
 
 // A values that changes immediately without the need for rerender
@@ -163,7 +159,7 @@ const initialState: SettingsState = {
 
 export let neckValue: Neck | null = initialState.neck;
 export let stringCountValue: number = initialState.stringCount;
-export let chordsValue: NoteChords[] | null = initialState.chords;
+export let chordsValue: ChordModeVariations[] = [];
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
@@ -224,7 +220,6 @@ const onGuitarSettingsUpdate = (
   state.stringCount = neck.length;
   neckValue = neck;
   stringCountValue = state.stringCount;
-  setChords(state);
   clearPreviousChords();
   if (!preventScaleDetectorFlush) {
     updateScaleIsBeingDetected(state, false);
@@ -242,20 +237,6 @@ const toggleMetronome = (state: WithMetronome, value: boolean) => {
 
 export const clearWipeExampleCacheTrigger = () => {
   wipeExampleCacheTriggerValue = false;
-};
-
-const setChords = (state: WithNeck & WithChordIsBeingDetected) => {
-  if (!state.neck) {
-    return;
-  }
-
-  // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
-  const chordsForNeck = chordsGenerator.process(state.neck, true, state.capo);
-  state.chords = chordsForNeck;
-  chordsValue = chordsForNeck;
-  clearChordDetector?.();
-  updateChordIsBeingDetected(state, false);
-  rebuildChordDetectorLookup();
 };
 
 export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
@@ -305,17 +286,6 @@ const updateIsPaused = (value: boolean, state: WithIsPaused) => {
   recreatePausePromise();
 };
 
-const updateChordIsBeingDetected = (
-  state: WithChordIsBeingDetected,
-  value: boolean
-) => {
-  state.chordIsBeingDetected = value;
-  chordIsBeingDetectedValue = value;
-  if (!value) {
-    clearChordDetector?.();
-  }
-};
-
 const updateScaleIsBeingDetected = (
   state: WithScaleIsBeingDetected,
   value: boolean
@@ -363,6 +333,10 @@ export const tryToggleInterval = (toggle: boolean) => {
   }
 };
 
+export const addChordMode = (chordModeVariations: ChordModeVariations) => {
+  chordsValue.push(chordModeVariations);
+};
+
 export enum PauseResolveValue {
   GoBack,
   GoForward,
@@ -403,7 +377,6 @@ export const settingsSlice = createSlice({
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       neckValue = state.neck;
       stringCountValue = state.stringCount;
-      chordsValue = state.chords;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -540,7 +513,12 @@ export const settingsSlice = createSlice({
       updateIsPaused(action.payload, state);
     },
     setChordIsBeingDetected(state, action: PayloadAction<boolean>) {
-      updateChordIsBeingDetected(state, action.payload);
+      const value = action.payload;
+      state.chordIsBeingDetected = value;
+      chordIsBeingDetectedValue = value;
+      if (!value) {
+        clearChordDetector?.();
+      }
     },
     setScaleIsBeingDetected(state, action: PayloadAction<boolean>) {
       updateScaleIsBeingDetected(state, action.payload);
@@ -595,6 +573,13 @@ export const settingsSlice = createSlice({
         updateStrummingPatternId(state, initialState.strummingPatternId);
       }
     },
+    incrementChordModesCount(state) {
+      state.chordModesCount++;
+    },
+    initChords(state) {
+      state.chordModesCount = 0;
+      chordsValue = [];
+    },
   },
 });
 
@@ -633,6 +618,8 @@ export const {
   setIsLooperPlaying,
   triggerCustomStrummingPatternChanged,
   checkCustomStrummingPatternAfterDeletion,
+  incrementChordModesCount,
+  initChords,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

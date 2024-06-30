@@ -57,7 +57,6 @@ const persistConfig = {
         const newState = { ...state } as any; // TODO: I don't understand it fully, but it works like this
         delete newState.neck;
         delete newState.stringCount;
-        delete newState.chords;
         delete newState.settingsExpanded;
         // delete newState.chordsExpanded; // chords could stay expanded
         // delete newState.controlPanelExpanded; // control panel could stay expanded
@@ -78,6 +77,7 @@ const persistConfig = {
         delete newState.isLastEvent;
         delete newState.isFirstEvent;
         delete newState.showAspectRatio;
+        delete newState.chordModesCount;
         return newState;
       },
       out: (state: PersistedState) => state, // No transformation needed when deserializing

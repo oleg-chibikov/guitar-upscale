@@ -1,16 +1,32 @@
 import { Expander } from "@/app/components/uiFramework/Expander";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
-import { ChordMode, getChordName, isAdvancedMode } from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
-import { SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
+import { NOTE_COUNT, SHARP_NOTE_COUNT } from "@/app/data/notes";
+import {
+  clearChordDetector,
+  rebuildChordDetectorLookup,
+} from "@/app/engine/chords/chordLookupBuilder";
+import {
+  chordNotesByName,
+  setPreferredVariationsForChordMode,
+} from "@/app/engine/chords/chordNotesByName";
+import { generateChords } from "@/app/engine/chords/chordsGeneratorWorkerApi";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
-import { selectSettings } from "@/app/store/settingsSlice";
+import {
+  addChordMode,
+  capoValue,
+  incrementChordModesCount,
+  initChords,
+  neckValue,
+  selectSettings,
+  setChordIsBeingDetected,
+} from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,15 +39,46 @@ const COMPACT_CHORDS_WIDTH = 220;
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
-  const { chords } = useSelector(selectSettings);
+  const { chordModesCount, guitarSettingsUpdatedTrigger } =
+    useSelector(selectSettings);
+
   const {
-    theme,
     chordsExpanded,
     chordsDisplayMode,
     useAdvancedChords,
     useSharpChords,
   } = useSelector(selectUi);
+
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (!neckValue) {
+      return;
+    }
+
+    chordNotesByName.clear();
+    dispatch(initChords());
+
+    // TODO: Async await? cancel when doing again?
+    // TODO: Prevent chord detection / midi upload until chords are built
+    // TODO: For midi upload as we change scale we will have to wait for this to finish
+    // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
+    generateChords(
+      neckValue,
+      true,
+      capoValue,
+      (chordModeVariationsContainer) => {
+        addChordMode(chordModeVariationsContainer.chordModeVariations);
+        setPreferredVariationsForChordMode(chordModeVariationsContainer);
+        dispatch(incrementChordModesCount());
+      },
+      () => {
+        clearChordDetector?.();
+        dispatch(setChordIsBeingDetected(false));
+        rebuildChordDetectorLookup();
+      }
+    );
+  }, [dispatch, guitarSettingsUpdatedTrigger]);
+
   const { premiumFeatures } = usePremiumFeatures();
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
@@ -75,21 +122,17 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!chords?.length) {
+  if (chordModesCount === 0) {
     return null;
   }
 
-  const hasAdvancedChords = useAdvancedChords
-    ? premiumFeatures.advancedChords === true
-    : false; // TODO: so-so protection:)
+  // TODO: Re-implement advanced chords - doesn't work with lazy loading
+  // const hasAdvancedChords = useAdvancedChords
+  //   ? premiumFeatures.advancedChords === true
+  //   : false; // TODO: so-so protection:)
 
-  const checkIsHiddenMode = (mode: ChordMode) =>
-    !hasAdvancedChords && isAdvancedMode(mode);
-
-  const totalRows = chords.length - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
-  const totalColumns = chords[0].modes.filter(
-    (x) => !checkIsHiddenMode(x.mode)
-  ).length;
+  const totalRows = NOTE_COUNT - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
+  const totalColumns = chordModesCount; // TODO: hide advanced chords!
 
   return (
     <Expander
@@ -117,30 +160,22 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
           gridTemplateRows: `repeat(${totalRows}, 1fr)`,
         }}
       >
-        {chords.flatMap((noteChord) =>
-          noteChord.modes.map((noteChordMode) => {
-            const isHidden =
-              checkIsHiddenMode(noteChordMode.mode) ||
-              (!useSharpChords && isSharp(noteChord.note));
-            const title = getChordName(noteChord.note, noteChordMode.mode);
-
-            return (
-              <ChordButton
-                key={title}
-                isHidden={isHidden}
-                variations={noteChordMode.variations}
-                chordName={title}
-                onStrummingStateChange={(value) => {
-                  if (!isMobileDeviceValue) {
-                    return;
-                  }
-                  const isStrummingClicked = value || isAnyStrummingClicked();
-                  toggleOverflow(isStrummingClicked, ref);
-                  toggleOverflow(isStrummingClicked, mainRef);
-                }}
-              />
-            );
-          })
+        {Array.from({ length: totalRows }).map((_, rowIndex) =>
+          Array.from({ length: totalColumns }).map((_, columnIndex) => (
+            <ChordButton
+              key={rowIndex + "_" + columnIndex}
+              chordModeIndex={columnIndex}
+              note={rowIndex}
+              onStrummingStateChange={(value) => {
+                if (!isMobileDeviceValue) {
+                  return;
+                }
+                const isStrummingClicked = value || isAnyStrummingClicked();
+                toggleOverflow(isStrummingClicked, ref);
+                toggleOverflow(isStrummingClicked, mainRef);
+              }}
+            />
+          ))
         )}
       </section>
     </Expander>

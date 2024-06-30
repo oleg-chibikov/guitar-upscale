@@ -1,4 +1,5 @@
 import { Chord, Note, getNoteText } from "@/app/data/notes";
+import { ChordPreferredVariations } from "@/app/engine/chords/chordVariationHelper";
 
 export interface ChordMode {
   description: string; // Description of the chord
@@ -392,14 +393,14 @@ export const chordModeOrder = buildModeOrder();
 export const getModeSuffix = (chord: string): string =>
   chord.substring(chord[1] === "#" ? 2 : 1);
 
-export type NoteChordMode = {
-  mode: ChordMode;
-  variations: Chord[];
+export type ChordModeVariations = {
+  chordMode: ChordMode;
+  variationsByNote: (Chord[] | undefined)[];
 };
 
-export type NoteChords = {
-  note: Note;
-  modes: NoteChordMode[];
+export type ChordModeVariationsContainer = {
+  chordModeVariations: ChordModeVariations;
+  preferredVariationsByNote: (ChordPreferredVariations | undefined)[];
 };
 
 export const getChordName = (note: Note, mode: ChordMode) => {

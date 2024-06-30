@@ -1,5 +1,5 @@
 import { getModeText } from "@/app/data/chordModes";
-import { Chord, getNoteText } from "@/app/data/notes";
+import { Chord, NOTE_COUNT, getNoteText } from "@/app/data/notes";
 import { chordsValue } from "@/app/store/settingsSlice";
 
 export const rebuildChordDetectorLookup = () => {
@@ -7,12 +7,12 @@ export const rebuildChordDetectorLookup = () => {
     return;
   }
 
-  for (const chord of chordsValue) {
-    const key = getNoteText(chord.note);
-    for (const mode of chord.modes) {
-      const modeKey = getModeText(mode.mode);
-      const fullKey = key + modeKey;
-      mode.variations.map((variation) => {
+  for (const chordModeVariations of chordsValue) {
+    const modeKey = getModeText(chordModeVariations.chordMode);
+    for (let note = 0; note < NOTE_COUNT; note++) {
+      const fullKey = getNoteText(note) + modeKey;
+      const variations = chordModeVariations.variationsByNote[note];
+      variations?.map((variation) => {
         // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
         //   debugger;
         // }

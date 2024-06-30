@@ -3,7 +3,7 @@ import {
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/data/clockConstants";
-import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
+import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   LooperPlayer,
@@ -53,9 +53,7 @@ export class LooperRecorder {
           );
         }
         if (chord) {
-          const preferredVariations = chordsGenerator.chordNotesByName.get(
-            chord.chord
-          );
+          const preferredVariations = chordNotesByName.get(chord.chord);
           if (preferredVariations) {
             for (const chordNote of preferredVariations.preferred) {
               if (!chordNote) {

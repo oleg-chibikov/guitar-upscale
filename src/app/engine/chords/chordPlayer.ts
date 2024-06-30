@@ -1,5 +1,5 @@
 import {} from "@/app/data/chordModes";
-import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
+import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { Chord } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
 import { chordNotesToPlayValue } from "../../store/settingsSlice";
@@ -69,9 +69,7 @@ export const playPreferredChordVariation = async (
   if (!params.variations.length) {
     return;
   }
-  const preferredVariations = chordsGenerator.chordNotesByName.get(
-    params.chordName
-  );
+  const preferredVariations = chordNotesByName.get(params.chordName);
   if (preferredVariations) {
     await playVariation(preferredVariations.preferred, "preferred", params);
   }
@@ -83,9 +81,7 @@ export const playPreferredChordVariationWithMinimumNotes = async (
   if (!params.variations.length) {
     return;
   }
-  const preferredVariations = chordsGenerator.chordNotesByName.get(
-    params.chordName
-  );
+  const preferredVariations = chordNotesByName.get(params.chordName);
   if (preferredVariations) {
     await playVariation(
       preferredVariations.preferredWithMinNotes,
@@ -101,9 +97,7 @@ export const playPreferredChordVariationWithMaximumNotes = async (
   if (!params.variations.length) {
     return;
   }
-  const preferredVariations = chordsGenerator.chordNotesByName.get(
-    params.chordName
-  );
+  const preferredVariations = chordNotesByName.get(params.chordName);
   if (preferredVariations) {
     await playVariation(
       preferredVariations.preferredWithMaxNotes,
