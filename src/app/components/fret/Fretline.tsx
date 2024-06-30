@@ -1,5 +1,10 @@
 import { NOTE_COUNT, StringOctaveNote } from "@/app/data/notes";
-import { Skin } from "@/app/data/skin";
+import {
+  CombinedSkinType,
+  EightStringSkin,
+  SevenStringSkin,
+  Skin,
+} from "@/app/data/skin";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -23,7 +28,7 @@ const calculateTop = (string: number, fret: number, modifiers: number[]) => {
   return fret * multiplier * modifiers[string];
 };
 
-const getParametersForSkin = (skin?: Skin) => {
+const getParametersForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
     default:
@@ -50,17 +55,17 @@ const getParametersForSkin = (skin?: Skin) => {
         widthStep: 10.85,
         stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
       };
-    case Skin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+    case SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
       return {
         height: 23,
         widthStep: 10.34,
         stringTiltModifiers: [1.4, 0, -1.8, -7, 5, 5.5, 6, 5.5],
       };
-    case Skin.Ibanez_RG9PB_TGF:
+    case EightStringSkin.Ibanez_RG9PB_TGF:
       return {
-        height: 26,
-        widthStep: 11,
-        stringTiltModifiers: [3.9, 4.3, 4.9, -5, 3.3, 3.2, 3.2, 3],
+        height: 24,
+        widthStep: 10.85,
+        stringTiltModifiers: [3.3, 3.3, 2.8, 2, 1, 1.8, 2.6, 2.7],
       };
   }
 };

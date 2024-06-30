@@ -1,6 +1,11 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { FRETBOARD } from "@/app/data/elementIds";
-import { Skin } from "@/app/data/skin";
+import {
+  CombinedSkinType,
+  EightStringSkin,
+  SevenStringSkin,
+  Skin,
+} from "@/app/data/skin";
 import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
@@ -12,7 +17,7 @@ import { useSelector } from "react-redux";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
-const getPositionForSkin = (skin?: Skin) => {
+const getPositionForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
     case Skin.PRS_SE_AX20E:
     case undefined:
@@ -39,17 +44,17 @@ const getPositionForSkin = (skin?: Skin) => {
         left: -520,
         xShift: 450,
       };
-    case Skin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+    case SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
       return {
         top: -547,
         left: -762,
         xShift: 450,
       };
 
-    case Skin.Ibanez_RG9PB_TGF:
+    case EightStringSkin.Ibanez_RG9PB_TGF:
       return {
-        top: -551,
-        left: -642,
+        top: -561,
+        left: -672,
         xShift: 450,
       };
   }

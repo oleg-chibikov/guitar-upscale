@@ -1,8 +1,14 @@
 import { AlertType } from "@/app/data/alertType";
-import { Skin } from "@/app/data/skin";
+import {
+  CombinedSkinType,
+  EightStringSkin,
+  SevenStringSkin,
+  Skin,
+} from "@/app/data/skin";
 import { Theme } from "@/app/data/theme";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { stringCountValue } from "@/app/store/settingsSlice";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 import { RootState } from "./store"; // Define RootState type
@@ -17,7 +23,7 @@ export const maxYZoom = 1;
 interface UiState {
   noteDisplayMode: NoteDisplayMode;
   chordsDisplayMode: ChordsDisplayMode;
-  skin: Skin;
+  skin: CombinedSkinType;
   settingsExpanded: boolean;
   chordsExpanded: boolean;
   controlPanelExpanded: boolean;
@@ -97,8 +103,17 @@ export const uiSlice = createSlice({
     setChordsDisplayMode: (state, action: PayloadAction<ChordsDisplayMode>) => {
       state.chordsDisplayMode = action.payload;
     },
-    setSkin(state, action: PayloadAction<Skin>) {
+    setSkin(state, action: PayloadAction<CombinedSkinType>) {
       state.skin = action.payload;
+    },
+    setSkinBasedOnStringCount(state) {
+      if (stringCountValue === 7) {
+        state.skin = SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior;
+      } else if (stringCountValue === 8) {
+        state.skin = EightStringSkin.Ibanez_RG9PB_TGF;
+      } else {
+        state.skin = Skin.PRS_SE_AX20E; // Default to one of the Skin types, update as needed
+      }
     },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
       state.settingsExpanded = action.payload;
@@ -208,6 +223,7 @@ export const {
   setNoteDisplayMode,
   setChordsDisplayMode,
   setSkin,
+  setSkinBasedOnStringCount,
   setSettingsExpanded,
   setChordsExpanded,
   setControlPanelExpanded,
