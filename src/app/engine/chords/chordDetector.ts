@@ -1,8 +1,8 @@
 import { AlertType } from "@/app/data/alertType";
 import { sortChords } from "@/app/engine/chords/chordsSorter";
 import { MissingChar } from "@/app/engine/detectorShared";
-import { STRING_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
+import { stringCountValue } from "@/app/store/settingsSlice";
 import { Chord, StringOctaveNote } from "../../data/notes";
 import { Trie } from "../../helpers/trie";
 
@@ -78,7 +78,7 @@ class ChordDetector {
     const serializedChord: (number | MissingChar)[] = [];
 
     // Initialize the serializedChord with '?' for each position
-    for (let i = 0; i < STRING_COUNT; i++) {
+    for (let i = 0; i < stringCountValue; i++) {
       serializedChord.push(missingChar);
     }
 

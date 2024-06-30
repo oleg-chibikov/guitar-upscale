@@ -56,6 +56,7 @@ const persistConfig = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const newState = { ...state } as any; // TODO: I don't understand it fully, but it works like this
         delete newState.neck;
+        delete newState.stringCount;
         delete newState.chords;
         delete newState.settingsExpanded;
         // delete newState.chordsExpanded; // chords could stay expanded

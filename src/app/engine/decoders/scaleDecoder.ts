@@ -5,9 +5,14 @@ import {
   serializeOctaveNote,
 } from "@/app/data/notes";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { capoValue, neckValue } from "@/app/store/settingsSlice";
+import {
+  capoValue,
+  neckValue,
+  stringCountValue,
+} from "@/app/store/settingsSlice";
 
 export const getWholeScale = (playFullString: boolean): EventsByTick => {
+  const stringCount = stringCountValue;
   const neck = neckValue;
   if (!neck) {
     throw new Error("Neck is not set up");
@@ -20,13 +25,13 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
     const stringCopy = [...neckString].filter(
       (x) => x && x.fret >= capo
     ) as StringOctaveNote[];
-    neckCopy[reverse ? neck.length - 1 - index : index] = stringCopy;
+    neckCopy[reverse ? stringCount - 1 - index : index] = stringCopy;
   });
 
   let tickIndex = 0;
   const result = new EventsByTick();
   // used to be stored in StringOctaveNotes
-  let realStringIndex = reverse ? neckCopy.length - 1 : 0;
+  let realStringIndex = reverse ? stringCount - 1 : 0;
   let orderedStringIndex = 0;
   for (const neckString of neckCopy) {
     realStringIndex = reverse ? realStringIndex - 1 : realStringIndex + 1; //incrementing string index here
@@ -40,7 +45,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
 
     if (!playFullString) {
       const nextString =
-        orderedStringIndex < neckCopy.length
+        orderedStringIndex < stringCount
           ? neckCopy[orderedStringIndex]
           : undefined;
 

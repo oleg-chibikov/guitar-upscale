@@ -49,6 +49,7 @@ interface WithNeck {
   neck: Neck | null;
   chords: NoteChords[] | null;
   capo: number;
+  stringCount: number;
 }
 
 interface WithIsPaused {
@@ -152,6 +153,7 @@ const initialState: SettingsState = {
   looperStateUpdateTrigger: false,
   isLooperPlaying: false,
   strummingPatternChangedTrigger: false,
+  stringCount: 6,
 };
 
 // A values that changes immediately without the need for rerender
@@ -160,6 +162,7 @@ const initialState: SettingsState = {
 // For settings affecting the UI use the state values, not these. State values are triggering rerender when changing
 
 export let neckValue: Neck | null = initialState.neck;
+export let stringCountValue: number = initialState.stringCount;
 export let chordsValue: NoteChords[] | null = initialState.chords;
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
@@ -218,7 +221,9 @@ const onGuitarSettingsUpdate = (
     capo
   );
   state.neck = neck;
+  state.stringCount = neck.length;
   neckValue = neck;
+  stringCountValue = state.stringCount;
   setChords(state);
   clearPreviousChords();
   if (!preventScaleDetectorFlush) {
@@ -397,6 +402,7 @@ export const settingsSlice = createSlice({
       isFirstEventValue = state.isFirstEvent;
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       neckValue = state.neck;
+      stringCountValue = state.stringCount;
       chordsValue = state.chords;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);

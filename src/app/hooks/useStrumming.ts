@@ -194,11 +194,6 @@ export const useStrumming = (
     }
 
     const currentPatternId = strummingPatternIdValue;
-    const patternObject = getPatternById(currentPatternId);
-    if (!patternObject) {
-      console.error("No strumming pattern selected!");
-      return;
-    }
 
     const register = () => {
       console.log(
@@ -344,9 +339,6 @@ export const useStrumming = (
     const otherChordsGracePeriodPromises =
       getOtherChordsGracePeriodPromises(chordName);
 
-    const patternTimeSignature = patternObject.timeSignature;
-    const waitBetween = getWaitBetweenFunc(patternTimeSignature);
-
     const isOtherChordStrumming = otherChordsStrummingPromises.length > 0;
     const clickedInOtherChordGracePeriod =
       otherChordsGracePeriodPromises.length > 0;
@@ -384,6 +376,14 @@ export const useStrumming = (
         );
         return;
       }
+
+      const patternObject = getPatternById(currentPatternId);
+      if (!patternObject) {
+        console.error("No strumming pattern selected!");
+        return;
+      }
+      const patternTimeSignature = patternObject.timeSignature;
+      const waitBetween = getWaitBetweenFunc(patternTimeSignature);
 
       const getInitialWait = () => {
         let skipIntervals: number | undefined;

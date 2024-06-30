@@ -7,10 +7,8 @@ import {
   MIN_NOTES_TO_DETECT_CHORD,
   chordDetector,
 } from "@/app/engine/chords/chordDetector";
-import {
-  STRING_COUNT,
-  octaveNoteToStringOctaveNoteMap,
-} from "@/app/engine/generateNeckRepresentation";
+import { octaveNoteToStringOctaveNoteMap } from "@/app/engine/generateNeckRepresentation";
+import { stringCountValue } from "@/app/store/settingsSlice";
 
 type ChordMatchResult = {
   chordName: string;
@@ -58,7 +56,7 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
     stringToPutNextNote: number,
     array: (StringOctaveNote | null)[]
   ): (StringOctaveNote | null)[][] => {
-    if (stringToPutNextNote >= STRING_COUNT) {
+    if (stringToPutNextNote >= stringCountValue) {
       console.log(
         "Index of note event: %d, index of string to put current event: %d. Strings exceeded. Returning the result without further processing",
         indexOfNoteEvent,

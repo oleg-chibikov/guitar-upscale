@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Slider } from "../../uiFramework/Slider";
 
 export const ChordNotesToPlaySlider: React.FC = () => {
-  const { chordNotesToPlay } = useSelector(selectSettings);
+  const { chordNotesToPlay, stringCount } = useSelector(selectSettings);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {
@@ -18,7 +18,7 @@ export const ChordNotesToPlaySlider: React.FC = () => {
         onValueChange={handleSliderChange}
         value={chordNotesToPlay}
         minimumValue={1}
-        maximumValue={6}
+        maximumValue={stringCount}
         step={1}
         label={chordNotesToPlay.toString()}
       />
