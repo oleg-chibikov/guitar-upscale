@@ -12,22 +12,15 @@ export interface FretlineProps {
 }
 
 const calculateTop = (string: number, fret: number, modifiers: number[]) => {
-  switch (string) {
-    case 0:
-      return -(fret * 0.4 * modifiers[0]);
-    case 1:
-      return -(fret * 0.3 * modifiers[1]);
-    case 2:
-      return -(fret * 0.2 * modifiers[2]);
-    case 3:
-      return fret * -0.1 * modifiers[3];
-    case 4:
-      return fret * 0.2 * modifiers[4];
-    case 5:
-      return fret * 0.3 * modifiers[5];
-    default:
-      return 0;
+  if (string < 0 || string >= modifiers.length) {
+    return 0;
   }
+
+  const baseMultipliers = [-0.4, -0.3, -0.2, -0.1, 0.2, 0.3, 0.4, 0.5];
+  const multiplier =
+    string < baseMultipliers.length ? baseMultipliers[string] : 0.3;
+
+  return fret * multiplier * modifiers[string];
 };
 
 const getParametersForSkin = (skin?: Skin) => {
@@ -37,25 +30,25 @@ const getParametersForSkin = (skin?: Skin) => {
       return {
         height: 25,
         widthStep: 10.25,
-        stringTiltModifiers: [3.2, 3, 2, 1, 2, 2.5],
+        stringTiltModifiers: [3.2, 3, 2, 1, 2, 2.5, 3, 3.5],
       };
     case Skin.Ibanez_AE140_WKH:
       return {
         height: 27,
         widthStep: 10.2,
-        stringTiltModifiers: [2.5, 2.2, 2, 1, 2, 2.5],
+        stringTiltModifiers: [2.5, 2.2, 2, 1, 2, 2.5, 3, 3.5],
       };
     case Skin.Yamaha_CSF3M:
       return {
         height: 29,
         widthStep: 10.56,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3],
+        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
       };
     case Skin.Yamaha_SLG200NW:
       return {
         height: 30,
         widthStep: 10.85,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3],
+        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
       };
   }
 };

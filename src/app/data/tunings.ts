@@ -1,6 +1,6 @@
 import { NOTE_COUNT, Note, OctaveNote } from "./notes";
 
-const OCTAVES_STING = "544433"; // octaves for notes in tuning
+const DEFAULT_OCTAVES = "54443322"; // Default octaves for up to 9
 const BASE_TUNING_SHIFT = Note.E - Note.C;
 
 const noteLookup: { [key: string]: Note } = {
@@ -22,11 +22,12 @@ export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
   const notes: OctaveNote[] = [];
 
   const data = tunings[tuningKey];
-  const octavesString = data.octaveNotes ?? OCTAVES_STING;
+  const octavesString =
+    data.octaveNotes ?? DEFAULT_OCTAVES.slice(0, tuningKey.length);
 
   for (
     let i = 0, j = 0;
-    i < tuningKey.length, j < octavesString.length;
+    i < tuningKey.length && j < octavesString.length;
     i++, j++
   ) {
     const thisChar = tuningKey[i];
@@ -93,6 +94,12 @@ export const tunings: { [key: string]: TuningData } = {
 
   "CGD#A#FC": { name: "C", shift: -4, octaveNotes: "444332" },
   "CGD#A#FA#": { name: "Drop A#", shift: -4, octaveNotes: "444332" },
+
+  EBGDAEB: { name: "B 7 string" },
+  EBGDAEA: { name: "Drop A 7 string" },
+
+  "EBGDAEBF#": { name: "F# 8-string" },
+  EBGDAEBE: { name: "Drop E 8-string" },
 };
 
 export type Tuning = Extract<keyof typeof tunings, string>;
