@@ -79,7 +79,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!chords) {
+  if (!chords?.length) {
     return null;
   }
 

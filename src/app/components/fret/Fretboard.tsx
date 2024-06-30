@@ -39,6 +39,19 @@ const getPositionForSkin = (skin?: Skin) => {
         left: -520,
         xShift: 450,
       };
+    case Skin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+      return {
+        top: -547,
+        left: -762,
+        xShift: 450,
+      };
+
+    case Skin.Ibanez_RG9PB_TGF:
+      return {
+        top: -551,
+        left: -642,
+        xShift: 450,
+      };
   }
 };
 

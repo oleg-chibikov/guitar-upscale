@@ -50,6 +50,18 @@ const getParametersForSkin = (skin?: Skin) => {
         widthStep: 10.85,
         stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
       };
+    case Skin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+      return {
+        height: 25,
+        widthStep: 10.34,
+        stringTiltModifiers: [2.5, 2, 1.4, -0.1, 1.7, 2.2, 2.5, 3],
+      };
+    case Skin.Ibanez_RG9PB_TGF:
+      return {
+        height: 26,
+        widthStep: 11,
+        stringTiltModifiers: [3.9, 4.3, 4.9, -5, 3.3, 3.2, 3.2, 3],
+      };
   }
 };
 
