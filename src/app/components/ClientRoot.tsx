@@ -4,7 +4,7 @@ import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionDialogWrapper } from "@/app/components/alert/ScaleDetectionDialogWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
@@ -27,6 +27,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
   return (
     <>
       <Initializer />
+      {premiumComponents.get("advancedChords") as ReactNode}
       <AlertWrapper />
       <ScaleDetectionDialogWrapper />
       {loadingMessage !== undefined ? (

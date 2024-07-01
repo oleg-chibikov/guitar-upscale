@@ -1,5 +1,4 @@
 import { Expander } from "@/app/components/uiFramework/Expander";
-import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
@@ -14,7 +13,10 @@ import {
   chordNotesByName,
   setPreferredVariationsForChordMode,
 } from "@/app/engine/chords/chordNotesByName";
-import { generateChords } from "@/app/engine/chords/chordsGeneratorWorkerApi";
+import {
+  abortGeneratingChords,
+  generateChords,
+} from "@/app/engine/chords/chordsGeneratorWorkerApi";
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
@@ -39,33 +41,41 @@ const COMPACT_CHORDS_WIDTH = 220;
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
-  const { chordModesCount, guitarSettingsUpdatedTrigger } =
+  // unique number for each chordGeneration. This helps with aborting the proper chordGeneration execution
+  const localGuitarSettingsUpdateCount = useRef<number>(0);
+
+  const { chordModesCount, guitarSettingsUpdateCount } =
     useSelector(selectSettings);
 
-  const {
-    chordsExpanded,
-    chordsDisplayMode,
-    useAdvancedChords,
-    useSharpChords,
-  } = useSelector(selectUi);
+  const { chordsExpanded, chordsDisplayMode, useSharpChords } =
+    useSelector(selectUi);
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (!neckValue) {
       return;
     }
+    if (
+      guitarSettingsUpdateCount === undefined ||
+      localGuitarSettingsUpdateCount.current === guitarSettingsUpdateCount
+    ) {
+      return;
+    }
 
+    // it will stop any current processing
+    abortGeneratingChords(localGuitarSettingsUpdateCount.current);
+
+    localGuitarSettingsUpdateCount.current = guitarSettingsUpdateCount;
     chordNotesByName.clear();
     dispatch(initChords());
 
-    // TODO: Async await? cancel when doing again?
     // TODO: Prevent chord detection / midi upload until chords are built
     // TODO: For midi upload as we change scale we will have to wait for this to finish
     // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
     generateChords(
       neckValue,
-      true,
       capoValue,
+      localGuitarSettingsUpdateCount.current,
       (chordModeVariationsContainer) => {
         addChordMode(chordModeVariationsContainer.chordModeVariations);
         setPreferredVariationsForChordMode(chordModeVariationsContainer);
@@ -77,9 +87,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
         rebuildChordDetectorLookup();
       }
     );
-  }, [dispatch, guitarSettingsUpdatedTrigger]);
+  }, [dispatch, guitarSettingsUpdateCount]);
 
-  const { premiumFeatures } = usePremiumFeatures();
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
@@ -104,7 +113,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     }, 1);
   };
 
-  useEffect(setupScrollbar, [useAdvancedChords, useSharpChords]);
+  useEffect(setupScrollbar, [useSharpChords]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -126,13 +135,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     return null;
   }
 
-  // TODO: Re-implement advanced chords - doesn't work with lazy loading
-  // const hasAdvancedChords = useAdvancedChords
-  //   ? premiumFeatures.advancedChords === true
-  //   : false; // TODO: so-so protection:)
-
   const totalRows = NOTE_COUNT - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
-  const totalColumns = chordModesCount; // TODO: hide advanced chords!
 
   return (
     <Expander
@@ -156,12 +159,12 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
               ? COMPACT_CHORDS_WIDTH
               : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
           maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+          gridTemplateColumns: `repeat(${chordModesCount}, 1fr)`,
           gridTemplateRows: `repeat(${totalRows}, 1fr)`,
         }}
       >
         {Array.from({ length: totalRows }).map((_, rowIndex) =>
-          Array.from({ length: totalColumns }).map((_, columnIndex) => (
+          Array.from({ length: chordModesCount }).map((_, columnIndex) => (
             <ChordButton
               key={rowIndex + "_" + columnIndex}
               chordModeIndex={columnIndex}

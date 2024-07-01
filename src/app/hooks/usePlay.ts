@@ -40,7 +40,7 @@ export interface UsePlayParams {
 }
 
 export const usePlay = ({ decodeExample }: UsePlayParams) => {
-  const { guitarSettingsUpdatedTrigger } = useSelector(selectSettings);
+  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
   const [isWaiting, setIsWaiting] = useState(false);
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
   const isWaitingRef = useRef<boolean>();
@@ -147,7 +147,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   useEffect(() => {
     // stop playing when any of dependencies changes
     dispatch(setIsPlaying(false));
-  }, [guitarSettingsUpdatedTrigger, dispatch]);
+  }, [guitarSettingsUpdateCount, dispatch]);
 
   useEffect(() => {
     const handleKeyPress = async (event: KeyboardEvent) => {

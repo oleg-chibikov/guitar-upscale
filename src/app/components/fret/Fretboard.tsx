@@ -61,13 +61,8 @@ const getPositionForSkin = (skin?: CombinedSkinType) => {
 };
 
 export const Fretboard: React.FC = () => {
-  const {
-    skin,
-    fretboardScaleX,
-    fretboardScaleY,
-    chordsExpanded,
-    useAdvancedChords,
-  } = useSelector(selectUi);
+  const { skin, fretboardScaleX, fretboardScaleY, chordsExpanded } =
+    useSelector(selectUi);
   const { neck } = useSelector(selectSettings);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [height, setHeight] = useState(window.innerHeight);

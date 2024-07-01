@@ -1,9 +1,9 @@
+import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
 import {
-  ChordMode,
-  ChordModeVariationsContainer,
-  chordModes,
-  isAdvancedMode,
-} from "@/app/data/chordModes";
+  GenerateChordsCallbackMessage,
+  GenerateChordsRequest,
+  WithGenerationId,
+} from "@/app/data/chordsGeneratorTypes";
 import {
   Chord,
   FingerPosition,
@@ -23,43 +23,85 @@ type ChordBuilderInfo = {
   maxAllowedFretIndex?: number;
 };
 
+type AbortData = {
+  abortController: AbortController;
+  abortSignal: AbortSignal;
+};
+
 class ChordsGenerator {
   //private allSlashChords = new Map<string, UltimateSlashChordInfoVariation[]>();
-  private useAdvancedChords = false;
   private capo = 0;
   private MAX_DISTANCE_IN_CHORD = 4;
   private absoluteMaxFretIndex = 0;
   private neck: Neck = [];
+  private abortDataByGenerationId = new Map<number, AbortData>();
 
-  processInWorker(neck: Neck, useAdvancedChords: boolean, capo: number): void {
-    this.capo = capo;
-    this.neck = neck;
-    this.useAdvancedChords = useAdvancedChords;
-    this.absoluteMaxFretIndex = neck[0].length - 1;
+  constructor() {
+    console.log("Creating ChordGenerator");
+  }
 
-    chordModes.forEach((chordMode, index) => {
-      if (chordMode.intervals.length > this.neck.length) {
-        // cannot build this chord on the given guitar - it has more notes that the strings guitar has
-        return;
-      }
+  abortProcessing({ generationId }: WithGenerationId): void {
+    const abortData = this.abortDataByGenerationId.get(generationId);
+    if (abortData) {
+      console.log("Aborting", generationId);
+      abortData.abortController.abort();
+    }
+  }
 
-      if (!this.useAdvancedChords && isAdvancedMode(chordMode)) {
-        // skip advanced mode
-        return;
-      }
-
-      const chordModeVariationsContainer = this.processChordMode(chordMode);
-
-      // Post a message for each processed chord mode
-      self.postMessage({
-        type: "chordModeProcessed",
-        chordModeVariationsContainer,
-        index,
+  processInWorker({
+    neck,
+    capo,
+    chordModes,
+    generationId,
+  }: GenerateChordsRequest): void {
+    try {
+      const abortController = new AbortController();
+      const abortSignal = abortController.signal;
+      this.abortDataByGenerationId.set(generationId, {
+        abortController,
+        abortSignal,
       });
-    });
+      this.capo = capo;
+      this.neck = neck;
+      this.absoluteMaxFretIndex = neck[0].length - 1;
 
-    // Post a message when all processing is complete
-    self.postMessage({ type: "processingComplete" });
+      const chordModesCount = chordModes.length;
+
+      for (let index = 0; index < chordModesCount; index++) {
+        if (abortSignal.aborted) {
+          console.log("Aborted processing chord modes");
+          this.sendAbortedMessage();
+          return;
+        }
+
+        const chordMode = chordModes[index];
+
+        if (chordMode.intervals.length > this.neck.length) {
+          // cannot build this chord on the given guitar - it has more notes that the strings guitar has
+          continue;
+        }
+
+        const chordModeVariationsContainer = this.processChordMode(
+          chordMode,
+          abortSignal
+        );
+
+        // Post a message for each processed chord mode
+        self.postMessage({
+          type: "chordModeProcessed",
+          chordModeVariationsContainer,
+          index,
+        } as GenerateChordsCallbackMessage);
+      }
+
+      // Post a message when processing is complete
+      self.postMessage({
+        type: "processingComplete",
+      } as GenerateChordsCallbackMessage);
+    } finally {
+      // cleanup signal after the processing is finished to avoid memory leaks
+      this.abortDataByGenerationId.delete(generationId);
+    }
   }
 
   private buildIntervalsWithoutPerfectFifth = (chordMode: ChordMode) => {
@@ -306,7 +348,8 @@ class ChordsGenerator {
 
   private processIntervalsInChordMode = (
     intervalsToUse: number[],
-    variationsToFill: Chord[][]
+    variationsToFill: Chord[][],
+    abortSignal: AbortSignal
   ) => {
     for (
       let stringIndex = this.neck.length - 1; // starting from the lowest (thickest) string
@@ -320,6 +363,11 @@ class ChordsGenerator {
         fretIndex < this.absoluteMaxFretIndex;
         fretIndex++
       ) {
+        if (abortSignal.aborted) {
+          console.log("Aborted processing intervals");
+          this.sendAbortedMessage();
+          return;
+        }
         const currentStringOctaveNote = neckString[fretIndex];
         if (currentStringOctaveNote === null) {
           continue;
@@ -342,7 +390,10 @@ class ChordsGenerator {
     }
   };
 
-  private processChordMode = (chordMode: ChordMode) => {
+  private processChordMode = (
+    chordMode: ChordMode,
+    abortSignal: AbortSignal
+  ) => {
     const variationsByNote: Chord[][] = [];
     const preferredVariationsByNote: (ChordPreferredVariations | undefined)[] =
       [];
@@ -350,17 +401,27 @@ class ChordsGenerator {
       chordModeVariations: { chordMode, variationsByNote },
       preferredVariationsByNote,
     };
-    this.processIntervalsInChordMode(chordMode.intervals, variationsByNote);
+    this.processIntervalsInChordMode(
+      chordMode.intervals,
+      variationsByNote,
+      abortSignal
+    );
     const intervalsWithoutPerfectFifth =
       this.buildIntervalsWithoutPerfectFifth(chordMode);
     if (intervalsWithoutPerfectFifth) {
       this.processIntervalsInChordMode(
         intervalsWithoutPerfectFifth,
-        variationsByNote
+        variationsByNote,
+        abortSignal
       );
     }
 
     for (let note = 0; note < NOTE_COUNT; note++) {
+      if (abortSignal.aborted) {
+        console.log("Aborted processing preferred variations");
+        this.sendAbortedMessage();
+        return;
+      }
       const noteChords = variationsByNote[note];
       if (!noteChords?.length) {
         continue;
@@ -412,6 +473,12 @@ class ChordsGenerator {
       newMax
     );
   };
+
+  private sendAbortedMessage() {
+    self.postMessage({
+      type: "processingAborted",
+    } as GenerateChordsCallbackMessage);
+  }
 }
 
 export const chordsGenerator = new ChordsGenerator();

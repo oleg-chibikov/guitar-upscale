@@ -57,7 +57,7 @@ interface WithMetronome {
 }
 
 interface CanUpdateGuitarSettings {
-  guitarSettingsUpdatedTrigger: boolean;
+  guitarSettingsUpdateCount?: number;
 }
 
 interface WithControls {
@@ -142,7 +142,6 @@ const initialState: SettingsState = {
   scaleIsBeingDetected: false,
   isRecording: false,
   toggleMetronomeWhenRecording: true,
-  guitarSettingsUpdatedTrigger: false,
   isFirstEvent: false,
   isLastEvent: false,
   looperStateUpdateTrigger: false,
@@ -226,7 +225,7 @@ const onGuitarSettingsUpdate = (
     clearScaleDetector?.();
   }
   // this can notify all the controls that use this prop to rerender
-  state.guitarSettingsUpdatedTrigger = !state.guitarSettingsUpdatedTrigger;
+  state.guitarSettingsUpdateCount = (state.guitarSettingsUpdateCount ?? 0) + 1;
 };
 
 const toggleMetronome = (state: WithMetronome, value: boolean) => {

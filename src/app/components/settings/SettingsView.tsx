@@ -35,7 +35,6 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       className="h-full"
       contentClassName="flexGrow overflow-y-auto"
     >
-      {premiumComponents.get("advancedChords") as ReactNode}
       <UseSharpChordsCheckbox />
       <UseChordAlterationCheckbox />
       {

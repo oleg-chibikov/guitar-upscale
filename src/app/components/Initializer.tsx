@@ -1,5 +1,5 @@
 import { Theme } from "@/app/data/theme";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch, useSelector } from "react-redux";
 import { Note } from "../data/notes";
@@ -24,10 +24,16 @@ export const Initializer: React.FC = () => {
   const dispatch = useDispatch();
   useSessionAuth();
   useGooglePlayAuth();
+  const isInitialized = useRef(false);
 
   useEffect(() => {
+    // to make sure it doesn't happen twice
+    if (isInitialized.current) {
+      return;
+    }
     dispatch(init());
     dispatch(initUi());
+    isInitialized.current = true;
   }, [dispatch]);
 
   useEffect(() => {

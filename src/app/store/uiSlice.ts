@@ -39,7 +39,6 @@ interface UiState {
   fretboardScaleX: number;
   fretboardScaleY: number;
   lockRatio: boolean;
-  useAdvancedChords: boolean;
   useSharpChords: boolean;
   loadingMessage?: string;
   showAspectRatio: boolean;
@@ -64,7 +63,6 @@ const initialState: UiState = {
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
-  useAdvancedChords: true,
   useSharpChords: true,
   showAspectRatio: false,
 };
@@ -203,9 +201,6 @@ export const uiSlice = createSlice({
         );
       }
     },
-    setUseAdvancedChords(state, action: PayloadAction<boolean>) {
-      state.useAdvancedChords = action.payload;
-    },
     setUseSharpChords(state, action: PayloadAction<boolean>) {
       state.useSharpChords = action.payload;
     },
@@ -237,7 +232,6 @@ export const {
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,
-  setUseAdvancedChords,
   setUseSharpChords,
   setLoadingMessage,
   setShowAspectRatio,

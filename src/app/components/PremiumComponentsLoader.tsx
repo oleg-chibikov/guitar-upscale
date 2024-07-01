@@ -1,5 +1,6 @@
 import "server-only";
 
+import { AdvancedChordModesLoader } from "@/app/components/AdvancedChordModesLoader";
 import { DetectScaleButton } from "@/app/components/settings/buttons/DetectScaleButton";
 import { MidiUploadButton } from "@/app/components/settings/buttons/MidiUploadButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
@@ -31,14 +32,6 @@ const PremiumPlayButton = dynamic(
   async () =>
     (await import("@/app/components/playPanel/PremiumPlayButton"))
       .PremiumPlayButton
-);
-const UseAdvancedChordsCheckbox = dynamic(
-  async () =>
-    (
-      await import(
-        "@/app/components/settings/checkboxes/UseAdvancedChordsCheckbox"
-      )
-    ).UseAdvancedChordsCheckbox
 );
 const InstrumentSelector = dynamic(
   async () =>
@@ -90,7 +83,7 @@ export const premiumFeaturesToMap = (
       case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
       case "advancedChords":
-        return <UseAdvancedChordsCheckbox />;
+        return <AdvancedChordModesLoader />;
       case "instruments":
         return (
           <>
