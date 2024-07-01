@@ -55,11 +55,11 @@ const getParametersForSkin = (skin?: CombinedSkinType) => {
         widthStep: 10.85,
         stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
       };
-    case SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+    case SevenStringSkin.Diablo_Baritone:
       return {
-        height: 23,
-        widthStep: 10.34,
-        stringTiltModifiers: [1.4, 0, -1.8, -7, 5, 5.5, 6, 5.5],
+        height: 21,
+        widthStep: 9.95,
+        stringTiltModifiers: [2.3, 1.8, 0.4, -2, 3, 3, 3.7, 4.7],
       };
     case EightStringSkin.Ibanez_RG9PB_TGF:
       return {

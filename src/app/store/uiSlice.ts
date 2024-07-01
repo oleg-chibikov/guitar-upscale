@@ -106,7 +106,7 @@ export const uiSlice = createSlice({
     },
     setSkinBasedOnStringCount(state) {
       if (stringCountValue === 7) {
-        state.skin = SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior;
+        state.skin = SevenStringSkin.Diablo_Baritone;
       } else if (stringCountValue === 8) {
         state.skin = EightStringSkin.Ibanez_RG9PB_TGF;
       } else {

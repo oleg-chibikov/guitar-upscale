@@ -6,8 +6,7 @@ export const Skin = {
 } as const;
 
 export const SevenStringSkin = {
-  Dean_MichaelAngelo_Batio_MAB7_Warrior:
-    "Dean_MichaelAngelo_Batio_MAB7_Warrior", // electric 7 string
+  Diablo_Baritone: "Diablo_Baritone", // electric 7 string
 } as const;
 
 export const EightStringSkin = {

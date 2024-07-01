@@ -44,10 +44,10 @@ const getPositionForSkin = (skin?: CombinedSkinType) => {
         left: -520,
         xShift: 450,
       };
-    case SevenStringSkin.Dean_MichaelAngelo_Batio_MAB7_Warrior:
+    case SevenStringSkin.Diablo_Baritone:
       return {
-        top: -547,
-        left: -762,
+        top: -590,
+        left: -699,
         xShift: 450,
       };
 
