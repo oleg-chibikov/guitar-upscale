@@ -45,7 +45,6 @@ interface WithNeck {
   neck: Neck | null;
   capo: number;
   stringCount: number;
-  chordModesCount: number;
 }
 
 interface WithIsPaused {
@@ -148,7 +147,6 @@ const initialState: SettingsState = {
   isLooperPlaying: false,
   strummingPatternChangedTrigger: false,
   stringCount: 6,
-  chordModesCount: 0,
 };
 
 // A values that changes immediately without the need for rerender
@@ -158,7 +156,7 @@ const initialState: SettingsState = {
 
 export let neckValue: Neck | null = initialState.neck;
 export let stringCountValue: number = initialState.stringCount;
-export let chordsValue: ChordModeVariations[] = [];
+export const chordsValue: ChordModeVariations[] = [];
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
@@ -572,13 +570,6 @@ export const settingsSlice = createSlice({
         updateStrummingPatternId(state, initialState.strummingPatternId);
       }
     },
-    incrementChordModesCount(state) {
-      state.chordModesCount++;
-    },
-    initChords(state) {
-      state.chordModesCount = 0;
-      chordsValue = [];
-    },
   },
 });
 
@@ -617,8 +608,6 @@ export const {
   setIsLooperPlaying,
   triggerCustomStrummingPatternChanged,
   checkCustomStrummingPatternAfterDeletion,
-  incrementChordModesCount,
-  initChords,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

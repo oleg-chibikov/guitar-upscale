@@ -10,8 +10,5 @@ self.onmessage = (event: WorkerMessageWrapper<GenerateChordsWorkerMessage>) => {
   if (type === "start") {
     const { type, ...rest } = event.data;
     chordsGenerator.processInWorker(rest);
-  } else if (type === "abort") {
-    const { type, ...rest } = event.data;
-    chordsGenerator.abortProcessing(rest);
   }
 };

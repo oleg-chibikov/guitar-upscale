@@ -1,6 +1,5 @@
-import { getChordName } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { Note } from "@/app/data/notes";
+import { Chord } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import {
   ChordPlayParameters,
@@ -25,7 +24,6 @@ import {
   chordIsBeingDetectedValue,
   chordPlayModeValue,
   chordStrummingDelayMsValue,
-  chordsValue,
 } from "@/app/store/settingsSlice";
 import { selectUi, themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
@@ -33,23 +31,21 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
 interface ChordButtonProps {
-  chordModeIndex: number;
-  note: Note;
+  chordName: string;
+  variations: Chord[];
+  isHidden: boolean;
   onStrummingStateChange: (value: boolean) => void;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
-  chordModeIndex,
-  note,
+  chordName,
+  variations,
+  isHidden,
   onStrummingStateChange,
 }) => {
-  const isHidden = false; // TODO!
-  const chordModeVariations = chordsValue[chordModeIndex];
-  const chordName = getChordName(note, chordModeVariations.chordMode);
-  const variations = chordModeVariations.variationsByNote[note];
   const elementRef = useRef<HTMLUListElement>(null);
   const hasTouchInput = useInputChecker();
-  const isDisabled = !variations?.length;
+  const isDisabled = !variations.length;
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);

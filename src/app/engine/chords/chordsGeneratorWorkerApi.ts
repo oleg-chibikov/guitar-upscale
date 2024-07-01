@@ -10,20 +10,29 @@ import {
 } from "@/app/data/chordsGeneratorTypes";
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 
-const worker = new Worker(
-  new URL("./chordsGeneratorWorker.ts", import.meta.url)
-);
+let worker: Worker | undefined;
 
-export const generateChords = (
+export const abortGeneratingChords = () => {
+  if (worker) {
+    console.log("Terminate worker");
+    worker.terminate();
+    worker = undefined;
+  }
+};
+
+export const generateChords = async (
   neck: Neck,
   capo: number,
-  generationId: number,
   onChordModeProcessed: (
     chordModeVariationsContainer: ChordModeVariationsContainer
   ) => void,
-  onComplete: () => void,
-  onAbort?: () => void
+  onComplete: () => void
 ) => {
+  console.log("Start generating chords");
+
+  worker = new Worker(new URL("./chordsGeneratorWorker.ts", import.meta.url));
+
+  // Set up the new worker's onmessage handler
   worker.onmessage = (
     event: WorkerMessageWrapper<GenerateChordsCallbackMessage>
   ) => {
@@ -37,37 +46,23 @@ export const generateChords = (
             `Chord mode ${chordModeVariationsContainer.chordModeVariations.chordMode.name} (index: ${index}) has been processed`
           );
           onChordModeProcessed(chordModeVariationsContainer);
-
-          // Update your UI or perform any other necessary actions
         }
         break;
       case "processingComplete":
         console.log("All chord modes have been processed");
-        // Perform any final actions needed when processing is complete
         onComplete();
-        break;
-      case "processingAborted":
-        console.log("Chord processing aborted");
-        onAbort?.();
+        worker = undefined;
         break;
     }
   };
 
   const allModes = [...chordModes, ...advancedChordModes];
 
-  // To start the processing
+  // Start the processing
   worker.postMessage({
     type: "start",
     neck,
     capo,
     chordModes: allModes,
-    generationId,
-  } as GenerateChordsWorkerMessage);
-};
-
-export const abortGeneratingChords = (generationId: number) => {
-  worker.postMessage({
-    type: "abort",
-    generationId,
   } as GenerateChordsWorkerMessage);
 };

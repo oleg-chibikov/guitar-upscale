@@ -1,10 +1,11 @@
 import { Expander } from "@/app/components/uiFramework/Expander";
+import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
-import { NOTE_COUNT, SHARP_NOTE_COUNT } from "@/app/data/notes";
+import { NOTE_COUNT, SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import {
   clearChordDetector,
   rebuildChordDetectorLookup,
@@ -23,14 +24,13 @@ import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import {
   addChordMode,
   capoValue,
-  incrementChordModesCount,
-  initChords,
+  chordsValue,
   neckValue,
   selectSettings,
   setChordIsBeingDetected,
 } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
-import { RefObject, useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
@@ -41,16 +41,20 @@ const COMPACT_CHORDS_WIDTH = 220;
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
-  // unique number for each chordGeneration. This helps with aborting the proper chordGeneration execution
-  const localGuitarSettingsUpdateCount = useRef<number>(0);
-
-  const { chordModesCount, guitarSettingsUpdateCount } =
-    useSelector(selectSettings);
-
   const { chordsExpanded, chordsDisplayMode, useSharpChords } =
     useSelector(selectUi);
-
   const dispatch = useDispatch();
+  const handleExpansion = () => {
+    dispatch(setChordsExpanded(!chordsExpanded));
+  };
+  // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
+  const localGuitarSettingsUpdateCount = useRef<number>(0);
+
+  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
+  const [chordModeVariations, setChordModeVariations] = useState<
+    ChordModeVariations[]
+  >([]);
+
   useEffect(() => {
     if (!neckValue) {
       return;
@@ -61,13 +65,12 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     ) {
       return;
     }
-
-    // it will stop any current processing
-    abortGeneratingChords(localGuitarSettingsUpdateCount.current);
+    abortGeneratingChords();
 
     localGuitarSettingsUpdateCount.current = guitarSettingsUpdateCount;
     chordNotesByName.clear();
-    dispatch(initChords());
+    chordsValue.length = 0; // clear chordsValue;
+    setChordModeVariations([]);
 
     // TODO: Prevent chord detection / midi upload until chords are built
     // TODO: For midi upload as we change scale we will have to wait for this to finish
@@ -75,11 +78,10 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     generateChords(
       neckValue,
       capoValue,
-      localGuitarSettingsUpdateCount.current,
       (chordModeVariationsContainer) => {
         addChordMode(chordModeVariationsContainer.chordModeVariations);
         setPreferredVariationsForChordMode(chordModeVariationsContainer);
-        dispatch(incrementChordModesCount());
+        setChordModeVariations([...chordsValue]);
       },
       () => {
         clearChordDetector?.();
@@ -88,10 +90,6 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
       }
     );
   }, [dispatch, guitarSettingsUpdateCount]);
-
-  const handleExpansion = () => {
-    dispatch(setChordsExpanded(!chordsExpanded));
-  };
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
@@ -130,8 +128,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  if (chordModesCount === 0) {
+  const totalColumns = chordModeVariations.length;
+  if (totalColumns === 0) {
     return null;
   }
 
@@ -150,7 +148,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     >
       <section
         ref={ref}
-        className={`grid grid-cols-2 gap-0.5 ${
+        className={`grid gap-0.5 ${
           scrollBarVisible ? "overscroll-contain" : "touch-none"
         } overflow-auto`}
         style={{
@@ -159,27 +157,34 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
               ? COMPACT_CHORDS_WIDTH
               : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
           maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-          gridTemplateColumns: `repeat(${chordModesCount}, 1fr)`,
+          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
           gridTemplateRows: `repeat(${totalRows}, 1fr)`,
         }}
       >
-        {Array.from({ length: totalRows }).map((_, rowIndex) =>
-          Array.from({ length: chordModesCount }).map((_, columnIndex) => (
-            <ChordButton
-              key={rowIndex + "_" + columnIndex}
-              chordModeIndex={columnIndex}
-              note={rowIndex}
-              onStrummingStateChange={(value) => {
-                if (!isMobileDeviceValue) {
-                  return;
-                }
-                const isStrummingClicked = value || isAnyStrummingClicked();
-                toggleOverflow(isStrummingClicked, ref);
-                toggleOverflow(isStrummingClicked, mainRef);
-              }}
-            />
-          ))
-        )}
+        {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) => (
+          <React.Fragment key={noteIndex}>
+            {chordModeVariations.map((chordMode) => {
+              const title = getChordName(noteIndex, chordMode.chordMode);
+              const isHidden = !useSharpChords && isSharp(noteIndex);
+              return (
+                <ChordButton
+                  key={title}
+                  isHidden={isHidden}
+                  variations={chordMode.variationsByNote[noteIndex] ?? []}
+                  chordName={title}
+                  onStrummingStateChange={(value) => {
+                    if (!isMobileDeviceValue) {
+                      return;
+                    }
+                    const isStrummingClicked = value || isAnyStrummingClicked();
+                    toggleOverflow(isStrummingClicked, ref);
+                    toggleOverflow(isStrummingClicked, mainRef);
+                  }}
+                />
+              );
+            })}
+          </React.Fragment>
+        ))}
       </section>
     </Expander>
   );

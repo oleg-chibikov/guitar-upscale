@@ -1,21 +1,16 @@
 import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 
-export type WithGenerationId = {
-  generationId: number;
-};
-
-export type GenerateChordsRequest = WithGenerationId & {
+export type GenerateChordsRequest = {
   neck: Neck;
   capo: number;
   chordModes: ChordMode[];
 };
 
 export type GenerateChordsWorkerMessage =
-  | ({
+  | {
       type: "start";
-    } & GenerateChordsRequest)
-  | ({ type: "abort" } & WithGenerationId);
+    } & GenerateChordsRequest;
 
 export type GenerateChordsCallback = {
   chordModeVariationsContainer: ChordModeVariationsContainer;
@@ -26,8 +21,7 @@ export type GenerateChordsCallbackMessage =
   | ({
       type: "chordModeProcessed";
     } & GenerateChordsCallback)
-  | { type: "processingComplete" }
-  | { type: "processingAborted" };
+  | { type: "processingComplete" };
 
 export type WorkerMessageWrapper<T> = {
   data: T;
