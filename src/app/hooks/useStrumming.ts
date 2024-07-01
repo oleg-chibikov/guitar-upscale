@@ -545,8 +545,8 @@ export const useStrumming = (
             resetStrummingPosition(); // just to log
           }
 
-          // we stop strumming anyway if the click was released in the first quarter of pattern
-          const indexLimitForClickRelease = patternObject.strums.length / 4;
+          // we stop strumming anyway if the click was released in the first half of pattern
+          const indexLimitForClickRelease = patternObject.strums.length / 2;
 
           while (isChordClicked(chordName)) {
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
