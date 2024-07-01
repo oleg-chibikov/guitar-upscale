@@ -545,9 +545,15 @@ export const useStrumming = (
             resetStrummingPosition(); // just to log
           }
 
+          // we stop strumming anyway if the click was released in the first quarter of pattern
+          const indexLimitForClickRelease = patternObject.strums.length / 4;
+
           while (isChordClicked(chordName)) {
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
-              if (!waitForPatternFinishValue) {
+              if (
+                !waitForPatternFinishValue ||
+                currentIndex < indexLimitForClickRelease
+              ) {
                 // early break pattern only when the checkbox is off
                 if (!isChordClicked(chordName)) {
                   // already released mouse/touch - don't play the strumming
