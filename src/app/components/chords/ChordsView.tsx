@@ -28,6 +28,7 @@ import {
   neckValue,
   selectSettings,
   setChordIsBeingDetected,
+  setChordsAreLoading,
 } from "@/app/store/settingsSlice";
 import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
 import React, { RefObject, useEffect, useRef, useState } from "react";
@@ -71,10 +72,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     chordNotesByName.clear();
     chordsValue.length = 0; // clear chordsValue;
     setChordModeVariations([]);
+    dispatch(setChordsAreLoading(true));
 
-    // TODO: Prevent chord detection / midi upload until chords are built
-    // TODO: For midi upload as we change scale we will have to wait for this to finish
-    // Passing true for useAdvancedChords to generate them all (in order to play in examples). But the user can show them only being premium
     generateChords(
       neckValue,
       capoValue,
@@ -87,6 +86,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
         clearChordDetector?.();
         dispatch(setChordIsBeingDetected(false));
         rebuildChordDetectorLookup();
+        dispatch(setChordsAreLoading(false));
       }
     );
   }, [dispatch, guitarSettingsUpdateCount]);

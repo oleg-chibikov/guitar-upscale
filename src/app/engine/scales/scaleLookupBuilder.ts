@@ -2,6 +2,9 @@ import { NOTE_COUNT, Note, getNoteText } from "@/app/data/notes";
 import { Scale, scalesMap } from "@/app/data/scales";
 import { getUnshiftedNote } from "@/app/data/tunings";
 import {
+  capoValue,
+  scaleGroupValue,
+  scaleValue,
   setCapo,
   setScale,
   setScaleGroup,
@@ -20,11 +23,22 @@ export const setCurrentScaleAndGroup = (
   data: ScaleAndGroup,
   dispatch: Dispatch<UnknownAction>
 ) => {
-  dispatch(setScaleGroup(data.group));
-  dispatch(setScale(data.scale));
+  let changed = false;
+  if (data.group !== scaleGroupValue) {
+    changed = true;
+    dispatch(setScaleGroup(data.group));
+  }
+  if (data.scale !== scaleValue) {
+    changed = true;
+    dispatch(setScale(data.scale));
+  }
   const unshiftedNote = getUnshiftedNote(data.note, tuningValue);
   console.log("New base note", getNoteText(unshiftedNote));
-  dispatch(setCapo(unshiftedNote));
+  if (capoValue !== unshiftedNote) {
+    changed = true;
+    dispatch(setCapo(unshiftedNote));
+  }
+  return changed;
 };
 
 export const rebuildScaleDetectorLookup = () => {

@@ -110,6 +110,7 @@ interface SettingsState
   looperStateUpdateTrigger: boolean;
   isLooperPlaying: boolean;
   strummingPatternChangedTrigger: boolean;
+  chordsAreLoading: boolean;
 }
 
 const initialState: SettingsState = {
@@ -147,6 +148,7 @@ const initialState: SettingsState = {
   isLooperPlaying: false,
   strummingPatternChangedTrigger: false,
   stringCount: 6,
+  chordsAreLoading: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -191,6 +193,7 @@ export let toggleMetronomeWhenRecordingValue: boolean =
 export let wipeExampleCacheTriggerValue: boolean = false;
 export let isLastEventValue: boolean = initialState.isLastEvent;
 export let isFirstEventValue: boolean = initialState.isFirstEvent;
+export let chordsAreLoadingValue: boolean = initialState.chordsAreLoading;
 
 export let preventScaleDetectorFlush: boolean = false;
 export const setPreventScaleDetectorFlush = (value: boolean) => {
@@ -374,6 +377,7 @@ export const settingsSlice = createSlice({
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       neckValue = state.neck;
       stringCountValue = state.stringCount;
+      chordsAreLoadingValue = state.chordsAreLoading;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -570,6 +574,10 @@ export const settingsSlice = createSlice({
         updateStrummingPatternId(state, initialState.strummingPatternId);
       }
     },
+    setChordsAreLoading(state, action: PayloadAction<boolean>) {
+      state.chordsAreLoading = action.payload;
+      chordsAreLoadingValue = action.payload;
+    },
   },
 });
 
@@ -608,6 +616,7 @@ export const {
   setIsLooperPlaying,
   triggerCustomStrummingPatternChanged,
   checkCustomStrummingPatternAfterDeletion,
+  setChordsAreLoading,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;

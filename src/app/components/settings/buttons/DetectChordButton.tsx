@@ -17,13 +17,21 @@ import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { chordIsBeingDetected } = useSelector(selectSettings);
+  const { chordIsBeingDetected, chordsAreLoading } =
+    useSelector(selectSettings);
   const setupChordDetector = useChordDetectorSetup();
   return (
     <IconButtonWrapper
       {...props}
+      disabled={chordsAreLoading}
       icon={chordIsBeingDetected ? <SearchOff /> : <Troubleshoot />}
-      tooltip={chordIsBeingDetected ? "Stop detecting chord" : "Detect chord"}
+      tooltip={
+        chordsAreLoading
+          ? "Wait for the chords to load before detecting"
+          : chordIsBeingDetected
+          ? "Stop detecting chord"
+          : "Detect chord"
+      }
       isActive={chordIsBeingDetected}
       activeBg="error"
       onPress={async () => {

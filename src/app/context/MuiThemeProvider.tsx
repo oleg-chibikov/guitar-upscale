@@ -83,7 +83,7 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
         fontSize: "0.85rem",
       },
       body2: {
-        fontSize: "0.50rem",
+        fontSize: "0.70rem",
       },
       button: {
         fontSize: "0.75rem",

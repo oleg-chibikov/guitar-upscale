@@ -79,6 +79,7 @@ const persistConfig = {
         delete newState.showAspectRatio;
         delete newState.chordModesCount;
         delete newState.guitarSettingsUpdateCount;
+        delete newState.chordsAreLoading;
         return newState;
       },
       out: (state: PersistedState) => state, // No transformation needed when deserializing

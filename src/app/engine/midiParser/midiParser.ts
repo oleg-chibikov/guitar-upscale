@@ -9,6 +9,7 @@ import {
 } from "@/app/data/notes";
 import { CHROMATIC, SPECIAL } from "@/app/data/scales";
 import { getShiftedNote } from "@/app/data/tunings";
+import { setPromiseToResolveWhenChordsAreLoaded } from "@/app/engine/chords/chordsGeneratorWorkerApi";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import { extractChordFromNotes } from "@/app/engine/midiParser/chordMatcher";
 import { groupEventsByTickWithTolerance } from "@/app/engine/midiParser/groupSplitter";
@@ -17,11 +18,13 @@ import { parseMidiFile } from "@/app/engine/midiParser/midiFileParser";
 import { setCurrentScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { arrayToMap } from "@/app/helpers/arrayHelper";
 import { FunctionCache } from "@/app/helpers/functionCache";
+import { createPromise } from "@/app/helpers/promiseHelper";
 import {
   capoValue,
   chordInstrumentValue,
   chordNotesToPlayValue,
   chordStrummingDelayMsValue,
+  setChordsAreLoading,
   tuningValue,
 } from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
@@ -43,64 +46,96 @@ export const parseMidiData = async (
   const midiData = read(byteArray);
   console.log(midiData);
   const { dataByTrack, distinctNotes } = parseMidiFile(midiData, setTempo);
-  const { scaleDetector } = await import("@/app/engine/scales/scaleDetector");
 
-  scaleDetector.findMatches(
-    distinctNotes,
-    distinctNotes.filter((x) => x !== undefined).length,
-    (result) => {
-      const currentBaseNote = getShiftedNote(capoValue, tuningValue);
-      if (result.scales?.length) {
-        const scalesInSameBaseNote = result.scales.filter(
-          (x) => x.note === currentBaseNote
-        );
-
-        const firstMatchingScale = scalesInSameBaseNote.length
-          ? scalesInSameBaseNote[0]
-          : result.scales[0];
-        setCurrentScaleAndGroup(firstMatchingScale, store.dispatch);
-        store.dispatch(
-          setAndShowAlert({
-            message:
-              "Playing the MIDI file in " +
-              getNoteText(firstMatchingScale.note) +
-              " " +
-              firstMatchingScale.scale +
-              " scale",
-            alertType: AlertType.Success,
-          })
-        );
-      } else {
-        setCurrentScaleAndGroup(
-          {
-            group: SPECIAL,
-            scale: CHROMATIC,
-            note: currentBaseNote,
-          },
-          store.dispatch
-        );
-        store.dispatch(
-          setAndShowAlert({
-            message:
-              "Cannot detect scale for the MIDI file. Playing in the Chromatic scale",
-            alertType: AlertType.Warning,
-          })
-        );
-      }
-    }
-  );
+  await detectScale(distinctNotes);
 
   const eventsByTick = new EventsByTick();
 
   let trackIndex = 0;
   for (const track of dataByTrack) {
     processTrack(track, eventsByTick, trackIndex);
-
     trackIndex++;
   }
 
   return eventsByTick;
 };
+
+async function detectScale(distinctNotes: unknown[]) {
+  const { scaleDetector } = await import("@/app/engine/scales/scaleDetector");
+  return new Promise<void>((resolve) => {
+    scaleDetector.findMatches(
+      distinctNotes,
+      distinctNotes.filter((x) => x !== undefined).length,
+      async (result) => {
+        let guitarSettingsChanged = false;
+        const currentBaseNote = getShiftedNote(capoValue, tuningValue);
+        if (result.scales?.length) {
+          const scalesInSameBaseNote = result.scales.filter(
+            (x) => x.note === currentBaseNote
+          );
+
+          const firstMatchingScale = scalesInSameBaseNote.length
+            ? scalesInSameBaseNote[0]
+            : result.scales[0];
+          guitarSettingsChanged = setCurrentScaleAndGroup(
+            firstMatchingScale,
+            store.dispatch
+          );
+          store.dispatch(
+            setAndShowAlert({
+              message:
+                "Playing the MIDI file in " +
+                getNoteText(firstMatchingScale.note) +
+                " " +
+                firstMatchingScale.scale +
+                " scale",
+              alertType: AlertType.Success,
+            })
+          );
+        } else {
+          guitarSettingsChanged = setCurrentScaleAndGroup(
+            {
+              group: SPECIAL,
+              scale: CHROMATIC,
+              note: currentBaseNote,
+            },
+            store.dispatch
+          );
+          store.dispatch(
+            setAndShowAlert({
+              message:
+                "Cannot detect scale for the MIDI file. Playing in the Chromatic scale",
+              alertType: AlertType.Warning,
+            })
+          );
+        }
+
+        if (guitarSettingsChanged) {
+          // settings changed - need to wait for the chords to be rebuilt
+          console.log("Waiting for chords to load");
+
+          //Create promise and pass resolve function to chord detector. Then wait for this promise to resolve
+          const { waitFor, recreate } = createPromise();
+
+          setPromiseToResolveWhenChordsAreLoaded(() => {
+            recreate(true); // true means we don't need to create another one when this is resolved
+          }); // set waiting to true soi tha waitForChordsToLoad doesn't return straight away
+          store.dispatch(setChordsAreLoading(true));
+          waitFor().then(() => {
+            console.log("Finished loading chords");
+            resolve();
+          });
+        } else {
+          console.log(
+            "Guitar settings didn't change - start playing immediately"
+          );
+          resolve();
+        }
+      }
+    );
+  });
+}
+
 function processTrack(
   track: TrackData,
   eventsByTick: EventsByTick,

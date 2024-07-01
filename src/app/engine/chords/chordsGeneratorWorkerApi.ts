@@ -11,6 +11,13 @@ import {
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 
 let worker: Worker | undefined;
+let chordsWaitResolve: (() => void) | undefined;
+
+export const setPromiseToResolveWhenChordsAreLoaded = (
+  resolve: () => void | undefined
+) => {
+  chordsWaitResolve = resolve;
+};
 
 export const abortGeneratingChords = () => {
   if (worker) {
@@ -52,6 +59,9 @@ export const generateChords = async (
         console.log("All chord modes have been processed");
         onComplete();
         worker = undefined;
+        chordsWaitResolve?.();
+        chordsWaitResolve = undefined;
+
         break;
     }
   };

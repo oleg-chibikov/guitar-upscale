@@ -1,6 +1,6 @@
 import { getModeText } from "@/app/data/chordModes";
 import { Chord, NOTE_COUNT, getNoteText } from "@/app/data/notes";
-import { chordsValue } from "@/app/store/settingsSlice";
+import { chordsAreLoadingValue, chordsValue } from "@/app/store/settingsSlice";
 
 export const rebuildChordDetectorLookup = () => {
   if (!chordsValue) {
@@ -28,6 +28,10 @@ export const setChordDetectorFunctions = (
 ) => {
   clearChordDetector = clear;
   addChordToDetectorLookup = addChord;
+  if (chordsAreLoadingValue) {
+    // This is unlikely to happen as the button is disabled until the chords are loaded
+    return; // if chords are being loaded then rebuildChordDetectorLookup will be called once they are built. No need to call it once more
+  }
   rebuildChordDetectorLookup(); // we need to re-scan all the chords after setting the function
 };
 
