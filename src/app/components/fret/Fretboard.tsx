@@ -1,64 +1,15 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { FRETBOARD } from "@/app/data/elementIds";
-import {
-  CombinedSkinType,
-  EightStringSkin,
-  SevenStringSkin,
-  Skin,
-} from "@/app/data/skin";
 import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
-import { getAssetsForSkin } from "@/app/helpers/skinHelper";
+import { getAssetsForSkin, getPositionForSkin } from "@/app/helpers/skinHelper";
 import { selectSettings } from "@/app/store/settingsSlice";
 import { selectUi } from "@/app/store/uiSlice";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
-
-const getPositionForSkin = (skin?: CombinedSkinType) => {
-  switch (skin) {
-    case Skin.PRS_SE_AX20E:
-    case undefined:
-      return {
-        top: -583,
-        left: -455,
-        xShift: 450,
-      };
-    case Skin.Ibanez_AE140_WKH:
-      return {
-        top: -589,
-        left: -544,
-        xShift: 520,
-      };
-    case Skin.Yamaha_CSF3M:
-      return {
-        top: -573,
-        left: -465,
-        xShift: 450,
-      };
-    case Skin.Yamaha_SLG200NW:
-      return {
-        top: -567,
-        left: -520,
-        xShift: 450,
-      };
-    case SevenStringSkin.Diablo_Baritone:
-      return {
-        top: -590,
-        left: -699,
-        xShift: 450,
-      };
-
-    case EightStringSkin.Ibanez_RG9PB_TGF:
-      return {
-        top: -561,
-        left: -672,
-        xShift: 450,
-      };
-  }
-};
 
 export const Fretboard: React.FC = () => {
   const { skin, fretboardScaleX, fretboardScaleY, chordsExpanded } =

@@ -1,10 +1,5 @@
 import { NOTE_COUNT, StringOctaveNote } from "@/app/data/notes";
-import {
-  CombinedSkinType,
-  EightStringSkin,
-  SevenStringSkin,
-  Skin,
-} from "@/app/data/skin";
+import { getParametersForSkin } from "@/app/helpers/skinHelper";
 import { selectUi } from "@/app/store/uiSlice";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -26,48 +21,6 @@ const calculateTop = (string: number, fret: number, modifiers: number[]) => {
     string < baseMultipliers.length ? baseMultipliers[string] : 0.3;
 
   return fret * multiplier * modifiers[string];
-};
-
-const getParametersForSkin = (skin?: CombinedSkinType) => {
-  switch (skin) {
-    case Skin.PRS_SE_AX20E:
-    default:
-      return {
-        height: 25,
-        widthStep: 10.25,
-        stringTiltModifiers: [3.2, 3, 2, 1, 2, 2.5, 3, 3.5],
-      };
-    case Skin.Ibanez_AE140_WKH:
-      return {
-        height: 27,
-        widthStep: 10.2,
-        stringTiltModifiers: [2.5, 2.2, 2, 1, 2, 2.5, 3, 3.5],
-      };
-    case Skin.Yamaha_CSF3M:
-      return {
-        height: 29,
-        widthStep: 10.56,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
-      };
-    case Skin.Yamaha_SLG200NW:
-      return {
-        height: 30,
-        widthStep: 10.85,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
-      };
-    case SevenStringSkin.Diablo_Baritone:
-      return {
-        height: 21,
-        widthStep: 9.95,
-        stringTiltModifiers: [2.3, 1.8, 0.4, -2, 3, 3, 3.7, 4.7],
-      };
-    case EightStringSkin.Ibanez_RG9PB_TGF:
-      return {
-        height: 24,
-        widthStep: 10.85,
-        stringTiltModifiers: [3.3, 3.3, 2.8, 2, 1, 1.8, 2.6, 2.7],
-      };
-  }
 };
 
 export const Fretline: React.FC<FretlineProps> = ({
