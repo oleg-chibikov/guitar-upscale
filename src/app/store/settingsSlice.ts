@@ -119,7 +119,7 @@ const initialState: SettingsState = {
   capo: 0,
   neck: null,
   tempoBpm: 120,
-  chordStrummingDelayMs: 3,
+  chordStrummingDelayMs: 0,
   volume: MAX_VOLUME,
   metronomeVolume: MAX_VOLUME,
   playbackType: PlaybackType.Melody,
@@ -132,7 +132,7 @@ const initialState: SettingsState = {
   chordInstrument: "orchestral_harp",
   reverbStrength: 0.2,
   useChordAlteration: false,
-  strummingPatternId: chordStrummingPatterns[5].id, // 5 is a pattern of a medium difficulty - not that simple as 0
+  strummingPatternId: chordStrummingPatterns[7].id, // it is a pattern of a medium difficulty - not that simple as the very first one
   waitForPatternFinish: true,
   seamlessChordSwitching: true,
   isMetronomeActive: false,
