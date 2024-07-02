@@ -2,6 +2,7 @@ export const chordButtonPossibleClasses = [
   "cursor-progress",
   "cursor-pointer",
   "border-2",
+  "border-red-500",
   "border-accent_stronger-light",
   "border-accent_stronger-dark",
   "border-accent_strongest-light",

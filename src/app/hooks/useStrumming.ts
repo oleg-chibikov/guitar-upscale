@@ -187,7 +187,8 @@ export const useStrumming = (
   hasTouchInput: boolean,
   setClickedState: (value: boolean) => void,
   setPlayingState: (value: boolean) => void,
-  setGracePeriodState: (value: boolean) => void
+  setGracePeriodState: (value: boolean) => void,
+  setImmediateChordGracePeriodState: (value: boolean) => void
 ) => {
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
@@ -628,16 +629,20 @@ export const useStrumming = (
       clickNumber
     );
     if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
-      // Add gracePeriod of 200 ms. During this period no chords will play and if the click is released - strumming finishes.
+      // Add gracePeriod of N ms. During this period no chords will play and if the click is released - strumming finishes.
       // This happens only for the new strumming - doesn't work when switching chords
       isInImmediateChordGracePeriod.current = true;
+      setImmediateChordGracePeriodState(isInImmediateChordGracePeriod.current);
       setTimeout(() => {
         isInImmediateChordGracePeriod.current = false;
-      }, 200);
+        setImmediateChordGracePeriodState(
+          isInImmediateChordGracePeriod.current
+        );
+      }, 400);
     }
     // Add a zero timeout to switch context - otherwise it plays the next chord even if strumming was released
     await asyncTimeout(waitAndStrum, 0);
   };
 
-  return { onChordPress, isAlternateRef };
+  return { onChordPress, isAlternateRef, isInImmediateChordGracePeriod };
 };

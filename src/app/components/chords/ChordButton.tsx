@@ -71,8 +71,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       isGracePeriodRef.current
     ) {
       neededClasses.push("border-2");
-
-      if (isGracePeriodRef.current) {
+      if (isInImmediateChordGracePeriod.current) {
+        neededClasses.push("border-red-500");
+      } else if (isGracePeriodRef.current) {
         neededClasses.push(
           themeValue === Theme.Light
             ? "border-accent_stronger-light"
@@ -148,14 +149,16 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   };
 
   const wasPlayedLastRef = useRef<boolean>(false);
-  const { onChordPress, isAlternateRef } = useStrumming(
-    chordName,
-    isDisabled,
-    hasTouchInput,
-    onClickedChange,
-    onPlayingChange,
-    onGracePeriodChange
-  );
+  const { onChordPress, isAlternateRef, isInImmediateChordGracePeriod } =
+    useStrumming(
+      chordName,
+      isDisabled,
+      hasTouchInput,
+      onClickedChange,
+      onPlayingChange,
+      onGracePeriodChange,
+      toggleClasses
+    );
 
   const { theme, useSharpChords } = useSelector(selectUi);
 
