@@ -64,14 +64,18 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       neededClasses.push("cursor-pointer");
     }
 
+    const isInImmediateChordGracePeriod =
+      isInImmediateChordGracePeriodRef.current !== undefined;
+
     // border
     if (
       isClickedRef.current ||
       isPlayingRef.current ||
-      isGracePeriodRef.current
+      isGracePeriodRef.current ||
+      isInImmediateChordGracePeriod
     ) {
       neededClasses.push("border-2");
-      if (isInImmediateChordGracePeriod.current) {
+      if (isInImmediateChordGracePeriod) {
         neededClasses.push("border-red-500");
       } else if (isGracePeriodRef.current) {
         neededClasses.push(
@@ -149,7 +153,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   };
 
   const wasPlayedLastRef = useRef<boolean>(false);
-  const { onChordPress, isAlternateRef, isInImmediateChordGracePeriod } =
+  const { onChordPress, isAlternateRef, isInImmediateChordGracePeriodRef } =
     useStrumming(
       chordName,
       isDisabled,

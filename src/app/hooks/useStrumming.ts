@@ -39,6 +39,7 @@ import {
   getChordClickedPromise,
   getOtherChordsGracePeriodPromises,
   getOtherChordsStrummingPromises,
+  isAnyChordInImmediateGracePeriod,
   isChordClicked,
   isChordStrumming,
   isChordStrummingOrPendingStrumming,
@@ -46,6 +47,8 @@ import {
   markChordAsStrumming,
   registerChordClick,
   releaseChordClick,
+  releaseImmediateChordGracePeriod,
+  setImmediateChordGracePeriod,
   startChordGracePeriod,
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
@@ -185,14 +188,14 @@ export const useStrumming = (
   chordName: string,
   isDisabled: boolean,
   hasTouchInput: boolean,
-  setClickedState: (value: boolean) => void,
-  setPlayingState: (value: boolean) => void,
-  setGracePeriodState: (value: boolean) => void,
-  setImmediateChordGracePeriodState: (value: boolean) => void
+  setClickedStateInComponent: (value: boolean) => void,
+  setPlayingStateInComponent: (value: boolean) => void,
+  setGracePeriodStateInComponent: (value: boolean) => void,
+  setImmediateChordGracePeriodStateInComponent: (value: boolean) => void
 ) => {
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
-  const isInImmediateChordGracePeriod = useRef<boolean>(false);
+  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>();
 
   const onChordPress = async () => {
     const clickNumber = clickNumberRef.current++;
@@ -288,7 +291,7 @@ export const useStrumming = (
       } else {
         releaseChordClick(chordName, clickNumber);
       }
-      setClickedState(value);
+      setClickedStateInComponent(value);
     };
 
     const setPlaying = (value: boolean) => {
@@ -296,9 +299,9 @@ export const useStrumming = (
         markChordAsStrumming(chordName, clickNumber);
       } else {
         finishChordGracePeriod(chordName, clickNumber);
-        setGracePeriodState(false);
+        setGracePeriodStateInComponent(false);
       }
-      setPlayingState(value);
+      setPlayingStateInComponent(value);
     };
 
     console.log(STRUMMING_LOG_PREFIX + "Pressed chord", chordName, clickNumber);
@@ -521,13 +524,15 @@ export const useStrumming = (
 
           const playChordOnce = async () => {
             const char = patternObject.strums[currentIndex];
+            const isInImmediateChordGracePeriod =
+              isInImmediateChordGracePeriodRef.current !== undefined;
             switch (char) {
               case "↑":
                 isAlternateRef.current = false;
                 play(
                   chordName,
                   clickedInGracePeriod,
-                  isInImmediateChordGracePeriod.current
+                  isInImmediateChordGracePeriod
                 );
                 break;
               case "↓":
@@ -535,7 +540,7 @@ export const useStrumming = (
                 play(
                   chordName,
                   clickedInGracePeriod,
-                  isInImmediateChordGracePeriod.current
+                  isInImmediateChordGracePeriod
                 );
                 break;
               case "":
@@ -564,7 +569,7 @@ export const useStrumming = (
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
               if (
                 !waitForPatternFinishValue ||
-                isInImmediateChordGracePeriod.current
+                isInImmediateChordGracePeriodRef.current !== undefined
               ) {
                 // early break pattern only when the checkbox is off or when within the immediate chord grace period
                 if (!isChordClicked(chordName)) {
@@ -579,7 +584,7 @@ export const useStrumming = (
           }
 
           if (waitForPatternFinishValue) {
-            setGracePeriodState(true);
+            setGracePeriodStateInComponent(true);
             startChordGracePeriod(chordName, clickNumber);
             // Wait GRACE_INTERVALS intervals - This gives additional opportunity to press another chord and repeat the pattern
             if (!areOtherChordsStrumming(chordName)) {
@@ -628,22 +633,29 @@ export const useStrumming = (
       chordName,
       clickNumber
     );
-    if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
+    if (
+      (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) ||
+      isAnyChordInImmediateGracePeriod()
+    ) {
       // Add gracePeriod of N ms. During this period no chords will play and if the click is released - strumming finishes
-      // This happens only for the new strumming - doesn't work when switching chords
+      // This happens only for the new strumming - doesn't work when switching chords (the only exception is when the other chord is also in immediate grace period)
       // Please note that this will likely skip 1-2 of the first notes in the pattern. This is the sacrifice we have to make to make strumming convenient
-      isInImmediateChordGracePeriod.current = true;
-      setImmediateChordGracePeriodState(isInImmediateChordGracePeriod.current);
-      setTimeout(() => {
-        isInImmediateChordGracePeriod.current = false;
-        setImmediateChordGracePeriodState(
-          isInImmediateChordGracePeriod.current
-        );
+      if (isInImmediateChordGracePeriodRef.current !== undefined) {
+        // playing the same chord while in immediate grace period - cancel previous timeout and start over
+        clearTimeout(isInImmediateChordGracePeriodRef.current);
+      }
+      const timeoutId = setTimeout(() => {
+        isInImmediateChordGracePeriodRef.current = undefined;
+        releaseImmediateChordGracePeriod(chordName, clickNumber);
+        setImmediateChordGracePeriodStateInComponent(false);
       }, 400);
+      isInImmediateChordGracePeriodRef.current = timeoutId;
+      setImmediateChordGracePeriod(chordName, clickNumber);
+      setImmediateChordGracePeriodStateInComponent(true);
     }
     // Add a zero timeout to switch context - otherwise it plays the next chord even if strumming was released
     await asyncTimeout(waitAndStrum, 0);
   };
 
-  return { onChordPress, isAlternateRef, isInImmediateChordGracePeriod };
+  return { onChordPress, isAlternateRef, isInImmediateChordGracePeriodRef };
 };

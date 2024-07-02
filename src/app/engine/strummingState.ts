@@ -21,7 +21,6 @@ type PromiseAndResolve = {
 };
 
 type StrummingData = {
-  isClicked: boolean;
   state: StrummingState;
   clickPromiseAndResolve?: PromiseAndResolve;
   strummingPromiseAndResolve?: PromiseAndResolve;
@@ -30,6 +29,7 @@ type StrummingData = {
 
 export const strummingChordsMap = new Map<string, StrummingData>();
 export const strummingClickedChords = new Set<string>(); // set of chords currently clicked
+export const strummingImmediateChordGracePeriodChords = new Set<string>(); // set of chords that are currently in immediate chord grace period
 
 const createStrummingPromise = (): PromiseAndResolve => {
   let resolve: ((value: void | PromiseLike<void>) => void) | undefined;
@@ -75,7 +75,7 @@ export const getOtherChordsGracePeriodPromises = (
 };
 
 export const isChordClicked = (chordName: string) =>
-  strummingChordsMap.get(chordName)?.isClicked === true;
+  strummingClickedChords.has(chordName);
 
 export const getChordClickedPromise = (chordName: string) =>
   strummingChordsMap.get(chordName)?.clickPromiseAndResolve?.promise;
@@ -99,7 +99,6 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
     strummingPromiseAndResolve: data?.strummingPromiseAndResolve,
     clickPromiseAndResolve,
     gracePeriodPromiseAndResolve: data?.gracePeriodPromiseAndResolve,
-    isClicked: true,
   });
 
   strummingClickedChords.add(chordName);
@@ -110,6 +109,33 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
     clickNumber
   );
 };
+
+export const setImmediateChordGracePeriod = (
+  chordName: string,
+  clickNumber: number
+) => {
+  console.log(
+    STRUMMING_LOG_PREFIX + "---> Entered immediate chord grace period",
+    chordName,
+    clickNumber
+  );
+  strummingImmediateChordGracePeriodChords.add(chordName);
+};
+
+export const releaseImmediateChordGracePeriod = (
+  chordName: string,
+  clickNumber: number
+) => {
+  console.log(
+    STRUMMING_LOG_PREFIX + "---> Exited immediate chord grace period",
+    chordName,
+    clickNumber
+  );
+  strummingImmediateChordGracePeriodChords.delete(chordName);
+};
+
+export const isAnyChordInImmediateGracePeriod = () =>
+  strummingImmediateChordGracePeriodChords.size > 0;
 
 export const releaseChordClick = (chordName: string, clickNumber: number) => {
   const data = strummingChordsMap.get(chordName);
@@ -122,7 +148,6 @@ export const releaseChordClick = (chordName: string, clickNumber: number) => {
 
   strummingChordsMap.set(chordName, {
     ...data,
-    isClicked: false,
     clickPromiseAndResolve: undefined,
   });
 
@@ -154,7 +179,6 @@ export const markChordAsPendingStrumming = (
     ...data,
     state: StrummingState.PendingStrummingStart,
     strummingPromiseAndResolve: createStrummingPromise(),
-    isClicked: true,
   });
 
   strummingClickedChords.add(chordName);
