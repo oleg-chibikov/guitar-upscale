@@ -35,26 +35,38 @@ import React, { RefObject, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
-const TOP_RESERVED_HEIGHT = 80;
+const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
+
+const isScrollbarVisible = (el: HTMLDivElement | null) => {
+  return el
+    ? el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
+    : false;
+};
 
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
+  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
+
+  const [height, setHeight] = useState(window.innerHeight);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
+  const [chordModeVariations, setChordModeVariations] = useState<
+    ChordModeVariations[]
+  >([]);
+
+  // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
+  const localGuitarSettingsUpdateCount = useRef<number>(0);
+  const ref = useRef<HTMLDivElement>(null);
   const { chordsExpanded, chordsDisplayMode, useSharpChords } =
     useSelector(selectUi);
+
   const dispatch = useDispatch();
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
-  // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
-  const localGuitarSettingsUpdateCount = useRef<number>(0);
-
-  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
-  const [chordModeVariations, setChordModeVariations] = useState<
-    ChordModeVariations[]
-  >([]);
 
   useEffect(() => {
     if (!neckValue) {
@@ -91,36 +103,31 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     );
   }, [dispatch, guitarSettingsUpdateCount]);
 
-  const [height, setHeight] = useState(window.innerHeight);
-  const [width, setWidth] = useState(window.innerWidth);
-  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const getScrollbarVisible = () => {
-    const el = ref.current;
-
-    return el
-      ? el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
-      : false;
-  };
-
-  const setupScrollbar = () => {
+  const setupIsScrollbarVisible = () => {
     // I have no idea why it works only with setTimeout. Without it it gives the previous values of dimensions
     setTimeout(() => {
-      setScrollBarVisible(getScrollbarVisible());
+      setScrollBarVisible(isScrollbarVisible(ref.current));
     }, 1);
   };
 
-  useEffect(setupScrollbar, [useSharpChords]);
+  useEffect(setupIsScrollbarVisible, [useSharpChords]);
+
+  useEffect(() => {
+    // update the state of scrollbar. Don't update if it was visible at some point
+    if (scrollBarVisible) {
+      return;
+    }
+    setupIsScrollbarVisible();
+  }, [chordModeVariations, scrollBarVisible]);
 
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
-      setupScrollbar();
+      setupIsScrollbarVisible();
     };
     const debouncedHandleResize = trailingDebounce(handleResize, 200);
-    setupScrollbar();
+    setupIsScrollbarVisible();
 
     window.addEventListener("resize", debouncedHandleResize);
     return () => {
@@ -138,7 +145,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   return (
     <Expander
       id={CHORDS_VIEW_ID}
-      className={`opacity-95 fixed touch-none ${
+      className={`opacity-95 fixed ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } z-20 bottom-1`}
       expanded={chordsExpanded}
