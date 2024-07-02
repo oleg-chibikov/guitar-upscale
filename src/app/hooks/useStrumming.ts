@@ -648,7 +648,7 @@ export const useStrumming = (
         isInImmediateChordGracePeriodRef.current = undefined;
         releaseImmediateChordGracePeriod(chordName, clickNumber);
         setImmediateChordGracePeriodStateInComponent(false);
-      }, 400);
+      }, 500);
       isInImmediateChordGracePeriodRef.current = timeoutId;
       setImmediateChordGracePeriod(chordName, clickNumber);
       setImmediateChordGracePeriodStateInComponent(true);
