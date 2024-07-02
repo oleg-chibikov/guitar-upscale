@@ -629,8 +629,9 @@ export const useStrumming = (
       clickNumber
     );
     if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
-      // Add gracePeriod of N ms. During this period no chords will play and if the click is released - strumming finishes.
+      // Add gracePeriod of N ms. During this period no chords will play and if the click is released - strumming finishes
       // This happens only for the new strumming - doesn't work when switching chords
+      // Please note that this will likely skip 1-2 of the first notes in the pattern. This is the sacrifice we have to make to make strumming convenient
       isInImmediateChordGracePeriod.current = true;
       setImmediateChordGracePeriodState(isInImmediateChordGracePeriod.current);
       setTimeout(() => {
