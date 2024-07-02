@@ -18,7 +18,7 @@ import {
 
 import { StrummingPattern } from "@/app/data/strummingPatterns";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import {
   currentTick,
   isMainClockActiveValue,
@@ -66,6 +66,27 @@ const stopStrummingElementIds = [
   PLAY_PANEL_ID,
   SETTINGS_PANEL_ID,
 ];
+
+const play = (
+  chordName: string,
+  isPlayedWithinGracePeriod: boolean,
+  skipPlaying: boolean
+) => {
+  if (skipPlaying) {
+    console.log(STRUMMING_LOG_PREFIX + "Skip playing", chordName);
+    return;
+  }
+  const chordToPlay =
+    (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
+    currentChord !== undefined
+      ? currentChord
+      : chordName;
+  // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
+  ChordEventBus.next({
+    chord: chordToPlay,
+    metadata: {},
+  });
+};
 
 const GRACE_INTERVALS = 2;
 
@@ -170,22 +191,7 @@ export const useStrumming = (
 ) => {
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
-
-  const play = useCallback(
-    (isPlayedWithinGracePeriod: boolean) => {
-      const chordToPlay =
-        (seamlessChordSwitchingValue || isPlayedWithinGracePeriod) &&
-        currentChord !== undefined
-          ? currentChord
-          : chordName;
-      // Using currentChord here is needed for seamless switching between chords while playing the strumming pattern
-      ChordEventBus.next({
-        chord: chordToPlay,
-        metadata: {},
-      });
-    },
-    [chordName]
-  );
+  const isInImmediateChordGracePeriod = useRef<boolean>(false);
 
   const onChordPress = async () => {
     const clickNumber = clickNumberRef.current++;
@@ -353,7 +359,7 @@ export const useStrumming = (
       );
 
       console.log(STRUMMING_LOG_PREFIX + "Playing", chordName, clickNumber);
-      play(false);
+      play(chordName, false, false);
       if (useChordAlterationValue) {
         isAlternateRef.current = !isAlternateRef.current;
       }
@@ -517,11 +523,19 @@ export const useStrumming = (
             switch (char) {
               case "↑":
                 isAlternateRef.current = false;
-                play(clickedInGracePeriod);
+                play(
+                  chordName,
+                  clickedInGracePeriod,
+                  isInImmediateChordGracePeriod.current
+                );
                 break;
               case "↓":
                 isAlternateRef.current = true;
-                play(clickedInGracePeriod);
+                play(
+                  chordName,
+                  clickedInGracePeriod,
+                  isInImmediateChordGracePeriod.current
+                );
                 break;
               case "":
                 break;
@@ -547,8 +561,11 @@ export const useStrumming = (
 
           while (isChordClicked(chordName)) {
             for (; currentIndex < patternObject.strums.length; currentIndex++) {
-              if (!waitForPatternFinishValue) {
-                // early break pattern only when the checkbox is off
+              if (
+                !waitForPatternFinishValue ||
+                isInImmediateChordGracePeriod.current
+              ) {
+                // early break pattern only when the checkbox is off or when within the immediate chord grace period
                 if (!isChordClicked(chordName)) {
                   // already released mouse/touch - don't play the strumming
                   return;
@@ -610,6 +627,14 @@ export const useStrumming = (
       chordName,
       clickNumber
     );
+    if (!isChordStrumming(chordName) && !wasStrummingWhenChordPressed) {
+      // Add gracePeriod of 200 ms. During this period no chords will play and if the click is released - strumming finishes.
+      // This happens only for the new strumming - doesn't work when switching chords
+      isInImmediateChordGracePeriod.current = true;
+      setTimeout(() => {
+        isInImmediateChordGracePeriod.current = false;
+      }, 200);
+    }
     // Add a zero timeout to switch context - otherwise it plays the next chord even if strumming was released
     await asyncTimeout(waitAndStrum, 0);
   };
