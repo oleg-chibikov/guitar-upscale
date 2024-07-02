@@ -1,105 +1,38 @@
+import { generateAllTunings } from "@/app/engine/tuningBuilder";
 import { NOTE_COUNT, Note, OctaveNote } from "./notes";
 
-const DEFAULT_OCTAVES = "54443322"; // Default octaves for up to 9
 const BASE_TUNING_SHIFT = Note.E - Note.C;
 
-const noteLookup: { [key: string]: Note } = {
-  E: Note.E,
-  F: Note.F,
-  "F#": Note["F#"],
-  G: Note.G,
-  "G#": Note["G#"],
-  A: Note.A,
-  "A#": Note["A#"],
-  B: Note.B,
-  C: Note.C,
-  "C#": Note["C#"],
-  D: Note.D,
-  "D#": Note["D#"],
-};
-
-export function parseStringToNotes(tuningKey: Tuning): OctaveNote[] {
-  const notes: OctaveNote[] = [];
-
-  const data = tunings[tuningKey];
-  const octavesString =
-    data.octaveNotes ?? DEFAULT_OCTAVES.slice(0, tuningKey.length);
-
-  for (
-    let i = 0, j = 0;
-    i < tuningKey.length && j < octavesString.length;
-    i++, j++
-  ) {
-    const thisChar = tuningKey[i];
-    const nextChar = tuningKey[i + 1];
-    const isSharp = nextChar === "#";
-    const note = noteLookup[thisChar + (isSharp ? "#" : "")];
-    if (isSharp) {
-      i++;
-    }
-    const octave = parseInt(octavesString[j], 10);
-    notes.push({ note, octave });
-  }
-
-  return notes;
+export function getOctaveNotesForTuning(tuningKey: Tuning): OctaveNote[] {
+  return tunings[tuningKey].octaveNotes;
 }
 
 export const getShiftedNote = (note: Note, tuning: Tuning) => {
   const currentTuningShift = getCurrentShift(tuning);
-
-  const withTuningShift =
-    currentTuningShift !== undefined
-      ? NOTE_COUNT + note + currentTuningShift
-      : note;
-
-  return (NOTE_COUNT + withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
+  return getShiftedNoteCore(note, currentTuningShift);
 };
 
 export const getUnshiftedNote = (note: Note, tuning: Tuning) => {
   const currentTuningShift = getCurrentShift(tuning);
+  return getUnshiftedNoteCore(note, currentTuningShift);
+};
 
+export const getShiftedNoteCore = (note: Note, shift?: number) => {
   const withTuningShift =
-    currentTuningShift !== undefined
-      ? NOTE_COUNT + note - currentTuningShift
-      : note;
+    shift !== undefined ? NOTE_COUNT + note + shift : note;
+
+  return (NOTE_COUNT + withTuningShift + BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
+};
+
+export const getUnshiftedNoteCore = (note: Note, shift?: number) => {
+  const withTuningShift =
+    shift !== undefined ? NOTE_COUNT + note - shift : note;
 
   return (NOTE_COUNT + withTuningShift - BASE_TUNING_SHIFT) % NOTE_COUNT; // tuning shift is set for the base note E, not C
 };
 
 export const getCurrentShift = (tuning: Tuning) => tunings[tuning].shift;
 
-interface TuningData {
-  name: string;
-  shift?: number;
-  octaveNotes?: string;
-}
-
-export const tunings: { [key: string]: TuningData } = {
-  EBGDAE: { name: "E" },
-  EBGDAD: { name: "Drop D" },
-
-  "EBEG#BE": { name: "Open E", octaveNotes: "655433" },
-  DADGAD: { name: "Celtic E", octaveNotes: "655433" },
-  DADDAD: { name: "Folk E" },
-  EBEGBE: { name: "Cross note E" },
-
-  "D#A#F#C#G#D#": { name: "D#", shift: -1, octaveNotes: "544433" },
-  "D#A#F#C#G#C#": { name: "Drop C#", shift: -1, octaveNotes: "544433" },
-
-  DAFCGD: { name: "D", shift: -2, octaveNotes: "544333" },
-  DAFCGC: { name: "Drop C", shift: -2, octaveNotes: "544332" },
-
-  "C#G#EBF#C#": { name: "C#", shift: -3, octaveNotes: "544332" },
-  "C#G#EBF#B": { name: "Drop B", shift: -3, octaveNotes: "544332" },
-
-  "CGD#A#FC": { name: "C", shift: -4, octaveNotes: "444332" },
-  "CGD#A#FA#": { name: "Drop A#", shift: -4, octaveNotes: "444332" },
-
-  EBGDAEB: { name: "B 7 string" },
-  EBGDAEA: { name: "Drop A 7 string" },
-
-  "EBGDAEBF#": { name: "F# 8-string" },
-  EBGDAEBE: { name: "Drop E 8-string" },
-};
+export const tunings = generateAllTunings();
 
 export type Tuning = Extract<keyof typeof tunings, string>;

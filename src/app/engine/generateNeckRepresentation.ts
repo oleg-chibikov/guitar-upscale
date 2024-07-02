@@ -45,7 +45,7 @@ export const generateNeckRepresentation = (
 
       const note = (position + baseNote) % NOTE_COUNT;
 
-      if (note === Note.C) {
+      if (fret > 0 && note === Note.C) {
         octave++;
       }
 

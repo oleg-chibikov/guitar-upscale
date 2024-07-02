@@ -7,8 +7,8 @@ import { getScalePattern, scalesMap } from "../data/scales";
 import { chordStrummingPatterns } from "../data/strummingPatterns";
 import {
   getCurrentShift,
+  getOctaveNotesForTuning,
   getShiftedNote,
-  parseStringToNotes,
   Tuning,
 } from "../data/tunings";
 import { clearPreviousChords } from "../engine/eventBus";
@@ -212,7 +212,7 @@ const onGuitarSettingsUpdate = (
   const capo = state.capo;
   const neck = generateNeckRepresentation(
     scalePattern,
-    parseStringToNotes(tuningValue),
+    getOctaveNotesForTuning(tuningValue),
     getShiftedNote(capo, tuningValue),
     capo
   );

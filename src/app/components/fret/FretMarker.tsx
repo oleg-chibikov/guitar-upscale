@@ -236,6 +236,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   useEffect(toggleClasses, [theme, neck]);
 
   useEffect(() => {
+    if (isHeader) {
+      return;
+    }
     // Function to play note and start animation
     const animate = () => {
       if (!(stringOctaveNote && typographyRef.current)) {
@@ -320,7 +323,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [dispatch, stringOctaveNote]);
+  }, [dispatch, stringOctaveNote, isHeader]);
 
   const getMarkerText = (stringOctaveNote: StringOctaveNote) => {
     if (isHeader) {
