@@ -39,12 +39,6 @@ const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 
-const isScrollbarVisible = (el: HTMLDivElement | null) => {
-  return el
-    ? el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
-    : false;
-};
-
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
@@ -52,7 +46,6 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
-  const [scrollBarVisible, setScrollBarVisible] = useState<boolean>(false);
   const [chordModeVariations, setChordModeVariations] = useState<
     ChordModeVariations[]
   >([]);
@@ -103,31 +96,12 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     );
   }, [dispatch, guitarSettingsUpdateCount]);
 
-  const setupIsScrollbarVisible = () => {
-    // I have no idea why it works only with setTimeout. Without it it gives the previous values of dimensions
-    setTimeout(() => {
-      setScrollBarVisible(isScrollbarVisible(ref.current));
-    }, 1);
-  };
-
-  useEffect(setupIsScrollbarVisible, [useSharpChords]);
-
-  useEffect(() => {
-    // update the state of scrollbar. Don't update if it was visible at some point
-    if (scrollBarVisible) {
-      return;
-    }
-    setupIsScrollbarVisible();
-  }, [chordModeVariations, scrollBarVisible]);
-
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
-      setupIsScrollbarVisible();
     };
     const debouncedHandleResize = trailingDebounce(handleResize, 200);
-    setupIsScrollbarVisible();
 
     window.addEventListener("resize", debouncedHandleResize);
     return () => {
@@ -155,9 +129,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     >
       <section
         ref={ref}
-        className={`grid gap-0.5 ${
-          scrollBarVisible ? "overscroll-contain" : "touch-none"
-        } overflow-auto`}
+        className={`grid gap-0.5 overscroll-contain overflow-auto`}
         style={{
           maxWidth:
             height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
