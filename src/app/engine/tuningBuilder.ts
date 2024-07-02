@@ -17,8 +17,8 @@ export function generateAllTunings(): { [key: string]: TuningData } {
     "drop",
     "celtic",
     "folk",
-    "cross",
-    "open",
+    "cross", // allows to play minor chord on the open string
+    "open", // allows to play major chord on the open string
   ];
   const stringCounts = [6, 7, 8];
 
