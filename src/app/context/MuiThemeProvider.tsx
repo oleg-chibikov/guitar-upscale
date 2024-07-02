@@ -74,10 +74,10 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
         fontSize: "0.75rem",
       },
       subtitle1: {
-        fontSize: "0.85rem",
+        fontSize: "0.7rem",
       },
       subtitle2: {
-        fontSize: "0.75rem",
+        fontSize: "0.65rem",
       },
       body1: {
         fontSize: "0.85rem",

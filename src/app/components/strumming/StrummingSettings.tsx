@@ -1,3 +1,4 @@
+import { ChordStrummingImmediateGracePeriodSlider } from "@/app/components/settings/sliders/ChordStrummingImmediateGracePeriodSlider";
 import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
@@ -23,6 +24,7 @@ export const StrummingSettings: FC = () => {
     >
       <WaitForPatternFinishCheckbox />
       <SeamlessChordSwitchingCheckbox />
+      <ChordStrummingImmediateGracePeriodSlider />
       <Alert severity="info">Long press the chord to strum</Alert>
       <StrummingPatternSelector />
       <StrummingPatternDialogWrapper />

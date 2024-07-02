@@ -88,6 +88,7 @@ interface SettingsState
     WithCustomStrummingPatternId {
   tempoBpm: number;
   chordStrummingDelayMs: number;
+  chordStrummingImmediateGracePeriodMs: number;
   volume: number;
   metronomeVolume: number;
   playbackType: PlaybackType;
@@ -120,6 +121,7 @@ const initialState: SettingsState = {
   neck: null,
   tempoBpm: 120,
   chordStrummingDelayMs: 0,
+  chordStrummingImmediateGracePeriodMs: 500,
   volume: MAX_VOLUME,
   metronomeVolume: MAX_VOLUME,
   playbackType: PlaybackType.Melody,
@@ -176,6 +178,8 @@ export let isPlayingValue: boolean = initialState.isPlaying;
 export let isPausedValue: boolean = initialState.isPaused;
 export let chordStrummingDelayMsValue: number =
   initialState.chordStrummingDelayMs;
+export let chordStrummingImmediateGracePeriodMsValue: number =
+  initialState.chordStrummingImmediateGracePeriodMs;
 export let chordIsBeingDetectedValue: boolean =
   initialState.chordIsBeingDetected;
 export let scaleIsBeingDetectedValue: boolean =
@@ -360,6 +364,8 @@ export const settingsSlice = createSlice({
       seamlessChordSwitchingValue = state.seamlessChordSwitching;
       isMetronomeActiveValue = state.isMetronomeActive;
       chordStrummingDelayMsValue = state.chordStrummingDelayMs;
+      chordStrummingImmediateGracePeriodMsValue =
+        state.chordStrummingImmediateGracePeriodMs;
       chordIsBeingDetectedValue = state.chordIsBeingDetected;
       scaleIsBeingDetectedValue = state.scaleIsBeingDetected;
       chordPlayModeValue = state.chordPlayMode;
@@ -441,6 +447,13 @@ export const settingsSlice = createSlice({
     setChordStrummingDelayMs(state, action: PayloadAction<number>) {
       state.chordStrummingDelayMs = action.payload;
       chordStrummingDelayMsValue = action.payload;
+    },
+    setChordStrummingImmediateGracePeriodMs(
+      state,
+      action: PayloadAction<number>
+    ) {
+      state.chordStrummingImmediateGracePeriodMs = action.payload;
+      chordStrummingImmediateGracePeriodMsValue = action.payload;
     },
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
@@ -591,6 +604,7 @@ export const {
   setMetronomeVolume,
   setPlaybackType,
   setChordStrummingDelayMs,
+  setChordStrummingImmediateGracePeriodMs,
   setChordPlayMode,
   setChordNotesToPlay,
   setTuning,

@@ -53,6 +53,7 @@ import {
 } from "../engine/strummingState";
 import { asyncTimeout } from "../helpers/asyncTimeout";
 import {
+  chordStrummingImmediateGracePeriodMsValue,
   isAnyTimerSpecificActivityRunning,
   seamlessChordSwitchingValue,
   strummingPatternIdValue,
@@ -648,7 +649,7 @@ export const useStrumming = (
         isInImmediateChordGracePeriodRef.current = undefined;
         releaseImmediateChordGracePeriod(chordName, clickNumber);
         setImmediateChordGracePeriodStateInComponent(false);
-      }, 500);
+      }, chordStrummingImmediateGracePeriodMsValue);
       isInImmediateChordGracePeriodRef.current = timeoutId;
       setImmediateChordGracePeriod(chordName, clickNumber);
       setImmediateChordGracePeriodStateInComponent(true);
