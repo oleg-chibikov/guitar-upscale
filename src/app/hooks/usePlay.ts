@@ -45,7 +45,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   );
   const [isWaiting, setIsWaiting] = useState(false);
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
-  const isWaitingRef = useRef<boolean>();
+  const isWaitingRef = useRef<boolean>(false);
 
   const updateWaiting = (value: boolean) => {
     setIsWaiting(value);

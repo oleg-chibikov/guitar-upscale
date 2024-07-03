@@ -18,7 +18,7 @@ function loadPatternsFromLocalStorage() {
     return;
   }
   const savedPatternsString = localStorage.getItem("strummingPatterns");
-  if (savedPatternsString) {
+  if (savedPatternsString !== null) {
     const savedPatterns: StrummingPattern[] = JSON.parse(savedPatternsString);
     savedPatterns.forEach((pattern) => {
       strummingPatternsMap.set(pattern.id, pattern);

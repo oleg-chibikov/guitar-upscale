@@ -1,6 +1,7 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
+import { midiSaver } from "@/app/engine/midiRecorder/midiSaver";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import Midi from "midi-writer-js";
 import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
@@ -30,8 +31,6 @@ export class MidiRecorder implements NoteRecorder {
   async stopRecording(save: boolean) {
     this.isRecording = false;
     if (save && this.midiEvents !== undefined && this.midiEvents.size) {
-      const midiSaver = (await import("@/app/engine/midiRecorder/midiSaver"))
-        .midiSaver;
       midiSaver.generateAndSave(this.midiEvents);
     }
     this.midiEvents = undefined;

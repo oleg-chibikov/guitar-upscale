@@ -35,7 +35,7 @@ export const ValueDialogControlDialog: React.FC<
         setHighlight(true); // Trigger highlight
       }
     },
-    [startPosition, startIndex, steps, setValue]
+    [startPosition, startIndex, steps, setValue, setHighlight]
   );
 
   const handleMouseMove = useCallback(
@@ -78,7 +78,15 @@ export const ValueDialogControlDialog: React.FC<
         window.removeEventListener("mouseup", handleMouseUp);
       }
     };
-  }, [isOpen, startPosition, handleMouseMove, handleTouchMove, hasTouchInput]);
+  }, [
+    isOpen,
+    startPosition,
+    handleMouseMove,
+    handleTouchMove,
+    hasTouchInput,
+    close,
+    setStartPosition,
+  ]);
 
   return (
     <DialogWrapper

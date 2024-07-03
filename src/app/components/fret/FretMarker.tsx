@@ -31,7 +31,7 @@ import {
 } from "@/app/store/settingsSlice";
 import { themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
@@ -98,7 +98,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       trackNumber = 5;
     }
 
-    if (blastAnimationColorRef.current) {
+    if (blastAnimationColorRef.current !== undefined) {
       classList.remove(blastAnimationColorRef.current);
     }
 
@@ -123,7 +123,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     blastAnimationColorRef.current = undefined;
   };
 
-  const toggleClasses = () => {
+  const toggleClasses = useCallback(() => {
     const typographyElement = typographyRef.current;
     if (!typographyElement) {
       return;
@@ -240,9 +240,9 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const classList = typographyElement.classList;
     classList.remove(...notNeededClasses);
     classList.add(...neededClasses);
-  };
+  }, [isBehindCapo, isColored]);
 
-  useEffect(toggleClasses, [theme, neck, isColored, isBehindCapo]);
+  useEffect(toggleClasses, [toggleClasses]);
 
   useEffect(() => {
     if (isHeader) {
@@ -332,7 +332,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       };
     }
     return;
-  }, [dispatch, stringOctaveNote, isHeader]);
+  }, [dispatch, stringOctaveNote, isHeader, toggleClasses]);
 
   const getMarkerText = (stringOctaveNote: StringOctaveNote) => {
     if (isHeader) {
