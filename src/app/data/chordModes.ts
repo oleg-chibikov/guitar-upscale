@@ -36,15 +36,17 @@ export let advancedChordModes: ChordMode[] = [];
 
 export const setAdvancedChordModes = (data: ChordMode[]) => {
   advancedChordModes = data;
+  chordModeOrder = buildModeOrder();
 };
 
 export const isAdvancedMode = (mode: ChordMode) => mode.extensions.length > 0;
 
 export const getModeText = (mode: ChordMode): string => mode.name;
 
-const buildModeOrder = (): string[] => chordModes.map((x) => x.name);
+const buildModeOrder = (): string[] =>
+  [...chordModes, ...advancedChordModes].map((x) => x.name);
 
-export const chordModeOrder = buildModeOrder();
+export let chordModeOrder = buildModeOrder();
 
 // Remove the root part of the chord (the first character and an optional '#')
 export const getModeSuffix = (chord: string): string =>
