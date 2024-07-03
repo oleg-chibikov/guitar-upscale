@@ -17,6 +17,11 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
           },
         },
       },
+      MuiButton: {
+        styleOverrides: {
+          root: { minWidth: 0 },
+        },
+      },
       MuiSelect: {
         styleOverrides: {
           icon: {

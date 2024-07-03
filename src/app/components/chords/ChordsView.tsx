@@ -1,3 +1,4 @@
+import { SlashChordButtonsContainer } from "@/app/components/chords/SlashChordButtonsContainer";
 import { Expander } from "@/app/components/uiFramework/Expander";
 import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
 import {
@@ -130,44 +131,49 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
       handleExpansion={handleExpansion}
       title="Chords"
     >
-      <section
-        ref={ref}
-        className={`grid gap-0.5 overscroll-contain overflow-auto`}
-        style={{
-          maxWidth:
-            height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
-              ? COMPACT_CHORDS_WIDTH
-              : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
-          maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-          gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-          gridTemplateRows: `repeat(${totalRows}, 1fr)`,
-        }}
-      >
-        {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) => (
-          <React.Fragment key={noteIndex}>
-            {chordModeVariations.map((chordMode) => {
-              const title = getChordName(noteIndex, chordMode.chordMode);
-              const isHidden = !useSharpChords && isSharp(noteIndex);
-              return (
-                <ChordButton
-                  key={title}
-                  isHidden={isHidden}
-                  variations={chordMode.variationsByNote[noteIndex] ?? []}
-                  chordName={title}
-                  onStrummingStateChange={(value) => {
-                    if (!isMobileDeviceValue) {
-                      return;
-                    }
-                    const isStrummingClicked = value || isAnyStrummingClicked();
-                    toggleOverflow(isStrummingClicked, ref);
-                    toggleOverflow(isStrummingClicked, mainRef);
-                  }}
-                />
-              );
-            })}
-          </React.Fragment>
-        ))}
-      </section>
+      <div className="relative flex flex-row gap-0.5">
+        <SlashChordButtonsContainer />
+
+        <section
+          ref={ref}
+          className={`grid gap-0.5 overscroll-contain overflow-auto`}
+          style={{
+            maxWidth:
+              height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
+                ? COMPACT_CHORDS_WIDTH
+                : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
+            maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
+            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
+            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
+          }}
+        >
+          {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) => (
+            <React.Fragment key={noteIndex}>
+              {chordModeVariations.map((chordMode) => {
+                const title = getChordName(noteIndex, chordMode.chordMode);
+                const isHidden = !useSharpChords && isSharp(noteIndex);
+                return (
+                  <ChordButton
+                    key={title}
+                    isHidden={isHidden}
+                    variations={chordMode.variationsByNote[noteIndex] ?? []}
+                    chordName={title}
+                    onStrummingStateChange={(value) => {
+                      if (!isMobileDeviceValue) {
+                        return;
+                      }
+                      const isStrummingClicked =
+                        value || isAnyStrummingClicked();
+                      toggleOverflow(isStrummingClicked, ref);
+                      toggleOverflow(isStrummingClicked, mainRef);
+                    }}
+                  />
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </section>
+      </div>
     </Expander>
   );
 };

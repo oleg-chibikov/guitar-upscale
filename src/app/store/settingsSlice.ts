@@ -111,6 +111,7 @@ interface SettingsState
   isLooperPlaying: boolean;
   strummingPatternChangedTrigger: boolean;
   chordsAreLoading: boolean;
+  slashChordBassNote?: Note; // may be undefined
 }
 
 const initialState: SettingsState = {
@@ -197,6 +198,8 @@ export let wipeExampleCacheTriggerValue: boolean = false;
 export let isLastEventValue: boolean = initialState.isLastEvent;
 export let isFirstEventValue: boolean = initialState.isFirstEvent;
 export let chordsAreLoadingValue: boolean = initialState.chordsAreLoading;
+export let slashChordBassNoteValue: Note | undefined =
+  initialState.slashChordBassNote;
 
 export let preventScaleDetectorFlush: boolean = false;
 export const setPreventScaleDetectorFlush = (value: boolean) => {
@@ -383,6 +386,7 @@ export const settingsSlice = createSlice({
       neckValue = state.neck;
       stringCountValue = state.stringCount;
       chordsAreLoadingValue = state.chordsAreLoading;
+      slashChordBassNoteValue = state.slashChordBassNote;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -590,6 +594,14 @@ export const settingsSlice = createSlice({
       state.chordsAreLoading = action.payload;
       chordsAreLoadingValue = action.payload;
     },
+    setSlashChordBassNote(state, action: PayloadAction<Note | undefined>) {
+      const value =
+        state.slashChordBassNote === action.payload
+          ? undefined
+          : action.payload;
+      state.slashChordBassNote = value;
+      slashChordBassNoteValue = value;
+    },
   },
 });
 
@@ -630,6 +642,7 @@ export const {
   triggerCustomStrummingPatternChanged,
   checkCustomStrummingPatternAfterDeletion,
   setChordsAreLoading,
+  setSlashChordBassNote,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;
