@@ -1,9 +1,8 @@
 import { CloseIcon } from "@/app/components/uiFramework/CloseIcon";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Box, DialogTitle, Typography } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 interface DialogHeaderProps {
   text: string;
   onClose?: () => void;
@@ -13,7 +12,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
   text,
   onClose,
 }) => {
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
 
   return (
     <DialogTitle

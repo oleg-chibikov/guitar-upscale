@@ -1,13 +1,13 @@
-import {
-  selectSettings,
-  setSeamlessChordSwitching,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setSeamlessChordSwitching } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const SeamlessChordSwitchingCheckbox: React.FC = (props) => {
-  const { seamlessChordSwitching } = useSelector(selectSettings);
+  const seamlessChordSwitching = useSettingsSelector(
+    (s) => s.seamlessChordSwitching
+  );
   const dispatch = useDispatch();
 
   return (

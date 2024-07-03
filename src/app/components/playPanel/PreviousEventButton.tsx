@@ -1,17 +1,17 @@
 "use client";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import {
   PauseResolveValue,
   moveCurrentPlayPosition,
-  selectSettings,
 } from "@/app/store/settingsSlice";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import React from "react";
-import { useSelector } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export const PreviousEventButton: React.FC = () => {
-  const { isPaused, isFirstEvent, isLooperPlaying } =
-    useSelector(selectSettings);
+  const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
+  const isFirstEvent = useSettingsSelector((s) => s.isFirstEvent);
+  const isPaused = useSettingsSelector((s) => s.isPaused);
   if (!isPaused || isLooperPlaying) {
     return null;
   }

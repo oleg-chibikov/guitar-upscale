@@ -2,9 +2,9 @@
 
 import { AlertType } from "@/app/data/alertType";
 import { MIN_NOTES_TO_DETECT_CHORD } from "@/app/engine/chords/chordDetector";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import {
-  selectSettings,
   setChordIsBeingDetected,
   setScaleIsBeingDetected,
 } from "@/app/store/settingsSlice";
@@ -12,13 +12,16 @@ import { setAndShowAlert } from "@/app/store/uiSlice";
 import SearchOff from "@mui/icons-material/SearchOff";
 import Troubleshoot from "@mui/icons-material/Troubleshoot";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { chordIsBeingDetected, chordsAreLoading } =
-    useSelector(selectSettings);
+  const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
+  const chordIsBeingDetected = useSettingsSelector(
+    (s) => s.chordIsBeingDetected
+  );
+
   const setupChordDetector = useChordDetectorSetup();
   return (
     <IconButtonWrapper

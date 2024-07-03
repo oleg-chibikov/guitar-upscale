@@ -1,13 +1,14 @@
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
-import { selectUi, setLockRatio } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setLockRatio } from "@/app/store/uiSlice";
 import Lock from "@mui/icons-material/Lock";
 import LockOpen from "@mui/icons-material/LockOpen";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const LockRatioButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { lockRatio } = useSelector(selectUi);
+  const lockRatio = useUiSelector((s) => s.lockRatio);
   return (
     <IconButtonWrapper
       {...props}

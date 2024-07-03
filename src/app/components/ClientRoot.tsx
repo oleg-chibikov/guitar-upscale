@@ -4,11 +4,10 @@ import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionDialogWrapper } from "@/app/components/alert/ScaleDetectionDialogWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { ReactNode, useRef } from "react";
-import { useSelector } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
-import { selectUi } from "../store/uiSlice";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
 import { AlertWrapper } from "./alert/AlertWrapper";
@@ -21,7 +20,8 @@ import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
 export const ClientRoot: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { loadingMessage, theme } = useSelector(selectUi);
+  const loadingMessage = useUiSelector((s) => s.loadingMessage);
+  const theme = useUiSelector((s) => s.theme);
   const mainRef = useRef<HTMLElement>(null);
 
   return (

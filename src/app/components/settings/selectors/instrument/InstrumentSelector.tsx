@@ -1,15 +1,14 @@
 "use client";
-import {
-  selectSettings,
-  setInstrument,
-  setInstrumentGroup,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setInstrument, setInstrumentGroup } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { BaseInstrumentSelector } from "./BaseInstrumentSelector";
 
 const InstrumentSelector: React.FC = () => {
-  const { instrument, instrumentGroup } = useSelector(selectSettings);
+  const instrument = useSettingsSelector((s) => s.instrument);
+  const instrumentGroup = useSettingsSelector((s) => s.instrumentGroup);
+
   const dispatch = useDispatch();
   return (
     <BaseInstrumentSelector

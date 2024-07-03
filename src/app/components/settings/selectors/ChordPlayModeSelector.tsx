@@ -1,12 +1,13 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { selectSettings, setChordPlayMode } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setChordPlayMode } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const ChordPlayModeSelector: React.FC = () => {
-  const { chordPlayMode } = useSelector(selectSettings);
+  const chordPlayMode = useSettingsSelector((s) => s.chordPlayMode);
   const dispatch = useDispatch();
 
   return (

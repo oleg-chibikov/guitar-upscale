@@ -11,7 +11,6 @@ import { stringCountValue } from "@/app/store/settingsSlice";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
-import { RootState } from "./store"; // Define RootState type
 
 const initialTheme = Theme.MatchOS;
 
@@ -236,7 +235,5 @@ export const {
   setLoadingMessage,
   setShowAspectRatio,
 } = uiSlice.actions;
-
-export const selectUi = (state: RootState) => state.ui;
 
 export default uiSlice.reducer;

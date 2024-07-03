@@ -1,10 +1,6 @@
-import {
-  hideScalesAlert,
-  selectUi,
-  setAndShowAlert,
-} from "@/app/store/uiSlice";
+import { hideScalesAlert, setAndShowAlert } from "@/app/store/uiSlice";
 import { Button, Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { AlertType } from "@/app/data/alertType";
@@ -14,12 +10,14 @@ import {
   formatScale,
   setCurrentScaleAndGroup,
 } from "@/app/engine/scales/scaleLookupBuilder";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { setPreventScaleDetectorFlush } from "@/app/store/settingsSlice";
 import { FC } from "react";
 
 export const ScaleDetectionAlert: FC = () => {
   const dispatch = useDispatch();
-  const { suggestedScales, showScalesAlert } = useSelector(selectUi);
+  const suggestedScales = useUiSelector((s) => s.suggestedScales);
+  const showScalesAlert = useUiSelector((s) => s.showScalesAlert);
 
   const handleButtonClick = (data: ScaleAndGroup) => {
     setPreventScaleDetectorFlush(true);
@@ -46,6 +44,7 @@ export const ScaleDetectionAlert: FC = () => {
     >
       {suggestedScales?.map((scaleAndGroup) => (
         <Button
+          key={scaleAndGroup.group + scaleAndGroup.scale + scaleAndGroup.note}
           className="w-full"
           variant="contained"
           color="primary"

@@ -1,14 +1,14 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Slider } from "@/app/components/uiFramework/Slider";
-import {
-  selectSettings,
-  setChordStrummingImmediateGracePeriodMs,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setChordStrummingImmediateGracePeriodMs } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const ChordStrummingImmediateGracePeriodSlider: React.FC = () => {
-  const { chordStrummingImmediateGracePeriodMs } = useSelector(selectSettings);
+  const chordStrummingImmediateGracePeriodMs = useSettingsSelector(
+    (s) => s.chordStrummingImmediateGracePeriodMs
+  );
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

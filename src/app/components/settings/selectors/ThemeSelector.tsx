@@ -1,8 +1,9 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Theme } from "@/app/data/theme";
-import { selectUi, setTheme } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setTheme } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 const convertOSTheme = (theme: Theme) => {
@@ -16,7 +17,7 @@ const convertOSTheme = (theme: Theme) => {
 };
 
 export const ThemeSelector: React.FC = () => {
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   const dispatch = useDispatch();
 
   return (

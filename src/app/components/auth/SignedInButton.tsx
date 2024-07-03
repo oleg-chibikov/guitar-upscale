@@ -1,19 +1,18 @@
 import { UserAvatar } from "@/app/components/auth/UserAvatar";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { selectAuth } from "@/app/store/authSlice";
-import { selectUi } from "@/app/store/uiSlice";
+import { useAuthSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { Button, Typography } from "@mui/material";
 import { Session } from "next-auth";
 import { FC } from "react";
-import { useSelector } from "react-redux";
 import { AuthButtonProps } from "./AuthButtonProps";
 
 export const SignedInButton: FC<
   AuthButtonProps & { user?: Session["user"] }
 > = ({ openDialog, user }) => {
-  const { subscriptionTier } = useSelector(selectAuth);
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const subscriptionTier = useAuthSelector((s) => s.subscriptionTier);
+  const theme = useUiSelector((s) => s.theme);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   return (
     <Button
       size="small"

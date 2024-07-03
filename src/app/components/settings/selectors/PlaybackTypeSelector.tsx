@@ -1,13 +1,14 @@
 "use client";
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { PlaybackType } from "@/app/data/playbackType";
-import { selectSettings, setPlaybackType } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setPlaybackType } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const PlaybackTypeSelector: React.FC = () => {
-  const { playbackType } = useSelector(selectSettings);
+  const playbackType = useSettingsSelector((s) => s.playbackType);
   const dispatch = useDispatch();
 
   return (

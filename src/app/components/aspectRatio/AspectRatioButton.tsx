@@ -1,12 +1,13 @@
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
-import { selectUi, setShowAspectRatio } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setShowAspectRatio } from "@/app/store/uiSlice";
 import AspectRatio from "@mui/icons-material/AspectRatio";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const AspectRatioButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { showAspectRatio } = useSelector(selectUi);
+  const showAspectRatio = useUiSelector((s) => s.showAspectRatio);
   return (
     <IconButtonWrapper
       {...props}

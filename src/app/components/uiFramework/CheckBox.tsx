@@ -1,8 +1,7 @@
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Checkbox, Typography } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 
 export type CheckBoxProps = {
   value: boolean;
@@ -19,7 +18,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
     onValueChange(event.target.checked);
   };
 
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   return (
     <div className="flex flex-row gap-2 items-center">
       <Checkbox

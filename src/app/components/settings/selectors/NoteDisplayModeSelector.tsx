@@ -1,12 +1,13 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
-import { selectUi, setNoteDisplayMode } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setNoteDisplayMode } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const NoteDisplayModeSelector: React.FC = () => {
-  const { noteDisplayMode } = useSelector(selectUi);
+  const noteDisplayMode = useUiSelector((s) => s.noteDisplayMode);
   const dispatch = useDispatch();
 
   return (

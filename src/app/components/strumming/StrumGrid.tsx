@@ -5,12 +5,11 @@ import {
   getDefaultSlotsForTimeSignature,
 } from "@/app/data/strummingPatterns";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { IconButton, Tooltip } from "@mui/material";
 import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
 
 interface StrumGridProps {
   pattern: StrummingPattern;
@@ -22,7 +21,7 @@ interface StrumGridProps {
 // TODO: update rendering - changing a cell shouldn't rerender everything
 export const StrumGrid: React.FC<StrumGridProps> = React.memo(
   ({ pattern, onStrum, onAdd, onRemove }) => {
-    const { theme } = useSelector(selectUi);
+    const theme = useUiSelector((s) => s.theme);
 
     const groupSize = 4;
     const totalSlots = pattern.strums.length;
@@ -123,3 +122,5 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
     );
   }
 );
+StrumGrid.displayName = "StrumGrid";
+StrumCell.displayName = "StrumCell";

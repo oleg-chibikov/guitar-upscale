@@ -1,8 +1,9 @@
-import { selectAuth, setIsSignedIn } from "@/app/store/authSlice";
+import { useAuthSelector } from "@/app/hooks/storeHooks";
+import { setIsSignedIn } from "@/app/store/authSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { AlertType } from "../data/alertType";
 import { processWithReloads } from "../helpers/reloadHelper";
 import { removeParamsFromQuery } from "../helpers/urlHelper";
@@ -13,7 +14,7 @@ const SESSION_RELOAD_KEY = "SESSION_RELOAD_COUNT";
 export const useSessionAuth = () => {
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const { isSignedIn } = useSelector(selectAuth);
+  const isSignedIn = useAuthSelector((s) => s.isSignedIn);
 
   useEffect(() => {
     const checkError = () => {

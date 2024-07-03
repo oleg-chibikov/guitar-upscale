@@ -5,16 +5,17 @@ import {
   formatStrums,
 } from "@/app/data/strummingPatterns";
 import { getAllPatterns } from "@/app/engine/strummingPatternsStorage";
-import {
-  selectSettings,
-  setStrummingPatternId,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setStrummingPatternId } from "@/app/store/settingsSlice";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const StrummingPatternSelector: React.FC = () => {
-  const { strummingPatternId, strummingPatternChangedTrigger } =
-    useSelector(selectSettings);
+  const strummingPatternId = useSettingsSelector((s) => s.strummingPatternId);
+  const strummingPatternChangedTrigger = useSettingsSelector(
+    (s) => s.strummingPatternChangedTrigger
+  );
+
   const dispatch = useDispatch();
   const [patterns, setPatterns] = useState<StrummingPattern[]>(
     chordStrummingPatterns

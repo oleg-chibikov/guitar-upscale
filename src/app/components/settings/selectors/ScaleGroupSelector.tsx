@@ -1,12 +1,13 @@
 import { scalesMap } from "@/app/data/scales";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { useExamples } from "@/app/hooks/useExamples";
-import { selectSettings, setScaleGroup } from "@/app/store/settingsSlice";
+import { setScaleGroup } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { SelectWrapper } from "../../uiFramework/SelectWrapper";
 
 const ScaleGroupSelector: React.FC = () => {
-  const { scaleGroup } = useSelector(selectSettings);
+  const scaleGroup = useSettingsSelector((s) => s.scaleGroup);
   const examplesMap = useExamples();
   const dispatch = useDispatch();
 

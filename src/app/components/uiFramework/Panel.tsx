@@ -4,9 +4,8 @@ import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";
 import { WithStyle } from "@/app/helpers/withStyle";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { FC } from "react";
-import { useSelector } from "react-redux";
 
 export const Panel: FC<
   WithChildren &
@@ -14,12 +13,13 @@ export const Panel: FC<
     WithStyle &
     WithId & { enableReverse?: boolean }
 > = ({ children, className, style, id, enableReverse = false }) => {
-  const { theme, chordsDisplayMode } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   return (
     <section
       id={id}
       style={style}
-      className={`${className ? `${className} ` : ""}border-2 ${
+      className={`${className !== undefined ? `${className} ` : ""}border-2 ${
         theme === Theme.Light
           ? "bg-panel-light border-border-light"
           : "bg-panel-dark border-border-dark"

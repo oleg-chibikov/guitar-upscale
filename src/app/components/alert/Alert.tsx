@@ -1,20 +1,24 @@
 import { AlertType } from "@/app/data/alertType";
-import { hideAlert, selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { hideAlert } from "@/app/store/uiSlice";
 import { Slide, Typography } from "@mui/material";
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const Alert: React.FC = () => {
   const dispatch = useDispatch();
-  const { alertMessage, showAlert, alertType, alertTimeout } =
-    useSelector(selectUi);
+
+  const alertMessage = useUiSelector((s) => s.alertMessage);
+  const showAlert = useUiSelector((s) => s.showAlert);
+  const alertType = useUiSelector((s) => s.alertType);
+  const alertTimeout = useUiSelector((s) => s.alertTimeout);
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(hideAlert());
     }, alertTimeout);
 
     return () => clearTimeout(timeout);
-  }, [dispatch, showAlert, alertMessage]);
+  }, [dispatch, showAlert, alertMessage, alertTimeout]);
 
   return (
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>

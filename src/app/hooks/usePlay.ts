@@ -1,9 +1,10 @@
 import { HALF_BEATS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { isLooperPlaying } from "@/app/engine/looper/looperShared";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
@@ -22,7 +23,6 @@ import {
   playbackTypeValue,
   reverbStrengthValue,
   scaleValue,
-  selectSettings,
   setIsPlaying,
   setTempoBpm,
   tempoBpmValue,
@@ -40,7 +40,9 @@ export interface UsePlayParams {
 }
 
 export const usePlay = ({ decodeExample }: UsePlayParams) => {
-  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
+  const guitarSettingsUpdateCount = useSettingsSelector(
+    (s) => s.guitarSettingsUpdateCount
+  );
   const [isWaiting, setIsWaiting] = useState(false);
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
   const isWaitingRef = useRef<boolean>();
@@ -107,7 +109,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
       await Promise.all(trackInstrumentPromises);
 
-      let {
+      const {
         eventsByTick,
         message,
       }: { eventsByTick: EventsByTick; message: string } = await decode(

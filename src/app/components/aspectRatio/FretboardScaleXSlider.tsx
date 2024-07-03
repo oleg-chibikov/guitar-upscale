@@ -1,15 +1,11 @@
-import {
-  maxXZoom,
-  minXZoom,
-  selectUi,
-  setFretboardScaleX,
-} from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { maxXZoom, minXZoom, setFretboardScaleX } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Slider } from "../uiFramework/Slider";
 
 export const FretboardScaleXSlider: React.FC = () => {
-  const { fretboardScaleX } = useSelector(selectUi);
+  const fretboardScaleX = useUiSelector((s) => s.fretboardScaleX);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

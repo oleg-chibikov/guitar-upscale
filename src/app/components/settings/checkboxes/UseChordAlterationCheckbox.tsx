@@ -1,13 +1,11 @@
-import {
-  selectSettings,
-  setUseChordAlteration,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setUseChordAlteration } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const UseChordAlterationCheckbox: React.FC = (props) => {
-  const { useChordAlteration } = useSelector(selectSettings);
+  const useChordAlteration = useSettingsSelector((s) => s.useChordAlteration);
   const dispatch = useDispatch();
 
   return (

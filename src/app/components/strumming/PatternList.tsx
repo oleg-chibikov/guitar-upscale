@@ -5,12 +5,11 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 
 import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
 import { StrummingPattern, formatStrums } from "@/app/data/strummingPatterns";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 
 interface PatternListProps {
   patterns: StrummingPattern[];
@@ -20,7 +19,7 @@ interface PatternListProps {
 
 export const PatternList: React.FC<PatternListProps> = React.memo(
   ({ patterns, onEdit, onDelete }) => {
-    const { theme } = useSelector(selectUi);
+    const theme = useUiSelector((s) => s.theme);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [patternIdToDelete, setPatternIdToDelete] = useState<number | null>(
       null
@@ -32,7 +31,7 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
     };
 
     const handleConfirmDelete = () => {
-      if (patternIdToDelete) {
+      if (patternIdToDelete !== null) {
         onDelete(patternIdToDelete);
       }
       setDeleteDialogOpen(false);
@@ -137,3 +136,5 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
     );
   }
 );
+
+PatternList.displayName = "PatternList";

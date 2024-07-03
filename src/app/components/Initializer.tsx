@@ -1,7 +1,8 @@
 import { Theme } from "@/app/data/theme";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useEffect, useRef } from "react";
 import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Note } from "../data/notes";
 import {
   loadMetronome,
@@ -17,10 +18,10 @@ import {
   instrumentValue,
   reverbStrengthValue,
 } from "../store/settingsSlice";
-import { initUi, selectUi } from "../store/uiSlice";
+import { initUi } from "../store/uiSlice";
 
 export const Initializer: React.FC = () => {
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   const dispatch = useDispatch();
   useSessionAuth();
   useGooglePlayAuth();

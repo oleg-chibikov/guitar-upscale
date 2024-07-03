@@ -3,14 +3,19 @@ import { Note } from "@/app/data/notes";
 import { MAX_VOLUME } from "@/app/data/volume";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { beatToMilliseconds } from "@/app/helpers/clockHelper";
-import { selectSettings, setVolume } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import {
+  instrumentValue,
+  reverbStrengthValue,
+  setVolume,
+  tempoBpmValue,
+} from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Slider } from "../../uiFramework/Slider";
 
 export const VolumeSlider: React.FC = () => {
-  const { volume, reverbStrength, instrument, tempoBpm } =
-    useSelector(selectSettings);
+  const volume = useSettingsSelector((s) => s.volume);
   const dispatch = useDispatch();
 
   const handleSliderChange = async (value: number) => {
@@ -18,9 +23,9 @@ export const VolumeSlider: React.FC = () => {
     await playNote(
       { note: Note.E, octave: 5 },
       value,
-      instrument,
-      reverbStrength,
-      beatToMilliseconds(tempoBpm)
+      instrumentValue,
+      reverbStrengthValue,
+      beatToMilliseconds(tempoBpmValue)
     );
   };
 

@@ -1,15 +1,15 @@
 import { ValueDialogControl } from "@/app/components/uiFramework/ValueDialogControl";
 import { chordStrummingDelaySteps } from "@/app/data/chordStrummingDelaySteps";
-import {
-  selectSettings,
-  setChordStrummingDelayMs,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setChordStrummingDelayMs } from "@/app/store/settingsSlice";
 import Schedule from "@mui/icons-material/Schedule";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const ChordStrummingDelayControl: React.FC = () => {
-  const { chordStrummingDelayMs } = useSelector(selectSettings);
+  const chordStrummingDelayMs = useSettingsSelector(
+    (s) => s.chordStrummingDelayMs
+  );
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

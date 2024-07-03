@@ -1,6 +1,5 @@
 import { TierInfo } from "@/lib/tier";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "./store"; // Define RootState type
 
 interface AuthState {
   isSignedIn: boolean;
@@ -25,7 +24,5 @@ export const authSlice = createSlice({
 });
 
 export const { setIsSignedIn, setSubscriptionTier } = authSlice.actions;
-
-export const selectAuth = (state: RootState) => state.auth;
 
 export default authSlice.reducer;

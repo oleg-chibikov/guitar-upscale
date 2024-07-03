@@ -4,17 +4,17 @@ import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
 import { getAssetsForSkin, getPositionForSkin } from "@/app/helpers/skinHelper";
-import { selectSettings } from "@/app/store/settingsSlice";
-import { selectUi } from "@/app/store/uiSlice";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { Fretline } from "./Fretline";
 import { GuitarImage } from "./GuitarImage";
 
 export const Fretboard: React.FC = () => {
-  const { skin, fretboardScaleX, fretboardScaleY, chordsExpanded } =
-    useSelector(selectUi);
-  const { neck } = useSelector(selectSettings);
+  const skin = useUiSelector((s) => s.skin);
+  const fretboardScaleX = useUiSelector((s) => s.fretboardScaleX);
+  const fretboardScaleY = useUiSelector((s) => s.fretboardScaleY);
+  const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
+  const neck = useSettingsSelector((s) => s.neck);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);

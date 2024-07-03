@@ -10,20 +10,17 @@ import {
   deletePattern,
   getCustomPatterns,
 } from "@/app/engine/strummingPatternsStorage";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import {
   checkCustomStrummingPatternAfterDeletion,
-  selectSettings,
   setStrummingPatternId,
   triggerCustomStrummingPatternChanged,
 } from "@/app/store/settingsSlice";
-import {
-  selectUi,
-  setStrummingPatternEditorExpanded,
-} from "@/app/store/uiSlice";
+import { setStrummingPatternEditorExpanded } from "@/app/store/uiSlice";
 import AddIcon from "@mui/icons-material/Add";
 import { IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { PatternEditor } from "./PatternEditor";
 import { PatternList } from "./PatternList";
 
@@ -33,8 +30,12 @@ export const StrummingPatternDialog: React.FC = () => {
     null
   );
   const dispatch = useDispatch();
-  const { strummingPatternEditorExpanded } = useSelector(selectUi);
-  const { strummingPatternChangedTrigger } = useSelector(selectSettings);
+  const strummingPatternEditorExpanded = useUiSelector(
+    (s) => s.strummingPatternEditorExpanded
+  );
+  const strummingPatternChangedTrigger = useSettingsSelector(
+    (s) => s.strummingPatternChangedTrigger
+  );
 
   useEffect(() => {
     const customPatterns = getCustomPatterns();

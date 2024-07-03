@@ -1,15 +1,15 @@
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import Login from "@mui/icons-material/Login";
 import { Button, Typography } from "@mui/material";
 import { FC } from "react";
-import { useSelector } from "react-redux";
 import { AuthButtonProps } from "./AuthButtonProps";
 
 export const OpenAuthDialogButton: FC<AuthButtonProps> = ({ openDialog }) => {
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const text = hasDigitalGoodsService ? "Subscribe" : "Sign in";
   return (

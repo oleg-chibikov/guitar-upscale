@@ -18,6 +18,7 @@ import {
 } from "@/app/engine/eventBus";
 import { areOtherChordsStrumming } from "@/app/engine/strummingState";
 import { chordButtonPossibleClasses } from "@/app/helpers/components/chordButtonPossibleClasses";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {
@@ -25,10 +26,9 @@ import {
   chordPlayModeValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
-import { selectUi, themeValue } from "@/app/store/uiSlice";
+import { themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 
 interface ChordButtonProps {
   chordName: string;
@@ -164,7 +164,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       toggleClasses
     );
 
-  const { theme, useSharpChords } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
+  const useSharpChords = useUiSelector((s) => s.useSharpChords);
 
   useEffect(() => {
     toggleClasses();

@@ -1,14 +1,14 @@
 "use client";
-import {
-  selectSettings,
-  setToggleMetronomeWhenRecording,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setToggleMetronomeWhenRecording } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const ToggleMetronomeWhenRecordingCheckbox: React.FC = (props) => {
-  const { toggleMetronomeWhenRecording } = useSelector(selectSettings);
+  const toggleMetronomeWhenRecording = useSettingsSelector(
+    (s) => s.toggleMetronomeWhenRecording
+  );
   const dispatch = useDispatch();
 
   return (

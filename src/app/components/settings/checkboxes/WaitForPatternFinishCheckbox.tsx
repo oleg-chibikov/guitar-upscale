@@ -1,13 +1,13 @@
-import {
-  selectSettings,
-  setWaitForPatternFinish,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setWaitForPatternFinish } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const WaitForPatternFinishCheckbox: React.FC = (props) => {
-  const { waitForPatternFinish } = useSelector(selectSettings);
+  const waitForPatternFinish = useSettingsSelector(
+    (s) => s.waitForPatternFinish
+  );
   const dispatch = useDispatch();
 
   return (

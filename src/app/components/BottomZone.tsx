@@ -3,14 +3,13 @@ import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { ReactNode } from "react";
-import { useSelector } from "react-redux";
 
 export const BottomZone: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { chordsDisplayMode } = useSelector(selectUi);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
 
   return (
     <div

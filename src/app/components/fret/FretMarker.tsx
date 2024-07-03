@@ -20,19 +20,19 @@ import {
   lightColors,
 } from "@/app/helpers/components/fretMarkerPossibleClasses";
 import { sleep } from "@/app/helpers/sleep";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
   capoValue,
   chordIsBeingDetectedValue,
   chordStrummingDelayMsValue,
   scaleIsBeingDetectedValue,
-  selectSettings,
   tuningValue,
 } from "@/app/store/settingsSlice";
-import { selectUi, themeValue } from "@/app/store/uiSlice";
+import { themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const coloredHeaders = new Set<number>([0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
@@ -60,15 +60,24 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 }) => {
   const typographyRef = useRef<HTMLParagraphElement>(null);
   const blastRef = useRef<HTMLDivElement>(null);
-  const { neck } = useSelector(selectSettings);
-  const { noteDisplayMode, fretboardScaleX, fretboardScaleY, theme } =
-    useSelector(selectUi);
+  const neck = useSettingsSelector((s) => s.neck);
+  const theme = useUiSelector((s) => s.theme);
+  const fretboardScaleX = useUiSelector((s) => s.fretboardScaleX);
+  const fretboardScaleY = useUiSelector((s) => s.fretboardScaleY);
+  const noteDisplayMode = useUiSelector((s) => s.noteDisplayMode);
 
   const hasTouchInput = useInputChecker();
   const isFromPreviousChordRef = useRef<boolean>(false);
   const isChordBeingDetectedRef = useRef<boolean>(false);
   const isScaleBeingDetectedRef = useRef<boolean>(false);
-  const blastAnimationColorRef = useRef<string>();
+  const blastAnimationColorRef = useRef<string | undefined>();
+
+  const isColored =
+    (isHeader &&
+      stringOctaveNote &&
+      coloredHeaders.has(stringOctaveNote?.fret)) ||
+    stringOctaveNote?.note === getShiftedNote(capoValue, tuningValue);
+  const isBehindCapo = fret < capoValue;
 
   const dispatch = useDispatch();
 
@@ -99,7 +108,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   };
 
   const resetTrackNumber = () => {
-    if (!blastAnimationColorRef.current) {
+    if (blastAnimationColorRef.current === undefined) {
       return;
     }
     const blastElement = blastRef.current;
@@ -233,7 +242,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     classList.add(...neededClasses);
   };
 
-  useEffect(toggleClasses, [theme, neck]);
+  useEffect(toggleClasses, [theme, neck, isColored, isBehindCapo]);
 
   useEffect(() => {
     if (isHeader) {
@@ -348,12 +357,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
   };
 
-  const isColored =
-    (isHeader &&
-      stringOctaveNote &&
-      coloredHeaders.has(stringOctaveNote?.fret)) ||
-    stringOctaveNote?.note === getShiftedNote(capoValue, tuningValue);
-
   const handlePress = async () => {
     if (isHeader) {
       if (!neck) {
@@ -400,8 +403,6 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       }
     },
   };
-
-  const isBehindCapo = fret < capoValue;
 
   return (
     // Space for the marker - it's drawn even if the marker is not present for the current scale

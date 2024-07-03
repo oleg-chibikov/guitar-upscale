@@ -1,9 +1,8 @@
 import { LazyLoadWrapper } from "@/app/components/uiFramework/LazyLoadWrapper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import dynamic from "next/dynamic";
 import { FC } from "react";
-import { useSelector } from "react-redux";
 
 const SettingsView = dynamic(
   async () => (await import("./SettingsView")).SettingsView
@@ -12,7 +11,7 @@ const SettingsView = dynamic(
 export const SettingsViewWrapper: FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { settingsExpanded } = useSelector(selectUi);
+  const settingsExpanded = useUiSelector((s) => s.settingsExpanded);
   return (
     <LazyLoadWrapper
       renderComponent={() => (

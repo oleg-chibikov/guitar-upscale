@@ -5,9 +5,10 @@ import { SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
-import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setSettingsExpanded } from "@/app/store/uiSlice";
 import { ReactNode } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
@@ -21,7 +22,9 @@ import { VolumeSlider } from "./sliders/VolumeSlider";
 export const SettingsView: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
-  const { theme, chordsDisplayMode, settingsExpanded } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const settingsExpanded = useUiSelector((s) => s.settingsExpanded);
   const dispatch = useDispatch();
   const close = () => dispatch(setSettingsExpanded(false));
 

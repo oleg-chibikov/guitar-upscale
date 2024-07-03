@@ -1,10 +1,9 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { WithClassName } from "@/app/helpers/withClassName";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Typography } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 
 export interface SliderProps extends WithClassName {
   onValueChange: (value: number) => void;
@@ -30,7 +29,8 @@ export const Slider: React.FC<SliderProps> = ({
   label,
   labelClass,
 }) => {
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const theme = useUiSelector((s) => s.theme);
   return (
     <div
       className={`items-center flex ${

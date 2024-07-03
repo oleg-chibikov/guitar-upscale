@@ -1,12 +1,10 @@
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { AUTH_PANEL_ID } from "@/app/data/elementIds";
 import { Theme } from "@/app/data/theme";
-import { selectAuth } from "@/app/store/authSlice";
-import { selectUi } from "@/app/store/uiSlice";
+import { useAuthSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { OpenAuthDialogButton } from "./OpenAuthDialogButton";
 import { SignedInButton } from "./SignedInButton";
 
@@ -20,8 +18,9 @@ export const AuthPanel: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogOpened, setDialogOpened] = useState(false);
   const { data: session } = useSession();
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
-  const { subscriptionTier } = useSelector(selectAuth);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const theme = useUiSelector((s) => s.theme);
+  const subscriptionTier = useAuthSelector((s) => s.subscriptionTier);
 
   const handleCloseDialog = () => {
     setOpenDialog(false);

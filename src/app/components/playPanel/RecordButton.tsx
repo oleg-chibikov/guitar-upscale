@@ -1,14 +1,15 @@
 "use client";
-import { selectSettings, setIsRecording } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setIsRecording } from "@/app/store/settingsSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export const RecordButton: React.FC = (props) => {
-  const { isRecording } = useSelector(selectSettings);
+  const isRecording = useSettingsSelector((s) => s.isRecording);
   const dispatch = useDispatch();
   return (
     <>

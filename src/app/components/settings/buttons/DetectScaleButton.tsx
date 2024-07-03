@@ -3,9 +3,9 @@
 import { AlertType } from "@/app/data/alertType";
 import { CHROMATIC, SPECIAL } from "@/app/data/scales";
 import { MIN_NOTES_TO_DETECT_SCALE } from "@/app/engine/scales/scaleDetector";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
-  selectSettings,
   setChordIsBeingDetected,
   setScale,
   setScaleGroup,
@@ -15,12 +15,14 @@ import { setAndShowAlert } from "@/app/store/uiSlice";
 import ManageSearch from "@mui/icons-material/ManageSearch";
 import SearchOff from "@mui/icons-material/SearchOff";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const DetectScaleButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { scaleIsBeingDetected } = useSelector(selectSettings);
+  const scaleIsBeingDetected = useSettingsSelector(
+    (s) => s.scaleIsBeingDetected
+  );
   const setupScaleDetector = useScaleDetectorSetup();
   return (
     <IconButtonWrapper

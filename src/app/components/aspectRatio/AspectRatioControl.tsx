@@ -1,13 +1,13 @@
 import { LockRatioButton } from "@/app/components/aspectRatio/LockRatioButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
-import { useSelector } from "react-redux";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { FretboardScaleXSlider } from "./FretboardScaleXSlider";
 import { FretboardScaleYSlider } from "./FretboardScaleYSlider";
 
 export const AspectRatioControl: React.FC = () => {
-  const { chordsDisplayMode, theme } = useSelector(selectUi);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const theme = useUiSelector((s) => s.theme);
   return (
     <>
       <div

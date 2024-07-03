@@ -1,7 +1,8 @@
+import { useAuthSelector } from "@/app/hooks/storeHooks";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { TierKey } from "@/lib/tier";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   ApiCallResult,
   acknowledgePurchaseOnBackend,
@@ -12,7 +13,6 @@ import { AlertType } from "../data/alertType";
 import { GuitarUpscaleSpecificPurchaseDetails } from "../digitalGoodsBrowser";
 import { processWithReloads } from "../helpers/reloadHelper";
 import { buildDigitalGoodsService } from "../helpers/serviceHelper";
-import { selectAuth } from "../store/authSlice";
 import { setAndShowAlert } from "../store/uiSlice";
 import { useInterval } from "./useInterval";
 import { useOnlineStatus } from "./useOnlineStatus";
@@ -36,7 +36,7 @@ function sortByItemId(
 
 // This hook reloads the page as the server should set the right permissions after the client sends the purchase info to it
 export const useGooglePlayAuth = () => {
-  const { subscriptionTier } = useSelector(selectAuth);
+  const subscriptionTier = useAuthSelector((s) => s.subscriptionTier);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const isOnline = useOnlineStatus();
   // https://developer.android.com/google/play/billing/subscriptions

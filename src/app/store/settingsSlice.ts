@@ -36,7 +36,6 @@ import {
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import { isAnythingStrumming } from "../engine/strummingState";
-import { RootState } from "./store"; // Define RootState type
 
 const getFirstScaleForGroup = (groupKey: string) =>
   scalesMap.get(groupKey)!.keys().next().value;
@@ -632,7 +631,5 @@ export const {
   checkCustomStrummingPatternAfterDeletion,
   setChordsAreLoading,
 } = settingsSlice.actions;
-
-export const selectSettings = (state: RootState) => state.settings;
 
 export default settingsSlice.reducer;

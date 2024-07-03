@@ -3,15 +3,14 @@ import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { useDigitalGoodsServiceInfo } from "@/app/context/DigitalGoodsServiceInfoProvider";
 import { usePremiumFeatures } from "@/app/context/PremiumFeaturesProvider";
 import { PURCHASE_OPTIONS_DIALOG } from "@/app/data/elementIds";
+import { useAuthSelector } from "@/app/hooks/storeHooks";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
-import { selectAuth } from "@/app/store/authSlice";
 import { PremiumFeatureKeys } from "@/lib/premiumFeatures";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { Tier } from "@/lib/tier";
 import { Alert, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { FC, useState } from "react";
-import { useSelector } from "react-redux";
 import { DialogProps } from "../DialogProps";
 import { PatreonDialogAuthButton } from "./PatreonDialogAuthButton";
 
@@ -54,7 +53,7 @@ export const PurchaseOptionsDialog: FC<DialogProps> = ({
     [key: string]: string;
   };
   const { data: session } = useSession();
-  const { subscriptionTier } = useSelector(selectAuth);
+  const subscriptionTier = useAuthSelector((s) => s.subscriptionTier);
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const [highlightedOption, setHighlightedOption] = useState<Tier>();
   const isOnline = useOnlineStatus();

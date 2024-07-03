@@ -1,13 +1,14 @@
 "use client";
 
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
-import { selectSettings, setReverbStrength } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setReverbStrength } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Slider } from "../../uiFramework/Slider";
 
 export const ReverbStrengthSlider: React.FC = () => {
-  const { reverbStrength } = useSelector(selectSettings);
+  const reverbStrength = useSettingsSelector((s) => s.reverbStrength);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

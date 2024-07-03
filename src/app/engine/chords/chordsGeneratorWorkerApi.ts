@@ -27,7 +27,7 @@ export const abortGeneratingChords = () => {
   }
 };
 
-export const generateChords = async (
+export const generateChords = (
   neck: Neck,
   capo: number,
   onChordModeProcessed: (

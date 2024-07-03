@@ -1,12 +1,13 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { selectSettings, setMetronomeVolume } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setMetronomeVolume } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Slider } from "../../uiFramework/Slider";
 
 export const MetronomeVolumeSlider: React.FC = () => {
-  const { metronomeVolume } = useSelector(selectSettings);
+  const metronomeVolume = useSettingsSelector((s) => s.metronomeVolume);
   const dispatch = useDispatch();
 
   const handleSliderChange = async (value: number) => {

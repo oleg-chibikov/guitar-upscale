@@ -21,18 +21,18 @@ import {
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import {
   addChordMode,
   capoValue,
   chordsValue,
   neckValue,
-  selectSettings,
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
-import { selectUi, setChordsExpanded } from "@/app/store/uiSlice";
+import { setChordsExpanded } from "@/app/store/uiSlice";
 import React, { RefObject, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
 
 const TOP_RESERVED_HEIGHT = 100;
@@ -42,7 +42,9 @@ const COMPACT_CHORDS_WIDTH = 220;
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   mainRef,
 }) => {
-  const { guitarSettingsUpdateCount } = useSelector(selectSettings);
+  const guitarSettingsUpdateCount = useSettingsSelector(
+    (s) => s.guitarSettingsUpdateCount
+  );
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
@@ -53,8 +55,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
   const localGuitarSettingsUpdateCount = useRef<number>(0);
   const ref = useRef<HTMLDivElement>(null);
-  const { chordsExpanded, chordsDisplayMode, useSharpChords } =
-    useSelector(selectUi);
+  const useSharpChords = useUiSelector((s) => s.useSharpChords);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
 
   const dispatch = useDispatch();
   const handleExpansion = () => {

@@ -6,15 +6,15 @@ import {
   SevenStringSkin,
   Skin,
 } from "@/app/data/skin";
-import { selectSettings } from "@/app/store/settingsSlice"; // Assuming you have a settingsSlice to select stringCount
-import { selectUi, setSkin } from "@/app/store/uiSlice";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
+import { setSkin } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const SkinSelector: React.FC = () => {
-  const { skin } = useSelector(selectUi);
-  const { stringCount } = useSelector(selectSettings);
+  const skin = useUiSelector((s) => s.skin);
+  const stringCount = useSettingsSelector((s) => s.stringCount);
   const dispatch = useDispatch();
 
   let enumObj: Record<string, CombinedSkinType>;

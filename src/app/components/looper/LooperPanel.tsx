@@ -13,9 +13,9 @@ import {
   clearLooperState,
   looperState,
 } from "@/app/engine/looper/looper";
-import { selectSettings } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { LooperButton } from "./LooperButton";
 
 export const LooperPanel: React.FC = () => {
@@ -23,8 +23,12 @@ export const LooperPanel: React.FC = () => {
   const hasAnyRecordings = Object.values(state).some((x) => x.hasRecording); // after being restored from the state array is converted to an object and just applying .some won't work
   const localGuitarSettingsUpdateCount = useRef<number>(0);
 
-  const { guitarSettingsUpdateCount, looperStateUpdateTrigger } =
-    useSelector(selectSettings);
+  const guitarSettingsUpdateCount = useSettingsSelector(
+    (s) => s.guitarSettingsUpdateCount
+  );
+  const looperStateUpdateTrigger = useSettingsSelector(
+    (s) => s.looperStateUpdateTrigger
+  );
   const dispatch = useDispatch();
   useEffect(() => {
     if (

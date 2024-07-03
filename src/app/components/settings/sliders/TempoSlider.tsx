@@ -1,12 +1,13 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { tempoSteps } from "@/app/data/tempo";
-import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setTempoBpm } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { StepSlider } from "../../uiFramework/StepSlider";
 
 export const TempoSlider: React.FC = () => {
-  const { tempoBpm } = useSelector(selectSettings);
+  const tempoBpm = useSettingsSelector((s) => s.tempoBpm);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

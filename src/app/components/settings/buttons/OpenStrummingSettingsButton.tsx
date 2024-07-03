@@ -1,13 +1,16 @@
-import { selectUi, setStrummingSettingsExpanded } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setStrummingSettingsExpanded } from "@/app/store/uiSlice";
 import Tune from "@mui/icons-material/Tune";
 import React from "react";
 import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const OpenStrummingSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { strummingSettingsExpanded } = useSelector(selectUi);
+  const strummingSettingsExpanded = useUiSelector(
+    (s) => s.strummingSettingsExpanded
+  );
   return (
     <IconButtonWrapper
       {...props}

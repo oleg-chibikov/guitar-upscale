@@ -1,19 +1,20 @@
 "use client";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
 import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
-import { selectSettings, setTempoBpm } from "@/app/store/settingsSlice";
+import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFile from "@mui/icons-material/UploadFile";
 import React, { Fragment, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 const LOG_PREFIX = "Midi upload button: ";
 export const MidiUploadButton: React.FC = () => {
   const ref = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
   const setupChordDetector = useChordDetectorSetup();
   const setupScaleDetector = useScaleDetectorSetup();
-  const { chordsAreLoading } = useSelector(selectSettings);
+  const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(LOG_PREFIX + "Processing midi file");
     const file = e.target.files?.[0];
@@ -21,11 +22,12 @@ export const MidiUploadButton: React.FC = () => {
       const reader = new FileReader();
       reader.onload = async (event) => {
         console.log(LOG_PREFIX + "File loaded");
-        if (event.target?.result) {
+        const result = event.target?.result;
+        if (result !== null && result !== undefined) {
           await setupChordDetector();
           await setupScaleDetector();
           const eventsByTick = await parseMidiData(
-            event.target.result as ArrayBuffer,
+            result as ArrayBuffer,
             (bpm) => {
               dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
             }
@@ -70,7 +72,7 @@ export const MidiUploadButton: React.FC = () => {
             ? "Wait for the chords to load before playing MIDI"
             : "Play midi file"
         }
-      ></IconButtonWrapper>
+      />
     </Fragment>
   );
 };

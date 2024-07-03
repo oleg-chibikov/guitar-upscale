@@ -11,11 +11,10 @@ import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import {
   reverbStrengthValue,
-  selectSettings,
+  tempoBpmValue,
   volumeValue,
 } from "@/app/store/settingsSlice";
 import React from "react";
-import { useSelector } from "react-redux";
 import { SelectWrapper } from "../../../uiFramework/SelectWrapper";
 
 interface BaseInstrumentSelectorProps {
@@ -33,8 +32,6 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
   setInstrumentGroup,
   setInstrument,
 }) => {
-  const { tempoBpm } = useSelector(selectSettings);
-
   const handleGroupChange = async (group: InstrumentGroup) => {
     setInstrumentGroup(group);
 
@@ -52,7 +49,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
       volumeValue,
       value,
       reverbStrengthValue,
-      beatToMilliseconds(tempoBpm)
+      beatToMilliseconds(tempoBpmValue)
     );
   };
 

@@ -1,13 +1,14 @@
-import { selectUi, setSettingsExpanded } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setSettingsExpanded } from "@/app/store/uiSlice";
 import SettingsApplications from "@mui/icons-material/SettingsApplications";
 import React from "react";
 import ReactGA from "react-ga4";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
 export const OpenSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { settingsExpanded } = useSelector(selectUi);
+  const settingsExpanded = useUiSelector((s) => s.settingsExpanded);
   return (
     <IconButtonWrapper
       {...props}

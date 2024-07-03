@@ -1,11 +1,13 @@
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
-import { selectSettings, setChordNotesToPlay } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setChordNotesToPlay } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Slider } from "../../uiFramework/Slider";
 
 export const ChordNotesToPlaySlider: React.FC = () => {
-  const { chordNotesToPlay, stringCount } = useSelector(selectSettings);
+  const chordNotesToPlay = useSettingsSelector((s) => s.chordNotesToPlay);
+  const stringCount = useSettingsSelector((s) => s.stringCount);
   const dispatch = useDispatch();
 
   const handleSliderChange = (value: number) => {

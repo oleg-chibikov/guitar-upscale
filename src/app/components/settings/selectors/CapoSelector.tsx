@@ -1,16 +1,13 @@
 import { Note, getNoteText } from "@/app/data/notes";
 import { getShiftedNote } from "@/app/data/tunings";
-import {
-  selectSettings,
-  setCapo,
-  tuningValue,
-} from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setCapo, tuningValue } from "@/app/store/settingsSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const CapoSelector: React.FC = () => {
-  const { capo } = useSelector(selectSettings);
+  const capo = useSettingsSelector((s) => s.capo);
   const dispatch = useDispatch();
 
   return (

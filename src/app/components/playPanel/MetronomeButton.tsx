@@ -1,12 +1,12 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import {
   isMetronomeActiveValue,
   metronomeVolumeValue,
-  selectSettings,
   setIsMetronomeActive,
 } from "@/app/store/settingsSlice";
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 export function MdiMetronome() {
@@ -28,7 +28,7 @@ export function MdiMetronome() {
 
 export const MetronomeButton: React.FC = (props) => {
   const dispatch = useDispatch();
-  const { isMetronomeActive } = useSelector(selectSettings);
+  const isMetronomeActive = useSettingsSelector((s) => s.isMetronomeActive);
 
   useEffect(() => {
     const sub = MetronomeEventBus.subscribe(async ({ isBar, isBeat }) => {

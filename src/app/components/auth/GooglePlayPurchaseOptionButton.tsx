@@ -10,12 +10,12 @@ import {
   getExistingNonCancelledPurchase,
   isPurchaseCancelled,
 } from "@/app/helpers/purchaseOptionHelper";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { CancellationMode } from "@/lib/apiTypes";
 import { msToFormattedDate } from "@/lib/dateHelper";
 import { Button } from "@mui/material";
 import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 interface GooglePlayPurchaseOptionButtonProps
   extends GetSubscriptionActionParams {
@@ -49,7 +49,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     : getMakePurchase(params, hasDigitalGoodsService, dispatch);
 
   const title = purchaseOption.tier;
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   const isAlreadyPurchased =
     purchaseOption.purchaseData?.purchaseToken !== undefined;
   const isCancelled = isPurchaseCancelled(purchaseOption);

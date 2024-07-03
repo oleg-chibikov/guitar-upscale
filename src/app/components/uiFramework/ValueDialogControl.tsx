@@ -1,10 +1,9 @@
 import { ValueDialogControlDialogWrapper } from "@/app/components/uiFramework/ValueDialogControlDialogWrapper";
 import { Theme } from "@/app/data/theme";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
-import { selectUi } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 interface ValueDialogControlProps {
   value: number;
@@ -38,7 +37,7 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
   label,
   postfix,
 }) => {
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [startPosition, setStartPosition] = useState<StartPosition>(null);
   const [startIndex, setStartIndex] = useState<number>(steps.indexOf(value));

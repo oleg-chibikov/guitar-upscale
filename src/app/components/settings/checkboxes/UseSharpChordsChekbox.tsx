@@ -1,12 +1,13 @@
 "useClient";
 
-import { selectUi, setUseSharpChords } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setUseSharpChords } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const UseSharpChordsCheckbox: React.FC = (props) => {
-  const { useSharpChords } = useSelector(selectUi);
+  const useSharpChords = useUiSelector((s) => s.useSharpChords);
   const dispatch = useDispatch();
 
   return (

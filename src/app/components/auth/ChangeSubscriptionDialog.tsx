@@ -9,12 +9,11 @@ import {
   getChangeAction,
   getExistingNonCancelledPurchase,
 } from "@/app/helpers/purchaseOptionHelper";
-import { selectUi } from "@/app/store/uiSlice";
 import { CancellationMode } from "@/lib/apiTypes";
 import { msToFormattedDate } from "@/lib/dateHelper";
 import { Alert, Button } from "@mui/material";
 import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { DialogProps } from "../DialogProps";
 
 export const ChangeSubscriptionDialog: FC<
@@ -27,7 +26,6 @@ export const ChangeSubscriptionDialog: FC<
     disabledMessage,
     allPurchasedOptions,
   } = params;
-  const { theme } = useSelector(selectUi);
   const dispatch = useDispatch();
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
 

@@ -1,17 +1,15 @@
 import React from "react";
-import { useSelector } from "react-redux";
 
-import { selectSettings } from "@/app/store/settingsSlice";
 import { ScaleGroupSelector } from "./ScaleGroupSelector";
 import { ScaleSelector } from "./ScaleSelector";
 
 import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel";
 import { Theme } from "@/app/data/theme";
-import { selectUi } from "@/app/store/uiSlice";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 
 export const ScaleAndGroupSelector: React.FC = () => {
-  const { scaleGroup } = useSelector(selectSettings);
-  const { theme } = useSelector(selectUi);
+  const scaleGroup = useSettingsSelector((s) => s.scaleGroup);
+  const theme = useUiSelector((s) => s.theme);
 
   return (
     <section

@@ -1,12 +1,13 @@
 import { Tuning, tunings } from "@/app/data/tunings";
-import { selectSettings, setTuning } from "@/app/store/settingsSlice";
+import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setTuning } from "@/app/store/settingsSlice";
 import { setSkinBasedOnStringCount } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { SelectWrapper } from "../../uiFramework/SelectWrapper";
 
 const TuningSelector: React.FC = () => {
-  const { tuning } = useSelector(selectSettings);
+  const tuning = useSettingsSelector((s) => s.tuning);
   const dispatch = useDispatch();
 
   return (

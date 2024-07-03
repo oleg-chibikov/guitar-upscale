@@ -8,9 +8,10 @@ import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { CONTROL_PANEL_ID } from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
-import { selectUi, setControlPanelExpanded } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setControlPanelExpanded } from "@/app/store/uiSlice";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ButtonContainer } from "./ButtonContainer";
 import { ScaleAndGroupSelector } from "./selectors/ScaleAndGroupSelector";
 
@@ -18,7 +19,8 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
   const dispatch = useDispatch();
-  const { chordsDisplayMode, controlPanelExpanded } = useSelector(selectUi);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const controlPanelExpanded = useUiSelector((s) => s.controlPanelExpanded);
   const handleExpansion = () => {
     dispatch(setControlPanelExpanded(!controlPanelExpanded));
   };

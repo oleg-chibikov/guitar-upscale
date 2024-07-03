@@ -3,13 +3,11 @@ import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";
 import { WithStyle } from "@/app/helpers/withStyle";
-import { selectUi } from "@/app/store/uiSlice";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import { FC } from "react";
-import { useSelector } from "react-redux";
 
 interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   expanded: boolean;
@@ -30,7 +28,7 @@ export const Expander: FC<ExpanderProps> = ({
   className,
   style,
 }) => {
-  const { theme } = useSelector(selectUi);
+  const theme = useUiSelector((s) => s.theme);
   return (
     <section
       style={style}

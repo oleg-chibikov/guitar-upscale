@@ -2,10 +2,9 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
-import { selectUi } from "@/app/store/uiSlice";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import dynamic from "next/dynamic";
 import React, { ReactNode } from "react";
-import { useSelector } from "react-redux";
 import { AboutButton } from "./buttons/AboutButton";
 import { FullscreenButton } from "./buttons/FullscreenButton";
 import { OpenSettingsButton } from "./buttons/OpenSettingsButton";
@@ -39,7 +38,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
   style,
   premiumComponents,
 }) => {
-  const { chordsDisplayMode } = useSelector(selectUi);
+  const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   return (
     <section className="flex flex-col gap-1" style={style}>
       <div
