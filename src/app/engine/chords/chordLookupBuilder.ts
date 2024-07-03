@@ -1,9 +1,18 @@
 import { getModeText } from "@/app/data/chordModes";
 import { Chord, NOTE_COUNT, getNoteText } from "@/app/data/notes";
-import { chordsAreLoadingValue, chordsValue } from "@/app/store/settingsSlice";
+import { getSlashChordsForVariation } from "@/app/engine/chords/slashChordGenerator";
+import {
+  capoValue,
+  chordsAreLoadingValue,
+  chordsValue,
+  neckValue,
+} from "@/app/store/settingsSlice";
 
 export const rebuildChordDetectorLookup = () => {
-  if (!chordsValue) {
+  const capo = capoValue;
+  const neck = neckValue;
+  const addToDetector = addChordToDetectorLookup;
+  if (!chordsValue || !addToDetector || !neck) {
     return;
   }
 
@@ -16,7 +25,24 @@ export const rebuildChordDetectorLookup = () => {
         // if (chord.note === Note.A && mode.mode === ChordMode.Minor) {
         //   debugger;
         // }
-        addChordToDetectorLookup?.(variation, fullKey);
+        addToDetector(variation, fullKey);
+        const slashChordsGenerator = getSlashChordsForVariation(
+          variation,
+          neck,
+          capo
+        );
+        let result = slashChordsGenerator.next();
+
+        while (!result.done) {
+          const slashChord = result.value;
+          if (slashChord) {
+            addToDetector(
+              slashChord.variation,
+              `${fullKey}/${getNoteText(slashChord.bassNote.note)}`
+            );
+          }
+          result = slashChordsGenerator.next();
+        }
       });
     }
   }
