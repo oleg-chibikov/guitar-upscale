@@ -3,6 +3,7 @@ import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";
 import { WithStyle } from "@/app/helpers/withStyle";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
