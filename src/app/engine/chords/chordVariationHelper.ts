@@ -1,3 +1,4 @@
+import { ChordVariations } from "@/app/data/chordModes";
 import { Chord, StringOctaveNote } from "@/app/data/notes";
 import { calculateAverage } from "@/app/helpers/arrayHelper";
 
@@ -10,7 +11,7 @@ export type ChordPreferredVariations = {
 type StringPreference = "high" | "low";
 
 const getPreferredChordVariation = (
-  chordVariations: Chord[],
+  chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number
 ): Chord => {
@@ -100,7 +101,7 @@ const getPreferredChordVariation = (
 };
 
 export const getPreferredChordVariations = (
-  chordVariations: Chord[],
+  chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number
 ): ChordPreferredVariations => {
@@ -129,7 +130,7 @@ export const getPreferredChordVariations = (
 };
 
 const getPreferredChordVariationWithMinNotes = (
-  chordVariations: Chord[],
+  chordVariations: ChordVariations,
   stringPreference: StringPreference,
   numberOfStrings: number
 ) => {
@@ -147,7 +148,7 @@ const getPreferredChordVariationWithMinNotes = (
 };
 
 const getPreferredChordVariationWithMaxNotes = (
-  chordVariations: Chord[],
+  chordVariations: ChordVariations,
   stringPreference: StringPreference,
   numberOfStrings: number
 ) => {

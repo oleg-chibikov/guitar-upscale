@@ -1,5 +1,5 @@
+import { ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { Chord } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import {
   ChordPlayParameters,
@@ -32,7 +32,7 @@ import { useSelector } from "react-redux";
 
 interface ChordButtonProps {
   chordName: string;
-  variations: Chord[];
+  variations: ChordVariations;
   isHidden: boolean;
   onStrummingStateChange: (value: boolean) => void;
 }

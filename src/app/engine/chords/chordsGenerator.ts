@@ -1,10 +1,13 @@
-import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
+import {
+  ChordMode,
+  ChordModeVariationsContainer,
+  ChordVariationsByNote,
+} from "@/app/data/chordModes";
 import {
   GenerateChordsCallbackMessage,
   GenerateChordsRequest,
 } from "@/app/data/chordsGeneratorTypes";
 import {
-  Chord,
   FingerPosition,
   NOTE_COUNT,
   Note,
@@ -204,96 +207,6 @@ class ChordsGenerator {
       .filter((x) => x) as ChordBuilderInfo[]; // exclude incomplete chords;
   };
 
-  // private getSlashChordsForVariation = (
-  //   variationInfo: ChordBuilderInfo,
-  //   neckString: (StringOctaveNote | null)[],
-  //   chordInfo: UltimateChordInfoVariation
-  // ) => {
-  //   const minAllowedFretIndex =
-  //     variationInfo.minAllowedFretIndex ?? this.capo + 1;
-  //   const maxAllowedFretIndex =
-  //     variationInfo.maxAllowedFretIndex ?? this.absoluteMaxFretIndex;
-  //   // get the variation of chord with open string;
-  //   const openStringNote = neckString[this.capo];
-  //   if (openStringNote !== null) {
-  //     this.applySlashChord(chordInfo, openStringNote);
-  //   }
-
-  //   for (
-  //     let fretIndex = minAllowedFretIndex;
-  //     fretIndex <= maxAllowedFretIndex;
-  //     fretIndex++
-  //   ) {
-  //     const noteAtFret = neckString[fretIndex];
-  //     if (noteAtFret !== null) {
-  //       this.applySlashChord(chordInfo, noteAtFret);
-  //     }
-  //   }
-  // };
-
-  // private applySlashChord = (
-  //   chordInfo: UltimateChordInfoVariation,
-  //   bassNote: StringOctaveNote
-  // ) => {
-  //   const originalVariation = chordInfo.fingerPositions;
-  //   if (originalVariation[bassNote.string]?.note === bassNote.note) {
-  //     // no need to apply a slash chord when the bass note is the same as in the original chord
-  //     return;
-  //   }
-
-  //   const chordCopy = [...originalVariation];
-  //   chordCopy[bassNote.string] = bassNote; // prepend open string note
-  //   const slashChordInfo = this.getUltimateSlashChord(
-  //     chordInfo.chordMode,
-  //     chordCopy,
-  //     bassNote
-  //   );
-  //   addOrUpdateMapArray(
-  //     this.allSlashChords,
-  //     slashChordInfo.name,
-  //     slashChordInfo
-  //   );
-  // };
-
-  // private getUltimateChord = (
-  //   baseNote: StringOctaveNote,
-  //   chordMode: ChordMode,
-  //   fingerPositions: FingerPosition[]
-  // ): UltimateChordInfoVariation => {
-  //   const fingerPositionsString = fingerPositions
-  //     .reverse()
-  //     .map((x) => x?.fret ?? "x")
-  //     .join(",");
-  //   return {
-  //     baseNote,
-  //     chordMode,
-  //     fingerPositions,
-  //     fingerPositionsString,
-  //   } as UltimateChordInfoVariation;
-  // };
-
-  // private getUltimateSlashChord = (
-  //   chordMode: ChordMode,
-  //   fingerPositions: FingerPosition[],
-  //   bassNote: StringOctaveNote
-  // ): UltimateSlashChordInfoVariation => {
-  //   const fingerPositionsString = fingerPositions
-  //     .reverse()
-  //     .map((x) => x?.fret ?? "x")
-  //     .join(",");
-
-  //   const chordName = chordMode.name || chordMode.description;
-  //   const bassNoteName = Note[bassNote.note];
-  //   const slashChordName = `${chordName}/${bassNoteName}`;
-  //   return {
-  //     chordMode,
-  //     fingerPositions,
-  //     fingerPositionsString,
-  //     bassNote,
-  //     name: slashChordName,
-  //   } as UltimateSlashChordInfoVariation;
-  // };
-
   private getFretLimitsForTheFirstTime = (fretIndex: number) => {
     const newMin = Math.max(
       this.capo + 1,
@@ -309,7 +222,7 @@ class ChordsGenerator {
 
   private processIntervalsInChordMode = (
     intervalsToUse: number[],
-    variationsToFill: Chord[][]
+    variationsToFill: ChordVariationsByNote
   ) => {
     for (
       let stringIndex = this.neck.length - 1; // starting from the lowest (thickest) string
@@ -346,7 +259,7 @@ class ChordsGenerator {
   };
 
   private processChordMode = (chordMode: ChordMode) => {
-    const variationsByNote: Chord[][] = [];
+    const variationsByNote: ChordVariationsByNote = [];
     this.processIntervalsInChordMode(chordMode.intervals, variationsByNote);
     const intervalsWithoutPerfectFifth =
       this.buildIntervalsWithoutPerfectFifth(chordMode);
@@ -406,7 +319,7 @@ class ChordsGenerator {
   };
 
   private fillPreferredVariations(
-    variationsByNote: Chord[][],
+    variationsByNote: ChordVariationsByNote,
     chordMode: ChordMode
   ) {
     const preferredVariationsByNote: (ChordPreferredVariations | undefined)[] =

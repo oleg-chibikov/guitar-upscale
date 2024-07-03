@@ -1,4 +1,4 @@
-import {} from "@/app/data/chordModes";
+import { ChordVariations } from "@/app/data/chordModes";
 import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { Chord } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
@@ -7,7 +7,7 @@ import { ChordMetadata, NotePlayEventBus } from "../eventBus";
 
 export type ChordPlayParameters = ChordMetadata & {
   chordName: string;
-  variations: Chord[];
+  variations: ChordVariations;
   delayMs?: number;
   notesToPlay?: number;
   reverse: boolean;
@@ -15,7 +15,7 @@ export type ChordPlayParameters = ChordMetadata & {
 
 const chordRoundRobinMap = new Map<string, number>();
 
-const selectRandomVariation = (variations: Chord[]) => {
+const selectRandomVariation = (variations: ChordVariations) => {
   const randomIndex = Math.floor(Math.random() * variations.length);
   return variations[randomIndex];
 };

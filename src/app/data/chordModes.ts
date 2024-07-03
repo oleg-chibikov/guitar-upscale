@@ -10,6 +10,9 @@ export interface ChordMode {
   canSkipPerfectFifth: boolean; // Indicates if the perfect fifth can be omitted
 }
 
+export type ChordVariations = Chord[];
+export type ChordVariationsByNote = (ChordVariations | undefined)[];
+
 export const chordModes: ChordMode[] = [
   {
     description: "Major",
@@ -49,7 +52,7 @@ export const getModeSuffix = (chord: string): string =>
 
 export type ChordModeVariations = {
   chordMode: ChordMode;
-  variationsByNote: (Chord[] | undefined)[];
+  variationsByNote: ChordVariationsByNote;
 };
 
 export type ChordModeVariationsContainer = {
