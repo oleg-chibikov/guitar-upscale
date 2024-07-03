@@ -22,22 +22,22 @@ export function extractChordFromNotes(
     return undefined;
   }
   const variations = getPossibleNotesArrangementOnNeck(sortedNotes)
+    // TODO: Do we need to filter out the null values here? later we'll add them back during serializing for detection
     .map((variation) => variation.filter((x) => x) as StringOctaveNote[])
     .sort(
       // sorting to put the variations with the highest number of notes first (it might give the better matching chord if different variations are matching different chords)
       (a: StringOctaveNote[], b: StringOctaveNote[]) => b.length - a.length
     );
+
   for (const variation of variations) {
     console.log(
       "Detecting chord for",
 
-      variation.map((x) =>
-        x ? x.string + "_" + x.fret : "no value for this string"
-      )
+      variation.map((x) => x.string + "_" + x.fret)
     );
     let chordName: string | undefined = undefined;
     chordDetector.findMatches(variation, (data) => {
-      if (data.chords?.length) {
+      if (data.chords !== undefined && data.chords.length > 0) {
         chordName = data.chords[0];
       }
     });
@@ -68,7 +68,10 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
     const serializedOctaveNote = serializeOctaveNote(noteEvent);
     const possibleStringOctaveNotes =
       octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote); // these notes should be already sorted from lowest to highest string
-    if (!possibleStringOctaveNotes?.length) {
+    if (
+      possibleStringOctaveNotes === undefined ||
+      possibleStringOctaveNotes.length === 0
+    ) {
       array[stringToPutNextNote] = null;
       console.log(
         "Index of note event: %d, index of string to put current event: %d. No matching notes in the current scale",

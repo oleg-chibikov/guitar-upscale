@@ -28,7 +28,7 @@ export class MidiRecorder implements NoteRecorder {
     this.startTick = undefined;
   }
 
-  async stopRecording(save: boolean) {
+  stopRecording(save: boolean) {
     this.isRecording = false;
     if (save && this.midiEvents !== undefined && this.midiEvents.size) {
       midiSaver.generateAndSave(this.midiEvents);

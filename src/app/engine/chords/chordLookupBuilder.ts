@@ -12,7 +12,7 @@ export const rebuildChordDetectorLookup = () => {
   const capo = capoValue;
   const neck = neckValue;
   const addToDetector = addChordToDetectorLookup;
-  if (!chordsValue || !addToDetector || !neck) {
+  if (!addToDetector || !neck) {
     return;
   }
 
@@ -33,7 +33,7 @@ export const rebuildChordDetectorLookup = () => {
         );
         let result = slashChordsGenerator.next();
 
-        while (!result.done) {
+        while (!(result.done ?? false)) {
           const slashChord = result.value;
           if (slashChord) {
             addToDetector(

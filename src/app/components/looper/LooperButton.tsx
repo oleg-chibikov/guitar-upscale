@@ -87,11 +87,11 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
               ? `Pause loop at channel ${channel + 1}`
               : `Play loop at channel ${channel + 1}`
           }
-          onPress={() => {
+          onPress={async () => {
             if (isDisabled) {
               return;
             }
-            handlePlayPauseClick();
+            await handlePlayPauseClick();
           }}
         />
       ) : null}

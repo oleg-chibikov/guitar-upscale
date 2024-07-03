@@ -50,4 +50,4 @@ export type Chord = FingerPosition[];
 export type FingerPosition = StringOctaveNote | undefined; // represents a note in a chord on a particular string. Undefined means there is no note on that string
 
 export const initNotesArray = <T>() =>
-  Array.from({ length: NOTE_COUNT }, (_) => undefined as T);
+  Array.from({ length: NOTE_COUNT }, () => undefined as T);

@@ -18,7 +18,7 @@ import {
 
 import { StrummingPattern } from "@/app/data/strummingPatterns";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
-import { useRef } from "react";
+import { MutableRefObject, useRef } from "react";
 import {
   currentTick,
   isMainClockActiveValue,
@@ -189,6 +189,9 @@ export const useStrumming = (
   chordName: string,
   isDisabled: boolean,
   hasTouchInput: boolean,
+  isInImmediateChordGracePeriodRef: MutableRefObject<
+    NodeJS.Timeout | undefined
+  >,
   setClickedStateInComponent: (value: boolean) => void,
   setPlayingStateInComponent: (value: boolean) => void,
   setGracePeriodStateInComponent: (value: boolean) => void,
@@ -196,7 +199,6 @@ export const useStrumming = (
 ) => {
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
-  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>();
 
   const onChordPress = async () => {
     const clickNumber = clickNumberRef.current++;

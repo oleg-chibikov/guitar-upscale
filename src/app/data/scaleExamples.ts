@@ -187,10 +187,8 @@ const getRandomRecord = <T>(array: T[]): T => {
 
 export const wipeExamplesCache = () => {
   console.log("Wiping example cache");
-  for (const [_scaleGroup, mapForScaleGroup] of Array.from(
-    examplesMap.entries()
-  )) {
-    for (const [_scale, examples] of Array.from(mapForScaleGroup.entries())) {
+  for (const [, mapForScaleGroup] of Array.from(examplesMap.entries())) {
+    for (const [, examples] of Array.from(mapForScaleGroup.entries())) {
       for (const example of examples) {
         example.decodedTracks = undefined;
       }

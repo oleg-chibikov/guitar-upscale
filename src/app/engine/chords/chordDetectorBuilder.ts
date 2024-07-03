@@ -64,7 +64,9 @@ class ChordDetectorBuilder {
         message: data.chords ? data.chords.join("\n") : data.text,
         alertType:
           data.alertType ??
-          (data.chords?.length ? AlertType.Success : AlertType.Warning),
+          (data.chords !== undefined && data.chords.length > 0
+            ? AlertType.Success
+            : AlertType.Warning),
         alertTimeout: 5000,
       })
     );

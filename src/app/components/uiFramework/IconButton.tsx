@@ -32,7 +32,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   tooltip,
   id,
   className,
-  disabled,
+  disabled = false,
   allowHandlerInDisabledState,
   ...rest
 }) => {
@@ -63,7 +63,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
         >
           <div className="relative inline-flex items-center justify-center">
             {icon}
-            {textContent && (
+            {textContent !== undefined && (
               <Typography
                 color={"ButtonText"}
                 variant="body2"

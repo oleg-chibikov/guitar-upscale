@@ -28,7 +28,7 @@ import {
 } from "@/app/store/settingsSlice";
 import { themeValue } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 interface ChordButtonProps {
   chordName: string;
@@ -49,8 +49,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
+  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>();
 
-  const toggleClasses = () => {
+  const toggleClasses = useCallback(() => {
     const element = elementRef.current;
     if (!element) {
       return;
@@ -123,7 +124,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     const classList = element.classList;
     classList.remove(...notNeededClasses);
     classList.add(...neededClasses);
-  };
+  }, [isDisabled, isInImmediateChordGracePeriodRef]);
 
   const onClickedChange = (value: boolean) => {
     isClickedRef.current = value;
@@ -153,23 +154,23 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   };
 
   const wasPlayedLastRef = useRef<boolean>(false);
-  const { onChordPress, isAlternateRef, isInImmediateChordGracePeriodRef } =
-    useStrumming(
-      chordName,
-      isDisabled,
-      hasTouchInput,
-      onClickedChange,
-      onPlayingChange,
-      onGracePeriodChange,
-      toggleClasses
-    );
+  const { onChordPress, isAlternateRef } = useStrumming(
+    chordName,
+    isDisabled,
+    hasTouchInput,
+    isInImmediateChordGracePeriodRef,
+    onClickedChange,
+    onPlayingChange,
+    onGracePeriodChange,
+    toggleClasses
+  );
 
   const theme = useUiSelector((s) => s.theme);
   const useSharpChords = useUiSelector((s) => s.useSharpChords);
 
   useEffect(() => {
     toggleClasses();
-  }, [theme]);
+  }, [theme, toggleClasses]);
 
   useEffect(() => {
     const animate = () => {
@@ -253,7 +254,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     return () => {
       ChordToChordButtonEventMap.delete(chordName);
     };
-  }, [chordName, isDisabled, variations, isAlternateRef]);
+  }, [chordName, isDisabled, variations, isAlternateRef, toggleClasses]);
 
   if (isHidden) {
     return null;

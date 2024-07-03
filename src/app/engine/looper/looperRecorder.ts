@@ -97,7 +97,7 @@ export class LooperRecorder {
       return;
     }
 
-    if (!this.eventsByTick?.hasItems) {
+    if (this.eventsByTick === undefined || !this.eventsByTick.hasItems) {
       return;
     }
 

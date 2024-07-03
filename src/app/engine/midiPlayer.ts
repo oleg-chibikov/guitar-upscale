@@ -71,7 +71,7 @@ class MidiPlayer {
         playAllNotes(events, logPrefix, tick);
       } else {
         switch (afterPauseAction) {
-          case PauseResolveValue.GoBack:
+          case PauseResolveValue.GoBack: {
             if (isLastEventValue) {
               i--; // special edge case to play the last note correctly
               store.dispatch(setIsLastEvent(false));
@@ -90,7 +90,8 @@ class MidiPlayer {
               i = -1; // special edge case to play the first note correctly (so that GoForward / Play would start from the 0 note)
             }
             break;
-          case PauseResolveValue.GoForward:
+          }
+          case PauseResolveValue.GoForward: {
             const nextItem = items[i];
             currentTick = nextItem.tick;
             playAllNotes(nextItem.events, logPrefix, tick);
@@ -102,6 +103,7 @@ class MidiPlayer {
               i--; // allow playing the last note over and over again
             }
             break;
+          }
         }
       }
     }

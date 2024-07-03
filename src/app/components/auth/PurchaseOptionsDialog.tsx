@@ -109,6 +109,11 @@ export const PurchaseOptionsDialog: FC<DialogProps> = ({
     );
   };
 
+  const user = session?.user;
+  const email = user?.email ?? undefined;
+  const userName = user?.email ?? undefined;
+  const hasUser = user !== undefined;
+
   return (
     <DialogWrapper
       anchor="top"
@@ -116,10 +121,9 @@ export const PurchaseOptionsDialog: FC<DialogProps> = ({
       close={handleCloseDialog}
       id={PURCHASE_OPTIONS_DIALOG}
       headerText={
-        (session?.user &&
-          (session.user.name ?? "") +
-            (session.user.email ? ` (${session.user.email})` : "")) ||
-        undefined
+        hasUser
+          ? (userName ?? "") + (email !== undefined ? ` (${email})` : "")
+          : undefined
       }
     >
       <div className="flex flex-row gap-4 items-center justify-center">

@@ -326,7 +326,7 @@ class ChordsGenerator {
       [];
     for (let note = 0; note < NOTE_COUNT; note++) {
       const noteChords = variationsByNote[note];
-      if (!noteChords?.length) {
+      if (noteChords === undefined || noteChords.length === 0) {
         continue;
       }
 

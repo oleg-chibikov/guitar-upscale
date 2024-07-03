@@ -17,7 +17,7 @@ export const ControlWithLabel: FC<ControlWithLabelProps> = ({
       <Typography className="flex items-center select-text">
         {label}:
       </Typography>
-      {subtitle && (
+      {subtitle !== undefined && (
         <Typography variant="subtitle1" className="select-text">
           {subtitle}:
         </Typography>

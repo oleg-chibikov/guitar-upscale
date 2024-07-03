@@ -23,13 +23,13 @@ export const RecordButton: React.FC = (props) => {
             const midiRecorder = (
               await import("@/app/engine/midiRecorder/midiRecorder")
             ).midiRecorder;
-            await midiRecorder.stopRecording(false);
+            midiRecorder.stopRecording(false);
             dispatch(
               setIsRecording({
                 value: false,
                 startRecording: midiRecorder.startRecording,
-                stopRecording: async () => {
-                  await midiRecorder.stopRecording(false);
+                stopRecording: () => {
+                  midiRecorder.stopRecording(false);
                 },
               })
             );
@@ -53,8 +53,8 @@ export const RecordButton: React.FC = (props) => {
               startRecording: () => {
                 midiRecorder.startRecording();
               },
-              stopRecording: async () => {
-                await midiRecorder.stopRecording(true);
+              stopRecording: () => {
+                midiRecorder.stopRecording(true);
               },
             })
           );

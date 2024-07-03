@@ -1,4 +1,5 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
+import { DistinctNoteMarker } from "@/app/data/midiParser/distinctNoteMarker";
 import { TrackData } from "@/app/data/midiParser/trackData";
 import { NOTE_COUNT, Note, OctaveNote, initNotesArray } from "@/app/data/notes";
 import { microsecondsToBpm } from "@/app/helpers/clockHelper";
@@ -19,11 +20,11 @@ export function parseMidiFile(
 ) {
   console.log("Parsing midi file");
   const dataByTrack: TrackData[] = [];
-  const distinctNotes = initNotesArray();
+  const distinctNotes = initNotesArray<DistinctNoteMarker>();
   const getGuitarUpscaleTicks = (midiTicks: number) =>
     (midiTicks / midiData.header.ticksPerBeat) * TICKS_IN_BEAT;
   midiData.header.ticksPerBeat;
-  midiData.tracks.forEach((track: any) => {
+  midiData.tracks.forEach((track) => {
     let currentPosition = 0;
     const data: TrackData = { events: [] };
 
@@ -34,7 +35,7 @@ export function parseMidiFile(
       const convertedPosition = getGuitarUpscaleTicks(currentPosition);
 
       switch (event.type) {
-        case "channel":
+        case "channel": {
           const channelEvent = event as ChannelEvent<string>;
 
           switch (channelEvent.subtype) {
@@ -72,7 +73,8 @@ export function parseMidiFile(
               break;
           }
           break;
-        case "meta":
+        }
+        case "meta": {
           const metaEvent = event as MetaEvent<string>;
           switch (metaEvent.subtype) {
             case "instrumentName":
@@ -91,6 +93,7 @@ export function parseMidiFile(
             }
           }
           break;
+        }
       }
     });
     dataByTrack.push(data);

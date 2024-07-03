@@ -1,4 +1,5 @@
 import { AlertType } from "@/app/data/alertType";
+import { DistinctNoteMarker } from "@/app/data/midiParser/distinctNoteMarker";
 import { NotePlayEvent } from "@/app/data/midiParser/notePlayEvent";
 import { TrackData } from "@/app/data/midiParser/trackData";
 import {
@@ -60,7 +61,7 @@ export const parseMidiData = async (
   return eventsByTick;
 };
 
-async function detectScale(distinctNotes: unknown[]) {
+async function detectScale(distinctNotes: DistinctNoteMarker[]) {
   const { scaleDetector } = await import("@/app/engine/scales/scaleDetector");
   return new Promise<void>((resolve) => {
     scaleDetector.findMatches(
@@ -69,7 +70,7 @@ async function detectScale(distinctNotes: unknown[]) {
       async (result) => {
         let guitarSettingsChanged = false;
         const currentBaseNote = getShiftedNote(capoValue, tuningValue);
-        if (result.scales?.length) {
+        if (result.scales !== undefined && result.scales.length > 0) {
           const scalesInSameBaseNote = result.scales.filter(
             (x) => x.note === currentBaseNote
           );
@@ -121,10 +122,15 @@ async function detectScale(distinctNotes: unknown[]) {
             recreate(true); // true means we don't need to create another one when this is resolved
           }); // set waiting to true soi tha waitForChordsToLoad doesn't return straight away
           store.dispatch(setChordsAreLoading(true));
-          waitFor().then(() => {
-            console.log("Finished loading chords");
-            resolve();
-          });
+          waitFor()
+            .then(() => {
+              console.log("Finished loading chords");
+              resolve();
+            })
+            .catch((e) => {
+              console.error("Cannot await midi parser wait", e);
+              resolve();
+            });
         } else {
           console.log(
             "Guitar settings didn't change - start playing immediately"

@@ -8,7 +8,6 @@ self.onmessage = (event: WorkerMessageWrapper<GenerateChordsWorkerMessage>) => {
   const { type } = event.data;
 
   if (type === "start") {
-    const { type, ...rest } = event.data;
-    chordsGenerator.processInWorker(rest);
+    chordsGenerator.processInWorker(event.data);
   }
 };

@@ -1,18 +1,13 @@
-import { Note } from "@/app/data/notes";
-import { CHROMATIC, SPECIAL, getScalePattern } from "@/app/data/scales";
-import { getOctaveNotesForTuning, getShiftedNote } from "@/app/data/tunings";
-import { generateNeckRepresentation } from "@/app/engine/generateNeckRepresentation";
+// const scalePattern = getScalePattern(SPECIAL, CHROMATIC); // all scales include 0, so it's omitted from the scales themselves
+// const tuning = "EBGDAE";
 
-const scalePattern = getScalePattern(SPECIAL, CHROMATIC); // all scales include 0, so it's omitted from the scales themselves
-const tuning = "EBGDAE";
-
-const baseNote = Note.E;
-const neck = generateNeckRepresentation(
-  scalePattern,
-  getOctaveNotesForTuning(tuning),
-  getShiftedNote(baseNote, tuning),
-  baseNote
-);
+// const baseNote = Note.E;
+// const neck = generateNeckRepresentation(
+//   scalePattern,
+//   getOctaveNotesForTuning(tuning),
+//   getShiftedNote(baseNote, tuning),
+//   baseNote
+// );
 
 // const data = chordsGenerator.process(neck, true, 0);
 // for (const noteMode of data) {

@@ -165,7 +165,7 @@ function processRootNote(
       const shift = (Note.E - rootNote + NOTE_COUNT) % NOTE_COUNT;
       const tuningString = tuning.map((note) => Note[note]).join("");
 
-      if (!tunings[tuningString]) {
+      if (tunings[tuningString] === undefined) {
         tunings[tuningString] = {
           name,
           shift: shift === 0 ? undefined : -shift,

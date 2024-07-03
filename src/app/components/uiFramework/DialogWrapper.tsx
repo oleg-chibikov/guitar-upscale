@@ -25,7 +25,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
   className,
   dialogClassName,
   contentClassName,
-  darkBackdrop,
+  darkBackdrop = false,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
 

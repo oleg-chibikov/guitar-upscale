@@ -19,15 +19,15 @@ interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
 }
 
 export const Expander: FC<ExpanderProps> = ({
-  expanded,
-  handleExpansion,
   id,
-  title,
-  reverseIcon,
-  expandOnlyOnIcon,
   children,
   className,
   style,
+  expanded,
+  handleExpansion,
+  title,
+  reverseIcon = false,
+  expandOnlyOnIcon = false,
 }) => {
   const theme = useUiSelector((s) => s.theme);
   return (

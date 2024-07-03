@@ -1,4 +1,5 @@
 import { AlertType } from "@/app/data/alertType";
+import { DistinctNoteMarker } from "@/app/data/midiParser/distinctNoteMarker";
 import { NOTE_COUNT } from "@/app/data/notes";
 import { Scale } from "@/app/data/scales";
 import { MissingChar } from "@/app/engine/detectorShared";
@@ -40,7 +41,7 @@ class ScaleDetector {
   }
 
   findMatches(
-    notes: (unknown | undefined)[],
+    notes: DistinctNoteMarker[],
     usedNotesCount: number,
     callback: (data: ScaleDetectorCallbackData) => void
   ) {
@@ -57,7 +58,7 @@ class ScaleDetector {
       });
       return;
     }
-    const serializedScale = notes.map((x) => (x ? 1 : "?")).join("");
+    const serializedScale = notes.map((x) => x ?? "?").join("");
     const matchedValues = this.trie.wildcardMatches(serializedScale);
     console.log("Matched values from trie", matchedValues);
     const nameData = Array.from(matchedValues)
