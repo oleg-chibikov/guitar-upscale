@@ -47,7 +47,7 @@ interface UiState {
 const initialState: UiState = {
   noteDisplayMode: NoteDisplayMode.Fret,
   chordsDisplayMode: ChordsDisplayMode.Left,
-  skin: Skin.Yamaha_SLG200NW,
+  skin: Skin.Guitar4,
   settingsExpanded: false,
   chordsExpanded: true,
   controlPanelExpanded: true,
@@ -107,9 +107,9 @@ export const uiSlice = createSlice({
     },
     setSkinBasedOnStringCount(state) {
       if (stringCountValue === 7) {
-        state.skin = SevenStringSkin.Diablo_Baritone;
+        state.skin = SevenStringSkin.Guitar5;
       } else if (stringCountValue === 8) {
-        state.skin = EightStringSkin.Ibanez_RG9PB_TGF;
+        state.skin = EightStringSkin.Guitar6;
       } else {
         state.skin = Skin.PRS_SE_AX20E; // Default to one of the Skin types, update as needed
       }
