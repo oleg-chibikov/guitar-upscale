@@ -30,13 +30,9 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
           },
           select: {
             color: "black", // Set font color to black
-            backgroundColor: "white", // Set background color to white
             padding: "6px",
             lineHeight: "1.25",
             minHeight: "initial", // Ensure minimal height for the input,
-            "&:focus": {
-              backgroundColor: "white", // Adjust focus styles if needed
-            },
           },
         },
       },
