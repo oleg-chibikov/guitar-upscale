@@ -7,7 +7,7 @@ import {
 
 export const getAssetsForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
-    case Skin.PRS_SE_AX20E:
+    case Skin.Guitar1:
     default:
       return [`/guitar_low.webp`, `/guitar.webp`];
     case Skin.Guitar2:
@@ -25,7 +25,7 @@ export const getAssetsForSkin = (skin?: CombinedSkinType) => {
 
 export const getPositionForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
-    case Skin.PRS_SE_AX20E:
+    case Skin.Guitar1:
     case undefined:
       return {
         top: -583,
@@ -68,7 +68,7 @@ export const getPositionForSkin = (skin?: CombinedSkinType) => {
 
 export const getParametersForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
-    case Skin.PRS_SE_AX20E:
+    case Skin.Guitar1:
     default:
       return {
         height: 25,

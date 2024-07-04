@@ -111,7 +111,7 @@ export const uiSlice = createSlice({
       } else if (stringCountValue === 8) {
         state.skin = EightStringSkin.Guitar6;
       } else {
-        state.skin = Skin.PRS_SE_AX20E; // Default to one of the Skin types, update as needed
+        state.skin = Skin.Guitar1; // Default to one of the Skin types, update as needed
       }
     },
     setSettingsExpanded: (state, action: PayloadAction<boolean>) => {
