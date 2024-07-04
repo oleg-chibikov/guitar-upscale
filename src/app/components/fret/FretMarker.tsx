@@ -242,7 +242,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     classList.add(...neededClasses);
   }, [isBehindCapo, isColored]);
 
-  useEffect(toggleClasses, [toggleClasses]);
+  useEffect(toggleClasses, [toggleClasses, neck]);
 
   useEffect(() => {
     if (isHeader) {
