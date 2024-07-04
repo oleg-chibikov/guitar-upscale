@@ -2,10 +2,10 @@ import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { NOTE_COUNT, Note } from "@/app/data/notes";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { setSlashChordBassNote } from "@/app/store/settingsSlice";
+import { setSlashChordsExpanded } from "@/app/store/uiSlice";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Box, Button, Drawer, IconButton, Typography } from "@mui/material";
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 
 const DRAWER_WIDTH = 30;
@@ -13,11 +13,11 @@ const TOGGLE_WIDTH = 20;
 export const SlashChordButtonsContainer = () => {
   const dispatch = useDispatch();
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const slashChordsExpanded = useUiSelector((s) => s.slashChordsExpanded);
   const slashChordBassNote = useSettingsSelector((s) => s.slashChordBassNote);
-  const [open, setOpen] = useState(false);
 
   const toggleDrawer = () => {
-    setOpen(!open);
+    dispatch(setSlashChordsExpanded(!slashChordsExpanded));
   };
 
   const isLeft = chordsDisplayMode === ChordsDisplayMode.Left;
@@ -29,7 +29,7 @@ export const SlashChordButtonsContainer = () => {
         sx={{
           position: "absolute",
           top: 0,
-          [isLeft ? "left" : "right"]: open ? DRAWER_WIDTH : 0,
+          [isLeft ? "left" : "right"]: slashChordsExpanded ? DRAWER_WIDTH : 0,
           width: TOGGLE_WIDTH,
           height: "100%",
           backgroundColor: "primary.main",
@@ -43,23 +43,24 @@ export const SlashChordButtonsContainer = () => {
         }}
       >
         <Typography
+          variant="overline"
           sx={{
             writingMode: "vertical-rl",
             textOrientation: "upright",
             letterSpacing: "0.1em",
           }}
         >
-          slash
+          Bass
         </Typography>
 
         <IconButton size="small" sx={{ p: 0 }}>
           {isLeft ? (
-            open ? (
+            slashChordsExpanded ? (
               <ChevronLeftIcon fontSize="small" />
             ) : (
               <ChevronRightIcon fontSize="small" />
             )
-          ) : open ? (
+          ) : slashChordsExpanded ? (
             <ChevronRightIcon fontSize="small" />
           ) : (
             <ChevronLeftIcon fontSize="small" />
@@ -67,22 +68,25 @@ export const SlashChordButtonsContainer = () => {
         </IconButton>
 
         <Typography
+          variant="overline"
           sx={{
             writingMode: "vertical-rl",
             textOrientation: "upright",
             letterSpacing: "0.1em",
           }}
         >
-          chords
+          note
         </Typography>
       </Box>
       <Drawer
         anchor={isLeft ? "left" : "right"}
-        open={open}
+        open={slashChordsExpanded}
         onClose={toggleDrawer}
         variant="persistent"
         sx={{
-          width: open ? TOGGLE_WIDTH + DRAWER_WIDTH : TOGGLE_WIDTH,
+          width: slashChordsExpanded
+            ? TOGGLE_WIDTH + DRAWER_WIDTH
+            : TOGGLE_WIDTH,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             position: "absolute",
