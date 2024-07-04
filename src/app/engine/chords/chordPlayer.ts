@@ -1,8 +1,12 @@
 import { ChordVariations } from "@/app/data/chordModes";
 import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
-import { Chord } from "../../data/notes";
+import { Chord, Note, StringOctaveNote } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
-import { chordNotesToPlayValue } from "../../store/settingsSlice";
+import {
+  chordNotesToPlayValue,
+  neckValue,
+  slashChordBassNoteValue,
+} from "../../store/settingsSlice";
 import { ChordMetadata, NotePlayEventBus } from "../eventBus";
 
 export type ChordPlayParameters = ChordMetadata & {
@@ -28,14 +32,13 @@ const playVariation = async (
   const noteCount = notesToPlay ?? chordNotesToPlayValue;
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
-  const toPlay = reverse ? [...variation].reverse() : variation;
-  for (const note of toPlay) {
-    if (!note) {
-      continue;
-    }
+  const variationNotes = variation.filter((x) => x) as StringOctaveNote[];
+  replaceBassNoteWithSlash(variationNotes);
+  const toPlay = reverse ? variationNotes.reverse() : variationNotes;
+  for (const stringOctaveNote of toPlay) {
     NotePlayEventBus.next({
       ...rest, // track metadata and strumming metadata
-      stringOctaveNote: note,
+      stringOctaveNote,
       fromChord: true,
     });
     if (++i >= noteCount) {
@@ -131,3 +134,56 @@ export const playRoundRobin = async (params: ChordPlayParameters) => {
   );
   chordRoundRobinMap.set(params.chordName, currentVariation);
 };
+
+// it goes simultaneously to the right and left from the source note and stops when the targetNote is found
+const findClosestNote = (
+  stringNotes: (StringOctaveNote | null)[],
+  sourceNote: StringOctaveNote,
+  targetNote: Note
+): StringOctaveNote | null => {
+  const sourceIndex = stringNotes.findIndex(
+    (note) =>
+      note && note.string === sourceNote.string && note.fret === sourceNote.fret
+  );
+
+  if (sourceIndex === -1) return null;
+
+  let leftIndex = sourceIndex;
+  let rightIndex = sourceIndex;
+
+  while (leftIndex >= 0 || rightIndex < stringNotes.length) {
+    // Check left
+    if (leftIndex >= 0) {
+      const leftNote = stringNotes[leftIndex];
+      if (leftNote && leftNote.note === targetNote) {
+        return leftNote;
+      }
+      leftIndex--;
+    }
+
+    // Check right
+    if (rightIndex < stringNotes.length) {
+      const rightNote = stringNotes[rightIndex];
+      if (rightNote && rightNote.note === targetNote) {
+        return rightNote;
+      }
+      rightIndex++;
+    }
+  }
+
+  return null;
+};
+function replaceBassNoteWithSlash(variationNotes: StringOctaveNote[]) {
+  const bassNote = variationNotes[variationNotes.length - 1];
+  const slashNote = slashChordBassNoteValue;
+  if (slashNote !== undefined && neckValue) {
+    const slashBassNote = findClosestNote(
+      neckValue[bassNote.string],
+      bassNote,
+      slashNote
+    );
+    if (slashBassNote) {
+      variationNotes[variationNotes.length - 1] = slashBassNote;
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { setSlashChordBassNote } from "@/app/store/settingsSlice";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Box, Button, Drawer, IconButton } from "@mui/material";
+import { Box, Button, Drawer, IconButton, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -34,13 +34,25 @@ export const SlashChordButtonsContainer = () => {
           height: "100%",
           backgroundColor: "primary.main",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
           cursor: "pointer",
           zIndex: 100,
+          padding: "10px 0",
         }}
       >
-        <IconButton size="small" sx={{ color: "white", p: 0 }}>
+        <Typography
+          sx={{
+            writingMode: "vertical-rl",
+            textOrientation: "upright",
+            letterSpacing: "0.1em",
+          }}
+        >
+          slash
+        </Typography>
+
+        <IconButton size="small" sx={{ p: 0 }}>
           {isLeft ? (
             open ? (
               <ChevronLeftIcon fontSize="small" />
@@ -53,6 +65,16 @@ export const SlashChordButtonsContainer = () => {
             <ChevronLeftIcon fontSize="small" />
           )}
         </IconButton>
+
+        <Typography
+          sx={{
+            writingMode: "vertical-rl",
+            textOrientation: "upright",
+            letterSpacing: "0.1em",
+          }}
+        >
+          chords
+        </Typography>
       </Box>
       <Drawer
         anchor={isLeft ? "left" : "right"}
