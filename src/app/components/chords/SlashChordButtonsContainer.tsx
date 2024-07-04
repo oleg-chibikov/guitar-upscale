@@ -8,7 +8,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Box, Button, Drawer, IconButton, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
-const DRAWER_WIDTH = 30;
+const DRAWER_WIDTH = 32;
 const TOGGLE_WIDTH = 20;
 export const SlashChordButtonsContainer = () => {
   const dispatch = useDispatch();
