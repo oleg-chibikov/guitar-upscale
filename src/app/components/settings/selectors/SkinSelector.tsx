@@ -7,12 +7,17 @@ import {
   Skin,
 } from "@/app/data/skin";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
+import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import { setSkin } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { EnumSelector } from "../../uiFramework/EnumSelector";
 
 export const SkinSelector: React.FC = () => {
+  const isOnline = useOnlineStatus();
+  const tooltip = isOnline
+    ? undefined
+    : "Skin selection is disabled while offline (it might need to download new image)";
   const skin = useUiSelector((s) => s.skin);
   const stringCount = useSettingsSelector((s) => s.stringCount);
   const dispatch = useDispatch();
@@ -34,6 +39,8 @@ export const SkinSelector: React.FC = () => {
         onValueChange={(value) => {
           dispatch(setSkin(value));
         }}
+        disabled={!isOnline}
+        tooltip={tooltip}
       />
     </ControlWithLabel>
   );

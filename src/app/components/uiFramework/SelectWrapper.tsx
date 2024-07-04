@@ -1,13 +1,15 @@
 import { Theme } from "@/app/data/theme";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import { MenuItem, Select } from "@mui/material";
+import { MenuItem, Select, Tooltip } from "@mui/material";
 import React from "react";
 
 interface SelectWrapperProps extends WithClassName {
   options: { value: string | number; label: string }[];
   value: string | number;
   onChange: (value: string | number) => void;
+  disabled?: boolean;
+  tooltip?: string;
 }
 
 export const SelectWrapper: React.FC<SelectWrapperProps> = ({
@@ -15,11 +17,14 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
   value,
   onChange,
   className,
+  disabled = false,
+  tooltip,
 }) => {
   const theme = useUiSelector((s) => s.theme);
 
-  return (
+  const selectComponent = (
     <Select
+      disabled={disabled}
       SelectDisplayProps={{ style: { paddingRight: "20px" } }}
       value={value}
       onChange={(event) =>
@@ -42,5 +47,11 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
         </MenuItem>
       ))}
     </Select>
+  );
+
+  return tooltip !== undefined ? (
+    <Tooltip title={tooltip}>{selectComponent}</Tooltip>
+  ) : (
+    selectComponent
   );
 };

@@ -9,6 +9,7 @@ import { Note } from "@/app/data/notes";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
+import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
 import {
   reverbStrengthValue,
   tempoBpmValue,
@@ -32,6 +33,10 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
   setInstrumentGroup,
   setInstrument,
 }) => {
+  const isOnline = useOnlineStatus();
+  const tooltip = isOnline
+    ? undefined
+    : "Instrument selection is disabled while offline (it might need to download new sound)";
   const handleGroupChange = async (group: InstrumentGroup) => {
     setInstrumentGroup(group);
 
@@ -63,6 +68,8 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
           value: group,
           label: group,
         }))}
+        disabled={!isOnline}
+        tooltip={tooltip}
       />
       <SelectWrapper
         value={instrument}
@@ -75,6 +82,8 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
               }))
             : []
         }
+        disabled={!isOnline}
+        tooltip={tooltip}
       />
     </ControlWithLabel>
   );
