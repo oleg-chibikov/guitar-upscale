@@ -25,7 +25,6 @@ export const SlashChordButtonsContainer = () => {
   return (
     <Box className="h-full">
       <Box
-        onClick={toggleDrawer}
         sx={{
           position: "absolute",
           top: 0,
@@ -53,7 +52,7 @@ export const SlashChordButtonsContainer = () => {
           Bass
         </Typography>
 
-        <IconButton size="small" sx={{ p: 0 }}>
+        <IconButton size="small" sx={{ p: 0 }} onClick={toggleDrawer}>
           {isLeft ? (
             slashChordsExpanded ? (
               <ChevronLeftIcon fontSize="small" />
