@@ -68,7 +68,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
           value: group,
           label: group,
         }))}
-        disabled={true}
+        disabled={!isOnline}
         tooltip={tooltip}
       />
       <SelectWrapper
