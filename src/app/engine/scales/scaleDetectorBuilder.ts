@@ -1,3 +1,4 @@
+import { DistinctNoteMarker } from "@/app/data/midiParser/distinctNoteMarker";
 import { initNotesArray, serializeStringOctaveNote } from "@/app/data/notes";
 import { NoteWithClearCallback } from "@/app/engine/detectorShared";
 import {
@@ -12,7 +13,7 @@ class ScaleDetectorBuilder {
   private usedNotesCount: number = 0;
   private currentlyDetectedNotes: (NoteWithClearCallback | undefined)[];
   private debouncedFindMatches: (
-    notes: (unknown | undefined)[],
+    notes: DistinctNoteMarker[],
     usedNotesCount: number,
     callback: (data: ScaleDetectorCallbackData) => void
   ) => void;
@@ -53,7 +54,7 @@ class ScaleDetectorBuilder {
     }
 
     this.debouncedFindMatches(
-      this.currentlyDetectedNotes,
+      this.currentlyDetectedNotes.map((x) => (x === undefined ? undefined : 1)),
       this.usedNotesCount,
       this.displayAlert
     );
