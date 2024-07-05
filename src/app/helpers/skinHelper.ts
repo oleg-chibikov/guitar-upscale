@@ -36,7 +36,7 @@ export const getPositionForSkin = (skin?: CombinedSkinType) => {
       return {
         top: -589,
         left: -544,
-        xShift: 520,
+        xShift: 450,
       };
     case Skin.Guitar3:
       return {

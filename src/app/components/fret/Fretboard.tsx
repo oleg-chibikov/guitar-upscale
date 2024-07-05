@@ -14,6 +14,7 @@ export const Fretboard: React.FC = () => {
   const fretboardScaleX = useUiSelector((s) => s.fretboardScaleX);
   const fretboardScaleY = useUiSelector((s) => s.fretboardScaleY);
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
+  const slashChordsExpanded = useUiSelector((s) => s.slashChordsExpanded);
   const neck = useSettingsSelector((s) => s.neck);
   // const [highResLoaded, setHighResLoaded] = useState(false);
   const [height, setHeight] = useState(window.innerHeight);
@@ -79,7 +80,13 @@ export const Fretboard: React.FC = () => {
           left:
             position.xShift +
             (!isHeightEnoughToShowLargeChords
-              ? interpolate(fretboardScaleX, 1, 3, -250, 250)
+              ? interpolate(
+                  fretboardScaleX,
+                  1,
+                  3,
+                  slashChordsExpanded ? -210 : -240,
+                  slashChordsExpanded ? 400 : 300
+                )
               : 0),
           top: needYShift ? -100 : 0,
         }}
