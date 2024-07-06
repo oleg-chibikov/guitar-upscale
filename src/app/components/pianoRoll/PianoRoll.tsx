@@ -9,10 +9,11 @@ import { BEATS_IN_BAR, TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { isSharp, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface PianoRollProps {
   notes: { tick: number; events: ChordOrNote[] }[];
+  onNoteMove?: (noteId: string, newTick: number, newPitch: number) => void;
 }
 
 const PIXELS_PER_TICK = 2;
@@ -20,15 +21,16 @@ const BEAT_WIDTH = TICKS_IN_BEAT * PIXELS_PER_TICK;
 const TOTAL_BEATS = 100;
 const TOTAL_WIDTH = TOTAL_BEATS * BEAT_WIDTH;
 
-export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
+export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [draggedNote, setDraggedNote] = useState<{
-    id: string;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const draggedNoteRef = useRef<{
+    element: HTMLElement;
+    noteId: string;
     startX: number;
     startY: number;
-    offsetX: number;
-    offsetY: number;
-    note: ChordOrNote;
+    originalLeft: number;
+    originalTop: number;
   } | null>(null);
 
   useEffect(() => {
@@ -38,50 +40,115 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
     canvas.width = TOTAL_WIDTH;
     canvas.height = TOTAL_HEIGHT;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Render piano roll background
     renderPianoRollBackground(ctx);
-
-    // Render grid
     renderGrid(ctx);
+  }, []);
 
-    // Render dragged note
-    if (draggedNote) {
-      renderDraggedNote(ctx);
+  const handleMouseDown = (
+    e: React.MouseEvent<HTMLDivElement>,
+    noteId: string
+  ) => {
+    const element = e.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    const containerRect = containerRef.current!.getBoundingClientRect();
+
+    draggedNoteRef.current = {
+      element,
+      noteId,
+      startX: e.clientX - rect.left,
+      startY: e.clientY - rect.top,
+      originalLeft: rect.left - containerRect.left,
+      originalTop: rect.top - containerRect.top,
+    };
+    element.style.zIndex = "10";
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!draggedNoteRef.current) return;
+
+    const { element, startX, startY, originalLeft, originalTop } =
+      draggedNoteRef.current;
+    const containerRect = containerRef.current!.getBoundingClientRect();
+
+    let newLeft = e.clientX - containerRect.left - startX;
+    let newTop = e.clientY - containerRect.top - startY;
+
+    // Snap to ticks
+    newLeft = Math.round(newLeft / PIXELS_PER_TICK) * PIXELS_PER_TICK;
+
+    // Snap to pitch lines
+    newTop = Math.round(newTop / NOTE_HEIGHT) * NOTE_HEIGHT;
+
+    // Constrain movement within the container
+    newLeft = Math.max(0, Math.min(newLeft, TOTAL_WIDTH - element.offsetWidth));
+    newTop = Math.max(0, Math.min(newTop, TOTAL_HEIGHT - element.offsetHeight));
+
+    element.style.transform = `translate(${newLeft - originalLeft}px, ${
+      newTop - originalTop
+    }px)`;
+  };
+
+  const handleMouseUp = () => {
+    if (draggedNoteRef.current) {
+      const { element, noteId, originalLeft, originalTop } =
+        draggedNoteRef.current;
+      const transform = element.style.transform;
+      const matches = transform.match(
+        /translate\((-?\d+(?:\.\d+)?)px, (-?\d+(?:\.\d+)?)px\)/
+      );
+
+      if (matches) {
+        const dx = parseFloat(matches[1]);
+        const dy = parseFloat(matches[2]);
+
+        const newLeft = originalLeft + dx;
+        const newTop = originalTop + dy;
+
+        const newTick = Math.round(newLeft / PIXELS_PER_TICK);
+        const newPitch = Math.round(newTop / NOTE_HEIGHT);
+
+        onNoteMove?.(noteId, newTick, newPitch);
+      }
+
+      element.style.zIndex = "";
+      element.style.transform = "";
+      draggedNoteRef.current = null;
     }
+  };
 
-    // Render notes
-    notes.forEach(({ tick, events }) => {
-      events.forEach((event, index) => renderNote(ctx, event, tick, index));
-    });
-  }, [notes, draggedNote]);
+  const MAX_OCTAVE = 8;
+
+  const getPitchPosition = (octaveNote: OctaveNote): number => {
+    const { octave, note } = octaveNote;
+    const octavePosition = octave * allNotes.length * NOTE_HEIGHT;
+    const notePosition = allNotes.indexOf(note) * NOTE_HEIGHT;
+
+    return octavePosition + notePosition;
+  };
 
   const renderPianoRollBackground = (ctx: CanvasRenderingContext2D) => {
     for (let octave = 0; octave <= MAX_OCTAVE; octave++) {
       for (let note = 0; note < NOTE_COUNT; note++) {
         const yPosition = getPitchPosition({ octave, note });
 
-        ctx.fillStyle = !isSharp(note) ? "#363636" : "#212121"; // gray-100 for white keys, gray-300 for black keys
+        ctx.fillStyle = !isSharp(note) ? "#f3f4f6" : "#d1d5db"; // gray-100 for white keys, gray-300 for black keys
         ctx.fillRect(0, yPosition, TOTAL_WIDTH, NOTE_HEIGHT);
 
         // Draw horizontal line
-        // ctx.strokeStyle = "#9ca3af"; // gray-400
         ctx.beginPath();
         ctx.moveTo(0, yPosition);
         ctx.lineTo(TOTAL_WIDTH, yPosition);
+        ctx.strokeStyle = "#9ca3af"; // gray-400
         ctx.stroke();
       }
     }
   };
 
   const renderGrid = (ctx: CanvasRenderingContext2D) => {
-    ctx.strokeStyle = "#9ca3af"; // gray-300
+    ctx.strokeStyle = "#9ca3af"; // gray-400
 
     for (let bar = 0; bar < TOTAL_BEATS / BEATS_IN_BAR; bar++) {
       for (let beat = 0; beat < BEATS_IN_BAR; beat++) {
@@ -95,62 +162,9 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
     }
   };
 
-  const renderNote = (
-    ctx: CanvasRenderingContext2D,
-    note: ChordOrNote,
-    tick: number
-  ) => {
-    const isChord = "chord" in note;
-    let octaveNote: OctaveNote;
-    if (isChord) {
-      const { chordBaseNote } = parseChordNoteAndAlterations(note.chord!.chord);
-      octaveNote = { octave: 5, note: chordBaseNote };
-    } else {
-      octaveNote = note.note!.note;
-    }
-    const duration = TICKS_IN_BEAT * PIXELS_PER_TICK; // Default duration of one beat
-    const yPosition = getPitchPosition(octaveNote);
-    const xPosition = tick * PIXELS_PER_TICK;
-
-    ctx.fillStyle = isChord ? "#3b82f6" : "#22c55e"; // blue-500 or green-500
-    ctx.fillRect(xPosition, yPosition, duration, NOTE_HEIGHT);
-    ctx.strokeStyle = "#d1d5db"; // gray-300
-    ctx.strokeRect(xPosition, yPosition, duration, NOTE_HEIGHT);
-  };
-
-  const renderDraggedNote = (ctx: CanvasRenderingContext2D) => {
-    if (!draggedNote) return;
-
-    const { startX, startY, offsetX, offsetY, note } = draggedNote;
-    const isChord = "chord" in note;
-    const duration = TICKS_IN_BEAT * PIXELS_PER_TICK; // Default duration of one beat
-
-    // Calculate snapped positions
-    const xPosition =
-      Math.round((startX + offsetX) / PIXELS_PER_TICK) * PIXELS_PER_TICK;
-    const yPosition =
-      Math.round((startY + offsetY) / NOTE_HEIGHT) * NOTE_HEIGHT;
-
-    ctx.fillStyle = isChord ? "#3b82f6" : "#22c55e"; // blue-500 or green-500
-    ctx.fillRect(xPosition, yPosition, duration, NOTE_HEIGHT);
-    ctx.strokeStyle = "#d1d5db"; // gray-300
-    ctx.strokeRect(xPosition, yPosition, duration, NOTE_HEIGHT);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Find the clicked note (this is a simplification, you may need a more sophisticated method)
-    const clickedTick = Math.floor(x / PIXELS_PER_TICK);
-    const clickedPitch = Math.floor(y / NOTE_HEIGHT);
-    const clickedNote = notes
-      .flatMap(({ events }) => events)
-      .find((event) => {
+  const renderNotes = () => {
+    return notes.flatMap(({ tick, events }) =>
+      events.map((event, index) => {
         const isChord = "chord" in event;
         let octaveNote: OctaveNote;
         if (isChord) {
@@ -161,91 +175,49 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
         } else {
           octaveNote = event.note!.note;
         }
-        const noteY = getPitchPosition(octaveNote);
-        const noteX = clickedTick * PIXELS_PER_TICK;
+        const duration = TICKS_IN_BEAT * PIXELS_PER_TICK;
+        const yPosition = getPitchPosition(octaveNote);
+        const xPosition = tick * PIXELS_PER_TICK;
+        const noteId = `${tick}-${index}`;
+
         return (
-          y >= noteY &&
-          y <= noteY + NOTE_HEIGHT &&
-          x >= noteX &&
-          x <= noteX + TICKS_IN_BEAT * PIXELS_PER_TICK
+          <div
+            key={noteId}
+            className="absolute cursor-move"
+            style={{
+              left: xPosition,
+              top: yPosition,
+              width: duration,
+              height: NOTE_HEIGHT,
+              backgroundColor: isChord ? "#3b82f6" : "#22c55e",
+              border: "1px solid #d1d5db",
+            }}
+            onMouseDown={(e) => handleMouseDown(e, noteId)}
+          />
         );
-      });
-
-    if (clickedNote) {
-      setDraggedNote({
-        id: `${clickedTick}-${clickedPitch}`,
-        startX: x,
-        startY: y,
-        offsetX: 0,
-        offsetY: 0,
-        note: clickedNote,
-      });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (draggedNote) {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const offsetX = x - draggedNote.startX;
-      const offsetY = y - draggedNote.startY;
-
-      setDraggedNote((prev) => (prev ? { ...prev, offsetX, offsetY } : prev));
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (draggedNote) {
-      // Update the note's position in your data structure here
-      // For now, just log the new position
-      console.log(
-        "Dropped note:",
-        draggedNote.id,
-        Math.round(draggedNote.offsetX / PIXELS_PER_TICK) * PIXELS_PER_TICK,
-        Math.round(draggedNote.offsetY / NOTE_HEIGHT) * NOTE_HEIGHT
-      );
-    }
-    setDraggedNote(null);
-  };
-
-  const MAX_OCTAVE = 8;
-
-  const getPitchPosition = (octaveNote: OctaveNote): number => {
-    const { octave, note } = octaveNote;
-    const octavePosition = octave * allNotes.length * NOTE_HEIGHT;
-    const notePosition = allNotes.indexOf(note) * NOTE_HEIGHT;
-
-    return octavePosition + notePosition;
+      })
+    );
   };
 
   return (
     <div className="relative w-full h-full bg-red overflow-auto">
       <PitchAxis className="absolute left-0 top-0 z-10" width={100} />
       <div
+        ref={containerRef}
         className="relative left-28 top-0"
-        style={{ width: `${TOTAL_WIDTH}px` }}
+        style={{ width: `${TOTAL_WIDTH}px`, height: `${TOTAL_HEIGHT}px` }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <Timeline width={TOTAL_WIDTH} pixelsPerTick={PIXELS_PER_TICK} />
-        {/* <PitchAxis
-          className="absolute"
-          showNoteLabels={false}
-          darkNoteColor="bg-gray-900"
-          lightNoteColor="bg-gray-800"
-          noteBorderColor="border-gray-800"
-          width={TOTAL_WIDTH}
-        /> */}
         <canvas
           ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          className="absolute left-0 top-0"
+          width={TOTAL_WIDTH}
+          height={TOTAL_HEIGHT}
         />
+        {renderNotes()}
       </div>
     </div>
   );
