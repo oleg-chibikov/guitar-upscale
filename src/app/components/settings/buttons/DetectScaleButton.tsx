@@ -8,13 +8,14 @@ import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import {
   setChordIsBeingDetected,
   setScale,
+  setScaleDetectorAvailable,
   setScaleGroup,
   setScaleIsBeingDetected,
 } from "@/app/store/settingsSlice";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import ManageSearch from "@mui/icons-material/ManageSearch";
 import SearchOff from "@mui/icons-material/SearchOff";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../../uiFramework/IconButton";
 
@@ -24,6 +25,21 @@ export const DetectScaleButton: React.FC = (props) => {
     (s) => s.scaleIsBeingDetected
   );
   const setupScaleDetector = useScaleDetectorSetup();
+
+  // let the other components know that they might use scale detector
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        await setupScaleDetector();
+        dispatch(setScaleDetectorAvailable(true));
+      } catch {
+        dispatch(setScaleDetectorAvailable(false));
+      }
+    };
+
+    void setup();
+  }, [dispatch, setupScaleDetector]);
+
   return (
     <IconButtonWrapper
       {...props}
@@ -33,7 +49,6 @@ export const DetectScaleButton: React.FC = (props) => {
       activeBg="error"
       onPress={async () => {
         if (!scaleIsBeingDetected) {
-          await setupScaleDetector();
           // Only one thing can be detected at a time - either chord or scale
           dispatch(setChordIsBeingDetected(false));
           dispatch(setScaleGroup(SPECIAL));

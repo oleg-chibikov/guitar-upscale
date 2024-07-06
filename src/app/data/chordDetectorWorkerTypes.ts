@@ -1,0 +1,49 @@
+import { AlertType } from "@/app/data/alertType";
+import { ChordModeVariations } from "@/app/data/chordModes";
+import { StringOctaveNote } from "@/app/data/notes";
+import { Neck } from "@/app/engine/generateNeckRepresentation";
+
+export const MIN_NOTES_TO_DETECT_CHORD = 3;
+export type ChordDetectorCallbackData =
+  | {
+      text: string;
+      alertType?: AlertType;
+      chords?: undefined;
+    }
+  | {
+      chords: string[];
+      text?: undefined;
+      alertType?: undefined;
+    };
+
+export type AddChordsToDetectorLookupRequest = {
+  chordModeVariations: ChordModeVariations;
+};
+
+export type FindMatchesRequest = {
+  notes: StringOctaveNote[];
+};
+
+export type SetNeckAndCapoRequest = {
+  neck: Neck;
+  capoValue: number;
+};
+
+export type ChordDetectorWorkerMessage =
+  | {
+      type: "addChordsToDetectorLookup";
+      payload: AddChordsToDetectorLookupRequest;
+    }
+  | {
+      type: "findMatches";
+      payload: FindMatchesRequest;
+    }
+  | {
+      type: "setNeckAndCapo";
+      payload: SetNeckAndCapoRequest;
+    };
+
+export type ChordDetectorCallbackMessage = {
+  type: "findMatchesResult";
+  payload: ChordDetectorCallbackData;
+};

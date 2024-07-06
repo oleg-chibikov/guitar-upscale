@@ -112,6 +112,8 @@ interface SettingsState
   strummingPatternChangedTrigger: boolean;
   chordsAreLoading: boolean;
   slashChordBassNote?: Note; // may be undefined
+  chordDetectorAvailable?: boolean; // may be undefined
+  scaleDetectorAvailable?: boolean; // may be undefined
 }
 
 const initialState: SettingsState = {
@@ -602,6 +604,12 @@ export const settingsSlice = createSlice({
       state.slashChordBassNote = value;
       slashChordBassNoteValue = value;
     },
+    setChordDetectorAvailable(state, action: PayloadAction<boolean>) {
+      state.chordDetectorAvailable = action.payload;
+    },
+    setScaleDetectorAvailable(state, action: PayloadAction<boolean>) {
+      state.scaleDetectorAvailable = action.payload;
+    },
   },
 });
 
@@ -643,6 +651,8 @@ export const {
   checkCustomStrummingPatternAfterDeletion,
   setChordsAreLoading,
   setSlashChordBassNote,
+  setChordDetectorAvailable,
+  setScaleDetectorAvailable,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

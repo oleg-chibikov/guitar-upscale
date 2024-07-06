@@ -54,7 +54,7 @@ export const parseMidiData = async (
 
   let trackIndex = 0;
   for (const track of dataByTrack) {
-    processTrack(track, eventsByTick, trackIndex);
+    await processTrack(track, eventsByTick, trackIndex);
     trackIndex++;
   }
 
@@ -142,7 +142,7 @@ async function detectScale(distinctNotes: DistinctNoteMarker[]) {
   });
 }
 
-function processTrack(
+async function processTrack(
   track: TrackData,
   eventsByTick: EventsByTick,
   trackIndex: number
@@ -157,7 +157,7 @@ function processTrack(
     // Try matching a chord out of matched notes.
     // If matched - play it as a chord. Play notMatchedNotes individually
     // If not matched - play all the notes in groupedByTolerance individually
-    previousNote = processToleranceGroup(
+    previousNote = await processToleranceGroup(
       toleranceGroup,
       eventsByTick,
       toleranceWindowStart,
@@ -177,7 +177,7 @@ function compareOctaveNotesDescending(a: OctaveNote, b: OctaveNote) {
   return b.octave - a.octave;
 }
 
-function processToleranceGroup(
+async function processToleranceGroup(
   toleranceGroup: NotePlayEvent[],
   eventsByTick: EventsByTick,
   toleranceWindowStart: number,
@@ -189,8 +189,9 @@ function processToleranceGroup(
     .map((x) => x.octaveNote)
     .sort(compareOctaveNotesDescending);
 
-  const chordMatchResult =
-    matchChordForToleranceGroupWithCache.execute(sortedNotes);
+  const chordMatchResult = await matchChordForToleranceGroupWithCache.execute(
+    sortedNotes
+  );
 
   let individualNotes: NotePlayEvent[];
 

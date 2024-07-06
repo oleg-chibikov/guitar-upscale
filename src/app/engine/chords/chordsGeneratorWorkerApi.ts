@@ -6,8 +6,8 @@ import {
 import {
   GenerateChordsCallbackMessage,
   GenerateChordsWorkerMessage,
-  WorkerMessageWrapper,
 } from "@/app/data/chordsGeneratorTypes";
+import { WorkerMessageWrapper } from "@/app/data/workerTypes";
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 
 let worker: Worker | undefined;
@@ -52,12 +52,13 @@ export const generateChords = (
           console.log(
             `Chord mode ${chordModeVariationsContainer.chordModeVariations.chordMode.name} (index: ${index}) has been processed`
           );
-          onChordModeProcessed(chordModeVariationsContainer);
+          void onChordModeProcessed(chordModeVariationsContainer);
         }
         break;
       case "processingComplete":
         console.log("All chord modes have been processed");
         onComplete();
+        worker?.terminate();
         worker = undefined;
         chordsWaitResolve?.();
         chordsWaitResolve = undefined;
