@@ -36,8 +36,8 @@ export const PianoRollDialog: React.FC = () => {
       className="h-screen"
     >
       <div className="flex">
-        <PitchAxis />
-        <div className="bg-red-500 flex-1">
+        <PitchAxis className="shrink-0" />
+        <div className="bg-red-500 w-[calc(100%-theme(space.16))]">
           <PianoRoll notes={notes} />
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { NOTE_HEIGHT, PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
+import { Timeline } from "@/app/components/pianoRoll/Timeline";
 import { BEATS_IN_BAR, TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { OctaveNote } from "@/app/data/notes";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
@@ -11,7 +12,7 @@ interface PianoRollProps {
 
 const PIXELS_PER_TICK = 2;
 const BEAT_WIDTH = TICKS_IN_BEAT * PIXELS_PER_TICK;
-const TOTAL_BEATS = 32;
+const TOTAL_BEATS = 100;
 const TOTAL_WIDTH = TOTAL_BEATS * BEAT_WIDTH;
 
 export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
@@ -87,7 +88,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
     const verticalLines = [];
 
     // Vertical lines (bars and beats)
-    for (let bar = 0; bar <= TOTAL_BEATS / BEATS_IN_BAR; bar++) {
+    for (let bar = 0; bar < TOTAL_BEATS / BEATS_IN_BAR; bar++) {
       for (let beat = 0; beat < BEATS_IN_BAR; beat++) {
         const xPosition = (bar * BEATS_IN_BAR + beat) * BEAT_WIDTH;
         verticalLines.push(
@@ -110,11 +111,12 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-gray-100 overflow-auto"
+      className="relative w-full h-full bg-red overflow-x-auto overflow-y-hidden"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      <Timeline width={TOTAL_WIDTH} pixelsPerTick={PIXELS_PER_TICK} />
       <div style={{ width: `${TOTAL_WIDTH}px`, height: "100%" }}>
         <PitchAxis
           className="absolute"
