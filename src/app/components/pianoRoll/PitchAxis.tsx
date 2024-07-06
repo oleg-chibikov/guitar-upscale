@@ -8,6 +8,7 @@ export const NOTE_HEIGHT = 20; // Should match the NOTE_HEIGHT in getPitchPositi
 export const allNotes = Object.values(Note)
   .filter((note): note is Note => typeof note === "number")
   .reverse();
+export const TOTAL_HEIGHT = NOTE_HEIGHT * allNotes.length * OCTAVE_COUNT;
 
 interface PitchAxisProps extends WithClassName {
   darkNoteColor?: string;

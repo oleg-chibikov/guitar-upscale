@@ -1,5 +1,4 @@
 import { PianoRoll } from "@/app/components/pianoRoll/PianoRoll";
-import { PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { PIANO_ROLL_DIALOG } from "@/app/data/elementIds";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
@@ -35,11 +34,8 @@ export const PianoRollDialog: React.FC = () => {
       headerText="Piano Roll"
       className="h-screen"
     >
-      <div className="flex">
-        <PitchAxis className="shrink-0" />
-        <div className="bg-red-500 w-[calc(100%-theme(space.16))]">
-          <PianoRoll notes={notes} />
-        </div>
+      <div className="bg-red-500 h-full w-full">
+        <PianoRoll notes={notes} />
       </div>
     </DialogWrapper>
   );
