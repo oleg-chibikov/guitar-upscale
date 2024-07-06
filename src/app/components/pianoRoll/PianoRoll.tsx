@@ -124,8 +124,12 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
     const { startX, startY, offsetX, offsetY, note } = draggedNote;
     const isChord = "chord" in note;
     const duration = TICKS_IN_BEAT * PIXELS_PER_TICK; // Default duration of one beat
-    const yPosition = startY + offsetY;
-    const xPosition = startX + offsetX;
+
+    // Calculate snapped positions
+    const xPosition =
+      Math.round((startX + offsetX) / PIXELS_PER_TICK) * PIXELS_PER_TICK;
+    const yPosition =
+      Math.round((startY + offsetY) / NOTE_HEIGHT) * NOTE_HEIGHT;
 
     ctx.fillStyle = isChord ? "#3b82f6" : "#22c55e"; // blue-500 or green-500
     ctx.fillRect(xPosition, yPosition, duration, NOTE_HEIGHT);
@@ -202,8 +206,8 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
       console.log(
         "Dropped note:",
         draggedNote.id,
-        draggedNote.offsetX,
-        draggedNote.offsetY
+        Math.round(draggedNote.offsetX / PIXELS_PER_TICK) * PIXELS_PER_TICK,
+        Math.round(draggedNote.offsetY / NOTE_HEIGHT) * NOTE_HEIGHT
       );
     }
     setDraggedNote(null);
