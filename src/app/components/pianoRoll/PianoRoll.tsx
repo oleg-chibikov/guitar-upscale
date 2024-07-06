@@ -95,7 +95,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes }) => {
             key={`v-${bar}-${beat}`}
             className={`absolute top-0 bottom-0 ${
               beat === 0
-                ? "border-l-2 border-gray-700"
+                ? "border-l-2 border-gray-300"
                 : "border-l border-gray-500"
             }`}
             style={{ left: `${xPosition}px` }}
