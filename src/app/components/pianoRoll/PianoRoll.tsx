@@ -1,5 +1,5 @@
 import { NOTE_HEIGHT, PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
-import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
+import { BEATS_IN_BAR, TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { OctaveNote } from "@/app/data/notes";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
