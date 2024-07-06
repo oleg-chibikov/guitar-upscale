@@ -1,5 +1,3 @@
-import { chordModeOrder, getModeSuffix } from "@/app/data/chordModes";
-
 export const sortChords = (chords: string[]): string[] =>
   chords.sort((a, b) => {
     // Check if either chord ends with "/Note"
@@ -11,18 +9,8 @@ export const sortChords = (chords: string[]): string[] =>
     } else if (!aHasSlashNote && bHasSlashNote) {
       return -1; // b is preferred
     }
-
-    // Compare by the mode suffix order
-    const aSuffix = getModeSuffix(a);
-    const bSuffix = getModeSuffix(b);
-    const aIndex = chordModeOrder.indexOf(aSuffix);
-    const bIndex = chordModeOrder.indexOf(bSuffix);
-    if (aIndex !== bIndex) {
-      return aIndex - bIndex;
-    }
-
-    // If lengths and mode suffixes are the same, sort alphabetically
-    return a.localeCompare(b);
+    // chords coming to this function (they come from trie) are already sorted properly. We just need to put slash chords after non slash chords
+    return 0;
   });
 
 const hasSlashNote = (chord: string): boolean => {

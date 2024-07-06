@@ -60,9 +60,9 @@ class ChordDetector {
       return;
     }
     const deduplicatedChordNames = Array.from(new Set(chordNames));
-    const sortedChordNames = sortChords(deduplicatedChordNames);
-    console.log("Matched chord names", sortedChordNames);
-    callback({ chords: sortedChordNames });
+    sortChords(deduplicatedChordNames);
+    console.log("Matched chord names", deduplicatedChordNames);
+    callback({ chords: deduplicatedChordNames });
   }
 
   private serializeChord(chord: Chord, missingChar: MissingChar) {
