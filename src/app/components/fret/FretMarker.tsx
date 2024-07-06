@@ -1,3 +1,4 @@
+import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
 import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import {
   NOTE_COUNT,
@@ -282,6 +283,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
           if (
             chordIsBeingDetectedValue &&
             stringOctaveNote !== null &&
+            stringOctaveNote.string <= MAX_STRING_INDEX_FOR_CHORD_GENERATION &&
             noteMetadata.skipChordDetection !== true
           ) {
             // this module is only loaded when chordIsBeingDetectedValue is true (meaning the chord detection button was pressed)
@@ -289,7 +291,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
               "@/app/engine/chords/chordDetectorBuilder"
             );
             isChordBeingDetectedRef.current = true;
-            chordDetectorBuilder.addNote({
+            void chordDetectorBuilder.addNote({
               stringOctaveNote,
               clear: () => {
                 isChordBeingDetectedRef.current = false;

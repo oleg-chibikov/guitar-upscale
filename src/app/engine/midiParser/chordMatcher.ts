@@ -1,12 +1,10 @@
+import { MIN_NOTES_TO_DETECT_CHORD } from "@/app/data/chordDetectorWorkerTypes";
 import {
   OctaveNote,
   StringOctaveNote,
   serializeOctaveNote,
 } from "@/app/data/notes";
-import {
-  MIN_NOTES_TO_DETECT_CHORD,
-  chordDetector,
-} from "@/app/engine/chords/chordDetector";
+import { chordDetectorWorkerApi } from "@/app/engine/chords/chordDetectorWorkerApi";
 import { octaveNoteToStringOctaveNoteMap } from "@/app/engine/generateNeckRepresentation";
 import { stringCountValue } from "@/app/store/settingsSlice";
 
@@ -15,9 +13,9 @@ type ChordMatchResult = {
   notes: StringOctaveNote[];
 };
 
-export function extractChordFromNotes(
+export async function extractChordFromNotes(
   sortedNotes: OctaveNote[]
-): ChordMatchResult | undefined {
+): Promise<ChordMatchResult | undefined> {
   if (sortedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
     return undefined;
   }
@@ -36,7 +34,7 @@ export function extractChordFromNotes(
       variation.map((x) => x.string + "_" + x.fret)
     );
     let chordName: string | undefined = undefined;
-    chordDetector.findMatches(variation, (data) => {
+    await chordDetectorWorkerApi.findMatches(variation, (data) => {
       if (data.chords !== undefined && data.chords.length > 0) {
         chordName = data.chords[0];
       }

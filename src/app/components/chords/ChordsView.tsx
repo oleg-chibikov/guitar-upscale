@@ -8,8 +8,8 @@ import {
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
 import { NOTE_COUNT, SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
 import {
+  addChordsToDetectorLookup,
   clearChordDetector,
-  rebuildChordDetectorLookup,
 } from "@/app/engine/chords/chordLookupBuilder";
 import {
   chordNotesByName,
@@ -46,6 +46,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   const guitarSettingsUpdateCount = useSettingsSelector(
     (s) => s.guitarSettingsUpdateCount
   );
+  const chordDetectorAvailable = useSettingsSelector(
+    (s) => s.chordDetectorAvailable
+  );
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
@@ -66,39 +69,56 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   };
 
   useEffect(() => {
-    if (!neckValue) {
-      return;
-    }
-    if (
-      guitarSettingsUpdateCount === undefined ||
-      localGuitarSettingsUpdateCount.current === guitarSettingsUpdateCount
-    ) {
-      return;
-    }
-    abortGeneratingChords();
-
-    localGuitarSettingsUpdateCount.current = guitarSettingsUpdateCount;
-    chordNotesByName.clear();
-    chordsValue.length = 0; // clear chordsValue;
-    setChordModeVariations([]);
-    dispatch(setChordsAreLoading(true));
-
-    generateChords(
-      neckValue,
-      capoValue,
-      (chordModeVariationsContainer) => {
-        addChordMode(chordModeVariationsContainer.chordModeVariations);
-        setPreferredVariationsForChordMode(chordModeVariationsContainer);
-        setChordModeVariations([...chordsValue]);
-      },
-      () => {
-        clearChordDetector?.();
-        dispatch(setChordIsBeingDetected(false));
-        rebuildChordDetectorLookup();
-        dispatch(setChordsAreLoading(false));
+    const setNewChords = async () => {
+      if (chordDetectorAvailable === undefined) {
+        // start generating chords only once we know if chords detector is available or not and its module is loaded
+        return;
       }
-    );
-  }, [dispatch, guitarSettingsUpdateCount]);
+      if (!neckValue) {
+        return;
+      }
+      if (
+        guitarSettingsUpdateCount === undefined ||
+        localGuitarSettingsUpdateCount.current === guitarSettingsUpdateCount
+      ) {
+        return;
+      }
+      const { chordDetectorWorkerApi } = await import(
+        "@/app/engine/chords/chordDetectorWorkerApi"
+      );
+
+      abortGeneratingChords();
+
+      localGuitarSettingsUpdateCount.current = guitarSettingsUpdateCount;
+      // chord detector needs these values to build slash chords
+      chordDetectorWorkerApi.setNeckAndCapo(neckValue, capoValue);
+      chordNotesByName.clear();
+      chordsValue.length = 0; // clear chordsValue;
+      setChordModeVariations([]);
+      dispatch(setChordsAreLoading(true));
+
+      generateChords(
+        neckValue,
+        capoValue,
+        (chordModeVariationsContainer) => {
+          addChordMode(chordModeVariationsContainer.chordModeVariations);
+          setPreferredVariationsForChordMode(chordModeVariationsContainer);
+          setChordModeVariations([...chordsValue]);
+
+          addChordsToDetectorLookup?.(
+            chordModeVariationsContainer.chordModeVariations
+          );
+        },
+        () => {
+          clearChordDetector?.();
+          dispatch(setChordIsBeingDetected(false));
+          dispatch(setChordsAreLoading(false));
+        }
+      );
+    };
+
+    void setNewChords();
+  }, [dispatch, guitarSettingsUpdateCount, chordDetectorAvailable]);
 
   useEffect(() => {
     const handleResize = () => {

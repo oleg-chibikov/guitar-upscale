@@ -1,4 +1,8 @@
 import { AlertType } from "@/app/data/alertType";
+import {
+  ChordDetectorCallbackData,
+  MIN_NOTES_TO_DETECT_CHORD,
+} from "@/app/data/chordDetectorWorkerTypes";
 import { sortChords } from "@/app/engine/chords/chordsSorter";
 import { MissingChar } from "@/app/engine/detectorShared";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
@@ -6,20 +10,7 @@ import { stringCountValue } from "@/app/store/settingsSlice";
 import { Chord, StringOctaveNote } from "../../data/notes";
 import { Trie } from "../../helpers/trie";
 
-export type ChordDetectorCallbackData =
-  | {
-      text: string;
-      alertType?: AlertType;
-      chords?: undefined;
-    }
-  | {
-      chords: string[];
-      text?: undefined;
-      alertType?: undefined;
-    };
-
 const START_ASCII_CODE = "a".charCodeAt(0);
-export const MIN_NOTES_TO_DETECT_CHORD = 3;
 
 class ChordDetector {
   private trie: Trie;
@@ -69,9 +60,9 @@ class ChordDetector {
       return;
     }
     const deduplicatedChordNames = Array.from(new Set(chordNames));
-    const sortedChordNames = sortChords(deduplicatedChordNames);
-    console.log("Matched chord names", sortedChordNames);
-    callback({ chords: sortedChordNames });
+    sortChords(deduplicatedChordNames);
+    console.log("Matched chord names", deduplicatedChordNames);
+    callback({ chords: deduplicatedChordNames });
   }
 
   private serializeChord(chord: Chord, missingChar: MissingChar) {

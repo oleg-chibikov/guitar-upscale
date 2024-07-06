@@ -1,9 +1,7 @@
 import { AlertType } from "@/app/data/alertType";
+import { ChordDetectorCallbackData } from "@/app/data/chordDetectorWorkerTypes";
 import { StringOctaveNote } from "@/app/data/notes";
-import {
-  ChordDetectorCallbackData,
-  chordDetector,
-} from "@/app/engine/chords/chordDetector";
+import { chordDetectorWorkerApi } from "@/app/engine/chords/chordDetectorWorkerApi";
 import { NoteWithClearCallback } from "@/app/engine/detectorShared";
 import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
@@ -19,7 +17,7 @@ class ChordDetectorBuilder {
   constructor() {
     this.currentlyDetectedNotesByString = [];
     this.debouncedFindMatches = trailingDebounce(
-      chordDetector.findMatches.bind(chordDetector),
+      chordDetectorWorkerApi.findMatches.bind(chordDetectorWorkerApi),
       200
     );
   }

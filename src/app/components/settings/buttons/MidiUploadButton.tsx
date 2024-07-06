@@ -3,8 +3,6 @@ import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
-import { useChordDetectorSetup } from "@/app/hooks/useChordDetectorSetup";
-import { useScaleDetectorSetup } from "@/app/hooks/useScaleDetectorSetup";
 import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFile from "@mui/icons-material/UploadFile";
 import React, { Fragment, useRef } from "react";
@@ -13,10 +11,24 @@ const LOG_PREFIX = "Midi upload button: ";
 export const MidiUploadButton: React.FC = () => {
   const ref = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
-  const setupChordDetector = useChordDetectorSetup();
-  const setupScaleDetector = useScaleDetectorSetup();
   const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
+  const chordDetectorAvailable = useSettingsSelector(
+    (s) => s.chordDetectorAvailable
+  );
+  const scaleDetectorAvailable = useSettingsSelector(
+    (s) => s.scaleDetectorAvailable
+  );
+
+  const disabled =
+    chordsAreLoading ||
+    chordDetectorAvailable === undefined ||
+    scaleDetectorAvailable === undefined;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) {
+      console.warn("Midi upload is not enabled yet");
+      return;
+    }
     console.log(LOG_PREFIX + "Processing midi file");
     const file = e.target.files?.[0];
     if (file) {
@@ -25,8 +37,6 @@ export const MidiUploadButton: React.FC = () => {
         console.log(LOG_PREFIX + "File loaded");
         const result = event.target?.result;
         if (result !== null && result !== undefined) {
-          await setupChordDetector();
-          await setupScaleDetector();
           const eventsByTick = await parseMidiData(
             result as ArrayBuffer,
             (bpm) => {
@@ -65,7 +75,7 @@ export const MidiUploadButton: React.FC = () => {
         onChange={handleFileChange}
       />
       <IconButtonWrapper
-        disabled={chordsAreLoading}
+        disabled={disabled}
         icon={<UploadFile />}
         onPress={() => {
           ref.current?.click();

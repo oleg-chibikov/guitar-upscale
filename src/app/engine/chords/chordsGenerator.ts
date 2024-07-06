@@ -6,6 +6,7 @@ import {
 import {
   GenerateChordsCallbackMessage,
   GenerateChordsRequest,
+  MAX_STRING_INDEX_FOR_CHORD_GENERATION,
 } from "@/app/data/chordsGeneratorTypes";
 import {
   FingerPosition,
@@ -225,7 +226,7 @@ class ChordsGenerator {
     variationsToFill: ChordVariationsByNote
   ) => {
     for (
-      let stringIndex = this.neck.length - 1; // starting from the lowest (thickest) string
+      let stringIndex = MAX_STRING_INDEX_FOR_CHORD_GENERATION; // TODO: We are intentionally limit chords to 6 strings. We don't search for them on the lower string as it requires too much memory to store. We can undo this if there's a better way to store all the chords in a trie for the chord detector // this.neck.length - 1; // starting from the lowest (thickest) string
       stringIndex >= intervalsToUse.length;
       stringIndex--
     ) {

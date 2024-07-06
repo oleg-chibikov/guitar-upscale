@@ -9,6 +9,7 @@ import {
   addPattern,
   deletePattern,
   getCustomPatterns,
+  loadPatternsFromLocalStorage,
 } from "@/app/engine/strummingPatternsStorage";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import {
@@ -36,6 +37,10 @@ export const StrummingPatternDialog: React.FC = () => {
   const strummingPatternChangedTrigger = useSettingsSelector(
     (s) => s.strummingPatternChangedTrigger
   );
+
+  useEffect(() => {
+    loadPatternsFromLocalStorage();
+  }, []);
 
   useEffect(() => {
     const customPatterns = getCustomPatterns();

@@ -49,31 +49,34 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   return (
     <div className={`${className} flex items-center justify-center`}>
       <Tooltip title={tooltip}>
-        <IconButton
-          id={id}
-          disabled={allowHandlerInDisabledState !== true && disabled}
-          onClick={onPress}
-          color={getColor()}
-          size="small"
-          sx={{
-            borderRadius: 0,
-            padding: "4px",
-          }}
-          {...rest}
-        >
-          <div className="relative inline-flex items-center justify-center">
-            {icon}
-            {textContent !== undefined && (
-              <Typography
-                color={"ButtonText"}
-                variant="subtitle2"
-                className="absolute"
-              >
-                {textContent}
-              </Typography>
-            )}
-          </div>
-        </IconButton>
+        {/* Span is needed here for tooltip to work when the button is disabled: check https://stackoverflow.com/questions/61115913/is-it-possible-to-render-a-tooltip-on-a-disabled-material-ui-button-within-a-but */}
+        <span>
+          <IconButton
+            id={id}
+            disabled={allowHandlerInDisabledState !== true && disabled}
+            onClick={onPress}
+            color={getColor()}
+            size="small"
+            sx={{
+              borderRadius: 0,
+              padding: "4px",
+            }}
+            {...rest}
+          >
+            <div className="relative inline-flex items-center justify-center">
+              {icon}
+              {textContent !== undefined && (
+                <Typography
+                  color={"ButtonText"}
+                  variant="subtitle2"
+                  className="absolute"
+                >
+                  {textContent}
+                </Typography>
+              )}
+            </div>
+          </IconButton>
+        </span>
       </Tooltip>
     </div>
   );
