@@ -25,4 +25,3 @@ apply to looper and to recording, not only to midi upload
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
 For recording we'll need to have the ability to replay the recording first
 Draggging over the X-axis should change current playback position. Should we adjust globalCurrentTick? Note that when we go forwards/backwards we don't do that - probably we should!
-Clicking piano notes should produce sound.

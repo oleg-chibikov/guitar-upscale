@@ -26,86 +26,64 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   onNoteMove,
 }) => {
   const noteRef = useRef<HTMLDivElement>(null);
-  const dragInfoRef = useRef<{
-    startX: number;
-    startY: number;
-    originalLeft: number;
-    originalTop: number;
-  } | null>(null);
-  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!isDraggingRef.current || !dragInfoRef.current || !noteRef.current)
-        return;
+      if (!dragStartRef.current || !noteRef.current) return;
 
-      const { startX, startY, originalLeft, originalTop } = dragInfoRef.current;
-      const element = noteRef.current;
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
 
-      let newLeft = e.clientX - startX;
-      let newTop = e.clientY - startY;
+      let newX = x + dx;
+      let newY = y + dy;
 
       // Constrain movement within the piano roll
-      newLeft = Math.max(0, Math.min(newLeft, TOTAL_WIDTH - width));
-      newTop = Math.max(0, Math.min(newTop, TOTAL_HEIGHT - height));
+      newX = Math.max(0, Math.min(newX, TOTAL_WIDTH - width));
+      newY = Math.max(0, Math.min(newY, TOTAL_HEIGHT - height));
 
       // Snap to grid
-      newLeft = Math.round(newLeft / PIXELS_PER_TICK) * PIXELS_PER_TICK;
-      newTop = Math.round(newTop / NOTE_HEIGHT) * NOTE_HEIGHT;
+      newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
+      newY = Math.round(newY / NOTE_HEIGHT) * NOTE_HEIGHT;
 
-      element.style.transform = `translate(${newLeft - originalLeft}px, ${
-        newTop - originalTop
+      noteRef.current.style.transform = `translate(${newX - x}px, ${
+        newY - y
       }px)`;
     },
-    [width, height]
+    [x, y, width, height]
   );
 
-  const handleMouseUp = useCallback(() => {
-    if (!isDraggingRef.current || !dragInfoRef.current || !noteRef.current)
-      return;
+  const handleMouseUp = useCallback(
+    (e: MouseEvent) => {
+      if (!dragStartRef.current || !noteRef.current) return;
 
-    const element = noteRef.current;
-    const transform = element.style.transform;
-    const matches = transform.match(
-      /translate\((-?\d+(?:\.\d+)?)px, (-?\d+(?:\.\d+)?)px\)/
-    );
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
 
-    if (matches) {
-      const dx = parseFloat(matches[1]);
-      const dy = parseFloat(matches[2]);
+      let newX = x + dx;
+      let newY = y + dy;
 
-      const newLeft = x + dx;
-      const newTop = y + dy;
+      // Snap to grid
+      newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
+      newY = Math.round(newY / NOTE_HEIGHT) * NOTE_HEIGHT;
 
-      const newTick = Math.round(newLeft / PIXELS_PER_TICK);
-      const newPitch = Math.round(newTop / NOTE_HEIGHT);
+      const newTick = Math.round(newX / PIXELS_PER_TICK);
+      const newPitch = Math.round(newY / NOTE_HEIGHT);
 
       onNoteMove(noteId, newTick, newPitch);
-    }
 
-    element.style.zIndex = "";
-    element.style.transform = "";
-    dragInfoRef.current = null;
-    isDraggingRef.current = false;
+      noteRef.current.style.transform = "";
+      dragStartRef.current = null;
 
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-  }, [noteId, x, y, onNoteMove, handleMouseMove]);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    },
+    [noteId, x, y, onNoteMove, handleMouseMove]
+  );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const element = noteRef.current;
-      if (!element) return;
-
-      const rect = element.getBoundingClientRect();
-      dragInfoRef.current = {
-        startX: e.clientX - rect.left,
-        startY: e.clientY - rect.top,
-        originalLeft: rect.left,
-        originalTop: rect.top,
-      };
-      element.style.zIndex = "10";
-      isDraggingRef.current = true;
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
 
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
