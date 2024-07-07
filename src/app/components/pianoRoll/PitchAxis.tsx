@@ -3,7 +3,7 @@ import { WithClassName } from "@/app/helpers/withClassName";
 import { Typography } from "@mui/material";
 import React from "react";
 
-const OCTAVE_COUNT = 9; // 0-8 octaves
+export const OCTAVE_COUNT = 9; // 0-8 octaves
 export const NOTE_HEIGHT = 20; // Should match the NOTE_HEIGHT in getPitchPosition
 export const allNotes = Object.values(Note)
   .filter((note): note is Note => typeof note === "number")

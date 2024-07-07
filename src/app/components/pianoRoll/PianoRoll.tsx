@@ -47,6 +47,50 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
     renderGrid(ctx);
   }, []);
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const { x, y } = calculateNotesCenter();
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    container.scrollLeft = x - containerWidth / 2;
+    container.scrollTop = y - containerHeight / 2;
+  }, [notes]);
+
+  const calculateNotesCenter = () => {
+    let minTick = Infinity;
+    let maxTick = -Infinity;
+    let minPitch = Infinity;
+    let maxPitch = -Infinity;
+
+    notes.forEach(({ tick, events }) => {
+      minTick = Math.min(minTick, tick);
+      maxTick = Math.max(maxTick, tick);
+
+      events.forEach((event) => {
+        const octaveNote =
+          "chord" in event
+            ? {
+                octave: 5,
+                note: parseChordNoteAndAlterations(event.chord!.chord)
+                  .chordBaseNote,
+              }
+            : event.note!.note;
+        const pitch = getPitchPosition(octaveNote);
+        minPitch = Math.min(minPitch, pitch);
+        maxPitch = Math.max(maxPitch, pitch);
+      });
+    });
+
+    return {
+      x: ((minTick + maxTick) / 2) * PIXELS_PER_TICK,
+      y: (minPitch + maxPitch) / 2,
+    };
+  };
+
   const handleMouseDown = (
     e: React.MouseEvent<HTMLDivElement>,
     noteId: string
@@ -200,10 +244,12 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   };
 
   return (
-    <div className="relative w-full h-full bg-red overflow-auto">
+    <div
+      className="relative w-full h-full bg-red overflow-auto"
+      ref={containerRef}
+    >
       <PitchAxis className="absolute left-0 top-0 z-10" width={100} />
       <div
-        ref={containerRef}
         className="relative left-28 top-0"
         style={{ width: `${TOTAL_WIDTH}px`, height: `${TOTAL_HEIGHT}px` }}
         onMouseMove={handleMouseMove}
