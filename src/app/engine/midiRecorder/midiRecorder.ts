@@ -1,6 +1,8 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
+import { ChordWithPlayMetadata } from "@/app/engine/eventBus";
+import { EventsByTick } from "@/app/engine/eventsByTick";
 import { midiSaver } from "@/app/engine/midiRecorder/midiSaver";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import Midi from "midi-writer-js";
@@ -17,6 +19,7 @@ export enum NoteOrigin {
 
 export class MidiRecorder implements NoteRecorder {
   private midiEvents: Map<TrackKey, NoteEvent[]> | undefined;
+  private eventsByTick: EventsByTick | undefined;
   private isRecording: boolean = false;
   private startTick: number | undefined;
   private octaveShift = 0;
@@ -24,17 +27,21 @@ export class MidiRecorder implements NoteRecorder {
 
   startRecording() {
     this.midiEvents = new Map<TrackKey, NoteEvent[]>();
+    this.eventsByTick = new EventsByTick();
     this.isRecording = true;
     this.startTick = undefined;
   }
 
-  stopRecording(save: boolean) {
+  stopRecording(save: boolean): EventsByTick | undefined {
+    const eventsByTick = this.eventsByTick;
     this.isRecording = false;
-    if (save && this.midiEvents !== undefined && this.midiEvents.size) {
+    if (save && this.midiEvents && this.midiEvents?.size) {
       midiSaver.generateAndSave(this.midiEvents);
     }
     this.midiEvents = undefined;
+    this.eventsByTick = undefined;
     this.startTick = undefined;
+    return eventsByTick;
   }
 
   addNoteAtGlobalTick(
@@ -42,17 +49,26 @@ export class MidiRecorder implements NoteRecorder {
     trackNumber: number,
     instrument: Instrument
   ) {
-    if (!this.isRecording || !this.midiEvents) {
+    if (!this.isRecording || !this.midiEvents || !this.eventsByTick) {
       return;
     }
 
-    const currentTick = globalCurrentTick;
-    if (this.startTick === undefined) {
-      this.startTick = currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+    const playAtTick = this.getRelativeTick();
+    this.addNoteAtTick(note, trackNumber, instrument, playAtTick);
+    this.eventsByTick.addEventAtTick(playAtTick, {
+      note,
+      trackNumber,
+      instrument,
+    });
+  }
+
+  addChordAtGlobalTick(chord: ChordWithPlayMetadata) {
+    if (!this.isRecording || !this.eventsByTick) {
+      return;
     }
 
-    const playAtTick = currentTick - this.startTick;
-    this.addNoteAtTick(note, trackNumber, instrument, playAtTick);
+    const playAtTick = this.getRelativeTick();
+    this.eventsByTick.addEventAtTick(playAtTick, chord);
   }
 
   initializeStartTick(startTick: number) {
@@ -93,6 +109,16 @@ export class MidiRecorder implements NoteRecorder {
         tick: (tick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
       })
     );
+  }
+
+  private getRelativeTick() {
+    const currentTick = globalCurrentTick;
+    if (this.startTick === undefined) {
+      this.startTick = currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
+    }
+
+    const playAtTick = currentTick - this.startTick;
+    return playAtTick;
   }
 
   private getTrackKey(trackNumber: number, instrument: Instrument): TrackKey {

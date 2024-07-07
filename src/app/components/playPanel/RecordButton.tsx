@@ -1,12 +1,56 @@
 "use client";
+import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
-import { setIsRecording } from "@/app/store/settingsSlice";
+import {
+  isAnyTimerSpecificActivityBesidesMetronomeRunning,
+  isMetronomeActiveValue,
+  setIsMetronomeActive,
+  setIsRecording,
+  toggleMetronomeWhenRecordingValue,
+  tryToggleInterval,
+} from "@/app/store/settingsSlice";
 import Cancel from "@mui/icons-material/Cancel";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import StopCircle from "@mui/icons-material/StopCircle";
-import React from "react";
+import React, { Dispatch } from "react";
 import { useDispatch } from "react-redux";
+import { UnknownAction } from "redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
+
+async function toggleRecording(
+  newValue: boolean,
+  dispatch: Dispatch<UnknownAction>,
+  saveWhenStop: boolean
+) {
+  const midiRecorder = (await import("@/app/engine/midiRecorder/midiRecorder"))
+    .midiRecorder;
+  dispatch(setIsRecording(newValue));
+  tryToggleInterval(newValue);
+
+  const canTriggerMetronome =
+    toggleMetronomeWhenRecordingValue && isMetronomeActiveValue !== newValue;
+  if (newValue) {
+    // start recording
+    midiRecorder.startRecording();
+    if (canTriggerMetronome) {
+      dispatch(setIsMetronomeActive(true));
+    }
+    return;
+  }
+
+  // stop recording
+  const eventsByTick = midiRecorder.stopRecording(saveWhenStop);
+  if (eventsByTick) {
+    setPianoRollData(eventsByTick, dispatch);
+  }
+  if (
+    canTriggerMetronome &&
+    !isAnyTimerSpecificActivityBesidesMetronomeRunning()
+  ) {
+    // only stop metronome when there is no other playing activity
+    dispatch(setIsMetronomeActive(false));
+  }
+}
 
 export const RecordButton: React.FC = (props) => {
   const isRecording = useSettingsSelector((s) => s.isRecording);
@@ -20,19 +64,7 @@ export const RecordButton: React.FC = (props) => {
           isActive={true}
           tooltip="Cancel recording"
           onPress={async () => {
-            const midiRecorder = (
-              await import("@/app/engine/midiRecorder/midiRecorder")
-            ).midiRecorder;
-            midiRecorder.stopRecording(false);
-            dispatch(
-              setIsRecording({
-                value: false,
-                startRecording: midiRecorder.startRecording,
-                stopRecording: () => {
-                  midiRecorder.stopRecording(false);
-                },
-              })
-            );
+            await toggleRecording(false, dispatch, false);
           }}
         />
       )}
@@ -44,20 +76,7 @@ export const RecordButton: React.FC = (props) => {
         activeBg="error"
         onPress={async () => {
           const newValue = !isRecording;
-          const midiRecorder = (
-            await import("@/app/engine/midiRecorder/midiRecorder")
-          ).midiRecorder;
-          dispatch(
-            setIsRecording({
-              value: newValue,
-              startRecording: () => {
-                midiRecorder.startRecording();
-              },
-              stopRecording: () => {
-                midiRecorder.stopRecording(true);
-              },
-            })
-          );
+          await toggleRecording(newValue, dispatch, true);
         }}
       />
     </>

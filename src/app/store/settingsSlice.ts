@@ -114,6 +114,7 @@ interface SettingsState
   slashChordBassNote?: Note; // may be undefined
   chordDetectorAvailable?: boolean; // may be undefined
   scaleDetectorAvailable?: boolean; // may be undefined
+  showReplayTrigger: boolean;
 }
 
 const initialState: SettingsState = {
@@ -153,6 +154,7 @@ const initialState: SettingsState = {
   strummingPatternChangedTrigger: false,
   stringCount: 6,
   chordsAreLoading: false,
+  showReplayTrigger: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -546,36 +548,10 @@ export const settingsSlice = createSlice({
       state.toggleMetronomeWhenRecording = action.payload;
       toggleMetronomeWhenRecordingValue = action.payload;
     },
-    setIsRecording(
-      state,
-      action: PayloadAction<{
-        value: boolean;
-        startRecording: () => void;
-        stopRecording: () => void;
-      }>
-    ) {
-      const value = action.payload.value;
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      const value = action.payload;
       state.isRecording = value;
       isRecordingValue = value;
-      tryToggleInterval(value);
-
-      const canTriggerMetronome =
-        toggleMetronomeWhenRecordingValue && isMetronomeActiveValue !== value;
-      if (value) {
-        action.payload.startRecording();
-        if (canTriggerMetronome) {
-          toggleMetronome(state, true);
-        }
-      } else {
-        action.payload.stopRecording();
-        if (
-          canTriggerMetronome &&
-          !isAnyTimerSpecificActivityBesidesMetronomeRunning()
-        ) {
-          // only stop metronome when there is no other playing activity
-          toggleMetronome(state, false);
-        }
-      }
     },
     triggerLooperStateUpdate(state) {
       state.looperStateUpdateTrigger = !state.looperStateUpdateTrigger;
@@ -609,6 +585,9 @@ export const settingsSlice = createSlice({
     },
     setScaleDetectorAvailable(state, action: PayloadAction<boolean>) {
       state.scaleDetectorAvailable = action.payload;
+    },
+    triggerShowReplay(state) {
+      state.showReplayTrigger = !state.showReplayTrigger;
     },
   },
 });
@@ -653,6 +632,7 @@ export const {
   setSlashChordBassNote,
   setChordDetectorAvailable,
   setScaleDetectorAvailable,
+  triggerShowReplay,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

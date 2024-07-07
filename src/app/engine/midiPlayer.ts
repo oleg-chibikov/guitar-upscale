@@ -140,7 +140,7 @@ export const playMidi = async (
   recreatePlaybackPromise();
   dispatch(setIsPlaying(true));
 
-  setPianoRollData(eventsByTick);
+  setPianoRollData(eventsByTick, dispatch);
   onStarted?.();
   await midiPlayer.play(eventsByTick, logPrefix);
   dispatch(setIsPlaying(false));

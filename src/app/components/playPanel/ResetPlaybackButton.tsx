@@ -35,7 +35,7 @@ export const ResetPlayButton: React.FC = () => {
   }
   const handleReset = async () => {
     setOpen(false);
-    setPianoRollData(undefined);
+    setPianoRollData(undefined, dispatch);
     setDataToPlay(undefined);
     // must be after setting data to undefined
     if (isPlayingValue) {

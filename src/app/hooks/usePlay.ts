@@ -48,10 +48,11 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
   const isPaused = useSettingsSelector((s) => s.isPaused);
+  const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
   const [dataToPlay, setDataToPlay] = useState<EventsByTick | undefined>();
   useEffect(() => {
     setDataToPlay(pianoRollData);
-  }, [isPlaying]);
+  }, [showReplayTrigger]);
   const [isWaiting, setIsWaiting] = useState(false);
 
   const isReplay = !(
