@@ -27,3 +27,5 @@ Draggging over the X-axis should change current playback position. Should we adj
 
 Replay button and set pianoRoll data after recording
 MIDI save button - for pianoRoll data whatever it is
+for chords - see what chords available for the new note. Prefer the same Mode, but if no - use the first available
+// Cannot change notes in the example - why?

@@ -1,9 +1,14 @@
 import { DraggableNote } from "@/app/components/pianoRoll/DraggableNote";
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { OctaveNote } from "@/app/data/notes";
-import { NOTE_HEIGHT, PIXELS_PER_TICK } from "@/app/data/pianoRollConstants";
+import {
+  NOTE_HEIGHT,
+  OCTAVE_COUNT,
+  PIXELS_PER_TICK,
+} from "@/app/data/pianoRollConstants";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 
 interface PianoRollNotesProps {
   notes: { tick: number; events: ChordOrNote[] }[];
@@ -14,13 +19,6 @@ export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
   notes,
   onNoteMove,
 }) => {
-  const getPitchPosition = (octaveNote: OctaveNote): number => {
-    const { octave, note } = octaveNote;
-    const octavePosition = octave * 12 * NOTE_HEIGHT;
-    const notePosition = note * NOTE_HEIGHT;
-    return octavePosition + notePosition;
-  };
-
   return (
     <>
       {notes.flatMap(({ tick, events }) =>
@@ -36,7 +34,10 @@ export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
             octaveNote = event.note!.note;
           }
           const duration = TICKS_IN_BEAT * PIXELS_PER_TICK;
-          const yPosition = getPitchPosition(octaveNote);
+          const yPosition = getPitchPosition({
+            note: octaveNote.note,
+            octave: OCTAVE_COUNT - octaveNote.octave - 1,
+          });
           const xPosition = tick * PIXELS_PER_TICK;
 
           return (
