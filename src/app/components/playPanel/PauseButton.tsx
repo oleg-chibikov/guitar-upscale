@@ -18,7 +18,7 @@ export const PauseButton: React.FC = () => {
     <IconButtonWrapper
       disabled={!isPlaying}
       isActive={false}
-      tooltip={isPaused ? "Continue playing" : "Play scale"}
+      tooltip={isPaused ? "Continue playing" : "Pause playback"}
       icon={isPaused ? <PlayArrow /> : <Pause />}
       onPress={() => {
         dispatch(setIsPaused(!isPaused));

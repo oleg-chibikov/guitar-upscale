@@ -22,7 +22,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   return (
     <IconButtonWrapper
       isActive={isPlaying}
-      activeBg="error"
       tooltip={
         isReplay
           ? "Replay"
