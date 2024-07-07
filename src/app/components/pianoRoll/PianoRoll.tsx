@@ -4,16 +4,14 @@ import { PianoRollNotes } from "./PianoRollNotes";
 import { PitchAxis } from "./PitchAxis";
 import { Timeline } from "./Timeline";
 
-import { OctaveNote } from "@/app/data/notes";
 import {
-  allNotes,
-  NOTE_HEIGHT,
   PIXELS_PER_TICK,
   TOTAL_HEIGHT,
   TOTAL_WIDTH,
 } from "@/app/data/pianoRollConstants";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 
 interface PianoRollProps {
   notes: { tick: number; events: ChordOrNote[] }[];
@@ -84,14 +82,6 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
       x: ((minTick + maxTick) / 2) * PIXELS_PER_TICK,
       y: (minPitch + maxPitch) / 2,
     };
-  };
-
-  const getPitchPosition = (octaveNote: OctaveNote): number => {
-    const { octave, note } = octaveNote;
-    const octavePosition = octave * allNotes.length * NOTE_HEIGHT;
-    const notePosition = allNotes.indexOf(note) * NOTE_HEIGHT;
-
-    return octavePosition + notePosition;
   };
 
   return (

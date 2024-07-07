@@ -1,10 +1,13 @@
 import { BEATS_IN_BAR } from "@/app/data/clockConstants";
-import { isSharp, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
+import { isSharp } from "@/app/data/notes";
 import {
+  allNotes,
   BEAT_WIDTH,
   NOTE_HEIGHT,
+  octaves,
   TOTAL_WIDTH,
 } from "@/app/data/pianoRollConstants";
+import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 import React, { useEffect, useRef } from "react";
 
 interface PianoRollGridProps {
@@ -33,20 +36,21 @@ export const PianoRollGrid: React.FC<PianoRollGridProps> = ({
   }, [width, height]);
 
   const renderPianoRollBackground = (ctx: CanvasRenderingContext2D) => {
-    for (let octave = 0; octave <= 8; octave++) {
-      for (let note = 0; note < NOTE_COUNT; note++) {
+    octaves.forEach((octave) => {
+      allNotes.forEach((note) => {
         const yPosition = getPitchPosition({ octave, note });
 
-        ctx.fillStyle = !isSharp(note) ? "#f3f4f6" : "#d1d5db";
-        ctx.fillRect(0, yPosition, width, NOTE_HEIGHT);
+        ctx.fillStyle = !isSharp(note) ? "#f3f4f6" : "#d1d5db"; // gray-100 for white keys, gray-300 for black keys
+        ctx.fillRect(0, yPosition, TOTAL_WIDTH, NOTE_HEIGHT);
 
+        // Draw horizontal line
         ctx.beginPath();
         ctx.moveTo(0, yPosition);
-        ctx.lineTo(width, yPosition);
-        ctx.strokeStyle = "#9ca3af";
+        ctx.lineTo(TOTAL_WIDTH, yPosition);
+        ctx.strokeStyle = "#9ca3af"; // gray-400
         ctx.stroke();
-      }
-    }
+      });
+    });
   };
 
   const renderGrid = (ctx: CanvasRenderingContext2D) => {
@@ -65,11 +69,4 @@ export const PianoRollGrid: React.FC<PianoRollGridProps> = ({
   };
 
   return <canvas ref={canvasRef} className="absolute left-0 top-0" />;
-};
-
-const getPitchPosition = (octaveNote: OctaveNote): number => {
-  const { octave, note } = octaveNote;
-  const octavePosition = octave * NOTE_COUNT * NOTE_HEIGHT;
-  const notePosition = note * NOTE_HEIGHT;
-  return octavePosition + notePosition;
 };

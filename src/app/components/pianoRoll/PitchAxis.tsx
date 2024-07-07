@@ -3,6 +3,7 @@ import {
   allNotes,
   NOTE_HEIGHT,
   OCTAVE_COUNT,
+  octaves,
 } from "@/app/data/pianoRollConstants";
 import { playNote } from "@/app/engine/sound/soundProvider";
 import { WithClassName } from "@/app/helpers/withClassName";
@@ -26,8 +27,6 @@ const HEIGHT_AND_HALF = NOTE_HEIGHT * 1.5;
 export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
   ({ className, showNoteLabels = true }, ref) => {
     const [pressedNotes, setPressedNotes] = useState<Set<string>>(new Set());
-
-    const octaves = Array.from({ length: OCTAVE_COUNT }, (_, i) => i);
 
     const getNoteLabel = (note: Note, octave: number): string => {
       return `${Note[note]}${octave}`;

@@ -11,3 +11,4 @@ export const allNotes = Object.values(Note)
   .filter((note): note is Note => typeof note === "number")
   .reverse();
 export const TOTAL_HEIGHT = NOTE_HEIGHT * allNotes.length * OCTAVE_COUNT;
+export const octaves = Array.from({ length: OCTAVE_COUNT }, (_, i) => i);
