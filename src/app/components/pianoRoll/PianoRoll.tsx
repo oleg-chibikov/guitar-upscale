@@ -22,7 +22,7 @@ interface PianoRollProps {
 
 export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const pitchAxisRef = useRef<HTMLDivElement>(null);
+  const pitchAxisRef = useRef<HTMLCanvasElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,11 +99,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
       className="relative w-full h-full bg-red overflow-auto"
       ref={containerRef}
     >
-      <PitchAxis
-        ref={pitchAxisRef}
-        className="absolute left-0 top-0 z-20"
-        width={100}
-      />
+      <PitchAxis ref={pitchAxisRef} className="absolute left-0 top-0 z-20" />
       <div
         className="relative left-28 top-0"
         style={{ width: `${TOTAL_WIDTH}px`, height: `${TOTAL_HEIGHT}px` }}
