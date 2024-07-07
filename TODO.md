@@ -20,6 +20,7 @@ Can we avoid using pre-built chords for chord detection?
 Piano roll:
 Undo-redo (use event sourcing technique)
 copy note instead of move when ctrl pressed (what about mobile?)
+move with touch gestures too
 Panel with actions on pianoRoll. It probably should be the same as play panel, but extended with tools or two different panels
 apply to looper and to recording, not only to midi upload
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
