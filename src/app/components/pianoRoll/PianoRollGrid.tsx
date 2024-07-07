@@ -40,21 +40,21 @@ export const PianoRollGrid: React.FC<PianoRollGridProps> = ({
       allNotes.forEach((note) => {
         const yPosition = getPitchPosition({ octave, note });
 
-        ctx.fillStyle = !isSharp(note) ? "#f3f4f6" : "#d1d5db"; // gray-100 for white keys, gray-300 for black keys
+        ctx.fillStyle = isSharp(note) ? "#37474f" : "#455a64"; // gray-800 for white keys, gray-700 for black keys
         ctx.fillRect(0, yPosition, TOTAL_WIDTH, NOTE_HEIGHT);
 
         // Draw horizontal line
         ctx.beginPath();
         ctx.moveTo(0, yPosition);
         ctx.lineTo(TOTAL_WIDTH, yPosition);
-        ctx.strokeStyle = "#9ca3af"; // gray-400
-        ctx.stroke();
+        // ctx.strokeStyle = "#546e7a"; // gray-600
+        //ctx.stroke();
       });
     });
   };
 
   const renderGrid = (ctx: CanvasRenderingContext2D) => {
-    ctx.strokeStyle = "#9ca3af";
+    ctx.strokeStyle = "#546e7a"; // gray-600
 
     for (let bar = 0; bar < TOTAL_WIDTH / (BEAT_WIDTH * BEATS_IN_BAR); bar++) {
       for (let beat = 0; beat < BEATS_IN_BAR; beat++) {
