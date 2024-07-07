@@ -1,7 +1,11 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { ChordWithPlayMetadata } from "@/app/engine/eventBus";
+import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
+import {
+  ChordWithPlayMetadata,
+  DEFAULT_CHORD_TRACK_NUMBER,
+} from "@/app/engine/eventBus";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { midiSaver } from "@/app/engine/midiRecorder/midiSaver";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
@@ -75,7 +79,42 @@ export class MidiRecorder implements NoteRecorder {
     this.startTick = startTick;
   }
 
-  addNoteAtTick(
+  addEvents(eventsByTick: EventsByTick) {
+    for (const eventsAtTick of eventsByTick.items) {
+      for (const event of eventsAtTick.events) {
+        const note = event.note;
+        const chord = event.chord;
+        if (note) {
+          this.addNoteAtTick(
+            note.note,
+            note.looperChannel ?? note.trackNumber,
+            note.instrument ?? "acoustic_guitar_nylon",
+            eventsAtTick.tick
+          );
+        }
+        if (chord) {
+          const preferredVariations = chordNotesByName.get(chord.chord);
+          if (preferredVariations) {
+            for (const chordNote of preferredVariations.preferred) {
+              if (!chordNote) {
+                continue;
+              }
+              this.addNoteAtTick(
+                chordNote,
+                chord.metadata.looperChannel ??
+                  chord.metadata.trackNumber ??
+                  DEFAULT_CHORD_TRACK_NUMBER,
+                chord.metadata.trackInstrument ?? "acoustic_guitar_nylon",
+                eventsAtTick.tick
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private addNoteAtTick(
     note: StringOctaveNote,
     trackNumber: number,
     instrument: Instrument,

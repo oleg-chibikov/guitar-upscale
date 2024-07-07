@@ -1,4 +1,3 @@
-import { midiRecorder } from "@/app/engine/midiRecorder/midiRecorder";
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
@@ -151,6 +150,8 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
   const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
   playAction?.(metadata);
 
+  const midiRecorder = (await import("./midiRecorder/midiRecorder"))
+    .midiRecorder;
   midiRecorder.addChordAtGlobalTick(chordWithMetadata);
 
   if (

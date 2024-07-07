@@ -1,4 +1,3 @@
-"use client";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { setIsPaused } from "@/app/store/settingsSlice";
 import Pause from "@mui/icons-material/Pause";

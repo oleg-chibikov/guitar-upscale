@@ -1,8 +1,12 @@
 import { HALF_BEATS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
-import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
+import {
+  pianoRollData,
+  setPianoRollData,
+} from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { usePianoRollData } from "@/app/hooks/usePianoRollData";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
@@ -48,11 +52,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
   const isPaused = useSettingsSelector((s) => s.isPaused);
-  const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
-  const [dataToPlay, setDataToPlay] = useState<EventsByTick | undefined>();
-  useEffect(() => {
-    setDataToPlay(pianoRollData);
-  }, [showReplayTrigger]);
+  const dataToPlay = usePianoRollData();
   const [isWaiting, setIsWaiting] = useState(false);
 
   const isReplay = !(
@@ -133,6 +133,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   useEffect(() => {
     // stop playing when any of dependencies changes
     dispatch(setIsPlaying(false));
+    setPianoRollData(undefined, dispatch);
   }, [guitarSettingsUpdateCount, dispatch]);
 
   useEffect(() => {

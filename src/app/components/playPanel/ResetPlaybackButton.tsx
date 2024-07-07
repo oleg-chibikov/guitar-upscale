@@ -1,19 +1,14 @@
-"use client";
 import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
-import { EventsByTick } from "@/app/engine/eventsByTick";
-import {
-  pianoRollData,
-  setPianoRollData,
-} from "@/app/engine/pianoRoll/pianoRollState";
-import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
+import { usePianoRollData } from "@/app/hooks/usePianoRollData";
 import { isPlayingValue } from "@/app/store/settingsSlice";
 import Clear from "@mui/icons-material/Clear";
-import React, { Dispatch, useEffect, useState } from "react";
+import React, { Dispatch, useState } from "react";
 import { useDispatch } from "react-redux";
 import { UnknownAction } from "redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
-export const ResetPlayButton: React.FC = () => {
+export const ResetPlaybackButton: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -25,18 +20,13 @@ export const ResetPlayButton: React.FC = () => {
   };
 
   const dispatch = useDispatch();
-  const isPlaying = useSettingsSelector((s) => s.isPlaying);
-  const [dataToPlay, setDataToPlay] = useState<EventsByTick | undefined>();
-  useEffect(() => {
-    setDataToPlay(pianoRollData);
-  }, [isPlaying]);
+  const dataToPlay = usePianoRollData();
   if (dataToPlay === undefined) {
     return null;
   }
   const handleReset = async () => {
     setOpen(false);
     setPianoRollData(undefined, dispatch);
-    setDataToPlay(undefined);
     // must be after setting data to undefined
     if (isPlayingValue) {
       await stop(dispatch);
