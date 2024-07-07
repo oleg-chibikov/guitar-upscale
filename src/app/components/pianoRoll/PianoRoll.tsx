@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { PianoRollGrid } from "./PianoRollGrid";
 import { PianoRollNotes } from "./PianoRollNotes";
-import { PitchAxis } from "./PitchAxis";
+import { OctaveNote, PitchAxis } from "./PitchAxis";
 import { Timeline } from "./Timeline";
 
 import {
@@ -15,7 +15,7 @@ import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 
 interface PianoRollProps {
   notes: { tick: number; events: ChordOrNote[] }[];
-  onNoteMove?: (noteId: string, newTick: number, newPitch: number) => void;
+  onNoteMove?: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
 }
 
 export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {

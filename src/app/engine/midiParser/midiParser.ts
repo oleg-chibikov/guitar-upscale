@@ -209,7 +209,7 @@ async function processToleranceGroup(
     for (const octaveNote of notes) {
       toleranceGroupMap.delete(serializeOctaveNote(octaveNote));
     }
-    eventsByTick.addOrUpdateEvent(toleranceWindowStart, {
+    eventsByTick.addEventAtTick(toleranceWindowStart, {
       chord: chordName,
       metadata: {
         trackNumber: trackIndex,
@@ -233,7 +233,7 @@ async function processToleranceGroup(
         velocity: event.velocity || 127,
         instrument,
       };
-      eventsByTick.addOrUpdateEvent(event.tick, noteEvent);
+      eventsByTick.addEventAtTick(event.tick, noteEvent);
       previousNote = stringOctaveNote;
     }
   }

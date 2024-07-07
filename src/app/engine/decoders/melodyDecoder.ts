@@ -53,7 +53,7 @@ export class MelodyDecoder {
           nextIsImmediateChord = false;
           const newChord = this.convertChord(immediateChord, this.tuningShift);
 
-          result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+          result.addEventAtTick(tickIndex * TICKS_IN_HALF_BEAT, {
             chord: newChord,
             metadata: {
               trackNumber: this.track.trackNumber,
@@ -202,7 +202,7 @@ export class MelodyDecoder {
     const stringOctaveNote = string[fret];
 
     if (stringOctaveNote) {
-      result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+      result.addEventAtTick(tickIndex * TICKS_IN_HALF_BEAT, {
         trackNumber: this.track.trackNumber,
         instrument: this.track.instrument,
         note: stringOctaveNote,

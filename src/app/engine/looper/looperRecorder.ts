@@ -152,7 +152,7 @@ export class LooperRecorder {
       return;
     }
 
-    this.eventsByTick.addOrUpdateEvent(currentTick, data);
+    this.eventsByTick.addEventAtTick(currentTick, data);
   }
 
   recordNote(
@@ -181,7 +181,7 @@ export class LooperRecorder {
       trackNumber,
     };
 
-    this.eventsByTick.addOrUpdateEvent(currentTick, internalNoteEvent);
+    this.eventsByTick.addEventAtTick(currentTick, internalNoteEvent);
   }
 
   private setStartTickAndGetCurrentTick() {

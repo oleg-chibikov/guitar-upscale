@@ -1,6 +1,12 @@
 import { Instrument } from "@/app/data/instruments";
-import { StringOctaveNote } from "@/app/data/notes";
+import {
+  getNoteText,
+  OctaveNote,
+  serializeOctaveNote,
+  StringOctaveNote,
+} from "@/app/data/notes";
 import { ChordWithPlayMetadata } from "@/app/engine/eventBus";
+import { octaveNoteToStringOctaveNoteMap } from "@/app/engine/generateNeckRepresentation";
 
 export type NoteEvent = {
   note: StringOctaveNote;
@@ -11,35 +17,37 @@ export type NoteEvent = {
 };
 
 export type ChordOrNote = {
+  id: string;
   note?: NoteEvent;
   chord?: ChordWithPlayMetadata;
 };
-
 export class EventsByTick {
   private events: Map<number, ChordOrNote[]>;
+  private eventsById: Map<string, { tick: number; event: ChordOrNote }>;
 
   constructor() {
     this.events = new Map<number, ChordOrNote[]>();
+    this.eventsById = new Map<string, { tick: number; event: ChordOrNote }>();
   }
 
-  /**
-   * Adds or updates a value in the array for the given key.
-   * If the key exists, the value is appended to the array.
-   * If the key does not exist, a new array is created with the value.
-   *
-   * @param tick - The tick (time) at which the event occurs
-   * @param value - The NoteEvent or ChordWithPlayMetadata to add or update
-   */
-  addOrUpdateEvent(
-    tick: number,
-    value: NoteEvent | ChordWithPlayMetadata
-  ): void {
+  private generateId(value: NoteEvent | ChordWithPlayMetadata): string {
+    if ("note" in value) {
+      return `note-${value.trackNumber}-${getNoteText(
+        value.note.note
+      )}-${Date.now()}`;
+    } else {
+      return `chord-${value.chord}-${Date.now()}`;
+    }
+  }
+
+  addEventAtTick(tick: number, value: NoteEvent | ChordWithPlayMetadata): void {
+    const id = this.generateId(value);
     let chordOrNote: ChordOrNote;
 
     if ("note" in value) {
-      chordOrNote = { note: value as NoteEvent };
+      chordOrNote = { id, note: value as NoteEvent };
     } else {
-      chordOrNote = { chord: value as ChordWithPlayMetadata };
+      chordOrNote = { id, chord: value as ChordWithPlayMetadata };
     }
 
     if (this.events.has(tick)) {
@@ -47,6 +55,75 @@ export class EventsByTick {
     } else {
       this.events.set(tick, [chordOrNote]);
     }
+
+    this.eventsById.set(id, { tick, event: chordOrNote });
+  }
+
+  changeEvent(id: string, newPitch: OctaveNote, newTick: number): boolean {
+    const eventInfo = this.eventsById.get(id);
+    if (!eventInfo) return false;
+
+    const { event } = eventInfo;
+
+    // Change pitch for NoteEvent
+    if (event.note) {
+      const serializedOctaveNote = serializeOctaveNote(newPitch);
+      const stringOctaveNotes =
+        octaveNoteToStringOctaveNoteMap.get(serializedOctaveNote);
+      if (stringOctaveNotes !== undefined && stringOctaveNotes.length > 0) {
+        event.note.note = stringOctaveNotes[0];
+      }
+    }
+
+    // Change pitch for ChordWithPlayMetadata
+    else if (event.chord) {
+      event.chord.chord = event.chord.chord.replace(
+        /^[A-G#b]+/,
+        getNoteText(newPitch.note)
+      );
+    }
+
+    // Change position
+    if (newTick !== eventInfo.tick) {
+      const oldTick = eventInfo.tick;
+      const oldEvents = this.events.get(oldTick);
+      if (oldEvents) {
+        const index = oldEvents.findIndex((e) => e.id === id);
+        if (index !== -1) {
+          const [removed] = oldEvents.splice(index, 1);
+          if (this.events.has(newTick)) {
+            this.events.get(newTick)?.push(removed);
+          } else {
+            this.events.set(newTick, [removed]);
+          }
+          eventInfo.tick = newTick;
+        }
+        if (oldEvents.length === 0) {
+          this.events.delete(oldTick);
+        }
+      }
+    }
+
+    return true;
+  }
+  removeEvent(id: string): boolean {
+    const eventInfo = this.eventsById.get(id);
+    if (eventInfo) {
+      const tick = eventInfo.tick;
+      const events = this.events.get(tick);
+      if (events) {
+        const index = events.findIndex((e) => e.id === id);
+        if (index !== -1) {
+          events.splice(index, 1);
+          if (events.length === 0) {
+            this.events.delete(tick);
+          }
+          this.eventsById.delete(id);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

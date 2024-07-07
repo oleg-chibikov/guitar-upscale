@@ -7,7 +7,7 @@ import { ChordOrNote } from "@/app/engine/eventsByTick";
 
 interface PianoRollNotesProps {
   notes: { tick: number; events: ChordOrNote[] }[];
-  onNoteMove: (noteId: string, newTick: number, newPitch: number) => void;
+  onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
 }
 
 export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
@@ -24,7 +24,7 @@ export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
   return (
     <>
       {notes.flatMap(({ tick, events }) =>
-        events.map((event, index) => {
+        events.map((event) => {
           const isChord = "chord" in event;
           let octaveNote: OctaveNote;
           if (isChord) {
@@ -38,12 +38,11 @@ export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
           const duration = TICKS_IN_BEAT * PIXELS_PER_TICK;
           const yPosition = getPitchPosition(octaveNote);
           const xPosition = tick * PIXELS_PER_TICK;
-          const noteId = `${tick}-${index}`;
 
           return (
             <DraggableNote
-              key={noteId}
-              noteId={noteId}
+              key={event.id}
+              noteId={event.id}
               x={xPosition}
               y={yPosition}
               width={duration}

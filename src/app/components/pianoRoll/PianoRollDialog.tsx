@@ -1,6 +1,7 @@
 import { PianoRoll } from "@/app/components/pianoRoll/PianoRoll";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { PIANO_ROLL_DIALOG } from "@/app/data/elementIds";
+import { OctaveNote } from "@/app/data/notes";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
 import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { useUiSelector } from "@/app/hooks/storeHooks";
@@ -35,7 +36,17 @@ export const PianoRollDialog: React.FC = () => {
       className="h-screen"
     >
       <div className="bg-red-500 h-full w-full">
-        <PianoRoll notes={notes} />
+        <PianoRoll
+          notes={notes}
+          onNoteMove={(
+            noteId: string,
+            newTick: number,
+            newPitch: OctaveNote
+          ) => {
+            pianoRollData.changeEvent(noteId, newPitch, newTick);
+            setNotes(pianoRollData?.items ?? []);
+          }}
+        />
       </div>
     </DialogWrapper>
   );

@@ -1,3 +1,4 @@
+import { NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import {
   NOTE_HEIGHT,
   PIXELS_PER_TICK,
@@ -13,8 +14,14 @@ interface DraggableNoteProps {
   width: number;
   height: number;
   isChord: boolean;
-  onNoteMove: (noteId: string, newTick: number, newPitch: number) => void;
+  onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
 }
+
+const calculateOctaveNote = (pitch: number): OctaveNote => {
+  const octave = Math.floor(pitch / NOTE_COUNT);
+  const note = pitch % NOTE_COUNT;
+  return { octave, note };
+};
 
 export const DraggableNote: React.FC<DraggableNoteProps> = ({
   noteId,
@@ -70,7 +77,8 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       const newTick = Math.round(newX / PIXELS_PER_TICK);
       const newPitch = Math.round(newY / NOTE_HEIGHT);
 
-      onNoteMove(noteId, newTick, newPitch);
+      const octaveNote = calculateOctaveNote(newPitch);
+      onNoteMove(noteId, newTick, octaveNote);
 
       noteRef.current.style.transform = "";
       dragStartRef.current = null;
