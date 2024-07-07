@@ -7,14 +7,8 @@ import {
 } from "@/app/data/instruments";
 import { Note } from "@/app/data/notes";
 import { playNote } from "@/app/engine/sound/soundProvider";
-import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { convertToTitleCase } from "@/app/helpers/stringHelper";
 import { useOnlineStatus } from "@/app/hooks/useOnlineStatus";
-import {
-  reverbStrengthValue,
-  tempoBpmValue,
-  volumeValue,
-} from "@/app/store/settingsSlice";
 import React from "react";
 import { SelectWrapper } from "../../../uiFramework/SelectWrapper";
 
@@ -49,13 +43,7 @@ const BaseInstrumentSelector: React.FC<BaseInstrumentSelectorProps> = ({
 
   const handleInstrumentChange = async (value: string) => {
     setInstrument(value as Instrument);
-    await playNote(
-      { note: Note.E, octave: 5 },
-      volumeValue,
-      value,
-      reverbStrengthValue,
-      beatToMilliseconds(tempoBpmValue)
-    );
+    await playNote({ note: Note.E, octave: 5 }, undefined, value);
   };
 
   const group: Instrument[] = instrumentGroups[instrumentGroup];

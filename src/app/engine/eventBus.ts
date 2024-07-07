@@ -1,14 +1,7 @@
-import { beatToMilliseconds } from "@/app/helpers/clockHelper";
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
 import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
-import {
-  chordInstrumentValue,
-  instrumentValue,
-  reverbStrengthValue,
-  tempoBpmValue,
-  volumeValue,
-} from "../store/settingsSlice";
+import { chordInstrumentValue, instrumentValue } from "../store/settingsSlice";
 import { currentlyRecordingLooperChannel } from "./looper/looperShared";
 import { playNote } from "./sound/soundProvider";
 
@@ -82,12 +75,10 @@ const play = async ({
   //   .playNote;
   await playNote(
     stringOctaveNote,
-    volume ?? volumeValue,
+    volume,
     trackInstrument ??
-      (fromChord === true ? chordInstrumentValue : instrumentValue),
+      (fromChord === true ? chordInstrumentValue : instrumentValue)
     // instrumentRef.current ?? instrument,
-    reverbStrengthValue,
-    beatToMilliseconds(tempoBpmValue)
   );
 };
 

@@ -63,20 +63,8 @@ export const Initializer: React.FC = () => {
         loadMetronome(),
       ]);
       await Promise.all([
-        playNote(
-          { note: Note.E, octave: 1 },
-          0,
-          instrumentValue,
-          reverbStrengthValue,
-          1
-        ),
-        playNote(
-          { note: Note.E, octave: 1 },
-          0,
-          chordInstrumentValue,
-          reverbStrengthValue,
-          1
-        ),
+        playNote({ note: Note.E, octave: 1 }, 0),
+        playNote({ note: Note.E, octave: 1 }, 0),
         playMetronomeBeat(false, 0),
       ]);
       console.log("Loaded sounds");
