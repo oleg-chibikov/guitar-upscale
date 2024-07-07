@@ -1,14 +1,12 @@
 import { isSharp, Note } from "@/app/data/notes";
+import {
+  allNotes,
+  NOTE_HEIGHT,
+  OCTAVE_COUNT,
+} from "@/app/data/pianoRollConstants";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { Typography } from "@mui/material";
 import { forwardRef } from "react";
-
-export const OCTAVE_COUNT = 9; // 0-8 octaves
-export const NOTE_HEIGHT = 20; // Should match the NOTE_HEIGHT in getPitchPosition
-export const allNotes = Object.values(Note)
-  .filter((note): note is Note => typeof note === "number")
-  .reverse();
-export const TOTAL_HEIGHT = NOTE_HEIGHT * allNotes.length * OCTAVE_COUNT;
 
 interface PitchAxisProps extends WithClassName {
   darkNoteColor?: string;
