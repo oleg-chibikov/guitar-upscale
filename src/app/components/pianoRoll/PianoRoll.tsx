@@ -1,6 +1,7 @@
 import {
   allNotes,
   NOTE_HEIGHT,
+  OCTAVE_COUNT,
   PitchAxis,
   TOTAL_HEIGHT,
 } from "@/app/components/pianoRoll/PitchAxis";
@@ -24,6 +25,8 @@ const TOTAL_WIDTH = TOTAL_BEATS * BEAT_WIDTH;
 export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pitchAxisRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const draggedNoteRef = useRef<{
     element: HTMLElement;
     noteId: string;
@@ -34,6 +37,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   } | null>(null);
 
   useEffect(() => {
+    // render grid and background
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -48,6 +52,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   }, []);
 
   useEffect(() => {
+    // scroll to notes
     if (!containerRef.current) return;
 
     const container = containerRef.current;
@@ -59,6 +64,24 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
     container.scrollLeft = x - containerWidth / 2;
     container.scrollTop = y - containerHeight / 2;
   }, [notes]);
+
+  useEffect(() => {
+    // support sticky headers
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (pitchAxisRef.current) {
+        pitchAxisRef.current.style.left = `${container.scrollLeft}px`;
+      }
+      if (timelineRef.current) {
+        timelineRef.current.style.top = `${container.scrollTop}px`;
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const calculateNotesCenter = () => {
     let minTick = Infinity;
@@ -163,8 +186,6 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
     }
   };
 
-  const MAX_OCTAVE = 8;
-
   const getPitchPosition = (octaveNote: OctaveNote): number => {
     const { octave, note } = octaveNote;
     const octavePosition = octave * allNotes.length * NOTE_HEIGHT;
@@ -174,7 +195,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   };
 
   const renderPianoRollBackground = (ctx: CanvasRenderingContext2D) => {
-    for (let octave = 0; octave <= MAX_OCTAVE; octave++) {
+    for (let octave = 0; octave < OCTAVE_COUNT; octave++) {
       for (let note = 0; note < NOTE_COUNT; note++) {
         const yPosition = getPitchPosition({ octave, note });
 
@@ -248,7 +269,11 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
       className="relative w-full h-full bg-red overflow-auto"
       ref={containerRef}
     >
-      <PitchAxis className="absolute left-0 top-0 z-10" width={100} />
+      <PitchAxis
+        className="absolute left-0 top-0 z-10"
+        width={100}
+        ref={pitchAxisRef}
+      />
       <div
         className="relative left-28 top-0"
         style={{ width: `${TOTAL_WIDTH}px`, height: `${TOTAL_HEIGHT}px` }}
@@ -256,7 +281,11 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <Timeline width={TOTAL_WIDTH} pixelsPerTick={PIXELS_PER_TICK} />
+        <Timeline
+          ref={timelineRef}
+          width={TOTAL_WIDTH}
+          pixelsPerTick={PIXELS_PER_TICK}
+        />
         <canvas
           ref={canvasRef}
           className="absolute left-0 top-0"

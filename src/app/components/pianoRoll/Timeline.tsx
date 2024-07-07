@@ -1,18 +1,21 @@
-// Timeline.tsx
 import { BEATS_IN_BAR, TICKS_IN_BEAT } from "@/app/data/clockConstants";
-import React from "react";
+import React, { forwardRef } from "react";
 
 interface TimelineProps {
   width: number;
   pixelsPerTick: number;
 }
 
-export const Timeline: React.FC<TimelineProps> = ({ width, pixelsPerTick }) => {
+export const Timeline: React.FC<TimelineProps> = forwardRef<
+  HTMLDivElement,
+  TimelineProps
+>(({ width, pixelsPerTick }, ref) => {
   const beatWidth = TICKS_IN_BEAT * pixelsPerTick;
   const totalBars = Math.ceil(width / (BEATS_IN_BAR * beatWidth));
 
   return (
     <div
+      ref={ref}
       className="absolute z-10 h-8 bg-gray-200 border-b border-gray-300"
       style={{ width }}
     >
@@ -43,4 +46,6 @@ export const Timeline: React.FC<TimelineProps> = ({ width, pixelsPerTick }) => {
       ))}
     </div>
   );
-};
+});
+
+Timeline.displayName = "Timeline";
