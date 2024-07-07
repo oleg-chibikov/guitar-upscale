@@ -23,6 +23,7 @@ export const ClearLooperButton: React.FC<CanSetLooperState> = ({
   };
 
   const handleConfirmClear = () => {
+    setOpen(false);
     clearLooperState();
     setState({ ...looperState });
     handleClose();

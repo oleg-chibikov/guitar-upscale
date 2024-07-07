@@ -30,8 +30,8 @@ import {
   waitForNextHalfBeat,
 } from "../engine/clock/mainClock";
 import {
+  checkLooperPlaying,
   currentlyRecordingLooperChannel,
-  isLooperPlaying,
 } from "../engine/looper/looperShared";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -252,7 +252,7 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
   isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||
-  isLooperPlaying();
+  checkLooperPlaying();
 
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();

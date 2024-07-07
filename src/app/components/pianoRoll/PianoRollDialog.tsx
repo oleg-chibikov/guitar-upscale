@@ -43,7 +43,7 @@ export const PianoRollDialog: React.FC = () => {
             newTick: number,
             newPitch: OctaveNote
           ) => {
-            pianoRollData.changeEvent(noteId, newPitch, newTick);
+            pianoRollData?.changeEvent(noteId, newPitch, newTick);
             setNotes(pianoRollData?.items ?? []);
           }}
         />

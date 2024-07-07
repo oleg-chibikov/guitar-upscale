@@ -13,9 +13,9 @@ import {
 } from "../../store/settingsSlice";
 import { LooperRecorder } from "./looperRecorder";
 import {
+  checkLooperPlaying,
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
-  isLooperPlaying,
   setCurrentlyRecordingLooperChannel,
 } from "./looperShared";
 
@@ -104,7 +104,7 @@ export const setPlayingInLooperChannel = (channel: number, value: boolean) => {
       return;
     }
     currentlyPlayingLooperChannels.delete(channel);
-    if (!isLooperPlaying()) {
+    if (!checkLooperPlaying()) {
       store.dispatch(setIsPlaying(false));
       store.dispatch(setIsLooperPlaying(false)); // this will show the pause button
     }

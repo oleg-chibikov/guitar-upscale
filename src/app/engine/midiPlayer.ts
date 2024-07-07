@@ -1,4 +1,5 @@
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import {
   recreatePlaybackPromise,
   waitForPlaybackToFinish,
@@ -138,6 +139,8 @@ export const playMidi = async (
   console.log(logPrefix + "Starting new playback");
   recreatePlaybackPromise();
   dispatch(setIsPlaying(true));
+
+  setPianoRollData(eventsByTick);
   onStarted?.();
   await midiPlayer.play(eventsByTick, logPrefix);
   dispatch(setIsPlaying(false));

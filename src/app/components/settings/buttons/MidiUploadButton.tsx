@@ -1,7 +1,6 @@
 "use client";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { parseMidiData } from "@/app/engine/midiParser/midiParser";
-import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { setTempoBpm } from "@/app/store/settingsSlice";
 import UploadFile from "@mui/icons-material/UploadFile";
@@ -43,8 +42,6 @@ export const MidiUploadButton: React.FC = () => {
               dispatch(setTempoBpm({ tempo: bpm, updateInterval: true }));
             }
           );
-
-          setPianoRollData(eventsByTick);
 
           if (!eventsByTick.hasItems) {
             return;
