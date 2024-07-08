@@ -21,6 +21,7 @@
     "generate-chords": "ts-node --require ./tsconfig-paths-bootstrap.js src/utilities/generateChords.ts"
   },
   "dependencies": {
+    "@datastructures-js/binary-search-tree": "^5.3.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.21",

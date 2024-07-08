@@ -6,7 +6,6 @@ Feedback form
 get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
 High string at the bottom mode
-Slash chords? when the main bass note is out of the chord
 WaitForNextHalfBeat could make the melody offbeat - we need to store what tick to wait for
 
 info about chord detection
@@ -26,8 +25,7 @@ apply to looper and to recording, not only to midi upload
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
 Draggging over the X-axis should change current playback position. Should we adjust globalCurrentTick? Note that when we go forwards/backwards we don't do that - probably we should!
 for chords - see what chords available for the new note. Prefer the same Mode, but if no - use the first available
-// Cannot change notes in the example - why?
 Zoom in/out - gesture + buttons/selection mode
 write note on events
-moving notes moves them somewhere else
-moving shouldn't reset scroll position
+when editing while playing it should be reflected for the next note
+clicking events should play them

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@datastructures-js/binary-search-tree':
+        specifier: ^5.3.2
+        version: 5.3.2
       '@emotion/react':
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.3.3)(react@18.3.1)
@@ -322,6 +325,9 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+
+  '@datastructures-js/binary-search-tree@5.3.2':
+    resolution: {integrity: sha512-8Y6SqH9wncY5HQMWbazjADyI5Sjop7VFVTPAcYoWWE8pHIVmAuS2CWCQ5wgwNEPUAnJMUz5idRTXmjtl5gwDCQ==}
 
   '@emotion/babel-plugin@11.11.0':
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
@@ -3358,6 +3364,8 @@ snapshots:
       to-fast-properties: 2.0.0
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@datastructures-js/binary-search-tree@5.3.2': {}
 
   '@emotion/babel-plugin@11.11.0':
     dependencies:
