@@ -6,6 +6,7 @@ import {
   StringOctaveNote,
 } from "@/app/data/notes";
 import { ChordWithPlayMetadata } from "@/app/engine/eventBus";
+import { IdGenerator } from "@/app/engine/eventIdGenerator";
 import { octaveNoteToStringOctaveNoteMap } from "@/app/engine/generateNeckRepresentation";
 
 export type NoteEvent = {
@@ -30,18 +31,16 @@ export class EventsByTick {
     this.eventsById = new Map<string, { tick: number; event: ChordOrNote }>();
   }
 
-  private generateId(value: NoteEvent | ChordWithPlayMetadata): string {
-    if ("note" in value) {
-      return `note-${value.trackNumber}-${getNoteText(
-        value.note.note
-      )}-${Date.now()}`;
-    } else {
-      return `chord-${value.chord}-${Date.now()}`;
-    }
+  private generateIdPrefix(value: NoteEvent | ChordWithPlayMetadata): string {
+    return "note" in value
+      ? `note-t${value.trackNumber}-${value.note.octave}-${getNoteText(
+          value.note.note
+        )}-${Date.now()}-`
+      : `chord-${value.chord}-`;
   }
 
   addEventAtTick(tick: number, value: NoteEvent | ChordWithPlayMetadata): void {
-    const id = this.generateId(value);
+    const id = IdGenerator.generate(this.generateIdPrefix(value));
     let chordOrNote: ChordOrNote;
 
     if ("note" in value) {
@@ -63,7 +62,7 @@ export class EventsByTick {
     const eventInfo = this.eventsById.get(id);
     if (!eventInfo) return false;
 
-    const { event } = eventInfo;
+    const { event, tick: oldTick } = eventInfo;
 
     // Change pitch for NoteEvent
     if (event.note) {
@@ -84,22 +83,25 @@ export class EventsByTick {
     }
 
     // Change position
-    if (newTick !== eventInfo.tick) {
-      const oldTick = eventInfo.tick;
+    if (newTick !== oldTick) {
       const oldEvents = this.events.get(oldTick);
       if (oldEvents) {
         const index = oldEvents.findIndex((e) => e.id === id);
         if (index !== -1) {
           const [removed] = oldEvents.splice(index, 1);
-          if (this.events.has(newTick)) {
-            this.events.get(newTick)?.push(removed);
-          } else {
-            this.events.set(newTick, [removed]);
+
+          // Ensure the event is added to the new tick
+          if (!this.events.has(newTick)) {
+            this.events.set(newTick, []);
           }
-          eventInfo.tick = newTick;
-        }
-        if (oldEvents.length === 0) {
-          this.events.delete(oldTick);
+          this.events.get(newTick)!.push(removed);
+
+          // Update eventsById
+          this.eventsById.set(id, { tick: newTick, event: removed });
+
+          if (oldEvents.length === 0) {
+            this.events.delete(oldTick);
+          }
         }
       }
     }
@@ -165,12 +167,18 @@ export class EventsByTick {
   static merge(...others: EventsByTick[]): EventsByTick {
     const merged = new EventsByTick();
     for (const other of others) {
+      // Merge events
       other.events.forEach((value, key) => {
         if (merged.events.has(key)) {
           merged.events.get(key)?.push(...value);
         } else {
           merged.events.set(key, [...value]);
         }
+      });
+
+      // Merge eventsById
+      other.eventsById.forEach((value, key) => {
+        merged.eventsById.set(key, { ...value });
       });
     }
     return merged;

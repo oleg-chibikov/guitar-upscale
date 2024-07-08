@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 
 const PianoRollContent: React.FC = () => {
   return (
-    <div className="bg-red-500 h-full w-full">
+    <div className="h-full w-full">
       <PianoRoll />
     </div>
   );

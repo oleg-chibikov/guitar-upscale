@@ -1,9 +1,9 @@
 export class IdGenerator {
   private static counter = 0;
 
-  static generate(): string {
+  static generate(prefix?: string): string {
     const timestamp = Date.now();
     const uniqueCounter = (++this.counter).toString().padStart(3, "0");
-    return `${timestamp}-${uniqueCounter}`;
+    return `${prefix}${timestamp}-${uniqueCounter}`;
   }
 }
