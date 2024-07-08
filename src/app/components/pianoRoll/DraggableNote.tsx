@@ -1,3 +1,4 @@
+import { useScaleContext } from "@/app/context/ScaleProvider";
 import { Note, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import {
   NOTE_HEIGHT,
@@ -15,7 +16,6 @@ interface DraggableNoteProps {
   height: number;
   isChord: boolean;
   onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
-  scalePattern: Set<Note>;
 }
 
 const calculateOctaveNote = (pitch: number): OctaveNote => {
@@ -49,11 +49,11 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   width,
   height,
   isChord,
-  scalePattern,
   onNoteMove,
 }) => {
   const noteRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const { scalePattern } = useScaleContext();
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
