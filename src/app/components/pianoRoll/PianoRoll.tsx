@@ -116,7 +116,11 @@ export const PianoRoll: React.FC<PianoRollProps> = ({
           height={TOTAL_HEIGHT}
           scalePattern={scalePattern}
         />
-        <PianoRollNotes notes={notes} onNoteMove={onNoteMove || (() => {})} />
+        <PianoRollNotes
+          notes={notes}
+          onNoteMove={onNoteMove || (() => {})}
+          scalePattern={scalePattern}
+        />
       </div>
     </div>
   );

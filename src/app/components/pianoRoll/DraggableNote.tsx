@@ -1,4 +1,4 @@
-import { NOTE_COUNT, OctaveNote } from "@/app/data/notes";
+import { Note, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import {
   NOTE_HEIGHT,
   PIXELS_PER_TICK,
@@ -15,12 +15,31 @@ interface DraggableNoteProps {
   height: number;
   isChord: boolean;
   onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
+  scalePattern: Set<Note>;
 }
 
 const calculateOctaveNote = (pitch: number): OctaveNote => {
   const octave = Math.floor(pitch / NOTE_COUNT);
   const note = pitch % NOTE_COUNT;
   return { octave, note };
+};
+
+const snapToScale = (pitch: number, scalePattern: Set<Note>): number => {
+  const octave = Math.floor(pitch / NOTE_COUNT);
+  const note = pitch % NOTE_COUNT;
+
+  let closestScaleNote = note;
+  let minDistance = NOTE_COUNT;
+
+  for (const scaleNote of Array.from(scalePattern)) {
+    const distance = Math.abs(scaleNote - note);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestScaleNote = scaleNote;
+    }
+  }
+
+  return octave * NOTE_COUNT + closestScaleNote;
 };
 
 export const DraggableNote: React.FC<DraggableNoteProps> = ({
@@ -30,6 +49,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   width,
   height,
   isChord,
+  scalePattern,
   onNoteMove,
 }) => {
   const noteRef = useRef<HTMLDivElement>(null);
@@ -51,13 +71,22 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
 
       // Snap to grid
       newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
-      newY = Math.round(newY / NOTE_HEIGHT) * NOTE_HEIGHT;
+
+      // Calculate the new pitch by inverting the y-axis
+      const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
+      let newPitch = totalNotes - 1 - Math.floor(newY / NOTE_HEIGHT);
+
+      // Snap to scale
+      newPitch = snapToScale(newPitch, scalePattern);
+
+      // Convert pitch back to y coordinate
+      newY = (totalNotes - 1 - newPitch) * NOTE_HEIGHT;
 
       noteRef.current.style.transform = `translate(${newX - x}px, ${
         newY - y
       }px)`;
     },
-    [x, y, width, height]
+    [x, y, width, height, scalePattern]
   );
 
   const handleMouseUp = useCallback(
@@ -68,17 +97,19 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       const dy = e.clientY - dragStartRef.current.y;
 
       let newX = x + dx;
-      let newY = y + dy;
+      const newY = y + dy;
 
       // Snap to grid
       newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
-      newY = Math.round(newY / NOTE_HEIGHT) * NOTE_HEIGHT;
 
       const newTick = Math.round(newX / PIXELS_PER_TICK);
 
       // Calculate the new pitch by inverting the y-axis
       const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
-      const newPitch = totalNotes - 1 - Math.floor(newY / NOTE_HEIGHT);
+      let newPitch = totalNotes - 1 - Math.floor(newY / NOTE_HEIGHT);
+
+      // Snap to scale
+      newPitch = snapToScale(newPitch, scalePattern);
 
       const octaveNote = calculateOctaveNote(newPitch);
       onNoteMove(noteId, newTick, octaveNote);
@@ -89,7 +120,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     },
-    [noteId, x, y, onNoteMove, handleMouseMove]
+    [noteId, x, y, onNoteMove, handleMouseMove, scalePattern]
   );
 
   const handleMouseDown = useCallback(

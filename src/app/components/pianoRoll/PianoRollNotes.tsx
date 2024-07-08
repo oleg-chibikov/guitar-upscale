@@ -1,6 +1,6 @@
 import { DraggableNote } from "@/app/components/pianoRoll/DraggableNote";
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
-import { OctaveNote } from "@/app/data/notes";
+import { Note, OctaveNote } from "@/app/data/notes";
 import {
   NOTE_HEIGHT,
   OCTAVE_COUNT,
@@ -13,11 +13,13 @@ import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 interface PianoRollNotesProps {
   notes: { tick: number; events: ChordOrNote[] }[];
   onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
+  scalePattern: Set<Note>;
 }
 
 export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
   notes,
   onNoteMove,
+  scalePattern,
 }) => {
   return (
     <>
@@ -50,6 +52,7 @@ export const PianoRollNotes: React.FC<PianoRollNotesProps> = ({
               height={NOTE_HEIGHT}
               isChord={isChord}
               onNoteMove={onNoteMove}
+              scalePattern={scalePattern}
             />
           );
         })
