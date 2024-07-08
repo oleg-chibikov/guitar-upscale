@@ -1,4 +1,3 @@
-import { PianoRollIconButton } from "@/app/components/pianoRoll/PianoRollButton";
 import { DownloadMidiButton } from "@/app/components/playPanel/DownloadMidiButton";
 import { MetronomeButton } from "@/app/components/playPanel/MetronomeButton";
 import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
@@ -34,7 +33,6 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
         <DisabledRecordButton />
       )}
-      <PianoRollIconButton />
     </Panel>
   );
 };

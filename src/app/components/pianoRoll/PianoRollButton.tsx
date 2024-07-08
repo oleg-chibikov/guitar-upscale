@@ -5,12 +5,12 @@ import PianoIcon from "@mui/icons-material/Piano"; // Or any other suitable icon
 import React from "react";
 import { useDispatch } from "react-redux";
 
-interface PianoRollIconButtonProps {
+interface PianoRollButtonProps {
   className?: string;
   id?: string;
 }
 
-export const PianoRollIconButton: React.FC<PianoRollIconButtonProps> = ({
+export const PianoRollButton: React.FC<PianoRollButtonProps> = ({
   className,
   id,
 }) => {
