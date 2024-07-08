@@ -4,7 +4,9 @@ import { PianoRollNotes } from "./PianoRollNotes";
 import { OctaveNote, PitchAxis } from "./PitchAxis";
 import { Timeline } from "./Timeline";
 
+import { Note } from "@/app/data/notes";
 import {
+  OCTAVE_COUNT,
   PIXELS_PER_TICK,
   TOTAL_HEIGHT,
   TOTAL_WIDTH,
@@ -16,14 +18,20 @@ import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 interface PianoRollProps {
   notes: { tick: number; events: ChordOrNote[] }[];
   onNoteMove?: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
+  scalePattern: Set<Note>;
 }
 
-export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
+export const PianoRoll: React.FC<PianoRollProps> = ({
+  notes,
+  onNoteMove,
+  scalePattern,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pitchAxisRef = useRef<HTMLCanvasElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // sticky headers
     const container = containerRef.current;
     if (!container) return;
 
@@ -41,6 +49,7 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
   }, []);
 
   useEffect(() => {
+    // scroll to the notes
     if (!containerRef.current) return;
 
     const container = containerRef.current;
@@ -72,7 +81,10 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
                   .chordBaseNote,
               }
             : event.note!.note;
-        const pitch = getPitchPosition(octaveNote);
+        const pitch = getPitchPosition({
+          note: octaveNote.note,
+          octave: OCTAVE_COUNT - octaveNote.octave - 1,
+        });
         minPitch = Math.min(minPitch, pitch);
         maxPitch = Math.max(maxPitch, pitch);
       });
@@ -99,7 +111,11 @@ export const PianoRoll: React.FC<PianoRollProps> = ({ notes, onNoteMove }) => {
           width={TOTAL_WIDTH}
           pixelsPerTick={PIXELS_PER_TICK}
         />
-        <PianoRollGrid width={TOTAL_WIDTH} height={TOTAL_HEIGHT} />
+        <PianoRollGrid
+          width={TOTAL_WIDTH}
+          height={TOTAL_HEIGHT}
+          scalePattern={scalePattern}
+        />
         <PianoRollNotes notes={notes} onNoteMove={onNoteMove || (() => {})} />
       </div>
     </div>

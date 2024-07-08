@@ -217,7 +217,7 @@ const onGuitarSettingsUpdate = (
     WithChordIsBeingDetected &
     WithScaleIsBeingDetected
 ) => {
-  const scalePattern = getScalePattern(state.scaleGroup, state.scale); // all scales include 0, so it's omitted from the scales themselves
+  const scalePattern = getScalePattern(state.scaleGroup, state.scale);
 
   const capo = state.capo;
   const neck = generateNeckRepresentation(

@@ -1,5 +1,5 @@
 import { BEATS_IN_BAR } from "@/app/data/clockConstants";
-import { isSharp } from "@/app/data/notes";
+import { isSharp, Note } from "@/app/data/notes";
 import {
   allNotes,
   BEAT_WIDTH,
@@ -13,11 +13,13 @@ import React, { useEffect, useRef } from "react";
 interface PianoRollGridProps {
   width: number;
   height: number;
+  scalePattern: Set<Note>;
 }
 
 export const PianoRollGrid: React.FC<PianoRollGridProps> = ({
   width,
   height,
+  scalePattern,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,22 +35,28 @@ export const PianoRollGrid: React.FC<PianoRollGridProps> = ({
 
     renderPianoRollBackground(ctx);
     renderGrid(ctx);
-  }, [width, height]);
+  }, [width, height, scalePattern]);
 
   const renderPianoRollBackground = (ctx: CanvasRenderingContext2D) => {
     octaves.forEach((octave) => {
       allNotes.forEach((note) => {
         const yPosition = getPitchPosition({ octave, note });
+        const isInScale = scalePattern.has(note);
 
-        ctx.fillStyle = isSharp(note) ? "#263238" : "#37474f"; // blue-grey-900 for white keys, blue-grey-800 for black keys
+        // Use different colors for in-scale and out-of-scale notes
+        if (isInScale) {
+          ctx.fillStyle = isSharp(note) ? "#263238" : "#37474f"; // blue-grey-900 for white keys, blue-grey-800 for black keys
+        } else {
+          ctx.fillStyle = "#546e7a"; // Darker shades for out-of-scale notes
+        }
         ctx.fillRect(0, yPosition, TOTAL_WIDTH, NOTE_HEIGHT);
 
         // Draw horizontal line
         ctx.beginPath();
         ctx.moveTo(0, yPosition);
         ctx.lineTo(TOTAL_WIDTH, yPosition);
-        // ctx.strokeStyle = "#546e7a"; // blue-grey-600
-        //ctx.stroke();
+        // ctx.strokeStyle = "#546e7a";
+        // ctx.stroke();
       });
     });
   };

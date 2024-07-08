@@ -75,7 +75,10 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       newY = Math.round(newY / NOTE_HEIGHT) * NOTE_HEIGHT;
 
       const newTick = Math.round(newX / PIXELS_PER_TICK);
-      const newPitch = Math.round(newY / NOTE_HEIGHT);
+
+      // Calculate the new pitch by inverting the y-axis
+      const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
+      const newPitch = totalNotes - 1 - Math.floor(newY / NOTE_HEIGHT);
 
       const octaveNote = calculateOctaveNote(newPitch);
       onNoteMove(noteId, newTick, octaveNote);

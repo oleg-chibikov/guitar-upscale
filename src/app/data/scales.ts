@@ -1,3 +1,6 @@
+import { getShiftedNote } from "@/app/data/tunings";
+import { tuningValue } from "@/app/store/settingsSlice";
+
 export type Scale = number[];
 
 // examples follow these rules:
@@ -143,8 +146,19 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
   ],
 ]);
 
-export const getScalePattern = (scaleGroup: string, scale: string) => {
-  const scaleNotesWithoutZero = scalesMap.get(scaleGroup)!.get(scale);
-  const scalePattern = new Set(scaleNotesWithoutZero?.concat([0])); // all scales include 0, so it's omitted from the scales themselves
-  return scalePattern;
+export const getScalePattern = (
+  scaleGroup: string,
+  scale: string,
+  useShiftedNotes: boolean = false
+) => {
+  let scaleNotesWithoutZero = scalesMap
+    .get(scaleGroup)
+    ?.get(scale)
+    ?.concat([0]);
+  if (useShiftedNotes) {
+    scaleNotesWithoutZero = scaleNotesWithoutZero?.map((note) =>
+      getShiftedNote(note, tuningValue)
+    );
+  }
+  return new Set(scaleNotesWithoutZero);
 };
