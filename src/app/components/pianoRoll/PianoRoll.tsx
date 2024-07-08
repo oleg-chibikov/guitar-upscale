@@ -56,7 +56,7 @@ export const PianoRoll: React.FC = () => {
   const pitchAxisRef = useRef<HTMLCanvasElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
-  const { notes } = usePianoRoll();
+  const { notes, loaded, setLoaded } = usePianoRoll();
 
   useEffect(() => {
     // sticky headers
@@ -78,7 +78,9 @@ export const PianoRoll: React.FC = () => {
 
   useEffect(() => {
     // scroll to the notes
-    if (!containerRef.current) return;
+    if (loaded || !containerRef.current || !notes.length) {
+      return;
+    }
 
     const container = containerRef.current;
     const { x, y } = calculateNotesCenter(notes);
@@ -88,7 +90,8 @@ export const PianoRoll: React.FC = () => {
 
     container.scrollLeft = x - containerWidth / 2;
     container.scrollTop = y - containerHeight / 2;
-  }, [notes]);
+    setLoaded(true);
+  }, [loaded, notes, setLoaded]);
 
   return (
     <div

@@ -13,6 +13,8 @@ import React, {
 interface PianoRollContextType {
   notes: { tick: number; events: ChordOrNote[] }[];
   onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
+  loaded: boolean;
+  setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PianoRollContext = createContext<PianoRollContextType | undefined>(
@@ -37,11 +39,15 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const [notes, setNotes] = useState<{ tick: number; events: ChordOrNote[] }[]>(
     []
   );
+  const [loaded, setLoaded] = useState<boolean>(false);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
 
   useEffect(() => {
     if (pianoRollExpanded) {
       setNotes(pianoRollData?.items ?? []);
+    } else {
+      setLoaded(false); // Set loaded to false when pianoRollExpanded is false
+      // Nested component will set this value to true when it's loaded
     }
   }, [pianoRollExpanded]);
 
@@ -50,12 +56,15 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     newTick: number,
     newPitch: OctaveNote
   ) => {
-    pianoRollData?.changeEvent(noteId, newPitch, newTick);
-    setNotes(pianoRollData?.items ?? []);
+    const updated =
+      pianoRollData?.changeEvent(noteId, newPitch, newTick) ?? false;
+    if (updated) {
+      setNotes(pianoRollData?.items ?? []);
+    }
   };
 
   return (
-    <PianoRollContext.Provider value={{ notes, onNoteMove }}>
+    <PianoRollContext.Provider value={{ notes, onNoteMove, loaded, setLoaded }}>
       {children}
     </PianoRollContext.Provider>
   );

@@ -109,7 +109,7 @@ export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
       };
 
       drawPitchAxis();
-    }, [ref, octaves, showNoteLabels, pressedNotes]);
+    }, [ref, showNoteLabels, pressedNotes]);
 
     const getClickedNote = (x: number, y: number): OctaveNote | null => {
       const octaveIndex = Math.floor(y / (NOTE_COUNT * NOTE_HEIGHT));
