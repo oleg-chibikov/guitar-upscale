@@ -121,9 +121,9 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       const newY = y + dy;
 
       // Snap to grid using the new snapToGrid function
-      const newTick = snapToGrid(
-        Math.round(newX / PIXELS_PER_TICK),
-        pianoRollSnap
+      const newTick = Math.max(
+        0,
+        snapToGrid(Math.round(newX / PIXELS_PER_TICK), pianoRollSnap)
       );
 
       // Calculate the new pitch by inverting the y-axis
