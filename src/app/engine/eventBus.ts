@@ -1,6 +1,11 @@
+import { ChordMode } from "@/app/data/chordModes";
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
-import { StringOctaveNote, serializeStringOctaveNote } from "../data/notes";
+import {
+  OctaveNote,
+  StringOctaveNote,
+  serializeStringOctaveNote,
+} from "../data/notes";
 import { chordInstrumentValue, instrumentValue } from "../store/settingsSlice";
 import { currentlyRecordingLooperChannel } from "./looper/looperShared";
 import { playNote } from "./sound/soundProvider";
@@ -29,11 +34,16 @@ export type NoteMetadata = TrackMetadata &
     looperChannel?: number;
   };
 
+export type ChordClearMetadata = {
+  clear: boolean;
+};
+
 export type ChordMetadata = TrackMetadata & {
   notesToPlay?: number;
   strummingDelayMs?: number;
-  clear?: boolean;
   looperChannel?: number;
+  chordMode?: ChordMode;
+  octaveNote?: OctaveNote;
 };
 
 export type ChordWithPlayMetadata = {
@@ -58,8 +68,8 @@ export const NoteToFretMarkerEventMap: Map<
 
 export const ChordToChordButtonEventMap: Map<
   string,
-  (metadata: ChordMetadata) => void
-> = new Map<string, (metadata: ChordMetadata) => void>();
+  (metadata: ChordMetadata | ChordClearMetadata) => void
+> = new Map<string, (metadata: ChordMetadata | ChordClearMetadata) => void>();
 
 export const fretMarkersFromPreviousChord: Set<string> = new Set<string>();
 export let previousChord: string;

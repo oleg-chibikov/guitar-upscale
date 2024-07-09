@@ -50,9 +50,9 @@ class MidiPlayer {
 
       await waitForNextTick();
 
-      console.log(logPrefix + "Waiting for pause");
+      // console.log(logPrefix + "Waiting for pause");
       const afterPauseAction = await waitForPauseToBeReleased();
-      console.log(logPrefix + "After pause: " + afterPauseAction);
+      // console.log(logPrefix + "After pause: " + afterPauseAction);
 
       if (afterPauseAction === undefined) {
         const events = eventsByTick.getEvents(currentTick);

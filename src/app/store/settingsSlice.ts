@@ -165,6 +165,10 @@ const initialState: SettingsState = {
 export let neckValue: Neck | null = initialState.neck;
 export let stringCountValue: number = initialState.stringCount;
 export const chordsValue: ChordModeVariations[] = [];
+
+export const resetChordsValue = () => {
+  chordsValue.length = 0;
+};
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;

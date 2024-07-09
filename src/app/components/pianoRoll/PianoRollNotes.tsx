@@ -11,7 +11,7 @@ import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
 
 export const PianoRollNotes: React.FC = () => {
-  const { notes, onNoteMove } = usePianoRoll();
+  const { notes } = usePianoRoll();
   return (
     <>
       {notes.flatMap(({ tick, events }) =>
@@ -19,10 +19,16 @@ export const PianoRollNotes: React.FC = () => {
           const isChord = "chord" in event;
           let octaveNote: OctaveNote;
           if (isChord) {
-            const { chordBaseNote } = parseChordNoteAndAlterations(
-              event.chord!.chord
-            );
-            octaveNote = { octave: 5, note: chordBaseNote };
+            const note = event.chord!.metadata.octaveNote;
+            if (note) {
+              // if chord metadata contains the note information
+              octaveNote = note;
+            } else {
+              const { chordBaseNote } = parseChordNoteAndAlterations(
+                event.chord!.chord
+              );
+              octaveNote = { octave: 5, note: chordBaseNote };
+            }
           } else {
             octaveNote = event.note!.note;
           }
@@ -42,7 +48,6 @@ export const PianoRollNotes: React.FC = () => {
               width={duration}
               height={NOTE_HEIGHT}
               isChord={isChord}
-              onNoteMove={onNoteMove}
             />
           );
         })

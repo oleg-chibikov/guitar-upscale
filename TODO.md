@@ -26,9 +26,6 @@ For looper we'll need another dialog showing all the tracks. Alternatively we ca
 Draggging over the X-axis should change current playback position. Should we adjust globalCurrentTick? Note that when we go forwards/backwards we don't do that - probably we should!
 for chords - see what chords available for the new note. Prefer the same Mode, but if no - use the first available or better show a dialog to choose from available. also show it if not available on the current note
 Zoom in/out - gesture + buttons/selection mode
-write note/chord on events
-when editing while playing it should be reflected for the next note
-clicking events should play them
 apply all this stuff to looper
 show the vertical line at the current tick
 move event only in 1 direction by holding ctrl once you start moving it

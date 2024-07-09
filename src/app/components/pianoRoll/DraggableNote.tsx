@@ -1,3 +1,4 @@
+import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
 import { Note, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import {
@@ -8,7 +9,6 @@ import {
 } from "@/app/data/pianoRollConstants";
 import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
 import { playChordOrNote } from "@/app/engine/playerHelper";
-import { playNote } from "@/app/engine/sound/soundProvider";
 import React, { useCallback, useEffect, useRef } from "react";
 
 interface DraggableNoteProps {
@@ -18,7 +18,6 @@ interface DraggableNoteProps {
   width: number;
   height: number;
   isChord: boolean;
-  onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
 }
 
 const calculateOctaveNote = (pitch: number): OctaveNote => {
@@ -52,8 +51,8 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   width,
   height,
   isChord,
-  onNoteMove,
 }) => {
+  const { onEventMove } = usePianoRoll();
   const noteRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const { scalePattern } = useScaleContext();
@@ -107,7 +106,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       // Snap to grid
       newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
 
-      const newTick = Math.round(newX / PIXELS_PER_TICK);
+      const newTick = Math.max(Math.round(newX / PIXELS_PER_TICK), 0);
 
       // Calculate the new pitch by inverting the y-axis
       const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
@@ -117,9 +116,8 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       newPitch = snapToScale(newPitch, scalePattern);
 
       const octaveNote = calculateOctaveNote(newPitch);
-      onNoteMove(noteEvent.id, newTick, octaveNote);
 
-      void playNote(octaveNote);
+      onEventMove(noteEvent.id, newTick, octaveNote);
 
       noteRef.current.style.transform = "";
       dragStartRef.current = null;
@@ -127,7 +125,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     },
-    [noteEvent.id, x, y, onNoteMove, handleMouseMove, scalePattern]
+    [noteEvent, x, y, onEventMove, handleMouseMove, scalePattern]
   );
 
   const handleMouseDown = useCallback(

@@ -1,9 +1,7 @@
-export class IdGenerator {
-  private static counter = 0;
+import { v4 as uuidv4 } from "uuid";
 
+export class IdGenerator {
   static generate(prefix?: string): string {
-    const timestamp = Date.now();
-    const uniqueCounter = (++this.counter).toString().padStart(3, "0");
-    return `${prefix}${timestamp}-${uniqueCounter}`;
+    return `${prefix}${uuidv4()}`;
   }
 }

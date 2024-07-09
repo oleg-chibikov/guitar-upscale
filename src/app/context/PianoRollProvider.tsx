@@ -12,7 +12,11 @@ import React, {
 
 interface PianoRollContextType {
   notes: { tick: number; events: ChordOrNote[] }[];
-  onNoteMove: (noteId: string, newTick: number, newPitch: OctaveNote) => void;
+  onEventMove: (
+    eventId: string,
+    newTick: number,
+    updatedNote: OctaveNote
+  ) => void;
   loaded: boolean;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -52,20 +56,26 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }
   }, [pianoRollExpanded, showReplayTrigger]);
 
-  const onNoteMove = (
-    noteId: string,
+  const onEventMove = (
+    eventId: string,
     newTick: number,
-    newPitch: OctaveNote
+    updatedNote: OctaveNote
   ) => {
-    const updated =
-      pianoRollData?.changeEvent(noteId, newPitch, newTick) ?? false;
+    const data = pianoRollData;
+    if (!data) {
+      return;
+    }
+    const updated = data.changeEvent(eventId, updatedNote, newTick);
     if (updated) {
-      setNotes(pianoRollData?.items ?? []);
+      const items = pianoRollData?.items;
+      setNotes(items ?? []);
     }
   };
 
   return (
-    <PianoRollContext.Provider value={{ notes, onNoteMove, loaded, setLoaded }}>
+    <PianoRollContext.Provider
+      value={{ notes, onEventMove, loaded, setLoaded }}
+    >
       {children}
     </PianoRollContext.Provider>
   );
