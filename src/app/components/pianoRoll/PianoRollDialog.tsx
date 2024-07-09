@@ -31,7 +31,8 @@ export const PianoRollDialog: React.FC = () => {
       close={handleCloseDialog}
       id={PIANO_ROLL_DIALOG}
       headerText="Piano Roll"
-      className="h-screen"
+      className="h-screen pb-10"
+      noPadding
     >
       <ScaleProvider>
         <PianoRollProvider>
