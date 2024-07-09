@@ -1,5 +1,6 @@
+import { Note, NOTE_COUNT } from "@/app/data/notes";
 import { getShiftedNote } from "@/app/data/tunings";
-import { tuningValue } from "@/app/store/settingsSlice";
+import { capoValue, tuningValue } from "@/app/store/settingsSlice";
 
 export type Scale = number[];
 
@@ -151,14 +152,13 @@ export const getScalePattern = (
   scale: string,
   useShiftedNotes: boolean = false
 ) => {
-  let scaleNotesWithoutZero = scalesMap
-    .get(scaleGroup)
-    ?.get(scale)
-    ?.concat([0]);
+  let scaleNotes = scalesMap.get(scaleGroup)?.get(scale)?.concat([0]);
   if (useShiftedNotes) {
-    scaleNotesWithoutZero = scaleNotesWithoutZero?.map((note) =>
-      getShiftedNote(note, tuningValue)
-    );
+    scaleNotes = scaleNotes?.map(getShiftedNoteWithCapo);
   }
-  return new Set(scaleNotesWithoutZero);
+  return new Set(scaleNotes);
+};
+
+export const getShiftedNoteWithCapo = (note: Note) => {
+  return (getShiftedNote(note, tuningValue) + capoValue) % NOTE_COUNT;
 };

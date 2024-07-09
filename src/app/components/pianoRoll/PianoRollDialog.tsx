@@ -1,5 +1,6 @@
 import { PianoRoll } from "@/app/components/pianoRoll/PianoRoll";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
+import { BaseNoteProvider } from "@/app/context/BaseNoteProvider";
 import { PianoRollProvider } from "@/app/context/PianoRollProvider";
 import { ScaleProvider } from "@/app/context/ScaleProvider";
 import { PIANO_ROLL_DIALOG } from "@/app/data/elementIds";
@@ -35,9 +36,11 @@ export const PianoRollDialog: React.FC = () => {
       noPadding
     >
       <ScaleProvider>
-        <PianoRollProvider>
-          <PianoRollContent />
-        </PianoRollProvider>
+        <BaseNoteProvider>
+          <PianoRollProvider>
+            <PianoRollContent />
+          </PianoRollProvider>
+        </BaseNoteProvider>
       </ScaleProvider>
     </DialogWrapper>
   );

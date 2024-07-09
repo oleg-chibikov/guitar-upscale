@@ -1,4 +1,10 @@
-import { isSharp, Note, NOTE_COUNT } from "@/app/data/notes";
+import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
+import {
+  isSharp,
+  Note,
+  NOTE_COUNT,
+  serializeOctaveNote,
+} from "@/app/data/notes";
 import {
   allNotes,
   NOTE_HEIGHT,
@@ -27,10 +33,7 @@ const HEIGHT_AND_HALF = NOTE_HEIGHT * 1.5;
 export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
   ({ className, showNoteLabels = true }, ref) => {
     const [pressedNotes, setPressedNotes] = useState<Set<string>>(new Set());
-
-    const getNoteLabel = (note: Note, octave: number): string => {
-      return `${Note[note]}${octave}`;
-    };
+    const { baseNote } = useBaseNoteContext();
 
     const handleNotePress = (octaveNote: OctaveNote) => {
       const noteKey = `${Note[octaveNote.note]}${octaveNote.octave}`;
@@ -62,7 +65,9 @@ export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
               noteIndex * NOTE_HEIGHT;
             const noteKey = `${Note[note]}${octave}`;
 
-            if (isSharp(note)) {
+            const sharp = isSharp(note);
+
+            if (sharp) {
               // Draw sharp notes
               ctx.fillStyle = pressedNotes.has(noteKey) ? "#333333" : "#000000";
               ctx.fillRect(0, y, BLACK_WIDTH, NOTE_HEIGHT);
@@ -99,17 +104,22 @@ export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
               ctx.stroke();
             }
 
-            if (showNoteLabels && note === Note.C) {
-              ctx.fillStyle = "#666666";
-              ctx.font = "NOTE_COUNTpx Arial";
-              ctx.fillText(getNoteLabel(note, octave), 4, y + NOTE_HEIGHT - 4);
+            if (showNoteLabels) {
+              const isBaseNote = note === baseNote;
+              ctx.fillStyle = !isBaseNote ? "#999" : sharp ? "white" : "black";
+              ctx.font = (isBaseNote ? "bold 9px" : "7px") + " Arial";
+              ctx.fillText(
+                serializeOctaveNote({ note, octave }),
+                4,
+                y + NOTE_HEIGHT - 4
+              );
             }
           });
         });
       };
 
       drawPitchAxis();
-    }, [ref, showNoteLabels, pressedNotes]);
+    }, [ref, showNoteLabels, pressedNotes, baseNote]);
 
     const getClickedNote = (x: number, y: number): OctaveNote | null => {
       const octaveIndex = Math.floor(y / (NOTE_COUNT * NOTE_HEIGHT));

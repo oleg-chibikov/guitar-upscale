@@ -36,7 +36,7 @@ export const PianoRollNotes: React.FC = () => {
           return (
             <DraggableNote
               key={event.id}
-              noteId={event.id}
+              noteEvent={event}
               x={xPosition}
               y={yPosition}
               width={duration}

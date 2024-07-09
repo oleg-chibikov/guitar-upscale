@@ -6,10 +6,13 @@ import {
   TOTAL_HEIGHT,
   TOTAL_WIDTH,
 } from "@/app/data/pianoRollConstants";
+import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
+import { playChordOrNote } from "@/app/engine/playerHelper";
+import { playNote } from "@/app/engine/sound/soundProvider";
 import React, { useCallback, useEffect, useRef } from "react";
 
 interface DraggableNoteProps {
-  noteId: string;
+  noteEvent: ChordOrNote;
   x: number;
   y: number;
   width: number;
@@ -43,7 +46,7 @@ const snapToScale = (pitch: number, scalePattern: Set<Note>): number => {
 };
 
 export const DraggableNote: React.FC<DraggableNoteProps> = ({
-  noteId,
+  noteEvent,
   x,
   y,
   width,
@@ -91,7 +94,9 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
 
   const handleMouseUp = useCallback(
     (e: MouseEvent) => {
-      if (!dragStartRef.current || !noteRef.current) return;
+      if (!dragStartRef.current || !noteRef.current) {
+        return;
+      }
 
       const dx = e.clientX - dragStartRef.current.x;
       const dy = e.clientY - dragStartRef.current.y;
@@ -112,7 +117,9 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       newPitch = snapToScale(newPitch, scalePattern);
 
       const octaveNote = calculateOctaveNote(newPitch);
-      onNoteMove(noteId, newTick, octaveNote);
+      onNoteMove(noteEvent.id, newTick, octaveNote);
+
+      void playNote(octaveNote);
 
       noteRef.current.style.transform = "";
       dragStartRef.current = null;
@@ -120,17 +127,18 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     },
-    [noteId, x, y, onNoteMove, handleMouseMove, scalePattern]
+    [noteEvent.id, x, y, onNoteMove, handleMouseMove, scalePattern]
   );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      playChordOrNote(noteEvent);
       dragStartRef.current = { x: e.clientX, y: e.clientY };
 
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [handleMouseMove, handleMouseUp]
+    [handleMouseMove, handleMouseUp, noteEvent]
   );
 
   useEffect(() => {
@@ -143,16 +151,20 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   return (
     <div
       ref={noteRef}
-      className="absolute cursor-move"
+      className={`absolute flex items-center justify-start border cursor-move pl-1 ${
+        isChord ? "bg-blue-500" : "bg-green-500"
+      }`}
       style={{
         left: x,
         top: y,
         width,
         height,
-        backgroundColor: isChord ? "#3b82f6" : "#22c55e",
-        border: "1px solid #d1d5db",
       }}
       onMouseDown={handleMouseDown}
-    />
+    >
+      <span className="text-white text-xs">
+        {getChordOrNoteText(noteEvent)}
+      </span>
+    </div>
   );
 };

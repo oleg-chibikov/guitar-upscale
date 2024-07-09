@@ -23,6 +23,12 @@ export type ChordOrNote = {
   note?: NoteEvent;
   chord?: ChordWithPlayMetadata;
 };
+
+export const getChordOrNoteText = (event: ChordOrNote) =>
+  event.note?.note
+    ? serializeOctaveNote(event.note?.note)
+    : event.chord?.chord ?? "";
+
 export class EventsByTick {
   // to find next/prev events for the given ticks
   private eventsTree: AvlTree<{ tick: number; events: ChordOrNote[] }>;
