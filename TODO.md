@@ -30,3 +30,7 @@ write note/chord on events
 when editing while playing it should be reflected for the next note
 clicking events should play them
 apply all this stuff to looper
+show the vertical line at the current tick
+move event only in 1 direction by holding ctrl once you start moving it
+choose snap
+quantize events

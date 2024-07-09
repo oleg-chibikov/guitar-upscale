@@ -10,12 +10,14 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
 
   return (
     <div
       className={`flex flex-row gap-1 fixed bottom-1 items-end ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}
+      style={pianoRollExpanded ? { zIndex: 9999999 } : undefined} // should be displayed over the dialog
     >
       <PlayPanel premiumComponents={premiumComponents} />
       {premiumComponents.get("looper") as ReactNode}

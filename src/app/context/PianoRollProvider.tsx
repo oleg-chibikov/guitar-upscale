@@ -1,7 +1,7 @@
 import { OctaveNote } from "@/app/data/notes";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
 import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
-import { useUiSelector } from "@/app/hooks/storeHooks";
+import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import React, {
   createContext,
   ReactNode,
@@ -41,6 +41,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   );
   const [loaded, setLoaded] = useState<boolean>(false);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
+  const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
 
   useEffect(() => {
     if (pianoRollExpanded) {
@@ -49,7 +50,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       setLoaded(false); // Set loaded to false when pianoRollExpanded is false
       // Nested component will set this value to true when it's loaded
     }
-  }, [pianoRollExpanded]);
+  }, [pianoRollExpanded, showReplayTrigger]);
 
   const onNoteMove = (
     noteId: string,
