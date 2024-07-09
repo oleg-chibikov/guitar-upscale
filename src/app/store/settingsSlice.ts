@@ -340,7 +340,7 @@ export const tryToggleInterval = (toggle: boolean) => {
     }
   } else {
     // stopping clock if nothing is playing
-    if (!isAnyTimerSpecificActivityRunning()) {
+    if (isMainClockActiveValue && !isAnyTimerSpecificActivityRunning()) {
       console.log("Nothing playing - stopping clock");
       stopInterval(true);
     }
@@ -450,7 +450,7 @@ export const settingsSlice = createSlice({
       state.tempoBpm = newValue;
       tempoBpmValue = newValue;
 
-      if (action.payload.updateInterval) {
+      if (action.payload.updateInterval && isMainClockActiveValue) {
         stopInterval(false);
         startInterval(false); // afresh is set to false to maintain current beat/bar position
       }
