@@ -235,10 +235,13 @@ export class EventsByTick {
 
     // Add to new position
     if (this.eventsMap.has(newTick)) {
-      this.eventsMap.get(newTick)!.push(event);
-      const node = this.eventsTree.findKey(newTick);
-      if (node) {
-        node.getValue().events.push(event);
+      const existingEvents = this.eventsMap.get(newTick)!;
+      if (!existingEvents.some((e) => e.id === eventId)) {
+        existingEvents.push(event);
+        const node = this.eventsTree.findKey(newTick);
+        if (node) {
+          node.getValue().events = existingEvents;
+        }
       }
     } else {
       this.eventsMap.set(newTick, [event]);
