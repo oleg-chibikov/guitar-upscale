@@ -20,10 +20,14 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
       style={pianoRollExpanded ? { zIndex: 9999999 } : undefined} // should be displayed over the dialog
     >
       <PlayPanel premiumComponents={premiumComponents} />
-      {premiumComponents.get("looper") as ReactNode}
-      <Panel>
-        <AspectRatioButton />
-      </Panel>
+      {!pianoRollExpanded && (
+        <>
+          {premiumComponents.get("looper") as ReactNode}
+          <Panel>
+            <AspectRatioButton />
+          </Panel>
+        </>
+      )}
     </div>
   );
 };
