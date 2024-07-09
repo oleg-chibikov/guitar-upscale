@@ -5,10 +5,12 @@ import { PersistedState, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./authSlice";
+import pianoRollReducer from "./pianoRollSlice";
 import settingsReducer from "./settingsSlice";
 import uiReducer from "./uiSlice";
 
 const rootReducer = combineReducers({
+  pianoRoll: pianoRollReducer,
   settings: settingsReducer,
   ui: uiReducer,
   auth: authReducer,

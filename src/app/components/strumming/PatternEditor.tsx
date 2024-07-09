@@ -62,7 +62,7 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
           enumObj={TimeSignature}
           selectedValue={currentPattern.timeSignature}
           onValueChange={handleTimeSignatureChange}
-          customLabel={(key, value) => value}
+          customLabel={(_key, value) => value}
         />
         <Typography>of a bar</Typography>
       </div>

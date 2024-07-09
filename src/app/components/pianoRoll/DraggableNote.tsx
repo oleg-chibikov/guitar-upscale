@@ -1,5 +1,9 @@
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
+import {
+  getTicksForTimeSignature,
+  TimeSignature,
+} from "@/app/data/clockConstants";
 import { Note, NOTE_COUNT, OctaveNote } from "@/app/data/notes";
 import {
   NOTE_HEIGHT,
@@ -9,6 +13,7 @@ import {
 } from "@/app/data/pianoRollConstants";
 import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
 import { playChordOrNote } from "@/app/engine/playerHelper";
+import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import React, { useCallback, useEffect, useRef } from "react";
 
 interface DraggableNoteProps {
@@ -44,6 +49,11 @@ const snapToScale = (pitch: number, scalePattern: Set<Note>): number => {
   return octave * NOTE_COUNT + closestScaleNote;
 };
 
+const snapToGrid = (tick: number, pianoRollSnap: TimeSignature): number => {
+  const snapTicks = getTicksForTimeSignature(pianoRollSnap);
+  return Math.round(tick / snapTicks) * snapTicks;
+};
+
 export const DraggableNote: React.FC<DraggableNoteProps> = ({
   noteEvent,
   x,
@@ -53,13 +63,16 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
   isChord,
 }) => {
   const { onEventMove } = usePianoRoll();
+  const pianoRollSnap = usePianoRollSelector((s) => s.pianoRollSnap);
   const noteRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const { scalePattern } = useScaleContext();
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!dragStartRef.current || !noteRef.current) return;
+      if (!dragStartRef.current || !noteRef.current) {
+        return;
+      }
 
       const dx = e.clientX - dragStartRef.current.x;
       const dy = e.clientY - dragStartRef.current.y;
@@ -71,8 +84,12 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       newX = Math.max(0, Math.min(newX, TOTAL_WIDTH - width));
       newY = Math.max(0, Math.min(newY, TOTAL_HEIGHT - height));
 
-      // Snap to grid
-      newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
+      // Snap to grid using the new snapToGrid function
+      const newTick = snapToGrid(
+        Math.round(newX / PIXELS_PER_TICK),
+        pianoRollSnap
+      );
+      newX = newTick * PIXELS_PER_TICK;
 
       // Calculate the new pitch by inverting the y-axis
       const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
@@ -88,7 +105,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
         newY - y
       }px)`;
     },
-    [x, y, width, height, scalePattern]
+    [x, y, width, height, scalePattern, pianoRollSnap]
   );
 
   const handleMouseUp = useCallback(
@@ -100,13 +117,14 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       const dx = e.clientX - dragStartRef.current.x;
       const dy = e.clientY - dragStartRef.current.y;
 
-      let newX = x + dx;
+      const newX = x + dx;
       const newY = y + dy;
 
-      // Snap to grid
-      newX = Math.round(newX / PIXELS_PER_TICK) * PIXELS_PER_TICK;
-
-      const newTick = Math.max(Math.round(newX / PIXELS_PER_TICK), 0);
+      // Snap to grid using the new snapToGrid function
+      const newTick = snapToGrid(
+        Math.round(newX / PIXELS_PER_TICK),
+        pianoRollSnap
+      );
 
       // Calculate the new pitch by inverting the y-axis
       const totalNotes = Math.floor(TOTAL_HEIGHT / NOTE_HEIGHT);
@@ -125,7 +143,7 @@ export const DraggableNote: React.FC<DraggableNoteProps> = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     },
-    [noteEvent, x, y, onEventMove, handleMouseMove, scalePattern]
+    [noteEvent, x, y, onEventMove, handleMouseMove, scalePattern, pianoRollSnap]
   );
 
   const handleMouseDown = useCallback(

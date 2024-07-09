@@ -7,6 +7,12 @@ export const useSettingsSelector = <T>(
   return useSelector((state: RootState) => selector(state.settings));
 };
 
+export const usePianoRollSelector = <T>(
+  selector: (state: RootState["pianoRoll"]) => T
+): T => {
+  return useSelector((state: RootState) => selector(state.pianoRoll));
+};
+
 export const useUiSelector = <T>(
   selector: (state: RootState["ui"]) => T
 ): T => {
