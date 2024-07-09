@@ -28,5 +28,6 @@ Zoom in/out - gesture + buttons/selection mode
 apply all this stuff to looper
 show the vertical line at the current tick
 move event only in 1 direction by holding ctrl once you start moving it
-choose snap
 quantize events
+
+BUG: reset playback then change scale then play - all the notes are played at once
