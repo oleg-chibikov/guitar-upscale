@@ -51,7 +51,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <StrummingSettingsWrapper />
           <BottomZone premiumComponents={premiumComponents} />
           <AspectRatioModalWrapper />
-          <PianoRollDialogWrapper premiumComponents={premiumComponents} />
+          <PianoRollDialogWrapper />
         </main>
       )}
     </>
