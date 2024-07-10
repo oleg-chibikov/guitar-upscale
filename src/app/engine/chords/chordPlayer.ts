@@ -3,6 +3,7 @@ import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { Chord, Note, StringOctaveNote } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
 import {
+  capoValue,
   chordNotesToPlayValue,
   neckValue,
   slashChordBassNoteValue,
@@ -18,37 +19,6 @@ export type ChordPlayParameters = ChordMetadata & {
 };
 
 const chordRoundRobinMap = new Map<string, number>();
-
-const selectRandomVariation = (variations: ChordVariations) => {
-  const randomIndex = Math.floor(Math.random() * variations.length);
-  return variations[randomIndex];
-};
-
-const playVariation = async (
-  variation: Chord,
-  variationKey: string,
-  { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
-) => {
-  const noteCount = notesToPlay ?? chordNotesToPlayValue;
-  let i = 0;
-  console.log(`Playing ${variationKey} variation of ${chordName}`);
-  const variationNotes = variation.filter((x) => x) as StringOctaveNote[];
-  replaceBassNoteWithSlash(variationNotes);
-  const toPlay = reverse ? variationNotes.reverse() : variationNotes;
-  for (const stringOctaveNote of toPlay) {
-    NotePlayEventBus.next({
-      ...rest, // track metadata and strumming metadata
-      stringOctaveNote,
-      fromChord: true,
-    });
-    if (++i >= noteCount) {
-      break;
-    }
-    if (delayMs !== undefined && delayMs > 0) {
-      await sleep(delayMs);
-    }
-  }
-};
 
 export const playRandomChordVariation = async (params: ChordPlayParameters) => {
   if (!params.variations.length) {
@@ -135,6 +105,37 @@ export const playRoundRobin = async (params: ChordPlayParameters) => {
   chordRoundRobinMap.set(params.chordName, currentVariation);
 };
 
+const selectRandomVariation = (variations: ChordVariations) => {
+  const randomIndex = Math.floor(Math.random() * variations.length);
+  return variations[randomIndex];
+};
+
+const playVariation = async (
+  variation: Chord,
+  variationKey: string,
+  { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
+) => {
+  const noteCount = notesToPlay ?? chordNotesToPlayValue;
+  let i = 0;
+  console.log(`Playing ${variationKey} variation of ${chordName}`);
+  const variationNotes = variation.filter((x) => x) as StringOctaveNote[];
+  replaceBassNoteWithSlash(variationNotes);
+  const toPlay = reverse ? variationNotes.reverse() : variationNotes;
+  for (const stringOctaveNote of toPlay) {
+    NotePlayEventBus.next({
+      ...rest, // track metadata and strumming metadata
+      stringOctaveNote,
+      fromChord: true,
+    });
+    if (++i >= noteCount) {
+      break;
+    }
+    if (delayMs !== undefined && delayMs > 0) {
+      await sleep(delayMs);
+    }
+  }
+};
+
 // it goes simultaneously to the right and left from the source note and stops when the targetNote is found
 const findClosestNote = (
   stringNotes: (StringOctaveNote | null)[],
@@ -173,17 +174,58 @@ const findClosestNote = (
 
   return null;
 };
-function replaceBassNoteWithSlash(variationNotes: StringOctaveNote[]) {
+
+const replaceBassNoteWithSlash = (variationNotes: StringOctaveNote[]) => {
   const bassNote = variationNotes[variationNotes.length - 1];
   const slashNote = slashChordBassNoteValue;
   if (slashNote !== undefined && neckValue) {
-    const slashBassNote = findClosestNote(
-      neckValue[bassNote.string],
-      bassNote,
-      slashNote
-    );
-    if (slashBassNote) {
-      variationNotes[variationNotes.length - 1] = slashBassNote;
+    let closestSlashBassNote: StringOctaveNote | null = null;
+    let minDistance = Infinity;
+
+    // Search on the current string and lower strings
+    for (
+      let stringIndex = bassNote.string;
+      stringIndex < neckValue.length;
+      stringIndex++
+    ) {
+      const stringNotes = neckValue[stringIndex];
+
+      // Check for "open" string (at capo position) first
+      const capoNote = stringNotes[capoValue];
+      if (
+        stringIndex > bassNote.string &&
+        capoNote &&
+        capoNote.note === slashNote
+      ) {
+        closestSlashBassNote = {
+          ...capoNote,
+          string: stringIndex,
+          fret: capoValue,
+        };
+        break; // Prefer "open" string (at capo position) on lower strings
+      }
+
+      const slashBassNote = findClosestNote(
+        stringNotes,
+        { ...bassNote, string: stringIndex },
+        slashNote
+      );
+
+      if (slashBassNote) {
+        const distance = Math.abs(slashBassNote.fret - bassNote.fret);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSlashBassNote = { ...slashBassNote, string: stringIndex };
+        }
+      }
+    }
+
+    if (closestSlashBassNote) {
+      // Remove the original bass note
+      variationNotes.pop();
+
+      // Add the new slash bass note
+      variationNotes.push(closestSlashBassNote);
     }
   }
-}
+};

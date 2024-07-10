@@ -26,10 +26,10 @@ type ChordBuilderInfo = {
   maxAllowedFretIndex?: number;
 };
 
+const MAX_DISTANCE_IN_CHORD = 4;
+
 class ChordsGenerator {
-  //private allSlashChords = new Map<string, UltimateSlashChordInfoVariation[]>();
   private capo = 0;
-  private MAX_DISTANCE_IN_CHORD = 4;
   private absoluteMaxFretIndex = 0;
   private neck: Neck = [];
 
@@ -170,11 +170,11 @@ class ChordsGenerator {
 
             // we can allow max MAX_DISTANCE_IN_CHORD frets in any direction. If we go left from the note on the next string - then the max limit should be recalculated from the leftmost position and vice versa for the right direction
             newMax = Math.min(
-              fret + this.MAX_DISTANCE_IN_CHORD,
+              fret + MAX_DISTANCE_IN_CHORD,
               maxAllowedFretIndex
             );
             newMin = Math.max(
-              fret - this.MAX_DISTANCE_IN_CHORD,
+              fret - MAX_DISTANCE_IN_CHORD,
               minAllowedFretIndex
             );
           }
@@ -209,14 +209,11 @@ class ChordsGenerator {
   };
 
   private getFretLimitsForTheFirstTime = (fretIndex: number) => {
-    const newMin = Math.max(
-      this.capo + 1,
-      fretIndex - this.MAX_DISTANCE_IN_CHORD
-    );
+    const newMin = Math.max(this.capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
 
     const newMax = Math.min(
       this.absoluteMaxFretIndex,
-      fretIndex + this.MAX_DISTANCE_IN_CHORD
+      fretIndex + MAX_DISTANCE_IN_CHORD
     );
     return { newMin, newMax };
   };

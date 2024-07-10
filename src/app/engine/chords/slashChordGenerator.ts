@@ -1,3 +1,4 @@
+import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
 import { Chord, StringOctaveNote } from "@/app/data/notes";
 import { FRET_COUNT, Neck } from "@/app/engine/generateNeckRepresentation";
 
@@ -5,7 +6,6 @@ export type SlashChord = {
   variation: Chord;
   bassNote: StringOctaveNote;
 };
-
 export function* getSlashChordsForVariation(
   chordVariation: Chord,
   neck: Neck,
@@ -15,24 +15,43 @@ export function* getSlashChordsForVariation(
   if (bassNoteStringIndex === -1) {
     return;
   }
-  const bassNoteString = neck[bassNoteStringIndex];
+
   const minAllowedFretIndex = capo + 1;
   const maxAllowedFretIndex = FRET_COUNT - 1;
 
-  // get the variation of chord with open string
-  const openStringNote = bassNoteString[capo];
-  if (openStringNote !== null) {
-    yield getSlashChord(chordVariation, openStringNote);
-  }
-
+  // Generate slash chords for all applicable strings below or equal to the current bass note string
   for (
-    let fretIndex = minAllowedFretIndex;
-    fretIndex <= maxAllowedFretIndex;
-    fretIndex++
+    let stringIndex = bassNoteStringIndex;
+    stringIndex <
+    Math.min(MAX_STRING_INDEX_FOR_CHORD_GENERATION + 1, neck.length);
+    stringIndex++
   ) {
-    const noteAtFret = bassNoteString[fretIndex];
-    if (noteAtFret !== null) {
-      yield getSlashChord(chordVariation, noteAtFret);
+    const bassNoteString = neck[stringIndex];
+    const removeBassNote = stringIndex !== bassNoteStringIndex;
+
+    // Create a new chord variation with the original bass note removed if necessary
+    const newChordVariation = removeBassNote
+      ? chordVariation.map((fret, index) =>
+          index === bassNoteStringIndex ? undefined : fret
+        )
+      : chordVariation;
+
+    // Get the variation of chord with open string
+    const openStringNote = bassNoteString[capo];
+    if (openStringNote !== null) {
+      yield getSlashChord(newChordVariation, openStringNote);
+    }
+
+    // Generate slash chords for fretted notes
+    for (
+      let fretIndex = minAllowedFretIndex;
+      fretIndex <= maxAllowedFretIndex;
+      fretIndex++
+    ) {
+      const noteAtFret = bassNoteString[fretIndex];
+      if (noteAtFret !== null) {
+        yield getSlashChord(newChordVariation, noteAtFret);
+      }
     }
   }
 }
