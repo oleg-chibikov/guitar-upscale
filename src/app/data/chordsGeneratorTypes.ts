@@ -2,6 +2,7 @@ import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
 import { Neck } from "@/app/engine/generateNeckRepresentation";
 
 export const MAX_STRING_INDEX_FOR_CHORD_GENERATION = 5;
+export const MAX_DISTANCE_IN_CHORD = 4;
 
 export type GenerateChordsRequest = {
   neck: Neck;

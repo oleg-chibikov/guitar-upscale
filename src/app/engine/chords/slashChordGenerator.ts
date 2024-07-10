@@ -1,11 +1,13 @@
 import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
 import { Chord, StringOctaveNote } from "@/app/data/notes";
-import { FRET_COUNT, Neck } from "@/app/engine/generateNeckRepresentation";
+import { Neck } from "@/app/engine/generateNeckRepresentation";
+import { getPossibleFretRangeForChord } from "@/app/helpers/slashChordHelper";
 
 export type SlashChord = {
   variation: Chord;
   bassNote: StringOctaveNote;
 };
+
 export function* getSlashChordsForVariation(
   chordVariation: Chord,
   neck: Neck,
@@ -16,8 +18,9 @@ export function* getSlashChordsForVariation(
     return;
   }
 
-  const minAllowedFretIndex = capo + 1;
-  const maxAllowedFretIndex = FRET_COUNT - 1;
+  // Find the minimum and maximum frets in the original chord variation
+  const { minAllowedFretIndex, maxAllowedFretIndex } =
+    getPossibleFretRangeForChord(chordVariation, capo);
 
   // Generate slash chords for all applicable strings below or equal to the current bass note string
   for (

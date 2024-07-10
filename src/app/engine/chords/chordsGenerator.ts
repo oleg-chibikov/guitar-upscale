@@ -6,6 +6,7 @@ import {
 import {
   GenerateChordsCallbackMessage,
   GenerateChordsRequest,
+  MAX_DISTANCE_IN_CHORD,
   MAX_STRING_INDEX_FOR_CHORD_GENERATION,
 } from "@/app/data/chordsGeneratorTypes";
 import {
@@ -25,8 +26,6 @@ type ChordBuilderInfo = {
   minAllowedFretIndex?: number;
   maxAllowedFretIndex?: number;
 };
-
-const MAX_DISTANCE_IN_CHORD = 4;
 
 class ChordsGenerator {
   private capo = 0;
