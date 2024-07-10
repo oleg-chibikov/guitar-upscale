@@ -1,3 +1,4 @@
+import { PianoRollButton } from "@/app/components/pianoRoll/PianoRollButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
@@ -64,6 +65,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
             : "justify-start"
         }`}
       >
+        <PianoRollButton />
         <OpenStrummingSettingsButton />
         {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
           <DisabledDetectScaleButton />

@@ -9,7 +9,7 @@ import {
 } from "@/app/engine/looper/looper";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
-import { isLooperPlaying } from "@/app/engine/looper/looperShared";
+import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -48,7 +48,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
       setPlayingInLooperChannel(channel, true);
       startMetronomeIfNeeded(dispatch);
 
-      if (!isLooperPlaying()) {
+      if (!checkLooperPlaying()) {
         // Stop any other playback when looper starts
         const { stopPlayback } = await import("@/app/engine/midiPlayer");
         await stopPlayback(dispatch, "Looper button");

@@ -29,6 +29,7 @@ interface UiState {
   strummingSettingsExpanded: boolean;
   strummingPatternEditorExpanded: boolean;
   slashChordsExpanded: boolean;
+  pianoRollExpanded: boolean;
   showAlert: boolean;
   alertType: AlertType;
   alertTimeout: number;
@@ -54,6 +55,7 @@ const initialState: UiState = {
   strummingSettingsExpanded: false,
   strummingPatternEditorExpanded: false,
   slashChordsExpanded: false,
+  pianoRollExpanded: false,
   showAlert: false,
   alertTimeout: 2000,
   alertType: AlertType.Neutral,
@@ -131,6 +133,9 @@ export const uiSlice = createSlice({
     },
     setSlashChordsExpanded(state, action: PayloadAction<boolean>) {
       state.slashChordsExpanded = action.payload;
+    },
+    setPianoRollExpanded(state, action: PayloadAction<boolean>) {
+      state.pianoRollExpanded = action.payload;
     },
     setAndShowAlert(
       state,
@@ -229,6 +234,7 @@ export const {
   setStrummingSettingsExpanded,
   setStrummingPatternEditorExpanded,
   setSlashChordsExpanded,
+  setPianoRollExpanded,
   setAndShowAlert,
   hideAlert,
   setSuggestedScales,

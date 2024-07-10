@@ -1,10 +1,16 @@
 import { HALF_BEATS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { isLooperPlaying } from "@/app/engine/looper/looperShared";
+import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
+import {
+  pianoRollData,
+  setPianoRollData,
+} from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { usePianoRollData } from "@/app/hooks/usePianoRollData";
+import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
+import { UnknownAction } from "redux";
 import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
@@ -43,7 +49,19 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
     (s) => s.guitarSettingsUpdateCount
   );
+  const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
+  const isPlaying = useSettingsSelector((s) => s.isPlaying);
+  const isPaused = useSettingsSelector((s) => s.isPaused);
+  const dataToPlay = usePianoRollData();
   const [isWaiting, setIsWaiting] = useState(false);
+
+  const isReplay = !(
+    isPlaying ||
+    isLooperPlaying ||
+    isPaused ||
+    dataToPlay === undefined
+  );
+
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
   const isWaitingRef = useRef<boolean>(false);
 
@@ -62,52 +80,31 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       );
       return;
     }
-    console.log(LOG_PREFIX, "Loading examples");
     updateWaiting(true);
     try {
       if (isPlayingValue) {
-        if (isLooperPlaying()) {
-          console.log(LOG_PREFIX + "Stopping looper playback");
-          const { stopLooperPlayback } = await import(
-            "@/app/engine/looper/looper"
-          );
-          stopLooperPlayback();
+        if (checkLooperPlaying()) {
+          await continueLooper();
           return;
         }
 
-        const { stopPlayback } = await import("@/app/engine/midiPlayer");
-        await stopPlayback(dispatch, LOG_PREFIX);
+        await stop(dispatch);
         return;
       }
 
-      let example: Example | undefined;
-      if (decodeExample && playbackTypeValue === melodyType) {
-        const { getRandomScaleExample, wipeExamplesCache } = await import(
-          "@/app/data/scaleExamples"
-        );
-        if (wipeExampleCacheTriggerValue) {
-          wipeExamplesCache();
-          clearWipeExampleCacheTrigger();
-        }
-        example = await getRandomScaleExample();
-        const tempo = example?.tempo;
-        if (tempo !== undefined && tempo !== tempoBpmValue) {
-          dispatch(setTempoBpm({ tempo: tempo, updateInterval: true }));
-        }
-      } else {
-        await import("@/app/engine/decoders/scaleDecoder");
+      if (pianoRollData) {
+        updateWaiting(false);
+        await replay(dispatch, pianoRollData);
+        return;
       }
 
-      // the instrument should be initialized before waiting for the first note
-      // init metronome here as we don't want to get glitches if it gets turned on during playing
-      const trackInstrumentPromises =
-        example?.tracks.map((track) =>
-          track.instrument !== undefined
-            ? loadInstrument(track.instrument, reverbStrengthValue)
-            : Promise.resolve()
-        ) ?? [];
+      console.log(LOG_PREFIX, "Loading examples");
+      const example: Example | undefined = await loadExample(
+        decodeExample,
+        dispatch
+      );
 
-      await Promise.all(trackInstrumentPromises);
+      await loadInstruments(example);
 
       const {
         eventsByTick,
@@ -121,26 +118,13 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         return;
       }
 
-      // Start playback
-      console.log(LOG_PREFIX + "Waiting for playback to start...");
-      await waitForStart(example);
-      console.log(LOG_PREFIX + "Start playing");
-      ReactGA.event({
-        category: "Playback",
-        action: "Playback started",
-      });
-
-      dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
-
-      const { playMidi } = await import("@/app/engine/midiPlayer");
-      await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
-        // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
-        console.log(
-          LOG_PREFIX + "The playback has started. Removing the waiting mark"
-        );
-
-        updateWaiting(false);
-      });
+      await playExampleOrScale(
+        example,
+        dispatch,
+        message,
+        eventsByTick,
+        updateWaiting
+      );
     } finally {
       updateWaiting(false);
     }
@@ -149,6 +133,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   useEffect(() => {
     // stop playing when any of dependencies changes
     dispatch(setIsPlaying(false));
+    setPianoRollData(undefined, dispatch);
   }, [guitarSettingsUpdateCount, dispatch]);
 
   useEffect(() => {
@@ -168,8 +153,91 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     };
   }, [handlePlay]); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
 
-  return { isWaiting, handlePlay };
+  return { isWaiting, handlePlay, isPlaying, isReplay };
 };
+
+async function stop(dispatch: Dispatch<UnknownAction>) {
+  const { stopPlayback } = await import("@/app/engine/midiPlayer");
+  await stopPlayback(dispatch, LOG_PREFIX);
+}
+
+async function replay(dispatch: Dispatch<UnknownAction>, data: EventsByTick) {
+  console.log("Replaying");
+  const { playMidi } = await import("@/app/engine/midiPlayer");
+  await playMidi(dispatch, data, LOG_PREFIX);
+}
+
+async function continueLooper() {
+  console.log(LOG_PREFIX + "Stopping looper playback");
+  const { stopLooperPlayback } = await import("@/app/engine/looper/looper");
+  stopLooperPlayback();
+}
+
+async function playExampleOrScale(
+  example: Example | undefined,
+  dispatch: Dispatch<UnknownAction>,
+  message: string,
+  eventsByTick: EventsByTick,
+  updateWaiting: (value: boolean) => void
+) {
+  // Start playback
+  console.log(LOG_PREFIX + "Waiting for playback to start...");
+  await waitForStart(example);
+  console.log(LOG_PREFIX + "Start playing");
+  ReactGA.event({
+    category: "Playback",
+    action: "Playback started",
+  });
+
+  dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
+
+  const { playMidi } = await import("@/app/engine/midiPlayer");
+  await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
+    // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
+    console.log(
+      LOG_PREFIX + "The playback has started. Removing the waiting mark"
+    );
+
+    updateWaiting(false);
+  });
+}
+
+async function loadInstruments(example: Example | undefined) {
+  // the instrument should be initialized before waiting for the first note
+  // init metronome here as we don't want to get glitches if it gets turned on during playing
+  const trackInstrumentPromises =
+    example?.tracks.map((track) =>
+      track.instrument !== undefined
+        ? loadInstrument(track.instrument, reverbStrengthValue)
+        : Promise.resolve()
+    ) ?? [];
+
+  await Promise.all(trackInstrumentPromises);
+}
+
+async function loadExample(
+  decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
+  dispatch: Dispatch<UnknownAction>
+) {
+  let example: Example | undefined;
+  if (decodeExample && playbackTypeValue === melodyType) {
+    const { getRandomScaleExample, wipeExamplesCache } = await import(
+      "@/app/data/scaleExamples"
+    );
+    if (wipeExampleCacheTriggerValue) {
+      wipeExamplesCache();
+      clearWipeExampleCacheTrigger();
+    }
+    example = await getRandomScaleExample();
+    const tempo = example?.tempo;
+    if (tempo !== undefined && tempo !== tempoBpmValue) {
+      dispatch(setTempoBpm({ tempo: tempo, updateInterval: true }));
+    }
+  } else {
+    await import("@/app/engine/decoders/scaleDecoder");
+  }
+  return example;
+}
 
 async function waitForStart(example: Example | undefined) {
   if (isMainClockActiveValue) {

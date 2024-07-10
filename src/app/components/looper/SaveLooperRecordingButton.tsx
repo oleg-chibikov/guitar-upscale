@@ -23,7 +23,7 @@ export const SaveLooperRecordingButton: React.FC<
         looperRecorder.addAllItemsToNoteRecorder(midiRecorder);
       });
 
-    await midiRecorder.stopRecording(true);
+    midiRecorder.stopRecording(true);
   };
 
   return (

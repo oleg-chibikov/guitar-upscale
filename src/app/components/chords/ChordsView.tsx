@@ -12,6 +12,10 @@ import {
   clearChordDetector,
 } from "@/app/engine/chords/chordLookupBuilder";
 import {
+  resetChordModesForNotes,
+  setChordModeForNotes,
+} from "@/app/engine/chords/chordModesByNote";
+import {
   chordNotesByName,
   setPreferredVariationsForChordMode,
 } from "@/app/engine/chords/chordNotesByName";
@@ -28,6 +32,7 @@ import {
   capoValue,
   chordsValue,
   neckValue,
+  resetChordsValue,
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
@@ -93,7 +98,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
       // chord detector needs these values to build slash chords
       chordDetectorWorkerApi.setNeckAndCapo(neckValue, capoValue);
       chordNotesByName.clear();
-      chordsValue.length = 0; // clear chordsValue;
+      resetChordModesForNotes();
+      resetChordsValue();
       setChordModeVariations([]);
       dispatch(setChordsAreLoading(true));
 
@@ -104,7 +110,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
           addChordMode(chordModeVariationsContainer.chordModeVariations);
           setPreferredVariationsForChordMode(chordModeVariationsContainer);
           setChordModeVariations([...chordsValue]);
-
+          setChordModeForNotes(chordModeVariationsContainer);
           addChordsToDetectorLookup?.(
             chordModeVariationsContainer.chordModeVariations
           );
@@ -176,6 +182,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
                   <ChordButton
                     key={title}
                     isHidden={isHidden}
+                    chordMode={chordMode.chordMode}
+                    note={noteIndex}
                     variations={chordMode.variationsByNote[noteIndex] ?? []}
                     chordName={title}
                     onStrummingStateChange={(value) => {

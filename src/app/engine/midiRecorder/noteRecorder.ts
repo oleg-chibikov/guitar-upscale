@@ -1,11 +1,5 @@
-import { Instrument } from "@/app/data/instruments";
-import { StringOctaveNote } from "@/app/data/notes";
+import { EventsByTick } from "@/app/engine/eventsByTick";
 
 export interface NoteRecorder {
-  addNoteAtTick(
-    note: StringOctaveNote,
-    trackNumber: number,
-    instrument: Instrument,
-    tick: number
-  ) : void;
+  addEvents(eventsByTick: EventsByTick): void;
 }

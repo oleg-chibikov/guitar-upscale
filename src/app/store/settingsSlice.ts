@@ -30,8 +30,8 @@ import {
   waitForNextHalfBeat,
 } from "../engine/clock/mainClock";
 import {
+  checkLooperPlaying,
   currentlyRecordingLooperChannel,
-  isLooperPlaying,
 } from "../engine/looper/looperShared";
 import { loadMetronome } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -114,6 +114,7 @@ interface SettingsState
   slashChordBassNote?: Note; // may be undefined
   chordDetectorAvailable?: boolean; // may be undefined
   scaleDetectorAvailable?: boolean; // may be undefined
+  showReplayTrigger: boolean;
 }
 
 const initialState: SettingsState = {
@@ -153,6 +154,7 @@ const initialState: SettingsState = {
   strummingPatternChangedTrigger: false,
   stringCount: 6,
   chordsAreLoading: false,
+  showReplayTrigger: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -163,6 +165,10 @@ const initialState: SettingsState = {
 export let neckValue: Neck | null = initialState.neck;
 export let stringCountValue: number = initialState.stringCount;
 export const chordsValue: ChordModeVariations[] = [];
+
+export const resetChordsValue = () => {
+  chordsValue.length = 0;
+};
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
@@ -215,7 +221,7 @@ const onGuitarSettingsUpdate = (
     WithChordIsBeingDetected &
     WithScaleIsBeingDetected
 ) => {
-  const scalePattern = getScalePattern(state.scaleGroup, state.scale); // all scales include 0, so it's omitted from the scales themselves
+  const scalePattern = getScalePattern(state.scaleGroup, state.scale);
 
   const capo = state.capo;
   const neck = generateNeckRepresentation(
@@ -252,7 +258,7 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
   isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||
-  isLooperPlaying();
+  checkLooperPlaying();
 
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
@@ -334,7 +340,7 @@ export const tryToggleInterval = (toggle: boolean) => {
     }
   } else {
     // stopping clock if nothing is playing
-    if (!isAnyTimerSpecificActivityRunning()) {
+    if (isMainClockActiveValue && !isAnyTimerSpecificActivityRunning()) {
       console.log("Nothing playing - stopping clock");
       stopInterval(true);
     }
@@ -444,7 +450,7 @@ export const settingsSlice = createSlice({
       state.tempoBpm = newValue;
       tempoBpmValue = newValue;
 
-      if (action.payload.updateInterval) {
+      if (action.payload.updateInterval && isMainClockActiveValue) {
         stopInterval(false);
         startInterval(false); // afresh is set to false to maintain current beat/bar position
       }
@@ -546,36 +552,10 @@ export const settingsSlice = createSlice({
       state.toggleMetronomeWhenRecording = action.payload;
       toggleMetronomeWhenRecordingValue = action.payload;
     },
-    setIsRecording(
-      state,
-      action: PayloadAction<{
-        value: boolean;
-        startRecording: () => void;
-        stopRecording: () => void;
-      }>
-    ) {
-      const value = action.payload.value;
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      const value = action.payload;
       state.isRecording = value;
       isRecordingValue = value;
-      tryToggleInterval(value);
-
-      const canTriggerMetronome =
-        toggleMetronomeWhenRecordingValue && isMetronomeActiveValue !== value;
-      if (value) {
-        action.payload.startRecording();
-        if (canTriggerMetronome) {
-          toggleMetronome(state, true);
-        }
-      } else {
-        action.payload.stopRecording();
-        if (
-          canTriggerMetronome &&
-          !isAnyTimerSpecificActivityBesidesMetronomeRunning()
-        ) {
-          // only stop metronome when there is no other playing activity
-          toggleMetronome(state, false);
-        }
-      }
     },
     triggerLooperStateUpdate(state) {
       state.looperStateUpdateTrigger = !state.looperStateUpdateTrigger;
@@ -609,6 +589,9 @@ export const settingsSlice = createSlice({
     },
     setScaleDetectorAvailable(state, action: PayloadAction<boolean>) {
       state.scaleDetectorAvailable = action.payload;
+    },
+    triggerShowReplay(state) {
+      state.showReplayTrigger = !state.showReplayTrigger;
     },
   },
 });
@@ -653,6 +636,7 @@ export const {
   setSlashChordBassNote,
   setChordDetectorAvailable,
   setScaleDetectorAvailable,
+  triggerShowReplay,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

@@ -13,6 +13,7 @@ interface DialogWrapperProps extends WithChildren, WithClassName, WithId {
   dialogClassName?: string;
   contentClassName?: string;
   darkBackdrop?: boolean;
+  noPadding?: boolean;
 }
 
 export const DialogWrapper: FC<DialogWrapperProps> = ({
@@ -26,6 +27,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
   dialogClassName,
   contentClassName,
   darkBackdrop = false,
+  noPadding = false,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -46,6 +48,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
       id={id}
       onClose={close}
       headerText={headerText}
+      hasPadding={!noPadding}
     >
       {children}
     </DialogContentWrapper>

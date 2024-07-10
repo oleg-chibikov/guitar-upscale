@@ -67,7 +67,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
         }
       }
 
-      result.addOrUpdateEvent(tickIndex * TICKS_IN_HALF_BEAT, {
+      result.addEventAtTick(tickIndex * TICKS_IN_HALF_BEAT, {
         trackNumber: 0,
         note,
       });

@@ -1,5 +1,6 @@
-import { ChordVariations } from "@/app/data/chordModes";
+import { ChordMode, ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
+import { Note } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import {
   ChordPlayParameters,
@@ -13,6 +14,7 @@ import {
 } from "@/app/engine/chords/chordPlayer";
 import { currentTick } from "@/app/engine/clock/mainClock";
 import {
+  ChordClearMetadata,
   ChordMetadata,
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
@@ -35,12 +37,16 @@ interface ChordButtonProps {
   variations: ChordVariations;
   isHidden: boolean;
   onStrummingStateChange: (value: boolean) => void;
+  chordMode: ChordMode;
+  note: Note;
 }
 
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   variations,
   isHidden,
+  chordMode,
+  note,
   onStrummingStateChange,
 }) => {
   const elementRef = useRef<HTMLUListElement>(null);
@@ -185,67 +191,77 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       }, 150);
     };
 
-    const handleChordEvent = async (metadata: ChordMetadata) => {
+    const handleChordEvent = async (
+      metadata: ChordMetadata | ChordClearMetadata
+    ) => {
       if (isDisabled) {
         return;
       }
 
-      if (metadata.clear === true) {
-        console.log("Clear previous chord marker: " + chordName);
-        wasPlayedLastRef.current = false;
-        toggleClasses();
+      if ((metadata as ChordClearMetadata).clear === true) {
+        processClearChord(chordName, wasPlayedLastRef, toggleClasses);
         return;
       }
 
-      if (chordIsBeingDetectedValue) {
-        // only load the module when the variable is true (meaning the chord detection button was pressed)
-        const { chordDetectorBuilder } = await import(
-          "@/app/engine/chords/chordDetectorBuilder"
-        );
-        // to make sure chords are always detected when played
-        chordDetectorBuilder.clear();
-      }
+      await processChord(metadata as ChordMetadata);
 
-      console.log("Playing chord: %s at tick %d", chordName, currentTick);
-      wasPlayedLastRef.current = true;
-      toggleClasses();
+      async function processChord(metadata: ChordMetadata) {
+        if (chordIsBeingDetectedValue) {
+          // only load the module when the variable is true (meaning the chord detection button was pressed)
+          const { chordDetectorBuilder } = await import(
+            "@/app/engine/chords/chordDetectorBuilder"
+          );
+          // to make sure chords are always detected when played
+          chordDetectorBuilder.clear();
+        }
 
-      // Start the animation sequence
-      animate();
+        console.log("Playing chord: %s at tick %d", chordName, currentTick);
+        wasPlayedLastRef.current = true;
+        toggleClasses();
 
-      const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
-      const params: ChordPlayParameters = {
-        ...metadata,
-        chordName,
-        variations,
-        delayMs,
-        reverse: isAlternateRef.current,
-      };
+        // Start the animation sequence
+        animate();
 
-      switch (chordPlayModeValue) {
-        case ChordPlayMode.Round_Robin:
-          await playRoundRobin(params);
-          break;
-        case ChordPlayMode.All_Variations:
-          await playAllVariations(params);
-          break;
-        case ChordPlayMode.First_Variation:
-          await playFirstChordVariation(params);
-          break;
-        case ChordPlayMode.Preferred_Variation:
-          await playPreferredChordVariation(params);
-          break;
-        case ChordPlayMode.Preferred_Variation_With_Min_Notes:
-          await playPreferredChordVariationWithMinimumNotes(params);
-          break;
-        case ChordPlayMode.Preferred_Variation_With_Max_Notes:
-          await playPreferredChordVariationWithMaximumNotes(params);
-          break;
-        case ChordPlayMode.Random_Variation:
-          await playRandomChordVariation(params);
-          break;
-        default:
-          break;
+        if (metadata.chordMode === undefined) {
+          metadata.chordMode = chordMode;
+        }
+        if (metadata.octaveNote === undefined) {
+          metadata.octaveNote = { note, octave: 5 };
+        }
+        const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
+        const params: ChordPlayParameters = {
+          ...metadata,
+          chordName,
+          variations,
+          delayMs,
+          reverse: isAlternateRef.current,
+        };
+
+        switch (chordPlayModeValue) {
+          case ChordPlayMode.Round_Robin:
+            await playRoundRobin(params);
+            break;
+          case ChordPlayMode.All_Variations:
+            await playAllVariations(params);
+            break;
+          case ChordPlayMode.First_Variation:
+            await playFirstChordVariation(params);
+            break;
+          case ChordPlayMode.Preferred_Variation:
+            await playPreferredChordVariation(params);
+            break;
+          case ChordPlayMode.Preferred_Variation_With_Min_Notes:
+            await playPreferredChordVariationWithMinimumNotes(params);
+            break;
+          case ChordPlayMode.Preferred_Variation_With_Max_Notes:
+            await playPreferredChordVariationWithMaximumNotes(params);
+            break;
+          case ChordPlayMode.Random_Variation:
+            await playRandomChordVariation(params);
+            break;
+          default:
+            break;
+        }
       }
     };
 
@@ -254,7 +270,15 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     return () => {
       ChordToChordButtonEventMap.delete(chordName);
     };
-  }, [chordName, isDisabled, variations, isAlternateRef, toggleClasses]);
+  }, [
+    chordName,
+    isDisabled,
+    variations,
+    isAlternateRef,
+    toggleClasses,
+    chordMode,
+    note,
+  ]);
 
   if (isHidden) {
     return null;
@@ -298,3 +322,12 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     </ul>
   );
 };
+function processClearChord(
+  chordName: string,
+  wasPlayedLastRef: React.MutableRefObject<boolean>,
+  toggleClasses: () => void
+) {
+  console.log("Clear previous chord marker: " + chordName);
+  wasPlayedLastRef.current = false;
+  toggleClasses();
+}

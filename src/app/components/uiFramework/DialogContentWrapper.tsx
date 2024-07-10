@@ -15,6 +15,7 @@ interface DialogContentWrapperProps
   onClose?: () => void;
   headerText?: string;
   contentClassName?: string;
+  hasPadding: boolean;
 }
 
 export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
@@ -25,6 +26,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
   onClose,
   headerText,
   contentClassName,
+  hasPadding,
 }) => {
   const theme = useUiSelector((s) => s.theme);
 
@@ -33,7 +35,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
       id={id}
       aria-labelledby={id}
       style={style}
-      className={`${className} ${
+      className={`${className !== undefined ? `${className} ` : ""} ${
         theme === Theme.Light
           ? "bg-accented_background-light border-border-light text-foreground-light"
           : "bg-accented_background-dark border-border-dark text-foreground-dark"
@@ -45,7 +47,10 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
       {headerText === undefined && onClose && (
         <CloseIcon onPress={onClose} className="absolute top-6 right-6 z-10" />
       )}
-      <DialogContent className={`${contentClassName} flex flex-col gap-2`}>
+      <DialogContent
+        sx={hasPadding ? undefined : { padding: 0 }}
+        className={`${contentClassName} flex flex-col gap-2`}
+      >
         {children}
       </DialogContent>
     </section>

@@ -3,7 +3,6 @@ import {
   TICKS_IN_HALF_BAR,
   TICKS_IN_HALF_BEAT,
 } from "@/app/data/clockConstants";
-import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   LooperPlayer,
@@ -18,7 +17,7 @@ import {
   globalCurrentLastBarTick,
   globalCurrentTick,
 } from "../clock/mainClock";
-import { ChordWithPlayMetadata, DEFAULT_CHORD_TRACK_NUMBER } from "../eventBus";
+import { ChordWithPlayMetadata } from "../eventBus";
 
 const LOG_PREFIX = "LooperRecorder: ";
 
@@ -40,38 +39,8 @@ export class LooperRecorder {
     if (!this.hasRecording()) {
       return;
     }
-    for (const eventsAtTick of this.eventsByTick!.items) {
-      for (const event of eventsAtTick.events) {
-        const note = event.note;
-        const chord = event.chord;
-        if (note) {
-          noteRecorder.addNoteAtTick(
-            note.note,
-            note.looperChannel ?? note.trackNumber,
-            note.instrument ?? "acoustic_guitar_nylon",
-            eventsAtTick.tick
-          );
-        }
-        if (chord) {
-          const preferredVariations = chordNotesByName.get(chord.chord);
-          if (preferredVariations) {
-            for (const chordNote of preferredVariations.preferred) {
-              if (!chordNote) {
-                continue;
-              }
-              noteRecorder.addNoteAtTick(
-                chordNote,
-                chord.metadata.looperChannel ??
-                  chord.metadata.trackNumber ??
-                  DEFAULT_CHORD_TRACK_NUMBER,
-                chord.metadata.trackInstrument ?? "acoustic_guitar_nylon",
-                eventsAtTick.tick
-              );
-            }
-          }
-        }
-      }
-    }
+    const eventsByTick = this.eventsByTick!;
+    noteRecorder.addEvents(eventsByTick);
   }
 
   hasRecording = () => {
@@ -152,7 +121,7 @@ export class LooperRecorder {
       return;
     }
 
-    this.eventsByTick.addOrUpdateEvent(currentTick, data);
+    this.eventsByTick.addEventAtTick(currentTick, data);
   }
 
   recordNote(
@@ -181,7 +150,7 @@ export class LooperRecorder {
       trackNumber,
     };
 
-    this.eventsByTick.addOrUpdateEvent(currentTick, internalNoteEvent);
+    this.eventsByTick.addEventAtTick(currentTick, internalNoteEvent);
   }
 
   private setStartTickAndGetCurrentTick() {

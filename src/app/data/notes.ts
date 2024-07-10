@@ -41,7 +41,7 @@ export const getNoteText = (noteNumber: number): string => {
 };
 
 export const serializeOctaveNote = (note: OctaveNote) =>
-  [note.octave, note.note].join("_");
+  getNoteText(note.note) + note.octave;
 
 export const serializeStringOctaveNote = (note: StringOctaveNote) =>
   [note.string, note.octave, note.note].join("_");

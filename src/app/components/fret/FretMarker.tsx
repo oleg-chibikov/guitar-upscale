@@ -3,7 +3,7 @@ import { NoteDisplayMode } from "@/app/data/noteDisplayMode";
 import {
   NOTE_COUNT,
   StringOctaveNote,
-  getNoteText,
+  serializeOctaveNote,
   serializeStringOctaveNote,
 } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
@@ -347,7 +347,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         : noteDisplayMode;
     switch (displayMode) {
       case NoteDisplayMode.Note:
-        return getNoteText(stringOctaveNote.note) + stringOctaveNote.octave;
+        return serializeOctaveNote(stringOctaveNote);
       case NoteDisplayMode.Note_Shift: {
         const result =
           (stringOctaveNote.note - getShiftedNote(capoValue, tuningValue)) %
