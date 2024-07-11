@@ -6,7 +6,6 @@ import {
 import {
   GenerateChordsCallbackMessage,
   GenerateChordsRequest,
-  MAX_DISTANCE_IN_CHORD,
   MAX_STRING_INDEX_FOR_CHORD_GENERATION,
 } from "@/app/data/chordsGeneratorTypes";
 import {
@@ -26,6 +25,8 @@ type ChordBuilderInfo = {
   minAllowedFretIndex?: number;
   maxAllowedFretIndex?: number;
 };
+
+type FingerAssignment = (number | undefined)[];
 
 class ChordsGenerator {
   private capo = 0;
@@ -84,98 +85,127 @@ class ChordsGenerator {
     );
   };
 
-  // this method recursively take all the matching notes on the next string (from bottom to top) and build multiple variations of the chord by scanning strings one by 1
-  private findChordNotesRecursive = (
+  private getMatchingNotesOnString(
     stringIndex: number,
-    allNotesInChord: Set<Note>, // all the notes that should participate in chord
-    chordBuilder: (StringOctaveNote | undefined)[], // recursively populated array with finger positions
-    usedNotesSet: Set<Note>, // recursively populated set with used notes
-    minAllowedFretIndex?: number,
-    maxAllowedFretIndex?: number
-  ): ChordBuilderInfo[] => {
-    // if (
-    //   allNotesInChord.has(Note.G) &&
-    //   allNotesInChord.has(Note.B) &&
-    //   allNotesInChord.has(Note.D) &&
-    //   chordBuilder[5]?.fret === 3 &&
-    //   chordBuilder[4]?.fret === 2 &&
-    //   chordBuilder[3]?.fret === 0 &&
-    //   chordBuilder[2]?.fret === 0 &&
-    //   chordBuilder[1]?.fret === 0
-    // ) {
-    //   debugger;
-    // }
+    allNotesInChord: Set<Note>,
+    previousFinger?: number,
+    previousFret?: number
+  ): FingerPosition[] {
     const currentString = this.neck[stringIndex];
+    const matchingNotes: FingerPosition[] = []; // these are the positions of the chord notes on the current string
 
-    const matchingNotesOnThisString: FingerPosition[] = []; // these are the positions of the chord notes on the current string
-    // Always take the open note into account
     const openStringNote = currentString[this.capo];
     if (openStringNote !== null && allNotesInChord.has(openStringNote.note)) {
-      matchingNotesOnThisString.push(openStringNote);
+      matchingNotes.push(openStringNote);
     }
 
-    for (
-      let j = minAllowedFretIndex ?? this.capo + 1;
-      j <= (maxAllowedFretIndex ?? this.absoluteMaxFretIndex);
-      j++
-    ) {
-      const nonOpenStringNote = this.neck[stringIndex][j];
+    for (let j = this.capo + 1; j <= this.absoluteMaxFretIndex; j++) {
+      const nonOpenStringNote = currentString[j];
       if (
         nonOpenStringNote !== null &&
-        allNotesInChord.has(nonOpenStringNote.note)
+        allNotesInChord.has(nonOpenStringNote.note) &&
+        (previousFret === undefined ||
+          this.isValidFingerPosition(previousFinger, previousFret, j))
       ) {
-        matchingNotesOnThisString.push(nonOpenStringNote);
+        matchingNotes.push(nonOpenStringNote);
       }
     }
 
-    matchingNotesOnThisString.push(undefined); // try muting this string (no note on the string)
+    matchingNotes.push(undefined); // try muting this string (no note on the string)
+    return matchingNotes;
+  }
+
+  private assignFinger(
+    fret: number,
+    availableFingers: number[],
+    previousFinger?: number,
+    previousFret?: number
+  ): number | undefined {
+    for (let i = 0; i < availableFingers.length; i++) {
+      const finger = availableFingers[i];
+      if (
+        this.isValidFingerPosition(previousFinger, previousFret, fret, finger)
+      ) {
+        return i;
+      }
+    }
+    return undefined;
+  }
+
+  private isValidFingerPosition(
+    previousFinger: number | undefined,
+    previousFret: number | undefined,
+    currentFret: number,
+    currentFinger?: number
+  ): boolean {
+    if (previousFinger === undefined || previousFret === undefined) {
+      return true;
+    }
+
+    const fingerDistance =
+      currentFinger !== undefined
+        ? Math.abs(currentFinger - previousFinger)
+        : 0;
+    const maxAllowedDistance = fingerDistance + 1;
+    const actualDistance = Math.abs(currentFret - previousFret);
+
+    return actualDistance <= maxAllowedDistance;
+  }
+
+  // this method recursively take all the matching notes on the next string (from bottom to top) and build multiple variations of the chord by scanning strings one by 1 and considering finger positions
+  private findChordNotesRecursive = (
+    stringIndex: number,
+    allNotesInChord: Set<Note>, // all the notes that should participate in chord
+    chordBuilder: FingerPosition[], // recursively populated array with finger positions
+    fingerAssignments: FingerAssignment, // recursively reducing array of available fingers for the current string
+    usedNotesSet: Set<Note>, // recursively populated set with used notes
+    availableFingers: number[],
+    previousFinger: number | undefined = undefined,
+    previousFret: number | undefined = undefined
+  ): ChordBuilderInfo[] => {
+    const matchingNotesOnThisString = this.getMatchingNotesOnString(
+      stringIndex,
+      allNotesInChord,
+      previousFinger,
+      previousFret
+    );
 
     return matchingNotesOnThisString
       .flatMap((stringOctaveNote) => {
         const chordBuilderCopy = [...chordBuilder];
+        const fingerAssignmentsCopy = [...fingerAssignments];
         chordBuilderCopy[stringIndex] = stringOctaveNote;
         const usedNotesSetCopy = new Set(usedNotesSet);
-        // limits for the next string
-        let newMin: number | undefined;
-        let newMax: number | undefined;
+        const newAvailableFingers = [...availableFingers];
+        let newPreviousFinger: number | undefined = previousFinger;
+        let newPreviousFret: number | undefined = previousFret;
 
         if (stringOctaveNote === undefined) {
-          // this is a muted string
-          // leave limits intact
-          newMin = minAllowedFretIndex;
-          newMax = maxAllowedFretIndex;
+          fingerAssignmentsCopy[stringIndex] = undefined;
+        } else if (stringOctaveNote.fret === this.capo) {
+          usedNotesSetCopy.add(stringOctaveNote.note);
+          fingerAssignmentsCopy[stringIndex] = undefined;
         } else {
           usedNotesSetCopy.add(stringOctaveNote.note);
-          // calculate possible range for the next string
           const fret = stringOctaveNote.fret;
 
-          if (
-            minAllowedFretIndex === undefined ||
-            maxAllowedFretIndex === undefined
-          ) {
-            // limits are not set yet (open notes were used on all the previous strings)
+          const fingerIndex = this.assignFinger(
+            fret,
+            availableFingers,
+            previousFinger,
+            previousFret
+          );
 
-            if (fret > this.capo) {
-              // we use a fret on non open string and need to adjust the limits for the next string
-              ({ newMin, newMax } = this.getFretLimitsForTheFirstTime(fret));
-            }
-            // else they are left undefined
-          } else if (fret === this.capo) {
-            // leave limits intact
-            newMin = minAllowedFretIndex;
-            newMax = maxAllowedFretIndex;
-          } else {
-            // adjust according to the current note
+          if (fingerIndex === undefined) {
+            return undefined;
+          }
 
-            // we can allow max MAX_DISTANCE_IN_CHORD frets in any direction. If we go left from the note on the next string - then the max limit should be recalculated from the leftmost position and vice versa for the right direction
-            newMax = Math.min(
-              fret + MAX_DISTANCE_IN_CHORD,
-              maxAllowedFretIndex
-            );
-            newMin = Math.max(
-              fret - MAX_DISTANCE_IN_CHORD,
-              minAllowedFretIndex
-            );
+          newPreviousFinger = newAvailableFingers[fingerIndex];
+          newPreviousFret = fret;
+          fingerAssignmentsCopy[stringIndex] = newPreviousFinger;
+
+          if (previousFret !== fret) {
+            newAvailableFingers.splice(fingerIndex, 1);
           }
         }
 
@@ -184,37 +214,29 @@ class ChordsGenerator {
             stringIndex - 1,
             allNotesInChord,
             chordBuilderCopy,
+            fingerAssignmentsCopy,
             usedNotesSetCopy,
-            newMin,
-            newMax
+            newAvailableFingers,
+            newPreviousFinger,
+            newPreviousFret
           );
         }
-        // this branch returns the final result
+
         const requiredNotesArray = Array.from(allNotesInChord);
         for (const requiredNote of requiredNotesArray) {
           if (!usedNotesSetCopy.has(requiredNote)) {
-            return null;
+            return undefined;
           }
         }
         return [
           {
             variation: chordBuilderCopy,
-            minAllowedFretIndex: newMin,
-            maxAllowedFretIndex: newMax,
+            fingerPositions: fingerAssignmentsCopy,
+            usedFingers: availableFingers.length - newAvailableFingers.length,
           },
         ];
       })
-      .filter((x) => x) as ChordBuilderInfo[]; // exclude incomplete chords;
-  };
-
-  private getFretLimitsForTheFirstTime = (fretIndex: number) => {
-    const newMin = Math.max(this.capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
-
-    const newMax = Math.min(
-      this.absoluteMaxFretIndex,
-      fretIndex + MAX_DISTANCE_IN_CHORD
-    );
-    return { newMin, newMax };
+      .filter((x) => x) as ChordBuilderInfo[];
   };
 
   private processIntervalsInChordMode = (
@@ -286,32 +308,24 @@ class ChordsGenerator {
     const notesInChord: Set<Note> = new Set(
       intervalsToUse.map((x) => (stringOctaveNote.note + x) % NOTE_COUNT)
     );
-    const fretIndex = stringOctaveNote.fret;
     // console.log("Processing", currentStringOctaveNote);
     const chordBuilder: FingerPosition[] = [...Array(this.neck.length)];
     chordBuilder[stringOctaveNote.string] = stringOctaveNote;
     const usedNotesSet = new Set<Note>();
     usedNotesSet.add(stringOctaveNote.note);
 
-    // fret limits for the first
-    let newMin: number | undefined;
-    let newMax: number | undefined;
-
-    if (fretIndex !== this.capo) {
-      // if we are not on the open string - then we can use only the adjacent several frets in each direction
-      ({ newMin, newMax } = this.getFretLimitsForTheFirstTime(fretIndex));
-    }
-
     const stringIndex = stringOctaveNote.string;
     // otherwise we are on the open string then we can use any fret for the next note
     // for each note and chord mode we build the realistic finger positions
+
+    const initialAvailableFingers = [1, 2, 3, 4]; // Index, middle, ring, pinky
     return this.findChordNotesRecursive(
       stringIndex - 1,
       notesInChord,
       chordBuilder,
+      [], // Initialize finger assignments
       usedNotesSet,
-      newMin,
-      newMax
+      initialAvailableFingers
     );
   };
 
