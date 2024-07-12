@@ -118,30 +118,12 @@ export class FretChordsGenerator {
     // ) {
     //   debugger;
     // }
-    const currentString = this.neck[stringIndex];
-
-    const matchingNotesOnThisString: NoteInChord[] = []; // these are the positions of the chord notes on the current string
-    // Always take the open note into account
-    const openStringNote = currentString[this.capo];
-    if (openStringNote !== null && allNotesInChord.has(openStringNote.note)) {
-      matchingNotesOnThisString.push(openStringNote);
-    }
-
-    for (
-      let j = minAllowedFretIndex ?? this.capo + 1;
-      j <= (maxAllowedFretIndex ?? this.absoluteMaxFretIndex);
-      j++
-    ) {
-      const nonOpenStringNote = this.neck[stringIndex][j];
-      if (
-        nonOpenStringNote !== null &&
-        allNotesInChord.has(nonOpenStringNote.note)
-      ) {
-        matchingNotesOnThisString.push(nonOpenStringNote);
-      }
-    }
-
-    matchingNotesOnThisString.push(undefined); // try muting this string (no note on the string)
+    const matchingNotesOnThisString = this.getMatchingNotesOnCurrentString(
+      stringIndex,
+      allNotesInChord,
+      minAllowedFretIndex,
+      maxAllowedFretIndex
+    );
 
     return matchingNotesOnThisString
       .flatMap((stringOctaveNote) => {
@@ -265,6 +247,40 @@ export class FretChordsGenerator {
       )
     );
   };
+
+  private getMatchingNotesOnCurrentString(
+    stringIndex: number,
+    allNotesInChord: Set<Note>,
+    minAllowedFretIndex: number | undefined,
+    maxAllowedFretIndex: number | undefined
+  ): NoteInChord[] {
+    const currentString = this.neck[stringIndex];
+
+    const matchingNotesOnThisString: NoteInChord[] = []; // these are the positions of the chord notes on the current string
+
+    // Always take the open note into account
+    const openStringNote = currentString[this.capo];
+    if (openStringNote !== null && allNotesInChord.has(openStringNote.note)) {
+      matchingNotesOnThisString.push(openStringNote);
+    }
+
+    for (
+      let j = minAllowedFretIndex ?? this.capo + 1;
+      j <= (maxAllowedFretIndex ?? this.absoluteMaxFretIndex);
+      j++
+    ) {
+      const nonOpenStringNote = this.neck[stringIndex][j];
+      if (
+        nonOpenStringNote !== null &&
+        allNotesInChord.has(nonOpenStringNote.note)
+      ) {
+        matchingNotesOnThisString.push(nonOpenStringNote);
+      }
+    }
+
+    matchingNotesOnThisString.push(undefined); // try muting this string (no note on the string)
+    return matchingNotesOnThisString;
+  }
 
   private getStartingOptions(
     stringOctaveNote: StringOctaveNote,
