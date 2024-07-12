@@ -52,6 +52,23 @@ const getColorClass = (trackNumber: number | undefined) => {
     : darkColors[colorIndex];
 };
 
+const getFingerNameByPosition = (fingerIndex: number) => {
+  switch (fingerIndex) {
+    case 0:
+      return "Index finger";
+    case 1:
+      return "Middle finger";
+    case 2:
+      return "Ring finger";
+    case 3:
+      return "Pinky";
+    case 4:
+      return "Thumb";
+    default:
+      throw new Error("Incrorrect finger " + fingerIndex);
+  }
+};
+
 export const FretMarker: React.FC<FretMarkerProps> = ({
   fret,
   width,
@@ -134,8 +151,8 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const neededClasses: string[] = [];
 
     // Remove existing chord finger badge if it exists
-    const existingBadge = typographyElement.nextElementSibling;
-    if (existingBadge && existingBadge.classList.contains("absolute")) {
+    const existingBadge = typographyElement.previousElementSibling;
+    if (existingBadge && existingBadge.classList.contains("badge")) {
       existingBadge.remove();
     }
 
@@ -143,22 +160,17 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       // Create and add new chord finger badge
       const badgeElement = document.createElement("div");
       badgeElement.className =
-        "absolute -top-1 -right-4 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center";
-      badgeElement.style.transform = `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`;
+        "badge absolute -top-2 z-30 left-1/2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center";
+      badgeElement.style.transform = `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY}) translateX(10px)`;
       badgeElement.style.fontSize = "10px";
-
+      badgeElement.title = getFingerNameByPosition(chordFingerRef.current);
       badgeElement.textContent = (chordFingerRef.current + 1).toString();
 
-      // Create a wrapper div for positioning
-      const wrapperDiv = document.createElement("div");
-      wrapperDiv.className = "relative inline-block";
-
       // Wrap the typography element
-      typographyElement.parentNode?.insertBefore(wrapperDiv, typographyElement);
-      wrapperDiv.appendChild(typographyElement);
-
-      // Add the badge to the wrapper
-      wrapperDiv.appendChild(badgeElement);
+      typographyElement.parentNode?.insertBefore(
+        badgeElement,
+        typographyElement
+      );
     }
 
     if (
