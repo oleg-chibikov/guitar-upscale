@@ -1,7 +1,7 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Instrument, InstrumentGroup } from "../data/instruments";
-import { Note } from "../data/notes";
+import { Neck, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { getScalePattern, scalesMap } from "../data/scales";
 import { chordStrummingPatterns } from "../data/strummingPatterns";
@@ -12,10 +12,7 @@ import {
   Tuning,
 } from "../data/tunings";
 import { clearPreviousChords } from "../engine/eventBus";
-import {
-  generateNeckRepresentation,
-  Neck,
-} from "../engine/generateNeckRepresentation";
+import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
 
 import { ChordModeVariations } from "@/app/data/chordModes";
 import { MAX_VOLUME } from "@/app/data/volume";

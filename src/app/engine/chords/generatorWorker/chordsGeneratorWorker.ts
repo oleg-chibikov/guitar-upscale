@@ -1,6 +1,6 @@
 import { GenerateChordsWorkerMessage } from "@/app/data/chordsGeneratorTypes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
-import { chordsGenerator } from "@/app/engine/chords/chordsGenerator";
+import { chordsGenerator } from "@/app/engine/chords/generatorWorker/chordsGenerator";
 
 self.onmessage = (event: WorkerMessageWrapper<GenerateChordsWorkerMessage>) => {
   const { type } = event.data;

@@ -30,6 +30,7 @@ export type ClearNoteMetadata = {
 export type NoteMetadata = TrackMetadata &
   PlayNoteParams & {
     fromChord?: boolean;
+    chordFinger?: number;
     skipChordDetection?: boolean;
     looperChannel?: number;
   };

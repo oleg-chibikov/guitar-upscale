@@ -1,11 +1,11 @@
-import { ChordVariations } from "@/app/data/chordModes";
-import { Chord, StringOctaveNote } from "@/app/data/notes";
+import { ChordBuilderInfo, ChordVariations } from "@/app/data/chordModes";
+import { StringOctaveNote } from "@/app/data/notes";
 import { calculateAverage } from "@/app/helpers/arrayHelper";
 
 export type ChordPreferredVariations = {
-  preferred: Chord;
-  preferredWithMinNotes: Chord;
-  preferredWithMaxNotes: Chord;
+  preferred: ChordBuilderInfo;
+  preferredWithMinNotes: ChordBuilderInfo;
+  preferredWithMaxNotes: ChordBuilderInfo;
 };
 
 type StringPreference = "high" | "low";
@@ -14,9 +14,9 @@ const getPreferredChordVariation = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number
-): Chord => {
-  const calculateVariationScore = (variation: Chord): number => {
-    const playedNotes = variation.filter(
+): ChordBuilderInfo => {
+  const calculateVariationScore = (variation: ChordBuilderInfo): number => {
+    const playedNotes = variation.variation.filter(
       (note): note is StringOctaveNote => note !== undefined
     );
 
@@ -58,18 +58,21 @@ const getPreferredChordVariation = (
       }, 0) / playedNotes.length;
 
     // 6. Slight penalty for skipping strings in the middle
-    const skippedStringsScore = variation.reduce((score, note, index, arr) => {
-      if (
-        note === undefined &&
-        index > 0 &&
-        index < arr.length - 1 &&
-        arr[index - 1] !== undefined &&
-        arr[index + 1] !== undefined
-      ) {
-        return score + 1;
-      }
-      return score;
-    }, 0);
+    const skippedStringsScore = variation.variation.reduce(
+      (score, note, index, arr) => {
+        if (
+          note === undefined &&
+          index > 0 &&
+          index < arr.length - 1 &&
+          arr[index - 1] !== undefined &&
+          arr[index + 1] !== undefined
+        ) {
+          return score + 1;
+        }
+        return score;
+      },
+      0
+    );
 
     // 7. Penalty for using the same note from the same octave
     const uniqueNotesScore = playedNotes.reduce((score, note, index, arr) => {
@@ -135,10 +138,13 @@ const getPreferredChordVariationWithMinNotes = (
   numberOfStrings: number
 ) => {
   const minPlayedNotes = Math.min(
-    ...chordVariations.map((v) => v.filter((note) => note !== undefined).length)
+    ...chordVariations.map(
+      (v) => v.variation.filter((note) => note !== undefined).length
+    )
   );
   const variationsWithMinNotes = chordVariations.filter(
-    (v) => v.filter((note) => note !== undefined).length === minPlayedNotes
+    (v) =>
+      v.variation.filter((note) => note !== undefined).length === minPlayedNotes
   );
   return getPreferredChordVariation(
     variationsWithMinNotes,
@@ -153,10 +159,13 @@ const getPreferredChordVariationWithMaxNotes = (
   numberOfStrings: number
 ) => {
   const maxPlayedNotes = Math.max(
-    ...chordVariations.map((v) => v.filter((note) => note !== undefined).length)
+    ...chordVariations.map(
+      (v) => v.variation.filter((note) => note !== undefined).length
+    )
   );
   const variationsWithMinNotes = chordVariations.filter(
-    (v) => v.filter((note) => note !== undefined).length === maxPlayedNotes
+    (v) =>
+      v.variation.filter((note) => note !== undefined).length === maxPlayedNotes
   );
   return getPreferredChordVariation(
     variationsWithMinNotes,

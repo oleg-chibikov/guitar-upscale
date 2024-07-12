@@ -1,6 +1,6 @@
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { FRETBOARD } from "@/app/data/elementIds";
-import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
+import { FRET_COUNT } from "@/app/data/notes";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
 import { getAssetsForSkin, getPositionForSkin } from "@/app/helpers/skinHelper";

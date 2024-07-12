@@ -1,5 +1,5 @@
 import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
+import { Neck } from "@/app/data/notes";
 
 export const MAX_STRING_INDEX_FOR_CHORD_GENERATION = 5;
 export const MAX_DISTANCE_IN_CHORD = 4;

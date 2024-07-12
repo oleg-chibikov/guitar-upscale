@@ -1,6 +1,5 @@
 import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
-import { Chord, StringOctaveNote } from "@/app/data/notes";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
+import { Chord, Neck, StringOctaveNote } from "@/app/data/notes";
 import { getPossibleFretRangeForChord } from "@/app/helpers/slashChordHelper";
 
 export type SlashChord = {

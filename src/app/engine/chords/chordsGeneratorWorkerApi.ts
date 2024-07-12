@@ -7,8 +7,8 @@ import {
   GenerateChordsCallbackMessage,
   GenerateChordsWorkerMessage,
 } from "@/app/data/chordsGeneratorTypes";
+import { Neck } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
 
 let worker: Worker | undefined;
 let chordsWaitResolve: (() => void) | undefined;
@@ -37,7 +37,9 @@ export const generateChords = (
 ) => {
   console.log("Start generating chords");
 
-  worker = new Worker(new URL("./chordsGeneratorWorker.ts", import.meta.url));
+  worker = new Worker(
+    new URL("./generatorWorker/chordsGeneratorWorker.ts", import.meta.url)
+  );
 
   // Set up the new worker's onmessage handler
   worker.onmessage = (

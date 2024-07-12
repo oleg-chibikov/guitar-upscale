@@ -6,9 +6,8 @@ import {
 import { sortChords } from "@/app/engine/chords/chordsSorter";
 import { MissingChar } from "@/app/engine/detectorShared";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { stringCountValue } from "@/app/store/settingsSlice";
-import { Chord, StringOctaveNote } from "../../data/notes";
-import { Trie } from "../../helpers/trie";
+import { Chord, StringOctaveNote } from "../../../data/notes";
+import { Trie } from "../../../helpers/trie";
 
 const START_ASCII_CODE = "a".charCodeAt(0);
 
@@ -69,7 +68,7 @@ class ChordDetector {
     const serializedChord: (number | MissingChar)[] = [];
 
     // Initialize the serializedChord with '?' for each position
-    for (let i = 0; i < stringCountValue; i++) {
+    for (let i = 0; i < chord.length; i++) {
       serializedChord.push(missingChar);
     }
 

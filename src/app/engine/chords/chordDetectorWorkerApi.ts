@@ -4,11 +4,12 @@ import {
   ChordDetectorWorkerMessage,
 } from "@/app/data/chordDetectorWorkerTypes";
 import { ChordModeVariations } from "@/app/data/chordModes";
-import { StringOctaveNote } from "@/app/data/notes";
+import { Neck, StringOctaveNote } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
 
-const worker = new Worker(new URL("./chordDetectorWorker.ts", import.meta.url));
+const worker = new Worker(
+  new URL("./detectorWorker/chordDetectorWorker.ts", import.meta.url)
+);
 
 class ChordDetectorWorkerApi {
   addChordsToDetectorLookup(chordModeVariations: ChordModeVariations): void {

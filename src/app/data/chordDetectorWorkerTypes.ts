@@ -1,7 +1,6 @@
 import { AlertType } from "@/app/data/alertType";
 import { ChordModeVariations } from "@/app/data/chordModes";
-import { StringOctaveNote } from "@/app/data/notes";
-import { Neck } from "@/app/engine/generateNeckRepresentation";
+import { Neck, StringOctaveNote } from "@/app/data/notes";
 
 export const MIN_NOTES_TO_DETECT_CHORD = 3;
 export type ChordDetectorCallbackData =

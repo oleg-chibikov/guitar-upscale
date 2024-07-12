@@ -46,8 +46,11 @@ export const serializeOctaveNote = (note: OctaveNote) =>
 export const serializeStringOctaveNote = (note: StringOctaveNote) =>
   [note.string, note.octave, note.note].join("_");
 
-export type Chord = FingerPosition[];
-export type FingerPosition = StringOctaveNote | undefined; // represents a note in a chord on a particular string. Undefined means there is no note on that string
+export type Chord = NoteInChord[];
+export type NoteInChord = StringOctaveNote | undefined; // represents a note in a chord on a particular string. Undefined means there is no note on that string
 
 export const initNotesArray = <T>() =>
   Array.from({ length: NOTE_COUNT }, () => undefined as T);
+
+export type Neck = (StringOctaveNote | null)[][];
+export const FRET_COUNT: number = NOTE_COUNT * 2;

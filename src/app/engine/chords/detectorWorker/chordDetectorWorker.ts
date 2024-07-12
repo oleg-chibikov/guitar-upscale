@@ -4,12 +4,10 @@ import {
   ChordDetectorWorkerMessage,
 } from "@/app/data/chordDetectorWorkerTypes";
 import { ChordModeVariations, getModeText } from "@/app/data/chordModes";
-import { getNoteText } from "@/app/data/notes";
+import { getNoteText, Neck } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
-import { chordDetector } from "@/app/engine/chords/chordDetector";
-import { getSlashChordsForVariation } from "@/app/engine/chords/slashChordGenerator";
-
-import { Neck } from "@/app/engine/generateNeckRepresentation";
+import { chordDetector } from "@/app/engine/chords/detectorWorker/chordDetector";
+import { getSlashChordsForVariation } from "@/app/engine/chords/detectorWorker/slashChordGenerator";
 
 let neckValue: Neck | null = null;
 let capoValue: number = 0;
@@ -21,9 +19,9 @@ const addChordsToDetectorLookup = (
   chordModeVariations.variationsByNote.forEach((variationsForNote, note) => {
     const fullKey = getNoteText(note) + modeKey;
     variationsForNote?.forEach((variation) => {
-      chordDetector.addChordToDetectorLookup(variation, fullKey);
+      chordDetector.addChordToDetectorLookup(variation.variation, fullKey);
       const slashChordsGenerator = getSlashChordsForVariation(
-        variation,
+        variation.variation,
         neckValue!,
         capoValue
       );

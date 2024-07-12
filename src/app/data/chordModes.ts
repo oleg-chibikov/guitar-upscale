@@ -10,7 +10,14 @@ export interface ChordMode {
   canSkipPerfectFifth: boolean; // Indicates if the perfect fifth can be omitted
 }
 
-export type ChordVariations = Chord[];
+export type ChordBuilderInfo = {
+  variation: Chord;
+  fingerAssignment: FingerAssignment;
+};
+
+export type FingerAssignment = (number | undefined)[];
+
+export type ChordVariations = ChordBuilderInfo[];
 export type ChordVariationsByNote = (ChordVariations | undefined)[];
 
 export const chordModes: ChordMode[] = [

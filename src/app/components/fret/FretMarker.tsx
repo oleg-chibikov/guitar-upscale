@@ -68,6 +68,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const noteDisplayMode = useUiSelector((s) => s.noteDisplayMode);
 
   const hasTouchInput = useInputChecker();
+  const chordFingerRef = useRef<number | undefined>();
   const isFromPreviousChordRef = useRef<boolean>(false);
   const isChordBeingDetectedRef = useRef<boolean>(false);
   const isScaleBeingDetectedRef = useRef<boolean>(false);
@@ -131,6 +132,34 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     }
 
     const neededClasses: string[] = [];
+
+    // Remove existing chord finger badge if it exists
+    const existingBadge = typographyElement.nextElementSibling;
+    if (existingBadge && existingBadge.classList.contains("absolute")) {
+      existingBadge.remove();
+    }
+
+    if (chordFingerRef.current !== undefined) {
+      // Create and add new chord finger badge
+      const badgeElement = document.createElement("div");
+      badgeElement.className =
+        "absolute -top-1 -right-4 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center";
+      badgeElement.style.transform = `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`;
+      badgeElement.style.fontSize = "10px";
+
+      badgeElement.textContent = chordFingerRef.current.toString();
+
+      // Create a wrapper div for positioning
+      const wrapperDiv = document.createElement("div");
+      wrapperDiv.className = "relative inline-block";
+
+      // Wrap the typography element
+      typographyElement.parentNode?.insertBefore(wrapperDiv, typographyElement);
+      wrapperDiv.appendChild(typographyElement);
+
+      // Add the badge to the wrapper
+      wrapperDiv.appendChild(badgeElement);
+    }
 
     if (
       isChordBeingDetectedRef.current ||
@@ -241,7 +270,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
     const classList = typographyElement.classList;
     classList.remove(...notNeededClasses);
     classList.add(...neededClasses);
-  }, [isBehindCapo, isColored]);
+  }, [fretboardScaleX, fretboardScaleY, isBehindCapo, isColored]);
 
   useEffect(toggleClasses, [toggleClasses, neck]);
 
@@ -277,6 +306,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
         try {
           if ((metadata as ClearNoteMetadata).clearChordMarker === true) {
             isFromPreviousChordRef.current = false;
+            chordFingerRef.current = undefined;
             return;
           }
           const noteMetadata = metadata as NoteMetadata;
@@ -323,6 +353,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
 
           if (noteMetadata.fromChord === true) {
             isFromPreviousChordRef.current = true;
+            chordFingerRef.current = noteMetadata.chordFinger;
           }
           animate();
         } finally {
@@ -452,12 +483,12 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
             className={`flex justify-center items-center font-mono contain-content
                       ${
                         isHeader
-                          ? `text-xl ${
+                          ? `${
                               theme === Theme.Light
                                 ? "text-foreground-light"
                                 : "text-foreground-dark"
                             }`
-                          : "text-md rounded-full w-7 h-7"
+                          : "rounded-full w-7 h-7"
                       }`}
             ref={typographyRef}
             style={{

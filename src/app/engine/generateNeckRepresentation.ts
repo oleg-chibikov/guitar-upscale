@@ -1,14 +1,13 @@
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
 import {
+  FRET_COUNT,
   NOTE_COUNT,
+  Neck,
   Note,
   OctaveNote,
   StringOctaveNote,
   serializeOctaveNote,
 } from "../data/notes";
-
-export type Neck = (StringOctaveNote | null)[][];
-export const FRET_COUNT: number = NOTE_COUNT * 2;
 
 // This map helps getting the notes on the fret based on just notes.
 // Each note has several positions on the fret. The map contains them all

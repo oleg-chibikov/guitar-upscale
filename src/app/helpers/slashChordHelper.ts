@@ -1,6 +1,5 @@
 import { MAX_DISTANCE_IN_CHORD } from "@/app/data/chordsGeneratorTypes";
-import { Chord, StringOctaveNote } from "@/app/data/notes";
-import { FRET_COUNT } from "@/app/engine/generateNeckRepresentation";
+import { Chord, FRET_COUNT, StringOctaveNote } from "@/app/data/notes";
 
 export function getPossibleFretRangeForChord(
   chordVariation: Chord,

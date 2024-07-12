@@ -1,7 +1,7 @@
-import { ChordVariations } from "@/app/data/chordModes";
+import { ChordBuilderInfo, ChordVariations } from "@/app/data/chordModes";
+import { StringOctaveNote } from "@/app/data/notes";
 import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { replaceBassNoteWithSlash } from "@/app/engine/chords/slashChordPlayer";
-import { Chord, StringOctaveNote } from "../../data/notes";
 import { sleep } from "../../helpers/sleep";
 import { chordNotesToPlayValue } from "../../store/settingsSlice";
 import { ChordMetadata, NotePlayEventBus } from "../eventBus";
@@ -107,25 +107,38 @@ const selectRandomVariation = (variations: ChordVariations) => {
 };
 
 const playVariation = async (
-  variation: Chord,
+  variation: ChordBuilderInfo,
   variationKey: string,
   { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
 ) => {
   const noteCount = notesToPlay ?? chordNotesToPlayValue;
   let i = 0;
   console.log(`Playing ${variationKey} variation of ${chordName}`);
-  const variationNotes = variation.filter((x) => x) as StringOctaveNote[];
-  replaceBassNoteWithSlash(variationNotes);
-  const toPlay = reverse ? variationNotes.reverse() : variationNotes;
-  for (const stringOctaveNote of toPlay) {
-    NotePlayEventBus.next({
-      ...rest, // track metadata and strumming metadata
-      stringOctaveNote,
-      fromChord: true,
-    });
-    if (++i >= noteCount) {
-      break;
+
+  const variationNotes = reverse
+    ? [...variation.variation].reverse()
+    : variation.variation;
+  const fingerAssignments = reverse
+    ? [...variation.fingerAssignment].reverse()
+    : variation.fingerAssignment;
+
+  replaceBassNoteWithSlash(
+    variationNotes.filter((x) => x) as StringOctaveNote[]
+  );
+
+  for (i = 0; i < variationNotes.length && i < noteCount; i++) {
+    const stringOctaveNote = variationNotes[i];
+    const chordFinger = fingerAssignments[i];
+
+    if (stringOctaveNote) {
+      NotePlayEventBus.next({
+        ...rest, // track metadata and strumming metadata
+        stringOctaveNote,
+        fromChord: true,
+        chordFinger,
+      });
     }
+
     if (delayMs !== undefined && delayMs > 0) {
       await sleep(delayMs);
     }
