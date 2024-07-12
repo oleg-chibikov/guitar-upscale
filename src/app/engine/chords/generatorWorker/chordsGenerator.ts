@@ -93,6 +93,11 @@ class ChordsGenerator {
           continue;
         }
 
+        // // TODO:!!!! remove, it's just to test
+        // if (fretIndex !== 1) {
+        //   continue;
+        // }
+
         const fretChordsGenerator = new FretChordsGenerator(
           this.capo,
           this.neck,
@@ -137,6 +142,7 @@ class ChordsGenerator {
       chordModeVariations: { chordMode, variationsByNote },
       preferredVariationsByNote,
     };
+
     return dataForChordMode;
   };
 

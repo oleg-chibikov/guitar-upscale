@@ -147,7 +147,7 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       badgeElement.style.transform = `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY})`;
       badgeElement.style.fontSize = "10px";
 
-      badgeElement.textContent = chordFingerRef.current.toString();
+      badgeElement.textContent = (chordFingerRef.current + 1).toString();
 
       // Create a wrapper div for positioning
       const wrapperDiv = document.createElement("div");
