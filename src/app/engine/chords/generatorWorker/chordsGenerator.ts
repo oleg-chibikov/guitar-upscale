@@ -90,7 +90,7 @@ class ChordsGenerator {
       // loop through the strings starting from the lowest, ensuring there are strings to put all the notes of the chordIntervals
       for (
         let fretIndex = this.capo;
-        fretIndex < this.maxFretToProcess; // we intentionally limit chords to 12 frets to improve performance. If performance gets better we can replace that with this.absoluteMaxFretIndex
+        fretIndex < this.maxFretToProcess; // we intentionally limit chords to 12 frets to improve performance. If performance gets better we can replace that with this.absoluteMaxFretIndex. Skip capo+12th fret and further
         fretIndex++
       ) {
         const currentStringOctaveNote = neckString[fretIndex];
