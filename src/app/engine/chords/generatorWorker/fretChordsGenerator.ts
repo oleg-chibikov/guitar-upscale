@@ -28,13 +28,13 @@ type RecursiveContainers = {
 
 export class FretChordsGenerator {
   private capo: number;
-  private absoluteMaxFretIndex: number;
+  private maxFretToProcess: number;
   private neck: Neck;
 
-  constructor(capo: number, neck: Neck, absoluteMaxFretIndex: number) {
+  constructor(capo: number, neck: Neck, maxFretToProcess: number) {
     this.capo = capo;
     this.neck = neck;
-    this.absoluteMaxFretIndex = absoluteMaxFretIndex;
+    this.maxFretToProcess = maxFretToProcess;
   }
 
   private initArrayOfFingers = () => Array(4).fill(undefined);
@@ -364,7 +364,7 @@ export class FretChordsGenerator {
     const newMin = Math.max(this.capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
 
     const newMax = Math.min(
-      this.absoluteMaxFretIndex,
+      this.maxFretToProcess,
       fretIndex + MAX_DISTANCE_IN_CHORD
     );
     return { newMin, newMax };
@@ -463,7 +463,7 @@ export class FretChordsGenerator {
 
     for (
       let j = minAllowedFretIndex ?? this.capo + 1;
-      j <= (maxAllowedFretIndex ?? this.absoluteMaxFretIndex);
+      j <= (maxAllowedFretIndex ?? this.maxFretToProcess);
       j++
     ) {
       const nonOpenStringNote = this.neck[stringIndex][j];

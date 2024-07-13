@@ -17,7 +17,6 @@ import { FretChordsGenerator } from "@/app/engine/chords/generatorWorker/fretCho
 
 class ChordsGenerator {
   private capo = 0;
-  private absoluteMaxFretIndex = 0;
   private neck: Neck = [];
   private maxFretToProcess = 0;
 
@@ -28,10 +27,9 @@ class ChordsGenerator {
   processInWorker({ neck, capo, chordModes }: GenerateChordsRequest): void {
     this.capo = capo;
     this.neck = neck;
-    this.absoluteMaxFretIndex = neck[0].length - 1;
     this.maxFretToProcess = Math.min(
       this.capo + NOTE_COUNT,
-      this.absoluteMaxFretIndex
+      neck[0].length - 1
     );
 
     const chordModesCount = chordModes.length;
@@ -101,7 +99,7 @@ class ChordsGenerator {
         const fretChordsGenerator = new FretChordsGenerator(
           this.capo,
           this.neck,
-          this.absoluteMaxFretIndex
+          this.maxFretToProcess
         );
 
         const newVariationsForNoteAndMode = fretChordsGenerator.processFret(
