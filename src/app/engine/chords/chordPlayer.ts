@@ -122,22 +122,20 @@ const playVariation = async (
     ? [...variation.fingerAssignment].reverse()
     : variation.fingerAssignment;
 
-  replaceBassNoteWithSlash(
-    variationNotes.filter((x) => x) as StringOctaveNote[]
-  );
+  const filtered = variationNotes.filter((x) => x) as StringOctaveNote[];
 
-  for (i = 0; i < variationNotes.length && i < noteCount; i++) {
-    const stringOctaveNote = variationNotes[i];
+  replaceBassNoteWithSlash(filtered);
+
+  for (i = 0; i < filtered.length && i < noteCount; i++) {
+    const stringOctaveNote = filtered[i];
     const chordFinger = fingerAssignments[i];
 
-    if (stringOctaveNote) {
-      NotePlayEventBus.next({
-        ...rest, // track metadata and strumming metadata
-        stringOctaveNote,
-        fromChord: true,
-        chordFinger,
-      });
-    }
+    NotePlayEventBus.next({
+      ...rest, // track metadata and strumming metadata
+      stringOctaveNote,
+      fromChord: true,
+      chordFinger,
+    });
 
     if (delayMs !== undefined && delayMs > 0) {
       await sleep(delayMs);
