@@ -8,21 +8,22 @@ import {
   StringOctaveNote,
 } from "@/app/data/notes";
 
-type StartingOption = {
-  availableFretByFingerIndex: number[];
-  fingerAssignment: FingerAssignment;
-  maxFingerUsedByFret: Map<number, number>;
-};
-
 const THUMB = 4;
 
+type OptionalNumber = number | undefined;
+type OptionalNumberArray = OptionalNumber[];
+type StartingOption = {
+  availableFretByFingerIndex: OptionalNumberArray;
+  fingerAssignment: FingerAssignment;
+  maxFingerUsedByFret: OptionalNumberArray;
+};
 type RecursiveContainers = {
-  availableFretByFingerIndex: (number | undefined)[]; // array of 4 numbers for each finger except the thumb. undefined means this finger can be used for any fret. Otherwise we limit it only to a single fret onwards (barre). It can be set to -1 meaning this finger cannot be used anymore
+  availableFretByFingerIndex: OptionalNumberArray; // array of 4 numbers for each finger except the thumb. undefined means this finger can be used for any fret. Otherwise we limit it only to a single fret onwards (barre). It can be set to -1 meaning this finger cannot be used anymore
   chordBuilder: NoteInChord[]; // notes that will be used in chord
   fingerAssignment: FingerAssignment; // how fingers are assigned to the strings
   usedNotesSet: Set<Note>; // contains all distinct notes currently used in the chord that's being built
-  barreFretByFingerIndex: (number | undefined)[]; // array of 4 numbers for each finger except the thumb. Having a value here means that this finger does a barre on a certain fret (uses 2+ strings)
-  maxFingerUsedByFret: Map<number, number>; // this prevents a lower finger to be placed on higher string for the same fret. Although technically possible (but hard to put fingers in such manner) such finger arrangement rarely makes practical sense
+  barreFretByFingerIndex: OptionalNumberArray; // array of 4 numbers for each finger except the thumb. Having a value here means that this finger does a barre on a certain fret (uses 2+ strings)
+  maxFingerUsedByFret: OptionalNumberArray; // this prevents a lower finger to be placed on higher string for the same fret. Although technically possible (but hard to put fingers in such manner) such finger arrangement rarely makes practical sense
 };
 
 export class FretChordsGenerator {
@@ -43,8 +44,8 @@ export class FretChordsGenerator {
     stringIndex: number,
     allNotesInChord: Set<Note>, // all the notes that should participate in chord
     recursiveData: RecursiveContainers,
-    minAllowedFretIndex: number | undefined,
-    maxAllowedFretIndex: number | undefined
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber
   ): ChordBuilderInfo[] => {
     // for every new recursive branch we need to have copies of all the recursively filled containers
     const copyRecursiveContainersForTheNextBranch = (): RecursiveContainers => {
@@ -55,7 +56,7 @@ export class FretChordsGenerator {
       const usedNotesSet = new Set(recursiveData.usedNotesSet);
       const fingerAssignment = [...recursiveData.fingerAssignment];
       const barreFretByFingerIndex = [...recursiveData.barreFretByFingerIndex];
-      const maxFingerUsedByFret = new Map(recursiveData.maxFingerUsedByFret);
+      const maxFingerUsedByFret = [...recursiveData.maxFingerUsedByFret];
       return {
         availableFretByFingerIndex,
         chordBuilder,
@@ -206,7 +207,7 @@ export class FretChordsGenerator {
             const {
               newMin,
               newMax,
-            }: { newMin: number | undefined; newMax: number | undefined } =
+            }: { newMin: OptionalNumber; newMax: OptionalNumber } =
               this.updateMinAndMaxFretPositions(
                 minAllowedFretIndex,
                 maxAllowedFretIndex,
@@ -216,7 +217,7 @@ export class FretChordsGenerator {
             const recursiveDataCopies =
               copyRecursiveContainersForTheNextBranch();
 
-            recursiveData.maxFingerUsedByFret.set(fret, currentFingerIndex);
+            recursiveData.maxFingerUsedByFret[fret] = currentFingerIndex;
             recursiveDataCopies.usedNotesSet.add(stringOctaveNote.note);
             recursiveDataCopies.fingerAssignment[stringIndex] =
               currentFingerIndex;
@@ -260,12 +261,12 @@ export class FretChordsGenerator {
   };
 
   private updateMinAndMaxFretPositions(
-    minAllowedFretIndex: number | undefined,
-    maxAllowedFretIndex: number | undefined,
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber,
     fret: number
   ) {
-    let newMin: number | undefined;
-    let newMax: number | undefined;
+    let newMin: OptionalNumber;
+    let newMax: OptionalNumber;
     // adjust limits according to the current note
     if (
       minAllowedFretIndex === undefined ||
@@ -326,8 +327,8 @@ export class FretChordsGenerator {
     stringIndex: number,
     allNotesInChord: Set<Note>,
     recursiveData: RecursiveContainers,
-    minAllowedFretIndex: number | undefined,
-    maxAllowedFretIndex: number | undefined
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber
   ) => {
     if (stringIndex > 0) {
       return this.findChordNotesRecursive(
@@ -406,7 +407,7 @@ export class FretChordsGenerator {
   };
 
   private preventCurrentBarresToContinueOnHigherStrings(
-    availableFretByFingerIndex: (number | undefined)[],
+    availableFretByFingerIndex: OptionalNumberArray,
     afterFret?: number
   ) {
     // if a string is muted it means that we cannot reuse the barre fingers anymore. We are setting all these fingers to -1 meaning they won't be reused.
@@ -423,7 +424,7 @@ export class FretChordsGenerator {
   private checkIfThereIsBarreOnHigherFret(
     currentFingerIndex: number,
     fret: number,
-    barreFretByFingerIndex: (number | undefined)[]
+    barreFretByFingerIndex: OptionalNumberArray
   ) {
     for (let i = currentFingerIndex + 1; i < 4; i++) {
       const barreFretOnOtherFinger = barreFretByFingerIndex[i];
@@ -441,8 +442,8 @@ export class FretChordsGenerator {
   private getMatchingNotesOnCurrentString(
     stringIndex: number,
     allNotesInChord: Set<Note>,
-    minAllowedFretIndex: number | undefined,
-    maxAllowedFretIndex: number | undefined
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber
   ): NoteInChord[] {
     const currentString = this.neck[stringIndex];
 
@@ -484,15 +485,15 @@ export class FretChordsGenerator {
     const baseFingerAssignment: FingerAssignment = new Array(this.neck.length);
 
     // fret limits for the first
-    let newMin: number | undefined;
-    let newMax: number | undefined;
+    let newMin: OptionalNumber;
+    let newMax: OptionalNumber;
 
     // Handle open string case
     if (startingFret === this.capo) {
       startingOptions.push({
         availableFretByFingerIndex: this.initArrayOfFingers(),
         fingerAssignment: [...baseFingerAssignment],
-        maxFingerUsedByFret: new Map<number, number>(),
+        maxFingerUsedByFret: [],
       });
     } else {
       // if we are not on the open string - then we can use only the adjacent several frets in each direction
@@ -505,7 +506,7 @@ export class FretChordsGenerator {
         startingOptions.push({
           availableFretByFingerIndex: this.initArrayOfFingers(),
           fingerAssignment: thumbFingerAssignment,
-          maxFingerUsedByFret: new Map<number, number>(),
+          maxFingerUsedByFret: [],
         });
       }
 
@@ -514,8 +515,8 @@ export class FretChordsGenerator {
         const availableFretByFingerIndex = this.initArrayOfFingers();
         availableFretByFingerIndex[i] = startingFret; // it means that we can use this finger only for this fret on the higher strings (barre)
         const currentFingerAssignment = [...baseFingerAssignment];
-        const maxFingerUsedByFret = new Map<number, number>();
-        maxFingerUsedByFret.set(startingFret, i);
+        const maxFingerUsedByFret: OptionalNumberArray = [];
+        maxFingerUsedByFret[startingFret] = i;
         currentFingerAssignment[stringIndex] = i;
         startingOptions.push({
           availableFretByFingerIndex,
@@ -533,7 +534,7 @@ const checkHasFurtherFingerOnLowerFrets = (
   fret: number,
   currentFingerIndex: number
 ) => {
-  const maxFingerUsedOnThisFret = recursiveData.maxFingerUsedByFret.get(fret);
+  const maxFingerUsedOnThisFret = recursiveData.maxFingerUsedByFret[fret];
   return (
     maxFingerUsedOnThisFret !== undefined &&
     currentFingerIndex < maxFingerUsedOnThisFret
