@@ -285,34 +285,40 @@ export class FretChordsGenerator {
   }
 
   private checkIfFingerPositionIsValid(
-    stringIndex: number,
+    currentStringIndex: number,
     fret: number,
     currentFingerIndex: number,
     recursiveData: RecursiveContainers
   ) {
     // going through each of the previous strings
-    for (let i = stringIndex; i < this.neck.length; i++) {
+    for (
+      let lowerStringIndex = currentStringIndex + 1;
+      lowerStringIndex < this.neck.length;
+      lowerStringIndex++
+    ) {
       // if we used a finger 1 on a lower string at a fret 5 it means that we can use fingers 2 and 3 on a frets >= 5 and we can use finger 0 on fret <= 5
-      const fingerUsedOnThisString = recursiveData.fingerAssignment[i];
-      let fretUsedOnThisString = recursiveData.chordBuilder[i]?.fret;
-      if (fretUsedOnThisString === this.capo) {
-        fretUsedOnThisString = undefined;
+      const fingerUsedOnLowerString =
+        recursiveData.fingerAssignment[lowerStringIndex];
+      let fretUsedOnLowerString =
+        recursiveData.chordBuilder[lowerStringIndex]?.fret;
+      if (fretUsedOnLowerString === this.capo) {
+        fretUsedOnLowerString = undefined;
       }
 
       if (
-        fingerUsedOnThisString !== undefined &&
-        fretUsedOnThisString !== undefined
+        fingerUsedOnLowerString !== undefined &&
+        fretUsedOnLowerString !== undefined
       ) {
         if (
-          fret > fretUsedOnThisString &&
-          currentFingerIndex <= fingerUsedOnThisString
+          fret > fretUsedOnLowerString &&
+          currentFingerIndex <= fingerUsedOnLowerString
         ) {
           return false;
         }
 
         if (
-          fret < fretUsedOnThisString &&
-          currentFingerIndex >= fingerUsedOnThisString
+          fret < fretUsedOnLowerString &&
+          currentFingerIndex >= fingerUsedOnLowerString
         ) {
           return false;
         }
