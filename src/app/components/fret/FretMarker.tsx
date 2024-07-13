@@ -65,7 +65,7 @@ const getFingerNameByPosition = (fingerIndex: number) => {
     case 4:
       return "Thumb";
     default:
-      throw new Error("Incrorrect finger " + fingerIndex);
+      throw new Error(`Incorrect finger ${fingerIndex}`);
   }
 };
 
@@ -160,17 +160,21 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
       // Create and add new chord finger badge
       const badgeElement = document.createElement("div");
       badgeElement.className =
-        "badge absolute -top-2 z-30 left-1/2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center";
+        "badge absolute -top-2 z-10 left-1/2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center";
       badgeElement.style.transform = `scaleX(${fretboardScaleX}) scaleY(${fretboardScaleY}) translateX(10px)`;
       badgeElement.style.fontSize = "10px";
-      badgeElement.title = getFingerNameByPosition(chordFingerRef.current);
+      typographyElement.parentElement!.title = getFingerNameByPosition(
+        chordFingerRef.current
+      );
       badgeElement.textContent = (chordFingerRef.current + 1).toString();
 
       // Wrap the typography element
-      typographyElement.parentNode?.insertBefore(
+      typographyElement.parentNode!.insertBefore(
         badgeElement,
         typographyElement
       );
+    } else {
+      typographyElement.parentElement!.title = "";
     }
 
     if (
