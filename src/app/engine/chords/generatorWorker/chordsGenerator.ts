@@ -19,6 +19,7 @@ class ChordsGenerator {
   private capo = 0;
   private absoluteMaxFretIndex = 0;
   private neck: Neck = [];
+  private maxFretToProcess = 0;
 
   constructor() {
     console.log("Creating ChordGenerator");
@@ -28,6 +29,10 @@ class ChordsGenerator {
     this.capo = capo;
     this.neck = neck;
     this.absoluteMaxFretIndex = neck[0].length - 1;
+    this.maxFretToProcess = Math.min(
+      this.capo + NOTE_COUNT,
+      this.absoluteMaxFretIndex
+    );
 
     const chordModesCount = chordModes.length;
 
@@ -85,18 +90,13 @@ class ChordsGenerator {
       // loop through the strings starting from the lowest, ensuring there are strings to put all the notes of the chordIntervals
       for (
         let fretIndex = this.capo;
-        fretIndex < this.absoluteMaxFretIndex;
+        fretIndex < this.maxFretToProcess; // we intentionally limit chords to 12 frets to improve performance. If performance gets better we can replace that with this.absoluteMaxFretIndex
         fretIndex++
       ) {
         const currentStringOctaveNote = neckString[fretIndex];
         if (currentStringOctaveNote === null) {
           continue;
         }
-
-        // // TODO:!!!! remove, it's just to test
-        // if (fretIndex !== 1) {
-        //   continue;
-        // }
 
         const fretChordsGenerator = new FretChordsGenerator(
           this.capo,
