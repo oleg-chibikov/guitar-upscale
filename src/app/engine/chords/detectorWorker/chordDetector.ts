@@ -3,11 +3,10 @@ import {
   ChordDetectorCallbackData,
   MIN_NOTES_TO_DETECT_CHORD,
 } from "@/app/data/chordDetectorWorkerTypes";
+import { Chord, StringOctaveNote } from "@/app/data/notes";
 import { sortChords } from "@/app/engine/chords/chordsSorter";
 import { MissingChar } from "@/app/engine/detectorShared";
 import { addOrUpdateMapArray } from "@/app/helpers/mapHelper";
-import { stringCountValue } from "@/app/store/settingsSlice";
-import { Chord, StringOctaveNote } from "../../../data/notes";
 import { Trie } from "../../../helpers/trie";
 
 const START_ASCII_CODE = "a".charCodeAt(0);
@@ -15,10 +14,15 @@ const START_ASCII_CODE = "a".charCodeAt(0);
 class ChordDetector {
   private trie: Trie;
   private reverseChordsMap: Map<string, string[]>;
+  private stringCount: number = 6;
 
   constructor() {
     this.trie = new Trie();
     this.reverseChordsMap = new Map<string, string[]>();
+  }
+
+  setStringCount(value: number) {
+    this.stringCount = value;
   }
 
   addChordToDetectorLookup(chord: Chord, fullKey: string) {
@@ -71,7 +75,7 @@ class ChordDetector {
     // Initialize the serializedChord with '?' for each position
 
     // TODO: don't import stringCountValue. instead pass the chord as notes for all the strings. now it contains only non-undefined ones
-    for (let i = 0; i < stringCountValue; i++) {
+    for (let i = 0; i < this.stringCount; i++) {
       serializedChord.push(missingChar);
     }
 

@@ -44,6 +44,7 @@ const addChordsToDetectorLookup = (
 const setNeckAndCapo = (neck: Neck, value: number) => {
   neckValue = neck;
   capoValue = value;
+  chordDetector.setStringCount(neckValue.length);
 };
 
 self.onmessage = (
