@@ -1,4 +1,4 @@
-import { Chord, Note, getNoteText } from "@/app/data/notes";
+import { Chord, Note, StringOctaveNote, getNoteText } from "@/app/data/notes";
 import { ChordPreferredVariations } from "@/app/engine/chords/chordVariationHelper";
 
 export interface ChordMode {
@@ -13,6 +13,11 @@ export interface ChordMode {
 export type ChordBuilderInfo = {
   variation: Chord;
   fingerAssignment: FingerAssignment;
+};
+
+export type StringOctaveNoteWithFingerPosition = {
+  stringOctaveNote: StringOctaveNote;
+  fingerIndex: number | undefined;
 };
 
 export type FingerAssignment = (number | undefined)[];
