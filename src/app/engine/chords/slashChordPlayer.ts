@@ -1,3 +1,4 @@
+import { StringOctaveNoteWithFingerPosition } from "@/app/data/chordModes";
 import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
 import { Note, StringOctaveNote } from "@/app/data/notes";
 import { getPossibleFretRangeForChord } from "@/app/helpers/slashChordHelper";
@@ -58,9 +59,10 @@ const findClosestNote = (
 };
 
 export const replaceBassNoteWithSlash = (
-  variationNotes: StringOctaveNote[]
+  variation: StringOctaveNoteWithFingerPosition[]
 ) => {
-  const bassNote = variationNotes[variationNotes.length - 1];
+  const variationNotes = variation.map((x) => x.stringOctaveNote);
+  const bassNote = variationNotes[variation.length - 1];
   const slashNote = slashChordBassNoteValue;
   const { minAllowedFretIndex, maxAllowedFretIndex } =
     getPossibleFretRangeForChord(variationNotes, capoValue);
@@ -111,10 +113,13 @@ export const replaceBassNoteWithSlash = (
 
     if (closestSlashBassNote) {
       // Remove the original bass note
-      variationNotes.pop();
+      const poppedNote = variation.pop();
 
       // Add the new slash bass note
-      variationNotes.push(closestSlashBassNote);
+      variation.push({
+        stringOctaveNote: closestSlashBassNote,
+        fingerIndex: poppedNote?.fingerIndex,
+      });
     }
   }
 };

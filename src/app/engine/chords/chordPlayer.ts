@@ -1,5 +1,8 @@
-import { ChordBuilderInfo, ChordVariations } from "@/app/data/chordModes";
-import { StringOctaveNote } from "@/app/data/notes";
+import {
+  ChordBuilderInfo,
+  ChordVariations,
+  StringOctaveNoteWithFingerPosition,
+} from "@/app/data/chordModes";
 import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
 import { replaceBassNoteWithSlash } from "@/app/engine/chords/slashChordPlayer";
 import { sleep } from "../../helpers/sleep";
@@ -112,33 +115,45 @@ const playVariation = async (
   { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
 ) => {
   const noteCount = notesToPlay ?? chordNotesToPlayValue;
-  let i = 0;
+
+  const combinedData = variation.variation.map((x, i) =>
+    x === undefined
+      ? undefined
+      : ({
+          stringOctaveNote: x,
+          fingerIndex: variation.fingerAssignment[i],
+        } as StringOctaveNoteWithFingerPosition)
+  );
   console.log(`Playing ${variationKey} variation of ${chordName}`);
 
-  const variationNotes = reverse
-    ? [...variation.variation].reverse()
-    : variation.variation;
-  const fingerAssignments = reverse
-    ? [...variation.fingerAssignment].reverse()
-    : variation.fingerAssignment;
-
-  const filtered = variationNotes.filter((x) => x) as StringOctaveNote[];
+  const filtered = combinedData.filter((x) => x !== undefined);
 
   replaceBassNoteWithSlash(filtered);
 
-  for (i = 0; i < filtered.length && i < noteCount; i++) {
-    const stringOctaveNote = filtered[i];
-    const chordFinger = fingerAssignments[i];
-
+  const playSingleNote = async (
+    noteWithFinger: StringOctaveNoteWithFingerPosition
+  ) => {
     NotePlayEventBus.next({
       ...rest, // track metadata and strumming metadata
-      stringOctaveNote,
+      stringOctaveNote: noteWithFinger.stringOctaveNote,
       fromChord: true,
-      chordFinger,
+      chordFinger: noteWithFinger.fingerIndex,
     });
 
     if (delayMs !== undefined && delayMs > 0) {
       await sleep(delayMs);
+    }
+  };
+
+  const maxNotes = Math.min(filtered.length, noteCount);
+
+  if (reverse) {
+    for (let i = maxNotes - 1; i >= 0; i--) {
+      await playSingleNote(filtered[i]);
+    }
+  } else {
+    for (let i = 0; i < maxNotes; i++) {
+      await playSingleNote(filtered[i]);
     }
   }
 };
