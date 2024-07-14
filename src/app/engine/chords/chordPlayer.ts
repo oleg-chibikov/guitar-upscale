@@ -126,7 +126,9 @@ const playVariation = async (
   );
   console.log(`Playing ${variationKey} variation of ${chordName}`);
 
-  const filtered = combinedData.filter((x) => x !== undefined);
+  const filtered = combinedData.filter(
+    (x) => x !== undefined
+  ) as StringOctaveNoteWithFingerPosition[];
 
   replaceBassNoteWithSlash(filtered);
 
