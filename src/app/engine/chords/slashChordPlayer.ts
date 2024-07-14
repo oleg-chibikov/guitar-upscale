@@ -113,12 +113,12 @@ export const replaceBassNoteWithSlash = (
 
     if (closestSlashBassNote) {
       // Remove the original bass note
-      const poppedNote = variation.pop();
+      variation.pop();
 
       // Add the new slash bass note
       variation.push({
         stringOctaveNote: closestSlashBassNote,
-        fingerIndex: poppedNote?.fingerIndex,
+        fingerIndex: undefined, // TODO: It can introduce wrong finger placement if the same finger is used. Add logic here. for example for the last string we can use Thumb. Also if it goes to the left it cannot be the same as previous
       });
     }
   }
