@@ -1,6 +1,6 @@
 import {
   ChordMode,
-  ChordModeVariationsContainer,
+  ChordModeVariations,
   ChordVariationsByNote,
 } from "@/app/data/chordModes";
 import {
@@ -9,10 +9,6 @@ import {
   MAX_STRING_INDEX_FOR_CHORD_GENERATION,
 } from "@/app/data/chordsGeneratorTypes";
 import { Neck, NOTE_COUNT } from "@/app/data/notes";
-import {
-  ChordPreferredVariations,
-  getPreferredChordVariations,
-} from "@/app/engine/chords/chordVariationHelper";
 import { FretChordsGenerator } from "@/app/engine/chords/generatorWorker/fretChordsGenerator";
 
 class ChordsGenerator {
@@ -42,12 +38,12 @@ class ChordsGenerator {
         continue;
       }
 
-      const chordModeVariationsContainer = this.processChordMode(chordMode);
+      const chordModeVariations = this.processChordMode(chordMode);
 
       // Post a message for each processed chord mode
       self.postMessage({
         type: "chordModeProcessed",
-        chordModeVariationsContainer,
+        chordModeVariations,
         index,
       } as GenerateChordsCallbackMessage);
     }
@@ -131,41 +127,13 @@ class ChordsGenerator {
       );
     }
 
-    const preferredVariationsByNote = this.fillPreferredVariations(
+    const dataForChordMode: ChordModeVariations = {
+      chordMode,
       variationsByNote,
-      chordMode
-    );
-
-    const dataForChordMode: ChordModeVariationsContainer = {
-      chordModeVariations: { chordMode, variationsByNote },
-      preferredVariationsByNote,
     };
 
     return dataForChordMode;
   };
-
-  private fillPreferredVariations(
-    variationsByNote: ChordVariationsByNote,
-    chordMode: ChordMode
-  ) {
-    const preferredVariationsByNote: (ChordPreferredVariations | undefined)[] =
-      [];
-    for (let note = 0; note < NOTE_COUNT; note++) {
-      const noteChords = variationsByNote[note];
-      if (noteChords === undefined || noteChords.length === 0) {
-        continue;
-      }
-
-      // after the mode has been processed we need to find the preferred variation for it and put into the dedicated map
-      preferredVariationsByNote[note] = getPreferredChordVariations(
-        noteChords,
-        chordMode.name === "5" ? "low" : "high", // Power chords prefer lower strings
-        this.neck.length
-      );
-    }
-
-    return preferredVariationsByNote;
-  }
 }
 
 export const chordsGenerator = new ChordsGenerator();

@@ -1,5 +1,4 @@
 import { ChordBuilderInfo, FingerAssignment } from "@/app/data/chordModes";
-import { MAX_DISTANCE_IN_CHORD } from "@/app/data/chordsGeneratorTypes";
 import {
   NOTE_COUNT,
   Neck,
@@ -7,8 +6,15 @@ import {
   NoteInChord,
   StringOctaveNote,
 } from "@/app/data/notes";
+import {
+  getPossibleFullFingerStretch,
+  isWithinAllowedDistance,
+} from "@/app/engine/chords/generatorWorker/fretDistanceChecker";
 
 const THUMB = 4;
+const NON_THUMB_FINGER_COUNT = 4;
+
+// TODO: Possible finger alignment when using thumb
 
 type OptionalNumber = number | undefined;
 type OptionalNumberArray = OptionalNumber[];
@@ -19,6 +25,7 @@ type StartingOption = {
 };
 type RecursiveContainers = {
   availableFretByFingerIndex: OptionalNumberArray; // array of 4 numbers for each finger except the thumb. undefined means this finger can be used for any fret. Otherwise we limit it only to a single fret onwards (barre). It can be set to -1 meaning this finger cannot be used anymore
+  usedFretByFingerIndex: OptionalNumberArray; // the same as previous, but cannot be set to -1
   chordBuilder: NoteInChord[]; // notes that will be used in chord
   fingerAssignment: FingerAssignment; // how fingers are assigned to the strings
   usedNotesSet: Set<Note>; // contains all distinct notes currently used in the chord that's being built
@@ -52,12 +59,14 @@ export class FretChordsGenerator {
       const availableFretByFingerIndex = [
         ...recursiveData.availableFretByFingerIndex,
       ];
+      const usedFretByFingerIndex = [...recursiveData.usedFretByFingerIndex];
       const chordBuilder = [...recursiveData.chordBuilder];
       const usedNotesSet = new Set(recursiveData.usedNotesSet);
       const fingerAssignment = [...recursiveData.fingerAssignment];
       const barreFretByFingerIndex = [...recursiveData.barreFretByFingerIndex];
       const maxFingerUsedByFret = [...recursiveData.maxFingerUsedByFret];
       return {
+        usedFretByFingerIndex,
         availableFretByFingerIndex,
         chordBuilder,
         fingerAssignment,
@@ -172,6 +181,7 @@ export class FretChordsGenerator {
               return null;
             }
 
+            // check which fret is used on the closest previous finger
             if (
               checkHasFurtherFingerOnLowerFrets(
                 recursiveData,
@@ -203,6 +213,26 @@ export class FretChordsGenerator {
               return null;
             }
 
+            if (
+              isInvalidDistanceBetweenCurrentAndPreviousFingers(
+                currentFingerIndex,
+                recursiveData,
+                fret
+              )
+            ) {
+              return null;
+            }
+
+            if (
+              isInvalidDistanceBetweenCurrentAndNextFingers(
+                currentFingerIndex,
+                recursiveData,
+                fret
+              )
+            ) {
+              return null;
+            }
+
             // calculate fret limits for the next string
             const {
               newMin,
@@ -213,6 +243,22 @@ export class FretChordsGenerator {
                 maxAllowedFretIndex,
                 fret
               );
+
+            const isBarreOnCurrentFret =
+              theOnlyAllowedFret !== undefined && fret === theOnlyAllowedFret;
+
+            if (isBarreOnCurrentFret) {
+              // having a barre and another finger on the same fret is highly unlikely - skipping this chord
+              const hasSameFretUsedByDifferentFinger =
+                checkHasSameFretUsedByDifferentFinger(
+                  currentFingerIndex,
+                  recursiveData,
+                  fret
+                );
+              if (hasSameFretUsedByDifferentFinger) {
+                return null;
+              }
+            }
 
             const recursiveDataCopies =
               copyRecursiveContainersForTheNextBranch();
@@ -232,12 +278,11 @@ export class FretChordsGenerator {
               recursiveDataCopies.availableFretByFingerIndex[
                 currentFingerIndex
               ] = fret;
+              recursiveDataCopies.usedFretByFingerIndex[currentFingerIndex] =
+                fret;
             }
 
-            if (
-              theOnlyAllowedFret !== undefined &&
-              fret === theOnlyAllowedFret
-            ) {
+            if (isBarreOnCurrentFret) {
               recursiveDataCopies.barreFretByFingerIndex[currentFingerIndex] =
                 fret;
             }
@@ -277,9 +322,17 @@ export class FretChordsGenerator {
       ({ newMin, newMax } = this.getFretLimitsForTheFirstTime(fret));
     } else {
       // else they are left undefined
-      // we can allow max MAX_DISTANCE_IN_CHORD frets in any direction. If we go left from the note on the next string - then the max limit should be recalculated from the leftmost position and vice versa for the right direction
-      newMax = Math.min(fret + MAX_DISTANCE_IN_CHORD, maxAllowedFretIndex);
-      newMin = Math.max(fret - MAX_DISTANCE_IN_CHORD, minAllowedFretIndex);
+      // we can allow max MAX_DISTANCE_IN_CHORD frets in any direction (it depends on the current fret). If we go left from the note on the next string - then the max limit should be recalculated from the leftmost position and vice versa for the right direction
+
+      newMin = Math.max(
+        fret - getPossibleFullFingerStretch(minAllowedFretIndex),
+        minAllowedFretIndex
+      );
+
+      newMax = Math.min(
+        fret + getPossibleFullFingerStretch(fret),
+        maxAllowedFretIndex
+      );
     }
     return { newMin, newMax };
   }
@@ -335,7 +388,7 @@ export class FretChordsGenerator {
     recursiveData: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber
-  ) => {
+  ): ChordBuilderInfo[] | null => {
     if (stringIndex > 0) {
       return this.findChordNotesRecursive(
         stringIndex - 1,
@@ -352,20 +405,28 @@ export class FretChordsGenerator {
         return null;
       }
     }
-    return [
-      {
-        variation: recursiveData.chordBuilder,
-        fingerAssignment: recursiveData.fingerAssignment,
-      } as ChordBuilderInfo,
-    ];
+
+    const chordBuilderInfo: ChordBuilderInfo = {
+      variation: recursiveData.chordBuilder,
+      fingerAssignment: recursiveData.fingerAssignment,
+      hasBarreOnIndexFinger:
+        recursiveData.barreFretByFingerIndex[0] !== undefined, // 0 is the index finger
+    };
+    return [chordBuilderInfo];
   };
 
   private getFretLimitsForTheFirstTime = (fretIndex: number) => {
-    const newMin = Math.max(this.capo + 1, fretIndex - MAX_DISTANCE_IN_CHORD);
+    const newMin = Math.max(
+      this.capo + 1,
+      fretIndex -
+        getPossibleFullFingerStretch(
+          Math.max(this.capo + 1, fretIndex - 5) // for more precise calculation we go 5 frets left, as the calculation is based on the leftmost fret of the range
+        )
+    );
 
     const newMax = Math.min(
       this.maxFretToProcess,
-      fretIndex + MAX_DISTANCE_IN_CHORD
+      fretIndex + getPossibleFullFingerStretch(fretIndex)
     );
     return { newMin, newMax };
   };
@@ -402,6 +463,7 @@ export class FretChordsGenerator {
             fingerAssignment,
             usedNotesSet,
             availableFretByFingerIndex,
+            usedFretByFingerIndex: [...availableFretByFingerIndex], // the same as availableFretByFingerIndex at this point
             barreFretByFingerIndex: this.initArrayOfFingers(),
             maxFingerUsedByFret,
           },
@@ -418,7 +480,7 @@ export class FretChordsGenerator {
   ) {
     // if a string is muted it means that we cannot reuse the barre fingers anymore. We are setting all these fingers to -1 meaning they won't be reused.
     // for the fingers that are still not used we can continue using them (including as barre)
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < NON_THUMB_FINGER_COUNT; i++) {
       const fretUsedWithFinger = availableFretByFingerIndex[i];
       if (fretUsedWithFinger !== undefined) {
         if (afterFret === undefined || fretUsedWithFinger > afterFret)
@@ -432,7 +494,7 @@ export class FretChordsGenerator {
     fret: number,
     barreFretByFingerIndex: OptionalNumberArray
   ) {
-    for (let i = currentFingerIndex + 1; i < 4; i++) {
+    for (let i = currentFingerIndex + 1; i < NON_THUMB_FINGER_COUNT; i++) {
       const barreFretOnOtherFinger = barreFretByFingerIndex[i];
       if (
         barreFretOnOtherFinger !== undefined &&
@@ -517,7 +579,7 @@ export class FretChordsGenerator {
       }
 
       // Consider each finger as a starting option
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < NON_THUMB_FINGER_COUNT; i++) {
         const availableFretByFingerIndex = this.initArrayOfFingers();
         availableFretByFingerIndex[i] = startingFret; // it means that we can use this finger only for this fret on the higher strings (barre)
         const currentFingerAssignment = [...baseFingerAssignment];
@@ -528,7 +590,7 @@ export class FretChordsGenerator {
           availableFretByFingerIndex,
           fingerAssignment: currentFingerAssignment,
           maxFingerUsedByFret,
-        });
+        } as StartingOption);
       }
     }
     return { startingOptions, newMin, newMax };
@@ -545,4 +607,82 @@ const checkHasFurtherFingerOnLowerFrets = (
     maxFingerUsedOnThisFret !== undefined &&
     currentFingerIndex < maxFingerUsedOnThisFret
   );
+};
+
+const isInvalidDistanceBetweenCurrentAndPreviousFingers = (
+  currentFingerIndex: number,
+  recursiveData: RecursiveContainers,
+  fret: number
+) => {
+  for (
+    let previousFingerIndex = currentFingerIndex - 1;
+    previousFingerIndex >= 0;
+    previousFingerIndex--
+  ) {
+    const fretUsedByPreviousFinger =
+      recursiveData.usedFretByFingerIndex[previousFingerIndex];
+    if (fretUsedByPreviousFinger !== undefined) {
+      if (
+        !isWithinAllowedDistance(
+          fretUsedByPreviousFinger,
+          fret,
+          previousFingerIndex,
+          currentFingerIndex
+        )
+      ) {
+        return true;
+      }
+
+      // we check only the closest adjacent finger
+      break;
+    }
+  }
+  return false;
+};
+
+const isInvalidDistanceBetweenCurrentAndNextFingers = (
+  currentFingerIndex: number,
+  recursiveData: RecursiveContainers,
+  fret: number
+) => {
+  for (
+    let previousFingerIndex = currentFingerIndex + 1;
+    previousFingerIndex < NON_THUMB_FINGER_COUNT;
+    previousFingerIndex++
+  ) {
+    const fretUsedByNextFinger =
+      recursiveData.usedFretByFingerIndex[previousFingerIndex];
+    if (fretUsedByNextFinger !== undefined) {
+      if (
+        !isWithinAllowedDistance(
+          fret,
+          fretUsedByNextFinger,
+          currentFingerIndex,
+          previousFingerIndex
+        )
+      ) {
+        return true;
+      }
+
+      // we check only the closest adjacent finger
+      break;
+    }
+  }
+  return false;
+};
+
+const checkHasSameFretUsedByDifferentFinger = (
+  currentFingerIndex: number,
+  recursiveData: RecursiveContainers,
+  fret: number
+) => {
+  for (let i = 0; i < NON_THUMB_FINGER_COUNT; i++) {
+    if (i === currentFingerIndex) {
+      continue; // skip current fret
+    }
+    if (recursiveData.usedFretByFingerIndex[i] === fret) {
+      return true;
+    }
+  }
+  return false;
 };

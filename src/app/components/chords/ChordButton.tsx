@@ -4,11 +4,8 @@ import { Note } from "@/app/data/notes";
 import { Theme } from "@/app/data/theme";
 import {
   ChordPlayParameters,
-  playAllVariations,
   playFirstChordVariation,
   playPreferredChordVariation,
-  playPreferredChordVariationWithMaximumNotes,
-  playPreferredChordVariationWithMinimumNotes,
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
@@ -241,20 +238,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           case ChordPlayMode.Round_Robin:
             await playRoundRobin(params);
             break;
-          case ChordPlayMode.All_Variations:
-            await playAllVariations(params);
-            break;
           case ChordPlayMode.First_Variation:
             await playFirstChordVariation(params);
             break;
           case ChordPlayMode.Preferred_Variation:
-            await playPreferredChordVariation(params);
-            break;
           case ChordPlayMode.Preferred_Variation_With_Min_Notes:
-            await playPreferredChordVariationWithMinimumNotes(params);
-            break;
           case ChordPlayMode.Preferred_Variation_With_Max_Notes:
-            await playPreferredChordVariationWithMaximumNotes(params);
+          case ChordPlayMode.Barre:
+            await playPreferredChordVariation(params);
             break;
           case ChordPlayMode.Random_Variation:
             await playRandomChordVariation(params);

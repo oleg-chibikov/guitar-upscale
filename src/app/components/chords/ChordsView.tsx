@@ -1,6 +1,7 @@
 import { SlashChordButtonsContainer } from "@/app/components/chords/SlashChordButtonsContainer";
 import { Expander } from "@/app/components/uiFramework/Expander";
 import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import {
   ChordsDisplayMode,
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
@@ -16,7 +17,7 @@ import {
   setChordModeForNotes,
 } from "@/app/engine/chords/chordModesByNote";
 import {
-  chordNotesByName,
+  chordPreferredVariationsByName,
   setPreferredVariationsForChordMode,
 } from "@/app/engine/chords/chordNotesByName";
 import {
@@ -28,11 +29,9 @@ import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import {
-  addChordMode,
   capoValue,
-  chordsValue,
+  chordPlayModeValue,
   neckValue,
-  resetChordsValue,
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
@@ -54,12 +53,16 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   const chordDetectorAvailable = useSettingsSelector(
     (s) => s.chordDetectorAvailable
   );
+  const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
+  const chordPlayMode = useSettingsSelector((s) => s.chordPlayMode);
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
   const [chordModeVariations, setChordModeVariations] = useState<
     ChordModeVariations[]
   >([]);
+
+  const chordModeVariationsRef = useRef<ChordModeVariations[]>([]);
 
   // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
   const localGuitarSettingsUpdateCount = useRef<number>(0);
@@ -72,6 +75,16 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
+
+  useEffect(() => {
+    if (chordsAreLoading) {
+      return; // don't switch it while chords are loaded - preferred variations will be updated once they are loaded
+    }
+    regeneratePreferredVariationsForAllModes(
+      chordModeVariationsRef.current,
+      chordPlayMode
+    );
+  }, [chordPlayMode, chordsAreLoading]);
 
   useEffect(() => {
     const setNewChords = async () => {
@@ -97,28 +110,39 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
       localGuitarSettingsUpdateCount.current = guitarSettingsUpdateCount;
       // chord detector needs these values to build slash chords
       chordDetectorWorkerApi.setNeckAndCapo(neckValue, capoValue);
-      chordNotesByName.clear();
+      chordPreferredVariationsByName.clear();
       resetChordModesForNotes();
-      resetChordsValue();
-      setChordModeVariations([]);
+      chordModeVariationsRef.current = [];
+      setChordModeVariations(chordModeVariationsRef.current);
       dispatch(setChordsAreLoading(true));
+      const chordPlayModeBeforeGeneration = chordPlayModeValue;
 
       generateChords(
         neckValue,
         capoValue,
-        (chordModeVariationsContainer) => {
-          addChordMode(chordModeVariationsContainer.chordModeVariations);
-          setPreferredVariationsForChordMode(chordModeVariationsContainer);
-          setChordModeVariations([...chordsValue]);
-          setChordModeForNotes(chordModeVariationsContainer);
-          addChordsToDetectorLookup?.(
-            chordModeVariationsContainer.chordModeVariations
+        (variations) => {
+          chordModeVariationsRef.current.push(variations);
+          setChordModeVariations([...chordModeVariationsRef.current]);
+
+          setPreferredVariationsForChordMode(
+            variations,
+            chordPlayModeBeforeGeneration
           );
+          setChordModeForNotes(variations);
+          addChordsToDetectorLookup?.(variations);
         },
         () => {
           clearChordDetector?.();
           dispatch(setChordIsBeingDetected(false));
           dispatch(setChordsAreLoading(false));
+
+          // if the chord play mode has changed while chords were being generated - update the preferred variations according to the new value
+          if (chordPlayModeValue !== chordPlayModeBeforeGeneration) {
+            regeneratePreferredVariationsForAllModes(
+              chordModeVariationsRef.current,
+              chordPlayModeValue
+            );
+          }
         }
       );
     };
@@ -139,6 +163,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const totalColumns = chordModeVariations.length;
   if (totalColumns === 0) {
     return null;
@@ -205,6 +230,16 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     </Expander>
   );
 };
+
+function regeneratePreferredVariationsForAllModes(
+  chordModeVariations: ChordModeVariations[],
+  chordPlayMode: ChordPlayMode
+) {
+  chordPreferredVariationsByName.clear();
+  chordModeVariations.forEach((variations) => {
+    setPreferredVariationsForChordMode(variations, chordPlayMode);
+  });
+}
 
 function toggleOverflow(
   isStrummingClicked: boolean,

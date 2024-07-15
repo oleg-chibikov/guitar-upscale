@@ -1,16 +1,47 @@
 import { ChordBuilderInfo, ChordVariations } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { StringOctaveNote } from "@/app/data/notes";
 import { calculateAverage } from "@/app/helpers/arrayHelper";
 
-export type ChordPreferredVariations = {
-  preferred: ChordBuilderInfo;
-  preferredWithMinNotes: ChordBuilderInfo;
-  preferredWithMaxNotes: ChordBuilderInfo;
-};
-
 type StringPreference = "high" | "low";
 
-const getPreferredChordVariation = (
+export const getPreferredChordVariation = (
+  chordVariations: ChordVariations,
+  stringPreference: StringPreference = "high",
+  numberOfStrings: number,
+  type: ChordPlayMode
+): ChordBuilderInfo => {
+  switch (type) {
+    case ChordPlayMode.Barre:
+      return chordVariations.filter(
+        (x) =>
+          x.hasBarreOnIndexFinger &&
+          x.fingerAssignment[x.fingerAssignment.length - 1] !== 4
+      )[0];
+    case ChordPlayMode.Preferred_Variation_With_Min_Notes:
+      return getPreferredChordVariationWithMinNotes(
+        chordVariations,
+        stringPreference,
+        numberOfStrings
+      );
+    case ChordPlayMode.Preferred_Variation_With_Max_Notes:
+      return getPreferredChordVariationWithMaxNotes(
+        chordVariations,
+        stringPreference,
+        numberOfStrings
+      );
+    case ChordPlayMode.Preferred_Variation:
+      return getGeneralPreferredChordVariation(
+        chordVariations,
+        stringPreference,
+        numberOfStrings
+      );
+    default:
+      return chordVariations[0];
+  }
+};
+
+const getGeneralPreferredChordVariation = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number
@@ -103,35 +134,6 @@ const getPreferredChordVariation = (
   });
 };
 
-export const getPreferredChordVariations = (
-  chordVariations: ChordVariations,
-  stringPreference: StringPreference = "high",
-  numberOfStrings: number
-): ChordPreferredVariations => {
-  const preferred = getPreferredChordVariation(
-    chordVariations,
-    stringPreference,
-    numberOfStrings
-  );
-
-  const preferredWithMinNotes = getPreferredChordVariationWithMinNotes(
-    chordVariations,
-    stringPreference,
-    numberOfStrings
-  );
-  const preferredWithMaxNotes = getPreferredChordVariationWithMaxNotes(
-    chordVariations,
-    stringPreference,
-    numberOfStrings
-  );
-
-  return {
-    preferred,
-    preferredWithMinNotes,
-    preferredWithMaxNotes,
-  };
-};
-
 const getPreferredChordVariationWithMinNotes = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference,
@@ -146,7 +148,7 @@ const getPreferredChordVariationWithMinNotes = (
     (v) =>
       v.variation.filter((note) => note !== undefined).length === minPlayedNotes
   );
-  return getPreferredChordVariation(
+  return getGeneralPreferredChordVariation(
     variationsWithMinNotes,
     stringPreference,
     numberOfStrings
@@ -167,7 +169,7 @@ const getPreferredChordVariationWithMaxNotes = (
     (v) =>
       v.variation.filter((note) => note !== undefined).length === maxPlayedNotes
   );
-  return getPreferredChordVariation(
+  return getGeneralPreferredChordVariation(
     variationsWithMinNotes,
     stringPreference,
     numberOfStrings

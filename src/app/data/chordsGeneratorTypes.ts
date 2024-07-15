@@ -1,4 +1,4 @@
-import { ChordMode, ChordModeVariationsContainer } from "@/app/data/chordModes";
+import { ChordMode, ChordModeVariations } from "@/app/data/chordModes";
 import { Neck } from "@/app/data/notes";
 
 export const MAX_STRING_INDEX_FOR_CHORD_GENERATION = 5;
@@ -16,7 +16,7 @@ export type GenerateChordsWorkerMessage =
     } & GenerateChordsRequest;
 
 export type GenerateChordsCallback = {
-  chordModeVariationsContainer: ChordModeVariationsContainer;
+  chordModeVariations: ChordModeVariations;
   index: number;
 };
 

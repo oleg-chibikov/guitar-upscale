@@ -1,7 +1,7 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
+import { chordPreferredVariationsByName } from "@/app/engine/chords/chordNotesByName";
 import {
   ChordWithPlayMetadata,
   DEFAULT_CHORD_TRACK_NUMBER,
@@ -93,7 +93,9 @@ export class MidiRecorder implements NoteRecorder {
           );
         }
         if (chord) {
-          const preferredVariations = chordNotesByName.get(chord.chord);
+          const preferredVariations = chordPreferredVariationsByName.get(
+            chord.chord
+          );
           if (preferredVariations) {
             for (const chordNote of preferredVariations.preferred.variation) {
               if (!chordNote) {

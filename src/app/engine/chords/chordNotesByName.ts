@@ -1,25 +1,35 @@
 import {
-  ChordModeVariationsContainer,
+  ChordBuilderInfo,
+  ChordModeVariations,
   getChordName,
 } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { NOTE_COUNT } from "@/app/data/notes";
-import { ChordPreferredVariations } from "@/app/engine/chords/chordVariationHelper";
+import { getPreferredChordVariation } from "@/app/engine/chords/chordVariationHelper";
+import { stringCountValue } from "@/app/store/settingsSlice";
 
-export const chordNotesByName = new Map<string, ChordPreferredVariations>();
+export const chordPreferredVariationsByName = new Map<
+  string,
+  ChordBuilderInfo
+>();
 
 export function setPreferredVariationsForChordMode(
-  chordModeVariationsContainer: ChordModeVariationsContainer
+  chordModeVariations: ChordModeVariations,
+  type: ChordPlayMode
 ) {
+  const chordMode = chordModeVariations.chordMode;
   for (let note = 0; note < NOTE_COUNT; note++) {
-    const preferredVariationsForNote =
-      chordModeVariationsContainer.preferredVariationsByNote[note];
-    if (!preferredVariationsForNote) {
+    const variationsForNote = chordModeVariations.variationsByNote[note];
+    if (!variationsForNote || !variationsForNote.length) {
       continue;
     }
-    const chordName = getChordName(
-      note,
-      chordModeVariationsContainer.chordModeVariations.chordMode
+    const preferredVariationsForNote = getPreferredChordVariation(
+      variationsForNote,
+      chordMode.name === "5" ? "low" : "high", // Power chords prefer lower strings
+      stringCountValue,
+      type
     );
-    chordNotesByName.set(chordName, preferredVariationsForNote);
+    const chordName = getChordName(note, chordMode);
+    chordPreferredVariationsByName.set(chordName, preferredVariationsForNote);
   }
 }

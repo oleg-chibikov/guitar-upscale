@@ -1,7 +1,7 @@
 import {
-  ChordModeVariationsContainer,
   advancedChordModes,
   chordModes,
+  ChordModeVariations,
 } from "@/app/data/chordModes";
 import {
   GenerateChordsCallbackMessage,
@@ -30,9 +30,7 @@ export const abortGeneratingChords = () => {
 export const generateChords = (
   neck: Neck,
   capo: number,
-  onChordModeProcessed: (
-    chordModeVariationsContainer: ChordModeVariationsContainer
-  ) => void,
+  onChordModeProcessed: (chordModeVariations: ChordModeVariations) => void,
   onComplete: () => void
 ) => {
   console.log("Start generating chords");
@@ -50,11 +48,11 @@ export const generateChords = (
     switch (type) {
       case "chordModeProcessed":
         {
-          const { chordModeVariationsContainer, index } = event.data;
+          const { chordModeVariations, index } = event.data;
           console.log(
-            `Chord mode ${chordModeVariationsContainer.chordModeVariations.chordMode.name} (index: ${index}) has been processed`
+            `Chord mode ${chordModeVariations.chordMode.name} (index: ${index}) has been processed`
           );
-          void onChordModeProcessed(chordModeVariationsContainer);
+          void onChordModeProcessed(chordModeVariations);
         }
         break;
       case "processingComplete":

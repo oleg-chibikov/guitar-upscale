@@ -14,7 +14,6 @@ import {
 import { clearPreviousChords } from "../engine/eventBus";
 import { generateNeckRepresentation } from "../engine/generateNeckRepresentation";
 
-import { ChordModeVariations } from "@/app/data/chordModes";
 import { MAX_VOLUME } from "@/app/data/volume";
 import { clearChordDetector } from "@/app/engine/chords/chordLookupBuilder";
 import { clearScaleDetector } from "@/app/engine/scales/scaleLookupBuilder";
@@ -161,11 +160,6 @@ const initialState: SettingsState = {
 
 export let neckValue: Neck | null = initialState.neck;
 export let stringCountValue: number = initialState.stringCount;
-export const chordsValue: ChordModeVariations[] = [];
-
-export const resetChordsValue = () => {
-  chordsValue.length = 0;
-};
 export let volumeValue: number = initialState.volume;
 export let metronomeVolumeValue: number = initialState.metronomeVolume;
 export let tempoBpmValue: number = initialState.tempoBpm;
@@ -342,10 +336,6 @@ export const tryToggleInterval = (toggle: boolean) => {
       stopInterval(true);
     }
   }
-};
-
-export const addChordMode = (chordModeVariations: ChordModeVariations) => {
-  chordsValue.push(chordModeVariations);
 };
 
 export enum PauseResolveValue {

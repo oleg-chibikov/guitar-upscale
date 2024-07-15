@@ -3,7 +3,7 @@ import {
   ChordVariations,
   StringOctaveNoteWithFingerPosition,
 } from "@/app/data/chordModes";
-import { chordNotesByName } from "@/app/engine/chords/chordNotesByName";
+import { chordPreferredVariationsByName } from "@/app/engine/chords/chordNotesByName";
 import { replaceBassNoteWithSlash } from "@/app/engine/chords/slashChordPlayer";
 import { sleep } from "../../helpers/sleep";
 import { chordNotesToPlayValue } from "../../store/settingsSlice";
@@ -41,48 +41,11 @@ export const playPreferredChordVariation = async (
   if (!params.variations.length) {
     return;
   }
-  const preferredVariations = chordNotesByName.get(params.chordName);
-  if (preferredVariations) {
-    await playVariation(preferredVariations.preferred, "preferred", params);
-  }
-};
-
-export const playPreferredChordVariationWithMinimumNotes = async (
-  params: ChordPlayParameters
-) => {
-  if (!params.variations.length) {
-    return;
-  }
-  const preferredVariations = chordNotesByName.get(params.chordName);
-  if (preferredVariations) {
-    await playVariation(
-      preferredVariations.preferredWithMinNotes,
-      "preferred min notes",
-      params
-    );
-  }
-};
-
-export const playPreferredChordVariationWithMaximumNotes = async (
-  params: ChordPlayParameters
-) => {
-  if (!params.variations.length) {
-    return;
-  }
-  const preferredVariations = chordNotesByName.get(params.chordName);
-  if (preferredVariations) {
-    await playVariation(
-      preferredVariations.preferredWithMaxNotes,
-      "preferred max notes",
-      params
-    );
-  }
-};
-
-export const playAllVariations = async (params: ChordPlayParameters) => {
-  for (const variation of params.variations) {
-    await playVariation(variation, "combined", params);
-    await sleep(1000);
+  const preferredVariation = chordPreferredVariationsByName.get(
+    params.chordName
+  );
+  if (preferredVariation) {
+    await playVariation(preferredVariation, "preferred", params);
   }
 };
 
