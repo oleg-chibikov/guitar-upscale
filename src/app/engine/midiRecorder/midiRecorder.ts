@@ -97,7 +97,7 @@ export class MidiRecorder implements NoteRecorder {
             chord.chord
           );
           if (preferredVariations) {
-            for (const chordNote of preferredVariations.preferred.variation) {
+            for (const chordNote of preferredVariations.variation) {
               if (!chordNote) {
                 continue;
               }
