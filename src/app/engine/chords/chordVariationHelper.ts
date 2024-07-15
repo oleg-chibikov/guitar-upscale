@@ -18,6 +18,10 @@ export const getPreferredChordVariation = (
           x.hasBarreOnIndexFinger &&
           x.fingerAssignment[x.fingerAssignment.length - 1] !== 4
       )[0];
+    case ChordPlayMode.With_Thumb:
+      return chordVariations.filter(
+        (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === 4
+      )[0];
     case ChordPlayMode.Preferred_Variation_With_Min_Notes:
       return getPreferredChordVariationWithMinNotes(
         chordVariations,

@@ -48,7 +48,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 }) => {
   const elementRef = useRef<HTMLUListElement>(null);
   const hasTouchInput = useInputChecker();
-  const isDisabled = !variations.length;
+  const isDisabled = !variations.length; // TODO: hide if there's no preferred variation of current type
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
@@ -245,6 +245,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           case ChordPlayMode.Preferred_Variation_With_Min_Notes:
           case ChordPlayMode.Preferred_Variation_With_Max_Notes:
           case ChordPlayMode.Barre:
+            await playPreferredChordVariation(params);
+            break;
+          case ChordPlayMode.With_Thumb:
             await playPreferredChordVariation(params);
             break;
           case ChordPlayMode.Random_Variation:

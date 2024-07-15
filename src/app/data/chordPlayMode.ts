@@ -4,6 +4,7 @@ export enum ChordPlayMode {
   Preferred_Variation_With_Min_Notes,
   Preferred_Variation_With_Max_Notes,
   Barre,
+  With_Thumb,
   First_Variation,
   Random_Variation,
 }
