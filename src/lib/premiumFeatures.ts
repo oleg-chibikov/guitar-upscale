@@ -24,6 +24,7 @@ export type PremiumFeatures = {
   scaleDetection?: boolean;
   midiUpload?: boolean;
   toggleMetronomeWhenRecordingCheckbox?: boolean;
+  saveMidiImmediatelyCheckbox?: boolean;
 };
 
 export type PremiumFeatureKeys = keyof PremiumFeatures;
@@ -43,6 +44,7 @@ export const composerPremiumFeatures: PremiumFeatures = {
   midiRecorder: true,
   looper: true,
   toggleMetronomeWhenRecordingCheckbox: true,
+  saveMidiImmediatelyCheckbox: true,
   skinSelection: true,
   midiUpload: true,
 };

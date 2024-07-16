@@ -25,6 +25,7 @@ type AllowedKeys = Exclude<
   | "reverbStrength"
   | "playbackTypeSelection"
   | "toggleMetronomeWhenRecordingCheckbox"
+  | "saveMidiImmediatelyCheckbox"
 >;
 
 const featureNames: Record<AllowedKeys, string> = {

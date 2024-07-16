@@ -111,6 +111,7 @@ interface SettingsState
   chordDetectorAvailable?: boolean; // may be undefined
   scaleDetectorAvailable?: boolean; // may be undefined
   showReplayTrigger: boolean;
+  saveMidiImmediately: boolean;
 }
 
 const initialState: SettingsState = {
@@ -151,6 +152,7 @@ const initialState: SettingsState = {
   stringCount: 6,
   chordsAreLoading: false,
   showReplayTrigger: false,
+  saveMidiImmediately: true,
 };
 
 // A values that changes immediately without the need for rerender
@@ -199,6 +201,7 @@ export let isFirstEventValue: boolean = initialState.isFirstEvent;
 export let chordsAreLoadingValue: boolean = initialState.chordsAreLoading;
 export let slashChordBassNoteValue: Note | undefined =
   initialState.slashChordBassNote;
+export let saveMidiImmediatelyValue: boolean = initialState.saveMidiImmediately;
 
 export let preventScaleDetectorFlush: boolean = false;
 export const setPreventScaleDetectorFlush = (value: boolean) => {
@@ -382,6 +385,7 @@ export const settingsSlice = createSlice({
       stringCountValue = state.stringCount;
       chordsAreLoadingValue = state.chordsAreLoading;
       slashChordBassNoteValue = state.slashChordBassNote;
+      saveMidiImmediatelyValue = state.saveMidiImmediately;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -580,6 +584,10 @@ export const settingsSlice = createSlice({
     triggerShowReplay(state) {
       state.showReplayTrigger = !state.showReplayTrigger;
     },
+    setSaveMidiImmediately(state, action: PayloadAction<boolean>) {
+      state.saveMidiImmediately = action.payload;
+      saveMidiImmediatelyValue = action.payload;
+    },
   },
 });
 
@@ -624,6 +632,7 @@ export const {
   setChordDetectorAvailable,
   setScaleDetectorAvailable,
   triggerShowReplay,
+  setSaveMidiImmediately,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

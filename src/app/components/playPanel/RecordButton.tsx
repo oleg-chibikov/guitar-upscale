@@ -4,6 +4,7 @@ import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import {
   isAnyTimerSpecificActivityBesidesMetronomeRunning,
   isMetronomeActiveValue,
+  saveMidiImmediatelyValue,
   setIsMetronomeActive,
   setIsRecording,
   toggleMetronomeWhenRecordingValue,
@@ -76,7 +77,7 @@ export const RecordButton: React.FC = (props) => {
         activeBg="error"
         onPress={async () => {
           const newValue = !isRecording;
-          await toggleRecording(newValue, dispatch, true);
+          await toggleRecording(newValue, dispatch, saveMidiImmediatelyValue);
         }}
       />
     </>

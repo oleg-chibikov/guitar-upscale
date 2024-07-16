@@ -45,6 +45,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
           "toggleMetronomeWhenRecordingCheckbox"
         ) as ReactNode
       }
+      {premiumComponents.get("saveMidiImmediatelyCheckbox") as ReactNode}
       {premiumComponents.get("instruments") as ReactNode}
       <div
         className={`grid gap-2 ${

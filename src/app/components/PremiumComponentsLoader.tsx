@@ -12,7 +12,6 @@ import {
 import { ClientRoot } from "./ClientRoot";
 import { LooperPanel } from "./looper/LooperPanel";
 import { DetectChordButton } from "./settings/buttons/DetectChordButton";
-import { ToggleMetronomeWhenRecordingCheckbox } from "./settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox";
 
 const RecordButton = dynamic(
   async () =>
@@ -54,6 +53,22 @@ const ReverbStrengthSlider = dynamic(
     (await import("@/app/components/settings/sliders/ReverbStrengthSlider"))
       .ReverbStrengthSlider
 );
+const ToggleMetronomeWhenRecordingCheckbox = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox"
+      )
+    ).ToggleMetronomeWhenRecordingCheckbox
+);
+const SaveMidiImmediatelyCheckbox = dynamic(
+  async () =>
+    (
+      await import(
+        "@/app/components/settings/checkboxes/SaveMidiImmediatelyCheckbox"
+      )
+    ).SaveMidiImmediatelyCheckbox
+);
 // const ErudaConsoleControl = dynamic(
 //   async () =>
 //     (await import("@/app/components/settings/ErudaConsoleControl"))
@@ -72,6 +87,8 @@ export const premiumFeaturesToMap = (
         return <LooperPanel />;
       case "toggleMetronomeWhenRecordingCheckbox":
         return <ToggleMetronomeWhenRecordingCheckbox />;
+      case "saveMidiImmediatelyCheckbox":
+        return <SaveMidiImmediatelyCheckbox />;
       case "skinSelection":
         return <SkinSelector />;
       case "chordDetection":
