@@ -9,5 +9,5 @@ export const usePianoRollData = () => {
   useEffect(() => {
     setDataToPlay(pianoRollData);
   }, [showReplayTrigger]);
-  return dataToPlay;
+  return dataToPlay?.hasItems === true ? dataToPlay : undefined;
 };

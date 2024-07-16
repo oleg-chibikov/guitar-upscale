@@ -36,6 +36,12 @@ export class MidiRecorder implements NoteRecorder {
     this.startTick = undefined;
   }
 
+  getMidiFile() {
+    if (this.midiEvents && this.midiEvents?.size) {
+      return midiSaver.getMidiFile(this.midiEvents);
+    }
+  }
+
   stopRecording(save: boolean): EventsByTick | undefined {
     const eventsByTick = this.eventsByTick;
     this.isRecording = false;

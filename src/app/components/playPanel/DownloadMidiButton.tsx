@@ -9,20 +9,18 @@ export const DownloadMidiButton: React.FC = () => {
     return null;
   }
   return (
-    <>
-      <IconButtonWrapper
-        tooltip={"Download Midi"}
-        icon={<Download />}
-        onPress={async () => {
-          const midiRecorder = (
-            await import("@/app/engine/midiRecorder/midiRecorder")
-          ).midiRecorder;
-          midiRecorder.startRecording();
-          midiRecorder.initializeStartTick(0);
-          midiRecorder.addEvents(dataToPlay);
-          midiRecorder.stopRecording(true);
-        }}
-      />
-    </>
+    <IconButtonWrapper
+      tooltip={"Download Midi"}
+      icon={<Download />}
+      onPress={async () => {
+        const midiRecorder = (
+          await import("@/app/engine/midiRecorder/midiRecorder")
+        ).midiRecorder;
+        midiRecorder.startRecording();
+        midiRecorder.initializeStartTick(0);
+        midiRecorder.addEvents(dataToPlay);
+        midiRecorder.stopRecording(true);
+      }}
+    />
   );
 };

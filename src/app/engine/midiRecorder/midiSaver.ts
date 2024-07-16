@@ -16,18 +16,46 @@ class MidiSaver {
     this.downloadMidiFile(midiData);
   }
 
+  getFileName() {
+    return `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
+      capoValue
+    )} | ${this.getFormattedDateTime()}.mid`;
+  }
+
+  getMidiFile(midiEvents: Map<string, NoteEvent[]>) {
+    const blob = this.generateMidiData(midiEvents);
+    return new File([blob], "example.txt", { type: "audio/midi" });
+  }
+
   private downloadMidiFile(midiFile: Blob) {
     // Download MIDI file
     const url = URL.createObjectURL(midiFile);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
-      capoValue
-    )} | ${this.getFormattedDateTime()}.mid`;
+    link.download = this.getFileName();
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  private getFormattedDateTime() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    const hours = String(currentDate.getHours()).padStart(2, "0");
+    const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}-${minutes}`;
+  }
+
+  private reverseTrackKey(key: TrackKey) {
+    const [instrument, trackNumber] = key.split("|");
+    return {
+      instrument: instrument as Instrument,
+      trackNumber: Number(trackNumber),
+    };
   }
 
   private generateMidiData(midiEvents: Map<string, NoteEvent[]>): Blob {
@@ -49,25 +77,6 @@ class MidiSaver {
     const write = new Midi.Writer(tracks);
     const byteArray = write.buildFile();
     return new Blob([byteArray], { type: "audio/midi" });
-  }
-
-  private getFormattedDateTime() {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const hours = String(currentDate.getHours()).padStart(2, "0");
-    const minutes = String(currentDate.getMinutes()).padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}-${minutes}`;
-  }
-
-  private reverseTrackKey(key: TrackKey) {
-    const [instrument, trackNumber] = key.split("|");
-    return {
-      instrument: instrument as Instrument,
-      trackNumber: Number(trackNumber),
-    };
   }
 }
 
