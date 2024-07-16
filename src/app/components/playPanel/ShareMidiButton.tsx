@@ -46,9 +46,9 @@ export const ShareMidiButton: React.FC = () => {
             text: "Check out this file!",
             files: [file],
           });
-        } catch (e) {
+        } catch (e: unknown) {
           console.error(e);
-          showAlert("Cannot share MIDI file");
+          showAlert(`Error sharing file: ${e}`);
         }
       }}
     />
