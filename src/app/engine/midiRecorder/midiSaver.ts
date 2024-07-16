@@ -24,7 +24,7 @@ class MidiSaver {
 
   getMidiFile(midiEvents: Map<string, NoteEvent[]>) {
     const blob = this.generateMidiData(midiEvents);
-    return new File([blob], this.getFileName("wav"), { type: "audio/wav" });
+    return new File([blob], this.getFileName("mid"), { type: "audio/wav" });
   }
 
   private downloadMidiFile(midiFile: Blob) {
