@@ -54,16 +54,13 @@ export const ShareMidiButton: React.FC = () => {
           showAlert("No MIDI data available");
           return;
         }
-        if (navigator.canShare({ files: [file] })) {
+        const shareObj = { files: [file] };
+        if (navigator.canShare(shareObj)) {
           showAlert("Share not allowed");
         }
 
         try {
-          await navigator.share({
-            title: "Share Example",
-            text: "Check out this file!",
-            files: [file],
-          });
+          await navigator.share(shareObj);
         } catch (e: unknown) {
           handleError(e);
         }
