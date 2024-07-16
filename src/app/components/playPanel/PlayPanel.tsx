@@ -5,7 +5,6 @@ import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
 import { ResetPlaybackButton } from "@/app/components/playPanel/ResetPlaybackButton";
-import { ShareMidiButton } from "@/app/components/playPanel/ShareMidiButton";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { PLAY_PANEL_ID } from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
@@ -30,7 +29,7 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       <NextEventButton />
       <ResetPlaybackButton />
       <DownloadMidiButton />
-      <ShareMidiButton />
+      {/* <ShareMidiButton /> */}
       <MetronomeButton />
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
         <DisabledRecordButton />
