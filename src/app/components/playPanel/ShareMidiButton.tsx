@@ -55,7 +55,7 @@ export const ShareMidiButton: React.FC = () => {
           return;
         }
         const shareObj = { files: [file] };
-        if (navigator.canShare(shareObj)) {
+        if (!navigator.canShare(shareObj)) {
           showAlert("Share not allowed");
         }
 

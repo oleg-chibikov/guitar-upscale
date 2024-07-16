@@ -16,15 +16,15 @@ class MidiSaver {
     this.downloadMidiFile(midiData);
   }
 
-  getFileName() {
+  getFileName(extension?: string) {
     return `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
       capoValue
-    )} | ${this.getFormattedDateTime()}.mid`;
+    )} | ${this.getFormattedDateTime()}.${extension ?? "mid"}`;
   }
 
   getMidiFile(midiEvents: Map<string, NoteEvent[]>) {
     const blob = this.generateMidiData(midiEvents);
-    return new File([blob], this.getFileName(), { type: "audio/midi" });
+    return new File([blob], this.getFileName("wav"), { type: "audio/wav" });
   }
 
   private downloadMidiFile(midiFile: Blob) {
