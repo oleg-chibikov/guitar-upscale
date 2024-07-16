@@ -54,7 +54,11 @@ export const ShareMidiButton: React.FC = () => {
           showAlert("No MIDI data available");
           return;
         }
-        const shareObj = { files: [file] };
+        const shareObj = {
+          files: [file],
+          title: "Share MIDI file",
+          text: "Due to the browser restriction the file was renamed to .wav. It should be renamed to .mid by the recipient",
+        };
         if (!navigator.canShare(shareObj)) {
           showAlert("Share not allowed");
         }
