@@ -12,11 +12,35 @@ export const ShareMidiButton: React.FC = () => {
   if (dataToPlay === undefined) {
     return null;
   }
+
+  const showAlert = (message: string) => {
+    dispatch(
+      setAndShowAlert({
+        message,
+        alertType: AlertType.Error,
+      })
+    );
+  };
+
+  const handleError = (error: unknown) => {
+    if (error instanceof Error) {
+      console.error("Error sharing file:", error);
+      showAlert(`Error sharing file: ${error.message}`);
+    } else {
+      console.error("Unexpected error:", error);
+      showAlert("An unexpected error occurred");
+    }
+  };
+
   return (
     <IconButtonWrapper
       tooltip={"Share Midi"}
       icon={<Share />}
       onPress={async () => {
+        if (navigator.canShare === undefined) {
+          showAlert("Your browser doesn't support the Web Share API");
+          return;
+        }
         const midiRecorder = (
           await import("@/app/engine/midiRecorder/midiRecorder")
         ).midiRecorder;
@@ -26,18 +50,12 @@ export const ShareMidiButton: React.FC = () => {
         const file = midiRecorder.getMidiFile();
         midiRecorder.stopRecording(false);
 
-        const showAlert = (message: string) => {
-          dispatch(
-            setAndShowAlert({
-              message,
-              alertType: AlertType.Error,
-            })
-          );
-        };
-
         if (!file) {
           showAlert("No MIDI data available");
           return;
+        }
+        if (navigator.canShare({ files: [file] })) {
+          showAlert("Share not allowed");
         }
 
         try {
@@ -47,8 +65,7 @@ export const ShareMidiButton: React.FC = () => {
             files: [file],
           });
         } catch (e: unknown) {
-          console.error(e);
-          showAlert(`Error sharing file: ${e}`);
+          handleError(e);
         }
       }}
     />
