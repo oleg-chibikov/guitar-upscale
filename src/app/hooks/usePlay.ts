@@ -6,7 +6,6 @@ import {
   setPianoRollData,
 } from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
-import { usePianoRollData } from "@/app/hooks/usePianoRollData";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
@@ -49,18 +48,8 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
     (s) => s.guitarSettingsUpdateCount
   );
-  const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
-  const isPaused = useSettingsSelector((s) => s.isPaused);
-  const dataToPlay = usePianoRollData();
   const [isWaiting, setIsWaiting] = useState(false);
-
-  const isReplay = !(
-    isPlaying ||
-    isLooperPlaying ||
-    isPaused ||
-    dataToPlay === undefined
-  );
 
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
   const isWaitingRef = useRef<boolean>(false);
@@ -88,13 +77,11 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
           return;
         }
 
-        await stop(dispatch);
-        return;
-      }
-
-      if (pianoRollData) {
-        updateWaiting(false);
-        await replay(dispatch, pianoRollData);
+        if (pianoRollData) {
+          updateWaiting(false);
+          await replay(dispatch, pianoRollData);
+          return;
+        }
         return;
       }
 
@@ -153,13 +140,8 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     };
   }, [handlePlay]); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
 
-  return { isWaiting, handlePlay, isPlaying, isReplay };
+  return { isWaiting, handlePlay, isPlaying };
 };
-
-async function stop(dispatch: Dispatch<UnknownAction>) {
-  const { stopPlayback } = await import("@/app/engine/midiPlayer");
-  await stopPlayback(dispatch, LOG_PREFIX);
-}
 
 async function replay(dispatch: Dispatch<UnknownAction>, data: EventsByTick) {
   console.log("Replaying");

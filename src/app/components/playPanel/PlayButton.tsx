@@ -4,7 +4,6 @@ import { UsePlayParams, usePlay } from "@/app/hooks/usePlay";
 import HourglassTop from "@mui/icons-material/HourglassTop";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import Replay from "@mui/icons-material/Replay";
-import Stop from "@mui/icons-material/Stop";
 import React from "react";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
@@ -13,7 +12,7 @@ type PlayButtonProps = UsePlayParams;
 export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   const neck = useSettingsSelector((s) => s.neck);
 
-  const { isWaiting, handlePlay, isReplay, isPlaying } = usePlay(params);
+  const { isWaiting, handlePlay, isPlaying } = usePlay(params);
 
   if (neck === null) {
     return null;
@@ -23,24 +22,14 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
     <IconButtonWrapper
       isActive={isPlaying}
       tooltip={
-        isReplay
-          ? "Replay"
-          : isWaiting
+        isWaiting
           ? "Waiting for player to get ready..."
           : isPlaying
-          ? "Stop playing"
+          ? "Replay"
           : "Play"
       }
       icon={
-        isReplay ? (
-          <Replay />
-        ) : isWaiting ? (
-          <HourglassTop />
-        ) : isPlaying ? (
-          <Stop />
-        ) : (
-          <PlayArrow />
-        )
+        isWaiting ? <HourglassTop /> : isPlaying ? <Replay /> : <PlayArrow />
       }
       onPress={handlePlay}
     />
