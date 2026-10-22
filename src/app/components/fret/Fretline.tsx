@@ -1,5 +1,5 @@
 import { NOTE_COUNT, StringOctaveNote } from "@/app/data/notes";
-import { getParametersForSkin } from "@/app/helpers/skinHelper";
+import { getParametersForSkin, StringTilt } from "@/app/helpers/skinHelper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import React from "react";
 import { FretMarker } from "./FretMarker";
@@ -10,17 +10,8 @@ export interface FretlineProps {
   isHeader: boolean;
 }
 
-const calculateTop = (string: number, fret: number, modifiers: number[]) => {
-  if (string < 0 || string >= modifiers.length) {
-    return 0;
-  }
-
-  const baseMultipliers = [-0.4, -0.3, -0.2, -0.1, 0.2, 0.3, 0.35, 0.5];
-  const multiplier =
-    string < baseMultipliers.length ? baseMultipliers[string] : 0.3;
-
-  return fret * multiplier * modifiers[string];
-};
+const calculateTop = (string: number, fret: number, tilt: StringTilt) =>
+  fret * tilt.slope * (string - tilt.center);
 
 export const Fretline: React.FC<FretlineProps> = ({
   elements,
@@ -29,7 +20,7 @@ export const Fretline: React.FC<FretlineProps> = ({
 }) => {
   const skin = useUiSelector((s) => s.skin);
 
-  const { widthStep, height, stringTiltModifiers } = getParametersForSkin(skin);
+  const { widthStep, height, stringTilt } = getParametersForSkin(skin);
   const widthFactor = 1.06;
   const initialWidth = (NOTE_COUNT + 1) * widthStep; // Initial width for the first fret
 
@@ -42,7 +33,7 @@ export const Fretline: React.FC<FretlineProps> = ({
         const width = initialWidth / Math.pow(widthFactor, fret);
         let top = 0;
         if (string !== undefined) {
-          top = calculateTop(string, fret, stringTiltModifiers);
+          top = calculateTop(string, fret, stringTilt);
         }
 
         return (

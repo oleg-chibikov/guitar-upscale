@@ -66,44 +66,53 @@ export const getPositionForSkin = (skin?: CombinedSkinType) => {
   }
 };
 
-export const getParametersForSkin = (skin?: CombinedSkinType) => {
+// The strings fan out from the neck axis, so each fret shifts a string by
+// slope * (its distance from the axis). center is the axis, in string indexes.
+export interface StringTilt {
+  slope: number;
+  center: number;
+}
+
+export const getParametersForSkin = (
+  skin?: CombinedSkinType,
+): { height: number; widthStep: number; stringTilt: StringTilt } => {
   switch (skin) {
     case Skin.Guitar1:
     default:
       return {
         height: 25,
         widthStep: 10.25,
-        stringTiltModifiers: [3.2, 3, 2, 1, 2, 2.5, 3, 3.5],
+        stringTilt: { slope: 0.41, center: 3.12 },
       };
     case Skin.Guitar2:
       return {
         height: 27,
         widthStep: 10.2,
-        stringTiltModifiers: [2.5, 2.2, 2, 1, 2, 2.5, 3, 3.5],
+        stringTilt: { slope: 0.35, center: 2.98 },
       };
     case Skin.Guitar3:
       return {
         height: 29,
         widthStep: 10.56,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
+        stringTilt: { slope: 0.373, center: 2.63 },
       };
     case Skin.Guitar4:
       return {
         height: 30,
         widthStep: 10.85,
-        stringTiltModifiers: [2.5, 2, 1.1, -2, 2.2, 3, 3, 3.5],
+        stringTilt: { slope: 0.373, center: 2.63 },
       };
     case SevenStringSkin.Guitar5:
       return {
         height: 21,
         widthStep: 9.95,
-        stringTiltModifiers: [2.3, 1.8, 0.4, -2, 3, 3, 3.7, 4.7],
+        stringTilt: { slope: 0.364, center: 2.43 },
       };
     case EightStringSkin.Guitar6:
       return {
         height: 24,
         widthStep: 10.85,
-        stringTiltModifiers: [3.3, 3.3, 2.8, 2, 1, 1.8, 2.6, 2.7],
+        stringTilt: { slope: 0.38, center: 3.52 },
       };
   }
 };

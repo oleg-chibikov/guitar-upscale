@@ -1,6 +1,5 @@
 More chords
 more examples
-get the formula to avoid hardcoding each string height offset
 High string at the bottom mode
 
 info about chord detection
