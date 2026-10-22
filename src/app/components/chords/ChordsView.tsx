@@ -46,6 +46,7 @@ import { ChordButton } from "./ChordButton";
 const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
+const CHORDS_RENDER_INTERVAL_MS = 150;
 
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = ({
   mainRef,
@@ -66,6 +67,23 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   >([]);
 
   const chordModeVariationsRef = useRef<ChordModeVariations[]>([]);
+  const renderTimerRef = useRef<number | undefined>(undefined);
+
+  // The grid re-renders once per batch of chord modes. A render per mode blocked the page for most of the load.
+  const renderChordModeVariations = (immediately: boolean) => {
+    if (immediately) {
+      window.clearTimeout(renderTimerRef.current);
+      renderTimerRef.current = undefined;
+      setChordModeVariations([...chordModeVariationsRef.current]);
+      return;
+    }
+    renderTimerRef.current ??= window.setTimeout(() => {
+      renderTimerRef.current = undefined;
+      setChordModeVariations([...chordModeVariationsRef.current]);
+    }, CHORDS_RENDER_INTERVAL_MS);
+  };
+
+  useEffect(() => () => window.clearTimeout(renderTimerRef.current), []);
 
   // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
   const localGuitarSettingsUpdateCount = useRef<number>(0);
@@ -117,7 +135,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
       chordPreferredVariationsByName.clear();
       resetChordModesForNotes();
       chordModeVariationsRef.current = [];
-      setChordModeVariations(chordModeVariationsRef.current);
+      renderChordModeVariations(true);
       dispatch(setChordsAreLoading(true));
       const chordPlayModeBeforeGeneration = chordPlayModeValue;
 
@@ -126,7 +144,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
         capoValue,
         (variations) => {
           chordModeVariationsRef.current.push(variations);
-          setChordModeVariations([...chordModeVariationsRef.current]);
+          renderChordModeVariations(false);
 
           setPreferredVariationsForChordMode(
             variations,
@@ -136,6 +154,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
           addChordsToDetectorLookup?.(variations);
         },
         () => {
+          renderChordModeVariations(true);
           clearChordDetector?.();
           dispatch(setChordIsBeingDetected(false));
           dispatch(setChordsAreLoading(false));
