@@ -1,53 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Guitar Upscale
 
-## Getting Started
+A guitar simulator in the browser. Play scales and chords on a virtual fretboard, record loops and export MIDI.
 
-First, run the development server:
+**Open the app:** https://oleg-chibikov.github.io/guitar-upscale/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+![Guitar Upscale, dark theme](<public/screenshots/Guitar upscale - Dark.webp>)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What it does
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Fretboard** shows the notes of the chosen scale and plays them on tap.
+- **Chords** come from the scale, with strumming patterns you can edit.
+- **Looper** records what you play on several channels.
+- **Piano roll** lets you edit a recording note by note.
+- **MIDI** files can be downloaded or shared.
+- **Instruments** go beyond guitar: sitar, banjo, koto, strings and more.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The app installs as a PWA, so it also works from the home screen.
 
-## Learn More
+## Run it locally
 
-To learn more about Next.js, take a look at the following resources:
+You need Node 24 and pnpm.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `pnpm install`
+2. `pnpm exec next dev`
+3. Open http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+`pnpm dev` calls the Windows `start` command. On macOS and Linux use `pnpm exec next dev`.
 
-## Deploy on Vercel
+## Checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Lint** `pnpm exec eslint .`
+- **Tests** `pnpm exec jest`
+- **Build** `pnpm exec next build`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Deploy
 
-# Creating a PWA
+Each push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The workflow lints, tests, builds a static export and publishes it to GitHub Pages.
 
-Use this guidance: https://web.dev/learn/pwa/web-app-manifest
+The Pages copy runs with sign-in off. The static export has no server, so the workflow deletes `src/pages/api` before the build.
 
-# Create an APK
+Dependabot opens update PRs every week. The `automerge` job merges them once the build passes.
 
-Option 1 (online):
-https://www.pwabuilder.com/reportcard?site=https://guitar-upscale.org.uk/
+## Sign-in and tiers
 
-Option 2 (local):
-https://github.com/GoogleChromeLabs/bubblewrap/tree/main/packages/cli
+Sign-in is off by default, and every visitor gets the Composer tier. Set `NEXT_PUBLIC_AUTH_ENABLED=true` to turn it on.
 
-Navigate to a folder where APK should appear and run
+With sign-in on, the server needs these variables:
 
-bubblewrap init --manifest https://guitar-upscale.org.uk/manifest.json
-bubblewrap build
+| Variable | What it is for |
+| --- | --- |
+| `PATREON_CLIENT_ID`, `PATREON_CLIENT_SECRET` | Sign-in through Patreon |
+| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY` | Checks Google Play subscriptions |
+| `ANDROID_PACKAGE_ID` | The Android app id on Google Play |
+| `COMPOSER_WHITELIST`, `EXPLORER_WHITELIST` | Emails that get a tier for free |
+
+## Android app
+
+The Android build wraps the PWA with [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap/tree/main/packages/cli).
+
+1. Go to the folder where the APK should appear.
+2. `bubblewrap init --manifest https://guitar-upscale.org.uk/manifest.json`
+3. `bubblewrap build`
+
+[PWABuilder](https://www.pwabuilder.com/reportcard?site=https://guitar-upscale.org.uk/) builds one online as well.
