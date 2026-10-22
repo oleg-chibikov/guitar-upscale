@@ -42,6 +42,14 @@ export class LooperRecorder {
     noteRecorder.addEvents(eventsByTick);
   }
 
+  get loopLengthTicks(): number | undefined {
+    return this.looperPlayer?.loopLengthTicks;
+  }
+
+  get positionInLoop(): number | undefined {
+    return this.looperPlayer?.positionInLoop;
+  }
+
   hasRecording = () => {
     return this.eventsByTick?.hasItems ?? false;
   };

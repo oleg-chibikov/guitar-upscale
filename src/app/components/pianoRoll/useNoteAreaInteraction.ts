@@ -135,7 +135,11 @@ const findNoteTemplate = (data: EventsByTick, selection: ReadonlySet<string>) =>
   const note =
     fromSelection ?? data.flatItems.find(({ event }) => event.note)?.event.note;
   return note
-    ? { trackNumber: note.trackNumber, instrument: note.instrument }
+    ? {
+        trackNumber: note.trackNumber,
+        instrument: note.instrument,
+        looperChannel: note.looperChannel,
+      }
     : undefined;
 };
 

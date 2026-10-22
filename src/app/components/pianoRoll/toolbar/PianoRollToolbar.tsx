@@ -3,6 +3,7 @@ import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText"
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
+import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
 import { ZOOM_STEP } from "@/app/data/pianoRollConstants";
@@ -65,8 +66,17 @@ const tools: { tool: PianoRollTool; icon: ReactNode; tooltip: string }[] = [
 ];
 
 export const PianoRollToolbar: React.FC = () => {
-  const { undo, redo, canUndo, canRedo, undoLabel, redoLabel } =
-    usePianoRoll();
+  const {
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    undoLabel,
+    redoLabel,
+    sources,
+    source,
+    setSourceId,
+  } = usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
   const transport = usePianoRollTransport();
@@ -80,17 +90,32 @@ export const PianoRollToolbar: React.FC = () => {
 
   return (
     <div className="flex flex-row flex-wrap items-center gap-1 px-1 py-0.5 bg-gray-800 border-b border-gray-700">
+      {sources.length > 1 && (
+        <>
+          <SelectWrapper
+            className="min-w-24"
+            tooltip="Track to edit: the melody or a looper channel"
+            options={sources.map(({ id, label }) => ({ value: id, label }))}
+            value={source?.id ?? ""}
+            onChange={(value) => setSourceId(String(value))}
+          />
+          <Divider />
+        </>
+      )}
       <Group>
         <IconButtonWrapper
           icon={<SkipPrevious />}
           tooltip="Move the playhead to the start (Home)"
           onPress={() => transport.seekTo(0)}
+          disabled={transport.isLoop}
         />
         <IconButtonWrapper
           icon={transport.isPlaying ? <Stop /> : <PlayArrow />}
           tooltip={
             transport.isPlaying
               ? "Stop (Space)"
+              : transport.isLoop
+              ? "Play the loop (Space)"
               : "Play these notes from the playhead (Space)"
           }
           onPress={() => void transport.togglePlay()}

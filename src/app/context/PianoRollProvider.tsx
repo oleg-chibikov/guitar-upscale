@@ -1,8 +1,11 @@
+import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
 import { getEditHistory } from "@/app/engine/pianoRoll/editHistory";
 import { EditResult } from "@/app/engine/pianoRoll/operations";
 import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
+import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
+import { BehaviorSubject } from "rxjs";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import React, {
   createContext,
@@ -14,7 +17,24 @@ import React, {
   useState,
 } from "react";
 
+export type PianoRollSource = {
+  id: string;
+  label: string;
+  data: EventsByTick;
+  // set for looper tracks
+  looperChannel?: number;
+  loopLengthTicks?: number;
+  positionInLoop?: () => number | undefined;
+};
+
+const MELODY_SOURCE_ID = "melody";
+
 interface PianoRollContextType {
+  sources: PianoRollSource[];
+  source: PianoRollSource | undefined;
+  setSourceId: (id: string) => void;
+  // the playhead of the shown track: the melody player's or the loop's
+  playhead$: BehaviorSubject<number>;
   data: EventsByTick | undefined;
   events: EventForTick[];
   selection: ReadonlySet<string>;
@@ -66,12 +86,80 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
 
+  const looperStateUpdateTrigger = useSettingsSelector(
+    (s) => s.looperStateUpdateTrigger
+  );
+  const guitarSettingsUpdateCount = useSettingsSelector(
+    (s) => s.guitarSettingsUpdateCount
+  );
+
   // pianoRollData is a module variable. showReplayTrigger flips whenever it changes
-  const data = useMemo(
+  const melody = useMemo(
     () => (pianoRollExpanded ? pianoRollData : undefined),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pianoRollExpanded, showReplayTrigger]
   );
+
+  const [loopSources, setLoopSources] = useState<PianoRollSource[]>([]);
+  useEffect(() => {
+    if (!pianoRollExpanded) return;
+    let cancelled = false;
+    // the looper loads on demand, so the piano roll does the same
+    void import("@/app/engine/looper/looper").then(({ looperState }) => {
+      if (cancelled) return;
+      setLoopSources(
+        looperState.flatMap(({ looperRecorder, hasRecording }, channel) => {
+          const loop = looperRecorder.items;
+          return hasRecording && loop
+            ? [
+                {
+                  id: `loop-${channel}`,
+                  label: `Loop ${channel + 1}`,
+                  data: loop,
+                  looperChannel: channel,
+                  loopLengthTicks: looperRecorder.loopLengthTicks,
+                  positionInLoop: () => looperRecorder.positionInLoop,
+                },
+              ]
+            : [];
+        })
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pianoRollExpanded, looperStateUpdateTrigger, guitarSettingsUpdateCount]);
+
+  const sources = useMemo(
+    () => [
+      ...(melody?.hasItems === true
+        ? [{ id: MELODY_SOURCE_ID, label: "Melody", data: melody }]
+        : []),
+      ...loopSources,
+    ],
+    [melody, loopSources]
+  );
+  const [sourceId, setSourceIdState] = useState(MELODY_SOURCE_ID);
+  const setSourceId = useCallback((id: string) => {
+    setSourceIdState(id);
+    // scroll to the notes of the other track
+    setLoaded(false);
+  }, []);
+  const source = sources.find((s) => s.id === sourceId) ?? sources.at(0);
+  const data = source?.data;
+
+  const loopPlayhead$ = useMemo(() => new BehaviorSubject<number>(0), []);
+  const positionInLoop = source?.positionInLoop;
+  useEffect(() => {
+    if (!positionInLoop) return;
+    // the clock ticks drive the loop, so they drive its playhead too
+    const subscription = MetronomeEventBus.subscribe(() => {
+      const position = positionInLoop() ?? 0;
+      if (loopPlayhead$.value !== position) loopPlayhead$.next(position);
+    });
+    return () => subscription.unsubscribe();
+  }, [positionInLoop, loopPlayhead$]);
+  const playhead$ = positionInLoop ? loopPlayhead$ : playheadTick$;
 
   // a selection belongs to one melody and drops when another one loads
   const [selectionState, setSelectionState] = useState<{
@@ -87,7 +175,6 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   useEffect(() => {
     if (!pianoRollExpanded) {
       // the piano roll scrolls to the notes again next time it opens
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoaded(false);
     }
   }, [pianoRollExpanded]);
@@ -155,6 +242,10 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
 
   const value = useMemo(
     () => ({
+      sources,
+      source,
+      setSourceId,
+      playhead$,
       data,
       events,
       selection,
@@ -174,7 +265,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, events, selection, setSelection, apply, undo, redo, loaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [sources, source, setSourceId, playhead$, data, events, selection, setSelection, apply, undo, redo, loaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

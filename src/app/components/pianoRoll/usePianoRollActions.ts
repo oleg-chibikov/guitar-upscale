@@ -2,7 +2,6 @@ import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
 import { getTicksForTimeSignature } from "@/app/data/clockConstants";
 import { getClipboard, setClipboard } from "@/app/engine/pianoRoll/clipboard";
-import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
 import {
   deleteEvents,
   getSpan,
@@ -20,7 +19,8 @@ import { useMemo } from "react";
  * Edits on the selection, shared by the toolbar and the keyboard shortcuts
  */
 export const usePianoRollActions = () => {
-  const { data, events, selection, setSelection, apply } = usePianoRoll();
+  const { data, events, selection, setSelection, apply, playhead$ } =
+    usePianoRoll();
   const { scalePattern } = useScaleContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
@@ -56,7 +56,7 @@ export const usePianoRollActions = () => {
         if (data && copy().length) apply(deleteEvents(data, selection));
       },
       // as in Cubase, a paste lands at the playhead
-      paste: () => pasteAt(playheadTick$.value),
+      paste: () => pasteAt(playhead$.value),
       pasteAt,
       duplicate: () => {
         const states = selected();
@@ -99,5 +99,5 @@ export const usePianoRollActions = () => {
         );
       },
     };
-  }, [data, events, selection, setSelection, apply, snapTicks, snapToScale, scalePattern]);
+  }, [data, events, selection, setSelection, apply, snapTicks, snapToScale, scalePattern, playhead$]);
 };

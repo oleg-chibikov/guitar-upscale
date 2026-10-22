@@ -1,4 +1,4 @@
-import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
+import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { tickToX, Zoom } from "@/app/engine/pianoRoll/geometry";
 import React, { useEffect, useRef } from "react";
 
@@ -10,16 +10,17 @@ interface PlayheadProps {
 
 export const Playhead: React.FC<PlayheadProps> = ({ zoom, variant }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const { playhead$ } = usePianoRoll();
 
   // moves the element directly, so playback doesn't re-render the notes every tick
   useEffect(() => {
-    const subscription = playheadTick$.subscribe((tick) => {
+    const subscription = playhead$.subscribe((tick) => {
       if (ref.current) {
         ref.current.style.transform = `translateX(${tickToX(tick, zoom)}px)`;
       }
     });
     return () => subscription.unsubscribe();
-  }, [zoom]);
+  }, [zoom, playhead$]);
 
   if (variant === "marker") {
     return (

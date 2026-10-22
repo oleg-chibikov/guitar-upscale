@@ -150,7 +150,11 @@ export const withDuration = (
 export const createNoteEvent = (
   pitch: number,
   duration: number,
-  template?: { trackNumber?: number; instrument?: Instrument }
+  template?: {
+    trackNumber?: number;
+    instrument?: Instrument;
+    looperChannel?: number;
+  }
 ): ChordOrNote | undefined => {
   const stringOctaveNote = findStringOctaveNote(pitch);
   if (!stringOctaveNote) {
@@ -160,6 +164,7 @@ export const createNoteEvent = (
     note: stringOctaveNote,
     trackNumber: template?.trackNumber ?? DEFAULT_NOTE_TRACK_NUMBER,
     instrument: template?.instrument,
+    looperChannel: template?.looperChannel,
   };
   return { id: EventsByTick.generateId(note), note, duration };
 };

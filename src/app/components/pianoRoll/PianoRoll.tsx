@@ -34,7 +34,8 @@ const WHEEL_ZOOM_SPEED = 0.0025;
 
 export const PianoRoll: React.FC = () => {
   const { scrollerRef, zoom, zoomBy } = usePianoRollView();
-  const { events, loaded, setLoaded } = usePianoRoll();
+  const { events, loaded, setLoaded, source } = usePianoRoll();
+  const loopLengthTicks = source?.loopLengthTicks;
   const { scalePattern } = useScaleContext();
   const { baseNote } = useBaseNoteContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
@@ -54,7 +55,7 @@ export const PianoRoll: React.FC = () => {
       ),
     [events]
   );
-  const totalTicks = getTotalTicks(lastEndTick);
+  const totalTicks = getTotalTicks(Math.max(lastEndTick, loopLengthTicks ?? 0));
   const width = tickToX(totalTicks, zoom);
   const height = getContentHeight(zoom);
 
@@ -149,6 +150,17 @@ export const PianoRoll: React.FC = () => {
           gridStyle={gridStyle}
         >
           <Playhead zoom={zoom} variant="line" />
+          {loopLengthTicks !== undefined && (
+            // notes past the loop end don't play
+            <div
+              className="absolute top-0 h-full bg-black/45 border-l-2 border-amber-400 pointer-events-none z-[3]"
+              style={{
+                left: tickToX(loopLengthTicks, zoom),
+                width: Math.max(0, width - tickToX(loopLengthTicks, zoom)),
+              }}
+              title="End of the loop"
+            />
+          )}
         </NoteArea>
       </div>
     </div>

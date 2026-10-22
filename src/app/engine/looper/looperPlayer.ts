@@ -35,6 +35,8 @@ export class LooperPlayer {
 
   // for testing - allows to wait for the current loop to finish
   currentLoopPromise: Promise<void> | undefined;
+  // global tick where the running loop started. Undefined while stopped
+  private loopStartTick: number | undefined;
 
   constructor(options: LooperPlayerOptions) {
     this.options = options;
@@ -43,10 +45,27 @@ export class LooperPlayer {
   stopPlaying(): void {
     this.abortController.abort();
     this.abortController = new AbortController();
+    this.loopStartTick = undefined;
+  }
+
+  get loopLengthTicks() {
+    return this.options.loopLengthTicks;
+  }
+
+  /**
+   * The tick inside the loop that the clock is at, for the piano roll playhead
+   */
+  get positionInLoop(): number | undefined {
+    if (this.loopStartTick === undefined) {
+      return undefined;
+    }
+    // the next pass sets its start before the clock gets there, so wrap negative positions too
+    const length = this.options.loopLengthTicks;
+    return (((globalCurrentTick - this.loopStartTick) % length) + length) % length;
   }
 
   async playLoop(): Promise<void> {
-    const items = this.options.eventsByTick.items;
+    let items = this.options.eventsByTick.items;
     if (!items.length) {
       return;
     }
@@ -59,6 +78,9 @@ export class LooperPlayer {
     let loopStartTick = this.getFirstLoopStartTick(items[0].tick);
 
     while (!checkFinished()) {
+      // the piano roll can edit the loop while it plays. Changes land on the next pass
+      items = this.options.eventsByTick.items;
+      this.loopStartTick = loopStartTick;
       let resolveCurrentLoop: (
         value: void | PromiseLike<void>
       ) => void = () => {};

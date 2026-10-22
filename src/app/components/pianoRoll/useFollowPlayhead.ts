@@ -1,6 +1,6 @@
 import { PITCH_AXIS_WIDTH } from "@/app/data/pianoRollConstants";
 import { tickToX, Zoom } from "@/app/engine/pianoRoll/geometry";
-import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
+import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import {
   usePianoRollSelector,
   useSettingsSelector,
@@ -18,11 +18,15 @@ export const useFollowPlayhead = (
   zoom: Zoom
 ) => {
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
-  const isPlaying = useSettingsSelector((s) => s.isPlaying);
+  const { playhead$, source } = usePianoRoll();
+  const isMelodyPlaying = useSettingsSelector((s) => s.isPlaying);
+  const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
+  const isPlaying =
+    source?.looperChannel !== undefined ? isLooperPlaying : isMelodyPlaying;
 
   useEffect(() => {
     if (!followPlayback || !isPlaying) return;
-    const subscription = playheadTick$.subscribe((tick) => {
+    const subscription = playhead$.subscribe((tick) => {
       const scroller = scrollerRef.current;
       if (!scroller) return;
       const x = tickToX(tick, zoom);
@@ -33,5 +37,5 @@ export const useFollowPlayhead = (
       }
     });
     return () => subscription.unsubscribe();
-  }, [followPlayback, isPlaying, scrollerRef, zoom]);
+  }, [followPlayback, isPlaying, scrollerRef, zoom, playhead$]);
 };
