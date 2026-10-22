@@ -1,5 +1,5 @@
 // A press that misses every playable chord still plays the closest one within this distance.
-export const MAX_SNAP_DISTANCE_PX = 24;
+export const MAX_SNAP_DISTANCE_PX = 48;
 
 const pressHandlers = new Map<HTMLElement, () => Promise<void>>();
 

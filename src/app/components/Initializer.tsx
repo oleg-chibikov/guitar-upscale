@@ -135,7 +135,8 @@ export const Initializer: React.FC = () => {
 
     if (typeof navigator.serviceWorker !== "undefined") {
       void navigator.serviceWorker.register(
-        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`
+        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`,
+        { updateViaCache: "none" }
       );
     }
   }, []);
