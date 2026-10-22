@@ -51,7 +51,6 @@ export const composerPremiumFeatures: PremiumFeatures = {
 };
 
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
-  "use server";
   if (!isAuthEnabled) {
     return {
       session: null,

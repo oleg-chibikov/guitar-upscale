@@ -125,7 +125,9 @@ export const Initializer: React.FC = () => {
     );
 
     if (typeof navigator.serviceWorker !== "undefined") {
-      void navigator.serviceWorker.register("/sw.js");
+      void navigator.serviceWorker.register(
+        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`
+      );
     }
   }, []);
   return isAuthEnabled ? <AuthInitializer /> : null;
