@@ -87,6 +87,7 @@ export class LooperPlayer {
       this.currentLoopPromise = new Promise<void>((resolve) => {
         resolveCurrentLoop = resolve;
       });
+      let waited = false;
       console.log(
         LOG_PREFIX + "Loop starts at global tick %d, length %d ticks",
         loopStartTick,
@@ -113,12 +114,26 @@ export class LooperPlayer {
           continue;
         }
 
+        waited = true;
         if (!(await this.waitForGlobalTick(targetTick, checkFinished))) {
           resolveCurrentLoop();
           return;
         }
 
         playAllNotes(events, LOG_PREFIX, tick);
+      }
+
+      // a pass with nothing to play, say after the piano roll deleted every note, still waits out the loop.
+      // Without the wait the loop would spin and freeze the page
+      if (
+        !waited &&
+        !(await this.waitForGlobalTick(
+          loopStartTick + loopLengthTicks,
+          checkFinished
+        ))
+      ) {
+        resolveCurrentLoop();
+        return;
       }
 
       console.log(LOG_PREFIX + "Loop ends");

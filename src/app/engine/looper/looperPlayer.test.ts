@@ -84,6 +84,27 @@ describe("LooperPlayer", () => {
     expect(result).toEqual([1, B + 1]);
   });
 
+  it("waits out a pass after the piano roll deletes every note", async () => {
+    const items = [{ tick: 1, events: [] }];
+    const player = new LooperPlayer({
+      eventsByTick: {
+        get items() {
+          return items;
+        },
+      } as never,
+      loopLengthTicks: B,
+    });
+    const loop = player.playLoop();
+    while (played.length < 1) await Promise.resolve();
+    items.length = 0;
+    // a spinning loop would never let the clock reach the next bars
+    while (clock.globalCurrentTick < 3 * B) await Promise.resolve();
+    player.stopPlaying();
+    await loop;
+    // the pass that read the note before the delete still plays it
+    expect(played).toEqual([1, B + 1]);
+  });
+
   it("stops when the clock is stopped", async () => {
     clock.isMainClockActiveValue = false;
     const player = new LooperPlayer({

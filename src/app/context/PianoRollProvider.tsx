@@ -3,10 +3,14 @@ import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
 import { getEditHistory } from "@/app/engine/pianoRoll/editHistory";
 import { EditResult } from "@/app/engine/pianoRoll/operations";
-import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
+import {
+  pianoRollData,
+  setPianoRollData,
+} from "@/app/engine/pianoRoll/pianoRollState";
 import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
 import { BehaviorSubject } from "rxjs";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
+import { useDispatch } from "react-redux";
 import React, {
   createContext,
   ReactNode,
@@ -52,7 +56,8 @@ interface PianoRollContextType {
   chooseChordMode: (id: string) => void;
   closeChordChoice: () => void;
   loaded: boolean;
-  setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  // marks the shown track as scrolled into view
+  setLoaded: (loaded: boolean) => void;
 }
 
 const PianoRollContext = createContext<PianoRollContextType | undefined>(
@@ -82,7 +87,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
 }) => {
   // the events live in a mutable structure, so a counter tells React they changed
   const [version, setVersion] = useState(0);
-  const [loaded, setLoaded] = useState<boolean>(false);
+  const dispatch = useDispatch();
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
 
@@ -130,23 +135,34 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     };
   }, [pianoRollExpanded, looperStateUpdateTrigger, guitarSettingsUpdateCount]);
 
+  // with nothing loaded the piano roll still offers a blank melody to draw in
+  const blankMelody = useMemo(() => new EventsByTick(), []);
   const sources = useMemo(
     () => [
-      ...(melody?.hasItems === true
-        ? [{ id: MELODY_SOURCE_ID, label: "Melody", data: melody }]
-        : []),
+      { id: MELODY_SOURCE_ID, label: "Melody", data: melody ?? blankMelody },
       ...loopSources,
     ],
-    [melody, loopSources]
+    [melody, blankMelody, loopSources]
   );
   const [sourceId, setSourceIdState] = useState(MELODY_SOURCE_ID);
   const setSourceId = useCallback((id: string) => {
     setSourceIdState(id);
-    // scroll to the notes of the other track
-    setLoaded(false);
   }, []);
   const source = sources.find((s) => s.id === sourceId) ?? sources.at(0);
   const data = source?.data;
+
+  // each track scrolls to its notes the first time it shows. Closing the piano roll forgets it
+  const [scrolledTrack, setScrolledTrack] = useState<EventsByTick | undefined>();
+  const [wasExpanded, setWasExpanded] = useState(pianoRollExpanded);
+  if (wasExpanded !== pianoRollExpanded) {
+    setWasExpanded(pianoRollExpanded);
+    if (!pianoRollExpanded) setScrolledTrack(undefined);
+  }
+  const loaded = data !== undefined && scrolledTrack === data;
+  const setLoaded = useCallback(
+    (value: boolean) => setScrolledTrack(value ? data : undefined),
+    [data]
+  );
 
   const loopPlayhead$ = useMemo(() => new BehaviorSubject<number>(0), []);
   const positionInLoop = source?.positionInLoop;
@@ -171,13 +187,6 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       selectionState.data === data ? selectionState.ids : new Set<string>(),
     [selectionState, data]
   );
-
-  useEffect(() => {
-    if (!pianoRollExpanded) {
-      // the piano roll scrolls to the notes again next time it opens
-      setLoaded(false);
-    }
-  }, [pianoRollExpanded]);
 
   const events = useMemo(
     () => data?.flatItems ?? [],
@@ -207,6 +216,10 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
         return;
       }
       getEditHistory(data).execute(command);
+      if (data === blankMelody && pianoRollData !== blankMelody) {
+        // the first note makes the blank melody the one that plays and exports
+        setPianoRollData(blankMelody, dispatch);
+      }
       setSelectionState({ data, ids: new Set(newSelection) });
       setVersion((v) => v + 1);
       if (chordsWithChangedMode.length) {
@@ -214,7 +227,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
         setChordQueue((queue) => [...queue, ...chordsWithChangedMode]);
       }
     },
-    [data]
+    [data, blankMelody, dispatch]
   );
 
   const step = useCallback(
@@ -265,7 +278,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, source, setSourceId, playhead$, data, events, selection, setSelection, apply, undo, redo, loaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [sources, source, setSourceId, playhead$, data, events, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

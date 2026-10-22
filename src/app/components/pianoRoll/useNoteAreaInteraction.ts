@@ -394,6 +394,11 @@ export const useNoteAreaInteraction = ({
         autoScrollFrame.current = undefined;
         return;
       }
+      // a press near the edge stays a click until the pointer itself moves
+      if ((gesture.kind === "note" || gesture.kind === "rubber") && !gesture.dragging) {
+        autoScrollFrame.current = requestAnimationFrame(step);
+        return;
+      }
       const rect = scroller.getBoundingClientRect();
       const speed = (distance: number) =>
         distance < AUTO_SCROLL_EDGE_PX

@@ -29,6 +29,9 @@ import {
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import React, { useCallback, useEffect, useMemo } from "react";
 
+// C4, the middle of the guitar range
+const EMPTY_VIEW_PITCH = 48;
+
 // how strongly one wheel notch or trackpad pinch step zooms
 const WHEEL_ZOOM_SPEED = 0.0025;
 
@@ -99,13 +102,15 @@ export const PianoRoll: React.FC = () => {
   }, [scrollerRef, zoomBy]);
 
   useEffect(() => {
-    // open on the notes
+    // open on the notes, or on the middle of the guitar range when there are none
     const scroller = scrollerRef.current;
-    if (loaded || !scroller || !events.length) {
+    if (loaded || !scroller) {
       return;
     }
-    const ticks = events.map(({ tick }) => tick);
-    const pitches = events.map(({ event }) => getEventPitch(event));
+    const ticks = events.length ? events.map(({ tick }) => tick) : [0];
+    const pitches = events.length
+      ? events.map(({ event }) => getEventPitch(event))
+      : [EMPTY_VIEW_PITCH];
     const x = tickToX(Math.min(...ticks), zoom);
     const y =
       (pitchToY(Math.max(...pitches), zoom) +
