@@ -22,6 +22,7 @@ import ContentCut from "@mui/icons-material/ContentCut";
 import ContentPaste from "@mui/icons-material/ContentPaste";
 import ControlPointDuplicate from "@mui/icons-material/ControlPointDuplicate";
 import Delete from "@mui/icons-material/Delete";
+import AlignHorizontalLeft from "@mui/icons-material/AlignHorizontalLeft";
 import Edit from "@mui/icons-material/Edit";
 import FitScreen from "@mui/icons-material/FitScreen";
 import KeyboardTab from "@mui/icons-material/KeyboardTab";
@@ -126,6 +127,11 @@ export const PianoRollToolbar: React.FC = () => {
       <Divider />
       <Group>
         <PianoRollSnapSelector />
+        <IconButtonWrapper
+          icon={<AlignHorizontalLeft />}
+          tooltip={`Quantize: move ${actions.hasSelection ? "the selected" : "all"} notes onto the grid (Q)`}
+          onPress={actions.quantize}
+        />
         <IconButtonWrapper
           icon={<LibraryMusic />}
           tooltip="Keep notes in the scale when moving and drawing"

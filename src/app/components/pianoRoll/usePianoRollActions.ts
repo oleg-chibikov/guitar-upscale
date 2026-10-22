@@ -8,6 +8,7 @@ import {
   getSpan,
   moveEvents,
   pasteEvents,
+  quantizeEvents,
   resolveMove,
   resolveTranspose,
 } from "@/app/engine/pianoRoll/operations";
@@ -78,6 +79,14 @@ export const usePianoRollActions = () => {
         const first = result.selection[0];
         const moved = first !== undefined ? data.getEvent(first) : undefined;
         if (moved) playChordOrNote(moved.event);
+      },
+      // with nothing selected, Cubase quantizes every note
+      quantize: () => {
+        if (!data) return;
+        const ids = selection.size
+          ? selection
+          : events.map(({ event }) => event.id);
+        apply(quantizeEvents(data, ids, snapTicks));
       },
       nudge: (steps: number) => {
         if (!data || !selection.size) return;

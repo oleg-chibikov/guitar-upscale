@@ -7,12 +7,15 @@ import { PianoRollTool, setPianoRollTool } from "@/app/store/pianoRollSlice";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 
-// keys typed into a field or a dropdown belong to that control
+// keys typed into a field or an open dropdown belong to that control
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   target.closest(
-    'input, textarea, select, [contenteditable="true"], [role="combobox"], [role="listbox"], [role="menu"]'
+    'input, textarea, select, [contenteditable="true"], [aria-expanded="true"], [role="listbox"], [role="menu"]'
   ) !== null;
+
+const isDropdown = (target: EventTarget | null) =>
+  target instanceof HTMLElement && target.closest('[role="combobox"]') !== null;
 
 const toolKeys: Record<string, PianoRollTool> = {
   "1": PianoRollTool.Select,
@@ -33,28 +36,36 @@ export const usePianoRollShortcuts = () => {
   });
 
   useEffect(() => {
-    // runs before the main Space handler, which loads a new melody, and tells it to skip
-    const handleSpace = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || isTyping(e.target)) return;
-      e.preventDefault();
-      void latest.current.togglePlay();
+    // runs before the main Space handler, which loads a new melody, and tells it to skip.
+    // Escape clears the selection before it gets to close the dialog
+    const handleEarlyKeys = (e: KeyboardEvent) => {
+      if (isTyping(e.target)) return;
+      if (e.code === "Space" && !isDropdown(e.target)) {
+        e.preventDefault();
+        void latest.current.togglePlay();
+      } else if (e.key === "Escape" && latest.current.actions.hasSelection) {
+        e.preventDefault();
+        e.stopPropagation();
+        latest.current.actions.deselect();
+      }
     };
-    document.addEventListener("keydown", handleSpace, { capture: true });
+    document.addEventListener("keydown", handleEarlyKeys, { capture: true });
     return () =>
-      document.removeEventListener("keydown", handleSpace, { capture: true });
+      document.removeEventListener("keydown", handleEarlyKeys, {
+        capture: true,
+      });
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isTyping(e.target)) return;
+      // a focused dropdown already used this key, for example an arrow to open its list
+      if (isTyping(e.target) || e.defaultPrevented) return;
       const { undo, redo, actions, zoomBy, zoomToFit, seekTo } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 
       if (key === "delete" || key === "backspace") {
         actions.deleteSelection();
-      } else if (key === "escape") {
-        actions.deselect();
       } else if (mod && key === "z" && !e.shiftKey) {
         undo();
       } else if (mod && (key === "y" || (key === "z" && e.shiftKey))) {
@@ -77,6 +88,8 @@ export const usePianoRollShortcuts = () => {
         // G and H zoom out and in as in Cubase. Shift zooms pitch
         const factor = key === "h" ? ZOOM_STEP : 1 / ZOOM_STEP;
         zoomBy(e.shiftKey ? 1 : factor, e.shiftKey ? factor : 1);
+      } else if (!mod && key === "q") {
+        actions.quantize();
       } else if (key === "home") {
         seekTo(0);
       } else if (!mod && key === "f") {
