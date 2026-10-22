@@ -7,6 +7,7 @@ import {
   setIsLooperPlaying,
   setIsMetronomeActive,
   setIsPlaying,
+  stopMetronomeIfIdle,
   toggleMetronomeWhenRecordingValue,
   triggerLooperStateUpdate,
   tryToggleInterval,
@@ -47,7 +48,7 @@ export const stopLooperPlayback = () => {
     looperChannel.looperRecorder.stopPlaying();
   });
   tryToggleInterval(false);
-  stopMetronomeIfNeeded(store.dispatch);
+  stopMetronomeIfIdle(store.dispatch);
   store.dispatch(triggerLooperStateUpdate()); // this will update all the buttons in the looper panel
   store.dispatch(setIsLooperPlaying(false)); // this will show the pause button
 };

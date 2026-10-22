@@ -24,6 +24,15 @@ export type RecursiveContainers = {
 
 export const noteBit = (note: number) => 1 << note;
 
+const countBits = (mask: number) => {
+  let count = 0;
+  while (mask !== 0) {
+    mask &= mask - 1;
+    count++;
+  }
+  return count;
+};
+
 export class RecursiveChordGenerator {
   private capo: number;
   private maxFretToProcess: number;
@@ -57,6 +66,14 @@ export class RecursiveChordGenerator {
     maxAllowedFretIndex: OptionalNumber,
     results: ChordBuilderInfo[]
   ): void => {
+    // Each string left adds one note at most. Too few strings for the missing notes means no chord down this branch.
+    if (
+      countBits(requiredNotesMask & ~state.usedNotesMask) >
+      stringIndex + 1
+    ) {
+      return;
+    }
+
     const neckString = this.neck[stringIndex];
 
     // Always take the open note into account

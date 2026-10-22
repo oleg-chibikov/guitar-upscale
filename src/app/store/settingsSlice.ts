@@ -1,5 +1,6 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, UnknownAction } from "@reduxjs/toolkit";
+import { Dispatch } from "react";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Neck, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
@@ -255,6 +256,15 @@ export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
 
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();
+
+export const stopMetronomeIfIdle = (dispatch: Dispatch<UnknownAction>) => {
+  if (
+    isMetronomeActiveValue &&
+    !isAnyTimerSpecificActivityBesidesMetronomeRunning()
+  ) {
+    dispatch(setIsMetronomeActive(false));
+  }
+};
 
 // this promise is resolved only when pause is released
 let pausePromise: Promise<PauseResolveValue | undefined> =

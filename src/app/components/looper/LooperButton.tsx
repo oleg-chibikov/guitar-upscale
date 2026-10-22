@@ -10,6 +10,7 @@ import {
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
+import { stopMetronomeIfIdle } from "@/app/store/settingsSlice";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -55,7 +56,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
       }
     } else {
       setPlayingInLooperChannel(channel, false);
-      stopMetronomeIfNeeded(dispatch);
+      stopMetronomeIfIdle(dispatch);
     }
     setState({ ...looperState });
   };

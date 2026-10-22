@@ -1,7 +1,10 @@
 import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { usePianoRollData } from "@/app/hooks/usePianoRollData";
-import { isPlayingValue } from "@/app/store/settingsSlice";
+import {
+  isPlayingValue,
+  stopMetronomeIfIdle,
+} from "@/app/store/settingsSlice";
 import Clear from "@mui/icons-material/Clear";
 import React, { Dispatch, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -55,4 +58,5 @@ export const ResetPlaybackButton: React.FC = () => {
 async function stop(dispatch: Dispatch<UnknownAction>) {
   const { stopPlayback } = await import("@/app/engine/midiPlayer");
   await stopPlayback(dispatch, "ResetPlayButton: ");
+  stopMetronomeIfIdle(dispatch);
 }
