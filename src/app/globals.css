@@ -102,6 +102,7 @@
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     -webkit-touch-callout: none; /* iOS long press popup */
+    -webkit-tap-highlight-color: transparent; /* grey flash on tap */
   }
 
   html,

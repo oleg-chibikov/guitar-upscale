@@ -124,6 +124,13 @@ export const Initializer: React.FC = () => {
       true
     );
 
+    // A long press opens the context menu, and the phone vibrates mid-play.
+    document.addEventListener(
+      "contextmenu",
+      (event) => event.preventDefault(),
+      true
+    );
+
     if (typeof navigator.serviceWorker !== "undefined") {
       void navigator.serviceWorker.register(
         `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`

@@ -184,11 +184,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
       handleExpansion={handleExpansion}
       title="Chords"
     >
-      <div
-        className="relative flex flex-row gap-0.5"
-        // A long press opens the context menu, and the phone vibrates mid-chord.
-        onContextMenu={(event) => event.preventDefault()}
-      >
+      <div className="relative flex flex-row gap-0.5">
         <SlashChordButtonsContainer />
 
         <section
