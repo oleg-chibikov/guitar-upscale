@@ -196,7 +196,7 @@ export class EventsByTick {
         const newChordMode =
           currentChordMode && modesForNewNote.has(currentChordMode)
             ? currentChordMode
-            : modesForNewNote.values().next().value; // get the first available mode
+            : modesForNewNote.values().next().value!; // get the first available mode
         chordData.chord = getChordName(updatedNote.note, newChordMode);
         metadata.chordMode = newChordMode;
         metadata.octaveNote = updatedNote;

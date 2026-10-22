@@ -1,6 +1,6 @@
 import { TrackKey } from "@/app/data/trackKey";
 import Midi from "midi-writer-js";
-import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
+import type { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../../data/instruments";
 import { getNoteText } from "../../data/notes";
 import {
@@ -75,7 +75,7 @@ class MidiSaver {
 
     // Create a new MIDI file with the track
     const write = new Midi.Writer(tracks);
-    const byteArray = write.buildFile();
+    const byteArray = write.buildFile() as Uint8Array<ArrayBuffer>;
     return new Blob([byteArray], { type: "audio/midi" });
   }
 }

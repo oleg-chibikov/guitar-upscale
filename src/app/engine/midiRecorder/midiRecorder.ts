@@ -10,7 +10,7 @@ import { EventsByTick } from "@/app/engine/eventsByTick";
 import { midiSaver } from "@/app/engine/midiRecorder/midiSaver";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
 import Midi from "midi-writer-js";
-import { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
+import type { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../../data/instruments";
 import { NOTE_COUNT, StringOctaveNote, getNoteText } from "../../data/notes";
 import { globalCurrentTick } from "../clock/mainClock";

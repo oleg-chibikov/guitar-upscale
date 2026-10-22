@@ -34,7 +34,7 @@ import { loadInstrument } from "../engine/sound/soundHelper";
 import { isAnythingStrumming } from "../engine/strummingState";
 
 const getFirstScaleForGroup = (groupKey: string) =>
-  scalesMap.get(groupKey)!.keys().next().value;
+  scalesMap.get(groupKey)!.keys().next().value!;
 
 interface WithNeck {
   neck: Neck | null;

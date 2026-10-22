@@ -26,7 +26,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "midi-writer-js/build/types/*": [
+        "./node_modules/midi-writer-js/build/types/*"
+      ]
     }
   },
   "include": [

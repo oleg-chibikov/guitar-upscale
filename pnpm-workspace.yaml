@@ -7,4 +7,5 @@ packages:
 allowBuilds:
   '@vercel/speed-insights': false
   midi-writer-js: false
+  unrs-resolver: false
 ignore-workspace-root-check: true
