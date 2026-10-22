@@ -15,6 +15,7 @@ export const DEFAULT_CHORD_TRACK_NUMBER = 1;
 
 export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
+  durationMs?: number;
   volume?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
 };
 
@@ -80,6 +81,7 @@ const play = async ({
   trackInstrument,
   volume,
   fromChord,
+  durationMs,
 }: NoteMetadata) => {
   // This module is essential and should be loaded asap, so I commented out lazy loading here
   // const playNote = (await import("@/app/engine/sound/soundProvider"))
@@ -88,8 +90,10 @@ const play = async ({
     stringOctaveNote,
     volume,
     trackInstrument ??
-      (fromChord === true ? chordInstrumentValue : instrumentValue)
+      (fromChord === true ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,
+    undefined,
+    durationMs
   );
 };
 

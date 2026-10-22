@@ -1,3 +1,4 @@
+import { pianoRollInitialState } from "@/app/store/pianoRollSlice";
 import { RootState } from "@/app/store/store";
 import { useSelector } from "react-redux";
 
@@ -10,7 +11,10 @@ export const useSettingsSelector = <T>(
 export const usePianoRollSelector = <T>(
   selector: (state: RootState["pianoRoll"]) => T
 ): T => {
-  return useSelector((state: RootState) => selector(state.pianoRoll));
+  // fields added after a user saved the state come back undefined from redux-persist
+  return useSelector((state: RootState) =>
+    selector({ ...pianoRollInitialState, ...state.pianoRoll })
+  );
 };
 
 export const useUiSelector = <T>(

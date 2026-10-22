@@ -1,115 +1,112 @@
-import React, { useEffect, useRef } from "react";
-import { PianoRollGrid } from "./PianoRollGrid";
-import { PianoRollNotes } from "./PianoRollNotes";
-import { PitchAxis } from "./PitchAxis";
-import { Timeline } from "./Timeline";
-
+import { NoteArea } from "@/app/components/pianoRoll/NoteArea";
+import { PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
+import { Timeline } from "@/app/components/pianoRoll/Timeline";
+import { getGridBackground } from "@/app/components/pianoRoll/gridBackground";
+import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
+import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
+import { useScaleContext } from "@/app/context/ScaleProvider";
+import { getTicksForTimeSignature } from "@/app/data/clockConstants";
 import {
-  OCTAVE_COUNT,
-  PIXELS_PER_TICK,
-  TOTAL_HEIGHT,
-  TOTAL_WIDTH,
+  PITCH_AXIS_WIDTH,
+  TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
-import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
-import { ChordOrNote } from "@/app/engine/eventsByTick";
-import { getPitchPosition } from "@/app/helpers/pianoRollHelper";
-
-const calculateNotesCenter = (
-  notes: { tick: number; events: ChordOrNote[] }[]
-) => {
-  let minTick = Infinity;
-  let maxTick = -Infinity;
-  let minPitch = Infinity;
-  let maxPitch = -Infinity;
-
-  notes.forEach(({ tick, events }) => {
-    minTick = Math.min(minTick, tick);
-    maxTick = Math.max(maxTick, tick);
-
-    events.forEach((event) => {
-      const octaveNote =
-        "chord" in event
-          ? {
-              octave: 5,
-              note: parseChordNoteAndAlterations(event.chord!.chord)
-                .chordBaseNote,
-            }
-          : event.note!.note;
-      const pitch = getPitchPosition({
-        note: octaveNote.note,
-        octave: OCTAVE_COUNT - octaveNote.octave - 1,
-      });
-      minPitch = Math.min(minPitch, pitch);
-      maxPitch = Math.max(maxPitch, pitch);
-    });
-  });
-
-  return {
-    x: ((minTick + maxTick) / 2) * PIXELS_PER_TICK,
-    y: (minPitch + maxPitch) / 2,
-  };
-};
+import {
+  getContentHeight,
+  getTotalTicks,
+  pitchToY,
+  tickToX,
+  Zoom,
+} from "@/app/engine/pianoRoll/geometry";
+import {
+  getEventDuration,
+  getEventPitch,
+} from "@/app/engine/pianoRoll/pianoRollEvent";
+import { usePianoRollSelector } from "@/app/hooks/storeHooks";
+import React, { useEffect, useMemo, useRef } from "react";
 
 export const PianoRoll: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pitchAxisRef = useRef<HTMLCanvasElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const { events, loaded, setLoaded } = usePianoRoll();
+  const { scalePattern } = useScaleContext();
+  const { baseNote } = useBaseNoteContext();
+  const snap = usePianoRollSelector((s) => s.pianoRollSnap);
+  const tool = usePianoRollSelector((s) => s.tool);
+  const snapToScale = usePianoRollSelector((s) => s.snapToScale);
+  const pixelsPerTick = usePianoRollSelector((s) => s.pixelsPerTick);
+  const noteHeight = usePianoRollSelector((s) => s.noteHeight);
+  const zoom: Zoom = useMemo(
+    () => ({ pixelsPerTick, noteHeight }),
+    [pixelsPerTick, noteHeight]
+  );
+  const snapTicks = getTicksForTimeSignature(snap);
 
-  const { notes, loaded, setLoaded } = usePianoRoll();
+  usePianoRollShortcuts();
+
+  const lastEndTick = useMemo(
+    () =>
+      events.reduce(
+        (end, { tick, event }) => Math.max(end, tick + getEventDuration(event)),
+        0
+      ),
+    [events]
+  );
+  const totalTicks = getTotalTicks(lastEndTick);
+  const width = tickToX(totalTicks, zoom);
+  const height = getContentHeight(zoom);
+
+  const gridStyle = useMemo(
+    () => getGridBackground(zoom, snapTicks, scalePattern, baseNote),
+    [zoom, snapTicks, scalePattern, baseNote]
+  );
 
   useEffect(() => {
-    // sticky headers
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      if (pitchAxisRef.current) {
-        pitchAxisRef.current.style.left = `${container.scrollLeft}px`;
-      }
-      if (timelineRef.current) {
-        timelineRef.current.style.top = `${container.scrollTop}px`;
-      }
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // scroll to the notes
-    if (loaded || !containerRef.current || !notes.length) {
+    // open on the notes
+    const scroller = scrollerRef.current;
+    if (loaded || !scroller || !events.length) {
       return;
     }
-
-    const container = containerRef.current;
-    const { x, y } = calculateNotesCenter(notes);
-
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-
-    container.scrollLeft = x - containerWidth / 2;
-    container.scrollTop = y - containerHeight / 2;
+    const ticks = events.map(({ tick }) => tick);
+    const pitches = events.map(({ event }) => getEventPitch(event));
+    const x = tickToX(Math.min(...ticks), zoom);
+    const y =
+      (pitchToY(Math.max(...pitches), zoom) +
+        pitchToY(Math.min(...pitches), zoom)) /
+      2;
+    scroller.scrollLeft = Math.max(0, x - PITCH_AXIS_WIDTH);
+    scroller.scrollTop = y - (scroller.clientHeight - TIMELINE_HEIGHT) / 2;
     setLoaded(true);
-  }, [loaded, notes, setLoaded]);
+  }, [loaded, events, setLoaded, zoom]);
 
   return (
     <div
-      className="relative w-full h-full bg-red overflow-auto"
-      ref={containerRef}
+      ref={scrollerRef}
+      className="relative w-full h-full overflow-auto overscroll-contain bg-[#1e272b]"
     >
-      <PitchAxis ref={pitchAxisRef} className="absolute left-0 top-0 z-20" />
       <div
-        className="relative left-28 top-0"
-        style={{ width: `${TOTAL_WIDTH}px`, height: `${TOTAL_HEIGHT}px` }}
+        className="grid"
+        style={{
+          gridTemplateColumns: `${PITCH_AXIS_WIDTH}px ${width}px`,
+          gridTemplateRows: `${TIMELINE_HEIGHT}px ${height}px`,
+        }}
       >
+        <div className="sticky left-0 top-0 z-30 bg-gray-300 border-b border-r border-gray-400" />
         <Timeline
-          ref={timelineRef}
-          width={TOTAL_WIDTH}
-          pixelsPerTick={PIXELS_PER_TICK}
+          className="sticky top-0 z-20"
+          zoom={zoom}
+          totalTicks={totalTicks}
         />
-        <PianoRollGrid width={TOTAL_WIDTH} height={TOTAL_HEIGHT} />
-        <PianoRollNotes />
+        <PitchAxis className="sticky left-0 z-20" zoom={zoom} />
+        <NoteArea
+          zoom={zoom}
+          width={width}
+          height={height}
+          snapTicks={snapTicks}
+          scalePattern={snapToScale ? scalePattern : undefined}
+          tool={tool}
+          scrollerRef={scrollerRef}
+          gridStyle={gridStyle}
+        />
       </div>
     </div>
   );

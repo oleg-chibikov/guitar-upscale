@@ -18,7 +18,6 @@ Can we avoid using pre-built chords for chord detection?
 Piano roll:
 Undo-redo (use event sourcing technique)
 copy note instead of move when ctrl pressed (what about mobile?)
-move with touch gestures too
 Panel with actions on pianoRoll. It probably should be the same as play panel, but extended with tools or two different panels
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
 Draggging over the X-axis should change current playback position. Should we adjust globalCurrentTick? Note that when we go forwards/backwards we don't do that - probably we should!

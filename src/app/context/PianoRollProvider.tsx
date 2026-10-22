@@ -1,22 +1,25 @@
-import { OctaveNote } from "@/app/data/notes";
-import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
+import { getEditHistory } from "@/app/engine/pianoRoll/editHistory";
+import { EditResult } from "@/app/engine/pianoRoll/operations";
 import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import React, {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 interface PianoRollContextType {
-  notes: { tick: number; events: ChordOrNote[] }[];
-  onEventMove: (
-    eventId: string,
-    newTick: number,
-    updatedNote: OctaveNote
-  ) => void;
+  data: EventsByTick | undefined;
+  events: EventForTick[];
+  selection: ReadonlySet<string>;
+  setSelection: (ids: Iterable<string>) => void;
+  // runs the edit through the undo history and selects what it returns
+  apply: (result: EditResult) => void;
   loaded: boolean;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -40,42 +43,78 @@ interface PianoRollProviderProps {
 export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   children,
 }) => {
-  const [notes, setNotes] = useState<{ tick: number; events: ChordOrNote[] }[]>(
-    []
-  );
+  // the events live in a mutable structure, so a counter tells React they changed
+  const [version, setVersion] = useState(0);
   const [loaded, setLoaded] = useState<boolean>(false);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
 
-  useEffect(() => {
-    if (pianoRollExpanded) {
-      setNotes(pianoRollData?.items ?? []);
-    } else {
-      setLoaded(false); // Set loaded to false when pianoRollExpanded is false
-      // Nested component will set this value to true when it's loaded
-    }
-  }, [pianoRollExpanded, showReplayTrigger]);
+  // pianoRollData is a module variable. showReplayTrigger flips whenever it changes
+  const data = useMemo(
+    () => (pianoRollExpanded ? pianoRollData : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pianoRollExpanded, showReplayTrigger]
+  );
 
-  const onEventMove = (
-    eventId: string,
-    newTick: number,
-    updatedNote: OctaveNote
-  ) => {
-    const data = pianoRollData;
-    if (!data) {
-      return;
+  // a selection belongs to one melody and drops when another one loads
+  const [selectionState, setSelectionState] = useState<{
+    data: EventsByTick | undefined;
+    ids: ReadonlySet<string>;
+  }>({ data: undefined, ids: new Set() });
+  const selection = useMemo(
+    () =>
+      selectionState.data === data ? selectionState.ids : new Set<string>(),
+    [selectionState, data]
+  );
+
+  useEffect(() => {
+    if (!pianoRollExpanded) {
+      // the piano roll scrolls to the notes again next time it opens
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoaded(false);
     }
-    const updated = data.changeEvent(eventId, updatedNote, newTick);
-    if (updated) {
-      const items = pianoRollData?.items;
-      setNotes(items ?? []);
-    }
-  };
+  }, [pianoRollExpanded]);
+
+  const events = useMemo(
+    () => data?.flatItems ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data, version]
+  );
+
+  const setSelection = useCallback(
+    (ids: Iterable<string>) => {
+      setSelectionState({ data, ids: new Set(ids) });
+    },
+    [data]
+  );
+
+  const apply = useCallback(
+    ({ command, selection: newSelection }: EditResult) => {
+      if (!data || !command) {
+        return;
+      }
+      getEditHistory(data).execute(command);
+      setSelectionState({ data, ids: new Set(newSelection) });
+      setVersion((v) => v + 1);
+    },
+    [data]
+  );
+
+  const value = useMemo(
+    () => ({
+      data,
+      events,
+      selection,
+      setSelection,
+      apply,
+      loaded,
+      setLoaded,
+    }),
+    [data, events, selection, setSelection, apply, loaded]
+  );
 
   return (
-    <PianoRollContext.Provider
-      value={{ notes, onEventMove, loaded, setLoaded }}
-    >
+    <PianoRollContext.Provider value={value}>
       {children}
     </PianoRollContext.Provider>
   );

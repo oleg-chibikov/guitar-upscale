@@ -233,7 +233,11 @@ async function processToleranceGroup(
         velocity: event.velocity || 127,
         instrument,
       };
-      eventsByTick.addEventAtTick(event.tick, noteEvent);
+      eventsByTick.addEventAtTick(
+        event.tick,
+        noteEvent,
+        Math.max(1, Math.round(event.duration))
+      );
       previousNote = stringOctaveNote;
     }
   }

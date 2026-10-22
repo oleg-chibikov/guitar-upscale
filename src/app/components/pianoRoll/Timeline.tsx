@@ -1,51 +1,67 @@
-import { BEATS_IN_BAR, TICKS_IN_BEAT } from "@/app/data/clockConstants";
-import React, { forwardRef } from "react";
+import {
+  BEATS_IN_BAR,
+  TICKS_IN_BAR,
+  TICKS_IN_BEAT,
+  TIMELINE_HEIGHT,
+} from "@/app/data/pianoRollConstants";
+import { Zoom } from "@/app/engine/pianoRoll/geometry";
+import React, { forwardRef, memo } from "react";
 
 interface TimelineProps {
-  width: number;
-  pixelsPerTick: number;
+  zoom: Zoom;
+  totalTicks: number;
+  className?: string;
+  onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
 }
 
-export const Timeline = forwardRef<HTMLDivElement, TimelineProps>(
-  ({ width, pixelsPerTick }, ref) => {
-    const beatWidth = TICKS_IN_BEAT * pixelsPerTick;
-    const totalBars = Math.ceil(width / (BEATS_IN_BAR * beatWidth));
+const MIN_LABEL_SPACING_PX = 32;
+
+const TimelineComponent = forwardRef<HTMLDivElement, TimelineProps>(
+  ({ zoom, totalTicks, className, onPointerDown }, ref) => {
+    const barWidth = TICKS_IN_BAR * zoom.pixelsPerTick;
+    const beatWidth = TICKS_IN_BEAT * zoom.pixelsPerTick;
+    const totalBars = Math.ceil(totalTicks / TICKS_IN_BAR);
+    // zoomed out, only every 2nd, 4th, 8th bar gets a number
+    let labelEvery = 1;
+    while (barWidth * labelEvery < MIN_LABEL_SPACING_PX) {
+      labelEvery *= 2;
+    }
+    const labels = [];
+    for (let bar = 0; bar < totalBars; bar += labelEvery) {
+      labels.push(
+        <span
+          key={bar}
+          className="absolute bottom-0 pl-1 pb-0.5 text-[11px] leading-none text-gray-700 border-l border-gray-600 h-full flex items-end"
+          style={{ left: bar * barWidth }}
+        >
+          {bar + 1}
+        </span>
+      );
+    }
 
     return (
       <div
         ref={ref}
-        className="absolute z-10 h-8 bg-gray-200 border-b border-gray-300"
-        style={{ width }}
+        className={`${className ?? ""} bg-gray-200 border-b border-gray-400 select-none touch-none cursor-text`}
+        style={{
+          height: TIMELINE_HEIGHT,
+          backgroundImage:
+            beatWidth >= 6
+              ? `repeating-linear-gradient(to right, #9ca3af 0 1px, transparent 1px ${beatWidth}px)`
+              : undefined,
+          backgroundSize: `auto ${TIMELINE_HEIGHT / 3}px`,
+          backgroundPosition: "bottom left",
+          backgroundRepeat: "repeat-x",
+        }}
+        onPointerDown={onPointerDown}
+        title={`${BEATS_IN_BAR}/4`}
       >
-        {Array.from({ length: totalBars }).map((_, barIndex) => (
-          <React.Fragment key={barIndex}>
-            {Array.from({ length: BEATS_IN_BAR }).map((_, beatIndex) => {
-              const xPosition =
-                (barIndex * BEATS_IN_BAR + beatIndex) * beatWidth;
-              return (
-                <div
-                  key={`${barIndex}-${beatIndex}`}
-                  className="absolute h-full flex items-end justify-start"
-                  style={{ left: `${xPosition}px`, width: beatWidth }}
-                >
-                  <div
-                    className={`h-full border-l ${
-                      beatIndex === 0 ? "border-gray-600" : "border-gray-400"
-                    }`}
-                  />
-                  {beatIndex === 0 && (
-                    <span className="text-xs pl-1 pb-1 text-gray-600">
-                      {barIndex + 1}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </React.Fragment>
-        ))}
+        {labels}
       </div>
     );
   }
 );
 
-Timeline.displayName = "Timeline";
+TimelineComponent.displayName = "Timeline";
+
+export const Timeline = memo(TimelineComponent);

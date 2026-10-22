@@ -1,11 +1,17 @@
 import { waitForNextTick } from "@/app/engine/clock/mainClock";
 import { ChordEventBus, NotePlayEventBus } from "@/app/engine/eventBus";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { tickToMilliseconds } from "@/app/helpers/clockHelper";
+import { tempoBpmValue } from "@/app/store/settingsSlice";
 
-export const playChordOrNote = ({ note, chord }: ChordOrNote) => {
+export const playChordOrNote = ({ note, chord, duration }: ChordOrNote) => {
   if (note) {
     NotePlayEventBus.next({
       stringOctaveNote: note.note,
+      durationMs:
+        duration === undefined
+          ? undefined
+          : tickToMilliseconds(duration, tempoBpmValue),
       looperChannel: note.looperChannel,
       trackInstrument: note.instrument,
       trackNumber: note.trackNumber,

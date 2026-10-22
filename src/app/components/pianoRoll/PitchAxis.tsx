@@ -1,176 +1,112 @@
 import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
-import {
-  isSharp,
-  Note,
-  NOTE_COUNT,
-  serializeOctaveNote,
-} from "@/app/data/notes";
-import {
-  allNotes,
-  NOTE_HEIGHT,
-  OCTAVE_COUNT,
-  octaves,
-} from "@/app/data/pianoRollConstants";
+import { isSharp, serializeOctaveNote } from "@/app/data/notes";
+import { PITCH_AXIS_WIDTH, PITCH_COUNT } from "@/app/data/pianoRollConstants";
 import { playNote } from "@/app/engine/sound/soundProvider";
+import { fromPitch, pitchToY, Zoom } from "@/app/engine/pianoRoll/geometry";
 import { WithClassName } from "@/app/helpers/withClassName";
-import { forwardRef, useEffect, useState } from "react";
-
-export type OctaveNote = {
-  octave: number;
-  note: Note;
-};
+import React, { memo, useEffect, useRef, useState } from "react";
 
 interface PitchAxisProps extends WithClassName {
-  showNoteLabels?: boolean;
+  zoom: Zoom;
+  // pitches that sound right now, lit on the keys
+  activePitches?: ReadonlySet<number>;
 }
 
-const WIDTH = 112;
-const BLACK_WIDTH = WIDTH * 0.6;
+const BLACK_WIDTH = PITCH_AXIS_WIDTH * 0.6;
+const PRESS_HIGHLIGHT_MS = 200;
+// tall canvases past this size fail on mobile Safari
+const MAX_CANVAS_PIXELS = 16_000_000;
 
-const HALF_HEIGHT = NOTE_HEIGHT * 0.5;
-const HEIGHT_AND_HALF = NOTE_HEIGHT * 1.5;
+const PitchAxisComponent: React.FC<PitchAxisProps> = ({
+  className,
+  zoom,
+  activePitches,
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [pressedPitch, setPressedPitch] = useState<number | undefined>();
+  const { baseNote } = useBaseNoteContext();
+  const height = PITCH_COUNT * zoom.noteHeight;
 
-export const PitchAxis = forwardRef<HTMLCanvasElement, PitchAxisProps>(
-  ({ className, showNoteLabels = true }, ref) => {
-    const [pressedNotes, setPressedNotes] = useState<Set<string>>(new Set());
-    const { baseNote } = useBaseNoteContext();
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-    const handleNotePress = (octaveNote: OctaveNote) => {
-      const noteKey = `${Note[octaveNote.note]}${octaveNote.octave}`;
-      void playNote(octaveNote);
-      setPressedNotes(new Set(pressedNotes.add(noteKey)));
-      setTimeout(() => {
-        setPressedNotes((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(noteKey);
-          return newSet;
-        });
-      }, 200);
-    };
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      Math.sqrt(MAX_CANVAS_PIXELS / (PITCH_AXIS_WIDTH * height))
+    );
+    canvas.width = Math.floor(PITCH_AXIS_WIDTH * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    useEffect(() => {
-      const canvas = ref instanceof Function ? null : ref?.current;
-      if (!canvas) return;
+    const h = zoom.noteHeight;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, PITCH_AXIS_WIDTH, height);
+    ctx.strokeStyle = "#D1D5DB";
+    ctx.lineWidth = 1;
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+    for (let pitch = 0; pitch < PITCH_COUNT; pitch++) {
+      const y = pitchToY(pitch, zoom);
+      const octaveNote = fromPitch(pitch);
+      const sharp = isSharp(octaveNote.note);
+      const lit = pressedPitch === pitch || activePitches?.has(pitch) === true;
 
-      const drawPitchAxis = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        octaves.forEach((octave) => {
-          allNotes.forEach((note, noteIndex) => {
-            const y =
-              (OCTAVE_COUNT - 1 - octave) * NOTE_COUNT * NOTE_HEIGHT +
-              noteIndex * NOTE_HEIGHT;
-            const noteKey = `${Note[note]}${octave}`;
-
-            const sharp = isSharp(note);
-
-            if (sharp) {
-              // Draw sharp notes
-              ctx.fillStyle = pressedNotes.has(noteKey) ? "#333333" : "#000000";
-              ctx.fillRect(0, y, BLACK_WIDTH, NOTE_HEIGHT);
-              ctx.strokeStyle = "#D1D5DB";
-              ctx.strokeRect(0, y, BLACK_WIDTH, NOTE_HEIGHT);
-            } else {
-              // Draw white notes
-              ctx.fillStyle = pressedNotes.has(noteKey) ? "#CCCCCC" : "#FFFFFF";
-              ctx.beginPath();
-              ctx.moveTo(0, y);
-              if (noteIndex > 0 && isSharp(allNotes[noteIndex - 1])) {
-                ctx.lineTo(BLACK_WIDTH, y);
-                ctx.lineTo(BLACK_WIDTH, y - HALF_HEIGHT);
-                ctx.lineTo(WIDTH, y - HALF_HEIGHT);
-                ctx.lineTo(WIDTH, y + NOTE_HEIGHT);
-              } else {
-                ctx.lineTo(WIDTH, y);
-                ctx.lineTo(WIDTH, y + NOTE_HEIGHT);
-              }
-              if (
-                noteIndex < allNotes.length - 1 &&
-                isSharp(allNotes[noteIndex + 1])
-              ) {
-                ctx.lineTo(WIDTH, y + HEIGHT_AND_HALF);
-                ctx.lineTo(BLACK_WIDTH, y + HEIGHT_AND_HALF);
-                ctx.lineTo(BLACK_WIDTH, y + NOTE_HEIGHT);
-              }
-              ctx.lineTo(0, y + NOTE_HEIGHT);
-              ctx.closePath();
-              ctx.fill();
-
-              // Stroke the entire white note area
-              ctx.strokeStyle = "#D1D5DB";
-              ctx.stroke();
-            }
-
-            if (showNoteLabels) {
-              const isBaseNote = note === baseNote;
-              ctx.fillStyle = !isBaseNote ? "#999" : sharp ? "white" : "black";
-              ctx.font = (isBaseNote ? "bold 9px" : "7px") + " Arial";
-              ctx.fillText(
-                serializeOctaveNote({ note, octave }),
-                4,
-                y + NOTE_HEIGHT - 4
-              );
-            }
-          });
-        });
-      };
-
-      drawPitchAxis();
-    }, [ref, showNoteLabels, pressedNotes, baseNote]);
-
-    const getClickedNote = (x: number, y: number): OctaveNote | null => {
-      const octaveIndex = Math.floor(y / (NOTE_COUNT * NOTE_HEIGHT));
-      const noteIndex = Math.floor(
-        (y % (NOTE_COUNT * NOTE_HEIGHT)) / NOTE_HEIGHT
-      );
-      const octave = OCTAVE_COUNT - 1 - octaveIndex;
-      const note = allNotes[noteIndex];
-      const isInFirstHalf = y % NOTE_HEIGHT < NOTE_HEIGHT / 2;
-
-      // Check if the click is on a black key first
-      if (isSharp(note)) {
-        if (x <= BLACK_WIDTH) {
-          return { octave, note };
-        } else {
-          if (isInFirstHalf && noteIndex > 0) {
-            return { octave, note: allNotes[noteIndex - 1] };
-          }
-          if (noteIndex < allNotes.length - 1) {
-            // If click is to the right of the black key, return null
-            return { octave, note: allNotes[noteIndex + 1] };
-          }
+      if (sharp) {
+        ctx.fillStyle = lit ? "#4b5563" : "#000000";
+        ctx.fillRect(0, y, BLACK_WIDTH, h);
+      } else {
+        if (lit) {
+          ctx.fillStyle = "#bfdbfe";
+          ctx.fillRect(0, y, PITCH_AXIS_WIDTH, h);
+        }
+        // a white key edge only where two white keys meet
+        if (!isSharp(fromPitch(pitch + 1).note)) {
+          ctx.beginPath();
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(PITCH_AXIS_WIDTH, y + 0.5);
+          ctx.stroke();
         }
       }
 
-      // If it's a white key or left of a black key, return the note
-      return { octave, note };
-    };
+      if (h >= 10) {
+        const isBaseNote = octaveNote.note === baseNote;
+        ctx.fillStyle = sharp ? "#9CA3AF" : isBaseNote ? "#000000" : "#6B7280";
+        ctx.font = `${isBaseNote ? "bold " : ""}${Math.min(11, h - 4)}px Arial`;
+        ctx.textBaseline = "middle";
+        ctx.fillText(
+          serializeOctaveNote(octaveNote),
+          sharp ? 4 : BLACK_WIDTH + 6,
+          y + h / 2
+        );
+      }
+    }
+  }, [zoom, height, baseNote, pressedPitch, activePitches]);
 
-    return (
-      <canvas
-        ref={ref}
-        className={`${className} pitch-axis cursor-pointer`}
-        width={WIDTH}
-        height={OCTAVE_COUNT * NOTE_COUNT * NOTE_HEIGHT}
-        onClick={(e) => {
-          const canvas = ref instanceof Function ? null : ref?.current;
-          if (!canvas) return;
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rowPitch = PITCH_COUNT - 1 - Math.floor(y / zoom.noteHeight);
+    let pitch = rowPitch;
+    // the right part of a black key row belongs to the white key under it
+    if (isSharp(fromPitch(rowPitch).note) && x > BLACK_WIDTH) {
+      const inUpperHalf = y % zoom.noteHeight < zoom.noteHeight / 2;
+      pitch = inUpperHalf ? rowPitch + 1 : rowPitch - 1;
+    }
+    void playNote(fromPitch(pitch));
+    setPressedPitch(pitch);
+    setTimeout(() => setPressedPitch(undefined), PRESS_HIGHLIGHT_MS);
+  };
 
-          const rect = canvas.getBoundingClientRect();
-          const y = e.clientY - rect.top;
-          const x = e.clientX - rect.left;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={`${className ?? ""} cursor-pointer block`}
+      style={{ width: PITCH_AXIS_WIDTH, height }}
+      onPointerDown={handlePointerDown}
+    />
+  );
+};
 
-          const clickedNote = getClickedNote(x, y);
-          if (clickedNote) {
-            handleNotePress(clickedNote);
-          }
-        }}
-      />
-    );
-  }
-);
-
-PitchAxis.displayName = "PitchAxis";
+export const PitchAxis = memo(PitchAxisComponent);

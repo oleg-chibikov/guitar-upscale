@@ -95,7 +95,8 @@ export class MidiRecorder implements NoteRecorder {
             note.note,
             note.looperChannel ?? note.trackNumber,
             note.instrument ?? "acoustic_guitar_nylon",
-            eventsAtTick.tick
+            eventsAtTick.tick,
+            event.duration
           );
         }
         if (chord) {
@@ -113,7 +114,8 @@ export class MidiRecorder implements NoteRecorder {
                   chord.metadata.trackNumber ??
                   DEFAULT_CHORD_TRACK_NUMBER,
                 chord.metadata.trackInstrument ?? "acoustic_guitar_nylon",
-                eventsAtTick.tick
+                eventsAtTick.tick,
+                event.duration
               );
             }
           }
@@ -126,7 +128,8 @@ export class MidiRecorder implements NoteRecorder {
     note: StringOctaveNote,
     trackNumber: number,
     instrument: Instrument,
-    tick: number
+    tick: number,
+    durationTicks?: number
   ) {
     if (!this.isRecording || !this.midiEvents) {
       return;
@@ -150,7 +153,11 @@ export class MidiRecorder implements NoteRecorder {
       new Midi.NoteEvent({
         pitch: [note.note + (this.octaveShift + midiOctave) * NOTE_COUNT],
         volume: MAX_VOLUME,
-        duration: "8", // the bigger the value - the shorter the note
+        // "8" is an eighth note. "T" gives an exact length in midi-writer-js ticks
+        duration:
+          durationTicks === undefined
+            ? "8"
+            : `T${durationTicks * (128 / TICKS_IN_BEAT)}`,
         channel: 1,
         sequential: false,
         tick: (tick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
