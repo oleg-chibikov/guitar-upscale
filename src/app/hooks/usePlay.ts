@@ -120,7 +120,8 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   useEffect(() => {
     const handleKeyPress = async (event: KeyboardEvent) => {
-      if (event.code === "Space") {
+      // the piano roll takes Space for its own playback and marks it handled
+      if (event.code === "Space" && !event.defaultPrevented) {
         // Call your function here
         await handlePlay();
       }

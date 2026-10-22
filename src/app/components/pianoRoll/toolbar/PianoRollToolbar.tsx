@@ -1,6 +1,7 @@
 import { PianoRollSnapSelector } from "@/app/components/pianoRoll/toolbar/PianoRollSnapSelector";
 import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
+import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
@@ -30,6 +31,9 @@ import ZoomIn from "@mui/icons-material/ZoomIn";
 import ZoomOut from "@mui/icons-material/ZoomOut";
 import LibraryMusic from "@mui/icons-material/LibraryMusic";
 import NearMe from "@mui/icons-material/NearMe";
+import PlayArrow from "@mui/icons-material/PlayArrow";
+import SkipPrevious from "@mui/icons-material/SkipPrevious";
+import Stop from "@mui/icons-material/Stop";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
 import React, { ReactNode } from "react";
@@ -64,6 +68,7 @@ export const PianoRollToolbar: React.FC = () => {
     usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
+  const transport = usePianoRollTransport();
   const tool = usePianoRollSelector((s) => s.tool);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const copyMode = usePianoRollSelector((s) => s.copyMode);
@@ -74,6 +79,24 @@ export const PianoRollToolbar: React.FC = () => {
 
   return (
     <div className="flex flex-row flex-wrap items-center gap-1 px-1 py-0.5 bg-gray-800 border-b border-gray-700">
+      <Group>
+        <IconButtonWrapper
+          icon={<SkipPrevious />}
+          tooltip="Move the playhead to the start (Home)"
+          onPress={() => transport.seekTo(0)}
+        />
+        <IconButtonWrapper
+          icon={transport.isPlaying ? <Stop /> : <PlayArrow />}
+          tooltip={
+            transport.isPlaying
+              ? "Stop (Space)"
+              : "Play these notes from the playhead (Space)"
+          }
+          onPress={() => void transport.togglePlay()}
+          isActive={transport.isPlaying}
+        />
+      </Group>
+      <Divider />
       <Group>
         <IconButtonWrapper
           icon={<Undo />}

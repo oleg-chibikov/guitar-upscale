@@ -5,6 +5,8 @@ import { Timeline } from "@/app/components/pianoRoll/Timeline";
 import { getGridBackground } from "@/app/components/pianoRoll/gridBackground";
 import { useFollowPlayhead } from "@/app/components/pianoRoll/useFollowPlayhead";
 import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
+import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
+import { snapTick } from "@/app/engine/pianoRoll/snap";
 import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
@@ -25,7 +27,7 @@ import {
   getEventPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 // how strongly one wheel notch or trackpad pinch step zooms
 const WHEEL_ZOOM_SPEED = 0.0025;
@@ -40,6 +42,7 @@ export const PianoRoll: React.FC = () => {
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const snapTicks = getTicksForTimeSignature(snap);
 
+  const { seekTo } = usePianoRollTransport();
   usePianoRollShortcuts();
   useFollowPlayhead(scrollerRef, zoom);
 
@@ -54,6 +57,21 @@ export const PianoRoll: React.FC = () => {
   const totalTicks = getTotalTicks(lastEndTick);
   const width = tickToX(totalTicks, zoom);
   const height = getContentHeight(zoom);
+
+  // pressing or dragging on the ruler moves the playhead. Shift turns off the grid
+  const handleRulerPointer = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.type === "pointerdown") {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } else if (!e.currentTarget.hasPointerCapture(e.pointerId)) {
+        return;
+      }
+      const rect = e.currentTarget.getBoundingClientRect();
+      const tick = Math.max(0, (e.clientX - rect.left) / zoom.pixelsPerTick);
+      seekTo(e.shiftKey ? Math.round(tick) : snapTick(tick, snapTicks));
+    },
+    [seekTo, snapTicks, zoom]
+  );
 
   const gridStyle = useMemo(
     () => getGridBackground(zoom, snapTicks, scalePattern, baseNote),
@@ -114,6 +132,8 @@ export const PianoRoll: React.FC = () => {
           className="sticky top-0 z-20"
           zoom={zoom}
           totalTicks={totalTicks}
+          onPointerDown={handleRulerPointer}
+          onPointerMove={handleRulerPointer}
         >
           <Playhead zoom={zoom} variant="marker" />
         </Timeline>

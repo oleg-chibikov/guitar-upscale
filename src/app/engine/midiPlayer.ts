@@ -8,6 +8,8 @@ import {
   getStartTick,
   publishPlayhead,
   returnToStart,
+  seek,
+  takePendingSeek,
 } from "@/app/engine/pianoRoll/playhead";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import {
@@ -69,6 +71,23 @@ class MidiPlayer {
     let isAligned = false;
     let isStarted = false;
 
+    const jumpTo = () => {
+      const seekTick = takePendingSeek();
+      if (seekTick === undefined) {
+        return;
+      }
+      currentTick = seekTick;
+      // line the new position up with the clock on the next tick instead of waiting for its bar
+      tickZeroBarPosition = undefined;
+      isAligned = false;
+      store.dispatch(
+        setIsFirstEvent(
+          eventsByTick.getPreviousEvents(currentTick) === undefined
+        )
+      );
+      store.dispatch(setIsLastEvent(currentTick >= eventsByTick.lastTick));
+    };
+
     try {
       while (currentTick <= lastTick) {
         if (checkFinished()) {
@@ -78,8 +97,11 @@ class MidiPlayer {
 
         await waitForNextTick();
 
+        jumpTo();
+
         if (isPausedValue) {
           const afterPauseAction = await waitForPauseToBeReleased();
+          jumpTo();
           if (afterPauseAction === undefined) {
             // pause released: wait for the clock tick that matches currentTick
             isAligned = false;
@@ -90,7 +112,8 @@ class MidiPlayer {
               logPrefix,
               currentTick
             );
-            publishPlayhead(currentTick);
+            // the next play or stop starts from here
+            seek(eventsByTick, currentTick, false);
           }
           continue;
         }

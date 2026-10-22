@@ -2,6 +2,7 @@ import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
 import { getTicksForTimeSignature } from "@/app/data/clockConstants";
 import { getClipboard, setClipboard } from "@/app/engine/pianoRoll/clipboard";
+import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
 import {
   deleteEvents,
   getSpan,
@@ -53,11 +54,8 @@ export const usePianoRollActions = () => {
       cut: () => {
         if (data && copy().length) apply(deleteEvents(data, selection));
       },
-      // without a playhead to aim at, a paste lands right after the copied notes
-      paste: () => {
-        const clipboard = getClipboard();
-        if (clipboard.length) pasteAt(getSpan(clipboard).end);
-      },
+      // as in Cubase, a paste lands at the playhead
+      paste: () => pasteAt(playheadTick$.value),
       pasteAt,
       duplicate: () => {
         const states = selected();
