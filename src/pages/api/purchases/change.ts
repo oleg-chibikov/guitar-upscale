@@ -79,7 +79,7 @@ const handle = async (
     wasDeferred = await defer(subscriptionToCancel, subscriptionData);
   } else {
     // upgrade or downgrade with revoke - change tier according to the new subscription
-    setSubscriptionCookie(subscriptionData.params, req, res);
+    await setSubscriptionCookie(subscriptionData.params, req, res);
 
     newTier = changeAction === "Downgrade" ? "Explorer" : "Composer";
     tierChanged = true;

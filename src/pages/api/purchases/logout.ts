@@ -9,7 +9,7 @@ import { HttpStatusCode } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
-  clearSubscriptionCookie(req, res);
+  await clearSubscriptionCookie(req, res);
   res.status(HttpStatusCode.Ok).json({ message: "Acknowledged" });
 };
 

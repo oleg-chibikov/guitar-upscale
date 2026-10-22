@@ -1,4 +1,4 @@
-import { getCookie } from "cookies-next";
+import { getCookie } from "cookies-next/server";
 import { cookies } from "next/headers";
 import {
   PremiumFeaturesWithSession,
@@ -21,8 +21,8 @@ const explorerWhitelist = new Set<string>(
   process.env.EXPLORER_WHITELIST?.split(",")
 );
 
-const getDataFromSubscriptionCookie = () => {
-  const value = getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, { cookies });
+const getDataFromSubscriptionCookie = async () => {
+  const value = await getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, { cookies });
   if (value === undefined || value.length === 0) {
     console.log("No value in subscription cookie");
     return undefined;
@@ -32,7 +32,7 @@ const getDataFromSubscriptionCookie = () => {
 };
 
 const getGooglePlaySubscriptionTierFromCookie = async () => {
-  const subscriptionData = getDataFromSubscriptionCookie();
+  const subscriptionData = await getDataFromSubscriptionCookie();
   if (subscriptionData) {
     const subscription = await fetchSubscriptionPurchase(subscriptionData);
     if (subscription !== undefined) {

@@ -1,4 +1,4 @@
-import { deleteCookie, setCookie } from "cookies-next";
+import { deleteCookie, setCookie } from "cookies-next/server";
 import { NextApiRequest, NextApiResponse } from "next/types";
 import { ResponseData } from "./apiTypes";
 import {
@@ -7,24 +7,24 @@ import {
   getCookieValue,
 } from "./purchaseParams";
 
-export const clearSubscriptionCookie = <T extends ResponseData>(
+export const clearSubscriptionCookie = async <T extends ResponseData>(
   req: NextApiRequest,
   res: NextApiResponse<T>
 ) => {
-  deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
+  await deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
     req,
     res,
   });
   console.log("Subscription cookie cleared");
 };
 
-export const setSubscriptionCookie = (
+export const setSubscriptionCookie = async (
   params: PurchaseParams,
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
   const value = getCookieValue(params);
-  setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {
+  await setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {
     req,
     res,
     maxAge: 60 * 60 * 24,

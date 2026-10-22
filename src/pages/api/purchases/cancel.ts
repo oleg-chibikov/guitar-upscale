@@ -57,7 +57,7 @@ const handle = async (
   if (!anotherCancelledSubscription) {
     if (mode === CancellationMode.Revoke) {
       // no permissions after revoke when there is no another cancelled subscription
-      clearSubscriptionCookie(req, res);
+      await clearSubscriptionCookie(req, res);
       tierChanged = true;
       newTier = undefined;
     } else {

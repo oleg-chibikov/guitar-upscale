@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import * as billing from "./billing";
 import { PurchaseParams } from "./purchaseParams";
+import { fromSubscriptionPurchaseV2 } from "./subscriptionPurchaseV2";
 
 //https://developers.google.com/android-publisher/api-ref/rest
 //https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest
@@ -8,12 +9,11 @@ import { PurchaseParams } from "./purchaseParams";
 // TODO: Client should be setup once in the init. See nextjs instrumentation thing
 // update - instrumentation worked locally, but didn't work on vercel. I left it as is so far
 const setupClient = async () => {
-  const jwtClient = new google.auth.JWT(
-    process.env.GOOGLE_CLIENT_EMAIL,
-    undefined,
-    process.env.GOOGLE_PRIVATE_KEY!.split(String.raw`\n`).join("\n"),
-    ["https://www.googleapis.com/auth/androidpublisher"]
-  );
+  const jwtClient = new google.auth.JWT({
+    email: process.env.GOOGLE_CLIENT_EMAIL,
+    key: process.env.GOOGLE_PRIVATE_KEY!.split(String.raw`\n`).join("\n"),
+    scopes: ["https://www.googleapis.com/auth/androidpublisher"],
+  });
 
   // Connect to the Google Play Developer API with JWT Client
   const playApi = google.androidpublisher({
@@ -64,9 +64,8 @@ export async function fetchSubscriptionPurchase(
   try {
     const playApi = await setupClient();
     const apiResponse = (
-      await playApi.purchases.subscriptions.get({
+      await playApi.purchases.subscriptionsv2.get({
         packageName: process.env.ANDROID_PACKAGE_ID,
-        subscriptionId: params.itemId,
         token: params.purchaseToken,
       })
     )?.data;
@@ -74,10 +73,7 @@ export async function fetchSubscriptionPurchase(
 
     console.log("Linked token", apiResponse.linkedPurchaseToken);
 
-    return billing.SubscriptionPurchase.fromApiResponse(
-      apiResponse,
-      params.purchaseToken
-    );
+    return fromSubscriptionPurchaseV2(apiResponse, params.purchaseToken);
   } catch (error) {
     console.error("Error fetching subscription", error);
     throw error;
@@ -118,10 +114,10 @@ export async function revokeSubscription(
   try {
     const playApi = await setupClient();
 
-    await playApi.purchases.subscriptions.revoke({
+    await playApi.purchases.subscriptionsv2.revoke({
       packageName: process.env.ANDROID_PACKAGE_ID,
-      subscriptionId: params.itemId,
       token: params.purchaseToken,
+      requestBody: { revocationContext: { fullRefund: {} } },
     });
     console.log("Revoked subscription");
   } catch (error) {

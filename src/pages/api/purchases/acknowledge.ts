@@ -49,7 +49,7 @@ const handle = async (
   if (!cancelledSubscription) {
     // set new tier from purchased subscription
     tierChanged = true;
-    setSubscriptionCookie(subscriptionData.params, req, res);
+    await setSubscriptionCookie(subscriptionData.params, req, res);
     newTier = purchasedTier;
   } else {
     const cancelledTier = tierMap.get(cancelledSubscription.params.itemId);
@@ -66,7 +66,7 @@ const handle = async (
         // if the existing subscription is Explorer but new is Composer - set permissions
         tierChanged = true;
         newTier = purchasedTier;
-        setSubscriptionCookie(subscriptionData.params, req, res);
+        await setSubscriptionCookie(subscriptionData.params, req, res);
       } else {
         // it shouldn't happen - it means the cancelled and purchased tiers are the same
         tierChanged = false;
