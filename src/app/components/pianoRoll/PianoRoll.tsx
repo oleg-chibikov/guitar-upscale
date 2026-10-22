@@ -32,7 +32,6 @@ export const PianoRoll: React.FC = () => {
   const { baseNote } = useBaseNoteContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const tool = usePianoRollSelector((s) => s.tool);
-  const copyMode = usePianoRollSelector((s) => s.copyMode);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const pixelsPerTick = usePianoRollSelector((s) => s.pixelsPerTick);
   const noteHeight = usePianoRollSelector((s) => s.noteHeight);
@@ -105,7 +104,6 @@ export const PianoRoll: React.FC = () => {
           snapTicks={snapTicks}
           scalePattern={snapToScale ? scalePattern : undefined}
           tool={tool}
-          copyMode={copyMode}
           scrollerRef={scrollerRef}
           gridStyle={gridStyle}
         />

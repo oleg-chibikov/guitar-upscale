@@ -2,7 +2,8 @@ import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { isMac } from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
-import { setCopyMode } from "@/app/store/pianoRollSlice";
+import { setAxisLock, setCopyMode } from "@/app/store/pianoRollSlice";
+import CompareArrows from "@mui/icons-material/CompareArrows";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
@@ -18,6 +19,7 @@ export const PianoRollToolbar: React.FC = () => {
   const { undo, redo, canUndo, canRedo, undoLabel, redoLabel } =
     usePianoRoll();
   const copyMode = usePianoRollSelector((s) => s.copyMode);
+  const axisLock = usePianoRollSelector((s) => s.axisLock);
   const dispatch = useDispatch();
 
   return (
@@ -40,6 +42,12 @@ export const PianoRollToolbar: React.FC = () => {
         tooltip={`Copy notes when dragging (or hold ${alt})`}
         onPress={() => dispatch(setCopyMode(!copyMode))}
         isActive={copyMode}
+      />
+      <IconButtonWrapper
+        icon={<CompareArrows />}
+        tooltip={`Drag notes in time or in pitch only (or hold ${mod.replace("+", "")})`}
+        onPress={() => dispatch(setAxisLock(!axisLock))}
+        isActive={axisLock}
       />
     </div>
   );

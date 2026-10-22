@@ -23,5 +23,4 @@ for chords - see what chords available for the new note. Prefer the same Mode, b
 Zoom in/out - gesture + buttons/selection mode
 apply all this stuff to looper
 show the vertical line at the current tick
-move event only in 1 direction by holding ctrl once you start moving it
 quantize events

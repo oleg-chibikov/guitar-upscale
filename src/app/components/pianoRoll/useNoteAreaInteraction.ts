@@ -31,6 +31,7 @@ import {
 } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { floorTick, snapPitchToScale, snapTick } from "@/app/engine/pianoRoll/snap";
 import { playChordOrNote } from "@/app/engine/playerHelper";
+import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
 import React, {
   RefObject,
@@ -66,6 +67,8 @@ type Gesture =
       ids: string[];
       dragging: boolean;
       lastPitch: number;
+      // set once the drag picks a direction while the axis lock is on
+      axis: "time" | "pitch" | undefined;
     }
   | {
       kind: "rubber";
@@ -92,8 +95,6 @@ export interface NoteAreaInteractionOptions {
   // undefined when notes move freely between all semitones
   scalePattern: Set<Note> | undefined;
   tool: PianoRollTool;
-  // copy instead of move without holding Alt
-  copyMode: boolean;
 }
 
 const AUTO_SCROLL_EDGE_PX = 28;
@@ -133,8 +134,10 @@ export const useNoteAreaInteraction = ({
   snapTicks,
   scalePattern,
   tool,
-  copyMode,
 }: NoteAreaInteractionOptions) => {
+  // touch screens have no Alt or Ctrl, so toolbar toggles stand in for them
+  const copyMode = usePianoRollSelector((s) => s.copyMode);
+  const axisLock = usePianoRollSelector((s) => s.axisLock);
   const { data, events, selection, setSelection, apply } = usePianoRoll();
   const [preview, setPreview] = useState<Preview | undefined>();
   const gestureRef = useRef<Gesture | undefined>(undefined);
@@ -143,12 +146,53 @@ export const useNoteAreaInteraction = ({
   const inertiaFrame = useRef<number | undefined>(undefined);
 
   // the handlers read the latest values through a ref, so listeners stay stable during a drag
-  const state = useRef({ data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode });
+  const latest = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock };
+  const state = useRef(latest);
   useLayoutEffect(() => {
-    state.current = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode };
+    state.current = latest;
   });
 
   const isCopy = (pointer: Modifiers) => pointer.altKey || state.current.copyMode;
+
+  const moveTargets = (
+    gesture: Extract<Gesture, { kind: "note" }>,
+    pointer: Point & Modifiers
+  ) => {
+    const { data, zoom, snapTicks, scalePattern, axisLock } = state.current;
+    const anchor = data!.getEvent(gesture.noteId)!;
+    const { x, y } = toContent(pointer);
+    const dx = x - gesture.start.x;
+    const dy = y - gesture.start.y;
+
+    if (pointer.ctrlKey || pointer.metaKey || axisLock) {
+      gesture.axis ??= Math.abs(dx) >= Math.abs(dy) ? "time" : "pitch";
+    } else {
+      gesture.axis = undefined;
+    }
+
+    const rawTick = anchor.tick + dx / zoom.pixelsPerTick;
+    const deltaTick =
+      gesture.axis === "pitch" ? 0 : snapTick(rawTick, snapTicks) - anchor.tick;
+    const deltaPitch =
+      gesture.axis === "time" ? 0 : yToPitch(y, zoom) - yToPitch(gesture.start.y, zoom);
+    return resolveMove(data!, gesture.ids, deltaTick, deltaPitch, scalePattern);
+  };
+
+  const resizeTargets = (
+    gesture: Extract<Gesture, { kind: "note" }>,
+    pointer: Point
+  ) => {
+    const { data, zoom, snapTicks } = state.current;
+    const { x } = toContent(pointer);
+    return resolveResize(
+      data!,
+      gesture.ids,
+      gesture.noteId,
+      gesture.edge!,
+      (x - gesture.start.x) / zoom.pixelsPerTick,
+      snapTicks
+    );
+  };
 
   const toContent = useCallback(
     ({ clientX, clientY }: Point) => {
@@ -198,33 +242,11 @@ export const useNoteAreaInteraction = ({
           if (!anchor) return;
 
           if (gesture.edge) {
-            const deltaTick = (x - gesture.start.x) / zoom.pixelsPerTick;
-            setPreview({
-              kind: "resize",
-              targets: resolveResize(
-                data,
-                gesture.ids,
-                gesture.noteId,
-                gesture.edge,
-                deltaTick,
-                snapTicks
-              ),
-            });
+            setPreview({ kind: "resize", targets: resizeTargets(gesture, pointer) });
             return;
           }
 
-          const dx = x - gesture.start.x;
-          const dy = y - gesture.start.y;
-          const rawTick = anchor.tick + dx / zoom.pixelsPerTick;
-          const deltaTick = snapTick(rawTick, snapTicks) - anchor.tick;
-          const deltaPitch = yToPitch(gesture.start.y + dy, zoom) - yToPitch(gesture.start.y, zoom);
-          const targets = resolveMove(
-            data,
-            gesture.ids,
-            deltaTick,
-            deltaPitch,
-            state.current.scalePattern
-          );
+          const targets = moveTargets(gesture, pointer);
           const anchorPitch = targets.get(gesture.noteId)?.pitch;
           if (anchorPitch !== undefined && anchorPitch !== gesture.lastPitch) {
             gesture.lastPitch = anchorPitch;
@@ -311,6 +333,7 @@ export const useNoteAreaInteraction = ({
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [toContent, scrollerRef, setSelection]
   );
 
@@ -388,35 +411,11 @@ export const useNoteAreaInteraction = ({
             if (pointer?.shiftKey !== true) setSelection([gesture.noteId]);
             return;
           }
-          const { zoom, snapTicks } = state.current;
-          const { x, y } = pointer ? toContent(pointer) : gesture.start;
-          if (gesture.edge) {
-            apply(
-              resizeEvents(
-                data,
-                resolveResize(
-                  data,
-                  gesture.ids,
-                  gesture.noteId,
-                  gesture.edge,
-                  (x - gesture.start.x) / zoom.pixelsPerTick,
-                  snapTicks
-                )
-              )
-            );
-            return;
-          }
-          const anchor = data.getEvent(gesture.noteId);
-          if (!anchor) return;
-          const rawTick = anchor.tick + (x - gesture.start.x) / zoom.pixelsPerTick;
-          const deltaTick = snapTick(rawTick, snapTicks) - anchor.tick;
-          const deltaPitch = yToPitch(y, zoom) - yToPitch(gesture.start.y, zoom);
+          if (!pointer || !data.getEvent(gesture.noteId)) return;
           apply(
-            moveEvents(
-              data,
-              resolveMove(data, gesture.ids, deltaTick, deltaPitch, state.current.scalePattern),
-              pointer !== undefined && isCopy(pointer)
-            )
+            gesture.edge
+              ? resizeEvents(data, resizeTargets(gesture, pointer))
+              : moveEvents(data, moveTargets(gesture, pointer), isCopy(pointer))
           );
           return;
         }
@@ -511,6 +510,7 @@ export const useNoteAreaInteraction = ({
           ids: Array.from(newSelection),
           dragging: false,
           lastPitch: getEventPitch(noteState.event),
+          axis: undefined,
         };
         runAutoScroll();
         return;
