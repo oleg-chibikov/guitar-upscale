@@ -23,7 +23,6 @@ import {
   resolveNextTick,
   startInterval,
   stopInterval,
-  waitForNextHalfBeat,
 } from "../engine/clock/mainClock";
 import {
   checkLooperPlaying,
@@ -267,11 +266,7 @@ export const waitForPauseToBeReleased = async (): Promise<
   if (!isPausedValue) {
     return;
   }
-  const afterPauseAction = await pausePromise;
-  if (afterPauseAction !== undefined) {
-    return afterPauseAction;
-  }
-  await waitForNextHalfBeat(); // wait for the next interval after pause has been released. Otherwise 2 notes might play simultaneously
+  return pausePromise;
 };
 
 let resolvePause: (

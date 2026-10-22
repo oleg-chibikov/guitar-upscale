@@ -99,8 +99,13 @@ export const startInterval = (afresh: boolean) => {
 };
 
 export const resolveNextTick = () => {
-  recreateNextTick(true);
+  // releases the current waiters once. Leaving the promise resolved would let tick loops spin until the next real tick
+  recreateNextTick();
 };
+
+// position inside the bar of the tick that fired last. Bars start every TICKS_IN_BAR global ticks
+export const getLastTickBarPosition = () =>
+  (((globalCurrentTick - 1) % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
 
 const reset = () => {
   currentBar = 0;

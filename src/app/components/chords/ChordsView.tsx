@@ -8,6 +8,7 @@ import {
 } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
 import { NOTE_COUNT, SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
+import { findPressHandlerAt } from "@/app/engine/chords/chordButtonHitAreas";
 import {
   addChordsToDetectorLookup,
   clearChordDetector,
@@ -28,6 +29,7 @@ import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
+import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
   capoValue,
   chordPlayModeValue,
@@ -70,6 +72,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   const useSharpChords = useUiSelector((s) => s.useSharpChords);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
+  const hasTouchInput = useInputChecker();
 
   const dispatch = useDispatch();
   const handleExpansion = () => {
@@ -181,11 +184,45 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
       handleExpansion={handleExpansion}
       title="Chords"
     >
-      <div className="relative flex flex-row gap-0.5">
+      <div
+        className="relative flex flex-row gap-0.5"
+        // A long press opens the context menu, and the phone vibrates mid-chord.
+        onContextMenu={(event) => event.preventDefault()}
+      >
         <SlashChordButtonsContainer />
 
         <section
           ref={ref}
+          onTouchStartCapture={
+            hasTouchInput
+              ? (event) => {
+                  const section = ref.current;
+                  if (!section) {
+                    return;
+                  }
+                  for (const touch of Array.from(event.changedTouches)) {
+                    void findPressHandlerAt(
+                      section,
+                      touch.clientX,
+                      touch.clientY
+                    )?.();
+                  }
+                }
+              : undefined
+          }
+          onMouseDownCapture={
+            hasTouchInput
+              ? undefined
+              : (event) => {
+                  if (ref.current) {
+                    void findPressHandlerAt(
+                      ref.current,
+                      event.clientX,
+                      event.clientY
+                    )?.();
+                  }
+                }
+          }
           className={`grid gap-0.5 overscroll-contain overflow-auto`}
           style={{
             maxWidth:

@@ -6,7 +6,7 @@ import {
 import { EventsByTick, NoteEvent } from "@/app/engine/eventsByTick";
 import {
   LooperPlayer,
-  LooperPlayerOptions,
+  getLoopLengthTicks,
 } from "@/app/engine/looper/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looper/looperShared";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
@@ -25,7 +25,6 @@ export class LooperRecorder {
   private eventsByTick: EventsByTick | undefined;
   private isRecording: boolean = false;
   private absoluteTickAtTheBeginningOfFirstEventBar: number | undefined;
-  private lastBarTickForLastRecordedEvent: number | undefined;
   private looperPlayer: LooperPlayer | undefined;
 
   /**
@@ -61,35 +60,21 @@ export class LooperRecorder {
     this.isRecording = false;
     if (
       this.absoluteTickAtTheBeginningOfFirstEventBar === undefined ||
-      this.lastBarTickForLastRecordedEvent === undefined
+      this.eventsByTick === undefined ||
+      !this.eventsByTick.hasItems
     ) {
       return;
     }
 
-    if (this.eventsByTick === undefined || !this.eventsByTick.hasItems) {
-      return;
-    }
+    const loopLengthTicks = getLoopLengthTicks(
+      globalCurrentLastBarTick - this.absoluteTickAtTheBeginningOfFirstEventBar,
+      currentTick < TICKS_IN_HALF_BAR
+    );
 
-    const lastBarTickWhenStoppedRecording =
-      globalCurrentLastBarTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
-    const endTick =
-      globalCurrentTick - this.absoluteTickAtTheBeginningOfFirstEventBar;
-    const recordingStoppedInTheFirstHalfOfLastBar =
-      currentTick < TICKS_IN_HALF_BAR;
-
-    const recordingEndedInFurtherBar =
-      lastBarTickWhenStoppedRecording > this.lastBarTickForLastRecordedEvent;
-
-    const options: LooperPlayerOptions = {
+    this.looperPlayer = new LooperPlayer({
       eventsByTick: this.eventsByTick,
-      lastBarTickWhenStoppedRecording,
-      lastBarTickForLastRecordedEvent: this.lastBarTickForLastRecordedEvent,
-      endTick,
-      recordingEndedInFurtherBar,
-      recordingStoppedInTheFirstHalfOfLastBar,
-    };
-
-    this.looperPlayer = new LooperPlayer(options);
+      loopLengthTicks,
+    });
   }
 
   async startPlaying(): Promise<void> {
@@ -169,7 +154,6 @@ export class LooperRecorder {
       if (relativeTick > TICKS_IN_BAR - TICKS_IN_HALF_BEAT) {
         // first event is very close to the end of the bar
         this.absoluteTickAtTheBeginningOfFirstEventBar += TICKS_IN_BAR; // Consider the next bar as the starting point
-        this.lastBarTickForLastRecordedEvent = 1;
         console.log(
           LOG_PREFIX +
             "The first event at tick %d is within a half beat from the new bar. Shifting the ticks by 1 bar and setting the first tick to 1",
@@ -185,11 +169,6 @@ export class LooperRecorder {
         );
         return undefined;
       }
-
-      // update the last bar number with every new event - it will point to the last one
-      this.lastBarTickForLastRecordedEvent =
-        globalCurrentLastBarTick -
-        this.absoluteTickAtTheBeginningOfFirstEventBar;
     }
 
     console.log(LOG_PREFIX + "Recorded event at tick", relativeTick);
@@ -200,7 +179,6 @@ export class LooperRecorder {
   private initialize() {
     this.eventsByTick = new EventsByTick();
     this.absoluteTickAtTheBeginningOfFirstEventBar = undefined;
-    this.lastBarTickForLastRecordedEvent = undefined;
     this.looperPlayer = undefined;
   }
 }

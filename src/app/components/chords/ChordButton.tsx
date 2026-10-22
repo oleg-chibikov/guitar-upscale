@@ -9,6 +9,7 @@ import {
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
+import { registerChordButtonHitArea } from "@/app/engine/chords/chordButtonHitAreas";
 import { currentTick } from "@/app/engine/clock/mainClock";
 import {
   ChordClearMetadata,
@@ -172,6 +173,19 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   const theme = useUiSelector((s) => s.theme);
   const useSharpChords = useUiSelector((s) => s.useSharpChords);
+
+  const onChordPressRef = useRef(onChordPress);
+  useEffect(() => {
+    onChordPressRef.current = onChordPress;
+  });
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element || isDisabled || isHidden) {
+      return;
+    }
+    return registerChordButtonHitArea(element, () => onChordPressRef.current());
+  }, [isDisabled, isHidden]);
 
   useEffect(() => {
     toggleClasses();

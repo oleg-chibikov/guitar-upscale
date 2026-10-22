@@ -1,9 +1,10 @@
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { playAllNotes, waitForTick } from "@/app/engine/playerHelper";
+import { playAllNotes } from "@/app/engine/playerHelper";
 import {
-  currentTick,
-  waitForNextBar,
+  globalCurrentLastBarTick,
+  globalCurrentTick,
+  isMainClockActiveValue,
   waitForNextTick,
 } from "../clock/mainClock";
 
@@ -11,12 +12,22 @@ const LOG_PREFIX = "LooperPlayer: ";
 
 export type LooperPlayerOptions = {
   eventsByTick: EventsByTick;
-  lastBarTickWhenStoppedRecording: number;
-  lastBarTickForLastRecordedEvent: number;
-  endTick: number;
-  recordingEndedInFurtherBar: boolean;
-  recordingStoppedInTheFirstHalfOfLastBar: boolean;
+  // Whole bars. Recorded ticks start at 1 in the first bar of the loop
+  loopLengthTicks: number;
 };
+
+/**
+ * @param stopBarTick the tick where the bar with the recording stop starts, relative to the first bar of the loop
+ */
+export const getLoopLengthTicks = (
+  stopBarTick: number,
+  stoppedInFirstHalfOfBar: boolean
+) =>
+  // Stopping in the first half of a bar drops that bar, so a late press doesn't add a nearly empty bar
+  Math.max(
+    TICKS_IN_BAR,
+    stoppedInFirstHalfOfBar ? stopBarTick : stopBarTick + TICKS_IN_BAR
+  );
 
 export class LooperPlayer {
   private options: LooperPlayerOptions;
@@ -35,19 +46,17 @@ export class LooperPlayer {
   }
 
   async playLoop(): Promise<void> {
-    const eventsByTick = this.options.eventsByTick;
-    // Edge case: if there are no notes, just return
-    if (!eventsByTick.hasItems) {
+    const items = this.options.eventsByTick.items;
+    if (!items.length) {
       return;
     }
 
     console.log(LOG_PREFIX + "Loop info", this.options);
 
+    const { loopLengthTicks } = this.options;
     const abortSignal = this.abortController.signal;
     const checkFinished = () => abortSignal.aborted;
-    const items = eventsByTick.items;
-    const firstEventTick = items[0].tick;
-    let currentTick: number;
+    let loopStartTick = this.getFirstLoopStartTick(items[0].tick);
 
     while (!checkFinished()) {
       let resolveCurrentLoop: (
@@ -56,115 +65,78 @@ export class LooperPlayer {
       this.currentLoopPromise = new Promise<void>((resolve) => {
         resolveCurrentLoop = resolve;
       });
-      currentTick = await this.getStartingPosition(firstEventTick);
-      console.log(LOG_PREFIX + `Loop starts. Current tick is %d`, currentTick);
-      for (const { tick, events } of items) {
-        if (checkFinished()) {
-          return;
-        }
+      console.log(
+        LOG_PREFIX + "Loop starts at global tick %d, length %d ticks",
+        loopStartTick,
+        loopLengthTicks
+      );
 
-        if (currentTick > tick) {
+      for (const { tick, events } of items) {
+        if (tick > loopLengthTicks) {
           console.log(
             LOG_PREFIX +
-              "Recorded tick %d is earlier than the current tick %d. Skipping it",
-            tick,
-            currentTick
+              "Recorded tick %d is past the loop end. Skipping the rest of the events",
+            tick
+          );
+          break;
+        }
+
+        const targetTick = loopStartTick + tick;
+        if (globalCurrentTick > targetTick) {
+          console.log(
+            LOG_PREFIX +
+              "Recorded tick %d is earlier than the current tick. Skipping it",
+            tick
           );
           continue;
         }
 
-        if (
-          this.options.lastBarTickWhenStoppedRecording !== 0 && // recording spans more than one bar
-          tick >= this.options.lastBarTickWhenStoppedRecording && // the event is in the last bar
-          this.options.recordingStoppedInTheFirstHalfOfLastBar === true // last event was recorded in the first half of the last bar
-        ) {
-          console.log(
-            LOG_PREFIX +
-              "Last bar recording was stopped before it reached its second half. Skipping the last bar"
-          );
-
-          break; // don't play the rest of the events in the last (incomplete) bar and start the loop afresh (this allows filtering out unnecessary events)
-        }
-
-        await waitForTick(tick, currentTick, checkFinished, LOG_PREFIX);
-        currentTick = tick;
-
-        if (checkFinished()) {
+        if (!(await this.waitForGlobalTick(targetTick, checkFinished))) {
+          resolveCurrentLoop();
           return;
         }
 
-        this.verifyTickIsCorrect(tick);
-
         playAllNotes(events, LOG_PREFIX, tick);
       }
-      console.log(LOG_PREFIX + "All notes in the loop are played");
-
-      if (this.options.recordingEndedInFurtherBar === true) {
-        console.log(
-          LOG_PREFIX +
-            "Recording ended in the further bar (not when the last event was recorded). Waiting for the tick when recording stopped and then for the first event"
-        );
-        await waitForTick(
-          this.options.lastBarTickWhenStoppedRecording,
-          currentTick,
-          checkFinished,
-          LOG_PREFIX
-        );
-      }
-
-      console.log(LOG_PREFIX + "Waiting for a single tick to finish the loop");
-
-      // wait for 1 tick to prevent instant replaying of the first event in the bar (for example, if the loop is just 1 event - we need to wait for a bar between replaying it. Otherwise it will just immediately repeat in a loop and will crash the browser)
-      await waitForNextTick();
 
       console.log(LOG_PREFIX + "Loop ends");
+      loopStartTick += loopLengthTicks;
       resolveCurrentLoop();
     }
   }
 
-  private async getStartingPosition(firstEventTick: number) {
-    const ticksPassedSinceLastBar = currentTick;
-    const mod = ticksPassedSinceLastBar % TICKS_IN_BAR;
-
-    if (mod > firstEventTick) {
+  private getFirstLoopStartTick(firstEventTick: number) {
+    const tickInBar = globalCurrentTick - globalCurrentLastBarTick;
+    if (tickInBar <= firstEventTick) {
       console.log(
         LOG_PREFIX +
-          "Waiting for the first event. Current tick %d is later than the first tick event %d - wait for the next bar and then start the loop",
-        mod,
+          "Current tick %d is not later than the first event tick %d. Starting the loop in the current bar",
+        tickInBar,
         firstEventTick
       );
-      await waitForNextBar();
-      return 1; // ticks are 1-based
-    } else {
-      if (mod < firstEventTick) {
-        console.log(
-          LOG_PREFIX +
-            "Waiting for the first event. Current tick %d is earlier than the first tick event %d - just wait for it in the current bar",
-          mod,
-          firstEventTick
-        );
-      } else {
-        console.log(
-          LOG_PREFIX +
-            "Waiting for the first event. Current tick %d is equal to the first event tick %d - play it immediately",
-          mod,
-          firstEventTick
-        );
-      }
-      return mod;
+      return globalCurrentLastBarTick;
     }
+
+    console.log(
+      LOG_PREFIX +
+        "Current tick %d is later than the first event tick %d. Starting the loop in the next bar",
+      tickInBar,
+      firstEventTick
+    );
+    return globalCurrentLastBarTick + TICKS_IN_BAR;
   }
 
-  private verifyTickIsCorrect(tick: number) {
-    const realTick = currentTick;
-    const tickInBar = tick % TICKS_IN_BAR;
-    if (tickInBar !== realTick) {
-      console.error(
-        LOG_PREFIX +
-          "Tick %d should be equal to real tick %d. Programming error",
-        tickInBar,
-        realTick
-      );
+  private async waitForGlobalTick(
+    targetTick: number,
+    checkFinished: () => boolean
+  ) {
+    while (globalCurrentTick < targetTick) {
+      // A stopped clock resolves every wait straight away, so looping here would freeze the page
+      if (checkFinished() || !isMainClockActiveValue) {
+        return false;
+      }
+      await waitForNextTick();
     }
+    return !checkFinished();
   }
 }
