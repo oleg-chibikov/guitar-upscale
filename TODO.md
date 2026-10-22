@@ -17,5 +17,4 @@ Can we avoid using pre-built chords for chord detection?
 
 Piano roll:
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
-for chords - see what chords available for the new note. Prefer the same Mode, but if no - use the first available or better show a dialog to choose from available. also show it if not available on the current note
 apply all this stuff to looper

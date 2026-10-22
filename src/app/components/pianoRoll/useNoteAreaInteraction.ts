@@ -69,6 +69,7 @@ type Gesture =
       lastPitch: number;
       // set once the drag picks a direction while the axis lock is on
       axis: "time" | "pitch" | undefined;
+      pointerType: string;
     }
   | {
       kind: "rubber";
@@ -111,6 +112,7 @@ const INERTIA_DECAY = 0.94;
 const INERTIA_MIN_SPEED = 0.02;
 // fingers closer than this along an axis don't zoom that axis
 const MIN_PINCH_SPREAD_PX = 40;
+const DOUBLE_TAP_MS = 350;
 
 const noModifiers: Modifiers = {
   shiftKey: false,
@@ -150,7 +152,9 @@ export const useNoteAreaInteraction = ({
   // touch screens have no Alt or Ctrl, so toolbar toggles stand in for them
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
-  const { data, events, selection, setSelection, apply } = usePianoRoll();
+  const { data, events, selection, setSelection, apply, chooseChordMode } =
+    usePianoRoll();
+  const lastTap = useRef<{ id: string; time: number } | undefined>(undefined);
   const [preview, setPreview] = useState<Preview | undefined>();
   const gestureRef = useRef<Gesture | undefined>(undefined);
   const lastPointerRef = useRef<(Point & Modifiers) | undefined>(undefined);
@@ -447,6 +451,20 @@ export const useNoteAreaInteraction = ({
           if (!gesture.dragging) {
             // a plain click on one of many selected notes keeps only that note
             if (pointer?.shiftKey !== true) setSelection([gesture.noteId]);
+            // mobile browsers send no dblclick, so two quick taps on a chord open its modes
+            const now = performance.now();
+            if (
+              gesture.pointerType !== "mouse" &&
+              lastTap.current?.id === gesture.noteId &&
+              now - lastTap.current.time < DOUBLE_TAP_MS
+            ) {
+              lastTap.current = undefined;
+              if (data.getEvent(gesture.noteId)?.event.chord) {
+                chooseChordMode(gesture.noteId);
+              }
+            } else {
+              lastTap.current = { id: gesture.noteId, time: now };
+            }
             return;
           }
           if (!pointer || !data.getEvent(gesture.noteId)) return;
@@ -572,6 +590,7 @@ export const useNoteAreaInteraction = ({
           dragging: false,
           lastPitch: getEventPitch(noteState.event),
           axis: undefined,
+          pointerType: e.pointerType,
         };
         runAutoScroll();
         return;
@@ -649,18 +668,26 @@ export const useNoteAreaInteraction = ({
     [finishGesture]
   );
 
-  // double click on empty space adds a note, as in Cubase
+  // double click on empty space adds a note, as in Cubase. On a chord it offers the other modes
   const onDoubleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const { data, tool } = state.current;
-      if (!data || tool !== PianoRollTool.Select) return;
-      if ((e.target as HTMLElement).closest("[data-note-id]")) return;
+      if (!data) return;
+      // pointer capture sends the event to the area, so find the note under the pointer
+      const noteId = document
+        .elementFromPoint(e.clientX, e.clientY)
+        ?.closest<HTMLElement>("[data-note-id]")?.dataset.noteId;
+      if (noteId !== undefined) {
+        if (data.getEvent(noteId)?.event.chord) chooseChordMode(noteId);
+        return;
+      }
+      if (tool !== PianoRollTool.Select) return;
       const { x, y } = toContent(e);
       startDraw(x, y);
       finishGesture({ ...noModifiers, clientX: e.clientX, clientY: e.clientY }, false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [finishGesture, toContent]
+    [finishGesture, toContent, chooseChordMode]
   );
 
   // pressing or releasing a modifier mid-drag switches between move and copy straight away

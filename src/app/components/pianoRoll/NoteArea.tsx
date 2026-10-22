@@ -9,6 +9,7 @@ import {
   getEventDuration,
   getEventPitch,
   isChordEvent,
+  isChordModeAvailable,
   withPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
@@ -82,6 +83,7 @@ export const NoteArea: React.FC<NoteAreaProps> = ({
         isChord={isChordEvent(event)}
         selected={selected}
         ghost={ghost}
+        unavailable={!ghost && !isChordModeAvailable(event)}
       />
     );
   };

@@ -56,6 +56,18 @@ export const getChordModesForPitch = (pitch: number): ChordMode[] =>
     (a, b) => modeOrderIndex(a) - modeOrderIndex(b)
   );
 
+/**
+ * False when the chord generator has no voicing of this chord's mode for its root, for example after the settings changed
+ */
+export const isChordModeAvailable = (event: ChordOrNote): boolean => {
+  if (!event.chord) {
+    return true;
+  }
+  const modeName = getChordModeName(event);
+  const modes = getModesForNote(fromPitch(getEventPitch(event)).note);
+  return Array.from(modes ?? []).some((mode) => mode.name === modeName);
+};
+
 const findStringOctaveNote = (
   pitch: number,
   preferredString?: number

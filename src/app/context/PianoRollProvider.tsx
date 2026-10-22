@@ -27,6 +27,10 @@ interface PianoRollContextType {
   canRedo: boolean;
   undoLabel: string | undefined;
   redoLabel: string | undefined;
+  // the chord waiting for the person to pick its mode
+  chordToChoose: string | undefined;
+  chooseChordMode: (id: string) => void;
+  closeChordChoice: () => void;
   loaded: boolean;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -101,14 +105,27 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     [data]
   );
 
+  const [chordQueue, setChordQueue] = useState<string[]>([]);
+  const chordToChoose = chordQueue.find((id) => data?.getEvent(id));
+  const chooseChordMode = useCallback((id: string) => {
+    setChordQueue((queue) => [id, ...queue.filter((queued) => queued !== id)]);
+  }, []);
+  const closeChordChoice = useCallback(() => {
+    setChordQueue((queue) => queue.slice(1));
+  }, []);
+
   const apply = useCallback(
-    ({ command, selection: newSelection }: EditResult) => {
+    ({ command, selection: newSelection, chordsWithChangedMode }: EditResult) => {
       if (!data || !command) {
         return;
       }
       getEditHistory(data).execute(command);
       setSelectionState({ data, ids: new Set(newSelection) });
       setVersion((v) => v + 1);
+      if (chordsWithChangedMode.length) {
+        // the move picked a stand-in mode. Offer the others
+        setChordQueue((queue) => [...queue, ...chordsWithChangedMode]);
+      }
     },
     [data]
   );
@@ -149,12 +166,15 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       canRedo,
       undoLabel,
       redoLabel,
+      chordToChoose,
+      chooseChordMode,
+      closeChordChoice,
       loaded,
       setLoaded,
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, events, selection, setSelection, apply, undo, redo, loaded, version]
+    [data, events, selection, setSelection, apply, undo, redo, loaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

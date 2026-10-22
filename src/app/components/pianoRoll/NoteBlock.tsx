@@ -12,6 +12,8 @@ export interface NoteBlockProps {
   selected: boolean;
   // a copy under the pointer while Alt-dragging, or a note being drawn
   ghost?: boolean;
+  // a chord whose mode the generator can't build on this root
+  unavailable?: boolean;
 }
 
 const MIN_LABEL_WIDTH_PX = 18;
@@ -26,6 +28,7 @@ const NoteBlockComponent: React.FC<NoteBlockProps> = ({
   isChord,
   selected,
   ghost = false,
+  unavailable = false,
 }) => {
   const colors = isChord
     ? selected
@@ -41,7 +44,14 @@ const NoteBlockComponent: React.FC<NoteBlockProps> = ({
       data-note-id={ghost ? undefined : id}
       className={`absolute flex items-center overflow-hidden rounded-[3px] border touch-none select-none ${colors} ${
         ghost ? "opacity-60 pointer-events-none" : "cursor-move"
-      } ${selected ? "z-[2] shadow-[0_0_0_1px_rgba(0,0,0,0.6)]" : "z-[1]"}`}
+      } ${selected ? "z-[2] shadow-[0_0_0_1px_rgba(0,0,0,0.6)]" : "z-[1]"} ${
+        unavailable ? "outline outline-2 outline-dashed outline-red-500" : ""
+      }`}
+      title={
+        unavailable
+          ? "This chord isn't available with the current chord settings. Double-click to pick another"
+          : undefined
+      }
       style={{
         transform: `translate(${x}px, ${y}px)`,
         width: Math.max(2, width),

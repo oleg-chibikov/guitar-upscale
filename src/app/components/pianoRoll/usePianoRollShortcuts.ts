@@ -24,22 +24,24 @@ const toolKeys: Record<string, PianoRollTool> = {
 };
 
 export const usePianoRollShortcuts = () => {
-  const { undo, redo } = usePianoRoll();
+  const { undo, redo, chordToChoose } = usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
   const { togglePlay, seekTo } = usePianoRollTransport();
   const dispatch = useDispatch();
   // the listener stays put and reads the latest state through the ref
-  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo });
+  // the chord dialog on top takes the keyboard
+  const paused = chordToChoose !== undefined;
+  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused });
   useLayoutEffect(() => {
-    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo };
+    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused };
   });
 
   useEffect(() => {
     // runs before the main Space handler, which loads a new melody, and tells it to skip.
     // Escape clears the selection before it gets to close the dialog
     const handleEarlyKeys = (e: KeyboardEvent) => {
-      if (isTyping(e.target)) return;
+      if (latest.current.paused || isTyping(e.target)) return;
       if (e.code === "Space" && !isDropdown(e.target)) {
         e.preventDefault();
         void latest.current.togglePlay();
@@ -59,7 +61,9 @@ export const usePianoRollShortcuts = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // a focused dropdown already used this key, for example an arrow to open its list
-      if (isTyping(e.target) || e.defaultPrevented) return;
+      if (latest.current.paused || isTyping(e.target) || e.defaultPrevented) {
+        return;
+      }
       const { undo, redo, actions, zoomBy, zoomToFit, seekTo } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();

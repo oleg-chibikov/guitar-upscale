@@ -1,3 +1,4 @@
+import { ChordModeDialog } from "@/app/components/pianoRoll/ChordModeDialog";
 import { PianoRoll } from "@/app/components/pianoRoll/PianoRoll";
 import { PianoRollToolbar } from "@/app/components/pianoRoll/toolbar/PianoRollToolbar";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
@@ -18,6 +19,7 @@ const PianoRollContent: React.FC = () => {
       <div className="flex-1 min-h-0">
         <PianoRoll />
       </div>
+      <ChordModeDialog />
     </div>
   );
 };
