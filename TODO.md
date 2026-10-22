@@ -1,7 +1,6 @@
 More chords
 Ads
 more examples
-7,8 string guitars
 Feedback form
 get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
