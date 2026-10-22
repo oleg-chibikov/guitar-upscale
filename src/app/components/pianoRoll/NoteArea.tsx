@@ -1,6 +1,7 @@
 import { NoteBlock } from "@/app/components/pianoRoll/NoteBlock";
 import { useNoteAreaInteraction } from "@/app/components/pianoRoll/useNoteAreaInteraction";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
+import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
 import { Note } from "@/app/data/notes";
 import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
 import { pitchToY, tickToX, Zoom } from "@/app/engine/pianoRoll/geometry";
@@ -46,6 +47,7 @@ export const NoteArea: React.FC<NoteAreaProps> = ({
 }) => {
   const areaRef = useRef<HTMLDivElement>(null);
   const { events, selection } = usePianoRoll();
+  const { zoomTo } = usePianoRollView();
   const { preview, handlers } = useNoteAreaInteraction({
     areaRef,
     scrollerRef,
@@ -53,6 +55,7 @@ export const NoteArea: React.FC<NoteAreaProps> = ({
     snapTicks,
     scalePattern,
     tool,
+    zoomTo,
   });
 
   const block = (

@@ -3,6 +3,8 @@ import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText"
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
+import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
+import { ZOOM_STEP } from "@/app/data/pianoRollConstants";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import {
   PianoRollTool,
@@ -19,6 +21,11 @@ import ContentPaste from "@mui/icons-material/ContentPaste";
 import ControlPointDuplicate from "@mui/icons-material/ControlPointDuplicate";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
+import FitScreen from "@mui/icons-material/FitScreen";
+import UnfoldLess from "@mui/icons-material/UnfoldLess";
+import UnfoldMore from "@mui/icons-material/UnfoldMore";
+import ZoomIn from "@mui/icons-material/ZoomIn";
+import ZoomOut from "@mui/icons-material/ZoomOut";
 import LibraryMusic from "@mui/icons-material/LibraryMusic";
 import NearMe from "@mui/icons-material/NearMe";
 import Redo from "@mui/icons-material/Redo";
@@ -54,6 +61,7 @@ export const PianoRollToolbar: React.FC = () => {
   const { undo, redo, canUndo, canRedo, undoLabel, redoLabel } =
     usePianoRoll();
   const actions = usePianoRollActions();
+  const { zoomBy, zoomToFit } = usePianoRollView();
   const tool = usePianoRollSelector((s) => s.tool);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const copyMode = usePianoRollSelector((s) => s.copyMode);
@@ -138,6 +146,34 @@ export const PianoRollToolbar: React.FC = () => {
           tooltip="Delete (Del)"
           onPress={actions.deleteSelection}
           disabled={!actions.hasSelection}
+        />
+      </Group>
+      <Divider />
+      <Group>
+        <IconButtonWrapper
+          icon={<ZoomOut />}
+          tooltip="Zoom out (G, or Ctrl+wheel)"
+          onPress={() => zoomBy(1 / ZOOM_STEP, 1)}
+        />
+        <IconButtonWrapper
+          icon={<ZoomIn />}
+          tooltip="Zoom in (H, or Ctrl+wheel)"
+          onPress={() => zoomBy(ZOOM_STEP, 1)}
+        />
+        <IconButtonWrapper
+          icon={<UnfoldLess />}
+          tooltip="Shorter rows (Shift+G, or Alt+wheel)"
+          onPress={() => zoomBy(1, 1 / ZOOM_STEP)}
+        />
+        <IconButtonWrapper
+          icon={<UnfoldMore />}
+          tooltip="Taller rows (Shift+H, or Alt+wheel)"
+          onPress={() => zoomBy(1, ZOOM_STEP)}
+        />
+        <IconButtonWrapper
+          icon={<FitScreen />}
+          tooltip="Fit all notes (F)"
+          onPress={zoomToFit}
         />
       </Group>
     </div>

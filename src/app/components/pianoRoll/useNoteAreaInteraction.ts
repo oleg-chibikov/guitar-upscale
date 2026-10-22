@@ -79,6 +79,13 @@ type Gesture =
   | { kind: "draw"; tick: number; event: ChordOrNote }
   | { kind: "erase"; ids: Set<string> }
   | {
+      kind: "pinch";
+      ids: [number, number];
+      startSpread: { x: number; y: number };
+      startZoom: Zoom;
+      lastMid: Point;
+    }
+  | {
       kind: "pan";
       start: Point;
       last: Point & { time: number };
@@ -95,12 +102,15 @@ export interface NoteAreaInteractionOptions {
   // undefined when notes move freely between all semitones
   scalePattern: Set<Note> | undefined;
   tool: PianoRollTool;
+  zoomTo: (zoom: Partial<Zoom>, anchor?: Point) => void;
 }
 
 const AUTO_SCROLL_EDGE_PX = 28;
 const AUTO_SCROLL_MAX_SPEED_PX = 18;
 const INERTIA_DECAY = 0.94;
 const INERTIA_MIN_SPEED = 0.02;
+// fingers closer than this along an axis don't zoom that axis
+const MIN_PINCH_SPREAD_PX = 40;
 
 const noModifiers: Modifiers = {
   shiftKey: false,
@@ -134,7 +144,9 @@ export const useNoteAreaInteraction = ({
   snapTicks,
   scalePattern,
   tool,
+  zoomTo,
 }: NoteAreaInteractionOptions) => {
+  const touchPoints = useRef(new Map<number, Point>());
   // touch screens have no Alt or Ctrl, so toolbar toggles stand in for them
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
@@ -307,6 +319,32 @@ export const useNoteAreaInteraction = ({
           }
           return;
         }
+        case "pinch": {
+          const scroller = scrollerRef.current;
+          const [a, b] = gesture.ids.map((id) => touchPoints.current.get(id));
+          if (!scroller || !a || !b) return;
+          const mid = {
+            clientX: (a.clientX + b.clientX) / 2,
+            clientY: (a.clientY + b.clientY) / 2,
+          };
+          const spread = (start: number, now: number) =>
+            start >= MIN_PINCH_SPREAD_PX ? Math.max(now, 1) / start : 1;
+          scroller.scrollLeft -= mid.clientX - gesture.lastMid.clientX;
+          scroller.scrollTop -= mid.clientY - gesture.lastMid.clientY;
+          gesture.lastMid = mid;
+          zoomTo(
+            {
+              pixelsPerTick:
+                gesture.startZoom.pixelsPerTick *
+                spread(gesture.startSpread.x, Math.abs(a.clientX - b.clientX)),
+              noteHeight:
+                gesture.startZoom.noteHeight *
+                spread(gesture.startSpread.y, Math.abs(a.clientY - b.clientY)),
+            },
+            mid
+          );
+          return;
+        }
         case "pan": {
           const scroller = scrollerRef.current;
           if (!scroller) return;
@@ -344,7 +382,7 @@ export const useNoteAreaInteraction = ({
       const scroller = scrollerRef.current;
       const pointer = lastPointerRef.current;
       const gesture = gestureRef.current;
-      if (!scroller || !pointer || !gesture || gesture.kind === "pan") {
+      if (!scroller || !pointer || !gesture || gesture.kind === "pan" || gesture.kind === "pinch") {
         autoScrollFrame.current = undefined;
         return;
       }
@@ -428,6 +466,8 @@ export const useNoteAreaInteraction = ({
         case "erase":
           apply(deleteEvents(data, gesture.ids));
           return;
+        case "pinch":
+          return;
         case "pan":
           clearTimeout(gesture.longPress);
           if (!gesture.moved) {
@@ -460,9 +500,30 @@ export const useNoteAreaInteraction = ({
       const { data, selection, tool } = state.current;
       if (!data) return;
       stopInertia();
+      if (e.pointerType === "touch") {
+        touchPoints.current.set(e.pointerId, e);
+      }
       if (gestureRef.current) {
-        // a second finger ends whatever the first one started
+        // a second finger drops whatever the first one started and zooms instead
         finishGesture(undefined, true);
+        const fingers = Array.from(touchPoints.current.entries());
+        if (fingers.length === 2) {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          const [[idA, a], [idB, b]] = fingers;
+          gestureRef.current = {
+            kind: "pinch",
+            ids: [idA, idB],
+            startSpread: {
+              x: Math.abs(a.clientX - b.clientX),
+              y: Math.abs(a.clientY - b.clientY),
+            },
+            startZoom: state.current.zoom,
+            lastMid: {
+              clientX: (a.clientX + b.clientX) / 2,
+              clientY: (a.clientY + b.clientY) / 2,
+            },
+          };
+        }
         return;
       }
 
@@ -561,6 +622,9 @@ export const useNoteAreaInteraction = ({
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (touchPoints.current.has(e.pointerId)) {
+        touchPoints.current.set(e.pointerId, e);
+      }
       if (!gestureRef.current) return;
       lastPointerRef.current = e;
       updateGesture(e);
@@ -570,15 +634,20 @@ export const useNoteAreaInteraction = ({
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      touchPoints.current.delete(e.pointerId);
       if (!gestureRef.current) return;
       finishGesture(e, false);
     },
     [finishGesture]
   );
 
-  const onPointerCancel = useCallback(() => {
-    finishGesture(undefined, true);
-  }, [finishGesture]);
+  const onPointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      touchPoints.current.delete(e.pointerId);
+      finishGesture(undefined, true);
+    },
+    [finishGesture]
+  );
 
   // double click on empty space adds a note, as in Cubase
   const onDoubleClick = useCallback(

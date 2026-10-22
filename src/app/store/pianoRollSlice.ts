@@ -39,6 +39,12 @@ export const pianoRollInitialState: PianoRollState = {
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
+export const clampPixelsPerTick = (value: number) =>
+  clamp(value, MIN_PIXELS_PER_TICK, MAX_PIXELS_PER_TICK);
+
+export const clampNoteHeight = (value: number) =>
+  clamp(value, MIN_NOTE_HEIGHT, MAX_NOTE_HEIGHT);
+
 export const PianoRollSlice = createSlice({
   name: "PianoRoll",
   initialState: pianoRollInitialState,
@@ -64,14 +70,10 @@ export const PianoRollSlice = createSlice({
     ) {
       const { pixelsPerTick, noteHeight } = action.payload;
       if (pixelsPerTick !== undefined) {
-        state.pixelsPerTick = clamp(
-          pixelsPerTick,
-          MIN_PIXELS_PER_TICK,
-          MAX_PIXELS_PER_TICK
-        );
+        state.pixelsPerTick = clampPixelsPerTick(pixelsPerTick);
       }
       if (noteHeight !== undefined) {
-        state.noteHeight = clamp(noteHeight, MIN_NOTE_HEIGHT, MAX_NOTE_HEIGHT);
+        state.noteHeight = clampNoteHeight(noteHeight);
       }
     },
   },

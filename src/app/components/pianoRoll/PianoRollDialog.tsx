@@ -3,6 +3,7 @@ import { PianoRollToolbar } from "@/app/components/pianoRoll/toolbar/PianoRollTo
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { BaseNoteProvider } from "@/app/context/BaseNoteProvider";
 import { PianoRollProvider } from "@/app/context/PianoRollProvider";
+import { PianoRollViewProvider } from "@/app/context/PianoRollViewProvider";
 import { ScaleProvider } from "@/app/context/ScaleProvider";
 import { PIANO_ROLL_DIALOG } from "@/app/data/elementIds";
 import { useUiSelector } from "@/app/hooks/storeHooks";
@@ -42,7 +43,9 @@ export const PianoRollDialog: React.FC = () => {
       <ScaleProvider>
         <BaseNoteProvider>
           <PianoRollProvider>
-            <PianoRollContent />
+            <PianoRollViewProvider>
+              <PianoRollContent />
+            </PianoRollViewProvider>
           </PianoRollProvider>
         </BaseNoteProvider>
       </ScaleProvider>

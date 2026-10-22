@@ -5,6 +5,7 @@ import { getGridBackground } from "@/app/components/pianoRoll/gridBackground";
 import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
 import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
+import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
 import { getTicksForTimeSignature } from "@/app/data/clockConstants";
 import {
@@ -16,29 +17,25 @@ import {
   getTotalTicks,
   pitchToY,
   tickToX,
-  Zoom,
 } from "@/app/engine/pianoRoll/geometry";
 import {
   getEventDuration,
   getEventPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
+
+// how strongly one wheel notch or trackpad pinch step zooms
+const WHEEL_ZOOM_SPEED = 0.0025;
 
 export const PianoRoll: React.FC = () => {
-  const scrollerRef = useRef<HTMLDivElement>(null);
+  const { scrollerRef, zoom, zoomBy } = usePianoRollView();
   const { events, loaded, setLoaded } = usePianoRoll();
   const { scalePattern } = useScaleContext();
   const { baseNote } = useBaseNoteContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const tool = usePianoRollSelector((s) => s.tool);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
-  const pixelsPerTick = usePianoRollSelector((s) => s.pixelsPerTick);
-  const noteHeight = usePianoRollSelector((s) => s.noteHeight);
-  const zoom: Zoom = useMemo(
-    () => ({ pixelsPerTick, noteHeight }),
-    [pixelsPerTick, noteHeight]
-  );
   const snapTicks = getTicksForTimeSignature(snap);
 
   usePianoRollShortcuts();
@@ -61,6 +58,25 @@ export const PianoRoll: React.FC = () => {
   );
 
   useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    // Ctrl+wheel (and a trackpad pinch, which arrives as one) zooms time, Alt+wheel zooms pitch
+    const handleWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey && !e.altKey) return;
+      e.preventDefault();
+      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+      const factor = Math.exp(-delta * WHEEL_ZOOM_SPEED);
+      if (e.altKey) {
+        zoomBy(1, factor, e);
+      } else {
+        zoomBy(factor, 1, e);
+      }
+    };
+    scroller.addEventListener("wheel", handleWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", handleWheel);
+  }, [scrollerRef, zoomBy]);
+
+  useEffect(() => {
     // open on the notes
     const scroller = scrollerRef.current;
     if (loaded || !scroller || !events.length) {
@@ -76,7 +92,7 @@ export const PianoRoll: React.FC = () => {
     scroller.scrollLeft = Math.max(0, x - PITCH_AXIS_WIDTH);
     scroller.scrollTop = y - (scroller.clientHeight - TIMELINE_HEIGHT) / 2;
     setLoaded(true);
-  }, [loaded, events, setLoaded, zoom]);
+  }, [loaded, events, setLoaded, zoom, scrollerRef]);
 
   return (
     <div
