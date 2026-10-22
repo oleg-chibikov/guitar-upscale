@@ -28,6 +28,7 @@ import {
 import { isAnyStrummingClicked } from "@/app/engine/strummingState";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
+import { NO_LONG_PRESS_ATTRIBUTE } from "@/app/helpers/longPressBlocker";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import {
@@ -189,6 +190,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
 
         <section
           ref={ref}
+          {...{ [NO_LONG_PRESS_ATTRIBUTE]: true }}
           onTouchStartCapture={
             hasTouchInput
               ? (event) => {

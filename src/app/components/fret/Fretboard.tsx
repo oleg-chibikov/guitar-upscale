@@ -3,6 +3,7 @@ import { FRETBOARD } from "@/app/data/elementIds";
 import { FRET_COUNT } from "@/app/data/notes";
 import { trailingDebounce } from "@/app/helpers/debounce";
 import { interpolate } from "@/app/helpers/interpolation";
+import { NO_LONG_PRESS_ATTRIBUTE } from "@/app/helpers/longPressBlocker";
 import { getAssetsForSkin, getPositionForSkin } from "@/app/helpers/skinHelper";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import React, { useEffect, useState } from "react";
@@ -64,6 +65,7 @@ export const Fretboard: React.FC = () => {
 
   return (
     <section
+      {...{ [NO_LONG_PRESS_ATTRIBUTE]: true }}
       className={`flex flex-col origin-top-left min-w-full items-start justify-center`}
       style={{
         height:

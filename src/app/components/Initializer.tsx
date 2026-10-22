@@ -1,4 +1,5 @@
 import { Theme } from "@/app/data/theme";
+import { blockLongPress } from "@/app/helpers/longPressBlocker";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { isAuthEnabled } from "@/lib/featureFlags";
 import { useEffect, useRef } from "react";
@@ -130,6 +131,7 @@ export const Initializer: React.FC = () => {
       (event) => event.preventDefault(),
       true
     );
+    blockLongPress();
 
     if (typeof navigator.serviceWorker !== "undefined") {
       void navigator.serviceWorker.register(
