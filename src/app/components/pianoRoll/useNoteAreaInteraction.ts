@@ -92,6 +92,8 @@ export interface NoteAreaInteractionOptions {
   // undefined when notes move freely between all semitones
   scalePattern: Set<Note> | undefined;
   tool: PianoRollTool;
+  // copy instead of move without holding Alt
+  copyMode: boolean;
 }
 
 const AUTO_SCROLL_EDGE_PX = 28;
@@ -131,6 +133,7 @@ export const useNoteAreaInteraction = ({
   snapTicks,
   scalePattern,
   tool,
+  copyMode,
 }: NoteAreaInteractionOptions) => {
   const { data, events, selection, setSelection, apply } = usePianoRoll();
   const [preview, setPreview] = useState<Preview | undefined>();
@@ -140,10 +143,12 @@ export const useNoteAreaInteraction = ({
   const inertiaFrame = useRef<number | undefined>(undefined);
 
   // the handlers read the latest values through a ref, so listeners stay stable during a drag
-  const state = useRef({ data, events, selection, zoom, snapTicks, scalePattern, tool });
+  const state = useRef({ data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode });
   useLayoutEffect(() => {
-    state.current = { data, events, selection, zoom, snapTicks, scalePattern, tool };
+    state.current = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode };
   });
+
+  const isCopy = (pointer: Modifiers) => pointer.altKey || state.current.copyMode;
 
   const toContent = useCallback(
     ({ clientX, clientY }: Point) => {
@@ -226,7 +231,7 @@ export const useNoteAreaInteraction = ({
             const moved = withPitch(anchor.event, anchorPitch);
             if (moved) playChordOrNote(moved.event);
           }
-          setPreview({ kind: "move", targets, copy: false });
+          setPreview({ kind: "move", targets, copy: isCopy(pointer) });
           return;
         }
         case "rubber": {
@@ -410,7 +415,7 @@ export const useNoteAreaInteraction = ({
             moveEvents(
               data,
               resolveMove(data, gesture.ids, deltaTick, deltaPitch, state.current.scalePattern),
-              false
+              pointer !== undefined && isCopy(pointer)
             )
           );
           return;
@@ -588,6 +593,32 @@ export const useNoteAreaInteraction = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [finishGesture, toContent]
   );
+
+  // pressing or releasing a modifier mid-drag switches between move and copy straight away
+  useEffect(() => {
+    const handleModifier = (e: KeyboardEvent) => {
+      const pointer = lastPointerRef.current;
+      if (!gestureRef.current || !pointer) return;
+      if (!["Alt", "Control", "Meta", "Shift"].includes(e.key)) return;
+      const updated = {
+        clientX: pointer.clientX,
+        clientY: pointer.clientY,
+        altKey: e.altKey,
+        ctrlKey: e.ctrlKey,
+        metaKey: e.metaKey,
+        shiftKey: e.shiftKey,
+      };
+      lastPointerRef.current = updated;
+      updateGesture(updated);
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", handleModifier);
+    document.addEventListener("keyup", handleModifier);
+    return () => {
+      document.removeEventListener("keydown", handleModifier);
+      document.removeEventListener("keyup", handleModifier);
+    };
+  }, [updateGesture]);
 
   useEffect(
     () => () => {

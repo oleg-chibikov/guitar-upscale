@@ -20,6 +20,7 @@ interface NoteAreaProps {
   snapTicks: number;
   scalePattern: Set<Note> | undefined;
   tool: PianoRollTool;
+  copyMode: boolean;
   scrollerRef: RefObject<HTMLDivElement | null>;
   gridStyle: CSSProperties;
   className?: string;
@@ -39,6 +40,7 @@ export const NoteArea: React.FC<NoteAreaProps> = ({
   snapTicks,
   scalePattern,
   tool,
+  copyMode,
   scrollerRef,
   gridStyle,
   className,
@@ -53,6 +55,7 @@ export const NoteArea: React.FC<NoteAreaProps> = ({
     snapTicks,
     scalePattern,
     tool,
+    copyMode,
   });
 
   const block = (
