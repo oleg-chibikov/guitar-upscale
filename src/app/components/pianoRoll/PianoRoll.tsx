@@ -1,8 +1,6 @@
-import { NoteArea } from "@/app/components/pianoRoll/NoteArea";
-import { Playhead } from "@/app/components/pianoRoll/Playhead";
-import { PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
-import { Timeline } from "@/app/components/pianoRoll/Timeline";
-import { getGridBackground } from "@/app/components/pianoRoll/gridBackground";
+import { PianoRollCanvas } from "@/app/components/pianoRoll/PianoRollCanvas";
+import { BACKGROUND } from "@/app/components/pianoRoll/pianoRollDrawing";
+import { useNoteAreaInteraction } from "@/app/components/pianoRoll/useNoteAreaInteraction";
 import { useFollowPlayhead } from "@/app/components/pianoRoll/useFollowPlayhead";
 import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
@@ -17,6 +15,7 @@ import {
   TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
 import {
+  fromPitch,
   getContentHeight,
   getTotalTicks,
   pitchToY,
@@ -26,8 +25,9 @@ import {
   getEventDuration,
   getEventPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
+import { playNote } from "@/app/engine/sound/soundProvider";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 // C4, the middle of the guitar range
 const EMPTY_VIEW_PITCH = 48;
@@ -36,8 +36,9 @@ const EMPTY_VIEW_PITCH = 48;
 const WHEEL_ZOOM_SPEED = 0.0025;
 
 export const PianoRoll: React.FC = () => {
-  const { scrollerRef, zoom, zoomBy } = usePianoRollView();
-  const { events, loaded, setLoaded, source } = usePianoRoll();
+  const { scrollerRef, zoom, zoomBy, zoomTo } = usePianoRollView();
+  const { events, selection, loaded, setLoaded, source, playhead$ } =
+    usePianoRoll();
   const loopLengthTicks = source?.loopLengthTicks;
   const { scalePattern } = useScaleContext();
   const { baseNote } = useBaseNoteContext();
@@ -63,24 +64,46 @@ export const PianoRoll: React.FC = () => {
   const height = getContentHeight(zoom);
 
   // pressing or dragging on the ruler moves the playhead. Shift turns off the grid
-  const handleRulerPointer = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (e.type === "pointerdown") {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } else if (!e.currentTarget.hasPointerCapture(e.pointerId)) {
-        return;
-      }
-      const rect = e.currentTarget.getBoundingClientRect();
-      const tick = Math.max(0, (e.clientX - rect.left) / zoom.pixelsPerTick);
-      seekTo(e.shiftKey ? Math.round(tick) : snapTick(tick, snapTicks));
+  const handleSeek = useCallback(
+    (x: number, exact: boolean) => {
+      const tick = Math.max(0, x / zoom.pixelsPerTick);
+      seekTo(exact ? Math.round(tick) : snapTick(tick, snapTicks));
     },
     [seekTo, snapTicks, zoom]
   );
 
-  const gridStyle = useMemo(
-    () => getGridBackground(zoom, snapTicks, scalePattern, baseNote),
-    [zoom, snapTicks, scalePattern, baseNote]
+  const handleKeyPress = useCallback(
+    (pitch: number) => void playNote(fromPitch(pitch)),
+    []
   );
+
+  const { preview, handlers } = useNoteAreaInteraction({
+    scrollerRef,
+    zoom,
+    snapTicks,
+    scalePattern: snapToScale ? scalePattern : undefined,
+    tool,
+    zoomTo,
+  });
+
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const observer = new ResizeObserver(() =>
+      setViewportSize({
+        width: scroller.clientWidth,
+        height: scroller.clientHeight,
+      })
+    );
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [scrollerRef]);
+
+  const contentWidth = PITCH_AXIS_WIDTH + width;
+  const contentHeight = TIMELINE_HEIGHT + height;
+  const viewportWidth = Math.min(viewportSize.width, contentWidth);
+  const viewportHeight = Math.min(viewportSize.height, contentHeight);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -124,49 +147,42 @@ export const PianoRoll: React.FC = () => {
   return (
     <div
       ref={scrollerRef}
-      className="relative w-full h-full overflow-auto overscroll-contain bg-[#1e272b]"
+      className="relative w-full h-full overflow-auto overscroll-contain"
+      style={{ background: BACKGROUND }}
     >
       <div
-        className="grid"
-        style={{
-          gridTemplateColumns: `${PITCH_AXIS_WIDTH}px ${width}px`,
-          gridTemplateRows: `${TIMELINE_HEIGHT}px ${height}px`,
-        }}
+        className="relative"
+        style={{ width: contentWidth, height: contentHeight }}
       >
-        <div className="sticky left-0 top-0 z-30 bg-gray-300 border-b border-r border-gray-400" />
-        <Timeline
-          className="sticky top-0 z-20"
-          zoom={zoom}
-          totalTicks={totalTicks}
-          onPointerDown={handleRulerPointer}
-          onPointerMove={handleRulerPointer}
+        <div
+          className="sticky left-0 top-0"
+          style={{ width: viewportWidth, height: viewportHeight }}
         >
-          <Playhead zoom={zoom} variant="marker" />
-        </Timeline>
-        <PitchAxis className="sticky left-0 z-20" zoom={zoom} />
-        <NoteArea
-          zoom={zoom}
-          width={width}
-          height={height}
-          snapTicks={snapTicks}
-          scalePattern={snapToScale ? scalePattern : undefined}
-          tool={tool}
-          scrollerRef={scrollerRef}
-          gridStyle={gridStyle}
-        >
-          <Playhead zoom={zoom} variant="line" />
-          {loopLengthTicks !== undefined && (
-            // notes past the loop end don't play
-            <div
-              className="absolute top-0 h-full bg-black/45 border-l-2 border-amber-400 pointer-events-none z-[3]"
-              style={{
-                left: tickToX(loopLengthTicks, zoom),
-                width: Math.max(0, width - tickToX(loopLengthTicks, zoom)),
+          {viewportWidth > 0 && viewportHeight > 0 && (
+            <PianoRollCanvas
+              scene={{
+                zoom,
+                width,
+                height,
+                snapTicks,
+                scalePattern,
+                baseNote,
+                events,
+                selection,
+                preview,
+                loopLengthTicks,
               }}
-              title="End of the loop"
+              scrollerRef={scrollerRef}
+              viewportWidth={viewportWidth}
+              viewportHeight={viewportHeight}
+              playhead$={playhead$}
+              tool={tool}
+              noteHandlers={handlers}
+              onSeek={handleSeek}
+              onKeyPress={handleKeyPress}
             />
           )}
-        </NoteArea>
+        </div>
       </div>
     </div>
   );

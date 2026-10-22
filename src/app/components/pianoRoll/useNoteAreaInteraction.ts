@@ -1,8 +1,11 @@
+import { hitTestNote } from "@/app/components/pianoRoll/pianoRollDrawing";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { Note } from "@/app/data/notes";
 import {
   DRAG_THRESHOLD_PX,
   LONG_PRESS_MS,
+  PITCH_AXIS_WIDTH,
+  TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
 import { ChordOrNote, EventsByTick } from "@/app/engine/eventsByTick";
 import {
@@ -96,7 +99,6 @@ type Gesture =
     };
 
 export interface NoteAreaInteractionOptions {
-  areaRef: RefObject<HTMLDivElement | null>;
   scrollerRef: RefObject<HTMLDivElement | null>;
   zoom: Zoom;
   snapTicks: number;
@@ -144,7 +146,6 @@ const findNoteTemplate = (data: EventsByTick, selection: ReadonlySet<string>) =>
 };
 
 export const useNoteAreaInteraction = ({
-  areaRef,
   scrollerRef,
   zoom,
   snapTicks,
@@ -214,13 +215,34 @@ export const useNoteAreaInteraction = ({
     );
   };
 
+  // grid px, with the scroll taken into account
   const toContent = useCallback(
     ({ clientX, clientY }: Point) => {
-      const rect = areaRef.current!.getBoundingClientRect();
-      return { x: clientX - rect.left, y: clientY - rect.top };
+      const scroller = scrollerRef.current!;
+      const rect = scroller.getBoundingClientRect();
+      return {
+        x:
+          clientX -
+          rect.left -
+          scroller.clientLeft -
+          PITCH_AXIS_WIDTH +
+          scroller.scrollLeft,
+        y:
+          clientY -
+          rect.top -
+          scroller.clientTop -
+          TIMELINE_HEIGHT +
+          scroller.scrollTop,
+      };
     },
-    [areaRef]
+    [scrollerRef]
   );
+
+  const noteAt = (point: Point) => {
+    const { events, selection, zoom } = state.current;
+    const { x, y } = toContent(point);
+    return hitTestNote(events, selection, zoom, x, y);
+  };
 
   const snapPitch = (pitch: number) => {
     const { scalePattern } = state.current;
@@ -317,10 +339,7 @@ export const useNoteAreaInteraction = ({
           return;
         }
         case "erase": {
-          const target = document
-            .elementFromPoint(pointer.clientX, pointer.clientY)
-            ?.closest<HTMLElement>("[data-note-id]");
-          const id = target?.dataset.noteId;
+          const id = noteAt(pointer)?.id;
           if (id !== undefined && !gesture.ids.has(id)) {
             gesture.ids.add(id);
             setPreview({ kind: "erase", ids: new Set(gesture.ids) });
@@ -557,9 +576,8 @@ export const useNoteAreaInteraction = ({
       e.currentTarget.setPointerCapture(e.pointerId);
       const point = toContent(e);
       lastPointerRef.current = e;
-      const target = e.target as HTMLElement;
-      const noteElement = target.closest<HTMLElement>("[data-note-id]");
-      const noteId = noteElement?.dataset.noteId;
+      const hit = noteAt(e);
+      const noteId = hit?.id;
 
       if (tool === PianoRollTool.Erase) {
         const ids = new Set(noteId !== undefined ? [noteId] : []);
@@ -587,9 +605,7 @@ export const useNoteAreaInteraction = ({
           setSelection(newSelection);
         }
         playChordOrNote(noteState.event);
-        const edge = target.closest<HTMLElement>("[data-edge]")?.dataset.edge as
-          | ResizeEdge
-          | undefined;
+        const edge = hit?.edge;
         gestureRef.current = {
           kind: "note",
           start: point,
@@ -682,10 +698,7 @@ export const useNoteAreaInteraction = ({
     (e: React.MouseEvent<HTMLDivElement>) => {
       const { data, tool } = state.current;
       if (!data) return;
-      // pointer capture sends the event to the area, so find the note under the pointer
-      const noteId = document
-        .elementFromPoint(e.clientX, e.clientY)
-        ?.closest<HTMLElement>("[data-note-id]")?.dataset.noteId;
+      const noteId = noteAt(e)?.id;
       if (noteId !== undefined) {
         if (data.getEvent(noteId)?.event.chord) chooseChordMode(noteId);
         return;
