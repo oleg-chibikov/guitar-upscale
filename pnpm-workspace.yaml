@@ -4,4 +4,7 @@ packages:
   - "packages/**"
   # if required, exclude some directories
   - "!**/test/**"
+allowBuilds:
+  '@vercel/speed-insights': false
+  midi-writer-js: false
 ignore-workspace-root-check: true

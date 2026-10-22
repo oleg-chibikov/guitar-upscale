@@ -1,0 +1,4 @@
+# Skip during rebase, cherry-pick and other detached-HEAD commits.
+git symbolic-ref -q HEAD >/dev/null || exit 0
+
+git push -u origin HEAD
