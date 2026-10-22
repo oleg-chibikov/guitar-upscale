@@ -1,7 +1,6 @@
 import { ChordMode, ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { Note } from "@/app/data/notes";
-import { Theme } from "@/app/data/theme";
 import {
   ChordPlayParameters,
   playFirstChordVariation,
@@ -9,7 +8,6 @@ import {
   playRandomChordVariation,
   playRoundRobin,
 } from "@/app/engine/chords/chordPlayer";
-import { registerChordButtonHitArea } from "@/app/engine/chords/chordButtonHitAreas";
 import { currentTick } from "@/app/engine/clock/mainClock";
 import {
   ChordClearMetadata,
@@ -17,8 +15,6 @@ import {
   ChordToChordButtonEventMap,
 } from "@/app/engine/eventBus";
 import { areOtherChordsStrumming } from "@/app/engine/strummingState";
-import { chordButtonPossibleClasses } from "@/app/helpers/components/chordButtonPossibleClasses";
-import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
 import { useStrumming } from "@/app/hooks/useStrumming";
 import {
@@ -26,9 +22,8 @@ import {
   chordPlayModeValue,
   chordStrummingDelayMsValue,
 } from "@/app/store/settingsSlice";
-import { themeValue } from "@/app/store/uiSlice";
-import { Typography } from "@mui/material";
 import React, { useCallback, useEffect, useRef } from "react";
+import { ChordGridStore } from "./chordGridStore";
 
 interface ChordButtonProps {
   chordName: string;
@@ -37,8 +32,12 @@ interface ChordButtonProps {
   onStrummingStateChange: (value: boolean) => void;
   chordMode: ChordMode;
   note: Note;
+  store: ChordGridStore;
 }
 
+/**
+ * Plays one chord and keeps its button state in the store. The chord grid canvas draws the button.
+ */
 export const ChordButton: React.FC<ChordButtonProps> = ({
   chordName,
   variations,
@@ -46,91 +45,28 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   chordMode,
   note,
   onStrummingStateChange,
+  store,
 }) => {
-  const elementRef = useRef<HTMLUListElement>(null);
   const hasTouchInput = useInputChecker();
   const isDisabled = !variations.length; // TODO: hide if there's no preferred variation of current type
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
+  const wasPlayedLastRef = useRef<boolean>(false);
   const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>(
     undefined
   );
 
-  const toggleClasses = useCallback(() => {
-    const element = elementRef.current;
-    if (!element) {
-      return;
-    }
-
-    // cursor
-    const neededClasses: string[] = [];
-    if (isClickedRef.current && !isPlayingRef.current) {
-      neededClasses.push("cursor-progress");
-    } else if (isPlayingRef.current || (!isDisabled && !isClickedRef.current)) {
-      neededClasses.push("cursor-pointer");
-    }
-
-    const isInImmediateChordGracePeriod =
-      isInImmediateChordGracePeriodRef.current !== undefined;
-
-    // border
-    if (
-      isClickedRef.current ||
-      isPlayingRef.current ||
-      isGracePeriodRef.current ||
-      isInImmediateChordGracePeriod
-    ) {
-      neededClasses.push("border-2");
-      if (isInImmediateChordGracePeriod) {
-        neededClasses.push("border-red-500");
-      } else if (isGracePeriodRef.current) {
-        neededClasses.push(
-          themeValue === Theme.Light
-            ? "border-accent_stronger-light"
-            : "border-accent_stronger-dark"
-        );
-      } else if (isPlayingRef.current) {
-        neededClasses.push(
-          themeValue === Theme.Light
-            ? "border-accent_strongest-light"
-            : "border-accent_strongest-dark"
-        );
-      } else {
-        neededClasses.push(
-          themeValue === Theme.Light
-            ? "border-accent-light"
-            : "border-accent-dark"
-        );
-      }
-    }
-
-    // background
-    if (isClickedRef.current) {
-      neededClasses.push(
-        themeValue === Theme.Light
-          ? "bg-button_pressed-light"
-          : "bg-button_pressed-dark"
-      );
-    } else if (wasPlayedLastRef.current) {
-      neededClasses.push(
-        themeValue === Theme.Light ? "bg-secondary-light" : "bg-secondary-dark"
-      );
-    } else {
-      neededClasses.push(
-        themeValue === Theme.Light ? "bg-button-light" : "bg-button-dark"
-      );
-    }
-
-    const neededClassesSet = new Set<string>(neededClasses);
-    const notNeededClasses = chordButtonPossibleClasses.filter(
-      (element) => !neededClassesSet.has(element)
-    );
-
-    const classList = element.classList;
-    classList.remove(...notNeededClasses);
-    classList.add(...neededClasses);
-  }, [isDisabled, isInImmediateChordGracePeriodRef]);
+  const publishState = useCallback(() => {
+    store.update(chordName, {
+      isClicked: isClickedRef.current,
+      isPlaying: isPlayingRef.current,
+      isGracePeriod: isGracePeriodRef.current,
+      isInImmediateChordGracePeriod:
+        isInImmediateChordGracePeriodRef.current !== undefined,
+      wasPlayedLast: wasPlayedLastRef.current,
+    });
+  }, [store, chordName]);
 
   const onClickedChange = (value: boolean) => {
     isClickedRef.current = value;
@@ -142,7 +78,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         onStrummingStateChange(true);
       }
     }
-    toggleClasses();
+    publishState();
   };
 
   const onPlayingChange = (value: boolean) => {
@@ -151,15 +87,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       // let the parent component know that the strumming has started (and disable overflow)
       onStrummingStateChange(true);
     }
-    toggleClasses();
+    publishState();
   };
 
   const onGracePeriodChange = (value: boolean) => {
     isGracePeriodRef.current = value;
-    toggleClasses();
+    publishState();
   };
 
-  const wasPlayedLastRef = useRef<boolean>(false);
   const { onChordPress, isAlternateRef } = useStrumming(
     chordName,
     isDisabled,
@@ -168,11 +103,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     onClickedChange,
     onPlayingChange,
     onGracePeriodChange,
-    toggleClasses
+    publishState
   );
-
-  const theme = useUiSelector((s) => s.theme);
-  const useSharpChords = useUiSelector((s) => s.useSharpChords);
 
   const onChordPressRef = useRef(onChordPress);
   useEffect(() => {
@@ -180,29 +112,14 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   });
 
   useEffect(() => {
-    const element = elementRef.current;
-    if (!element || isDisabled || isHidden) {
+    if (isDisabled || isHidden) {
       return;
     }
-    return registerChordButtonHitArea(element, () => onChordPressRef.current());
-  }, [isDisabled, isHidden]);
+    return store.registerPress(chordName, () => onChordPressRef.current());
+  }, [isDisabled, isHidden, store, chordName]);
 
   useEffect(() => {
-    toggleClasses();
-  }, [theme, toggleClasses]);
-
-  useEffect(() => {
-    const animate = () => {
-      if (!elementRef.current) {
-        return;
-      }
-
-      elementRef.current.classList.add("scale-50");
-      void elementRef.current.offsetWidth; // trigger reflow
-      setTimeout(() => {
-        elementRef.current?.classList.remove("scale-50");
-      }, 150);
-    };
+    const animate = () => store.pulse(chordName);
 
     const handleChordEvent = async (
       metadata: ChordMetadata | ChordClearMetadata
@@ -212,7 +129,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       }
 
       if ((metadata as ChordClearMetadata).clear === true) {
-        processClearChord(chordName, wasPlayedLastRef, toggleClasses);
+        processClearChord(chordName, wasPlayedLastRef, publishState);
         return;
       }
 
@@ -229,7 +146,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
         console.log("Playing chord: %s at tick %d", chordName, currentTick);
         wasPlayedLastRef.current = true;
-        toggleClasses();
+        publishState();
 
         // Start the animation sequence
         animate();
@@ -284,65 +201,20 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     isDisabled,
     variations,
     isAlternateRef,
-    toggleClasses,
+    publishState,
     chordMode,
     note,
+    store,
   ]);
 
-  if (isHidden) {
-    return null;
-  }
-
-  return (
-    <ul
-      ref={elementRef}
-      onTouchStartCapture={
-        hasTouchInput
-          ? async () => {
-              await onChordPress();
-            }
-          : undefined
-      }
-      onMouseDownCapture={
-        hasTouchInput
-          ? undefined
-          : async () => {
-              await onChordPress();
-            }
-      }
-      className={`flex items-center justify-center content-center text-center w-16 font-mono transition-transform transform origin-center
-      ${useSharpChords ? "text-xs h-6" : "text-md h-8"}
-      ${
-        isDisabled
-          ? theme === Theme.Light
-            ? "bg-disabled-light text-gray-500"
-            : "bg-disabled-dark text-gray-500"
-          : theme === Theme.Light
-            ? "bg-button-light"
-            : "bg-button-dark"
-      }
-      ${
-        theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
-      }`}
-    >
-      <Typography
-        noWrap
-        variant="button"
-        sx={{
-          textTransform: "none",
-        }}
-      >
-        {chordName}
-      </Typography>
-    </ul>
-  );
+  return null;
 };
 function processClearChord(
   chordName: string,
   wasPlayedLastRef: React.MutableRefObject<boolean>,
-  toggleClasses: () => void
+  publishState: () => void
 ) {
   console.log("Clear previous chord marker: " + chordName);
   wasPlayedLastRef.current = false;
-  toggleClasses();
+  publishState();
 }

@@ -7,8 +7,7 @@ import {
   MIN_HEIGHT_TO_SHOW_LARGE_CHORDS,
 } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
-import { NOTE_COUNT, SHARP_NOTE_COUNT, isSharp } from "@/app/data/notes";
-import { findPressHandlerAt } from "@/app/engine/chords/chordButtonHitAreas";
+import { NOTE_COUNT, isSharp } from "@/app/data/notes";
 import {
   addChordsToDetectorLookup,
   clearChordDetector,
@@ -39,9 +38,11 @@ import {
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
 import { setChordsExpanded } from "@/app/store/uiSlice";
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
+import { ChordGrid } from "./ChordGrid";
+import { ChordGridStore } from "./chordGridStore";
 
 const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
@@ -88,6 +89,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   // unique number for each chordGeneration. This helps avoiding running this code twice in dev mode
   const localGuitarSettingsUpdateCount = useRef<number>(0);
   const ref = useRef<HTMLDivElement>(null);
+  const store = useMemo(() => new ChordGridStore(), []);
   const useSharpChords = useUiSelector((s) => s.useSharpChords);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
@@ -191,7 +193,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
     return null;
   }
 
-  const totalRows = NOTE_COUNT - (useSharpChords ? 0 : SHARP_NOTE_COUNT);
+  const notes = Array.from({ length: NOTE_COUNT }, (_, note) => note).filter(
+    (note) => useSharpChords || !isSharp(note)
+  );
 
   return (
     <Expander
@@ -210,75 +214,47 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
         <section
           ref={ref}
           {...{ [NO_LONG_PRESS_ATTRIBUTE]: true }}
-          onTouchStartCapture={
-            hasTouchInput
-              ? (event) => {
-                  const section = ref.current;
-                  if (!section) {
-                    return;
-                  }
-                  for (const touch of Array.from(event.changedTouches)) {
-                    void findPressHandlerAt(
-                      section,
-                      touch.clientX,
-                      touch.clientY
-                    )?.();
-                  }
-                }
-              : undefined
-          }
-          onMouseDownCapture={
-            hasTouchInput
-              ? undefined
-              : (event) => {
-                  if (ref.current) {
-                    void findPressHandlerAt(
-                      ref.current,
-                      event.clientX,
-                      event.clientY
-                    )?.();
-                  }
-                }
-          }
-          className={`grid gap-0.5 overscroll-contain overflow-auto`}
+          className={`overscroll-contain overflow-auto`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
                 ? COMPACT_CHORDS_WIDTH
                 : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
             maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
-            gridTemplateColumns: `repeat(${totalColumns}, 1fr)`,
-            gridTemplateRows: `repeat(${totalRows}, 1fr)`,
           }}
         >
-          {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) => (
-            <React.Fragment key={noteIndex}>
-              {chordModeVariations.map((chordMode) => {
-                const title = getChordName(noteIndex, chordMode.chordMode);
-                const isHidden = !useSharpChords && isSharp(noteIndex);
-                return (
-                  <ChordButton
-                    key={title}
-                    isHidden={isHidden}
-                    chordMode={chordMode.chordMode}
-                    note={noteIndex}
-                    variations={chordMode.variationsByNote[noteIndex] ?? []}
-                    chordName={title}
-                    onStrummingStateChange={(value) => {
-                      if (!isMobileDeviceValue) {
-                        return;
-                      }
-                      const isStrummingClicked =
-                        value || isAnyStrummingClicked();
-                      toggleOverflow(isStrummingClicked, ref);
-                      toggleOverflow(isStrummingClicked, mainRef);
-                    }}
-                  />
-                );
-              })}
-            </React.Fragment>
-          ))}
+          <ChordGrid
+            columns={chordModeVariations}
+            notes={notes}
+            store={store}
+            scrollerRef={ref}
+            hasTouchInput={hasTouchInput}
+          />
         </section>
+        {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) =>
+          chordModeVariations.map((chordMode) => {
+            const title = getChordName(noteIndex, chordMode.chordMode);
+            return (
+              <ChordButton
+                key={title}
+                store={store}
+                isHidden={!useSharpChords && isSharp(noteIndex)}
+                chordMode={chordMode.chordMode}
+                note={noteIndex}
+                variations={chordMode.variationsByNote[noteIndex] ?? []}
+                chordName={title}
+                onStrummingStateChange={(value) => {
+                  if (!isMobileDeviceValue) {
+                    return;
+                  }
+                  const isStrummingClicked = value || isAnyStrummingClicked();
+                  toggleOverflow(isStrummingClicked, ref);
+                  toggleOverflow(isStrummingClicked, mainRef);
+                }}
+              />
+            );
+          })
+        )}
       </div>
     </Expander>
   );
