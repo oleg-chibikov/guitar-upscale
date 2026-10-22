@@ -11,11 +11,28 @@ A guitar simulator in the browser. Play scales and chords on a virtual fretboard
 - **Fretboard** shows the notes of the chosen scale and plays them on tap.
 - **Chords** come from the scale, with strumming patterns you can edit.
 - **Looper** records what you play on several channels.
-- **Piano roll** lets you edit a recording note by note.
+- **Piano roll** edits a melody, a MIDI recording or a looper channel note by note.
 - **MIDI** files can be downloaded or shared.
 - **Instruments** go beyond guitar: sitar, banjo, koto, strings and more.
 
 The app installs as a PWA, so it also works from the home screen.
+
+## Piano roll keys
+
+| Key | Action |
+| --- | --- |
+| Space | Play or stop the shown track from the playhead |
+| 1, 2, 3 | Select, draw, erase |
+| Alt + drag | Copy the notes |
+| Ctrl or Cmd + drag | Keep the drag in time or in pitch |
+| Arrows | Move the selection a grid step or a scale step. Shift moves an octave |
+| Q | Quantize to the grid |
+| Ctrl or Cmd + Z, Shift + Z | Undo, redo |
+| Ctrl or Cmd + C, X, V, D | Copy, cut, paste at the playhead, duplicate |
+| G, H, F | Zoom out, zoom in, fit all notes. Shift zooms the rows |
+| Home | Playhead to the start |
+
+On a touch screen, hold empty space and drag to select an area, and pinch to zoom. The toolbar toggles stand in for Alt and Ctrl.
 
 ## Run it locally
 
