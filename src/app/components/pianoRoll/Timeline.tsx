@@ -12,12 +12,13 @@ interface TimelineProps {
   totalTicks: number;
   className?: string;
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
+  children?: React.ReactNode;
 }
 
 const MIN_LABEL_SPACING_PX = 32;
 
 const TimelineComponent = forwardRef<HTMLDivElement, TimelineProps>(
-  ({ zoom, totalTicks, className, onPointerDown }, ref) => {
+  ({ zoom, totalTicks, className, onPointerDown, children }, ref) => {
     const barWidth = TICKS_IN_BAR * zoom.pixelsPerTick;
     const beatWidth = TICKS_IN_BEAT * zoom.pixelsPerTick;
     const totalBars = Math.ceil(totalTicks / TICKS_IN_BAR);
@@ -57,6 +58,7 @@ const TimelineComponent = forwardRef<HTMLDivElement, TimelineProps>(
         title={`${BEATS_IN_BAR}/4`}
       >
         {labels}
+        {children}
       </div>
     );
   }

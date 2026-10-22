@@ -1,7 +1,9 @@
 import { NoteArea } from "@/app/components/pianoRoll/NoteArea";
+import { Playhead } from "@/app/components/pianoRoll/Playhead";
 import { PitchAxis } from "@/app/components/pianoRoll/PitchAxis";
 import { Timeline } from "@/app/components/pianoRoll/Timeline";
 import { getGridBackground } from "@/app/components/pianoRoll/gridBackground";
+import { useFollowPlayhead } from "@/app/components/pianoRoll/useFollowPlayhead";
 import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
 import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
@@ -39,6 +41,7 @@ export const PianoRoll: React.FC = () => {
   const snapTicks = getTicksForTimeSignature(snap);
 
   usePianoRollShortcuts();
+  useFollowPlayhead(scrollerRef, zoom);
 
   const lastEndTick = useMemo(
     () =>
@@ -111,7 +114,9 @@ export const PianoRoll: React.FC = () => {
           className="sticky top-0 z-20"
           zoom={zoom}
           totalTicks={totalTicks}
-        />
+        >
+          <Playhead zoom={zoom} variant="marker" />
+        </Timeline>
         <PitchAxis className="sticky left-0 z-20" zoom={zoom} />
         <NoteArea
           zoom={zoom}
@@ -122,7 +127,9 @@ export const PianoRoll: React.FC = () => {
           tool={tool}
           scrollerRef={scrollerRef}
           gridStyle={gridStyle}
-        />
+        >
+          <Playhead zoom={zoom} variant="line" />
+        </NoteArea>
       </div>
     </div>
   );

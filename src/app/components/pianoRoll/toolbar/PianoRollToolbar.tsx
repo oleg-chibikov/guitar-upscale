@@ -10,6 +10,7 @@ import {
   PianoRollTool,
   setAxisLock,
   setCopyMode,
+  setFollowPlayback,
   setPianoRollTool,
   setSnapToScale,
 } from "@/app/store/pianoRollSlice";
@@ -22,6 +23,7 @@ import ControlPointDuplicate from "@mui/icons-material/ControlPointDuplicate";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import FitScreen from "@mui/icons-material/FitScreen";
+import KeyboardTab from "@mui/icons-material/KeyboardTab";
 import UnfoldLess from "@mui/icons-material/UnfoldLess";
 import UnfoldMore from "@mui/icons-material/UnfoldMore";
 import ZoomIn from "@mui/icons-material/ZoomIn";
@@ -66,6 +68,7 @@ export const PianoRollToolbar: React.FC = () => {
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
+  const followPlayback = usePianoRollSelector((s) => s.followPlayback);
   const dispatch = useDispatch();
   const mod = modKey();
 
@@ -174,6 +177,12 @@ export const PianoRollToolbar: React.FC = () => {
           icon={<FitScreen />}
           tooltip="Fit all notes (F)"
           onPress={zoomToFit}
+        />
+        <IconButtonWrapper
+          icon={<KeyboardTab />}
+          tooltip="Follow the playhead during playback"
+          onPress={() => dispatch(setFollowPlayback(!followPlayback))}
+          isActive={followPlayback}
         />
       </Group>
     </div>

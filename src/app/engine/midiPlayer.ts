@@ -4,6 +4,11 @@ import {
   waitForNextTick,
 } from "@/app/engine/clock/mainClock";
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import {
+  getStartTick,
+  publishPlayhead,
+  returnToStart,
+} from "@/app/engine/pianoRoll/playhead";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import {
   recreatePlaybackPromise,
@@ -57,7 +62,7 @@ class MidiPlayer {
 
     console.log(logPrefix + "Midi info", eventsByTick);
 
-    let currentTick = 0;
+    let currentTick = getStartTick(eventsByTick);
     let lastTick = eventsByTick.lastTick;
     // melody tick 0 sits at this bar position. It stays fixed so a resume after pause lands on the same beat
     let tickZeroBarPosition = startBarPosition;
@@ -85,6 +90,7 @@ class MidiPlayer {
               logPrefix,
               currentTick
             );
+            publishPlayhead(currentTick);
           }
           continue;
         }
@@ -112,6 +118,7 @@ class MidiPlayer {
         if (events) {
           playAllNotes(events, logPrefix, currentTick);
         }
+        publishPlayhead(currentTick);
 
         if (currentTick === lastTick) {
           store.dispatch(setIsLastEvent(true));
@@ -126,6 +133,7 @@ class MidiPlayer {
       if (!isStarted) {
         onStarted?.();
       }
+      returnToStart(eventsByTick);
     }
     store.dispatch(setIsLastEvent(true));
     store.dispatch(setIsFirstEvent(true));

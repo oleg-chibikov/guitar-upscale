@@ -24,6 +24,8 @@ export interface PianoRollState {
   axisLock: boolean;
   pixelsPerTick: number;
   noteHeight: number;
+  // scroll along with the playhead during playback
+  followPlayback: boolean;
 }
 
 export const pianoRollInitialState: PianoRollState = {
@@ -34,6 +36,7 @@ export const pianoRollInitialState: PianoRollState = {
   axisLock: false,
   pixelsPerTick: DEFAULT_PIXELS_PER_TICK,
   noteHeight: DEFAULT_NOTE_HEIGHT,
+  followPlayback: true,
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -64,6 +67,9 @@ export const PianoRollSlice = createSlice({
     setAxisLock(state, action: PayloadAction<boolean>) {
       state.axisLock = action.payload;
     },
+    setFollowPlayback(state, action: PayloadAction<boolean>) {
+      state.followPlayback = action.payload;
+    },
     setPianoRollZoom(
       state,
       action: PayloadAction<{ pixelsPerTick?: number; noteHeight?: number }>
@@ -86,6 +92,7 @@ export const {
   setCopyMode,
   setAxisLock,
   setPianoRollZoom,
+  setFollowPlayback,
 } = PianoRollSlice.actions;
 
 export default PianoRollSlice.reducer;
