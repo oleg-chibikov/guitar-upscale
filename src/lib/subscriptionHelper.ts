@@ -101,9 +101,6 @@ export async function defer(
   const newSubscriptionDesiredStartTimeMs =
     cancelledSubscription.subscription.expiryTimeMillis;
 
-  let newSubscriptionDesiredExpiryTimeMs =
-    purchasedSubscription.subscription.expiryTimeMillis;
-
   const newSubscriptionCurrentExpiryTimeMs =
     purchasedSubscription.subscription.expiryTimeMillis;
 
@@ -111,7 +108,7 @@ export async function defer(
     purchasedSubscription.subscription.expiryTimeMillis -
     purchasedSubscription.subscription.startTimeMillis;
 
-  newSubscriptionDesiredExpiryTimeMs =
+  const newSubscriptionDesiredExpiryTimeMs =
     newSubscriptionDesiredStartTimeMs + currentSubscriptionDurationMs;
 
   const expiryTimeDifference =
@@ -140,7 +137,7 @@ export async function defer(
         newSubscriptionDesiredExpiryTimeMs
       );
       return true;
-    } catch (error: unknown) {
+    } catch {
       return false;
     }
   } else {

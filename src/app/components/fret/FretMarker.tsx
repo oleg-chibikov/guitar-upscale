@@ -85,11 +85,11 @@ export const FretMarker: React.FC<FretMarkerProps> = ({
   const noteDisplayMode = useUiSelector((s) => s.noteDisplayMode);
 
   const hasTouchInput = useInputChecker();
-  const chordFingerRef = useRef<number | undefined>();
+  const chordFingerRef = useRef<number | undefined>(undefined);
   const isFromPreviousChordRef = useRef<boolean>(false);
   const isChordBeingDetectedRef = useRef<boolean>(false);
   const isScaleBeingDetectedRef = useRef<boolean>(false);
-  const blastAnimationColorRef = useRef<string | undefined>();
+  const blastAnimationColorRef = useRef<string | undefined>(undefined);
 
   const isColored =
     (isHeader &&

@@ -52,7 +52,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
-  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>();
+  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const toggleClasses = useCallback(() => {
     const element = elementRef.current;

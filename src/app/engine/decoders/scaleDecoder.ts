@@ -23,7 +23,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
   const capo = capoValue;
   neck.forEach((neckString, index) => {
     const stringCopy = [...neckString].filter(
-      (x) => x && x.fret >= capo
+      (x) => x !== null && x !== undefined && x.fret >= capo
     ) as StringOctaveNote[];
     neckCopy[reverse ? stringCount - 1 - index : index] = stringCopy;
   });
@@ -50,7 +50,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
           : undefined;
 
       if (nextString !== undefined) {
-        const trimmedString = nextString.filter((x) => x) as OctaveNote[];
+        const trimmedString = nextString.filter(Boolean) as OctaveNote[];
         const firstOrLastIndex = !reverse ? trimmedString.length - 1 : 0;
         const firstOrLastNoteOfNextString = trimmedString[firstOrLastIndex];
         boundaryNote = serializeOctaveNote(firstOrLastNoteOfNextString);

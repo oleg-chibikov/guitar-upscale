@@ -30,6 +30,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm exec eslint .
+
       - run: pnpm exec jest
 
       # Static export rejects API routes, and the Pages copy runs with auth off.
@@ -38,7 +40,7 @@ jobs:
       - id: pages
         uses: actions/configure-pages@v6
 
-      # next build also runs lint and the type check.
+      # next build also runs the type check.
       - run: pnpm exec next build
         env:
           STATIC_EXPORT: "true"

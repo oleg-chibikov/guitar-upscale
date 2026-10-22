@@ -214,10 +214,11 @@ export const useStrumming = (
         chordName,
         clickNumber
       );
-      !hasTouchInput &&
-        document.addEventListener("mouseup", handlePressReleased, true);
-      hasTouchInput &&
+      if (hasTouchInput) {
         document.addEventListener("touchend", handlePressReleased, true);
+      } else {
+        document.addEventListener("mouseup", handlePressReleased, true);
+      }
     };
 
     const unregister = () => {
@@ -226,10 +227,11 @@ export const useStrumming = (
         chordName,
         clickNumber
       );
-      !hasTouchInput &&
-        document.removeEventListener("mouseup", handlePressReleased, true);
-      hasTouchInput &&
+      if (hasTouchInput) {
         document.removeEventListener("touchend", handlePressReleased, true);
+      } else {
+        document.removeEventListener("mouseup", handlePressReleased, true);
+      }
     };
 
     const handlePressReleased = (event: MouseEvent | TouchEvent) => {

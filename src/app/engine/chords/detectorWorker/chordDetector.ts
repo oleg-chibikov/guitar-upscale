@@ -54,7 +54,7 @@ class ChordDetector {
     console.log("Matched values from trie", matchedValues);
     const chordNames = Array.from(matchedValues)
       .flatMap((x) => this.reverseChordsMap.get(x))
-      .filter((x) => x) as string[];
+      .filter(Boolean) as string[];
     if (!chordNames.length) {
       console.warn("No chords matched to the values from trie");
       callback({

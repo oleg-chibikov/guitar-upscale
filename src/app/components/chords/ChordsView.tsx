@@ -44,7 +44,7 @@ const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 
-export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
+export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = ({
   mainRef,
 }) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
@@ -161,7 +161,6 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement> }> = ({
     return () => {
       window.removeEventListener("resize", debouncedHandleResize);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalColumns = chordModeVariations.length;
@@ -243,7 +242,7 @@ function regeneratePreferredVariationsForAllModes(
 
 function toggleOverflow(
   isStrummingClicked: boolean,
-  ref: RefObject<HTMLElement>
+  ref: RefObject<HTMLElement | null>
 ) {
   if (isStrummingClicked) {
     // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll

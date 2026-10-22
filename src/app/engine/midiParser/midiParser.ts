@@ -68,7 +68,7 @@ async function detectScale(distinctNotes: DistinctNoteMarker[]) {
       distinctNotes,
       distinctNotes.filter((x) => x !== undefined).length,
       async (result) => {
-        let guitarSettingsChanged = false;
+        let guitarSettingsChanged: boolean;
         const currentBaseNote = getShiftedNote(capoValue, tuningValue);
         if (result.scales !== undefined && result.scales.length > 0) {
           const scalesInSameBaseNote = result.scales.filter(

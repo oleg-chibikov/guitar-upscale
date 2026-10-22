@@ -17,7 +17,7 @@ const findClosestNote = (
 ): StringOctaveNote | null => {
   const sourceIndex = stringNotes.findIndex(
     (note) =>
-      note && note.string === sourceNote.string && note.fret === sourceNote.fret
+      note?.string === sourceNote.string && note.fret === sourceNote.fret
   );
 
   if (sourceIndex === -1) return null;

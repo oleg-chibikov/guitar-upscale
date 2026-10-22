@@ -23,7 +23,6 @@ export function parseMidiFile(
   const distinctNotes = initNotesArray<DistinctNoteMarker>();
   const getGuitarUpscaleTicks = (midiTicks: number) =>
     (midiTicks / midiData.header.ticksPerBeat) * TICKS_IN_BEAT;
-  midiData.header.ticksPerBeat;
   midiData.tracks.forEach((track) => {
     let currentPosition = 0;
     const data: TrackData = { events: [] };

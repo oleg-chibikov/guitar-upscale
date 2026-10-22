@@ -212,7 +212,6 @@ export class MelodyDecoder {
         instrument: this.track.instrument,
         note: stringOctaveNote,
       });
-      tickIndex++;
     }
   }
 }
