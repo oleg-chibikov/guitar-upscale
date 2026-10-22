@@ -9,6 +9,7 @@ export const playSound = (
   soundfont: Soundfont | SplendidGrandPiano,
   durationMs: number
 ) => {
+  resumeAudio();
   return soundfont.start({
     note: getNoteText(note.note) + note.octave,
     velocity: volume,
@@ -17,6 +18,32 @@ export const playSound = (
 };
 
 const soundfontMap = new Map<string, Soundfont | SplendidGrandPiano>();
+
+let audioContext: AudioContext | undefined;
+
+// Phones only let audio start inside a tap. touchstart doesn't count, so a context made then stays suspended.
+const resumeAudio = () => {
+  if (audioContext && audioContext.state !== "running") {
+    void audioContext.resume();
+  }
+};
+
+const getAudioContext = () => {
+  if (!audioContext) {
+    audioContext = new AudioContext();
+    // Lets iOS play sound with the silent switch on.
+    const audioSession = (
+      navigator as Navigator & { audioSession?: { type: string } }
+    ).audioSession;
+    if (audioSession) {
+      audioSession.type = "playback";
+    }
+    for (const eventName of ["pointerup", "touchend", "click", "keydown"]) {
+      document.addEventListener(eventName, resumeAudio, true);
+    }
+  }
+  return audioContext;
+};
 
 export const loadInstrument = async (
   instrument: Instrument,
@@ -27,7 +54,7 @@ export const loadInstrument = async (
   if (soundfont) {
     return soundfont;
   }
-  const context = new AudioContext();
+  const context = getAudioContext();
 
   if (instrument === "sampled_piano") {
     const SplendidGrandPiano = (await import("smplr")).SplendidGrandPiano;
