@@ -1,5 +1,6 @@
 import { Theme } from "@/app/data/theme";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { isAuthEnabled } from "@/lib/featureFlags";
 import { useEffect, useRef } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
@@ -20,11 +21,15 @@ import {
 } from "../store/settingsSlice";
 import { initUi } from "../store/uiSlice";
 
+const AuthInitializer: React.FC = () => {
+  useSessionAuth();
+  useGooglePlayAuth();
+  return null;
+};
+
 export const Initializer: React.FC = () => {
   const theme = useUiSelector((s) => s.theme);
   const dispatch = useDispatch();
-  useSessionAuth();
-  useGooglePlayAuth();
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -123,5 +128,5 @@ export const Initializer: React.FC = () => {
       void navigator.serviceWorker.register("/sw.js");
     }
   }, []);
-  return null;
+  return isAuthEnabled ? <AuthInitializer /> : null;
 };

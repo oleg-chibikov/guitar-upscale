@@ -6,6 +6,7 @@ import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRati
 import { PianoRollDialogWrapper } from "@/app/components/pianoRoll/PianoRollDialogWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { isAuthEnabled } from "@/lib/featureFlags";
 import { ReactNode, useRef } from "react";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
@@ -47,7 +48,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           <ChordsView mainRef={mainRef} />
-          <AuthPanel />
+          {isAuthEnabled && <AuthPanel />}
           <StrummingSettingsWrapper />
           <BottomZone premiumComponents={premiumComponents} />
           <AspectRatioModalWrapper />

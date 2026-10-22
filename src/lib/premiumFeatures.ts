@@ -1,5 +1,6 @@
 import { Session } from "next-auth";
 import { auth } from "./auth";
+import { isAuthEnabled } from "./featureFlags";
 import { TierInfo } from "./tier";
 import { applyTierToResult, getTierName } from "./tierHelper";
 
@@ -51,6 +52,15 @@ export const composerPremiumFeatures: PremiumFeatures = {
 
 export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> {
   "use server";
+  if (!isAuthEnabled) {
+    return {
+      session: null,
+      premiumFeatures: composerPremiumFeatures,
+      explorerPremiumFeatures,
+      composerPremiumFeatures,
+    };
+  }
+
   // Determine premium status
   const session = await auth();
 

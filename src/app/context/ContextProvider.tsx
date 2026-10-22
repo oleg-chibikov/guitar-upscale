@@ -1,5 +1,6 @@
 "use client";
 
+import { isAuthEnabled } from "@/lib/featureFlags";
 import { SessionProvider } from "next-auth/react";
 import { FC } from "react";
 import { Provider } from "react-redux";
@@ -18,19 +19,25 @@ export const ContextProvider: FC<PremiumFeaturesContextProviderProps> = ({
   children,
   premiumFeatures,
 }) => {
-  return (
+  const content = (
+    <Provider store={store}>
+      <MuiThemeProvider>
+        <DigitalGoodsServiceInfoProvider>
+          <PremiumFeaturesProvider premiumFeatures={premiumFeatures}>
+            <PersistGate loading={null} persistor={persistor}>
+              {children}
+            </PersistGate>
+          </PremiumFeaturesProvider>
+        </DigitalGoodsServiceInfoProvider>
+      </MuiThemeProvider>
+    </Provider>
+  );
+
+  return isAuthEnabled ? (
     <SessionProvider session={premiumFeatures.session}>
-      <Provider store={store}>
-        <MuiThemeProvider>
-          <DigitalGoodsServiceInfoProvider>
-            <PremiumFeaturesProvider premiumFeatures={premiumFeatures}>
-              <PersistGate loading={null} persistor={persistor}>
-                {children}
-              </PersistGate>
-            </PremiumFeaturesProvider>
-          </DigitalGoodsServiceInfoProvider>
-        </MuiThemeProvider>
-      </Provider>
+      {content}
     </SessionProvider>
+  ) : (
+    content
   );
 };
