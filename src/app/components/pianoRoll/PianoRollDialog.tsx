@@ -1,4 +1,5 @@
 import { PianoRoll } from "@/app/components/pianoRoll/PianoRoll";
+import { PianoRollToolbar } from "@/app/components/pianoRoll/toolbar/PianoRollToolbar";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { BaseNoteProvider } from "@/app/context/BaseNoteProvider";
 import { PianoRollProvider } from "@/app/context/PianoRollProvider";
@@ -11,8 +12,11 @@ import { useDispatch } from "react-redux";
 
 const PianoRollContent: React.FC = () => {
   return (
-    <div className="h-full w-full">
-      <PianoRoll />
+    <div className="h-full w-full flex flex-col">
+      <PianoRollToolbar />
+      <div className="flex-1 min-h-0">
+        <PianoRoll />
+      </div>
     </div>
   );
 };

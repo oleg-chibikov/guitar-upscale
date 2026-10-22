@@ -1,4 +1,5 @@
 import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
+import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
 import { getEditHistory } from "@/app/engine/pianoRoll/editHistory";
 import { EditResult } from "@/app/engine/pianoRoll/operations";
 import { pianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
@@ -20,6 +21,12 @@ interface PianoRollContextType {
   setSelection: (ids: Iterable<string>) => void;
   // runs the edit through the undo history and selects what it returns
   apply: (result: EditResult) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  undoLabel: string | undefined;
+  redoLabel: string | undefined;
   loaded: boolean;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -35,6 +42,12 @@ export const usePianoRoll = () => {
   }
   return context;
 };
+
+// after undo or redo the notes it touched stay selected
+const affectedIds = (data: EventsByTick, command: EditCommand) =>
+  command.changes
+    .map((change) => change.id)
+    .filter((id) => data.getEvent(id) !== undefined);
 
 interface PianoRollProviderProps {
   children: ReactNode;
@@ -100,6 +113,29 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     [data]
   );
 
+  const step = useCallback(
+    (direction: "undo" | "redo") => {
+      if (!data) {
+        return;
+      }
+      const history = getEditHistory(data);
+      const command = direction === "undo" ? history.undo() : history.redo();
+      if (command) {
+        setSelectionState({ data, ids: new Set(affectedIds(data, command)) });
+        setVersion((v) => v + 1);
+      }
+    },
+    [data]
+  );
+  const undo = useCallback(() => step("undo"), [step]);
+  const redo = useCallback(() => step("redo"), [step]);
+
+  const history = data ? getEditHistory(data) : undefined;
+  const canUndo = history?.canUndo ?? false;
+  const canRedo = history?.canRedo ?? false;
+  const undoLabel = history?.undoLabel;
+  const redoLabel = history?.redoLabel;
+
   const value = useMemo(
     () => ({
       data,
@@ -107,10 +143,18 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       selection,
       setSelection,
       apply,
+      undo,
+      redo,
+      canUndo,
+      canRedo,
+      undoLabel,
+      redoLabel,
       loaded,
       setLoaded,
     }),
-    [data, events, selection, setSelection, apply, loaded]
+    // version changes whenever the history does
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data, events, selection, setSelection, apply, undo, redo, loaded, version]
   );
 
   return (

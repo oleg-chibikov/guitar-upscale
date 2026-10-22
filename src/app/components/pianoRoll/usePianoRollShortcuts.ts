@@ -18,7 +18,8 @@ export const usePianoRollShortcuts = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTyping(e.target)) return;
-      const { data, events, selection, setSelection, apply } = latest.current;
+      const { data, events, selection, setSelection, apply, undo, redo } =
+        latest.current;
       if (!data) return;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
@@ -27,6 +28,10 @@ export const usePianoRollShortcuts = () => {
         apply(deleteEvents(data, selection));
       } else if (key === "escape") {
         setSelection([]);
+      } else if (mod && key === "z" && !e.shiftKey) {
+        undo();
+      } else if (mod && (key === "y" || (key === "z" && e.shiftKey))) {
+        redo();
       } else if (mod && key === "a") {
         setSelection(events.map(({ event }) => event.id));
       } else {

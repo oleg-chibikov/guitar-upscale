@@ -16,7 +16,6 @@ piano roll editor for looper/recording
 Can we avoid using pre-built chords for chord detection?
 
 Piano roll:
-Undo-redo (use event sourcing technique)
 copy note instead of move when ctrl pressed (what about mobile?)
 Panel with actions on pianoRoll. It probably should be the same as play panel, but extended with tools or two different panels
 For looper we'll need another dialog showing all the tracks. Alternatively we can have buttons under the play buttons
