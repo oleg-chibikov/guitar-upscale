@@ -9,7 +9,7 @@ import {
 type SubscriptionPurchaseV2 = androidpublisher_v3.Schema$SubscriptionPurchaseV2;
 
 const toMillis = (time?: string | null) =>
-  time ? new Date(time).getTime() : 0;
+  typeof time === "string" && time !== "" ? new Date(time).getTime() : 0;
 
 const getCancelReason = (purchase: SubscriptionPurchaseV2) => {
   const context = purchase.canceledStateContext;
