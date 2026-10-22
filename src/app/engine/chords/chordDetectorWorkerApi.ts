@@ -4,7 +4,7 @@ import {
   ChordDetectorWorkerMessage,
 } from "@/app/data/chordDetectorWorkerTypes";
 import { ChordModeVariations } from "@/app/data/chordModes";
-import { Neck, StringOctaveNote } from "@/app/data/notes";
+import { Chord, Neck, StringOctaveNote } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
 
 const worker = new Worker(
@@ -13,10 +13,26 @@ const worker = new Worker(
 
 class ChordDetectorWorkerApi {
   addChordsToDetectorLookup(chordModeVariations: ChordModeVariations): void {
+    // Finger layouts of one voicing share the variation array. The detector needs each voicing once.
+    const seenVariations = new Set<Chord>();
     const message: WorkerMessageWrapper<ChordDetectorWorkerMessage> = {
       data: {
         type: "addChordsToDetectorLookup",
-        payload: { chordModeVariations },
+        payload: {
+          chordModeVariations: {
+            ...chordModeVariations,
+            variationsByNote: chordModeVariations.variationsByNote.map(
+              (variations) =>
+                variations?.filter(({ variation }) => {
+                  if (seenVariations.has(variation)) {
+                    return false;
+                  }
+                  seenVariations.add(variation);
+                  return true;
+                })
+            ),
+          },
+        },
       },
     };
     worker.postMessage(message);

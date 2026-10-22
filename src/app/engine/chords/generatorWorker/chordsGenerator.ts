@@ -10,6 +10,7 @@ import {
 } from "@/app/data/chordsGeneratorTypes";
 import { Neck, NOTE_COUNT } from "@/app/data/notes";
 import { FretChordsGenerator } from "@/app/engine/chords/generatorWorker/fretChordsGenerator";
+import { SharedArrayCache } from "@/app/engine/chords/generatorWorker/sharedArrayCache";
 
 class ChordsGenerator {
   private capo = 0;
@@ -73,7 +74,8 @@ class ChordsGenerator {
 
   private processIntervalsInChordMode = (
     intervalsToUse: number[],
-    variationsToFill: ChordVariationsByNote
+    variationsToFill: ChordVariationsByNote,
+    sharedArrayCache: SharedArrayCache
   ) => {
     for (
       let stringIndex = MAX_STRING_INDEX_FOR_CHORD_GENERATION; // TODO: We are intentionally limit chords to 6 strings. We don't search for them on the lower string as it requires too much memory to store. We can undo this if there's a better way to store all the chords in a trie for the chord detector // this.neck.length - 1; // starting from the lowest (thickest) string
@@ -95,7 +97,8 @@ class ChordsGenerator {
         const fretChordsGenerator = new FretChordsGenerator(
           this.capo,
           this.neck,
-          this.maxFretToProcess
+          this.maxFretToProcess,
+          sharedArrayCache
         );
 
         const newVariationsForNoteAndMode = fretChordsGenerator.processFret(
@@ -117,13 +120,19 @@ class ChordsGenerator {
 
   private processChordMode = (chordMode: ChordMode) => {
     const variationsByNote: ChordVariationsByNote = [];
-    this.processIntervalsInChordMode(chordMode.intervals, variationsByNote);
+    const sharedArrayCache = new SharedArrayCache();
+    this.processIntervalsInChordMode(
+      chordMode.intervals,
+      variationsByNote,
+      sharedArrayCache
+    );
     const intervalsWithoutPerfectFifth =
       this.buildIntervalsWithoutPerfectFifth(chordMode);
     if (intervalsWithoutPerfectFifth) {
       this.processIntervalsInChordMode(
         intervalsWithoutPerfectFifth,
-        variationsByNote
+        variationsByNote,
+        sharedArrayCache
       );
     }
 

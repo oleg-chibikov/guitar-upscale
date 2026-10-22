@@ -11,6 +11,7 @@ import {
   noteBit,
   RecursiveChordGenerator,
 } from "@/app/engine/chords/generatorWorker/recursiveChordGenerator";
+import { SharedArrayCache } from "@/app/engine/chords/generatorWorker/sharedArrayCache";
 
 type OptionalNumber = number | undefined;
 type OptionalNumberArray = OptionalNumber[];
@@ -28,7 +29,12 @@ export class FretChordsGenerator {
   private neck: Neck;
   private recursiveChordGenerator: RecursiveChordGenerator;
 
-  constructor(capo: number, neck: Neck, maxFretToProcess: number) {
+  constructor(
+    capo: number,
+    neck: Neck,
+    maxFretToProcess: number,
+    sharedArrayCache: SharedArrayCache
+  ) {
     this.capo = capo;
     this.neck = neck;
     this.maxFretToProcess = maxFretToProcess;
@@ -36,7 +42,8 @@ export class FretChordsGenerator {
       capo,
       neck,
       maxFretToProcess,
-      this.getFretLimitsForTheFirstTime
+      this.getFretLimitsForTheFirstTime,
+      sharedArrayCache
     );
   }
 

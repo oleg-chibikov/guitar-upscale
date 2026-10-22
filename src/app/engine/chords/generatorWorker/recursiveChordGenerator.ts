@@ -5,6 +5,7 @@ import {
   getPossibleFullFingerStretch,
   isWithinAllowedDistance,
 } from "@/app/engine/chords/generatorWorker/fretDistanceChecker";
+import { SharedArrayCache } from "@/app/engine/chords/generatorWorker/sharedArrayCache";
 
 // TODO: Possible finger alignment when using thumb
 
@@ -41,6 +42,7 @@ export class RecursiveChordGenerator {
     newMin: number;
     newMax: number;
   };
+  private sharedArrayCache: SharedArrayCache;
 
   constructor(
     capo: number,
@@ -49,12 +51,14 @@ export class RecursiveChordGenerator {
     getLimits: (fretIndex: number) => {
       newMin: number;
       newMax: number;
-    }
+    },
+    sharedArrayCache: SharedArrayCache
   ) {
     this.capo = capo;
     this.neck = neck;
     this.maxFretToProcess = maxFretToProcess;
     this.getFretLimits = getLimits;
+    this.sharedArrayCache = sharedArrayCache;
   }
 
   // this method recursively takes all the matching notes on the next string (from bottom to top) and builds multiple variations of the chord by scanning strings one by one
@@ -464,8 +468,10 @@ export class RecursiveChordGenerator {
     }
 
     results.push({
-      variation: [...state.chordBuilder],
-      fingerAssignment: [...state.fingerAssignment],
+      variation: this.sharedArrayCache.getVariation(state.chordBuilder),
+      fingerAssignment: this.sharedArrayCache.getFingerAssignment(
+        state.fingerAssignment
+      ),
       hasBarreOnIndexFinger: state.barreFretByFingerIndex[0] !== undefined, // 0 is the index finger
     });
   }
