@@ -531,7 +531,8 @@ export const Fretboard: React.FC = () => {
   return (
     <section
       {...{ [NO_LONG_PRESS_ATTRIBUTE]: true }}
-      className="relative min-w-full"
+      // isolate keeps the canvas under the fixed panels, as the old CSS transform did
+      className="relative isolate min-w-full"
       style={{ height: sectionHeight }}
     >
       <div
