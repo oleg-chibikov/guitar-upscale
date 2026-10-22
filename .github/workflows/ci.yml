@@ -63,3 +63,21 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # Merges Dependabot PRs once the build passes, majors included.
+  automerge:
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - run: gh pr merge "${{ github.event.pull_request.html_url }}" --squash --delete-branch
+
+      # A merge made with GITHUB_TOKEN doesn't start the push workflow, so deploy by hand.
+      - run: gh workflow run ci.yml --ref main
