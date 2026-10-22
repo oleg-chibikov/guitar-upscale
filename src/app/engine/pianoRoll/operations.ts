@@ -6,7 +6,7 @@ import {
   EventsByTick,
 } from "@/app/engine/eventsByTick";
 import { CommandBuilder, EditCommand } from "@/app/engine/pianoRoll/editCommand";
-import { clampPitch } from "@/app/engine/pianoRoll/geometry";
+import { clampPitch, fromPitch } from "@/app/engine/pianoRoll/geometry";
 import {
   canPlaceAtPitch,
   cloneWithNewId,
@@ -68,6 +68,45 @@ export const resolveMove = (
       },
     ])
   );
+};
+
+/**
+ * Steps each event up or down. With a scale, a step goes to the next note of the scale.
+ * Nothing moves when one of the events would leave what the neck or the chord generator can play.
+ */
+export const resolveTranspose = (
+  data: EventsByTick,
+  ids: Iterable<string>,
+  steps: number,
+  scalePattern?: Set<Note>
+): Map<string, MoveTarget> => {
+  const states = existing(data, ids);
+  const direction = Math.sign(steps);
+  const stepPitch = (pitch: number) => {
+    let next = pitch;
+    for (let i = 0; i < Math.abs(steps); i++) {
+      next = clampPitch(next + direction);
+      while (
+        scalePattern &&
+        scalePattern.size > 0 &&
+        !scalePattern.has(fromPitch(next).note) &&
+        clampPitch(next + direction) !== next
+      ) {
+        next += direction;
+      }
+    }
+    return next;
+  };
+  const targets = new Map(
+    states.map(({ tick, event }) => [
+      event.id,
+      { tick, pitch: stepPitch(getEventPitch(event)) },
+    ])
+  );
+  const fits = states.every(({ event }) =>
+    canPlaceAtPitch(event, targets.get(event.id)!.pitch)
+  );
+  return fits ? targets : new Map();
 };
 
 export const moveEvents = (

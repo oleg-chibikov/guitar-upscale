@@ -10,6 +10,7 @@ import {
   resizeEvents,
   resolveMove,
   resolveResize,
+  resolveTranspose,
   setChordMode,
 } from "./operations";
 import { getEventPitch } from "./pianoRollEvent";
@@ -151,6 +152,19 @@ describe("piano roll operations", () => {
     new EditHistory(data).execute(command!);
     expect(data.getEvent("a")?.tick).toBe(8);
     expect(data.getEvent("b")?.tick).toBe(16);
+  });
+
+  it("steps through the scale", () => {
+    const { data } = setup();
+    const scale = new Set([Note.C, Note.E, Note.G]);
+    expect(resolveTranspose(data, ["a"], 1, scale).get("a")?.pitch).toBe(C4 + 4);
+    expect(resolveTranspose(data, ["a"], -1, scale).get("a")?.pitch).toBe(C4 - 5);
+    expect(resolveTranspose(data, ["a"], 12).get("a")?.pitch).toBe(C4 + 12);
+  });
+
+  it("doesn't transpose off the neck", () => {
+    const { data } = setup();
+    expect(resolveTranspose(data, ["a"], 48).size).toBe(0);
   });
 
   it("pastes at a tick", () => {

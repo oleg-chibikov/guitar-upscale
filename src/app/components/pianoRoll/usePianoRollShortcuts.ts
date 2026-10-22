@@ -1,39 +1,63 @@
+import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
-import { deleteEvents } from "@/app/engine/pianoRoll/operations";
+import { PianoRollTool, setPianoRollTool } from "@/app/store/pianoRollSlice";
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 
+// keys typed into a field or a dropdown belong to that control
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
-  (target.isContentEditable ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+  target.closest(
+    'input, textarea, select, [contenteditable="true"], [role="combobox"], [role="listbox"], [role="menu"]'
+  ) !== null;
+
+const toolKeys: Record<string, PianoRollTool> = {
+  "1": PianoRollTool.Select,
+  "2": PianoRollTool.Draw,
+  "3": PianoRollTool.Erase,
+};
 
 export const usePianoRollShortcuts = () => {
-  const pianoRoll = usePianoRoll();
+  const { undo, redo } = usePianoRoll();
+  const actions = usePianoRollActions();
+  const dispatch = useDispatch();
   // the listener stays put and reads the latest state through the ref
-  const latest = useRef(pianoRoll);
+  const latest = useRef({ undo, redo, actions });
   useLayoutEffect(() => {
-    latest.current = pianoRoll;
+    latest.current = { undo, redo, actions };
   });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTyping(e.target)) return;
-      const { data, events, selection, setSelection, apply, undo, redo } =
-        latest.current;
-      if (!data) return;
+      const { undo, redo, actions } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 
       if (key === "delete" || key === "backspace") {
-        apply(deleteEvents(data, selection));
+        actions.deleteSelection();
       } else if (key === "escape") {
-        setSelection([]);
+        actions.deselect();
       } else if (mod && key === "z" && !e.shiftKey) {
         undo();
       } else if (mod && (key === "y" || (key === "z" && e.shiftKey))) {
         redo();
       } else if (mod && key === "a") {
-        setSelection(events.map(({ event }) => event.id));
+        actions.selectAll();
+      } else if (mod && key === "c") {
+        actions.copy();
+      } else if (mod && key === "x") {
+        actions.cut();
+      } else if (mod && key === "v") {
+        actions.paste();
+      } else if (mod && key === "d") {
+        actions.duplicate();
+      } else if (key === "arrowup" || key === "arrowdown") {
+        actions.transpose(key === "arrowup" ? 1 : -1, e.shiftKey);
+      } else if (key === "arrowleft" || key === "arrowright") {
+        actions.nudge(key === "arrowright" ? 1 : -1);
+      } else if (!mod && !e.altKey && toolKeys[key] !== undefined) {
+        dispatch(setPianoRollTool(toolKeys[key]));
       } else {
         return;
       }
@@ -42,5 +66,5 @@ export const usePianoRollShortcuts = () => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [dispatch]);
 };

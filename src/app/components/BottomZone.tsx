@@ -1,5 +1,4 @@
 import { AspectRatioButton } from "@/app/components/aspectRatio/AspectRatioButton";
-import { PianoRollToolboxPanel } from "@/app/components/pianoRoll/toolbox/PianoRollToolboxPanel";
 import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
@@ -20,7 +19,6 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
       }`}
       style={pianoRollExpanded ? { zIndex: 9999999 } : undefined} // should be displayed over the dialog
     >
-      {pianoRollExpanded && <PianoRollToolboxPanel />}
       <PlayPanel premiumComponents={premiumComponents} />
       {!pianoRollExpanded && (
         <>

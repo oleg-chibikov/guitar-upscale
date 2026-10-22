@@ -12,7 +12,8 @@ export const PianoRollSnapSelector: React.FC = () => {
   return (
     <EnumSelector
       enumObj={TimeSignature}
-      className="h-8"
+      className="h-7"
+      tooltip="Grid: notes snap to this length"
       selectedValue={pianoRollSnap}
       onValueChange={(value) => {
         dispatch(setPianoRollSnap(value));
