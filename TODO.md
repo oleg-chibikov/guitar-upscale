@@ -6,7 +6,6 @@ Feedback form
 get the formula to avoid hardcoding each string height offset
 youtube videos for each scale
 High string at the bottom mode
-WaitForNextHalfBeat could make the melody offbeat - we need to store what tick to wait for
 
 info about chord detection
 https://www.oolimo.com/en/guitar-chords/analyze

@@ -1,4 +1,4 @@
-import { HALF_BEATS_IN_BAR } from "@/app/data/clockConstants";
+import { TICKS_IN_BAR, TICKS_IN_HALF_BEAT } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
 import {
@@ -14,12 +14,7 @@ import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
-import {
-  currentHalfBeat,
-  isMainClockActiveValue,
-  waitForNextBar,
-  waitForNextHalfBeat,
-} from "../engine/clock/mainClock";
+import { isMainClockActiveValue } from "../engine/clock/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   capoValue,
@@ -164,24 +159,29 @@ async function playExampleOrScale(
 ) {
   // Start playback
   console.log(LOG_PREFIX + "Waiting for playback to start...");
-  await waitForStart(example);
-  console.log(LOG_PREFIX + "Start playing");
-  ReactGA.event({
-    category: "Playback",
-    action: "Playback started",
-  });
-
-  dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
-
   const { playMidi } = await import("@/app/engine/midiPlayer");
-  await playMidi(dispatch, eventsByTick, LOG_PREFIX, () => {
-    // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
-    console.log(
-      LOG_PREFIX + "The playback has started. Removing the waiting mark"
-    );
+  await playMidi(
+    dispatch,
+    eventsByTick,
+    LOG_PREFIX,
+    () => {
+      console.log(LOG_PREFIX + "Start playing");
+      ReactGA.event({
+        category: "Playback",
+        action: "Playback started",
+      });
 
-    updateWaiting(false);
-  });
+      dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
+
+      // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
+      console.log(
+        LOG_PREFIX + "The playback has started. Removing the waiting mark"
+      );
+
+      updateWaiting(false);
+    },
+    getStartBarPosition(example)
+  );
 }
 
 async function loadInstruments(example: Example | undefined) {
@@ -221,29 +221,17 @@ async function loadExample(
   return example;
 }
 
-async function waitForStart(example: Example | undefined) {
-  if (isMainClockActiveValue) {
-    // if metronome or chord strumming is already playing then wait for the bar, other
-    console.log(LOG_PREFIX + "Waiting for the next bar");
-    if (example?.halfBeatShift !== undefined && example.halfBeatShift) {
-      // wait for the remainder of the beats till desired value
-      const desiredHalfBeat = HALF_BEATS_IN_BAR - example.halfBeatShift + 1;
-      let halfBeatsToWait = desiredHalfBeat - currentHalfBeat;
-      if (halfBeatsToWait < 0) {
-        // If play starts too close (less than tickShift ticks) to the next bar - wait for the bar after
-        halfBeatsToWait = HALF_BEATS_IN_BAR + halfBeatsToWait;
-      }
-      console.log(
-        LOG_PREFIX +
-          `Current ${currentHalfBeat}; desired: ${desiredHalfBeat}; toWait: ${halfBeatsToWait}`
-      );
-      for (let i = 0; i < halfBeatsToWait; i++) {
-        await waitForNextHalfBeat();
-      }
-    } else {
-      await waitForNextBar();
-    }
+function getStartBarPosition(example: Example | undefined) {
+  if (!isMainClockActiveValue) {
+    // nothing else is playing, so the melody starts straight away
+    return undefined;
   }
+  const halfBeatShift = example?.halfBeatShift ?? 0;
+  // a shifted melody starts that many half beats before the bar
+  return (
+    (TICKS_IN_BAR - halfBeatShift * TICKS_IN_HALF_BEAT + TICKS_IN_BAR) %
+    TICKS_IN_BAR
+  );
 }
 
 async function decode(
