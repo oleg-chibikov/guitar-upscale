@@ -12,4 +12,5 @@ Can we avoid using pre-built chords for chord detection?
 ## Long term
 
 Ads
+Feedback form
 youtube videos for each scale
