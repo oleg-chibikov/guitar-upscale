@@ -10,8 +10,8 @@ export interface FretlineProps {
   isHeader: boolean;
 }
 
-const calculateTop = (string: number, fret: number, tilt: StringTilt) =>
-  fret * tilt.slope * (string - tilt.center);
+const calculateTop = (string: number, x: number, tilt: StringTilt) =>
+  x * tilt.slope * (string - tilt.center);
 
 export const Fretline: React.FC<FretlineProps> = ({
   elements,
@@ -31,9 +31,14 @@ export const Fretline: React.FC<FretlineProps> = ({
     >
       {elements.map((stringOctaveNote, fret) => {
         const width = initialWidth / Math.pow(widthFactor, fret);
+        // Each fret is narrower by widthFactor, so the frets before it sum up as a geometric series.
+        const left =
+          (initialWidth * (1 - Math.pow(widthFactor, -fret))) /
+          (1 - 1 / widthFactor);
+        const x = left + (width - initialWidth) / 2;
         let top = 0;
         if (string !== undefined) {
-          top = calculateTop(string, fret, stringTilt);
+          top = calculateTop(string, x, stringTilt);
         }
 
         return (
