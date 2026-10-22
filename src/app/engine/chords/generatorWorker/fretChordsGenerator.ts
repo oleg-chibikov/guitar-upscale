@@ -1,14 +1,16 @@
 import { NON_THUMB_FINGER_COUNT, THUMB } from "@/app/data/chordFingerConstants";
-import { FingerAssignment } from "@/app/data/chordModes";
+import { ChordBuilderInfo, FingerAssignment } from "@/app/data/chordModes";
 import {
   NOTE_COUNT,
   Neck,
-  Note,
   NoteInChord,
   StringOctaveNote,
 } from "@/app/data/notes";
 import { getPossibleFullFingerStretch } from "@/app/engine/chords/generatorWorker/fretDistanceChecker";
-import { RecursiveChordGenerator } from "@/app/engine/chords/generatorWorker/recursiveChordGenerator";
+import {
+  noteBit,
+  RecursiveChordGenerator,
+} from "@/app/engine/chords/generatorWorker/recursiveChordGenerator";
 
 type OptionalNumber = number | undefined;
 type OptionalNumberArray = OptionalNumber[];
@@ -67,13 +69,12 @@ export class FretChordsGenerator {
     intervalsToUse: number[],
     stringOctaveNote: StringOctaveNote
   ) => {
-    const notesInChord: Set<Note> = new Set(
-      intervalsToUse.map((x) => (stringOctaveNote.note + x) % NOTE_COUNT)
-    );
+    let requiredNotesMask = 0;
+    for (const interval of intervalsToUse) {
+      requiredNotesMask |= noteBit((stringOctaveNote.note + interval) % NOTE_COUNT);
+    }
     const chordBuilder: NoteInChord[] = [...Array(this.neck.length)];
     chordBuilder[stringOctaveNote.string] = stringOctaveNote;
-    const usedNotesSet = new Set<Note>();
-    usedNotesSet.add(stringOctaveNote.note);
 
     const stringIndex = stringOctaveNote.string;
     const startingOptions = this.getStartingOptions(
@@ -81,31 +82,32 @@ export class FretChordsGenerator {
       stringIndex
     );
 
-    return startingOptions.flatMap(
-      ({
-        availableFretByFingerIndex,
-        fingerAssignment,
-        maxFingerUsedByFret,
+    const results: ChordBuilderInfo[] = [];
+    for (const {
+      availableFretByFingerIndex,
+      fingerAssignment,
+      maxFingerUsedByFret,
+      minAllowedFret,
+      maxAllowedFret,
+    } of startingOptions) {
+      this.recursiveChordGenerator.findChordNotesRecursive(
+        stringIndex - 1,
+        requiredNotesMask,
+        {
+          chordBuilder,
+          fingerAssignment,
+          usedNotesMask: noteBit(stringOctaveNote.note),
+          availableFretByFingerIndex,
+          usedFretByFingerIndex: [...availableFretByFingerIndex], // the same as availableFretByFingerIndex at this point
+          barreFretByFingerIndex: this.initArrayOfFingers(),
+          maxFingerUsedByFret,
+        },
         minAllowedFret,
         maxAllowedFret,
-      }) => {
-        return this.recursiveChordGenerator.findChordNotesRecursive(
-          stringIndex - 1,
-          notesInChord,
-          {
-            chordBuilder,
-            fingerAssignment,
-            usedNotesSet,
-            availableFretByFingerIndex,
-            usedFretByFingerIndex: [...availableFretByFingerIndex], // the same as availableFretByFingerIndex at this point
-            barreFretByFingerIndex: this.initArrayOfFingers(),
-            maxFingerUsedByFret,
-          },
-          minAllowedFret,
-          maxAllowedFret
-        );
-      }
-    );
+        results
+      );
+    }
+    return results;
   };
 
   private getStartingOptions(

@@ -1,6 +1,6 @@
 import { NON_THUMB_FINGER_COUNT } from "@/app/data/chordFingerConstants";
 import { ChordBuilderInfo, FingerAssignment } from "@/app/data/chordModes";
-import { Neck, Note, NoteInChord } from "@/app/data/notes";
+import { Neck, NoteInChord, StringOctaveNote } from "@/app/data/notes";
 import {
   getPossibleFullFingerStretch,
   isWithinAllowedDistance,
@@ -11,15 +11,18 @@ import {
 type OptionalNumber = number | undefined;
 type OptionalNumberArray = OptionalNumber[];
 
-type RecursiveContainers = {
+// The search mutates this state in place and restores it after each branch, so no branch copies it.
+export type RecursiveContainers = {
   availableFretByFingerIndex: OptionalNumberArray; // array of 4 numbers for each finger except the thumb. undefined means this finger can be used for any fret. Otherwise we limit it only to a single fret onwards (barre). It can be set to -1 meaning this finger cannot be used anymore
   usedFretByFingerIndex: OptionalNumberArray; // the same as previous, but cannot be set to -1
   chordBuilder: NoteInChord[]; // notes that will be used in chord
   fingerAssignment: FingerAssignment; // how fingers are assigned to the strings
-  usedNotesSet: Set<Note>; // contains all distinct notes currently used in the chord that's being built
+  usedNotesMask: number; // bit N is set when note N is already used in the chord that's being built
   barreFretByFingerIndex: OptionalNumberArray; // array of 4 numbers for each finger except the thumb. Having a value here means that this finger does a barre on a certain fret (uses 2+ strings)
   maxFingerUsedByFret: OptionalNumberArray; // this prevents a lower finger to be placed on higher string for the same fret. Although technically possible (but hard to put fingers in such manner) such finger arrangement rarely makes practical sense
 };
+
+export const noteBit = (note: number) => 1 << note;
 
 export class RecursiveChordGenerator {
   private capo: number;
@@ -45,258 +48,302 @@ export class RecursiveChordGenerator {
     this.getFretLimits = getLimits;
   }
 
-  // this method recursively take all the matching notes on the next string (from bottom to top) and build multiple variations of the chord by scanning strings one by 1
+  // this method recursively takes all the matching notes on the next string (from bottom to top) and builds multiple variations of the chord by scanning strings one by one
   findChordNotesRecursive = (
     stringIndex: number,
-    allNotesInChord: Set<Note>, // all the notes that should participate in chord
-    recursiveData: RecursiveContainers,
+    requiredNotesMask: number, // all the notes that should participate in chord
+    state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
-    maxAllowedFretIndex: OptionalNumber
-  ): ChordBuilderInfo[] => {
-    // for every new recursive branch we need to have copies of all the recursively filled containers
-    const copyRecursiveContainersForTheNextBranch = (): RecursiveContainers => {
-      const availableFretByFingerIndex = [
-        ...recursiveData.availableFretByFingerIndex,
-      ];
-      const usedFretByFingerIndex = [...recursiveData.usedFretByFingerIndex];
-      const chordBuilder = [...recursiveData.chordBuilder];
-      const usedNotesSet = new Set(recursiveData.usedNotesSet);
-      const fingerAssignment = [...recursiveData.fingerAssignment];
-      const barreFretByFingerIndex = [...recursiveData.barreFretByFingerIndex];
-      const maxFingerUsedByFret = [...recursiveData.maxFingerUsedByFret];
-      return {
-        usedFretByFingerIndex,
-        availableFretByFingerIndex,
-        chordBuilder,
-        fingerAssignment,
-        usedNotesSet,
-        barreFretByFingerIndex,
-        maxFingerUsedByFret,
-      };
-    };
+    maxAllowedFretIndex: OptionalNumber,
+    results: ChordBuilderInfo[]
+  ): void => {
+    const neckString = this.neck[stringIndex];
 
-    // if (
-    //   allNotesInChord.has(Note.G) &&
-    //   allNotesInChord.has(Note.B) &&
-    //   allNotesInChord.has(Note.D) &&
-    //   chordBuilder[5]?.fret === 3 &&
-    //   chordBuilder[4]?.fret === 2 &&
-    //   chordBuilder[3]?.fret === 0 &&
-    //   chordBuilder[2]?.fret === 0 &&
-    //   chordBuilder[1]?.fret === 0
-    // ) {
-    //   debugger;
-    // }
+    // Always take the open note into account
+    const openStringNote = neckString[this.capo];
+    if (
+      openStringNote !== null &&
+      (requiredNotesMask & noteBit(openStringNote.note)) !== 0
+    ) {
+      this.tryOpenString(
+        stringIndex,
+        openStringNote,
+        requiredNotesMask,
+        state,
+        minAllowedFretIndex,
+        maxAllowedFretIndex,
+        results
+      );
+    }
 
-    const matchingNotesOnThisString = this.getMatchingNotesOnCurrentString(
+    // maxFingerUsedByFret changes stay visible to the next notes on this string, then get rolled back
+    const changedFrets: number[] = [];
+    const previousFingers: OptionalNumber[] = [];
+    const lastFret = maxAllowedFretIndex ?? this.maxFretToProcess;
+    for (let fret = minAllowedFretIndex ?? this.capo + 1; fret <= lastFret; fret++) {
+      const stringOctaveNote = neckString[fret];
+      if (
+        stringOctaveNote !== null &&
+        (requiredNotesMask & noteBit(stringOctaveNote.note)) !== 0
+      ) {
+        this.tryFrettedNote(
+          stringIndex,
+          stringOctaveNote,
+          requiredNotesMask,
+          state,
+          minAllowedFretIndex,
+          maxAllowedFretIndex,
+          results,
+          changedFrets,
+          previousFingers
+        );
+      }
+    }
+
+    this.tryMutedString(
       stringIndex,
-      allNotesInChord,
+      requiredNotesMask,
+      state,
       minAllowedFretIndex,
-      maxAllowedFretIndex
+      maxAllowedFretIndex,
+      results
     );
 
-    return matchingNotesOnThisString
-      .flatMap((stringOctaveNote) => {
-        if (stringOctaveNote === undefined) {
-          // this is a muted string
-
-          // we cannot continue any existing barre anymore when muting a string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
-          if (
-            this.checkIfThereIsBarreOnHigherFret(
-              -1, // check all fingers
-              this.capo,
-              recursiveData.barreFretByFingerIndex
-            )
-          ) {
-            return null;
-          }
-
-          const recursiveDataCopies = copyRecursiveContainersForTheNextBranch();
-
-          // TODO: note sure if this makes for a muted string sense but safer to keep
-          this.preventCurrentBarresToContinueOnHigherStrings(
-            recursiveDataCopies.availableFretByFingerIndex
-          );
-
-          return this.processNoteRecursively(
-            stringIndex,
-            allNotesInChord,
-            recursiveDataCopies,
-            minAllowedFretIndex, // leave limits and previously used finger/fret intact
-            maxAllowedFretIndex
-          );
-        }
-
-        // calculate possible range for the next string
-        const fret = stringOctaveNote.fret;
-        const isOpenString = fret === this.capo;
-
-        if (isOpenString) {
-          // we cannot continue any existing barre anymore when using an open string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
-          if (
-            this.checkIfThereIsBarreOnHigherFret(
-              -1, // check all fingers
-              fret,
-              recursiveData.barreFretByFingerIndex
-            )
-          ) {
-            return null;
-          }
-
-          const recursiveDataCopies = copyRecursiveContainersForTheNextBranch();
-
-          recursiveDataCopies.usedNotesSet.add(stringOctaveNote.note);
-          recursiveDataCopies.chordBuilder[stringIndex] = stringOctaveNote;
-
-          // TODO: note sure if this makes for an open string sense but safer to keep
-          this.preventCurrentBarresToContinueOnHigherStrings(
-            recursiveDataCopies.availableFretByFingerIndex
-          );
-
-          return this.processNoteRecursively(
-            stringIndex,
-            allNotesInChord,
-            recursiveDataCopies,
-            minAllowedFretIndex, // leave limits intact
-            maxAllowedFretIndex
-          );
-        }
-
-        // Below is non-capo fret processing
-        // we should try putting all available fingers on each note
-        return recursiveData.availableFretByFingerIndex.flatMap(
-          (theOnlyAllowedFret, currentFingerIndex) => {
-            if (
-              theOnlyAllowedFret !== undefined &&
-              stringOctaveNote.fret !== theOnlyAllowedFret
-            ) {
-              // if we have already used this finger - it means we can only use it on the same fret on a higher string (barre). In any other case we cannot apply this finger anymore
-              return null;
-            }
-
-            // check which fret is used on the closest previous finger
-            if (
-              this.checkHasFurtherFingerOnLowerFrets(
-                recursiveData,
-                fret,
-                currentFingerIndex
-              )
-            ) {
-              return null;
-            }
-
-            if (
-              !this.checkIfFingerPositionIsValid(
-                stringIndex,
-                fret,
-                currentFingerIndex,
-                recursiveData
-              )
-            ) {
-              return null;
-            }
-
-            if (
-              this.checkIfThereIsBarreOnHigherFret(
-                currentFingerIndex,
-                fret,
-                recursiveData.barreFretByFingerIndex
-              )
-            ) {
-              return null;
-            }
-
-            if (
-              this.isInvalidDistanceBetweenCurrentAndPreviousFingers(
-                currentFingerIndex,
-                recursiveData,
-                fret
-              )
-            ) {
-              return null;
-            }
-
-            if (
-              this.isInvalidDistanceBetweenCurrentAndNextFingers(
-                currentFingerIndex,
-                recursiveData,
-                fret
-              )
-            ) {
-              return null;
-            }
-
-            // calculate fret limits for the next string
-            const {
-              newMin,
-              newMax,
-            }: { newMin: OptionalNumber; newMax: OptionalNumber } =
-              this.updateMinAndMaxFretPositions(
-                minAllowedFretIndex,
-                maxAllowedFretIndex,
-                fret
-              );
-
-            const isBarreOnCurrentFret =
-              theOnlyAllowedFret !== undefined && fret === theOnlyAllowedFret;
-
-            if (isBarreOnCurrentFret) {
-              // having a barre and another finger on the same fret is highly unlikely - skipping this chord
-              const hasSameFretUsedByDifferentFinger =
-                this.checkHasSameFretUsedByDifferentFinger(
-                  currentFingerIndex,
-                  recursiveData,
-                  fret
-                );
-              if (hasSameFretUsedByDifferentFinger) {
-                return null;
-              }
-            }
-
-            const recursiveDataCopies =
-              copyRecursiveContainersForTheNextBranch();
-
-            recursiveData.maxFingerUsedByFret[fret] = currentFingerIndex;
-            recursiveDataCopies.usedNotesSet.add(stringOctaveNote.note);
-            recursiveDataCopies.fingerAssignment[stringIndex] =
-              currentFingerIndex;
-            recursiveDataCopies.chordBuilder[stringIndex] = stringOctaveNote;
-
-            // this finger can only be used for barre on higher strings
-            if (
-              recursiveDataCopies.availableFretByFingerIndex[
-                currentFingerIndex
-              ] === undefined
-            ) {
-              recursiveDataCopies.availableFretByFingerIndex[
-                currentFingerIndex
-              ] = fret;
-              recursiveDataCopies.usedFretByFingerIndex[currentFingerIndex] =
-                fret;
-            }
-
-            if (isBarreOnCurrentFret) {
-              recursiveDataCopies.barreFretByFingerIndex[currentFingerIndex] =
-                fret;
-            }
-
-            this.preventCurrentBarresToContinueOnHigherStrings(
-              recursiveDataCopies.availableFretByFingerIndex,
-              fret
-            );
-
-            return this.processNoteRecursively(
-              stringIndex,
-              allNotesInChord,
-              recursiveDataCopies,
-              newMin,
-              newMax
-            );
-          }
-        );
-      })
-      .filter((x) => x) as ChordBuilderInfo[]; // exclude incomplete chords;
+    for (let i = changedFrets.length - 1; i >= 0; i--) {
+      state.maxFingerUsedByFret[changedFrets[i]] = previousFingers[i];
+    }
   };
+
+  private tryMutedString(
+    stringIndex: number,
+    requiredNotesMask: number,
+    state: RecursiveContainers,
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber,
+    results: ChordBuilderInfo[]
+  ) {
+    // we cannot continue any existing barre anymore when muting a string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
+    if (
+      this.checkIfThereIsBarreOnHigherFret(
+        -1, // check all fingers
+        this.capo,
+        state.barreFretByFingerIndex
+      )
+    ) {
+      return;
+    }
+
+    const available = state.availableFretByFingerIndex;
+    const [a0, a1, a2, a3] = available;
+
+    // TODO: note sure if this makes for a muted string sense but safer to keep
+    this.preventCurrentBarresToContinueOnHigherStrings(available);
+
+    this.processNoteRecursively(
+      stringIndex,
+      requiredNotesMask,
+      state,
+      minAllowedFretIndex, // leave limits and previously used finger/fret intact
+      maxAllowedFretIndex,
+      results
+    );
+
+    available[0] = a0;
+    available[1] = a1;
+    available[2] = a2;
+    available[3] = a3;
+  }
+
+  private tryOpenString(
+    stringIndex: number,
+    stringOctaveNote: StringOctaveNote,
+    requiredNotesMask: number,
+    state: RecursiveContainers,
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber,
+    results: ChordBuilderInfo[]
+  ) {
+    // we cannot continue any existing barre anymore when using an open string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
+    if (
+      this.checkIfThereIsBarreOnHigherFret(
+        -1, // check all fingers
+        stringOctaveNote.fret,
+        state.barreFretByFingerIndex
+      )
+    ) {
+      return;
+    }
+
+    const available = state.availableFretByFingerIndex;
+    const [a0, a1, a2, a3] = available;
+    const previousMask = state.usedNotesMask;
+
+    state.usedNotesMask |= noteBit(stringOctaveNote.note);
+    state.chordBuilder[stringIndex] = stringOctaveNote;
+
+    // TODO: note sure if this makes for an open string sense but safer to keep
+    this.preventCurrentBarresToContinueOnHigherStrings(available);
+
+    this.processNoteRecursively(
+      stringIndex,
+      requiredNotesMask,
+      state,
+      minAllowedFretIndex, // leave limits intact
+      maxAllowedFretIndex,
+      results
+    );
+
+    available[0] = a0;
+    available[1] = a1;
+    available[2] = a2;
+    available[3] = a3;
+    state.usedNotesMask = previousMask;
+    state.chordBuilder[stringIndex] = undefined;
+  }
+
+  // we should try putting all available fingers on each note
+  private tryFrettedNote(
+    stringIndex: number,
+    stringOctaveNote: StringOctaveNote,
+    requiredNotesMask: number,
+    state: RecursiveContainers,
+    minAllowedFretIndex: OptionalNumber,
+    maxAllowedFretIndex: OptionalNumber,
+    results: ChordBuilderInfo[],
+    changedFrets: number[],
+    previousFingers: OptionalNumber[]
+  ) {
+    const fret = stringOctaveNote.fret;
+    const available = state.availableFretByFingerIndex;
+
+    for (
+      let currentFingerIndex = 0;
+      currentFingerIndex < NON_THUMB_FINGER_COUNT;
+      currentFingerIndex++
+    ) {
+      const theOnlyAllowedFret = available[currentFingerIndex];
+      if (theOnlyAllowedFret !== undefined && fret !== theOnlyAllowedFret) {
+        // if we have already used this finger - it means we can only use it on the same fret on a higher string (barre). In any other case we cannot apply this finger anymore
+        continue;
+      }
+
+      // check which fret is used on the closest previous finger
+      if (
+        this.checkHasFurtherFingerOnLowerFrets(state, fret, currentFingerIndex)
+      ) {
+        continue;
+      }
+
+      if (
+        !this.checkIfFingerPositionIsValid(
+          stringIndex,
+          fret,
+          currentFingerIndex,
+          state
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        this.checkIfThereIsBarreOnHigherFret(
+          currentFingerIndex,
+          fret,
+          state.barreFretByFingerIndex
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        this.isInvalidDistanceBetweenCurrentAndPreviousFingers(
+          currentFingerIndex,
+          state,
+          fret
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        this.isInvalidDistanceBetweenCurrentAndNextFingers(
+          currentFingerIndex,
+          state,
+          fret
+        )
+      ) {
+        continue;
+      }
+
+      const isBarreOnCurrentFret =
+        theOnlyAllowedFret !== undefined && fret === theOnlyAllowedFret;
+
+      // having a barre and another finger on the same fret is highly unlikely - skipping this chord
+      if (
+        isBarreOnCurrentFret &&
+        this.checkHasSameFretUsedByDifferentFinger(
+          currentFingerIndex,
+          state,
+          fret
+        )
+      ) {
+        continue;
+      }
+
+      // calculate fret limits for the next string
+      const { newMin, newMax } = this.updateMinAndMaxFretPositions(
+        minAllowedFretIndex,
+        maxAllowedFretIndex,
+        fret
+      );
+
+      const [a0, a1, a2, a3] = available;
+      const previousUsedFret = state.usedFretByFingerIndex[currentFingerIndex];
+      const previousBarreFret =
+        state.barreFretByFingerIndex[currentFingerIndex];
+      const previousMask = state.usedNotesMask;
+
+      state.usedNotesMask |= noteBit(stringOctaveNote.note);
+      state.fingerAssignment[stringIndex] = currentFingerIndex;
+      state.chordBuilder[stringIndex] = stringOctaveNote;
+
+      // this finger can only be used for barre on higher strings
+      if (theOnlyAllowedFret === undefined) {
+        available[currentFingerIndex] = fret;
+        state.usedFretByFingerIndex[currentFingerIndex] = fret;
+      }
+
+      if (isBarreOnCurrentFret) {
+        state.barreFretByFingerIndex[currentFingerIndex] = fret;
+      }
+
+      this.preventCurrentBarresToContinueOnHigherStrings(available, fret);
+
+      this.processNoteRecursively(
+        stringIndex,
+        requiredNotesMask,
+        state,
+        newMin,
+        newMax,
+        results
+      );
+
+      available[0] = a0;
+      available[1] = a1;
+      available[2] = a2;
+      available[3] = a3;
+      state.usedFretByFingerIndex[currentFingerIndex] = previousUsedFret;
+      state.barreFretByFingerIndex[currentFingerIndex] = previousBarreFret;
+      state.usedNotesMask = previousMask;
+      state.fingerAssignment[stringIndex] = undefined;
+      state.chordBuilder[stringIndex] = undefined;
+
+      // later notes and fingers on this string see this finger, the branch above did not
+      changedFrets.push(fret);
+      previousFingers.push(state.maxFingerUsedByFret[fret]);
+      state.maxFingerUsedByFret[fret] = currentFingerIndex;
+    }
+  }
 
   private updateMinAndMaxFretPositions(
     minAllowedFretIndex: OptionalNumber,
@@ -334,7 +381,7 @@ export class RecursiveChordGenerator {
     currentStringIndex: number,
     fret: number,
     currentFingerIndex: number,
-    recursiveData: RecursiveContainers
+    state: RecursiveContainers
   ) {
     // going through each of the previous strings
     for (
@@ -344,9 +391,9 @@ export class RecursiveChordGenerator {
     ) {
       // if we used a finger 1 on a lower string at a fret 5 it means that we can use fingers 2 and 3 on a frets >= 5 and we can use finger 0 on fret <= 5
       const fingerUsedOnLowerString =
-        recursiveData.fingerAssignment[lowerStringIndex];
+        state.fingerAssignment[lowerStringIndex];
       let fretUsedOnLowerString =
-        recursiveData.chordBuilder[lowerStringIndex]?.fret;
+        state.chordBuilder[lowerStringIndex]?.fret;
       if (fretUsedOnLowerString === this.capo) {
         fretUsedOnLowerString = undefined;
       }
@@ -375,38 +422,36 @@ export class RecursiveChordGenerator {
   }
 
   // recursive call for a single note
-  private processNoteRecursively = (
+  private processNoteRecursively(
     stringIndex: number,
-    allNotesInChord: Set<Note>,
-    recursiveData: RecursiveContainers,
+    requiredNotesMask: number,
+    state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
-    maxAllowedFretIndex: OptionalNumber
-  ): ChordBuilderInfo[] | null => {
+    maxAllowedFretIndex: OptionalNumber,
+    results: ChordBuilderInfo[]
+  ) {
     if (stringIndex > 0) {
-      return this.findChordNotesRecursive(
+      this.findChordNotesRecursive(
         stringIndex - 1,
-        allNotesInChord,
-        recursiveData,
+        requiredNotesMask,
+        state,
         minAllowedFretIndex,
-        maxAllowedFretIndex
+        maxAllowedFretIndex,
+        results
       );
+      return;
     }
     // this branch returns the final result
-    const requiredNotesArray = Array.from(allNotesInChord);
-    for (const requiredNote of requiredNotesArray) {
-      if (!recursiveData.usedNotesSet.has(requiredNote)) {
-        return null;
-      }
+    if ((state.usedNotesMask & requiredNotesMask) !== requiredNotesMask) {
+      return;
     }
 
-    const chordBuilderInfo: ChordBuilderInfo = {
-      variation: recursiveData.chordBuilder,
-      fingerAssignment: recursiveData.fingerAssignment,
-      hasBarreOnIndexFinger:
-        recursiveData.barreFretByFingerIndex[0] !== undefined, // 0 is the index finger
-    };
-    return [chordBuilderInfo];
-  };
+    results.push({
+      variation: [...state.chordBuilder],
+      fingerAssignment: [...state.fingerAssignment],
+      hasBarreOnIndexFinger: state.barreFretByFingerIndex[0] !== undefined, // 0 is the index finger
+    });
+  }
 
   private preventCurrentBarresToContinueOnHigherStrings(
     availableFretByFingerIndex: OptionalNumberArray,
@@ -441,46 +486,12 @@ export class RecursiveChordGenerator {
     return false;
   }
 
-  private getMatchingNotesOnCurrentString(
-    stringIndex: number,
-    allNotesInChord: Set<Note>,
-    minAllowedFretIndex: OptionalNumber,
-    maxAllowedFretIndex: OptionalNumber
-  ): NoteInChord[] {
-    const currentString = this.neck[stringIndex];
-
-    const matchingNotesOnThisString: NoteInChord[] = []; // these are the positions of the chord notes on the current string
-
-    // Always take the open note into account
-    const openStringNote = currentString[this.capo];
-    if (openStringNote !== null && allNotesInChord.has(openStringNote.note)) {
-      matchingNotesOnThisString.push(openStringNote);
-    }
-
-    for (
-      let j = minAllowedFretIndex ?? this.capo + 1;
-      j <= (maxAllowedFretIndex ?? this.maxFretToProcess);
-      j++
-    ) {
-      const nonOpenStringNote = this.neck[stringIndex][j];
-      if (
-        nonOpenStringNote !== null &&
-        allNotesInChord.has(nonOpenStringNote.note)
-      ) {
-        matchingNotesOnThisString.push(nonOpenStringNote);
-      }
-    }
-
-    matchingNotesOnThisString.push(undefined); // try muting this string (no note on the string)
-    return matchingNotesOnThisString;
-  }
-
   private checkHasFurtherFingerOnLowerFrets = (
-    recursiveData: RecursiveContainers,
+    state: RecursiveContainers,
     fret: number,
     currentFingerIndex: number
   ) => {
-    const maxFingerUsedOnThisFret = recursiveData.maxFingerUsedByFret[fret];
+    const maxFingerUsedOnThisFret = state.maxFingerUsedByFret[fret];
     return (
       maxFingerUsedOnThisFret !== undefined &&
       currentFingerIndex < maxFingerUsedOnThisFret
@@ -489,7 +500,7 @@ export class RecursiveChordGenerator {
 
   private isInvalidDistanceBetweenCurrentAndPreviousFingers = (
     currentFingerIndex: number,
-    recursiveData: RecursiveContainers,
+    state: RecursiveContainers,
     fret: number
   ) => {
     for (
@@ -498,7 +509,7 @@ export class RecursiveChordGenerator {
       previousFingerIndex--
     ) {
       const fretUsedByPreviousFinger =
-        recursiveData.usedFretByFingerIndex[previousFingerIndex];
+        state.usedFretByFingerIndex[previousFingerIndex];
       if (fretUsedByPreviousFinger !== undefined) {
         if (
           !isWithinAllowedDistance(
@@ -520,7 +531,7 @@ export class RecursiveChordGenerator {
 
   private isInvalidDistanceBetweenCurrentAndNextFingers = (
     currentFingerIndex: number,
-    recursiveData: RecursiveContainers,
+    state: RecursiveContainers,
     fret: number
   ) => {
     for (
@@ -529,7 +540,7 @@ export class RecursiveChordGenerator {
       previousFingerIndex++
     ) {
       const fretUsedByNextFinger =
-        recursiveData.usedFretByFingerIndex[previousFingerIndex];
+        state.usedFretByFingerIndex[previousFingerIndex];
       if (fretUsedByNextFinger !== undefined) {
         if (
           !isWithinAllowedDistance(
@@ -551,14 +562,14 @@ export class RecursiveChordGenerator {
 
   private checkHasSameFretUsedByDifferentFinger = (
     currentFingerIndex: number,
-    recursiveData: RecursiveContainers,
+    state: RecursiveContainers,
     fret: number
   ) => {
     for (let i = 0; i < NON_THUMB_FINGER_COUNT; i++) {
       if (i === currentFingerIndex) {
         continue; // skip current fret
       }
-      if (recursiveData.usedFretByFingerIndex[i] === fret) {
+      if (state.usedFretByFingerIndex[i] === fret) {
         return true;
       }
     }
