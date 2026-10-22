@@ -5,6 +5,7 @@ import { DetectScaleButton } from "@/app/components/settings/buttons/DetectScale
 import { MidiUploadButton } from "@/app/components/settings/buttons/MidiUploadButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
+import { Fragment } from "react";
 import {
   PremiumComponent,
   WithPremiumFeatures,
@@ -123,9 +124,10 @@ export const premiumFeaturesToMap = (
     if (value === true) {
       // You can define the React node here based on the key
       // For simplicity, let's assume it's a string representation of the key
+      // Map entries are serialized as an array to the client, so each element needs a key.
       premiumComponents.set(
         key as PremiumFeatureKeys,
-        convertKeyToComponent(key)
+        <Fragment key={key}>{convertKeyToComponent(key)}</Fragment>
       );
     }
   });
