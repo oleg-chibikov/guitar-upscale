@@ -1,30 +1,113 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --primary: #3a3a3a;
-  --secondary: #181818;
-  --tertiary: #2c2c2c;
+@theme {
+  --shadow-glow: 0 0 40px 20px;
+
+  --font-mono:
+    monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New";
+
+  /* https://paperheartdesign.com/blog/color-palette-dark-moody */
+  --color-primary-light: #E6B39A; /* Mocha */
+  --color-primary-dark: #b3cde4;
+  --color-secondary-light: #F6E7D2; /* Cappuccino */
+  --color-secondary-dark: #1d3f58;
+  --color-previous_fret_marker-light: #333333; /* Cappuccino */
+  --color-previous_fret_marker-dark: #b3cde4;
+  --color-previous_fret_marker_match-light: #4E342E; /* Coffee Bean */
+  --color-previous_fret_marker_match-dark: #a2cef5;
+  --color-fret_marker_match-light: #D2A179; /* Latte */
+  --color-fret_marker_match-dark: #1d3f58;
+  --color-fret_marker-light: #F6E7D2; /* Cream */
+  --color-fret_marker-dark: #537692;
+  --color-button-light: #D2A179; /* Latte */
+  --color-button-dark: #537692;
+  --color-button_pressed-light: #F9C2A8; /* Cappuccino */
+  --color-button_pressed-dark: #849db3;
+  --color-foreground-light: #2E1F1B; /* French Roast */
+  --color-foreground-dark: #F2F2F2;
+  --color-background-light: #FDF6F1; /* Light Cream */
+  --color-background-dark: #001b2e;
+  --color-accented_background-light: #e5cdbf; /* Light Mocha */
+  --color-accented_background-dark: #333333;
+  --color-panel-light: #F6E7D2; /* Cream */
+  --color-panel-dark: #666666;
+  --color-border-light: #8D6E63; /* Coffee Bean */
+  --color-border-dark: #999999;
+  --color-chord_detection-light: #8D6E63;
+  --color-chord_detection-dark: #F2F2F2;
+  --color-chord_detection_glow-light: #F6E7D2;
+  --color-chord_detection_glow-dark: #a2cef5;
+  --color-scale_detection-light: #9B3320;
+  --color-scale_detection-dark: #001b2e;
+  --color-scale_detection_glow-light: #9B3320;
+  --color-scale_detection_glow-dark: #B103BC;
+  --color-accent-light: #D48CA7;
+  --color-accent-dark: #9567DB;
+  --color-accent_stronger-light: #B8505C;
+  --color-accent_stronger-dark: #9932CC;
+  --color-accent_strongest-light: #9B3320;
+  --color-accent_strongest-dark: #B103BC;
+  --color-select_background-light: #F2F2F2;
+  --color-select_background-dark: #F2F2F2;
+  --color-select_foreground-light: #2E1F1B;
+  --color-select_foreground-dark: #001b2e;
+  --color-disabled-light: #dadada;
+  --color-disabled-dark: #8c8c8c;
+  --color-disabled_match-light: #8a8888;
+  --color-disabled_match-dark: #5c5c5c;
 }
 
-* {
-  user-select: none;
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
+@custom-variant maxhmd (@media (max-height: 600px));
+@custom-variant maxhlg (@media (max-height: 800px));
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* Tailwind CSS v4 dropped the pointer cursor on buttons. This keeps the v3 look. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
-html,
-body,
-main {
-  height: 100%;
-  width: 100%;
+@utility text-balance {
+  text-wrap: balance;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  :root {
+    --primary: #3a3a3a;
+    --secondary: #181818;
+    --tertiary: #2c2c2c;
+  }
+
+  * {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+  }
+
+  html,
+  body,
+  main {
+    height: 100%;
+    width: 100%;
   }
 }
 

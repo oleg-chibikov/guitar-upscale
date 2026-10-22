@@ -67,9 +67,9 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
               {icon}
               {textContent !== undefined && (
                 <Typography
-                  color={"ButtonText"}
                   variant="subtitle2"
                   className="absolute"
+                  sx={{ color: "ButtonText" }}
                 >
                   {textContent}
                 </Typography>
