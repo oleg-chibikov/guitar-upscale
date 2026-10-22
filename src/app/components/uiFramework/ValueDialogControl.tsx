@@ -14,8 +14,10 @@ interface ValueDialogControlProps {
   postfix?: string;
 }
 
-export interface ValueDialogControlDialogProps
-  extends Omit<ValueDialogControlProps, "icon"> {
+export interface ValueDialogControlDialogProps extends Omit<
+  ValueDialogControlProps,
+  "icon"
+> {
   startIndex: number;
   setHighlight: (value: boolean) => void;
   isOpen: boolean;
@@ -76,7 +78,12 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
         <div className="flex flex-col items-center gap-0.5 leading-none">
           <div>{value}</div>
           {postfix !== undefined && (
-            <Typography lineHeight={1.1} variant="overline">
+            <Typography
+              variant="overline"
+              sx={{
+                lineHeight: 1.1,
+              }}
+            >
               {postfix}
             </Typography>
           )}

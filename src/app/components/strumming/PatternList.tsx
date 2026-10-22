@@ -91,12 +91,18 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
                         ? "bg-background-light"
                         : "bg-background-dark"
                       : theme === Theme.Light
-                      ? "bg-panel-light"
-                      : "bg-panel-dark"
+                        ? "bg-panel-light"
+                        : "bg-panel-dark"
                   }`}
                 >
                   <td className={`px-4 py-1`}>
-                    <Typography textOverflow="clip" overflow="auto" noWrap>
+                    <Typography
+                      noWrap
+                      sx={{
+                        textOverflow: "clip",
+                        overflow: "auto",
+                      }}
+                    >
                       {formatStrums(pattern.strums)}
                     </Typography>
                   </td>

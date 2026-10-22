@@ -52,7 +52,9 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);
-  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
 
   const toggleClasses = useCallback(() => {
     const element = elementRef.current;
@@ -205,9 +207,8 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
       async function processChord(metadata: ChordMetadata) {
         if (chordIsBeingDetectedValue) {
           // only load the module when the variable is true (meaning the chord detection button was pressed)
-          const { chordDetectorBuilder } = await import(
-            "@/app/engine/chords/chordDetectorBuilder"
-          );
+          const { chordDetectorBuilder } =
+            await import("@/app/engine/chords/chordDetectorBuilder");
           // to make sure chords are always detected when played
           chordDetectorBuilder.clear();
         }
@@ -303,14 +304,20 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
             ? "bg-disabled-light text-gray-500"
             : "bg-disabled-dark text-gray-500"
           : theme === Theme.Light
-          ? "bg-button-light"
-          : "bg-button-dark"
+            ? "bg-button-light"
+            : "bg-button-dark"
       }
       ${
         theme === Theme.Light ? "text-foreground-light" : "text-foreground-dark"
       }`}
     >
-      <Typography noWrap variant="button" textTransform={"none"}>
+      <Typography
+        noWrap
+        variant="button"
+        sx={{
+          textTransform: "none",
+        }}
+      >
         {chordName}
       </Typography>
     </ul>
