@@ -109,6 +109,8 @@ Playback types, picked in Settings [Explorer]:
 
 Without Explorer, Play plays the scale.
 
+Right click or hold Play to pick a song [Explorer]. The menu lists songs in the current scale first, then songs in other scales, each list sorted by name. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo.
+
 Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/hooks/usePlay.ts), [midiPlayer.ts](../src/app/engine/midiPlayer.ts), [scaleExamples.ts](../src/app/data/scaleExamples.ts).
 
 ## MIDI recording
