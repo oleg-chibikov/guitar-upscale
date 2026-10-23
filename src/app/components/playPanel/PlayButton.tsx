@@ -13,13 +13,7 @@ import {
 import HourglassTop from "@mui/icons-material/HourglassTop";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import Replay from "@mui/icons-material/Replay";
-import {
-  Divider,
-  ListItemText,
-  ListSubheader,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import { ListItemText, Menu, MenuItem } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
@@ -36,9 +30,7 @@ const getExampleName = (example: Example) =>
   `${example.band} - ${example.title}`;
 
 const getExampleChoices = (
-  examplesMap: Map<string, Map<string, Example[]>> | undefined,
-  currentScaleGroup: string,
-  currentScale: string
+  examplesMap: Map<string, Map<string, Example[]>> | undefined
 ) => {
   const choices: ExampleChoice[] = [];
   examplesMap?.forEach((scales, scaleGroup) =>
@@ -51,12 +43,7 @@ const getExampleChoices = (
   choices.sort((a, b) =>
     getExampleName(a.example).localeCompare(getExampleName(b.example))
   );
-  const isCurrent = (choice: ExampleChoice) =>
-    choice.scaleGroup === currentScaleGroup && choice.scale === currentScale;
-  return {
-    current: choices.filter(isCurrent),
-    others: choices.filter((choice) => !isCurrent(choice)),
-  };
+  return choices;
 };
 
 export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
@@ -90,15 +77,14 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
     return null;
   }
 
-  const { current, others } = params.decodeExample
-    ? getExampleChoices(examplesMap, scaleGroup, scale)
-    : { current: [], others: [] };
-  const canChoose = current.length > 0 || others.length > 0;
+  const choices = params.decodeExample ? getExampleChoices(examplesMap) : [];
+  const canChoose = choices.length > 0;
+  const isCurrent = (choice: ExampleChoice) =>
+    choice.scaleGroup === scaleGroup && choice.scale === scale;
 
   const playChosen = (choice: ExampleChoice) => {
     setMenuAnchor(null);
-    const isSameScale =
-      choice.scaleGroup === scaleGroup && choice.scale === scale;
+    const isSameScale = isCurrent(choice);
     const exampleTuning = choice.example.tuning;
     const needsTuning = exampleTuning !== undefined && exampleTuning !== tuning;
     if (isSameScale && playbackType === PlaybackType.Melody && !needsTuning) {
@@ -119,11 +105,6 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
     }
     pending.current = choice;
   };
-
-  const sections = [
-    { label: `${scale} (current)`, choices: current, showScale: false },
-    { label: "Other scales", choices: others, showScale: true },
-  ].filter((section) => section.choices.length > 0);
 
   return (
     <>
@@ -154,28 +135,25 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           },
         }}
       >
-        {sections.flatMap(({ label, choices, showScale }, index) => [
-          index > 0 && <Divider key={`divider ${label}`} />,
-          <ListSubheader key={`header ${label}`}>{label}</ListSubheader>,
-          ...choices.map((choice) => (
-            <MenuItem
-              key={`${choice.scaleGroup} ${choice.scale} ${getExampleName(
-                choice.example
-              )}`}
-              dense
-              onClick={() => playChosen(choice)}
-            >
-              <ListItemText
-                primary={getExampleName(choice.example)}
-                secondary={
-                  showScale
-                    ? `${choice.scale} (${choice.scaleGroup})`
-                    : undefined
-                }
-              />
-            </MenuItem>
-          )),
-        ])}
+        {choices.map((choice) => (
+          <MenuItem
+            key={`${choice.scaleGroup} ${choice.scale} ${getExampleName(
+              choice.example
+            )}`}
+            dense
+            onClick={() => playChosen(choice)}
+          >
+            <ListItemText
+              primary={getExampleName(choice.example)}
+              secondary={`${choice.scale} (${choice.scaleGroup})`}
+              slotProps={{
+                primary: isCurrent(choice)
+                  ? { sx: { color: "success.main", fontWeight: "bold" } }
+                  : undefined,
+              }}
+            />
+          </MenuItem>
+        ))}
       </Menu>
     </>
   );
