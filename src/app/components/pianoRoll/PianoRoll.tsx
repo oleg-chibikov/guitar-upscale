@@ -228,6 +228,7 @@ export const PianoRoll: React.FC = () => {
                 height,
                 snapTicks,
                 scalePattern,
+                snapToScale,
                 baseNote,
                 events,
                 inactiveEvents,

@@ -29,12 +29,12 @@ const ROW_OUT_OF_SCALE = "#1e272b";
 const ROW_LINE = "rgba(0,0,0,0.35)";
 const KEY_WHITE = "#FFFFFF";
 const KEY_BLACK = "#000000";
-const KEY_WHITE_OUT_OF_SCALE = "#D1D5DB";
-const KEY_BLACK_OUT_OF_SCALE = "#6B7280";
+const KEY_WHITE_OUT_OF_SCALE = "#FBCFE8";
+const KEY_BLACK_OUT_OF_SCALE = "#831843";
 const KEY_LABEL_WHITE = "#6B7280";
 const KEY_LABEL_BLACK = "#9CA3AF";
-const KEY_LABEL_OUT_OF_SCALE = "#9CA3AF";
-const KEY_LABEL_BLACK_OUT_OF_SCALE = "#D1D5DB";
+const KEY_LABEL_OUT_OF_SCALE = "#BE185D";
+const KEY_LABEL_BLACK_OUT_OF_SCALE = "#F9A8D4";
 const BAR_LINE = "#90a4ae";
 const BEAT_LINE = "rgba(144,164,174,0.45)";
 const SNAP_LINE = "rgba(144,164,174,0.16)";
@@ -76,6 +76,8 @@ export interface PianoRollScene {
   height: number;
   snapTicks: number;
   scalePattern: Set<Note>;
+  // the keys outside the scale grey out while new notes snap to it
+  snapToScale: boolean;
   baseNote: Note;
   events: { tick: number; event: ChordOrNote }[];
   // notes of the tracks not being edited. They show dimmed and ignore the pointer
@@ -443,7 +445,7 @@ const drawTimeline = (
 
 const drawPitchAxis = (
   ctx: CanvasRenderingContext2D,
-  { zoom, baseNote, scalePattern, pressedPitch }: PianoRollScene,
+  { zoom, baseNote, scalePattern, snapToScale, pressedPitch }: PianoRollScene,
   viewport: Viewport
 ) => {
   const h = zoom.noteHeight;
@@ -463,7 +465,7 @@ const drawPitchAxis = (
     const octaveNote = fromPitch(pitch);
     const sharp = isSharp(octaveNote.note);
     const lit = pressedPitch === pitch;
-    const inScale = scalePattern.has(octaveNote.note);
+    const inScale = !snapToScale || scalePattern.has(octaveNote.note);
 
     if (sharp) {
       ctx.fillStyle = lit ? "#1e3a8a" : inScale ? KEY_BLACK : KEY_BLACK_OUT_OF_SCALE;
