@@ -247,12 +247,15 @@ export const clearWipeExampleCacheTrigger = () => {
   wipeExampleCacheTriggerValue = false;
 };
 
-export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
+// strumming, recording and the looper keep to the clock's bars, so the melody can't move the clock while they run
+export const isClockUsedBesidesMelodyAndMetronome = () =>
   isAnythingStrumming() ||
-  isPlayingValue ||
   isRecordingValue ||
   currentlyRecordingLooperChannel !== undefined ||
   checkLooperPlaying();
+
+export const isAnyTimerSpecificActivityBesidesMetronomeRunning = () =>
+  isPlayingValue || isClockUsedBesidesMelodyAndMetronome();
 
 export const isAnyTimerSpecificActivityRunning = () =>
   isMetronomeActiveValue || isAnyTimerSpecificActivityBesidesMetronomeRunning();

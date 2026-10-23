@@ -1,6 +1,7 @@
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import {
   getLastTickBarPosition,
+  setNextTickBarPosition,
   waitForNextTick,
 } from "@/app/engine/clock/mainClock";
 import { EventsByTick } from "@/app/engine/eventsByTick";
@@ -19,8 +20,10 @@ import {
 import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   PauseResolveValue,
+  isClockUsedBesidesMelodyAndMetronome,
   isFirstEventValue,
   isLastEventValue,
+  isMetronomeActiveValue,
   isPausedValue,
   isPlayingValue,
   setIsFirstEvent,
@@ -37,15 +40,17 @@ const checkFinished = () => !isPlayingValue;
 const toBarPosition = (tick: number) =>
   ((tick % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
 
+// a melody keeps its bar position between plays, so a replay or a piano roll play lands on the same beat
+const startBarPositions = new WeakMap<EventsByTick, number>();
+
 class MidiPlayer {
   /**
-   * @param startBarPosition the position inside the bar where melody tick 0 should land.
-   * When omitted, tick 0 plays on the next clock tick.
+   * @param tickZeroBarPosition the position inside the bar where melody tick 0 lands.
    */
   async play(
     eventsByTick: EventsByTick,
     logPrefix: string,
-    startBarPosition?: number,
+    tickZeroBarPosition: number,
     onStarted?: () => void
   ): Promise<void> {
     if (isLastEventValue) {
@@ -66,9 +71,9 @@ class MidiPlayer {
 
     let currentTick = getStartTick(eventsByTick);
     let lastTick = eventsByTick.lastTick;
-    // melody tick 0 sits at this bar position. It stays fixed so a resume after pause lands on the same beat
-    let tickZeroBarPosition = startBarPosition;
     let isAligned = false;
+    // a running metronome sets the bar for a new melody. After a seek the clock follows the melody
+    let canMoveClock = !isMetronomeActiveValue;
     let isStarted = false;
 
     const jumpTo = () => {
@@ -77,9 +82,8 @@ class MidiPlayer {
         return;
       }
       currentTick = seekTick;
-      // line the new position up with the clock on the next tick instead of waiting for its bar
-      tickZeroBarPosition = undefined;
       isAligned = false;
+      canMoveClock = true;
       store.dispatch(
         setIsFirstEvent(
           eventsByTick.getPreviousEvents(currentTick) === undefined
@@ -105,6 +109,7 @@ class MidiPlayer {
           if (afterPauseAction === undefined) {
             // pause released: wait for the clock tick that matches currentTick
             isAligned = false;
+            canMoveClock = false;
           } else {
             currentTick = this.move(
               afterPauseAction,
@@ -119,15 +124,12 @@ class MidiPlayer {
         }
 
         if (!isAligned) {
-          if (tickZeroBarPosition === undefined) {
-            tickZeroBarPosition = toBarPosition(
-              getLastTickBarPosition() - currentTick
-            );
-          }
-          if (
-            toBarPosition(currentTick + tickZeroBarPosition) !==
-            getLastTickBarPosition()
-          ) {
+          const barPosition = toBarPosition(currentTick + tickZeroBarPosition);
+          if (barPosition !== getLastTickBarPosition()) {
+            if (canMoveClock && !isClockUsedBesidesMelodyAndMetronome()) {
+              // start on the next tick instead of waiting up to a bar
+              setNextTickBarPosition(barPosition);
+            }
             continue;
           }
           isAligned = true;
@@ -229,7 +231,15 @@ export const playMidi = async (
   dispatch(setIsPlaying(true));
 
   setPianoRollData(eventsByTick, dispatch);
-  await midiPlayer.play(eventsByTick, logPrefix, startBarPosition, onStarted);
+  if (startBarPosition !== undefined) {
+    startBarPositions.set(eventsByTick, startBarPosition);
+  }
+  await midiPlayer.play(
+    eventsByTick,
+    logPrefix,
+    startBarPositions.get(eventsByTick) ?? 0,
+    onStarted
+  );
   dispatch(setIsPlaying(false));
   recreatePlaybackPromise();
   console.log(logPrefix + "Stopped new playback");

@@ -14,7 +14,6 @@ import { AlertType } from "../data/alertType";
 import { Example } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
-import { isMainClockActiveValue } from "../engine/clock/mainClock";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import {
   capoValue,
@@ -223,10 +222,6 @@ async function loadExample(
 }
 
 function getStartBarPosition(example: Example | undefined) {
-  if (!isMainClockActiveValue) {
-    // nothing else is playing, so the melody starts straight away
-    return undefined;
-  }
   const halfBeatShift = example?.halfBeatShift ?? 0;
   // a shifted melody starts that many half beats before the bar
   return (

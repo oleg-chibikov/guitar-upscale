@@ -107,6 +107,19 @@ export const resolveNextTick = () => {
 export const getLastTickBarPosition = () =>
   (((globalCurrentTick - 1) % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
 
+const toBarPosition = (tick: number) =>
+  ((tick % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
+
+// moves the clock forward so its next tick lands on this bar position. Only safe while nothing else follows the bar grid
+export const setNextTickBarPosition = (position: number) => {
+  globalCurrentTick += toBarPosition(position - globalCurrentTick);
+  currentTick = position;
+  const lastTick = globalCurrentTick - 1;
+  globalCurrentLastBarTick = lastTick - toBarPosition(lastTick);
+  globalCurrentLastBeatTick =
+    lastTick - (toBarPosition(lastTick) % TICKS_IN_BEAT);
+};
+
 const reset = () => {
   currentBar = 0;
   currentHalfBar = 0;
