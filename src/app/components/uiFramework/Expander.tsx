@@ -36,11 +36,11 @@ export const Expander: FC<ExpanderProps> = ({
   return (
     <section
       style={style}
-      className={`${className} ${
+      className={`${className} rounded-xl border p-1.5 ${
         theme === Theme.Light
-          ? "bg-accented_background-light"
-          : "bg-accented_background-dark"
-      } p-1`}
+          ? "border-bar_border-light bg-bar-light"
+          : "border-bar_border-dark bg-bar-dark"
+      }`}
     >
       <Accordion
         expanded={expanded}
@@ -48,21 +48,22 @@ export const Expander: FC<ExpanderProps> = ({
         // slots={{ transition: Fade as AccordionSlots["transition"] }}
         // slotProps={{ transition: { timeout: 400 } }}
         sx={{
+          bgcolor: "transparent",
+          backgroundImage: "none",
+          boxShadow: "none",
+          "&::before": { display: "none" },
           "& .MuiAccordionSummary-content": {
             margin: 0,
-            marginY: 0.5,
+            marginY: 0.25,
           },
         }}
         disableGutters
       >
         <AccordionSummary
-          sx={
-            expandOnlyOnIcon
-              ? {
-                  pointerEvents: "none",
-                }
-              : undefined
-          }
+          sx={{
+            px: 0.75,
+            ...(expandOnlyOnIcon ? { pointerEvents: "none" } : {}),
+          }}
           expandIcon={
             reverseIcon ? (
               <ExpandMore
@@ -93,7 +94,9 @@ export const Expander: FC<ExpanderProps> = ({
           aria-controls={id}
         >
           <div className="flex w-full flex-row items-center justify-between gap-2">
-            <Typography variant="overline">{title}</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.75 }}>
+              {title}
+            </Typography>
             {headerAction !== undefined && (
               <span
                 style={{ pointerEvents: "auto" }}

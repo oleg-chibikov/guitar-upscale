@@ -2,7 +2,6 @@ import { ValueDialogControlDialogWrapper } from "@/app/components/uiFramework/Va
 import { Theme } from "@/app/data/theme";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useInputChecker } from "@/app/hooks/useInputChecker";
-import { Typography } from "@mui/material";
 import React, { ReactNode, useEffect, useState } from "react";
 
 interface ValueDialogControlProps {
@@ -68,24 +67,17 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
       <div
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className={`flex w-16 flex-row items-center justify-around gap-1 p-1 ${
+        className={`flex h-[34px] shrink-0 cursor-pointer flex-row items-center gap-1.5 rounded-[10px] border px-2 text-sm whitespace-nowrap ${
           theme === Theme.Light
-            ? "bg-select_background-light text-select_foreground-light"
-            : "bg-select_background-dark text-select_foreground-dark"
-        } h-8 cursor-pointer text-xs ${highlight ? "highlight" : ""}`}
+            ? "border-control_border-light bg-control-light text-foreground-light"
+            : "border-control_border-dark bg-control-dark text-foreground-dark"
+        } ${highlight ? "highlight" : ""}`}
       >
-        <div>{icon}</div>
-        <div className="flex flex-col items-center gap-0.5 leading-none">
-          <div>{value}</div>
+        <div className="flex">{icon}</div>
+        <div className="flex flex-row items-baseline gap-1">
+          <span className="font-semibold">{value}</span>
           {postfix !== undefined && (
-            <Typography
-              variant="overline"
-              sx={{
-                lineHeight: 1.1,
-              }}
-            >
-              {postfix}
-            </Typography>
+            <span className="text-xs opacity-70">{postfix}</span>
           )}
         </div>
       </div>

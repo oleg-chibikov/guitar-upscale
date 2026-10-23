@@ -1,5 +1,6 @@
 import { KeyChip } from "@/app/components/settings/KeyChip";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
+import { BarDivider } from "@/app/components/uiFramework/BarDivider";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { CONTROL_PANEL_ID } from "@/app/data/elementIds";
@@ -27,10 +28,11 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
     <Panel
       enableReverse
       id={CONTROL_PANEL_ID}
-      className={`fixed top-1 z-30 p-1 opacity-95 ${isRight ? "right-1" : "left-1"}`}
+      className={`fixed top-1 z-30 ${isRight ? "right-1" : "left-1"}`}
       style={{ maxWidth: "calc(100vw - 8px)" }}
     >
       <KeyChip premiumComponents={premiumComponents} />
+      <BarDivider />
       {controlPanelExpanded && (
         <ButtonContainer premiumComponents={premiumComponents} />
       )}

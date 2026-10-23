@@ -54,6 +54,17 @@
   --color-disabled-dark: #8c8c8c;
   --color-disabled_match-light: #8a8888;
   --color-disabled_match-dark: #5c5c5c;
+  /* floating bars over the fretboard and the controls in them */
+  --color-bar-light: #f6e7d2eb;
+  --color-bar-dark: #202020eb;
+  --color-bar_border-light: #d9bfae;
+  --color-bar_border-dark: #444444;
+  --color-control-light: #fdf6f1;
+  --color-control-dark: #2e2e2e;
+  --color-control_border-light: #d2b8a6;
+  --color-control_border-dark: #4a4a4a;
+  --color-key-light: #d2a179;
+  --color-key-dark: #3a5f86;
 }
 
 @custom-variant maxhmd (@media (max-height: 600px));

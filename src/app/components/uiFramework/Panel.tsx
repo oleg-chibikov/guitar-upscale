@@ -11,24 +11,35 @@ export const Panel: FC<
   WithChildren &
     WithClassName &
     WithStyle &
-    WithId & { enableReverse?: boolean }
-> = ({ children, className, style, id, enableReverse = false }) => {
+    // bare drops the frame, for a group inside another bar
+    WithId & { enableReverse?: boolean; bare?: boolean }
+> = ({
+  children,
+  className,
+  style,
+  id,
+  enableReverse = false,
+  bare = false,
+}) => {
   const theme = useUiSelector((s) => s.theme);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
+  const frame = bare
+    ? ""
+    : `rounded-xl border p-1.5 overflow-auto overscroll-contain ${
+        theme === Theme.Light
+          ? "border-bar_border-light bg-bar-light"
+          : "border-bar_border-dark bg-bar-dark"
+      }`;
   return (
     <section
       id={id}
       style={style}
-      className={`${className !== undefined ? `${className} ` : ""}border-2 ${
-        theme === Theme.Light
-          ? "border-border-light bg-panel-light"
-          : "border-border-dark bg-panel-dark"
-      } flex ${
+      className={`${className !== undefined ? `${className} ` : ""}${frame} flex ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left && enableReverse
           ? "flex-row-reverse"
           : "flex-row"
-      } items-center gap-1 overflow-auto overscroll-contain`}
+      } items-center gap-1.5`}
     >
       {children}
     </section>

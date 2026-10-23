@@ -22,6 +22,12 @@ const light = {
   disabled: "#dadada",
   disabledMatch: "#8a8888",
   notePress: "rgb(235, 188, 102)",
+  bar: "#f6e7d2eb",
+  barBorder: "#d9bfae",
+  control: "#fdf6f1",
+  controlBorder: "#d2b8a6",
+  key: "#d2a179",
+  keyForeground: "#2e1f1b",
   // amber, slate, violet, fuchsia, pink, rose 400
   tracks: ["#fbbf24", "#94a3b8", "#a78bfa", "#e879f9", "#f472b6", "#fb7185"],
 };
@@ -49,6 +55,12 @@ const dark: Palette = {
   disabled: "#8c8c8c",
   disabledMatch: "#5c5c5c",
   notePress: "rgb(99, 9, 245)",
+  bar: "#202020eb",
+  barBorder: "#444444",
+  control: "#2e2e2e",
+  controlBorder: "#4a4a4a",
+  key: "#3a5f86",
+  keyForeground: "#ffffff",
   // sky, teal, emerald, indigo, cyan, purple 600
   tracks: ["#0284c7", "#0d9488", "#059669", "#4f46e5", "#0891b2", "#9333ea"],
 };

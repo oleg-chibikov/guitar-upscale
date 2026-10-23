@@ -8,6 +8,7 @@ import { ControlWithLabel } from "@/app/components/uiFramework/ControlWithLabel"
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { Theme } from "@/app/data/theme";
 import { getShiftedNote, tunings } from "@/app/data/tunings";
+import { getPalette } from "@/app/helpers/canvas/palette";
 import { describeKey } from "@/app/helpers/keyDescription";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
@@ -30,6 +31,7 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
   premiumComponents,
 }) => {
   const theme = useUiSelector((s) => s.theme);
+  const palette = getPalette(theme);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const scaleGroup = useSettingsSelector((s) => s.scaleGroup);
   const scale = useSettingsSelector((s) => s.scale);
@@ -63,17 +65,26 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
     <>
       <Button
         variant="contained"
+        disableElevation
         color={scaleIsBeingDetected ? "error" : "primary"}
         onClick={(e) => setAnchor(e.currentTarget)}
         endIcon={<ExpandMore />}
         sx={{
           textTransform: "none",
-          borderRadius: 5,
-          py: 0.25,
-          px: 1.5,
-          maxWidth: 240,
+          borderRadius: "20px",
+          height: 36,
+          py: 0,
+          px: 1.75,
+          maxWidth: "min(240px, calc(100vw - 72px))",
           flexShrink: 0,
           justifyContent: "space-between",
+          ...(scaleIsBeingDetected
+            ? {}
+            : {
+                bgcolor: palette.key,
+                color: palette.keyForeground,
+                "&:hover": { bgcolor: palette.key, filter: "brightness(1.1)" },
+              }),
         }}
       >
         <span className="flex min-w-0 flex-col items-start leading-tight">
@@ -92,12 +103,23 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
         keepMounted // scale detection sets itself up on mount
         anchorOrigin={{ vertical: "bottom", horizontal: side }}
         transformOrigin={{ vertical: "top", horizontal: side }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1,
+              borderRadius: "14px",
+              border: `1px solid ${palette.barBorder}`,
+              bgcolor: palette.bar,
+              backgroundImage: "none",
+            },
+          },
+        }}
       >
         <section
-          className={`grid items-center gap-2 p-3 ${
+          className={`grid items-center gap-2.5 p-4 ${
             theme === Theme.Light
-              ? "bg-panel-light text-foreground-light"
-              : "bg-panel-dark text-foreground-dark"
+              ? "text-foreground-light"
+              : "text-foreground-dark"
           }`}
           style={{ gridTemplateColumns: "auto minmax(180px, 1fr)" }}
         >

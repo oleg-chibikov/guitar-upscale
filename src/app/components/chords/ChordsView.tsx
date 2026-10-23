@@ -43,7 +43,12 @@ import { Button } from "@mui/material";
 import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
-import { ChordGrid, LARGE_CELL_HEIGHT, SMALL_CELL_HEIGHT } from "./ChordGrid";
+import {
+  ChordGrid,
+  KEY_CELL_HEIGHT,
+  LARGE_CELL_HEIGHT,
+  SMALL_CELL_HEIGHT,
+} from "./ChordGrid";
 import { buildAllChordsLayout, buildKeyChordsLayout } from "./chordGridLayout";
 import { ChordGridStore } from "./chordGridStore";
 
@@ -210,8 +215,11 @@ export const ChordsView: React.FC<{
         getShiftedNote(capo, tuning),
         KEY_CHORDS_PER_COLUMN,
       );
-  const cellHeight =
-    allChordsShown && useSharpChords ? SMALL_CELL_HEIGHT : LARGE_CELL_HEIGHT;
+  const cellHeight = !allChordsShown
+    ? KEY_CELL_HEIGHT
+    : useSharpChords
+      ? SMALL_CELL_HEIGHT
+      : LARGE_CELL_HEIGHT;
 
   return (
     <Expander
@@ -228,10 +236,16 @@ export const ChordsView: React.FC<{
           <Button
             component="span"
             size="small"
-            sx={{ minWidth: 0, py: 0, lineHeight: 1.5 }}
+            sx={{
+              minWidth: 0,
+              py: 0,
+              lineHeight: 1.5,
+              textTransform: "none",
+              fontWeight: 600,
+            }}
             onClick={() => dispatch(setAllChordsShown(!allChordsShown))}
           >
-            {allChordsShown ? "In key" : "All"}
+            {allChordsShown ? "In key" : "All chords"}
           </Button>
         ) : undefined
       }

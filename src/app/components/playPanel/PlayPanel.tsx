@@ -26,7 +26,7 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
 }) => {
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   return (
-    <Panel id={PLAY_PANEL_ID}>
+    <Panel bare id={PLAY_PANEL_ID}>
       <PreviousEventButton />
       {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       <PauseButton />

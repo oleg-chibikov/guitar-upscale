@@ -22,11 +22,37 @@ import { ChordGridCell } from "./chordGridLayout";
 const CELL_WIDTH = 64;
 export const SMALL_CELL_HEIGHT = 24;
 export const LARGE_CELL_HEIGHT = 32;
+export const KEY_CELL_HEIGHT = 40;
 const GAP = 2;
 const BORDER = 2;
 const TEXT_PADDING = 2;
 const PULSE_SCALE = 0.5;
 const FONT = `${BUTTON_FONT_STYLE} 12px ${BUTTON_FONT_FAMILY}`;
+
+// the few chords of the key get bigger, rounder buttons than the full grid
+const getGeometry = (cellHeight: number) =>
+  cellHeight >= KEY_CELL_HEIGHT
+    ? { gap: 4, radius: 8, font: `600 14px ${BUTTON_FONT_FAMILY}` }
+    : { gap: GAP, radius: 5, font: FONT };
+
+type Geometry = ReturnType<typeof getGeometry>;
+
+const roundedRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) => {
+  ctx.beginPath();
+  // older Safari has no roundRect
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, width, height, radius);
+  } else {
+    ctx.rect(x, y, width, height);
+  }
+};
 
 interface ChordGridProps {
   layout: ChordGridCell[];
@@ -116,11 +142,12 @@ const drawCells = (
   ctx: CanvasRenderingContext2D,
   cells: Cell[],
   cellHeight: number,
+  geometry: Geometry,
   palette: Palette,
   store: ChordGridStore,
   now: number,
 ) => {
-  ctx.font = FONT;
+  ctx.font = geometry.font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const { chordName, label, x, y, isDisabled } of cells) {
@@ -133,18 +160,22 @@ const drawCells = (
       ctx.translate(-x - CELL_WIDTH / 2, -y - cellHeight / 2);
     }
     ctx.fillStyle = getFill(palette, state, isDisabled);
-    ctx.fillRect(x, y, CELL_WIDTH, cellHeight);
+    roundedRect(ctx, x, y, CELL_WIDTH, cellHeight, geometry.radius);
+    ctx.fill();
 
     const border = isDisabled ? undefined : getBorder(palette, state);
     if (border !== undefined) {
       ctx.strokeStyle = border;
       ctx.lineWidth = BORDER;
-      ctx.strokeRect(
+      roundedRect(
+        ctx,
         x + BORDER / 2,
         y + BORDER / 2,
         CELL_WIDTH - BORDER,
         cellHeight - BORDER,
+        geometry.radius,
       );
+      ctx.stroke();
     }
 
     ctx.fillStyle = isDisabled ? GRAY_500 : palette.foreground;
@@ -172,10 +203,15 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
 
+  const geometry = getGeometry(cellHeight);
+  const step = CELL_WIDTH + geometry.gap;
   const columnCount = Math.max(0, ...layout.map((c) => c.column + 1));
   const rowCount = Math.max(0, ...layout.map((c) => c.row + 1));
-  const width = Math.max(0, columnCount * (CELL_WIDTH + GAP) - GAP);
-  const height = Math.max(0, rowCount * (cellHeight + GAP) - GAP);
+  const width = Math.max(0, columnCount * step - geometry.gap);
+  const height = Math.max(
+    0,
+    rowCount * (cellHeight + geometry.gap) - geometry.gap,
+  );
 
   const cells: Cell[] = layout.map(
     ({ chordName, root, column, row, isDisabled }) => ({
@@ -184,8 +220,8 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
         bassNote === undefined || bassNote === root || isDisabled
           ? chordName
           : `${chordName}/${Note[bassNote]}`,
-      x: column * (CELL_WIDTH + GAP),
-      y: row * (cellHeight + GAP),
+      x: column * step,
+      y: row * (cellHeight + geometry.gap),
       isDisabled,
     }),
   );
@@ -194,7 +230,15 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
   useLayoutEffect(() => {
     const palette = getPalette(theme);
     drawRef.current = (ctx) =>
-      drawCells(ctx, cells, cellHeight, palette, store, performance.now());
+      drawCells(
+        ctx,
+        cells,
+        cellHeight,
+        geometry,
+        palette,
+        store,
+        performance.now(),
+      );
     layerRef.current?.batchDraw();
   });
 

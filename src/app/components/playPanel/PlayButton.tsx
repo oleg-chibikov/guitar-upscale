@@ -178,6 +178,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   return (
     <>
       <IconButtonWrapper
+        emphasis
         isActive={isPlaying}
         tooltip={
           isWaiting

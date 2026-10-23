@@ -24,6 +24,8 @@ export interface IconButtonWrapperProps extends WithClassName, WithId {
   allowHandlerInDisabledState?: boolean;
   // fires on a press held for LONG_PRESS_MS or a right click
   onLongPress?: (anchor: HTMLElement) => void;
+  // the main button of a bar, drawn light on dark
+  emphasis?: boolean;
 }
 
 export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
@@ -39,6 +41,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   disabled = false,
   allowHandlerInDisabledState,
   onLongPress,
+  emphasis = false,
   ...rest
 }) => {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -100,10 +103,17 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
             color={getColor()}
             size="small"
             sx={{
-              borderRadius: 0,
               padding: "4px",
               WebkitTouchCallout: "none",
               userSelect: "none",
+              ...(emphasis
+                ? {
+                    bgcolor: "text.primary",
+                    borderColor: "text.primary",
+                    color: "background.default",
+                    "&:hover": { bgcolor: "text.secondary" },
+                  }
+                : {}),
             }}
             {...longPressProps}
             {...rest}

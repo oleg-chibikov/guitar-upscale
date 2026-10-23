@@ -1,5 +1,6 @@
 import { AspectRatioButton } from "@/app/components/aspectRatio/AspectRatioButton";
 import { PlayPanel } from "@/app/components/playPanel/PlayPanel";
+import { BarDivider } from "@/app/components/uiFramework/BarDivider";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
@@ -11,23 +12,32 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
 }) => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
+  const looper = premiumComponents.get("looper") as ReactNode;
 
   return (
-    <div
-      className={`fixed bottom-1 flex flex-row items-end gap-1 ${
+    <Panel
+      className={`fixed bottom-1 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}
-      style={pianoRollExpanded ? { zIndex: 9999999 } : undefined} // should be displayed over the dialog
+      style={{
+        maxWidth: "calc(100vw - 8px)",
+        // should be displayed over the dialog
+        ...(pianoRollExpanded ? { zIndex: 9999999 } : {}),
+      }}
     >
       <PlayPanel premiumComponents={premiumComponents} />
       {!pianoRollExpanded && (
         <>
-          {premiumComponents.get("looper") as ReactNode}
-          <Panel>
-            <AspectRatioButton />
-          </Panel>
+          {looper !== undefined && looper !== null && (
+            <>
+              <BarDivider />
+              {looper}
+            </>
+          )}
+          <BarDivider />
+          <AspectRatioButton />
         </>
       )}
-    </div>
+    </Panel>
   );
 };

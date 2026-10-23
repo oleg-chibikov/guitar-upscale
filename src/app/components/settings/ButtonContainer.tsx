@@ -31,7 +31,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   return (
     <section
-      className={`flex flex-row gap-1 ${
+      className={`flex flex-row gap-1.5 ${
         chordsDisplayMode === ChordsDisplayMode.Left
           ? "flex-row-reverse"
           : "flex-row"

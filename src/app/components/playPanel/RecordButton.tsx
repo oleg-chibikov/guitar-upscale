@@ -75,6 +75,7 @@ export const RecordButton: React.FC = (props) => {
         isActive={isRecording}
         tooltip={isRecording ? "Stop recording and save MIDI" : "Record MIDI"}
         activeBg="error"
+        inactiveBg="error"
         onPress={async () => {
           const newValue = !isRecording;
           await toggleRecording(newValue, dispatch, saveMidiImmediatelyValue);

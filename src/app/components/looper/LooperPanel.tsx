@@ -46,7 +46,7 @@ export const LooperPanel: React.FC = () => {
     setState({ ...looperState });
   }, [dispatch, looperStateUpdateTrigger]);
   return (
-    <Panel id={LOOPER_PANEL_ID}>
+    <Panel bare id={LOOPER_PANEL_ID}>
       <RemoveLooperChannelButton
         setState={setState}
         disabled={!canRemoveChannel()}

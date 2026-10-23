@@ -1,5 +1,6 @@
 "use client";
 import { Theme } from "@/app/data/theme";
+import { getPalette } from "@/app/helpers/canvas/palette";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { FC } from "react";
@@ -7,13 +8,16 @@ import { WithChildren } from "../helpers/withChildren";
 
 export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   const theme = useUiSelector((s) => s.theme);
+  const palette = getPalette(theme);
 
   const muiTheme = createTheme({
     components: {
       MuiIconButton: {
         styleOverrides: {
           root: {
-            backgroundColor: theme === Theme.Light ? "#e5cdbf" : "#333333",
+            backgroundColor: palette.control,
+            border: `1px solid ${palette.controlBorder}`,
+            borderRadius: 10,
           },
         },
       },
@@ -39,7 +43,7 @@ export const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
     },
 
     shape: {
-      borderRadius: 0,
+      borderRadius: 8,
     },
 
     palette: {
