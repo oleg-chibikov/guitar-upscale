@@ -43,7 +43,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "maj7",
         triad: "Major",
         extensions: ["maj7"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Minor 7th",
@@ -51,7 +51,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "m7",
         triad: "Minor",
         extensions: ["7"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Dominant 7th",
@@ -59,7 +59,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "7",
         triad: "Major",
         extensions: ["7"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Diminished 7th",
@@ -78,14 +78,6 @@ export const AdvancedChordModesLoader: React.FC = () => {
         canSkipPerfectFifth: false,
       },
       {
-        description: "Augmented 7th",
-        intervals: [0, 4, 8, 10],
-        name: "aug7",
-        triad: "Augmented",
-        extensions: ["7"],
-        canSkipPerfectFifth: false,
-      },
-      {
         description: "Minor Major 7",
         intervals: [0, 3, 7, 11],
         name: "mMaj7",
@@ -99,7 +91,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "maj9",
         triad: "Major",
         extensions: ["maj7", "9"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Minor 9th",
@@ -107,7 +99,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "m9",
         triad: "Minor",
         extensions: ["7", "9"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Dominant 9th",
@@ -115,7 +107,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
         name: "9",
         triad: "Major",
         extensions: ["7", "9"],
-        canSkipPerfectFifth: false,
+        canSkipPerfectFifth: true,
       },
       {
         description: "Minor Major 9",
@@ -151,10 +143,10 @@ export const AdvancedChordModesLoader: React.FC = () => {
       },
       {
         description: "Major 13th",
-        intervals: [0, 4, 7, 11, 14, 17, 21],
+        intervals: [0, 4, 7, 11, 14, 21],
         name: "maj13",
         triad: "Major",
-        extensions: ["maj7", "9", "11", "13"],
+        extensions: ["maj7", "9", "13"],
         canSkipPerfectFifth: true,
       },
       {
@@ -167,10 +159,10 @@ export const AdvancedChordModesLoader: React.FC = () => {
       },
       {
         description: "Dominant 13th",
-        intervals: [0, 4, 7, 10, 14, 17, 21],
+        intervals: [0, 4, 7, 10, 14, 21],
         name: "13",
         triad: "Major",
-        extensions: ["7", "9", "11", "13"],
+        extensions: ["7", "9", "13"],
         canSkipPerfectFifth: true,
       },
       {
@@ -215,7 +207,7 @@ export const AdvancedChordModesLoader: React.FC = () => {
       },
       {
         description: "13sus4",
-        intervals: [0, 5, 7, 10, 14, 17, 21],
+        intervals: [0, 5, 7, 10, 14, 21],
         name: "13sus4",
         triad: "Suspended",
         extensions: ["7", "9", "11", "13"],
