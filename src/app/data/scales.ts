@@ -4,17 +4,6 @@ import { capoValue, tuningValue } from "@/app/store/settingsSlice";
 
 export type Scale = number[];
 
-// examples follow these rules:
-
-// They are written for EBGDAE tuning, converting to other tunings will require shifting notes
-// *4 - play 4th string onwards
-// 8 - play 8th fret on the previously remembered string and pause for one step
-// 1-0 - paly 10th fret following the same rules
-// ^51 - immediately play 1st fret on 5th string without pausing (useful for chords)
-// ^41-2 - immediately play 12th fret on 4th string following the same rules
-// (<melody>)3 play <melody> for 3 times
-// <Asus4> - play Asus4 chord immediately. It uses the preferred variation head and the strumming delay from settings
-
 export const SPECIAL = "Special";
 export const CHROMATIC = "Chromatic (All notes)";
 

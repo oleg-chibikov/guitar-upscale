@@ -171,3 +171,36 @@ type AllInstruments = InstrumentGroups[keyof InstrumentGroups][number];
 // Define the Instrument type
 export type Instrument = AllInstruments;
 export type InstrumentGroup = keyof InstrumentGroups;
+
+// General MIDI program numbers go in blocks of 8, in this order
+const gmGroupOrder: InstrumentGroup[] = [
+  "Piano",
+  "Chromatic Percussion",
+  "Organ",
+  "Guitar",
+  "Bass",
+  "Strings Orchestra",
+  "Ensemble",
+  "Brass",
+  "Reed",
+  "Pipe",
+  "Synth Lead",
+  "Synth Pad",
+  "Synth Effects",
+  "Ethnic",
+  "Percussive",
+  "Sound Effects",
+];
+
+const gmInstruments: Instrument[] = gmGroupOrder.flatMap((group) =>
+  (instrumentGroups[group] as readonly Instrument[]).filter(
+    (instrument) => instrument !== "sampled_piano",
+  ),
+);
+
+export const getInstrumentForProgram = (
+  program: number,
+): Instrument | undefined => gmInstruments[program];
+
+export const getProgramForInstrument = (instrument: Instrument): number =>
+  Math.max(0, gmInstruments.indexOf(instrument));

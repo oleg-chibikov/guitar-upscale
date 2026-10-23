@@ -20,10 +20,10 @@ const DisabledDetectChordButton = dynamic(
     ).DisabledDetectChordButton
 );
 
-const DisabledMidiUploadButton = dynamic(
+const DisabledSongUploadButton = dynamic(
   async () =>
-    (await import("@/app/components/settings/buttons/DisabledMidiUploadButton"))
-      .DisabledMidiUploadButton
+    (await import("@/app/components/settings/buttons/DisabledSongUploadButton"))
+      .DisabledSongUploadButton
 );
 
 const DisabledDetectScaleButton = dynamic(
@@ -55,7 +55,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
           <DisabledDetectChordButton />
         )}
         {(premiumComponents.get("midiUpload") as ReactNode) ?? (
-          <DisabledMidiUploadButton />
+          <DisabledSongUploadButton />
         )}
       </div>
       <div

@@ -1,20 +1,20 @@
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import { Instrument } from "./instruments";
-import { Tuning } from "./tunings";
+import { Song } from "./song";
 
 export type Example = {
+  id: string;
   band: string;
   title: string;
-  tracks: Track[];
-  tuning?: Tuning;
-  tempo?: number;
-  halfBeatShift?: number;
+  scaleGroup: string;
+  scale: string;
+  // uploaded by the person, as opposed to the songs that come with the app
+  isUserSong: boolean;
+  load: () => Promise<Song>;
+  song?: Song;
   decodedTracks?: EventsByTick;
 };
 
-export type Track = {
-  melody: string;
-  instrument?: Instrument;
-};
+export type ExamplesMap = Map<string, Map<string, Example[]>>;
 
-export type TrackWithNumber = Track & { trackNumber: number };
+export const getExampleName = (example: Pick<Example, "band" | "title">) =>
+  [example.band, example.title].filter(Boolean).join(" - ");

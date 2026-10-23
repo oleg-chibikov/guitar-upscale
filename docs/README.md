@@ -51,7 +51,7 @@ The app has a free tier and two paid ones. Sign-in is off by default, and then e
 | --- | --- |
 | **Free** | fretboard, scales, tunings, basic chords, strumming, scale playback, piano roll |
 | **Explorer** | song examples, more chord types, instrument choice, reverb, playback type, chord and scale detection |
-| **Composer** | MIDI recording, looper, MIDI upload, skins, recording options |
+| **Composer** | MIDI recording, looper, song upload (Guitar Pro and MIDI), skins, recording options |
 
 A person pays through Patreon on the web or Google Play in the Android app.
 

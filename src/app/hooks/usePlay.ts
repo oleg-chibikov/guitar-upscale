@@ -1,4 +1,4 @@
-import { TICKS_IN_BAR, TICKS_IN_HALF_BEAT } from "@/app/data/clockConstants";
+import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
 import {
@@ -11,7 +11,7 @@ import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
 import { UnknownAction } from "redux";
 import { AlertType } from "../data/alertType";
-import { Example } from "../data/example";
+import { Example, getExampleName } from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -21,6 +21,7 @@ import {
   isPlayingValue,
   playbackTypeValue,
   reverbStrengthValue,
+  scaleGroupValue,
   scaleValue,
   setIsPlaying,
   setTempoBpm,
@@ -40,7 +41,7 @@ export interface UsePlayParams {
 
 export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
-    (s) => s.guitarSettingsUpdateCount
+    (s) => s.guitarSettingsUpdateCount,
   );
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
   const [isWaiting, setIsWaiting] = useState(false);
@@ -55,66 +56,69 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   const dispatch = useDispatch();
 
-  const handlePlay = useCallback(async (chosen?: Example) => {
-    if (isWaitingRef.current) {
-      console.log(
-        LOG_PREFIX +
-          "Already waiting for playback to start, skipping new request"
-      );
-      return;
-    }
-    updateWaiting(true);
-    try {
-      if (chosen && isPlayingValue && !checkLooperPlaying()) {
-        await stop(dispatch);
+  const handlePlay = useCallback(
+    async (chosen?: Example) => {
+      if (isWaitingRef.current) {
+        console.log(
+          LOG_PREFIX +
+            "Already waiting for playback to start, skipping new request",
+        );
+        return;
       }
+      updateWaiting(true);
+      try {
+        if (chosen && isPlayingValue && !checkLooperPlaying()) {
+          await stop(dispatch);
+        }
 
-      if (isPlayingValue) {
-        if (checkLooperPlaying()) {
-          await continueLooper();
+        if (isPlayingValue) {
+          if (checkLooperPlaying()) {
+            await continueLooper();
+            return;
+          }
+
+          if (pianoRollData) {
+            updateWaiting(false);
+            await replay(dispatch, pianoRollData);
+            return;
+          }
           return;
         }
 
-        if (pianoRollData) {
-          updateWaiting(false);
-          await replay(dispatch, pianoRollData);
+        console.log(LOG_PREFIX, "Loading examples");
+        const example: Example | undefined = await loadExample(
+          decodeExample,
+          dispatch,
+          chosen,
+        );
+
+        await loadInstruments(example);
+
+        const {
+          eventsByTick,
+          message,
+        }: { eventsByTick: EventsByTick; message: string } = await decode(
+          decodeExample,
+          example,
+        );
+
+        if (!eventsByTick.hasItems) {
           return;
         }
-        return;
+
+        await playExampleOrScale(
+          example,
+          dispatch,
+          message,
+          eventsByTick,
+          updateWaiting,
+        );
+      } finally {
+        updateWaiting(false);
       }
-
-      console.log(LOG_PREFIX, "Loading examples");
-      const example: Example | undefined = await loadExample(
-        decodeExample,
-        dispatch,
-        chosen
-      );
-
-      await loadInstruments(example);
-
-      const {
-        eventsByTick,
-        message,
-      }: { eventsByTick: EventsByTick; message: string } = await decode(
-        decodeExample,
-        example
-      );
-
-      if (!eventsByTick.hasItems) {
-        return;
-      }
-
-      await playExampleOrScale(
-        example,
-        dispatch,
-        message,
-        eventsByTick,
-        updateWaiting
-      );
-    } finally {
-      updateWaiting(false);
-    }
-  }, [dispatch, decodeExample]);
+    },
+    [dispatch, decodeExample],
+  );
 
   useEffect(() => {
     // stop playing when any of dependencies changes
@@ -166,7 +170,7 @@ async function playExampleOrScale(
   dispatch: Dispatch<UnknownAction>,
   message: string,
   eventsByTick: EventsByTick,
-  updateWaiting: (value: boolean) => void
+  updateWaiting: (value: boolean) => void,
 ) {
   // Start playback
   console.log(LOG_PREFIX + "Waiting for playback to start...");
@@ -186,12 +190,12 @@ async function playExampleOrScale(
 
       // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
       console.log(
-        LOG_PREFIX + "The playback has started. Removing the waiting mark"
+        LOG_PREFIX + "The playback has started. Removing the waiting mark",
       );
 
       updateWaiting(false);
     },
-    getStartBarPosition(example)
+    getStartBarPosition(example),
   );
 }
 
@@ -199,10 +203,10 @@ async function loadInstruments(example: Example | undefined) {
   // the instrument should be initialized before waiting for the first note
   // init metronome here as we don't want to get glitches if it gets turned on during playing
   const trackInstrumentPromises =
-    example?.tracks.map((track) =>
+    example?.song?.tracks.map((track) =>
       track.instrument !== undefined
         ? loadInstrument(track.instrument, reverbStrengthValue)
-        : Promise.resolve()
+        : Promise.resolve(),
     ) ?? [];
 
   await Promise.all(trackInstrumentPromises);
@@ -211,19 +215,18 @@ async function loadInstruments(example: Example | undefined) {
 async function loadExample(
   decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
   dispatch: Dispatch<UnknownAction>,
-  chosen?: Example
+  chosen?: Example,
 ) {
   let example: Example | undefined;
   if (decodeExample && playbackTypeValue === melodyType) {
-    const { getScaleExample, wipeExamplesCache } = await import(
-      "@/app/data/scaleExamples"
-    );
+    const { getScaleExample, wipeExamplesCache } =
+      await import("@/app/engine/songs/songLibrary");
     if (wipeExampleCacheTriggerValue) {
       wipeExamplesCache();
       clearWipeExampleCacheTrigger();
     }
-    example = await getScaleExample(chosen);
-    const tempo = example?.tempo;
+    example = await getScaleExample(scaleGroupValue, scaleValue, chosen);
+    const tempo = example?.song?.tempo;
     if (tempo !== undefined && tempo !== tempoBpmValue) {
       dispatch(setTempoBpm({ tempo: tempo, updateInterval: true }));
     }
@@ -234,33 +237,29 @@ async function loadExample(
 }
 
 function getStartBarPosition(example: Example | undefined) {
-  const halfBeatShift = example?.halfBeatShift ?? 0;
-  // a shifted melody starts that many half beats before the bar
-  return (
-    (TICKS_IN_BAR - halfBeatShift * TICKS_IN_HALF_BEAT + TICKS_IN_BAR) %
-    TICKS_IN_BAR
-  );
+  const pickupTicks = (example?.song?.pickupTicks ?? 0) % TICKS_IN_BAR;
+  // a song with a pickup bar starts that many ticks before the bar
+  return (TICKS_IN_BAR - pickupTicks) % TICKS_IN_BAR;
 }
 
 async function decode(
   decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
-  example: Example | undefined
+  example: Example | undefined,
 ) {
   let eventsByTick: EventsByTick;
   let message: string;
   if (decodeExample && example && playbackTypeValue === melodyType) {
     // this sets decoded melody in the example
     eventsByTick = await decodeExample(example);
-    message = `${example.band} - ${example.title}`;
+    message = getExampleName(example);
   } else {
     const isFullStringScalePlayback = playbackTypeValue === fullStringScaleType;
     message = `${getNoteText(capoValue)} ${scaleValue} ${
       isFullStringScalePlayback ? " (full string)" : ""
     }`;
 
-    const { getWholeScale } = await import(
-      "@/app/engine/decoders/scaleDecoder"
-    );
+    const { getWholeScale } =
+      await import("@/app/engine/decoders/scaleDecoder");
     eventsByTick = getWholeScale(isFullStringScalePlayback);
   }
   return { eventsByTick, message };

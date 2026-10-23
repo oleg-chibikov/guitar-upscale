@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-// Downloads a song from Songsterr and adds it to src/app/data/scaleExamples.ts.
+// Downloads a song from Songsterr and saves it as a Guitar Pro file in public/songs.
 // The app builds every scale from E, so the song is moved to an E tonic first.
-import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { toFileName, writeGuitarPro } from "./lib/gpWriter.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SCALES_FILE = resolve(ROOT, "src/app/data/scales.ts");
-const EXAMPLES_FILE = resolve(ROOT, "src/app/data/scaleExamples.ts");
+const SONGS_DIR = resolve(ROOT, "public/songs");
 const NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split(" ");
 const STANDARD = [64, 59, 55, 50, 45, 40];
 const MAX_FRET = 24;
@@ -35,8 +37,8 @@ Without --section or --from/--to it lists the tracks and sections and stops.
   --tonic NOTE      tonic of the source, e.g. "C#" (default: guessed from the bass)
   --scale G/NAME    target scale, e.g. "Minor/Dorian" (default: the best fit)
   --band, --title   names to show in the app
-  --file PATH       examples file (default: src/app/data/scaleExamples.ts)
-  --dry-run         print the example and leave the file alone`;
+  --dir PATH        songs folder (default: public/songs)
+  --dry-run         print what it found and save nothing`;
 
 const { values: opts, positionals } = parseArgs({
   allowPositionals: true,
@@ -52,7 +54,7 @@ const { values: opts, positionals } = parseArgs({
     scale: { type: "string" },
     band: { type: "string" },
     title: { type: "string" },
-    file: { type: "string" },
+    dir: { type: "string" },
     "dry-run": { type: "boolean" },
     help: { type: "boolean", short: "h" },
   },
@@ -341,82 +343,13 @@ const pickChords = (bass, melody, barStarts, length, scale) => {
   return chords;
 };
 
-// The app reads fret 12 as "1-2".
-const fretText = (fret) => String(fret).split("").join("-");
-
-const encodeNotes = (notes, length) => {
-  const byTick = new Map();
-  notes.forEach((n) => byTick.set(n.tick, [...(byTick.get(n.tick) ?? []), n]));
-  let out = "";
-  let tick = 0;
-  let current;
-  for (const t of [...byTick.keys()].sort((a, b) => a - b)) {
-    out += "_".repeat(t - tick);
-    const group = byTick.get(t).sort((a, b) => b.string - a.string);
-    const main = group.pop();
-    group.forEach((n) => (out += `^${n.string}${fretText(n.fret)}`));
-    if (main.string !== current) out += `*${main.string}`;
-    current = main.string;
-    out += fretText(main.fret);
-    tick = t + 1;
+// A rerun replaces the old copy of the same song, even under another scale.
+const removeOldCopies = (dir, fileName) => {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) removeOldCopies(path, fileName);
+    else if (entry.name === fileName) rmSync(path);
   }
-  return out + "_".repeat(Math.max(0, length - tick));
-};
-
-const encodeChords = (chords, length) => {
-  let out = "";
-  let tick = 0;
-  for (const c of chords) {
-    out += "_".repeat(c.tick - tick) + `<${c.name}>`;
-    tick = c.tick;
-  }
-  return out + "_".repeat(Math.max(0, length - tick));
-};
-
-const renderExample = ({ band, title, tempo, tracks }) =>
-  [
-    "          {",
-    `            band: ${JSON.stringify(band)},`,
-    `            title: ${JSON.stringify(title)},`,
-    `            tempo: ${tempo},`,
-    "            tracks: [",
-    ...tracks.flatMap((melody) => [
-      "              {",
-      "                melody:",
-      `                  ${JSON.stringify(melody)},`,
-      "              },",
-    ]),
-    "            ],",
-    "          },",
-  ].join("\n");
-
-const insertExample = (text, group, scale, example) => {
-  const groupHead = `\n  [\n    ${JSON.stringify(group)},\n    new Map([\n`;
-  const groupStart = text.indexOf(groupHead);
-  if (groupStart < 0) {
-    const end = text.indexOf("\n]);\n");
-    const block = `\n  [\n    ${JSON.stringify(group)},\n    new Map([\n      [\n        ${JSON.stringify(scale)},\n        [\n${example}\n        ],\n      ],\n    ]),\n  ],`;
-    return text.slice(0, end) + block + text.slice(end);
-  }
-  const groupEnd = text.indexOf("\n    ]),\n  ],", groupStart);
-  const scaleHead = `\n      [\n        ${JSON.stringify(scale)},\n        [\n`;
-  const scaleStart = text.indexOf(scaleHead, groupStart);
-  if (scaleStart < 0 || scaleStart > groupEnd) {
-    const block = `\n      [\n        ${JSON.stringify(scale)},\n        [\n${example}\n        ],\n      ],`;
-    return text.slice(0, groupEnd) + block + text.slice(groupEnd);
-  }
-  const listEnd = text.indexOf("\n        ],\n      ],", scaleStart);
-  return text.slice(0, listEnd) + "\n" + example + text.slice(listEnd);
-};
-
-// A rerun replaces the old copy of the same song.
-const removeExample = (text, band, title) => {
-  const head = `\n          {\n            band: ${JSON.stringify(band)},\n            title: ${JSON.stringify(title)},\n`;
-  const start = text.indexOf(head);
-  if (start < 0) return text;
-  const close = "\n          },";
-  const end = text.indexOf(close, start) + close.length;
-  return text.slice(0, start) + text.slice(end);
 };
 
 const main = async () => {
@@ -490,13 +423,20 @@ const main = async () => {
   const bpm =
     tempos.filter((a) => a.measure <= from).at(-1)?.bpm ?? tempos[0]?.bpm ?? 120;
 
-  const tracks = [encodeNotes(melody, melodyRaw.length)];
-  if (bass.length) tracks.push(encodeNotes(bass, melodyRaw.length));
-  if (chords.length) tracks.push(encodeChords(chords, melodyRaw.length));
+  // One step is a 16th note, so the tempo doubles
+  const toTab = (notes) =>
+    notes.map((n) => ({ step: n.tick, string: n.string, fret: n.fret }));
+  const tracks = [{ name: "Melody", program: 24, notes: toTab(melody) }];
+  if (bass.length) tracks.push({ name: "Melody 2", program: 24, notes: toTab(bass) });
+  if (chords.length)
+    tracks.push({
+      name: "Chords",
+      program: 24,
+      chords: chords.map((c) => ({ step: c.tick, name: c.name })),
+    });
 
   const band = opts.band ?? meta.artist;
   const title = opts.title ?? meta.title;
-  const example = renderExample({ band, title, tempo: snapTempo(bpm * 2), tracks });
 
   console.log(`${band} - ${title}, measures ${from + 1}-${to + 1}`);
   console.log(`Tonic ${NOTE_NAMES[tonic]}, moved by ${shift} semitones to E`);
@@ -509,12 +449,23 @@ const main = async () => {
   if (!bass.length) console.log("No bass found, chords follow the lowest notes.");
   if (!chords.length) console.log("No chord fits the scale.");
 
-  if (opts["dry-run"]) return console.log(`\n${example}`);
+  if (chords.length) console.log(`Chords: ${chords.map((c) => c.name).join(" ")}`);
 
-  const file = resolve(opts.file ?? EXAMPLES_FILE);
-  const text = removeExample(readFileSync(file, "utf8"), band, title);
-  writeFileSync(file, insertExample(text, scale.group, scale.name, example));
+  if (opts["dry-run"]) return;
+
+  const dir = resolve(opts.dir ?? SONGS_DIR);
+  const fileName = `${toFileName(band)} - ${toFileName(title)}.gp`;
+  const file = join(dir, toFileName(scale.group), toFileName(scale.name), fileName);
+  removeOldCopies(dir, basename(file));
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, writeGuitarPro({ band, title, tempo: snapTempo(bpm * 2), tracks }));
   console.log(`Saved to ${file}`);
+  if (dir === SONGS_DIR) {
+    execFileSync(process.execPath, [resolve(ROOT, "scripts/build-song-index.mjs")], {
+      cwd: ROOT,
+      stdio: "inherit",
+    });
+  }
 };
 
 main();

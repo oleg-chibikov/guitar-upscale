@@ -6,6 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
     "dev": "npm run open-browser && next dev",
+    "prebuild": "pnpm songs:index",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -20,9 +21,11 @@
     "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge",
     "update-all": "ncu --upgrade && pnpm i",
     "songsterr": "node scripts/songsterr-example.mjs",
+    "songs:index": "node scripts/build-song-index.mjs",
     "generate-chords": "ts-node --require ./tsconfig-paths-bootstrap.js src/utilities/generateChords.ts"
   },
   "dependencies": {
+    "@coderline/alphatab": "^1.8.4",
     "@datastructures-js/binary-search-tree": "^5.4.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",

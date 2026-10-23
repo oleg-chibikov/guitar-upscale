@@ -2,7 +2,7 @@ import "server-only";
 
 import { AdvancedChordModesLoader } from "@/app/components/AdvancedChordModesLoader";
 import { DetectScaleButton } from "@/app/components/settings/buttons/DetectScaleButton";
-import { MidiUploadButton } from "@/app/components/settings/buttons/MidiUploadButton";
+import { SongUploadButton } from "@/app/components/settings/buttons/SongUploadButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
 import { Fragment } from "react";
@@ -97,7 +97,7 @@ export const premiumFeaturesToMap = (
       case "scaleDetection":
         return <DetectScaleButton />;
       case "midiUpload":
-        return <MidiUploadButton />;
+        return <SongUploadButton />;
       case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
       case "advancedChords":

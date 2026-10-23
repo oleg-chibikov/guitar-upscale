@@ -208,16 +208,17 @@ sequenceDiagram
 
 ## One note format: `EventsByTick`
 
-[eventsByTick.ts](../src/app/engine/eventsByTick.ts) stores notes and chords by clock tick. Song examples, recordings, uploads, loops and piano roll edits share it.
+[eventsByTick.ts](../src/app/engine/eventsByTick.ts) stores notes and chords by clock tick. Songs, recordings, loops and piano roll edits share it.
 
 - **Lookups** a map by tick, a map by event id and an AVL tree for the next or previous tick.
 - **Events** a note or a chord, with an id and an optional length in ticks. No length means one beat.
 
 ```mermaid
 flowchart LR
-  EX["Song example<br/>exampleDecoder"] --> E[(EventsByTick)]
+  GP["Guitar Pro file<br/>gpReader"] --> SONG["Song"]
+  MID["MIDI file<br/>midiReader"] --> SONG
+  SONG -->|songDecoder| E[(EventsByTick)]
   SC["Scale<br/>scaleDecoder"] --> E
-  UP["MIDI file<br/>midiParser"] --> E
   REC["midiRecorder"] --> E
   LOOP["looperRecorder"] --> E
   PR["Piano roll edits"] --> E
@@ -233,7 +234,8 @@ flowchart LR
 - **Entry** `playMidi` stores the data as the loaded melody, so the piano roll and download button see it.
 - **Pause** the player awaits `waitForPauseToBeReleased`. Previous and next release one step and pause again.
 - **Choice of data** [usePlay.ts](../src/app/hooks/usePlay.ts) picks what Play plays: a song example, the scale, or a replay of the loaded melody.
-- **Songs** [scaleExamples.ts](../src/app/data/scaleExamples.ts) lists songs per scale in a short fret notation. [exampleDecoder.ts](../src/app/engine/decoders/exampleDecoder.ts) turns them into events.
+- **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `public/songs/index.json` with the songs kept in the browser. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
+- **Chords** only a track named `Chords` gives chords, so chords stay apart from the melody. [songDecoder.ts](../src/app/engine/decoders/songDecoder.ts) plays them by name and moves the song to the key in the settings.
 
 ## Recording
 
@@ -380,7 +382,7 @@ flowchart LR
 - **Static export** [next.config.mjs](../next.config.mjs) sets `output: "export"` when `STATIC_EXPORT=true`. `NEXT_PUBLIC_BASE_PATH` sets the sub path.
 - **Server build** a plain `next build` keeps the API routes for sign-in.
 - **PWA** [sw.js](../public/sw.js) caches responses network first. [manifest.json](../public/manifest.json) asks for fullscreen landscape.
-- **Tests** Jest covers `EventsByTick`, the looper player, piano roll edits, chord button and fretboard layout, the trie and Google Play subscription parsing.
+- **Tests** Jest covers `EventsByTick`, the Guitar Pro and MIDI song readers, the looper player, piano roll edits, chord button and fretboard layout, the trie and Google Play subscription parsing.
 
 ## Where to start a change
 
@@ -389,6 +391,6 @@ flowchart LR
 | a scale or a scale group | [scales.ts](../src/app/data/scales.ts) |
 | a chord type | [chordModes.ts](../src/app/data/chordModes.ts) |
 | a built-in strum pattern | [strummingPatterns.ts](../src/app/data/strummingPatterns.ts) |
-| a song example | [scaleExamples.ts](../src/app/data/scaleExamples.ts) |
+| a built-in song | a `.gp` file in [public/songs/](../public/songs/), then `pnpm songs:index` |
 | what a tier unlocks | [premiumFeatures.ts](../src/lib/premiumFeatures.ts) and [PremiumComponentsLoader.tsx](../src/app/components/PremiumComponentsLoader.tsx) |
 | a saved setting | the slice, then bump `VERSION` in [store.ts](../src/app/store/store.ts) if old data breaks |

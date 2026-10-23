@@ -57,17 +57,31 @@ You need Node 24 and pnpm.
 - **Tests** `pnpm exec jest`
 - **Build** `pnpm exec next build`
 
+## Songs
+
+Each song is a Guitar Pro file in [`public/songs`](public/songs), one file per song.
+
+- **Place** `public/songs/<Scale group>/<Scale>/<Band> - <Title>.gp`, for example `Minor/Dorian/Santana - Oye Como Va.gp`. A `/` in a name becomes `-`, so "Aeolian / Natural" sits in `Aeolian - Natural`.
+- **Key** write the song in E. The app moves it to the key picked in the settings.
+- **Chords** go on a track named `Chords`. Each chord needs its name above the beat (the chord diagram name in Guitar Pro). The app plays it as its own chord with the strum settings. A beat with no name gets a name from its notes.
+- **Melody** tracks play the tab as written. A track named `Melody` plays with the instrument picked in the app, other tracks keep their own instrument.
+- **List** run `pnpm songs:index` after adding, renaming or removing a file. It writes `public/songs/index.json`. `pnpm build` runs it too.
+
+People add their own songs in the app with the upload button [Composer]. It takes Guitar Pro (`.gp`, `.gp3` to `.gp5`, `.gpx`) and MIDI files. The browser keeps them, and the scale detector picks the scale.
+
+In a MIDI file a track named `Chords` plays as chords. A text or marker event like `Am` at the chord names it. Other tracks play as notes, with no chord guessing.
+
 ## Add a song from Songsterr
 
-`pnpm songsterr` downloads a song from Songsterr and adds it to [`scaleExamples.ts`](src/app/data/scaleExamples.ts) as an example.
+`pnpm songsterr` downloads a song from Songsterr and saves it as a Guitar Pro file in `public/songs`.
 
 1. `pnpm songsterr "wintersun beyond the dark sun"` lists the tracks and sections.
 2. `pnpm songsterr "wintersun beyond the dark sun" --from 4 --to 16` adds measures 4 to 16.
 
 - **Key** the song moves to an E tonic, since the app builds every scale from E.
 - **Scale** the script picks the scale from `scales.ts` with the fewest notes outside it, or the one from `--scale "Minor/Dorian"`. It moves those notes to the nearest scale note. It prints each change.
-- **Tracks** melody, a bass with one note per beat, and chords built on the bass.
-- **Rerun** replaces the example with the same band and title.
+- **Tracks** melody, a bass with one note per beat, and a `Chords` track built on the bass.
+- **Rerun** replaces the file with the same band and title, and refreshes `index.json`.
 
 `--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--scale`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
 

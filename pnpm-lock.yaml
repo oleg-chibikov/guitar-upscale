@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@coderline/alphatab':
+        specifier: ^1.8.4
+        version: 1.8.4
       '@datastructures-js/binary-search-tree':
         specifier: ^5.4.0
         version: 5.4.0
@@ -340,6 +343,10 @@ packages:
 
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
+
+  '@coderline/alphatab@1.8.4':
+    resolution: {integrity: sha512-VN5rfTZZWgA63Ny1aDKCp02k3Qm9CHhg4Q9AnK0kHm7G+fNDNZo36TeToPDFoJ6VpB9+AHcCrHwHFUP1tKqdsw==}
+    engines: {node: '>=6.0.0'}
 
   '@datastructures-js/binary-search-tree@5.4.0':
     resolution: {integrity: sha512-dPmPRRgAEvfC1+xq9voBJcIanbXZbaOR1908R6RfhceXignnlCL1wX7LToPVHSKVCb+bGa+tAbK22cit0BLWDA==}
@@ -3980,6 +3987,8 @@ snapshots:
     dependencies:
       hashery: 1.5.1
       keyv: 5.6.0
+
+  '@coderline/alphatab@1.8.4': {}
 
   '@datastructures-js/binary-search-tree@5.4.0': {}
 

@@ -109,9 +109,9 @@ Playback types, picked in Settings [Explorer]:
 
 Without Explorer, Play plays the scale.
 
-Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo.
+Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo. Uploaded songs say "uploaded" and have a delete button.
 
-Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/hooks/usePlay.ts), [midiPlayer.ts](../src/app/engine/midiPlayer.ts), [scaleExamples.ts](../src/app/data/scaleExamples.ts).
+Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/hooks/usePlay.ts), [midiPlayer.ts](../src/app/engine/midiPlayer.ts), [songLibrary.ts](../src/app/engine/songs/songLibrary.ts), [public/songs/](../public/songs/).
 
 ## MIDI recording
 
@@ -154,16 +154,19 @@ The first note drawn into the empty melody makes that melody the one that plays 
 
 Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](../src/app/context/PianoRollProvider.tsx), [engine/pianoRoll/](../src/app/engine/pianoRoll/).
 
-## MIDI upload
+## Song upload
 
-[Composer] The upload button plays a `.mid` file from disk.
+[Composer] The upload button adds Guitar Pro and MIDI files to the song list. The browser keeps them.
 
-1. The app reads the tempo and sets it.
-2. The scale detector picks the closest scale and switches to it.
-3. Notes that sound together turn into chords where a known chord matches.
-4. The file plays and becomes the melody for the piano roll.
+1. The app reads the file: tab, tempo, instruments and the `Chords` track.
+2. The scale detector picks the smallest scale that holds every note. The song goes under that scale.
+3. The first file plays at once, moved to the key picked in the settings.
 
-Code: [MidiUploadButton.tsx](../src/app/components/settings/buttons/MidiUploadButton.tsx), [midiParser/](../src/app/engine/midiParser/).
+- **Chords** only a track named `Chords` plays chords. The chord name comes from the file, or from the notes when the file has none.
+- **Other tracks** play their notes as written, with no chord guessing.
+- **Delete** hold Play and press the bin next to an uploaded song.
+
+Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [songs/](../src/app/engine/songs/).
 
 ## Chord and scale detection
 
@@ -209,7 +212,7 @@ With sign-in on, a sign-in panel shows on the page.
 
 - **Patreon** sign in with Patreon. The server reads the Patreon membership and maps it to Explorer or Composer.
 - **Google Play** in the Android app, a purchase goes through the Digital Goods API. The person can later change or cancel the plan from the same panel.
-- **Locked buttons** record, detect chord, detect scale and MIDI upload show greyed out. A tap says which plan unlocks them.
+- **Locked buttons** record, detect chord, detect scale and song upload show greyed out. A tap says which plan unlocks them.
 - **Hidden controls** the looper, instrument pickers, skin, playback type and reverb stay hidden until the tier allows them.
 
 Code: [auth/](../src/app/components/auth/), [premiumFeatures.ts](../src/lib/premiumFeatures.ts), [tierHelper.ts](../src/lib/tierHelper.ts), [NoPremiumButton.tsx](../src/app/components/settings/buttons/NoPremiumButton.tsx).
