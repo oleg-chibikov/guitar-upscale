@@ -6,6 +6,8 @@ import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
+import { useScaleContext } from "@/app/context/ScaleProvider";
+import { NOTE_COUNT } from "@/app/data/notes";
 import { ZOOM_STEP } from "@/app/data/pianoRollConstants";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import {
@@ -82,6 +84,8 @@ export const PianoRollToolbar: React.FC = () => {
   const transport = usePianoRollTransport();
   const tool = usePianoRollSelector((s) => s.tool);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
+  const { scalePattern } = useScaleContext();
+  const isChromatic = scalePattern.size === NOTE_COUNT;
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
@@ -159,9 +163,14 @@ export const PianoRollToolbar: React.FC = () => {
         />
         <IconButtonWrapper
           icon={<LibraryMusic />}
-          tooltip="Keep notes in the scale when moving and drawing"
+          tooltip={
+            isChromatic
+              ? "Keep notes in the scale: the scale has all 12 notes, so pick another scale to use it"
+              : "Keep notes in the scale when moving and drawing"
+          }
           onPress={() => dispatch(setSnapToScale(!snapToScale))}
-          isActive={snapToScale}
+          isActive={snapToScale && !isChromatic}
+          disabled={isChromatic}
         />
       </Group>
       <Divider />
