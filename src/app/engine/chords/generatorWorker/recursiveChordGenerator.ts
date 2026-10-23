@@ -1,4 +1,4 @@
-import { NON_THUMB_FINGER_COUNT } from "@/app/data/chordFingerConstants";
+import { NON_THUMB_FINGER_COUNT, THUMB } from "@/app/data/chordFingerConstants";
 import { ChordBuilderInfo, FingerAssignment } from "@/app/data/chordModes";
 import { Neck, NoteInChord, StringOctaveNote } from "@/app/data/notes";
 import {
@@ -97,9 +97,6 @@ export class RecursiveChordGenerator {
       );
     }
 
-    // maxFingerUsedByFret changes stay visible to the next notes on this string, then get rolled back
-    const changedFrets: number[] = [];
-    const previousFingers: OptionalNumber[] = [];
     const lastFret = maxAllowedFretIndex ?? this.maxFretToProcess;
     for (let fret = minAllowedFretIndex ?? this.capo + 1; fret <= lastFret; fret++) {
       const stringOctaveNote = neckString[fret];
@@ -114,9 +111,7 @@ export class RecursiveChordGenerator {
           state,
           minAllowedFretIndex,
           maxAllowedFretIndex,
-          results,
-          changedFrets,
-          previousFingers
+          results
         );
       }
     }
@@ -129,10 +124,6 @@ export class RecursiveChordGenerator {
       maxAllowedFretIndex,
       results
     );
-
-    for (let i = changedFrets.length - 1; i >= 0; i--) {
-      state.maxFingerUsedByFret[changedFrets[i]] = previousFingers[i];
-    }
   };
 
   private tryMutedString(
@@ -230,9 +221,7 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[],
-    changedFrets: number[],
-    previousFingers: OptionalNumber[]
+    results: ChordBuilderInfo[]
   ) {
     const fret = stringOctaveNote.fret;
     const available = state.availableFretByFingerIndex;
@@ -323,10 +312,15 @@ export class RecursiveChordGenerator {
       const previousBarreFret =
         state.barreFretByFingerIndex[currentFingerIndex];
       const previousMask = state.usedNotesMask;
+      const previousMaxFinger = state.maxFingerUsedByFret[fret];
 
       state.usedNotesMask |= noteBit(stringOctaveNote.note);
       state.fingerAssignment[stringIndex] = currentFingerIndex;
       state.chordBuilder[stringIndex] = stringOctaveNote;
+      state.maxFingerUsedByFret[fret] = Math.max(
+        previousMaxFinger ?? currentFingerIndex,
+        currentFingerIndex
+      );
 
       // this finger can only be used for barre on higher strings
       if (theOnlyAllowedFret === undefined) {
@@ -358,11 +352,7 @@ export class RecursiveChordGenerator {
       state.usedNotesMask = previousMask;
       state.fingerAssignment[stringIndex] = undefined;
       state.chordBuilder[stringIndex] = undefined;
-
-      // later notes and fingers on this string see this finger, the branch above did not
-      changedFrets.push(fret);
-      previousFingers.push(state.maxFingerUsedByFret[fret]);
-      state.maxFingerUsedByFret[fret] = currentFingerIndex;
+      state.maxFingerUsedByFret[fret] = previousMaxFinger;
     }
   }
 
@@ -411,8 +401,12 @@ export class RecursiveChordGenerator {
       lowerStringIndex++
     ) {
       // if we used a finger 1 on a lower string at a fret 5 it means that we can use fingers 2 and 3 on a frets >= 5 and we can use finger 0 on fret <= 5
-      const fingerUsedOnLowerString =
+      let fingerUsedOnLowerString =
         state.fingerAssignment[lowerStringIndex];
+      // The thumb wraps around the neck behind the index finger, so it ranks below finger 0
+      if (fingerUsedOnLowerString === THUMB) {
+        fingerUsedOnLowerString = -1;
+      }
       let fretUsedOnLowerString =
         state.chordBuilder[lowerStringIndex]?.fret;
       if (fretUsedOnLowerString === this.capo) {
