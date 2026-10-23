@@ -29,6 +29,7 @@ import {
   setIsFirstEvent,
   setIsLastEvent,
   setIsPlaying,
+  stopMetronomeIfIdle,
   waitForPauseToBeReleased,
 } from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
@@ -46,13 +47,14 @@ const startBarPositions = new WeakMap<EventsByTick, number>();
 class MidiPlayer {
   /**
    * @param tickZeroBarPosition the position inside the bar where melody tick 0 lands.
+   * @returns true when the melody played to the end.
    */
   async play(
     eventsByTick: EventsByTick,
     logPrefix: string,
     tickZeroBarPosition: number,
     onStarted?: () => void
-  ): Promise<void> {
+  ): Promise<boolean> {
     if (isLastEventValue) {
       store.dispatch(setIsLastEvent(false));
     }
@@ -64,7 +66,7 @@ class MidiPlayer {
     if (!eventsByTick.hasItems) {
       console.log(logPrefix + "No events for playback");
       onStarted?.();
-      return;
+      return true;
     }
 
     console.log(logPrefix + "Midi info", eventsByTick);
@@ -96,7 +98,7 @@ class MidiPlayer {
       while (currentTick <= lastTick) {
         if (checkFinished()) {
           console.log(logPrefix + "Finished playback prematurely");
-          return;
+          return false;
         }
 
         await waitForNextTick();
@@ -163,6 +165,7 @@ class MidiPlayer {
     store.dispatch(setIsLastEvent(true));
     store.dispatch(setIsFirstEvent(true));
     console.log(logPrefix + "All events are played");
+    return true;
   }
 
   // plays the previous or next event while paused and returns its tick
@@ -234,7 +237,7 @@ export const playMidi = async (
   if (startBarPosition !== undefined) {
     startBarPositions.set(eventsByTick, startBarPosition);
   }
-  await midiPlayer.play(
+  const isPlayedToEnd = await midiPlayer.play(
     eventsByTick,
     logPrefix,
     startBarPositions.get(eventsByTick) ?? 0,
@@ -242,5 +245,8 @@ export const playMidi = async (
   );
   dispatch(setIsPlaying(false));
   recreatePlaybackPromise();
+  if (isPlayedToEnd) {
+    stopMetronomeIfIdle(dispatch);
+  }
   console.log(logPrefix + "Stopped new playback");
 };

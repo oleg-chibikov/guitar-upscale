@@ -47,7 +47,6 @@ export const usePianoRollTransport = () => {
     }
     const { playMidi } = await import("@/app/engine/midiPlayer");
     await playMidi(dispatch, data, LOG_PREFIX);
-    stopMetronomeIfIdle(dispatch);
   }, [data, dispatch, looperChannel]);
 
   const togglePlay = useCallback(async () => {
