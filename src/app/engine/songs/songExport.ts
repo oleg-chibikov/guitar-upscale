@@ -11,6 +11,7 @@ import { chordPreferredVariationsByName } from "@/app/engine/chords/chordNotesBy
 import { getCurrentRoot } from "@/app/engine/decoders/songDecoder";
 import { DEFAULT_CHORD_TRACK_NUMBER } from "@/app/engine/eventBus";
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { getTrackInfos } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { writeGuitarPro } from "@/app/engine/songs/gpWriter";
 import { toFileName } from "@/app/engine/songs/songHelpers";
 import {
@@ -37,14 +38,15 @@ const getChordFrets = (name: string) => {
 // The song as it sounds now: in the key and tuning from the settings, with the piano roll edits
 export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
   const tuning = getOctaveNotesForTuning(tuningValue);
+  const infos = getTrackInfos(events);
   const tracks = new Map<number, SongTrack>();
   const getTrack = (trackNumber: number, instrument?: Instrument) => {
     let track = tracks.get(trackNumber);
     if (!track) {
-      const source = example?.song?.tracks.at(trackNumber);
+      const info = infos.get(trackNumber);
       track = {
-        name: source?.name ?? "",
-        instrument: source ? source.instrument : instrument,
+        name: info?.name ?? "",
+        instrument: info ? info.instrument : instrument,
         tuning,
         tabNotes: [],
         pitchNotes: [],
@@ -57,12 +59,13 @@ export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
 
   for (const { tick, event } of events.flatItems) {
     if (event.note) {
-      const { note, trackNumber, instrument } = event.note;
+      const { note, trackNumber, instrument, velocity } = event.note;
       getTrack(trackNumber, instrument).tabNotes.push({
         tick,
         string: note.string,
         fret: note.fret,
         duration: event.duration ?? TICKS_IN_BEAT,
+        velocity,
       });
     } else if (event.chord) {
       const { chord, metadata } = event.chord;

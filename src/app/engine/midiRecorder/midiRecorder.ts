@@ -96,7 +96,8 @@ export class MidiRecorder implements NoteRecorder {
             note.looperChannel ?? note.trackNumber,
             note.instrument ?? "acoustic_guitar_nylon",
             eventsAtTick.tick,
-            event.duration
+            event.duration,
+            note.velocity
           );
         }
         if (chord) {
@@ -129,7 +130,8 @@ export class MidiRecorder implements NoteRecorder {
     trackNumber: number,
     instrument: Instrument,
     tick: number,
-    durationTicks?: number
+    durationTicks?: number,
+    velocity = MAX_VOLUME
   ) {
     if (!this.isRecording || !this.midiEvents) {
       return;
@@ -152,7 +154,8 @@ export class MidiRecorder implements NoteRecorder {
     noteEventsForTrack.push(
       new Midi.NoteEvent({
         pitch: [note.note + (this.octaveShift + midiOctave) * NOTE_COUNT],
-        volume: MAX_VOLUME,
+        // midi-writer-js takes the velocity from 1 to 100
+        velocity: Math.max(1, Math.round((velocity * 100) / MAX_VOLUME)),
         // "8" is an eighth note. "T" gives an exact length in midi-writer-js ticks
         duration:
           durationTicks === undefined

@@ -1,8 +1,9 @@
+import { MAX_VOLUME } from "@/app/data/volume";
 import { waitForNextTick } from "@/app/engine/clock/mainClock";
 import { ChordEventBus, NotePlayEventBus } from "@/app/engine/eventBus";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
 import { tickToMilliseconds } from "@/app/helpers/clockHelper";
-import { tempoBpmValue } from "@/app/store/settingsSlice";
+import { tempoBpmValue, volumeValue } from "@/app/store/settingsSlice";
 
 export const playChordOrNote = ({ note, chord, duration }: ChordOrNote) => {
   if (note) {
@@ -12,6 +13,10 @@ export const playChordOrNote = ({ note, chord, duration }: ChordOrNote) => {
         duration === undefined
           ? undefined
           : tickToMilliseconds(duration, tempoBpmValue),
+      volume:
+        note.velocity === undefined
+          ? undefined
+          : (volumeValue * note.velocity) / MAX_VOLUME,
       looperChannel: note.looperChannel,
       trackInstrument: note.instrument,
       trackNumber: note.trackNumber,

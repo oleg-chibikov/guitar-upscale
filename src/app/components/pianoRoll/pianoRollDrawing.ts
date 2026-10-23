@@ -9,6 +9,7 @@ import {
   TICKS_IN_BEAT,
   TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
+import { MAX_VOLUME } from "@/app/data/volume";
 import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
 import { fromPitch, pitchToY, tickToX, Zoom } from "@/app/engine/pianoRoll/geometry";
 import {
@@ -66,6 +67,7 @@ const TRACK_NOTE_COLORS = [
 ];
 
 const INACTIVE_TRACK_ALPHA = 0.3;
+const MIN_VELOCITY_ALPHA = 0.25;
 
 export const getTrackColor = (index: number) =>
   TRACK_NOTE_COLORS[index % TRACK_NOTE_COLORS.length].fill;
@@ -80,7 +82,7 @@ export interface PianoRollScene {
   snapToScale: boolean;
   baseNote: Note;
   events: { tick: number; event: ChordOrNote }[];
-  // notes of the tracks not being edited. They show dimmed and ignore the pointer
+  // notes of the tracks not being edited. They show dimmed, and pressing one edits its track
   inactiveEvents: { tick: number; event: ChordOrNote }[];
   // the colour slot of each track. Undefined paints every note green
   trackColors: Map<number, number> | undefined;
@@ -305,7 +307,15 @@ const drawBlock = (
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, 3);
   ctx.fillStyle = colors.fill;
+  // a quieter note shows paler
+  const velocity = event.note?.velocity;
+  const opacity = ctx.globalAlpha;
+  if (velocity !== undefined) {
+    ctx.globalAlpha =
+      opacity * (MIN_VELOCITY_ALPHA + (1 - MIN_VELOCITY_ALPHA) * (velocity / MAX_VOLUME));
+  }
   ctx.fill();
+  ctx.globalAlpha = opacity;
   ctx.beginPath();
   ctx.roundRect(x + 0.5, y + 0.5, width - 1, height - 1, 2.5);
   ctx.strokeStyle = colors.border;

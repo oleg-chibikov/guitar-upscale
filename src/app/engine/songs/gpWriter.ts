@@ -41,8 +41,19 @@ type WriteOptions = {
 };
 
 type Placed = { string: number; fret: number; chord?: string };
-type Hit = { tick: number; duration: number; notes: Placed[] };
+type Hit = { tick: number; duration: number; notes: Placed[]; velocity?: number };
 type Beat = Hit & { tied: boolean };
+
+// Guitar Pro keeps loudness per beat, from ppp (0) to fff (7). The default f plays at full volume
+const FORTE = 5;
+
+export const dynamicsToVelocity = (dynamics: number): number | undefined =>
+  dynamics >= FORTE ? undefined : Math.round((127 * (dynamics + 1)) / (FORTE + 1));
+
+export const velocityToDynamics = (velocity: number | undefined): number =>
+  velocity === undefined
+    ? FORTE
+    : Math.min(FORTE, Math.max(0, Math.round((velocity * (FORTE + 1)) / 127) - 1));
 
 const toMidi = (note: OctaveNote) => note.octave * 12 + note.note;
 
@@ -94,12 +105,14 @@ const getHits = (track: SongTrack, tuning: number[]): Hit[] => {
     ...track.tabNotes.map((n) => ({
       tick: n.tick,
       duration: n.duration,
+      velocity: n.velocity,
       string: n.string,
       fret: n.fret,
     })),
     ...track.pitchNotes.map((n) => ({
       tick: n.tick,
       duration: n.duration,
+      velocity: n.velocity,
       ...placePitch(toMidi(n.octaveNote), tuning),
     })),
   ]
@@ -112,6 +125,7 @@ const getHits = (track: SongTrack, tuning: number[]): Hit[] => {
   return notes.map((n) => ({
     tick: n.tick,
     duration: Math.max(1, Math.round(n.duration ?? nextOnset(n.tick) - n.tick)),
+    velocity: n.velocity,
     notes: [{ string: n.string, fret: n.fret }],
   }));
 };
@@ -153,6 +167,7 @@ const toVoices = (hits: Hit[]): Hit[][] => {
       const sameBeat =
         last.tick === hit.tick &&
         last.duration === hit.duration &&
+        velocityToDynamics(last.velocity) === velocityToDynamics(hit.velocity) &&
         hit.notes.every((n) => !last.notes.some((x) => x.string === n.string));
       if (sameBeat) {
         last.notes.push(...hit.notes);
@@ -319,7 +334,13 @@ export const writeGuitarPro = async (
         while (tick < hitEnd) {
           const barIndex = barStarts.findLastIndex((start) => start <= tick);
           const until = Math.min(hitEnd, barEnd(barIndex));
-          beats.push({ tick, duration: until - tick, notes: hit.notes, tied });
+          beats.push({
+            tick,
+            duration: until - tick,
+            notes: hit.notes,
+            velocity: hit.velocity,
+            tied,
+          });
           tick = until;
           tied = true;
         }
@@ -341,6 +362,9 @@ export const writeGuitarPro = async (
             const gpBeat = new m.Beat();
             gpBeat.duration = part.value as AlphaTab.model.Duration;
             gpBeat.dots = part.dots;
+            gpBeat.dynamics = velocityToDynamics(
+              beat?.velocity
+            ) as AlphaTab.model.DynamicValue;
             for (const note of beat?.notes ?? []) {
               const gpNote = new m.Note();
               // alphaTab counts strings from the lowest one

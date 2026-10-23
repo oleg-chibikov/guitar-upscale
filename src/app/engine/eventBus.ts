@@ -16,7 +16,8 @@ export const DEFAULT_CHORD_TRACK_NUMBER = 1;
 export type PlayNoteParams = {
   stringOctaveNote: StringOctaveNote;
   durationMs?: number;
-  volume?: number; // TODO: so far it is not supplied anywhere, but we might need to implement velocity per single note. It should also be relative to the main velocity. Actually main velocity is actually volume. Change it - there is Volume in smplr
+  // the main volume scaled by the note's velocity. Undefined plays at the main volume
+  volume?: number;
 };
 
 export type TrackMetadata = {

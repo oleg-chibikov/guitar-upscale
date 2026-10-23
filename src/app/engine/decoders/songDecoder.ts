@@ -147,6 +147,7 @@ export class SongDecoder {
             trackNumber,
             instrument: track.instrument,
             note: stringOctaveNote,
+            velocity: tabNote.velocity,
           },
           tabNote.duration
         );
@@ -161,7 +162,9 @@ export class SongDecoder {
       trackNumber,
       tabNote.tick,
       shiftOctaveNote(songString, tabNote.fret),
-      tabNote.duration
+      tabNote.duration,
+      undefined,
+      tabNote.velocity
     );
   }
 

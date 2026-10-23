@@ -1,6 +1,10 @@
 import { getInstrumentLabel, Instrument } from "@/app/data/instruments";
 import { DEFAULT_CHORD_TRACK_NUMBER } from "@/app/engine/eventBus";
-import { ChordOrNote, EventForTick } from "@/app/engine/eventsByTick";
+import {
+  ChordOrNote,
+  EventForTick,
+  EventsByTick,
+} from "@/app/engine/eventsByTick";
 
 export type PianoRollTrack = {
   trackNumber: number;
@@ -9,8 +13,26 @@ export type PianoRollTrack = {
   instrument?: Instrument;
 };
 
-// the name and instrument a song gives its track, by track number
-export type TrackInfo = { name: string; instrument?: Instrument };
+// the name and instrument of a track. A removed track still names its notes after an undo
+export type TrackInfo = {
+  name: string;
+  instrument?: Instrument;
+  removed?: boolean;
+};
+
+const trackInfos = new WeakMap<EventsByTick, Map<number, TrackInfo>>();
+
+/**
+ * The tracks a melody names, by track number. The piano roll adds, renames and removes them here
+ */
+export const getTrackInfos = (data: EventsByTick): Map<number, TrackInfo> => {
+  let infos = trackInfos.get(data);
+  if (!infos) {
+    infos = new Map();
+    trackInfos.set(data, infos);
+  }
+  return infos;
+};
 
 export const getEventTrack = (event: ChordOrNote): number =>
   event.note
@@ -18,15 +40,16 @@ export const getEventTrack = (event: ChordOrNote): number =>
     : event.chord?.metadata.trackNumber ?? DEFAULT_CHORD_TRACK_NUMBER;
 
 /**
- * The tracks of the song plus any track the events use, in track order
+ * The named tracks plus any track the events use, in track order
  */
 export const listTracks = (
   events: EventForTick[],
-  songTracks: (TrackInfo | undefined)[] = []
+  infos: ReadonlyMap<number, TrackInfo> = new Map()
 ): PianoRollTrack[] => {
+  const used = new Set(events.map(({ event }) => getEventTrack(event)));
   const tracks = new Map<number, PianoRollTrack>();
-  songTracks.forEach((info, trackNumber) => {
-    if (info) {
+  infos.forEach((info, trackNumber) => {
+    if (info.removed !== true || used.has(trackNumber)) {
       tracks.set(trackNumber, {
         trackNumber,
         label: info.name,
@@ -55,6 +78,48 @@ export const listTracks = (
           ? getInstrumentLabel(track.instrument)
           : `Track ${track.trackNumber + 1}`),
     }));
+};
+
+/**
+ * Adds an empty track after every track the melody had, removed ones included
+ */
+export const addTrackInfo = (
+  data: EventsByTick,
+  tracks: PianoRollTrack[]
+): number => {
+  const infos = getTrackInfos(data);
+  const trackNumber =
+    Math.max(
+      -1,
+      ...infos.keys(),
+      ...tracks.map(({ trackNumber }) => trackNumber)
+    ) + 1;
+  infos.set(trackNumber, { name: `Track ${trackNumber + 1}` });
+  return trackNumber;
+};
+
+const getInfo = (data: EventsByTick, track: PianoRollTrack): TrackInfo =>
+  getTrackInfos(data).get(track.trackNumber) ?? {
+    name: "",
+    instrument: track.instrument,
+  };
+
+export const renameTrackInfo = (
+  data: EventsByTick,
+  track: PianoRollTrack,
+  name: string
+) => {
+  getTrackInfos(data).set(track.trackNumber, {
+    ...getInfo(data, track),
+    name: name.trim(),
+  });
+};
+
+export const removeTrackInfo = (data: EventsByTick, track: PianoRollTrack) => {
+  getTrackInfos(data).set(track.trackNumber, {
+    ...getInfo(data, track),
+    removed: true,
+  });
 };
 
 /**

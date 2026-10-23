@@ -178,15 +178,11 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     } else if (region === "keys") {
       cursor = "pointer";
     } else if (region === "notes") {
-      const { events, selection, zoom } = scene;
+      const { events, inactiveEvents, selection, zoom } = scene;
       const scroller = scrollerRef.current;
-      const hit = hitTestNote(
-        events,
-        selection,
-        zoom,
-        point.x - PITCH_AXIS_WIDTH + (scroller?.scrollLeft ?? 0),
-        point.y - TIMELINE_HEIGHT + (scroller?.scrollTop ?? 0)
-      );
+      const x = point.x - PITCH_AXIS_WIDTH + (scroller?.scrollLeft ?? 0);
+      const y = point.y - TIMELINE_HEIGHT + (scroller?.scrollTop ?? 0);
+      const hit = hitTestNote(events, selection, zoom, x, y);
       if (hit) {
         cursor = hit.edge ? "ew-resize" : "move";
         const event: ChordOrNote | undefined = events.find(
@@ -195,6 +191,9 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
         if (event && !isChordModeAvailable(event)) {
           title = UNAVAILABLE_CHORD_TITLE;
         }
+      } else if (hitTestNote(inactiveEvents, new Set(), zoom, x, y)) {
+        cursor = "pointer";
+        title = "Edit this track";
       } else {
         cursor = toolCursor[e.altKey ? PianoRollTool.Draw : tool];
       }

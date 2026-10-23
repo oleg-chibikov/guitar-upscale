@@ -1,18 +1,21 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
-import { getEditHistory } from "@/app/engine/pianoRoll/editHistory";
-import { EditResult } from "@/app/engine/pianoRoll/operations";
+import { getEditHistory, pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
+import { deleteEvents, EditResult } from "@/app/engine/pianoRoll/operations";
 import {
   pianoRollData,
   setPianoRollData,
 } from "@/app/engine/pianoRoll/pianoRollState";
 import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
 import {
+  addTrackInfo,
   getEventTrack,
+  getTrackInfos,
   listTracks,
   PianoRollTrack,
-  TrackInfo,
+  removeTrackInfo,
+  renameTrackInfo,
 } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { BehaviorSubject } from "rxjs";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
@@ -48,6 +51,11 @@ interface PianoRollContextType {
   // the track being edited. Undefined edits every track at once
   activeTrack: PianoRollTrack | undefined;
   setActiveTrack: (trackNumber: number | undefined) => void;
+  // adds an empty track and makes it the one being edited
+  addTrack: () => void;
+  // deletes the track's notes through the undo history
+  deleteTrack: (track: PianoRollTrack) => void;
+  renameTrack: (track: PianoRollTrack, name: string) => void;
   // the playhead of the shown track: the melody player's or the loop's
   playhead$: BehaviorSubject<number>;
   data: EventsByTick | undefined;
@@ -167,26 +175,6 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const source = sources.find((s) => s.id === sourceId) ?? sources.at(0);
   const data = source?.data;
 
-  // an uploaded or built-in song names its tracks. Other melodies get names from their instruments
-  const [songTracks, setSongTracks] = useState<{
-    data: EventsByTick | undefined;
-    tracks: (TrackInfo | undefined)[];
-  }>({ data: undefined, tracks: [] });
-  useEffect(() => {
-    if (!data || source?.looperChannel !== undefined) return;
-    let cancelled = false;
-    void import("@/app/engine/songs/songLibrary").then(
-      ({ getExampleForEvents }) => {
-        if (cancelled) return;
-        const tracks = getExampleForEvents(data)?.song?.tracks ?? [];
-        setSongTracks({ data, tracks });
-      }
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [data, source?.looperChannel]);
-
   // each track scrolls to its notes the first time it shows. Closing the piano roll forgets it
   const [scrolledTrack, setScrolledTrack] = useState<EventsByTick | undefined>();
   const [wasExpanded, setWasExpanded] = useState(pianoRollExpanded);
@@ -219,13 +207,12 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     [data, version]
   );
 
+  // a song names its tracks. Other tracks get names from their instruments
   const tracks = useMemo(
-    () =>
-      listTracks(
-        allEvents,
-        songTracks.data === data ? songTracks.tracks : undefined
-      ),
-    [allEvents, songTracks, data]
+    () => listTracks(allEvents, data ? getTrackInfos(data) : undefined),
+    // renames change the track infos in place, so version tells when
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allEvents, data, version]
   );
 
   // the track being edited belongs to one melody, like the selection
@@ -332,6 +319,43 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const undo = useCallback(() => step("undo"), [step]);
   const redo = useCallback(() => step("redo"), [step]);
 
+  const addTrack = useCallback(() => {
+    if (!data) return;
+    const trackNumber = addTrackInfo(data, tracks);
+    setActiveTrackState({ data, trackNumber });
+    setSelectionState({ data, ids: new Set() });
+    setVersion((v) => v + 1);
+  }, [data, tracks]);
+
+  const deleteTrack = useCallback(
+    (track: PianoRollTrack) => {
+      if (!data) return;
+      removeTrackInfo(data, track);
+      const ids = allEvents
+        .filter(({ event }) => getEventTrack(event) === track.trackNumber)
+        .map(({ event }) => event.id);
+      const result = deleteEvents(data, ids);
+      apply({
+        ...result,
+        command: result.command && { ...result.command, label: "Delete track" },
+      });
+      setActiveTrackState({ data, trackNumber: undefined });
+      setVersion((v) => v + 1);
+    },
+    [data, allEvents, apply]
+  );
+
+  const renameTrack = useCallback(
+    (track: PianoRollTrack, name: string) => {
+      if (!data) return;
+      renameTrackInfo(data, track, name);
+      setVersion((v) => v + 1);
+      // saves the song under the new track name
+      pianoRollEdits$.next(data);
+    },
+    [data]
+  );
+
   const history = data ? getEditHistory(data) : undefined;
   const canUndo = history?.canUndo ?? false;
   const canRedo = history?.canRedo ?? false;
@@ -346,6 +370,9 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       tracks,
       activeTrack,
       setActiveTrack,
+      addTrack,
+      deleteTrack,
+      renameTrack,
       playhead$,
       data,
       allEvents,
@@ -368,7 +395,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, addTrack, deleteTrack, renameTrack, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

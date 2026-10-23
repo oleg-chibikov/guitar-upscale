@@ -12,6 +12,7 @@ import {
   resolveResize,
   resolveTranspose,
   setChordMode,
+  setVelocity,
 } from "./operations";
 import { getEventPitch } from "./pianoRollEvent";
 
@@ -145,6 +146,17 @@ describe("piano roll operations", () => {
     history.execute(resizeEvents(data, targets).command!);
     expect(data.getEvent("b")?.tick).toBe(20);
     expect(data.getEvent("b")?.event.duration).toBe(12);
+  });
+
+  it("sets the volume of the notes and undoes it", () => {
+    const { data, history } = setup();
+    history.execute(setVelocity(data, ["a", "b"], 40).command!);
+    expect(data.getEvent("a")?.event.note?.velocity).toBe(40);
+    expect(data.getEvent("b")?.event.note?.velocity).toBe(40);
+    // the same volume again makes no undo step
+    expect(setVelocity(data, ["a"], 40).command).toBeUndefined();
+    history.undo();
+    expect(data.getEvent("a")?.event.note?.velocity).toBeUndefined();
   });
 
   it("quantizes", () => {

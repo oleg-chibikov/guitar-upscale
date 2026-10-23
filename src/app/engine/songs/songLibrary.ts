@@ -7,6 +7,7 @@ import { Song, SongFormat, getSongFormat } from "@/app/data/song";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
+import { getTrackInfos } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { scaleDetector } from "@/app/engine/scales/scaleDetector";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import {
@@ -267,6 +268,10 @@ const exampleByEvents = new WeakMap<EventsByTick, Example>();
 
 export const bindExampleEvents = (example: Example, events: EventsByTick) => {
   exampleByEvents.set(events, example);
+  const infos = getTrackInfos(events);
+  example.song?.tracks.forEach(({ name, instrument }, trackNumber) =>
+    infos.set(trackNumber, { name, instrument })
+  );
 };
 
 export const getExampleForEvents = (events: EventsByTick | undefined) =>

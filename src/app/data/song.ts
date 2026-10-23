@@ -7,6 +7,8 @@ export type TabNote = {
   string: number;
   fret: number;
   duration?: number;
+  // MIDI velocity from 1 to 127. Undefined plays at full volume
+  velocity?: number;
 };
 
 // A note known only by its pitch, as in MIDI. The app picks the string

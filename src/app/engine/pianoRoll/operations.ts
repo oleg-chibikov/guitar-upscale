@@ -255,6 +255,31 @@ export const quantizeEvents = (
   };
 };
 
+/**
+ * Sets the MIDI velocity of the single notes. Chords keep theirs
+ */
+export const setVelocity = (
+  data: EventsByTick,
+  ids: Iterable<string>,
+  velocity: number
+): EditResult => {
+  const builder = new CommandBuilder(data, "Change volume");
+  const states = existing(data, ids);
+  states.forEach(({ tick, event }) => {
+    if (event.note && event.note.velocity !== velocity) {
+      builder.set(event.id, {
+        tick,
+        event: { ...event, note: { ...event.note, velocity } },
+      });
+    }
+  });
+  return {
+    command: builder.build(),
+    selection: states.map((s) => s.event.id),
+    chordsWithChangedMode: [],
+  };
+};
+
 export const pasteEvents = (
   data: EventsByTick,
   clipboard: EventForTick[],

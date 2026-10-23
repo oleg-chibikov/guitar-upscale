@@ -208,4 +208,32 @@ describe("writeGuitarPro", () => {
       [80, "C"],
     ]);
   });
+
+  it("keeps the note volume as dynamics", async () => {
+    const song: Song = {
+      band: "Band",
+      title: "Title",
+      root: Note.E,
+      tracks: [
+        {
+          name: "Lead",
+          tuning: standard,
+          tabNotes: [
+            { tick: 0, string: 0, fret: 3, duration: 8, velocity: 64 },
+            // a quieter note on the same beat gets its own beat
+            { tick: 0, string: 1, fret: 3, duration: 8, velocity: 21 },
+            { tick: 8, string: 0, fret: 5, duration: 8 },
+          ],
+          pitchNotes: [],
+          chords: [],
+        },
+      ],
+    };
+
+    const back = await readGuitarProSong(await writeGuitarPro(song), "x.gp");
+    const sorted = [...back.tracks[0].tabNotes].sort(
+      (a, b) => a.tick - b.tick || a.string - b.string
+    );
+    expect(sorted.map((n) => n.velocity)).toEqual([64, 21, undefined]);
+  });
 });

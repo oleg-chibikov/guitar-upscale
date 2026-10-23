@@ -1,7 +1,18 @@
-import { ChordOrNote } from "@/app/engine/eventsByTick";
-import { getEventTrack, listTracks, withTrack } from "./pianoRollTracks";
+import { ChordOrNote, EventsByTick } from "@/app/engine/eventsByTick";
+import {
+  addTrackInfo,
+  getEventTrack,
+  getTrackInfos,
+  listTracks,
+  removeTrackInfo,
+  renameTrackInfo,
+  withTrack,
+} from "./pianoRollTracks";
 
 jest.mock("@/app/engine/eventBus", () => ({ DEFAULT_CHORD_TRACK_NUMBER: 1 }));
+jest.mock("@/app/engine/eventIdGenerator", () => ({
+  IdGenerator: { generate: (prefix = "") => prefix },
+}));
 
 const note = (id: string, trackNumber: number): ChordOrNote => ({
   id,
@@ -24,10 +35,13 @@ describe("piano roll tracks", () => {
       { tick: 0, event: note("b", 3) },
       { tick: 0, event: note("c", 5) },
     ];
-    const tracks = listTracks(events, [
-      { name: "Lead" },
-      { name: "Rhythm", instrument: "distortion_guitar" },
-    ]);
+    const tracks = listTracks(
+      events,
+      new Map([
+        [0, { name: "Lead" }],
+        [1, { name: "Rhythm", instrument: "distortion_guitar" as const }],
+      ])
+    );
     expect(tracks.map(({ trackNumber, label }) => [trackNumber, label])).toEqual([
       [0, "Lead"],
       [1, "Rhythm"],
@@ -53,5 +67,27 @@ describe("piano roll tracks", () => {
       trackNumber: 2,
       trackInstrument: "voice_oohs",
     });
+  });
+
+  it("adds, renames and removes tracks", () => {
+    const data = new EventsByTick();
+    const events = [{ tick: 0, event: note("a", 3) }];
+    const added = addTrackInfo(data, listTracks(events, getTrackInfos(data)));
+    expect(added).toBe(4);
+
+    const tracks = () => listTracks(events, getTrackInfos(data));
+    renameTrackInfo(data, tracks()[0], " Solo ");
+    expect(tracks().map(({ label }) => label)).toEqual(["Solo", "Track 5"]);
+    // the renamed track keeps the instrument its notes play with
+    expect(tracks()[0].instrument).toBe("overdriven_guitar");
+
+    removeTrackInfo(data, tracks()[1]);
+    expect(tracks().map(({ label }) => label)).toEqual(["Solo"]);
+    // a removed track with notes left, after an undo, shows with its name
+    removeTrackInfo(data, tracks()[0]);
+    expect(tracks().map(({ label }) => label)).toEqual(["Solo"]);
+    expect(listTracks([], getTrackInfos(data))).toEqual([]);
+    // the next track doesn't take the number of a removed one
+    expect(addTrackInfo(data, [])).toBe(5);
   });
 });

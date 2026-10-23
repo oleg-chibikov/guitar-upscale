@@ -9,6 +9,7 @@ import {
   isChordsTrackName,
   isMelodyTrackName,
 } from "@/app/data/song";
+import { dynamicsToVelocity } from "@/app/engine/songs/gpWriter";
 import {
   midiToOctaveNote,
   normalizeChordName,
@@ -88,6 +89,7 @@ const readTrack = (
           continue;
         }
         const tick = toAppTicks(playedBar.start + beat.playbackStart);
+        const velocity = dynamicsToVelocity(beat.dynamics);
 
         if (isChords) {
           const chord: SongChord = {
@@ -109,6 +111,7 @@ const readTrack = (
               string: tuning.length - note.string,
               fret: note.fret,
               duration,
+              velocity,
             };
             result.tabNotes.push(tabNote);
             lengthOwners.set(note, tabNote);
@@ -117,6 +120,7 @@ const readTrack = (
               tick,
               octaveNote: midiToOctaveNote(note.realValue),
               duration,
+              velocity,
             };
             result.pitchNotes.push(pitchNote);
             lengthOwners.set(note, pitchNote);

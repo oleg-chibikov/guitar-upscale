@@ -32,7 +32,10 @@ import {
   getEventPitch,
   withPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
-import { PianoRollTrack } from "@/app/engine/pianoRoll/pianoRollTracks";
+import {
+  getEventTrack,
+  PianoRollTrack,
+} from "@/app/engine/pianoRoll/pianoRollTracks";
 import { floorTick, snapPitchToScale, snapTick } from "@/app/engine/pianoRoll/snap";
 import { playChordOrNote } from "@/app/engine/playerHelper";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
@@ -169,8 +172,17 @@ export const useNoteAreaInteraction = ({
   // touch screens have no Alt or Ctrl, so toolbar toggles stand in for them
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
-  const { data, events, selection, setSelection, apply, chooseChordMode, activeTrack } =
-    usePianoRoll();
+  const {
+    data,
+    events,
+    inactiveEvents,
+    selection,
+    setSelection,
+    apply,
+    chooseChordMode,
+    activeTrack,
+    setActiveTrack,
+  } = usePianoRoll();
   const lastTap = useRef<{ id: string; time: number } | undefined>(undefined);
   const [preview, setPreview] = useState<Preview | undefined>();
   const gestureRef = useRef<Gesture | undefined>(undefined);
@@ -179,7 +191,7 @@ export const useNoteAreaInteraction = ({
   const inertiaFrame = useRef<number | undefined>(undefined);
 
   // the handlers read the latest values through a ref, so listeners stay stable during a drag
-  const latest = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock, activeTrack };
+  const latest = { data, events, inactiveEvents, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock, activeTrack, setActiveTrack };
   const state = useRef(latest);
   useLayoutEffect(() => {
     state.current = latest;
@@ -254,6 +266,12 @@ export const useNoteAreaInteraction = ({
     const { events, selection, zoom } = state.current;
     const { x, y } = toContent(point);
     return hitTestNote(events, selection, zoom, x, y);
+  };
+
+  const inactiveNoteAt = (point: Point) => {
+    const { inactiveEvents, zoom } = state.current;
+    const { x, y } = toContent(point);
+    return hitTestNote(inactiveEvents, new Set(), zoom, x, y);
   };
 
   const snapPitch = (pitch: number) => {
@@ -576,7 +594,7 @@ export const useNoteAreaInteraction = ({
         return;
       }
       if (e.button !== 0 && e.pointerType === "mouse") return;
-      const { data, selection } = state.current;
+      const { data } = state.current;
       // holding Alt draws whatever tool is picked. Alt on a note still copies it
       const tool = e.altKey ? PianoRollTool.Draw : state.current.tool;
       if (!data) return;
@@ -611,7 +629,18 @@ export const useNoteAreaInteraction = ({
       e.currentTarget.setPointerCapture(e.pointerId);
       const point = toContent(e);
       lastPointerRef.current = e;
-      const hit = noteAt(e);
+      const activeHit = noteAt(e);
+      // a note of a dimmed track makes its track the one being edited
+      const inactiveHit = activeHit ? undefined : inactiveNoteAt(e);
+      const inactiveEvent =
+        inactiveHit && data.getEvent(inactiveHit.id)?.event;
+      if (inactiveEvent) {
+        state.current.setActiveTrack(getEventTrack(inactiveEvent));
+      }
+      const hit = activeHit ?? (inactiveEvent ? inactiveHit : undefined);
+      const selection = inactiveEvent
+        ? new Set<string>()
+        : state.current.selection;
       const noteId = hit?.id;
 
       if (tool === PianoRollTool.Erase) {
