@@ -33,6 +33,7 @@ Without --section or --from/--to it lists the tracks and sections and stops.
   --section NAME    take the measures of one section, e.g. "Chorus"
   --from N --to N   measure range, 1-based and inclusive, as on the site
   --tonic NOTE      tonic of the source, e.g. "C#" (default: guessed from the bass)
+  --scale G/NAME    target scale, e.g. "Minor/Dorian" (default: the best fit)
   --band, --title   names to show in the app
   --file PATH       examples file (default: src/app/data/scaleExamples.ts)
   --dry-run         print the example and leave the file alone`;
@@ -48,6 +49,7 @@ const { values: opts, positionals } = parseArgs({
     from: { type: "string" },
     to: { type: "string" },
     tonic: { type: "string" },
+    scale: { type: "string" },
     band: { type: "string" },
     title: { type: "string" },
     file: { type: "string" },
@@ -139,9 +141,10 @@ const listSong = (meta, measures) => {
 const pickRange = (measures) => {
   if (opts.section) {
     const wanted = opts.section.toLowerCase();
-    const start = measures.findIndex((m) =>
-      m.marker?.text?.toLowerCase().includes(wanted)
-    );
+    const name = (m) => m.marker?.text?.trim().toLowerCase();
+    const exact = measures.findIndex((m) => name(m) === wanted);
+    const start =
+      exact >= 0 ? exact : measures.findIndex((m) => name(m)?.includes(wanted));
     if (start < 0) fail(`No section "${opts.section}"`);
     let end = start + 1;
     while (end < measures.length && !measures[end].marker) end++;
@@ -453,11 +456,11 @@ const main = async () => {
   const shift = pickShift(tonic, melodyRaw.notes);
   const shifted = (n) => ({ ...n, pitch: n.pitch + shift });
 
-  const scale = pickScale(
-    parseScales(),
-    melodyRaw.notes.map(shifted),
-    bassNotes.map(shifted)
-  );
+  const scales = parseScales();
+  const scale = opts.scale
+    ? scales.find((s) => `${s.group}/${s.name}` === opts.scale) ??
+      fail(`Unknown scale "${opts.scale}"`)
+    : pickScale(scales, melodyRaw.notes.map(shifted), bassNotes.map(shifted));
   const changed = new Map();
   const moveToScale = (n) => {
     const pitch = fitToScale(n.pitch + shift, scale);

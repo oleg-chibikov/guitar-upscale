@@ -65,11 +65,11 @@ You need Node 24 and pnpm.
 2. `pnpm songsterr "wintersun beyond the dark sun" --from 4 --to 16` adds measures 4 to 16.
 
 - **Key** the song moves to an E tonic, since the app builds every scale from E.
-- **Scale** the script picks the scale from `scales.ts` with the fewest notes outside it, and moves those notes to the nearest scale note. It prints each change.
+- **Scale** the script picks the scale from `scales.ts` with the fewest notes outside it, or the one from `--scale "Minor/Dorian"`. It moves those notes to the nearest scale note. It prints each change.
 - **Tracks** melody, a bass with one note per beat, and chords built on the bass.
 - **Rerun** replaces the example with the same band and title.
 
-`--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
+`--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--scale`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
 
 ## Deploy
 
