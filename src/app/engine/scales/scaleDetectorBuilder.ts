@@ -15,14 +15,14 @@ class ScaleDetectorBuilder {
   private debouncedFindMatches: (
     notes: DistinctNoteMarker[],
     usedNotesCount: number,
-    callback: (data: ScaleDetectorCallbackData) => void
+    callback: (data: ScaleDetectorCallbackData) => void,
   ) => void;
 
   constructor() {
     this.currentlyDetectedNotes = initNotesArray();
     this.debouncedFindMatches = trailingDebounce(
       scaleDetector.findMatches.bind(scaleDetector),
-      200
+      200,
     );
   }
 
@@ -56,7 +56,7 @@ class ScaleDetectorBuilder {
     this.debouncedFindMatches(
       this.currentlyDetectedNotes.map((x) => (x === undefined ? undefined : 1)),
       this.usedNotesCount,
-      this.displayAlert
+      this.displayAlert,
     );
   }
 
@@ -75,7 +75,7 @@ class ScaleDetectorBuilder {
           message: data.text,
           alertType: data.alertType,
           alertTimeout: 5000,
-        })
+        }),
       );
     } else {
       store.dispatch(setSuggestedScales(data.scales));

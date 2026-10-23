@@ -33,9 +33,9 @@ export const Slider: React.FC<SliderProps> = ({
   const theme = useUiSelector((s) => s.theme);
   return (
     <div
-      className={`items-center flex ${
+      className={`flex items-center ${
         isVertical ? "flex-col" : "flex-row"
-      } gap-2 justify-center ${className}`}
+      } justify-center gap-2 ${className}`}
     >
       <div
         className={`${isVertical ? "h-full" : "w-full"} flex items-center ${

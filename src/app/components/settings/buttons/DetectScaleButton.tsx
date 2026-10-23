@@ -22,7 +22,7 @@ import { IconButtonWrapper } from "../../uiFramework/IconButton";
 export const DetectScaleButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const scaleIsBeingDetected = useSettingsSelector(
-    (s) => s.scaleIsBeingDetected
+    (s) => s.scaleIsBeingDetected,
   );
   const setupScaleDetector = useScaleDetectorSetup();
 
@@ -61,7 +61,7 @@ export const DetectScaleButton: React.FC = (props) => {
                 " different notes to detect a scale",
               alertType: AlertType.Neutral,
               alertTimeout: 5000,
-            })
+            }),
           );
         }
         dispatch(setScaleIsBeingDetected(!scaleIsBeingDetected));

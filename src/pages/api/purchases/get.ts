@@ -9,7 +9,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<GetPurchaseResponseData>
+  res: NextApiResponse<GetPurchaseResponseData>,
 ) => {
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
     allowCancelled: true,

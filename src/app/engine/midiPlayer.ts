@@ -55,7 +55,7 @@ class MidiPlayer {
     eventsByTick: EventsByTick,
     logPrefix: string,
     tickZeroBarPosition: number,
-    onStarted?: () => void
+    onStarted?: () => void,
   ): Promise<boolean> {
     if (isLastEventValue) {
       store.dispatch(setIsLastEvent(false));
@@ -90,8 +90,8 @@ class MidiPlayer {
       canMoveClock = true;
       store.dispatch(
         setIsFirstEvent(
-          eventsByTick.getPreviousEvents(currentTick) === undefined
-        )
+          eventsByTick.getPreviousEvents(currentTick) === undefined,
+        ),
       );
       store.dispatch(setIsLastEvent(currentTick >= eventsByTick.lastTick));
     };
@@ -123,7 +123,7 @@ class MidiPlayer {
               afterPauseAction,
               eventsByTick,
               logPrefix,
-              currentTick
+              currentTick,
             );
             // the next play or stop starts from here
             seek(eventsByTick, currentTick, false);
@@ -152,7 +152,7 @@ class MidiPlayer {
           playAllNotes(
             getAudibleEvents(eventsByTick, events),
             logPrefix,
-            currentTick
+            currentTick,
           );
         }
         publishPlayhead(currentTick);
@@ -194,7 +194,7 @@ class MidiPlayer {
     action: PauseResolveValue,
     eventsByTick: EventsByTick,
     logPrefix: string,
-    currentTick: number
+    currentTick: number,
   ): number {
     switch (action) {
       case PauseResolveValue.GoBack: {
@@ -205,7 +205,7 @@ class MidiPlayer {
         playAllNotes(
           getAudibleEvents(eventsByTick, prevData.events),
           logPrefix,
-          prevData.tick
+          prevData.tick,
         );
         store.dispatch(setIsLastEvent(false));
 
@@ -222,7 +222,7 @@ class MidiPlayer {
         playAllNotes(
           getAudibleEvents(eventsByTick, nextData.events),
           logPrefix,
-          nextData.tick
+          nextData.tick,
         );
         store.dispatch(setIsFirstEvent(false));
 
@@ -239,7 +239,7 @@ const midiPlayer = new MidiPlayer();
 
 export const stopPlayback = async (
   dispatch: Dispatch<UnknownAction>,
-  logPrefix: string
+  logPrefix: string,
 ) => {
   if (isPlayingValue) {
     console.log(logPrefix + "Stopping current playback");
@@ -255,7 +255,7 @@ export const playMidi = async (
   eventsByTick: EventsByTick,
   logPrefix: string,
   onStarted?: () => void,
-  startBarPosition?: number
+  startBarPosition?: number,
 ) => {
   await stopPlayback(dispatch, logPrefix);
   console.log(logPrefix + "Starting new playback");
@@ -270,7 +270,7 @@ export const playMidi = async (
     eventsByTick,
     logPrefix,
     startBarPositions.get(eventsByTick) ?? 0,
-    onStarted
+    onStarted,
   );
   dispatch(setIsPlaying(false));
   recreatePlaybackPromise();

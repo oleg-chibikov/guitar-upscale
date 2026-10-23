@@ -28,14 +28,14 @@ import { PatternList } from "./PatternList";
 export const StrummingPatternDialog: React.FC = () => {
   const [patterns, setPatterns] = useState<StrummingPattern[]>([]);
   const [currentPattern, setCurrentPattern] = useState<StrummingPattern | null>(
-    null
+    null,
   );
   const dispatch = useDispatch();
   const strummingPatternEditorExpanded = useUiSelector(
-    (s) => s.strummingPatternEditorExpanded
+    (s) => s.strummingPatternEditorExpanded,
   );
   const strummingPatternChangedTrigger = useSettingsSelector(
-    (s) => s.strummingPatternChangedTrigger
+    (s) => s.strummingPatternChangedTrigger,
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export const StrummingPatternDialog: React.FC = () => {
       id: newId,
       timeSignature: DEFAULT_TIME_SIGNATURE,
       strums: Array(
-        getDefaultSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE)
+        getDefaultSlotsForTimeSignature(DEFAULT_TIME_SIGNATURE),
       ).fill(""),
     });
     dispatch(setStrummingPatternId(newId)); // select the new pattern automatically

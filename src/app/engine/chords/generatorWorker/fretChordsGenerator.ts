@@ -33,7 +33,7 @@ export class FretChordsGenerator {
     capo: number,
     neck: Neck,
     maxFretToProcess: number,
-    sharedArrayCache: SharedArrayCache
+    sharedArrayCache: SharedArrayCache,
   ) {
     this.capo = capo;
     this.neck = neck;
@@ -43,7 +43,7 @@ export class FretChordsGenerator {
       neck,
       maxFretToProcess,
       this.getFretLimitsForTheFirstTime,
-      sharedArrayCache
+      sharedArrayCache,
     );
   }
 
@@ -54,13 +54,13 @@ export class FretChordsGenerator {
       this.capo + 1,
       fretIndex -
         getPossibleFullFingerStretch(
-          Math.max(this.capo + 1, fretIndex - 5) // for more precise calculation we go 5 frets left, as the calculation is based on the leftmost fret of the range
-        )
+          Math.max(this.capo + 1, fretIndex - 5), // for more precise calculation we go 5 frets left, as the calculation is based on the leftmost fret of the range
+        ),
     );
 
     const newMax = Math.min(
       this.maxFretToProcess,
-      fretIndex + getPossibleFullFingerStretch(fretIndex)
+      fretIndex + getPossibleFullFingerStretch(fretIndex),
     );
     return { newMin, newMax };
   };
@@ -74,11 +74,13 @@ export class FretChordsGenerator {
 
   processFret = (
     intervalsToUse: number[],
-    stringOctaveNote: StringOctaveNote
+    stringOctaveNote: StringOctaveNote,
   ) => {
     let requiredNotesMask = 0;
     for (const interval of intervalsToUse) {
-      requiredNotesMask |= noteBit((stringOctaveNote.note + interval) % NOTE_COUNT);
+      requiredNotesMask |= noteBit(
+        (stringOctaveNote.note + interval) % NOTE_COUNT,
+      );
     }
     const chordBuilder: NoteInChord[] = [...Array(this.neck.length)];
     chordBuilder[stringOctaveNote.string] = stringOctaveNote;
@@ -86,7 +88,7 @@ export class FretChordsGenerator {
     const stringIndex = stringOctaveNote.string;
     const startingOptions = this.getStartingOptions(
       stringOctaveNote,
-      stringIndex
+      stringIndex,
     );
 
     const results: ChordBuilderInfo[] = [];
@@ -111,7 +113,7 @@ export class FretChordsGenerator {
         },
         minAllowedFret,
         maxAllowedFret,
-        results
+        results,
       );
     }
     return results;
@@ -119,7 +121,7 @@ export class FretChordsGenerator {
 
   private getStartingOptions(
     stringOctaveNote: StringOctaveNote,
-    stringIndex: number
+    stringIndex: number,
   ) {
     const startingFret = stringOctaveNote.fret;
 

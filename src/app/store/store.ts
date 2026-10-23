@@ -44,7 +44,7 @@ const persistConfig = {
         "Purging version" +
           storedVersion +
           " as there is a newer version " +
-          VERSION
+          VERSION,
       );
       // Clear previous state if version has changed
       void persistor.purge();

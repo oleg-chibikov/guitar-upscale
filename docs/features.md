@@ -60,13 +60,13 @@ The chords panel opens on the chords of the key: one chord per scale note, from 
 
 Settings that change how a chord sounds:
 
-| Setting | Where | What it does |
-| --- | --- | --- |
-| **Chord play mode** | Settings | picks the shape: round robin, preferred, fewest or most notes, barre, with thumb, first, random |
-| **Notes to play in chord** | Settings | caps how many strings sound |
-| **Delay between notes in chord** | Strumming | time between strings in one strum |
-| **Show chords for ♯ notes** | Settings | adds chords on sharp roots to the full grid |
-| **Alternate chords (↑↓)** | Settings | flips the strum direction on each press |
+| Setting                          | Where     | What it does                                                                                    |
+| -------------------------------- | --------- | ----------------------------------------------------------------------------------------------- |
+| **Chord play mode**              | Settings  | picks the shape: round robin, preferred, fewest or most notes, barre, with thumb, first, random |
+| **Notes to play in chord**       | Settings  | caps how many strings sound                                                                     |
+| **Delay between notes in chord** | Strumming | time between strings in one strum                                                               |
+| **Show chords for ♯ notes**      | Settings  | adds chords on sharp roots to the full grid                                                     |
+| **Alternate chords (↑↓)**        | Settings  | flips the strum direction on each press                                                         |
 
 Web Workers build the chord shapes when the app starts or the guitar settings change. The rows fill in one chord type at a time as the workers finish.
 
@@ -91,17 +91,17 @@ Code: [strumming/](../src/app/components/strumming/), [useStrumming.ts](../src/a
 
 The play panel plays, steps through and saves what is loaded.
 
-| Button | What it does |
-| --- | --- |
-| **Play** | plays by playback type. Pressed again during playback, it replays from the start |
-| **Pause** | pauses, and a second press goes on from the same spot |
-| **Previous, next** | steps one event back or forward |
-| **Reset** | after a confirm, stops playback and drops the loaded melody |
-| **Download** | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
-| **Metronome** | turns the click on and off |
-| **Record** | records MIDI [Composer]. See [MIDI recording](#midi-recording) |
-| **Tempo** | shows the BPM. A press opens a slider. Hidden while the piano roll is open |
-| **Volume** | shows the playback volume. A press opens a slider. Hidden while the piano roll is open |
+| Button             | What it does                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Play**           | plays by playback type. Pressed again during playback, it replays from the start                                                    |
+| **Pause**          | pauses, and a second press goes on from the same spot                                                                               |
+| **Previous, next** | steps one event back or forward                                                                                                     |
+| **Reset**          | after a confirm, stops playback and drops the loaded melody                                                                         |
+| **Download**       | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
+| **Metronome**      | turns the click on and off                                                                                                          |
+| **Record**         | records MIDI [Composer]. See [MIDI recording](#midi-recording)                                                                      |
+| **Tempo**          | shows the BPM. A press opens a slider. Hidden while the piano roll is open                                                          |
+| **Volume**         | shows the playback volume. A press opens a slider. Hidden while the piano roll is open                                              |
 
 Space starts playback from anywhere on the page. The piano roll takes Space for its own player while open.
 
@@ -194,13 +194,13 @@ Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChord
 
 The gear button opens a drawer. Each value survives a reload.
 
-| Group | Settings |
-| --- | --- |
-| **Look** | theme (light, dark, match OS), note display mode, chords display mode, skin [Composer] |
-| **Chords** | chord play mode, notes to play in chord, ♯ chords, alternate chords |
-| **Sound** | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only] |
-| **Playback** | playback type [Explorer] |
-| **Recording** | start metronome when recording, save MIDI right after recording [Composer] |
+| Group         | Settings                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Look**      | theme (light, dark, match OS), note display mode, chords display mode, skin [Composer]                              |
+| **Chords**    | chord play mode, notes to play in chord, ♯ chords, alternate chords                                                 |
+| **Sound**     | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only] |
+| **Playback**  | playback type [Explorer]                                                                                            |
+| **Recording** | start metronome when recording, save MIDI right after recording [Composer]                                          |
 
 "Reset settings" at the bottom puts the defaults back.
 

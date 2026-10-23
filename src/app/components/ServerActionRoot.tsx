@@ -8,7 +8,7 @@ import React, { ReactElement } from "react";
 
 const ServerActionRoot: React.FC<{
   renderChildren: (
-    premiumFeaturesWithSession: PremiumFeaturesWithSession
+    premiumFeaturesWithSession: PremiumFeaturesWithSession,
   ) => ReactElement;
 }> = async ({ renderChildren }) => {
   const premiumFeaturesWithSession = await getPremiumFeatures();

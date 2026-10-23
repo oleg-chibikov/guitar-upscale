@@ -3,7 +3,7 @@ import { Chord, FRET_COUNT, StringOctaveNote } from "@/app/data/notes";
 
 export function getPossibleFretRangeForChord(
   chordVariation: Chord,
-  capo: number
+  capo: number,
 ) {
   const chordFrets = chordVariation
     .filter((fp): fp is StringOctaveNote => fp !== undefined)
@@ -13,11 +13,11 @@ export function getPossibleFretRangeForChord(
   // Calculate allowed fret range for this string
   const minAllowedFretIndex = Math.max(
     capo + 1,
-    maxChordFret - MAX_DISTANCE_IN_CHORD
+    maxChordFret - MAX_DISTANCE_IN_CHORD,
   );
   const maxAllowedFretIndex = Math.min(
     FRET_COUNT - 1,
-    minChordFret + MAX_DISTANCE_IN_CHORD
+    minChordFret + MAX_DISTANCE_IN_CHORD,
   );
   return { minAllowedFretIndex, maxAllowedFretIndex };
 }

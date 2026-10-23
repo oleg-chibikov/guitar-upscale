@@ -39,7 +39,7 @@ export const getMakePurchase = (
     allPurchasedOptions,
   }: GetSubscriptionActionParams,
   hasDigitalGoodsService: boolean,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch<UnknownAction>,
 ) => {
   const makePurchase = async () => {
     if (!hasDigitalGoodsService) {
@@ -55,7 +55,7 @@ export const getMakePurchase = (
     try {
       const paymentResponse = await showGooglePlayPurchaseUiAndSubscribe(
         dispatch,
-        purchaseOption
+        purchaseOption,
       );
       if (!paymentResponse) {
         return;
@@ -75,13 +75,13 @@ export const getMakePurchase = (
       if (existingNotCancelledPurchaseOption) {
         result = await changePurchaseOnBackend(
           purchaseParams,
-          existingNotCancelledPurchaseOption
+          existingNotCancelledPurchaseOption,
         );
         actionString = "change";
       } else {
         result = await acknowledgePurchaseOnBackend(
           purchaseParams,
-          getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
+          getExistingCancelledPurchase(allPurchasedOptions, purchaseOption),
         );
         actionString = "acknowledge";
       }
@@ -100,7 +100,7 @@ export const getMakePurchase = (
         const completeResult = await completeSuccessfulResponse(
           paymentResponse,
           dispatch,
-          purchaseOption.tier
+          purchaseOption.tier,
         );
         if (!completeResult) {
           return;
@@ -116,14 +116,14 @@ export const getMakePurchase = (
           setAndShowAlert({
             message: "Success",
             alertType: AlertType.Success,
-          })
+          }),
         );
         await incrementAndReload(
           GOOGLE_PLAY_RELOAD_KEY,
           0,
           dispatch,
           message,
-          READ_MESSAGE_WAIT_TIME
+          READ_MESSAGE_WAIT_TIME,
         );
       } else if (result.status === ApiCallResult.SkipProcessing) {
         const message = `Subscription is already cancelled. Cannot ${actionString} it`;
@@ -132,13 +132,13 @@ export const getMakePurchase = (
           setAndShowAlert({
             message,
             alertType: AlertType.Warning,
-          })
+          }),
         );
       } else {
         const completeResult = await completeFailedResonse(
           paymentResponse,
           dispatch,
-          purchaseOption.tier
+          purchaseOption.tier,
         );
         if (!completeResult) {
           return;
@@ -149,7 +149,7 @@ export const getMakePurchase = (
           setAndShowAlert({
             message,
             alertType: AlertType.Error,
-          })
+          }),
         );
         return;
       }
@@ -163,7 +163,7 @@ export const getMakePurchase = (
 
 function getDeferredMessage(
   data: ChangeSubscriptionActionResponseData,
-  postfix: string
+  postfix: string,
 ) {
   const wasDeferred = data.wasDeferred;
   if (wasDeferred === true) {
@@ -183,7 +183,7 @@ export function getTierInfoMessage(data: SubscriptionActionResponseData) {
 
 async function showGooglePlayPurchaseUiAndSubscribe(
   dispatch: Dispatch<UnknownAction>,
-  purchaseOption: PurchaseOption
+  purchaseOption: PurchaseOption,
 ) {
   // Define the preferred payment method and item ID
   const paymentMethods: PaymentMethodData[] = [
@@ -218,7 +218,7 @@ async function showGooglePlayPurchaseUiAndSubscribe(
       setAndShowAlert({
         message: "Purchasing aborted",
         alertType: AlertType.Warning,
-      })
+      }),
     );
     return null;
   }
@@ -227,7 +227,7 @@ async function showGooglePlayPurchaseUiAndSubscribe(
 async function completeFailedResonse(
   paymentResponse: PaymentResponse,
   dispatch: Dispatch<UnknownAction>,
-  title: string
+  title: string,
 ) {
   try {
     // Optional: tell the PaymentRequest API the validation was not
@@ -241,7 +241,7 @@ async function completeFailedResonse(
       setAndShowAlert({
         message: `Completing response (marking it as failed) was not successful for "${title}" due to an error`,
         alertType: AlertType.Error,
-      })
+      }),
     );
     return false;
   }
@@ -250,7 +250,7 @@ async function completeFailedResonse(
 async function completeSuccessfulResponse(
   paymentResponse: PaymentResponse,
   dispatch: Dispatch<UnknownAction>,
-  title: string
+  title: string,
 ) {
   try {
     // Optional: tell the PaymentRequest API the validation was
@@ -264,7 +264,7 @@ async function completeSuccessfulResponse(
       setAndShowAlert({
         message: `Completing response (marking it as successful) was not successful for "${title}" due to an error`,
         alertType: AlertType.Error,
-      })
+      }),
     );
     return false;
   }

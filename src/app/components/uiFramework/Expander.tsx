@@ -92,7 +92,7 @@ export const Expander: FC<ExpanderProps> = ({
           id={id}
           aria-controls={id}
         >
-          <div className="flex flex-row items-center justify-between gap-2 w-full">
+          <div className="flex w-full flex-row items-center justify-between gap-2">
             <Typography variant="overline">{title}</Typography>
             {headerAction !== undefined && (
               <span

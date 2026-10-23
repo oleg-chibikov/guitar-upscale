@@ -6,7 +6,7 @@ import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const WaitForPatternFinishCheckbox: React.FC = (props) => {
   const waitForPatternFinish = useSettingsSelector(
-    (s) => s.waitForPatternFinish
+    (s) => s.waitForPatternFinish,
   );
   const dispatch = useDispatch();
 

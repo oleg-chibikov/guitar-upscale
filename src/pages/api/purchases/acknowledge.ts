@@ -22,7 +22,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<ChangeSubscriptionActionResponseData>
+  res: NextApiResponse<ChangeSubscriptionActionResponseData>,
 ) => {
   // we should grant permissions even if the subscription is cancelled - it is valid until its expiration period
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
@@ -37,7 +37,7 @@ const handle = async (
 
   const cancelledSubscription = await getCancelledSubscriptionFromRequest(
     req,
-    res
+    res,
   );
 
   let newTier: Tier;

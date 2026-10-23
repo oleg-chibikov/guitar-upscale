@@ -36,13 +36,13 @@ export const playFirstChordVariation = async (params: ChordPlayParameters) => {
 };
 
 export const playPreferredChordVariation = async (
-  params: ChordPlayParameters
+  params: ChordPlayParameters,
 ) => {
   if (!params.variations.length) {
     return;
   }
   const preferredVariation = chordPreferredVariationsByName.get(
-    params.chordName
+    params.chordName,
   );
   if (preferredVariation) {
     await playVariation(preferredVariation, "preferred", params);
@@ -62,7 +62,7 @@ export const playRoundRobin = async (params: ChordPlayParameters) => {
   await playVariation(
     params.variations[currentVariation],
     "round robin",
-    params
+    params,
   );
   chordRoundRobinMap.set(params.chordName, currentVariation);
 };
@@ -75,7 +75,7 @@ const selectRandomVariation = (variations: ChordVariations) => {
 const playVariation = async (
   variation: ChordBuilderInfo,
   variationKey: string,
-  { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters
+  { chordName, delayMs, notesToPlay, reverse, ...rest }: ChordPlayParameters,
 ) => {
   const noteCount = notesToPlay ?? chordNotesToPlayValue;
 
@@ -85,18 +85,18 @@ const playVariation = async (
       : ({
           stringOctaveNote: x,
           fingerIndex: variation.fingerAssignment[i],
-        } as StringOctaveNoteWithFingerPosition)
+        } as StringOctaveNoteWithFingerPosition),
   );
   console.log(`Playing ${variationKey} variation of ${chordName}`);
 
   const filtered = combinedData.filter(
-    (x) => x !== undefined
+    (x) => x !== undefined,
   ) as StringOctaveNoteWithFingerPosition[];
 
   replaceBassNoteWithSlash(filtered);
 
   const playSingleNote = async (
-    noteWithFinger: StringOctaveNoteWithFingerPosition
+    noteWithFinger: StringOctaveNoteWithFingerPosition,
   ) => {
     NotePlayEventBus.next({
       ...rest, // track metadata and strumming metadata

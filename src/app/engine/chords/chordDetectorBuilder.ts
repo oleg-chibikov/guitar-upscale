@@ -11,14 +11,14 @@ class ChordDetectorBuilder {
   private currentlyDetectedNotesByString: (NoteWithClearCallback | null)[];
   private debouncedFindMatches: (
     notes: StringOctaveNote[],
-    callback: (data: ChordDetectorCallbackData) => void
+    callback: (data: ChordDetectorCallbackData) => void,
   ) => void;
 
   constructor() {
     this.currentlyDetectedNotesByString = [];
     this.debouncedFindMatches = trailingDebounce(
       chordDetectorWorkerApi.findMatches.bind(chordDetectorWorkerApi),
-      200
+      200,
     );
   }
 
@@ -43,10 +43,10 @@ class ChordDetectorBuilder {
     this.debouncedFindMatches(
       (
         this.currentlyDetectedNotesByString.filter(
-          (x) => x
+          (x) => x,
         ) as NoteWithClearCallback[]
       ).map((x) => x.stringOctaveNote),
-      this.displayAlert
+      this.displayAlert,
     );
   }
 
@@ -66,7 +66,7 @@ class ChordDetectorBuilder {
             ? AlertType.Success
             : AlertType.Warning),
         alertTimeout: 5000,
-      })
+      }),
     );
   }
 }

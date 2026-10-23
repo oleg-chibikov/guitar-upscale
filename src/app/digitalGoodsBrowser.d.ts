@@ -6,8 +6,7 @@ import "@types/digital-goods-browser";
 // Define your TierKey type
 export type TierKey = "guitar_upscale.composer" | "guitar_upscale.explorer";
 
-export interface GuitarUpscaleSpecificDigitalGoodsProductDetails
-  extends DigitalGoodsProductDetails {
+export interface GuitarUpscaleSpecificDigitalGoodsProductDetails extends DigitalGoodsProductDetails {
   itemId: TierKey; // Override itemId with TierKey type
 }
 

@@ -3,12 +3,12 @@ import { trailingDebounce } from "../helpers/debounce";
 
 export const useScreenOrientation = () => {
   const [orientation, setOrientation] = useState(
-    window.innerWidth > window.innerHeight ? "landscape" : "portrait"
+    window.innerWidth > window.innerHeight ? "landscape" : "portrait",
   );
 
   const checkOrientation = () => {
     setOrientation(
-      window.innerWidth > window.innerHeight ? "landscape" : "portrait"
+      window.innerWidth > window.innerHeight ? "landscape" : "portrait",
     );
   };
 

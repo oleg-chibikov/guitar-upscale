@@ -25,7 +25,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<GetPurchaseResponseData>
+  res: NextApiResponse<GetPurchaseResponseData>,
 ) => {
   const subscriptionData = await getSubscriptionFromRequest(req, res, {
     allowCancelled: false,
@@ -50,7 +50,7 @@ const handle = async (
   console.log(
     "New subscription: %s; Existing subscription to cancel: %s",
     subscriptionData.params.itemId,
-    subscriptionToCancel.params.itemId
+    subscriptionToCancel.params.itemId,
   );
 
   await acknowledge(subscriptionData);

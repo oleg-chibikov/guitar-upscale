@@ -19,8 +19,15 @@ import { useMemo } from "react";
  * Edits on the selection, shared by the toolbar and the keyboard shortcuts
  */
 export const usePianoRollActions = () => {
-  const { data, events, selection, setSelection, apply, playhead$, activeTrack } =
-    usePianoRoll();
+  const {
+    data,
+    events,
+    selection,
+    setSelection,
+    apply,
+    playhead$,
+    activeTrack,
+  } = usePianoRoll();
   const { scalePattern } = useScaleContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
@@ -76,7 +83,7 @@ export const usePianoRollActions = () => {
               data,
               ids,
               steps,
-              snapToScale ? scalePattern : undefined
+              snapToScale ? scalePattern : undefined,
             );
         if (!targets.size) return;
         const result = moveEvents(data, targets, false);
@@ -99,10 +106,21 @@ export const usePianoRollActions = () => {
           moveEvents(
             data,
             resolveMove(data, selection, steps * snapTicks, 0),
-            false
-          )
+            false,
+          ),
         );
       },
     };
-  }, [data, events, selection, setSelection, apply, snapTicks, snapToScale, scalePattern, playhead$, activeTrack]);
+  }, [
+    data,
+    events,
+    selection,
+    setSelection,
+    apply,
+    snapTicks,
+    snapToScale,
+    scalePattern,
+    playhead$,
+    activeTrack,
+  ]);
 };

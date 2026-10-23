@@ -23,7 +23,7 @@ export async function incrementAndReload(
   currentValue: number,
   dispatch: Dispatch<UnknownAction>,
   reloadMessage?: string,
-  sleepTimeMs?: number
+  sleepTimeMs?: number,
 ) {
   dispatch(setLoadingMessage(reloadMessage ?? "Permissions mismatch"));
   console.log("Waiting to reload for the key", key);
@@ -58,7 +58,7 @@ export const processWithReloads = async (
   }>,
   onMismatchAndLimitExceeded: () => void,
   onMatch: () => void,
-  limit: number = 2
+  limit: number = 2,
 ) => {
   const signInCheckCount = getReloadCount(key);
 

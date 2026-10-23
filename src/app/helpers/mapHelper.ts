@@ -1,7 +1,7 @@
 export function addOrUpdateMapArray<T, V>(
   map: Map<T, V[]>,
   key: T,
-  value: V
+  value: V,
 ): void {
   if (map.has(key)) {
     // Key exists, so we can safely add the value to the existing array

@@ -8,7 +8,7 @@ export function calculateAverage(arr: number[]): number {
 }
 
 export function findObjectWithMinValue<T>(
-  arr: { object: T; number: number }[]
+  arr: { object: T; number: number }[],
 ): T {
   const { object: minObject } = arr.reduce((min, current) => {
     return current.number < min.number ? current : min;
@@ -19,7 +19,7 @@ export function findObjectWithMinValue<T>(
 
 export function arrayToMap<T, TKey>(
   array: T[],
-  keyFn: (value: T) => TKey
+  keyFn: (value: T) => TKey,
 ): Map<TKey, T> {
   return array.reduce((map, item) => {
     const key = keyFn(item);

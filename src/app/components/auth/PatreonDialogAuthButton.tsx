@@ -10,7 +10,7 @@ import { DialogAuthButtonProps } from "./AuthButtonProps";
 const PatreonSubscribeButton = React.lazy(() =>
   import("./PatreonSubscribeButton").then((module) => ({
     default: module.PatreonSubscribeButton,
-  }))
+  })),
 );
 
 export const PatreonDialogAuthButton: FC<DialogAuthButtonProps> = ({

@@ -30,7 +30,7 @@ const setupClient = async () => {
  * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
  */
 export async function acknowledgeSubscriptionPurchase(
-  params: PurchaseParams
+  params: PurchaseParams,
 ): Promise<boolean> {
   console.log("Acknowledging subscription", params.itemId);
   try {
@@ -58,7 +58,7 @@ export async function acknowledgeSubscriptionPurchase(
  * @param {params} PurchaseParams
  */
 export async function fetchSubscriptionPurchase(
-  params: PurchaseParams
+  params: PurchaseParams,
 ): Promise<billing.SubscriptionPurchase> {
   console.log("Fetching subscription", params.itemId);
   try {
@@ -85,7 +85,7 @@ export async function fetchSubscriptionPurchase(
  * @param {params} PurchaseParams
  */
 export async function cancelSubscription(
-  params: PurchaseParams
+  params: PurchaseParams,
 ): Promise<void> {
   console.log("Cancelling subscription", params.itemId);
   try {
@@ -108,7 +108,7 @@ export async function cancelSubscription(
  * @param {params} PurchaseParams
  */
 export async function revokeSubscription(
-  params: PurchaseParams
+  params: PurchaseParams,
 ): Promise<void> {
   console.log("Revoking subscription", params.itemId);
   try {
@@ -135,7 +135,7 @@ export async function revokeSubscription(
 export async function deferSubscription(
   params: PurchaseParams,
   currentExpiryTimeMs: number,
-  newExpiryTimeMs: number
+  newExpiryTimeMs: number,
 ): Promise<void> {
   console.log("Deferring subscription", params.itemId);
   try {

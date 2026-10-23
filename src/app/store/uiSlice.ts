@@ -77,7 +77,7 @@ export let themeValue: Theme = initialState.theme;
 const calculatePercentage = (
   minimum: number,
   maximum: number,
-  currentPosition: number
+  currentPosition: number,
 ): number => {
   const percentage: number =
     ((currentPosition - minimum) / (maximum - minimum)) * 100;
@@ -87,7 +87,7 @@ const calculatePercentage = (
 const getValueFromPercentage = (
   minimum: number,
   maximum: number,
-  percentage: number
+  percentage: number,
 ): number => {
   const range = maximum - minimum;
   return (percentage / 100) * range + minimum;
@@ -148,7 +148,7 @@ export const uiSlice = createSlice({
         message: string;
         alertType?: AlertType;
         alertTimeout?: number;
-      }>
+      }>,
     ) {
       state.showAlert = true;
       state.alertMessage = action.payload.message;
@@ -176,12 +176,12 @@ export const uiSlice = createSlice({
         const relativePosition = calculatePercentage(
           minXZoom,
           maxXZoom,
-          action.payload
+          action.payload,
         );
         state.fretboardScaleY = getValueFromPercentage(
           minYZoom,
           maxYZoom,
-          100 - relativePosition
+          100 - relativePosition,
         );
       }
     },
@@ -191,12 +191,12 @@ export const uiSlice = createSlice({
         const relativePosition = calculatePercentage(
           minYZoom,
           maxYZoom,
-          action.payload
+          action.payload,
         );
         state.fretboardScaleX = getValueFromPercentage(
           minXZoom,
           maxXZoom,
-          100 - relativePosition
+          100 - relativePosition,
         );
       }
     },
@@ -206,12 +206,12 @@ export const uiSlice = createSlice({
         const relativePositionY = calculatePercentage(
           minYZoom,
           maxYZoom,
-          state.fretboardScaleY
+          state.fretboardScaleY,
         );
         state.fretboardScaleX = getValueFromPercentage(
           minXZoom,
           maxXZoom,
-          100 - relativePositionY
+          100 - relativePositionY,
         );
       }
     },

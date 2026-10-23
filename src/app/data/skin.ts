@@ -19,6 +19,4 @@ export type SevenStringSkinType =
 export type EightStringSkinType =
   (typeof EightStringSkin)[keyof typeof EightStringSkin];
 export type CombinedSkinType =
-  | SkinType
-  | SevenStringSkinType
-  | EightStringSkinType;
+  SkinType | SevenStringSkinType | EightStringSkinType;

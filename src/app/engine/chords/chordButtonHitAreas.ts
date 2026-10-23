@@ -22,7 +22,7 @@ export const findClosestCell = <T>(
   cells: Iterable<{ rect: CellRect; value: T }>,
   x: number,
   y: number,
-  viewport: CellRect
+  viewport: CellRect,
 ): T | undefined => {
   let closest: T | undefined;
   let closestDistance = MAX_SNAP_DISTANCE_PX;

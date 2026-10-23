@@ -21,7 +21,7 @@ import { IconButtonWrapper } from "../uiFramework/IconButton";
 async function toggleRecording(
   newValue: boolean,
   dispatch: Dispatch<UnknownAction>,
-  saveWhenStop: boolean
+  saveWhenStop: boolean,
 ) {
   const midiRecorder = (await import("@/app/engine/midiRecorder/midiRecorder"))
     .midiRecorder;

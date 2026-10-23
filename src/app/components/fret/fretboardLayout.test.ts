@@ -1,8 +1,4 @@
-import {
-  HEADER_GAP,
-  findFretHit,
-  getFretboardLayout,
-} from "./fretboardLayout";
+import { HEADER_GAP, findFretHit, getFretboardLayout } from "./fretboardLayout";
 
 const noTilt = { slope: 0, center: 0 };
 const layout = getFretboardLayout(24, 6, 10, 24, noTilt);
@@ -25,7 +21,7 @@ describe("findFretHit", () => {
 
   it("finds the fret number", () => {
     expect(
-      findFretHit(layout, second.centerX, layout.headerCenterY, everyNote, 6)
+      findFretHit(layout, second.centerX, layout.headerCenterY, everyNote, 6),
     ).toEqual({ kind: "header", fret: 2 });
   });
 
@@ -50,7 +46,7 @@ describe("findFretHit", () => {
 
   it("misses past the last fret", () => {
     expect(
-      findFretHit(layout, layout.width + 1, layout.headerCenterY, everyNote, 6)
+      findFretHit(layout, layout.width + 1, layout.headerCenterY, everyNote, 6),
     ).toBeUndefined();
   });
 });

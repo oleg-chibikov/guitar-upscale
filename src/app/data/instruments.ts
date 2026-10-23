@@ -194,12 +194,12 @@ const gmGroupOrder: InstrumentGroup[] = [
 
 const gmInstruments: Instrument[] = gmGroupOrder.flatMap((group) =>
   (instrumentGroups[group] as readonly Instrument[]).filter(
-    (instrument) => instrument !== "sampled_piano"
-  )
+    (instrument) => instrument !== "sampled_piano",
+  ),
 );
 
 export const getInstrumentForProgram = (
-  program: number
+  program: number,
 ): Instrument | undefined => gmInstruments[program];
 
 // "distortion_guitar" reads as "Distortion Guitar"

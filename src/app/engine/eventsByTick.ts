@@ -27,7 +27,7 @@ export type ChordOrNote = {
 export const getChordOrNoteText = (event: ChordOrNote) =>
   event.note?.note
     ? serializeOctaveNote(event.note?.note)
-    : event.chord?.chord ?? "";
+    : (event.chord?.chord ?? "");
 
 export type EventsForTick = {
   tick: number;
@@ -60,16 +60,16 @@ export class EventsByTick {
     return IdGenerator.generate(
       "note" in value
         ? `note-t${value.trackNumber}-${value.note.octave}-${getNoteText(
-            value.note.note
+            value.note.note,
           )}-${Date.now()}-`
-        : `chord-${value.chord}-`
+        : `chord-${value.chord}-`,
     );
   }
 
   addEventAtTick(
     tick: number,
     value: NoteEvent | ChordWithPlayMetadata,
-    duration?: number
+    duration?: number,
   ): ChordOrNote {
     const id = EventsByTick.generateId(value);
     const chordOrNote: ChordOrNote =
@@ -183,7 +183,7 @@ export class EventsByTick {
    */
   get flatItems(): EventForTick[] {
     return this.items.flatMap(({ tick, events }) =>
-      events.map((event) => ({ tick, event }))
+      events.map((event) => ({ tick, event })),
     );
   }
 

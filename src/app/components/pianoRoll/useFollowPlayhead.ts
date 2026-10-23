@@ -16,7 +16,7 @@ const PAGE_MARGIN_PX = 40;
  */
 export const useFollowPlayhead = (
   scrollerRef: RefObject<HTMLDivElement | null>,
-  zoom: Zoom
+  zoom: Zoom,
 ) => {
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
   const { playhead$, source, selection } = usePianoRoll();

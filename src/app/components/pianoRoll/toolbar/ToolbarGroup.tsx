@@ -6,7 +6,7 @@ export const Group: React.FC<{ children: ReactNode; className?: string }> = ({
   className = "",
 }) => (
   <div
-    className={`flex flex-row items-center shrink-0 rounded-md bg-white/5 overflow-hidden ${className}`}
+    className={`flex shrink-0 flex-row items-center overflow-hidden rounded-md bg-white/5 ${className}`}
   >
     {children}
   </div>

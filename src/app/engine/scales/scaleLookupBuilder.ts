@@ -21,7 +21,7 @@ export const formatScale = (scaleAndGroup: ScaleAndGroup) =>
 
 export const setCurrentScaleAndGroup = (
   data: ScaleAndGroup,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch<UnknownAction>,
 ) => {
   let changed = false;
   if (data.group !== scaleGroupValue) {
@@ -55,7 +55,7 @@ export const rebuildScaleDetectorLookup = () => {
   for (const [group, groupMap] of Array.from(allScales)) {
     // Iterate through each scale within the group
     for (const [scaleName, scaleNotesWithoutZero] of Array.from(
-      groupMap.entries()
+      groupMap.entries(),
     )) {
       const fullScaleNotes = [0].concat(scaleNotesWithoutZero);
       const scaleString = JSON.stringify(fullScaleNotes);
@@ -64,8 +64,8 @@ export const rebuildScaleDetectorLookup = () => {
       if (encounteredScales.has(scaleString)) {
         console.log(
           `Duplicate found: Scale '${scaleName}' in '${group}' duplicates '${encounteredScales.get(
-            scaleString
-          )}'`
+            scaleString,
+          )}'`,
         );
       } else {
         // Otherwise, add the scale to the map
@@ -91,7 +91,7 @@ export const rebuildScaleDetectorLookup = () => {
 
 export const setScaleDetectorFunctions = (
   clear: () => void,
-  addScale: (scale: Scale, scaleData: ScaleAndGroup) => void
+  addScale: (scale: Scale, scaleData: ScaleAndGroup) => void,
 ) => {
   clearScaleDetector = clear;
   addScaleToDetectorLookup = addScale;
@@ -101,5 +101,4 @@ export const setScaleDetectorFunctions = (
 export let clearScaleDetector: () => void | undefined;
 
 export let addScaleToDetectorLookup:
-  | ((scale: Scale, scaleData: ScaleAndGroup) => void)
-  | undefined;
+  ((scale: Scale, scaleData: ScaleAndGroup) => void) | undefined;

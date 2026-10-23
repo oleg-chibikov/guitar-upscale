@@ -14,7 +14,7 @@ type ChordMatchResult = {
 };
 
 export async function extractChordFromNotes(
-  sortedNotes: OctaveNote[]
+  sortedNotes: OctaveNote[],
 ): Promise<ChordMatchResult | undefined> {
   if (sortedNotes.length < MIN_NOTES_TO_DETECT_CHORD) {
     return undefined;
@@ -24,14 +24,14 @@ export async function extractChordFromNotes(
     .map((variation) => variation.filter((x) => x) as StringOctaveNote[])
     .sort(
       // sorting to put the variations with the highest number of notes first (it might give the better matching chord if different variations are matching different chords)
-      (a: StringOctaveNote[], b: StringOctaveNote[]) => b.length - a.length
+      (a: StringOctaveNote[], b: StringOctaveNote[]) => b.length - a.length,
     );
 
   for (const variation of variations) {
     console.log(
       "Detecting chord for",
 
-      variation.map((x) => x.string + "_" + x.fret)
+      variation.map((x) => x.string + "_" + x.fret),
     );
     let chordName: string | undefined = undefined;
     await chordDetectorWorkerApi.findMatches(variation, (data) => {
@@ -52,13 +52,13 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
   const appendNextNoteRecursive = (
     indexOfNoteEvent: number,
     stringToPutNextNote: number,
-    array: (StringOctaveNote | null)[]
+    array: (StringOctaveNote | null)[],
   ): (StringOctaveNote | null)[][] => {
     if (stringToPutNextNote >= stringCountValue) {
       console.log(
         "Index of note event: %d, index of string to put current event: %d. Strings exceeded. Returning the result without further processing",
         indexOfNoteEvent,
-        stringToPutNextNote
+        stringToPutNextNote,
       );
       return [array];
     }
@@ -74,12 +74,12 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
       console.log(
         "Index of note event: %d, index of string to put current event: %d. No matching notes in the current scale",
         indexOfNoteEvent,
-        stringToPutNextNote
+        stringToPutNextNote,
       );
       return appendNextNoteRecursive(
         indexOfNoteEvent + 1,
         stringToPutNextNote + 1,
-        array
+        array,
       );
     }
 
@@ -92,18 +92,18 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
       console.log(
         "Index of note event: %d, index of string to put current event: %d. No matching notes for the current string. Trying the same note on the next string",
         indexOfNoteEvent,
-        stringToPutNextNote
+        stringToPutNextNote,
       );
       return appendNextNoteRecursive(
         indexOfNoteEvent,
         stringToPutNextNote + 1,
-        array
+        array,
       );
     }
     console.log(
       "Index of note event: %d, index of string to put current event: %d. Processing possible notes",
       indexOfNoteEvent,
-      stringToPutNextNote
+      stringToPutNextNote,
     );
     const possibleBranches: (StringOctaveNote | null)[][] = [];
     while (highestNote.string <= stringToPutNextNote) {
@@ -118,7 +118,7 @@ function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
         const nextBranches = appendNextNoteRecursive(
           indexOfNoteEvent + 1,
           highestNote.string + 1,
-          arrayCopy
+          arrayCopy,
         );
         for (const branch of nextBranches) {
           possibleBranches.push(branch);

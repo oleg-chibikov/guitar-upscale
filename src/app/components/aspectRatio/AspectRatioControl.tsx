@@ -11,10 +11,10 @@ export const AspectRatioControl: React.FC = () => {
   return (
     <>
       <div
-        className={`z-30 fixed bottom-1 px-1 ${
+        className={`fixed bottom-1 z-30 px-1 ${
           theme === Theme.Light
-            ? " bg-accented_background-light"
-            : " bg-accented_background-dark"
+            ? "bg-accented_background-light"
+            : "bg-accented_background-dark"
         } ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left
@@ -25,10 +25,10 @@ export const AspectRatioControl: React.FC = () => {
         <FretboardScaleXSlider />
       </div>
       <div
-        className={`z-30 fixed bottom-10 py-1 rounded-t-md ${
+        className={`fixed bottom-10 z-30 rounded-t-md py-1 ${
           theme === Theme.Light
-            ? " bg-accented_background-light"
-            : " bg-accented_background-dark"
+            ? "bg-accented_background-light"
+            : "bg-accented_background-dark"
         } ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
@@ -37,7 +37,7 @@ export const AspectRatioControl: React.FC = () => {
         <FretboardScaleYSlider />
       </div>
       <div
-        className={`z-30 fixed bottom-1  ${
+        className={`fixed bottom-1 z-30 ${
           // it should be on the opposite side of chords to avoid overlapping
           chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
         }`}

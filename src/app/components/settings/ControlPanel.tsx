@@ -27,7 +27,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
     <Panel
       enableReverse
       id={CONTROL_PANEL_ID}
-      className={`z-30 opacity-95 fixed top-1 p-1 ${isRight ? "right-1" : "left-1"}`}
+      className={`fixed top-1 z-30 p-1 opacity-95 ${isRight ? "right-1" : "left-1"}`}
       style={{ maxWidth: "calc(100vw - 8px)" }}
     >
       <KeyChip premiumComponents={premiumComponents} />

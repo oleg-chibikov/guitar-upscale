@@ -32,16 +32,14 @@ type GetSubscriptionParams = {
 export const getSubscriptionFromRequest = async <T extends ResponseData>(
   req: NextApiRequest,
   res: NextApiResponse<T>,
-  { allowCancelled, paramNames, required }: GetSubscriptionParams
+  { allowCancelled, paramNames, required }: GetSubscriptionParams,
 ): Promise<SubscriptionData | undefined> => {
   const paramCollection = (
     req.method === "POST" ? req.body : req.query
   ) as Record<string, string | null | undefined>;
   // Extract parameters from the body instead of query
   const itemId = paramCollection[paramNames?.itemId ?? "itemId"] as
-    | TierKey
-    | null
-    | undefined;
+    TierKey | null | undefined;
   const purchaseToken =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
@@ -76,10 +74,10 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
 
 // This is a single cancelled subscription with the highest tier
 export const getCancelledSubscriptionFromRequest = async <
-  T extends ResponseData
+  T extends ResponseData,
 >(
   req: NextApiRequest,
-  res: NextApiResponse<T>
+  res: NextApiResponse<T>,
 ) => {
   return await getSubscriptionFromRequest(req, res, {
     allowCancelled: true, // this param can contain only cancelled subscription
@@ -96,7 +94,7 @@ export const shouldRevoke = (subscription: SubscriptionPurchase) =>
 
 export async function defer(
   cancelledSubscription: SubscriptionData,
-  purchasedSubscription: SubscriptionData
+  purchasedSubscription: SubscriptionData,
 ) {
   const newSubscriptionDesiredStartTimeMs =
     cancelledSubscription.subscription.expiryTimeMillis;
@@ -127,14 +125,14 @@ export async function defer(
     new Date(newSubscriptionDesiredExpiryTimeMs),
     new Date(newSubscriptionCurrentExpiryTimeMs),
     msToTime(currentSubscriptionDurationMs),
-    differenceObject
+    differenceObject,
   );
   if (differenceObject.days >= 1 && differenceObject.days <= 365) {
     try {
       await deferSubscription(
         purchasedSubscription.params,
         purchasedSubscription.subscription.expiryTimeMillis,
-        newSubscriptionDesiredExpiryTimeMs
+        newSubscriptionDesiredExpiryTimeMs,
       );
       return true;
     } catch {
@@ -143,7 +141,7 @@ export async function defer(
   } else {
     // https://developer.android.com/google/play/billing/subscriptions#defer
     console.log(
-      "Difference in expiry time should be between 1 day and 1 year. Subscription won't be deferred"
+      "Difference in expiry time should be between 1 day and 1 year. Subscription won't be deferred",
     );
     return false;
   }
@@ -156,14 +154,14 @@ export const cancel = async (subscriptionData: SubscriptionData) => {
   if (shouldRevoke(subscription)) {
     console.log(
       "Subscription %s is still in grace period. Revoking permissions",
-      params.itemId
+      params.itemId,
     );
     await revokeSubscription(params);
     mode = CancellationMode.Revoke;
   } else {
     console.log(
       "Subscription %s is not in grace period anymore. Keeping permissions",
-      params.itemId
+      params.itemId,
     );
     await cancelSubscription(params);
     // we should keep the permissions. it will be revoked only when the subscription expires
@@ -177,7 +175,7 @@ export const acknowledge = async (subscriptionData: SubscriptionData) => {
   console.log(
     "Subscription %s acknowledgement state %s",
     params.itemId,
-    wasAcknowledged
+    wasAcknowledged,
   );
   // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
 

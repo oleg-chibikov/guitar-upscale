@@ -18,7 +18,7 @@ export const ShareMidiButton: React.FC = () => {
       setAndShowAlert({
         message,
         alertType: AlertType.Error,
-      })
+      }),
     );
   };
 

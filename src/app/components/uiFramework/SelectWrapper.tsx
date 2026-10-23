@@ -47,15 +47,15 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
             ? "bg-disabled-light text-gray-500"
             : "bg-disabled-dark text-gray-500"
           : theme === Theme.Light
-          ? "bg-select_background-light text-select_foreground-light"
-          : "bg-select_background-dark text-select_foreground-dark"
+            ? "bg-select_background-light text-select_foreground-light"
+            : "bg-select_background-dark text-select_foreground-dark"
       }`}
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
           {option.color !== undefined && (
             <span
-              className="inline-block w-2.5 h-2.5 rounded-full mr-1.5 shrink-0"
+              className="mr-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
               style={{ background: option.color }}
             />
           )}

@@ -51,7 +51,7 @@ export const areOtherChordsStrumming = (chordName: string): boolean =>
   Array.from(strummingChordsMap).filter((x) => x[0] !== chordName).length > 0;
 
 export const getOtherChordsStrummingPromises = (
-  chordName: string
+  chordName: string,
 ): Promise<void>[] => {
   return Array.from(strummingChordsMap)
     .map(([name, data]) => {
@@ -63,7 +63,7 @@ export const getOtherChordsStrummingPromises = (
 };
 
 export const getOtherChordsGracePeriodPromises = (
-  chordName: string
+  chordName: string,
 ): Promise<void>[] => {
   return Array.from(strummingChordsMap)
     .map(([name, data]) => {
@@ -81,7 +81,7 @@ export const getChordClickedPromise = (chordName: string) =>
   strummingChordsMap.get(chordName)?.clickPromiseAndResolve?.promise;
 
 export const isChordStrummingOrPendingStrumming = (
-  chordName: string
+  chordName: string,
 ): boolean =>
   strummingChordsMap.get(chordName)?.state !== StrummingState.Clicked;
 
@@ -106,30 +106,30 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming registered",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };
 
 export const setImmediateChordGracePeriod = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   console.log(
     STRUMMING_LOG_PREFIX + "---> Entered immediate chord grace period",
     chordName,
-    clickNumber
+    clickNumber,
   );
   strummingImmediateChordGracePeriodChords.add(chordName);
 };
 
 export const releaseImmediateChordGracePeriod = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   console.log(
     STRUMMING_LOG_PREFIX + "---> Exited immediate chord grace period",
     chordName,
-    clickNumber
+    clickNumber,
   );
   strummingImmediateChordGracePeriodChords.delete(chordName);
 };
@@ -156,13 +156,13 @@ export const releaseChordClick = (chordName: string, clickNumber: number) => {
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming click released",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };
 
 export const markChordAsPendingStrumming = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   const data =
     strummingChordsMap.get(chordName) ??
@@ -171,7 +171,7 @@ export const markChordAsPendingStrumming = (
         "No record for marking as pending strumming: " +
           chordName +
           " " +
-          clickNumber
+          clickNumber,
       );
     })();
   setCurrentChord(chordName);
@@ -187,19 +187,19 @@ export const markChordAsPendingStrumming = (
   console.log(
     STRUMMING_LOG_PREFIX + "---> Chord pending strumming start",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };
 
 export const markChordAsStrumming = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   const data =
     strummingChordsMap.get(chordName) ??
     (() => {
       throw new Error(
-        "No record for marking as strumming: " + chordName + " " + clickNumber
+        "No record for marking as strumming: " + chordName + " " + clickNumber,
       );
     })();
   strummingChordsMap.set(chordName, {
@@ -209,7 +209,7 @@ export const markChordAsStrumming = (
   console.log(
     STRUMMING_LOG_PREFIX + "---> Started strumming",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };
 
@@ -218,13 +218,13 @@ export const markChordAsStrumming = (
 // Strumming is totally finished for the chord when setIsStrumming is called with the false value
 export const startChordGracePeriod = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   const data =
     strummingChordsMap.get(chordName) ??
     (() => {
       throw new Error(
-        "No record for starting grace period: " + chordName + " " + clickNumber
+        "No record for starting grace period: " + chordName + " " + clickNumber,
       );
     })();
 
@@ -233,7 +233,7 @@ export const startChordGracePeriod = (
       "No record for strumming promise for starting grace period: " +
         chordName +
         " " +
-        clickNumber
+        clickNumber,
     );
   }
 
@@ -248,13 +248,13 @@ export const startChordGracePeriod = (
     STRUMMING_LOG_PREFIX +
       "---> Strumming pending finishing. Grace period started",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };
 
 export const finishChordGracePeriod = (
   chordName: string,
-  clickNumber: number
+  clickNumber: number,
 ) => {
   const gracePeriodPromiseAndResolve =
     strummingChordsMap.get(chordName)?.gracePeriodPromiseAndResolve;
@@ -264,6 +264,6 @@ export const finishChordGracePeriod = (
   console.log(
     STRUMMING_LOG_PREFIX + "---> Strumming finished. Grace period ended",
     chordName,
-    clickNumber
+    clickNumber,
   );
 };

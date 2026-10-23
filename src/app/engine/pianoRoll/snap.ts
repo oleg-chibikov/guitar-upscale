@@ -12,7 +12,7 @@ export const floorTick = (tick: number, snapTicks: number) =>
  */
 export const snapPitchToScale = (
   pitch: number,
-  scalePattern: Set<Note>
+  scalePattern: Set<Note>,
 ): number => {
   if (scalePattern.size === 0) {
     return pitch;

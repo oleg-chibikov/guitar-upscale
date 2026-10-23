@@ -105,11 +105,13 @@ const easeOut = (progress: number) => 1 - Math.pow(1 - progress, 2);
 
 const getMarkerText = (
   stringOctaveNote: StringOctaveNote,
-  noteDisplayMode: NoteDisplayMode
+  noteDisplayMode: NoteDisplayMode,
 ) => {
   // the open string shows its note
   const displayMode =
-    stringOctaveNote.fret === capoValue ? NoteDisplayMode.Note : noteDisplayMode;
+    stringOctaveNote.fret === capoValue
+      ? NoteDisplayMode.Note
+      : noteDisplayMode;
   switch (displayMode) {
     case NoteDisplayMode.Note:
       return serializeOctaveNote(stringOctaveNote);
@@ -162,7 +164,7 @@ const drawBoard = (ctx: CanvasRenderingContext2D, state: DrawState) => {
           x,
           toY(centerY - FRET_LINE_HEIGHT / 2),
           lineWidth,
-          FRET_LINE_HEIGHT / scaleY
+          FRET_LINE_HEIGHT / scaleY,
         );
       }
     }
@@ -171,7 +173,7 @@ const drawBoard = (ctx: CanvasRenderingContext2D, state: DrawState) => {
     ctx.fillText(
       String(column.fret),
       toX(column.centerX),
-      toY(layout.headerCenterY)
+      toY(layout.headerCenterY),
     );
   }
 };
@@ -180,7 +182,7 @@ const getMarkerColors = (
   palette: Palette,
   marker: FretMarkerState | undefined,
   isColored: boolean,
-  fret: number
+  fret: number,
 ) => {
   const isFromPreviousChord = marker?.isFromPreviousChord === true;
   const fill = isFromPreviousChord
@@ -211,7 +213,7 @@ const drawMarkers = (
   ctx: CanvasRenderingContext2D,
   state: DrawState,
   store: FretMarkerStore,
-  now: number
+  now: number,
 ) => {
   const { layout, neck, palette, scaleX, scaleY, originX, originY } = state;
   const shiftedNote = getShiftedNote(capoValue, tuningValue);
@@ -232,7 +234,7 @@ const drawMarkers = (
         palette,
         marker,
         stringOctaveNote.note === shiftedNote,
-        fret
+        fret,
       );
 
       let fill = colors.fill;
@@ -277,7 +279,7 @@ const drawMarkers = (
       ctx.fillText(
         getMarkerText(stringOctaveNote, state.noteDisplayMode),
         x,
-        y
+        y,
       );
       ctx.globalAlpha = 1;
 
@@ -317,7 +319,7 @@ const drawMarkers = (
       y,
       BLAST_START_RADIUS * BLAST_MAX_SCALE * easeOut(progress),
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
     ctx.fill();
   }
@@ -332,7 +334,7 @@ const useWindowSize = () => {
   useEffect(() => {
     const handleResize = trailingDebounce(
       () => setSize({ width: window.innerWidth, height: window.innerHeight }),
-      200
+      200,
     );
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -378,7 +380,7 @@ export const Fretboard: React.FC = () => {
       stringCount,
       widthStep,
       height,
-      stringTilt
+      stringTilt,
     );
   }, [skin, stringCount]);
 
@@ -397,28 +399,27 @@ export const Fretboard: React.FC = () => {
           1,
           3,
           slashChordsExpanded ? -210 : -240,
-          slashChordsExpanded ? 400 : 300
+          slashChordsExpanded ? 400 : 300,
         ));
-  const originY =
-    (sectionHeight - layout.height) / 2 + (needYShift ? -100 : 0);
+  const originY = (sectionHeight - layout.height) / 2 + (needYShift ? -100 : 0);
 
   const imageX = originX + position.left;
   const imageY = originY + position.top;
   const imageClipWidth = Math.min(
     IMAGE_WIDTH,
-    Math.max(width * scaleX, 2000) - position.left - 12 * scaleX
+    Math.max(width * scaleX, 2000) - position.left - 12 * scaleX,
   );
   const imageClipHeight = Math.min(
     IMAGE_HEIGHT,
     Math.max((height - 380) * scaleY, 400) -
       position.top +
-      (needYShift ? 160 : 0)
+      (needYShift ? 160 : 0),
   );
   const stageWidth = Math.ceil(
-    Math.max(imageX + imageClipWidth, originX + layout.width) / scaleX
+    Math.max(imageX + imageClipWidth, originX + layout.width) / scaleX,
   );
   const stageHeight = Math.ceil(
-    Math.max(imageY + imageClipHeight, originY + layout.height) / scaleY
+    Math.max(imageY + imageClipHeight, originY + layout.height) / scaleY,
   );
 
   const drawState = useRef<DrawState | undefined>(undefined);
@@ -484,7 +485,7 @@ export const Fretboard: React.FC = () => {
       x,
       y,
       (string, fret) => (neck[string]?.[fret] ?? null) !== null,
-      neck.length
+      neck.length,
     );
   };
 
@@ -497,7 +498,7 @@ export const Fretboard: React.FC = () => {
       console.log(
         "Playing all the notes on fret %d at tick %d",
         hit.fret,
-        currentTick
+        currentTick,
       );
       for (const string of neck) {
         const stringOctaveNote = string[hit.fret];
@@ -512,7 +513,7 @@ export const Fretboard: React.FC = () => {
     console.log(
       "Playing note (manual) %o at tick %d",
       stringOctaveNote,
-      currentTick
+      currentTick,
     );
     NotePlayEventBus.next({ stringOctaveNote });
   };
@@ -538,7 +539,7 @@ export const Fretboard: React.FC = () => {
       <div
         ref={containerRef}
         id={FRETBOARD}
-        className="absolute left-0 top-0 z-10"
+        className="absolute top-0 left-0 z-10"
         style={{ width: stageWidth, height: stageHeight }}
         onTouchStartCapture={
           hasTouchInput
@@ -592,7 +593,7 @@ export const Fretboard: React.FC = () => {
                     getNativeContext(context),
                     drawState.current,
                     store,
-                    performance.now()
+                    performance.now(),
                   );
                 }
               }}

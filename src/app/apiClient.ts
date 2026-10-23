@@ -31,7 +31,7 @@ export enum ApiCallResult {
 const callApi = async <T extends ResponseData>(
   endpoint: string,
   method: Method,
-  params?: Record<string, unknown>
+  params?: Record<string, unknown>,
 ): Promise<Response<T>> => {
   try {
     const options = {
@@ -68,7 +68,7 @@ const callApi = async <T extends ResponseData>(
 
       console.error(
         `Error status received while calling ${endpoint}`,
-        responseData
+        responseData,
       );
       return { status: ApiCallResult.Error, data: { error } };
     }
@@ -80,7 +80,7 @@ const callApi = async <T extends ResponseData>(
 
 export async function acknowledgePurchaseOnBackend(
   params: PurchaseParams,
-  anotherCancelledSubscriptionParams?: PurchaseParams // there might be another cancelled subscription when we acknowledge a subscription. We need to make sure its tier is taken into account
+  anotherCancelledSubscriptionParams?: PurchaseParams, // there might be another cancelled subscription when we acknowledge a subscription. We need to make sure its tier is taken into account
 ): Promise<Response<ChangeSubscriptionActionResponseData>> {
   const { itemId, purchaseToken } = params;
   const {
@@ -97,7 +97,7 @@ export async function acknowledgePurchaseOnBackend(
 
 export async function changePurchaseOnBackend(
   newParams: PurchaseParams,
-  oldParams: PurchaseParams
+  oldParams: PurchaseParams,
 ): Promise<Response<ChangeSubscriptionActionResponseData>> {
   // We don't check for any other cancelled subscriptions currently - we just have 2 options and both of them should be already passed to this method as newParams and oldParams
   const { itemId, purchaseToken } = newParams;
@@ -112,7 +112,7 @@ export async function changePurchaseOnBackend(
 
 export async function cancelPurchaseOnBackend(
   params: PurchaseParams,
-  anotherCancelledSubscriptionParams?: PurchaseParams // there might be another cancelled subscription when we cancel a subscription. We need to make sure its tier is taken into account
+  anotherCancelledSubscriptionParams?: PurchaseParams, // there might be another cancelled subscription when we cancel a subscription. We need to make sure its tier is taken into account
 ): Promise<Response<SubscriptionActionResponseData>> {
   const { itemId, purchaseToken } = params;
   const {
@@ -132,7 +132,7 @@ export async function logoutOnBackend(): Promise<Response<ResponseData>> {
 }
 
 export async function getPurchaseOnBackend(
-  params: PurchaseParams
+  params: PurchaseParams,
 ): Promise<Response<GetPurchaseResponseData>> {
   const { itemId, purchaseToken } = params;
   return callApi(`/api/purchases/get`, "GET", {

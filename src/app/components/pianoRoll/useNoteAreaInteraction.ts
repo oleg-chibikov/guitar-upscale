@@ -7,7 +7,11 @@ import {
   PITCH_AXIS_WIDTH,
   TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
-import { ChordOrNote, EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
+import {
+  ChordOrNote,
+  EventForTick,
+  EventsByTick,
+} from "@/app/engine/eventsByTick";
 import {
   pitchToY,
   tickToX,
@@ -36,7 +40,11 @@ import {
   getEventTrack,
   PianoRollTrack,
 } from "@/app/engine/pianoRoll/pianoRollTracks";
-import { floorTick, snapPitchToScale, snapTick } from "@/app/engine/pianoRoll/snap";
+import {
+  floorTick,
+  snapPitchToScale,
+  snapTick,
+} from "@/app/engine/pianoRoll/snap";
 import { playChordOrNote } from "@/app/engine/playerHelper";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
@@ -140,7 +148,7 @@ const findNoteTemplate = (
   data: EventsByTick,
   events: EventForTick[],
   selection: ReadonlySet<string>,
-  activeTrack: PianoRollTrack | undefined
+  activeTrack: PianoRollTrack | undefined,
 ) => {
   const fromSelection = Array.from(selection)
     .map((id) => data.getEvent(id)?.event.note)
@@ -156,7 +164,10 @@ const findNoteTemplate = (
   }
   // the first note in an empty track
   return activeTrack
-    ? { trackNumber: activeTrack.trackNumber, instrument: activeTrack.instrument }
+    ? {
+        trackNumber: activeTrack.trackNumber,
+        instrument: activeTrack.instrument,
+      }
     : undefined;
 };
 
@@ -191,17 +202,31 @@ export const useNoteAreaInteraction = ({
   const inertiaFrame = useRef<number | undefined>(undefined);
 
   // the handlers read the latest values through a ref, so listeners stay stable during a drag
-  const latest = { data, events, inactiveEvents, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock, activeTrack, setActiveTrack };
+  const latest = {
+    data,
+    events,
+    inactiveEvents,
+    selection,
+    zoom,
+    snapTicks,
+    scalePattern,
+    tool,
+    copyMode,
+    axisLock,
+    activeTrack,
+    setActiveTrack,
+  };
   const state = useRef(latest);
   useLayoutEffect(() => {
     state.current = latest;
   });
 
-  const isCopy = (pointer: Modifiers) => pointer.altKey || state.current.copyMode;
+  const isCopy = (pointer: Modifiers) =>
+    pointer.altKey || state.current.copyMode;
 
   const moveTargets = (
     gesture: Extract<Gesture, { kind: "note" }>,
-    pointer: Point & Modifiers
+    pointer: Point & Modifiers,
   ) => {
     const { data, zoom, snapTicks, scalePattern, axisLock } = state.current;
     const anchor = data!.getEvent(gesture.noteId)!;
@@ -219,13 +244,15 @@ export const useNoteAreaInteraction = ({
     const deltaTick =
       gesture.axis === "pitch" ? 0 : snapTick(rawTick, snapTicks) - anchor.tick;
     const deltaPitch =
-      gesture.axis === "time" ? 0 : yToPitch(y, zoom) - yToPitch(gesture.start.y, zoom);
+      gesture.axis === "time"
+        ? 0
+        : yToPitch(y, zoom) - yToPitch(gesture.start.y, zoom);
     return resolveMove(data!, gesture.ids, deltaTick, deltaPitch, scalePattern);
   };
 
   const resizeTargets = (
     gesture: Extract<Gesture, { kind: "note" }>,
-    pointer: Point
+    pointer: Point,
   ) => {
     const { data, zoom, snapTicks } = state.current;
     const { x } = toContent(pointer);
@@ -235,7 +262,7 @@ export const useNoteAreaInteraction = ({
       gesture.noteId,
       gesture.edge!,
       (x - gesture.start.x) / zoom.pixelsPerTick,
-      snapTicks
+      snapTicks,
     );
   };
 
@@ -259,7 +286,7 @@ export const useNoteAreaInteraction = ({
           scroller.scrollTop,
       };
     },
-    [scrollerRef]
+    [scrollerRef],
   );
 
   const noteAt = (point: Point) => {
@@ -314,7 +341,10 @@ export const useNoteAreaInteraction = ({
           if (!anchor) return;
 
           if (gesture.edge) {
-            setPreview({ kind: "resize", targets: resizeTargets(gesture, pointer) });
+            setPreview({
+              kind: "resize",
+              targets: resizeTargets(gesture, pointer),
+            });
             return;
           }
 
@@ -362,10 +392,17 @@ export const useNoteAreaInteraction = ({
         case "draw": {
           const endTick = Math.max(
             gesture.tick + snapTicks,
-            snapTick(xToTick(x, zoom), snapTicks)
+            snapTick(xToTick(x, zoom), snapTicks),
           );
-          gesture.event = { ...gesture.event, duration: endTick - gesture.tick };
-          setPreview({ kind: "draw", tick: gesture.tick, event: gesture.event });
+          gesture.event = {
+            ...gesture.event,
+            duration: endTick - gesture.tick,
+          };
+          setPreview({
+            kind: "draw",
+            tick: gesture.tick,
+            event: gesture.event,
+          });
           return;
         }
         case "erase": {
@@ -398,7 +435,7 @@ export const useNoteAreaInteraction = ({
                 gesture.startZoom.noteHeight *
                 spread(gesture.startSpread.y, Math.abs(a.clientY - b.clientY)),
             },
-            mid
+            mid,
           );
           return;
         }
@@ -412,7 +449,7 @@ export const useNoteAreaInteraction = ({
             !gesture.moved &&
             Math.hypot(
               pointer.clientX - gesture.start.clientX,
-              pointer.clientY - gesture.start.clientY
+              pointer.clientY - gesture.start.clientY,
             ) < DRAG_THRESHOLD_PX
           ) {
             return;
@@ -423,13 +460,17 @@ export const useNoteAreaInteraction = ({
           scroller.scrollTop -= dy;
           const dt = Math.max(1, now - gesture.last.time);
           gesture.velocity = { x: dx / dt, y: dy / dt };
-          gesture.last = { clientX: pointer.clientX, clientY: pointer.clientY, time: now };
+          gesture.last = {
+            clientX: pointer.clientX,
+            clientY: pointer.clientY,
+            time: now,
+          };
           return;
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [toContent, scrollerRef, setSelection]
+    [toContent, scrollerRef, setSelection],
   );
 
   // dragging near an edge keeps scrolling the view while the pointer stays still
@@ -439,12 +480,21 @@ export const useNoteAreaInteraction = ({
       const scroller = scrollerRef.current;
       const pointer = lastPointerRef.current;
       const gesture = gestureRef.current;
-      if (!scroller || !pointer || !gesture || gesture.kind === "pan" || gesture.kind === "pinch") {
+      if (
+        !scroller ||
+        !pointer ||
+        !gesture ||
+        gesture.kind === "pan" ||
+        gesture.kind === "pinch"
+      ) {
         autoScrollFrame.current = undefined;
         return;
       }
       // a press near the edge stays a click until the pointer itself moves
-      if ((gesture.kind === "note" || gesture.kind === "rubber") && !gesture.dragging) {
+      if (
+        (gesture.kind === "note" || gesture.kind === "rubber") &&
+        !gesture.dragging
+      ) {
         autoScrollFrame.current = requestAnimationFrame(step);
         return;
       }
@@ -455,9 +505,11 @@ export const useNoteAreaInteraction = ({
             AUTO_SCROLL_MAX_SPEED_PX
           : 0;
       const dx =
-        speed(pointer.clientX - rect.left) * -1 + speed(rect.right - pointer.clientX);
+        speed(pointer.clientX - rect.left) * -1 +
+        speed(rect.right - pointer.clientX);
       const dy =
-        speed(pointer.clientY - rect.top) * -1 + speed(rect.bottom - pointer.clientY);
+        speed(pointer.clientY - rect.top) * -1 +
+        speed(rect.bottom - pointer.clientY);
       if (dx || dy) {
         scroller.scrollLeft += dx;
         scroller.scrollTop += dy;
@@ -474,7 +526,10 @@ export const useNoteAreaInteraction = ({
     let last = performance.now();
     const step = (now: number) => {
       const scroller = scrollerRef.current;
-      if (!scroller || (Math.abs(x) < INERTIA_MIN_SPEED && Math.abs(y) < INERTIA_MIN_SPEED)) {
+      if (
+        !scroller ||
+        (Math.abs(x) < INERTIA_MIN_SPEED && Math.abs(y) < INERTIA_MIN_SPEED)
+      ) {
         inertiaFrame.current = undefined;
         return;
       }
@@ -490,7 +545,7 @@ export const useNoteAreaInteraction = ({
   };
 
   const finishGesture = useCallback(
-    (pointer: Point & Modifiers | undefined, cancelled: boolean) => {
+    (pointer: (Point & Modifiers) | undefined, cancelled: boolean) => {
       const gesture = gestureRef.current;
       gestureRef.current = undefined;
       lastPointerRef.current = undefined;
@@ -529,7 +584,11 @@ export const useNoteAreaInteraction = ({
           apply(
             gesture.edge
               ? resizeEvents(data, resizeTargets(gesture, pointer))
-              : moveEvents(data, moveTargets(gesture, pointer), isCopy(pointer))
+              : moveEvents(
+                  data,
+                  moveTargets(gesture, pointer),
+                  isCopy(pointer),
+                ),
           );
           return;
         }
@@ -556,18 +615,19 @@ export const useNoteAreaInteraction = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apply, setSelection, toContent, updateGesture]
+    [apply, setSelection, toContent, updateGesture],
   );
 
   const startDraw = (x: number, y: number) => {
-    const { data, events, zoom, snapTicks, selection, activeTrack } = state.current;
+    const { data, events, zoom, snapTicks, selection, activeTrack } =
+      state.current;
     if (!data) return;
     const tick = floorTick(xToTick(x, zoom), snapTicks);
     const pitch = snapPitch(yToPitch(y, zoom));
     const event = createNoteEvent(
       pitch,
       snapTicks,
-      findNoteTemplate(data, events, selection, activeTrack)
+      findNoteTemplate(data, events, selection, activeTrack),
     );
     if (!event) return;
     playChordOrNote(event);
@@ -632,8 +692,7 @@ export const useNoteAreaInteraction = ({
       const activeHit = noteAt(e);
       // a note of a dimmed track makes its track the one being edited
       const inactiveHit = activeHit ? undefined : inactiveNoteAt(e);
-      const inactiveEvent =
-        inactiveHit && data.getEvent(inactiveHit.id)?.event;
+      const inactiveEvent = inactiveHit && data.getEvent(inactiveHit.id)?.event;
       if (inactiveEvent) {
         state.current.setActiveTrack(getEventTrack(inactiveEvent));
       }
@@ -726,7 +785,7 @@ export const useNoteAreaInteraction = ({
       gestureRef.current = gesture;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [finishGesture, runAutoScroll, setSelection, toContent]
+    [finishGesture, runAutoScroll, setSelection, toContent],
   );
 
   const onPointerMove = useCallback(
@@ -738,7 +797,7 @@ export const useNoteAreaInteraction = ({
       lastPointerRef.current = e;
       updateGesture(e);
     },
-    [updateGesture]
+    [updateGesture],
   );
 
   const onPointerUp = useCallback(
@@ -747,7 +806,7 @@ export const useNoteAreaInteraction = ({
       if (!gestureRef.current) return;
       finishGesture(e, false);
     },
-    [finishGesture]
+    [finishGesture],
   );
 
   const onPointerCancel = useCallback(
@@ -755,7 +814,7 @@ export const useNoteAreaInteraction = ({
       touchPoints.current.delete(e.pointerId);
       finishGesture(undefined, true);
     },
-    [finishGesture]
+    [finishGesture],
   );
 
   // double click on empty space adds a note, as in Cubase. On a chord it offers the other modes
@@ -771,10 +830,13 @@ export const useNoteAreaInteraction = ({
       if (tool !== PianoRollTool.Select) return;
       const { x, y } = toContent(e);
       startDraw(x, y);
-      finishGesture({ ...noModifiers, clientX: e.clientX, clientY: e.clientY }, false);
+      finishGesture(
+        { ...noModifiers, clientX: e.clientX, clientY: e.clientY },
+        false,
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [finishGesture, toContent, chooseChordMode]
+    [finishGesture, toContent, chooseChordMode],
   );
 
   // pressing or releasing a modifier mid-drag switches between move and copy straight away
@@ -808,7 +870,7 @@ export const useNoteAreaInteraction = ({
       stopAutoScroll();
       stopInertia();
     },
-    []
+    [],
   );
 
   return {

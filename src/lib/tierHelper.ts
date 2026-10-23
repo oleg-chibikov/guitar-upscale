@@ -14,15 +14,17 @@ import { SubscriptionProvider } from "./subscriptionProvider";
 import { Tier, TierInfo, tierMap } from "./tier";
 
 const composerWhitelist = new Set<string>(
-  process.env.COMPOSER_WHITELIST?.split(",")
+  process.env.COMPOSER_WHITELIST?.split(","),
 );
 
 const explorerWhitelist = new Set<string>(
-  process.env.EXPLORER_WHITELIST?.split(",")
+  process.env.EXPLORER_WHITELIST?.split(","),
 );
 
 const getDataFromSubscriptionCookie = async () => {
-  const value = await getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, { cookies });
+  const value = await getCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
+    cookies,
+  });
   if (value === undefined || value.length === 0) {
     console.log("No value in subscription cookie");
     return undefined;
@@ -69,7 +71,7 @@ const getTierFromPatreonApi = async (accessToken: string) => {
 
     const includedTiers = responseData.included?.filter(
       (item: { type: "tier" | unknown; id: string }) =>
-        item.type === "tier" && orderedTargetTierIds.includes(item.id)
+        item.type === "tier" && orderedTargetTierIds.includes(item.id),
     );
 
     includedTiers?.forEach((tier: { attributes: { title: Tier } }) => {
@@ -96,7 +98,7 @@ const getTierFromWhitelist = (email?: string) => {
 
 export async function getTierName(
   email?: string,
-  accessToken?: string
+  accessToken?: string,
 ): Promise<TierInfo | undefined> {
   // Checking whitelists
   let tier: Tier | undefined;
@@ -130,7 +132,7 @@ export async function getTierName(
 
 export const applyTierToResult = (
   result: PremiumFeaturesWithSession,
-  subscriptionTier?: TierInfo
+  subscriptionTier?: TierInfo,
 ) => {
   if (!subscriptionTier) {
     return result;

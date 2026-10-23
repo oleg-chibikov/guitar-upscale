@@ -17,8 +17,7 @@ import { Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch } from "react-redux";
 
-interface GooglePlayPurchaseOptionButtonProps
-  extends GetSubscriptionActionParams {
+interface GooglePlayPurchaseOptionButtonProps extends GetSubscriptionActionParams {
   onClick: () => void;
   isSelected: boolean;
   showCancellationDialog: () => void;
@@ -40,7 +39,7 @@ export const GooglePlayPurchaseOptionButton: FC<
 
   const existingNonCancelledPurchaseOption = getExistingNonCancelledPurchase(
     allPurchasedOptions,
-    purchaseOption
+    purchaseOption,
   );
   const hasDigitalGoodsService = useDigitalGoodsServiceInfo();
   const dispatch = useDispatch();
@@ -67,10 +66,10 @@ export const GooglePlayPurchaseOptionButton: FC<
 
   if (isPurchasedAndNotCancelled) {
     const expirationDate = msToFormattedDate(
-      purchaseOption.purchaseData?.expirationDateMs
+      purchaseOption.purchaseData?.expirationDateMs,
     );
     const subscribedDate = msToFormattedDate(
-      purchaseOption.purchaseData?.subscribedDateMs
+      purchaseOption.purchaseData?.subscribedDateMs,
     );
     buttonColor = "error";
     buttonAction = async () => await showCancellationDialog();
@@ -88,7 +87,7 @@ export const GooglePlayPurchaseOptionButton: FC<
     bg = theme === Theme.Light ? "bg-accent-light" : "bg-accent-dark";
   } else if (isCancelled) {
     const expirationDate = msToFormattedDate(
-      purchaseOption.purchaseData?.expirationDateMs
+      purchaseOption.purchaseData?.expirationDateMs,
     );
     buttonColor = "primary";
     buttonAction = makePurchase; // re-subscribe
@@ -104,8 +103,8 @@ export const GooglePlayPurchaseOptionButton: FC<
         ? "bg-primary-light"
         : "bg-primary-dark"
       : theme === Theme.Light
-      ? "bg-disabled-light"
-      : "bg-disabled-dark";
+        ? "bg-disabled-light"
+        : "bg-disabled-dark";
   } else {
     // not purchased
     buttonColor = "primary";
@@ -118,8 +117,8 @@ export const GooglePlayPurchaseOptionButton: FC<
         ? "bg-primary-light"
         : "bg-primary-dark"
       : theme === Theme.Light
-      ? "bg-secondary-light"
-      : "bg-secondary-dark";
+        ? "bg-secondary-light"
+        : "bg-secondary-dark";
   }
 
   // Format the price according to the user locale.

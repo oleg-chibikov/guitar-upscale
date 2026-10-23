@@ -72,7 +72,7 @@ export async function getPremiumFeatures(): Promise<PremiumFeaturesWithSession> 
 
   const tierInfo = await getTierName(
     session?.user?.email ?? undefined,
-    session?.accessToken
+    session?.accessToken,
   );
 
   console.log("Subscription tier", tierInfo);

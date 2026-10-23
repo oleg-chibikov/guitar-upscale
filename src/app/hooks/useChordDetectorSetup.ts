@@ -11,17 +11,15 @@ export const useChordDetectorSetup = () => {
     }
 
     // async load detector module and set its functions to settings on the first detect action.
-    const { chordDetectorWorkerApi } = await import(
-      "@/app/engine/chords/chordDetectorWorkerApi"
-    );
-    const { chordDetectorBuilder } = await import(
-      "@/app/engine/chords/chordDetectorBuilder"
-    );
+    const { chordDetectorWorkerApi } =
+      await import("@/app/engine/chords/chordDetectorWorkerApi");
+    const { chordDetectorBuilder } =
+      await import("@/app/engine/chords/chordDetectorBuilder");
     setChordDetectorFunctions(
       chordDetectorBuilder.clear.bind(chordDetectorBuilder),
       chordDetectorWorkerApi.addChordsToDetectorLookup.bind(
-        chordDetectorWorkerApi
-      )
+        chordDetectorWorkerApi,
+      ),
     );
   };
 };

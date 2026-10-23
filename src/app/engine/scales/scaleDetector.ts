@@ -43,7 +43,7 @@ class ScaleDetector {
   findMatches(
     notes: DistinctNoteMarker[],
     usedNotesCount: number,
-    callback: (data: ScaleDetectorCallbackData) => void
+    callback: (data: ScaleDetectorCallbackData) => void,
   ) {
     console.log("Detecting scale");
 

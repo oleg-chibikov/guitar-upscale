@@ -4,12 +4,12 @@ import dynamic from "next/dynamic";
 import { FC } from "react";
 
 const StrummingSettings = dynamic(
-  async () => (await import("./StrummingSettings")).StrummingSettings
+  async () => (await import("./StrummingSettings")).StrummingSettings,
 );
 
 export const StrummingSettingsWrapper: FC = () => {
   const strummingSettingsExpanded = useUiSelector(
-    (s) => s.strummingSettingsExpanded
+    (s) => s.strummingSettingsExpanded,
   );
   return (
     <LazyLoadWrapper

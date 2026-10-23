@@ -19,7 +19,7 @@ export const getCancelSubscription = (
     allPurchasedOptions,
   }: GetSubscriptionActionParams,
   hasDigitalGoodsService: boolean,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch<UnknownAction>,
 ) => {
   const cancelSubscription = async () => {
     if (!hasDigitalGoodsService) {
@@ -36,7 +36,7 @@ export const getCancelSubscription = (
     try {
       const cancelResult = await cancelPurchaseOnBackend(
         purchaseOption.purchaseData,
-        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption)
+        getExistingCancelledPurchase(allPurchasedOptions, purchaseOption),
       );
       if (cancelResult.status === ApiCallResult.Success) {
         const tierInfoMessage = getTierInfoMessage(cancelResult.data);
@@ -45,28 +45,28 @@ export const getCancelSubscription = (
           setAndShowAlert({
             message: "Success",
             alertType: AlertType.Success,
-          })
+          }),
         );
         await incrementAndReload(
           GOOGLE_PLAY_RELOAD_KEY,
           0,
           dispatch,
           message,
-          READ_MESSAGE_WAIT_TIME
+          READ_MESSAGE_WAIT_TIME,
         );
       } else if (cancelResult.status === ApiCallResult.SkipProcessing) {
         dispatch(
           setAndShowAlert({
             message: `Subscription "${purchaseOption.tier}" is already cancelled`,
             alertType: AlertType.Warning,
-          })
+          }),
         );
       } else {
         dispatch(
           setAndShowAlert({
             message: `Cannot cancel the subscription "${purchaseOption.tier}" due to an error`,
             alertType: AlertType.Error,
-          })
+          }),
         );
       }
     } catch (e) {
@@ -75,7 +75,7 @@ export const getCancelSubscription = (
         setAndShowAlert({
           message: "Cancellation aborted",
           alertType: AlertType.Warning,
-        })
+        }),
       );
     } finally {
       setIsLoading(false);

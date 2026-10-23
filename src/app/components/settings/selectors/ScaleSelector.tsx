@@ -28,7 +28,7 @@ const ScaleSelector: React.FC = () => {
             value: scaleName,
             label: scaleName + asterisk,
           };
-        }
+        },
       )}
       value={scale}
       onChange={(value) => {

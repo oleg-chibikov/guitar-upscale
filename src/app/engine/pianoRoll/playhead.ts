@@ -24,7 +24,10 @@ export const getLoopRange = (data: EventsByTick): LoopRange | undefined => {
   return loop?.data === data ? loop.range : undefined;
 };
 
-export const setLoopRange = (data: EventsByTick, range: LoopRange | undefined) => {
+export const setLoopRange = (
+  data: EventsByTick,
+  range: LoopRange | undefined,
+) => {
   loopRange$.next(range ? { data, range } : undefined);
 };
 

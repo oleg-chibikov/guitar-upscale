@@ -7,7 +7,7 @@ const MAX_CANVAS_PIXELS = 16_000_000;
 export const getSafePixelRatio = (width: number, height: number) =>
   Math.min(
     window.devicePixelRatio || 1,
-    Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, width * height))
+    Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, width * height)),
   );
 
 /**
@@ -16,7 +16,7 @@ export const getSafePixelRatio = (width: number, height: number) =>
 export const useSafePixelRatio = (
   layerRefs: RefObject<Konva.Layer | null>[],
   width: number,
-  height: number
+  height: number,
 ) => {
   useLayoutEffect(() => {
     const ratio = getSafePixelRatio(width, height);

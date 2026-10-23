@@ -1,7 +1,10 @@
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
-import { getEditHistory, pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
+import {
+  getEditHistory,
+  pianoRollEdits$,
+} from "@/app/engine/pianoRoll/editHistory";
 import { deleteEvents, EditResult } from "@/app/engine/pianoRoll/operations";
 import {
   pianoRollData,
@@ -89,7 +92,7 @@ interface PianoRollContextType {
 }
 
 const PianoRollContext = createContext<PianoRollContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const usePianoRoll = () => {
@@ -120,17 +123,17 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const showReplayTrigger = useSettingsSelector((s) => s.showReplayTrigger);
 
   const looperStateUpdateTrigger = useSettingsSelector(
-    (s) => s.looperStateUpdateTrigger
+    (s) => s.looperStateUpdateTrigger,
   );
   const guitarSettingsUpdateCount = useSettingsSelector(
-    (s) => s.guitarSettingsUpdateCount
+    (s) => s.guitarSettingsUpdateCount,
   );
 
   // pianoRollData is a module variable. showReplayTrigger flips whenever it changes
   const melody = useMemo(
     () => (pianoRollExpanded ? pianoRollData : undefined),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pianoRollExpanded, showReplayTrigger]
+    [pianoRollExpanded, showReplayTrigger],
   );
 
   const [loopSources, setLoopSources] = useState<PianoRollSource[]>([]);
@@ -155,7 +158,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
                 },
               ]
             : [];
-        })
+        }),
       );
     });
     return () => {
@@ -170,7 +173,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       { id: MELODY_SOURCE_ID, label: "Melody", data: melody ?? blankMelody },
       ...loopSources,
     ],
-    [melody, blankMelody, loopSources]
+    [melody, blankMelody, loopSources],
   );
   const [sourceId, setSourceIdState] = useState(MELODY_SOURCE_ID);
   const setSourceId = useCallback((id: string) => {
@@ -180,7 +183,9 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const data = source?.data;
 
   // each track scrolls to its notes the first time it shows. Closing the piano roll forgets it
-  const [scrolledTrack, setScrolledTrack] = useState<EventsByTick | undefined>();
+  const [scrolledTrack, setScrolledTrack] = useState<
+    EventsByTick | undefined
+  >();
   const [wasExpanded, setWasExpanded] = useState(pianoRollExpanded);
   if (wasExpanded !== pianoRollExpanded) {
     setWasExpanded(pianoRollExpanded);
@@ -189,7 +194,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const loaded = data !== undefined && scrolledTrack === data;
   const setLoaded = useCallback(
     (value: boolean) => setScrolledTrack(value ? data : undefined),
-    [data]
+    [data],
   );
 
   const loopPlayhead$ = useMemo(() => new BehaviorSubject<number>(0), []);
@@ -208,7 +213,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const allEvents = useMemo(
     () => data?.flatItems ?? [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, version]
+    [data, version],
   );
 
   // a song names its tracks. Other tracks get names from their instruments
@@ -216,7 +221,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     () => listTracks(allEvents, data ? getTrackInfos(data) : undefined),
     // renames change the track infos in place, so version tells when
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allEvents, data, version]
+    [allEvents, data, version],
   );
 
   // the track being edited belongs to one melody, like the selection
@@ -227,7 +232,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const activeTrack =
     activeTrackState.data === data
       ? tracks.find(
-          ({ trackNumber }) => trackNumber === activeTrackState.trackNumber
+          ({ trackNumber }) => trackNumber === activeTrackState.trackNumber,
         )
       : undefined;
 
@@ -268,7 +273,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     // an undo can touch a dimmed track. Its notes stay unselected
     const editable = new Set(events.map(({ event }) => event.id));
     return new Set(
-      Array.from(selectionState.ids).filter((id) => editable.has(id))
+      Array.from(selectionState.ids).filter((id) => editable.has(id)),
     );
   }, [selectionState, data, activeTrack, events]);
 
@@ -276,7 +281,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     (ids: Iterable<string>) => {
       setSelectionState({ data, ids: new Set(ids) });
     },
-    [data]
+    [data],
   );
 
   const setActiveTrack = useCallback(
@@ -284,7 +289,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       setActiveTrackState({ data, trackNumber });
       setSelectionState({ data, ids: new Set() });
     },
-    [data]
+    [data],
   );
 
   const [chordQueue, setChordQueue] = useState<string[]>([]);
@@ -297,7 +302,11 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   }, []);
 
   const apply = useCallback(
-    ({ command, selection: newSelection, chordsWithChangedMode }: EditResult) => {
+    ({
+      command,
+      selection: newSelection,
+      chordsWithChangedMode,
+    }: EditResult) => {
       if (!data || !command) {
         return;
       }
@@ -313,7 +322,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
         setChordQueue((queue) => [...queue, ...chordsWithChangedMode]);
       }
     },
-    [data, blankMelody, dispatch]
+    [data, blankMelody, dispatch],
   );
 
   const step = useCallback(
@@ -328,7 +337,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
         setVersion((v) => v + 1);
       }
     },
-    [data]
+    [data],
   );
   const undo = useCallback(() => step("undo"), [step]);
   const redo = useCallback(() => step("redo"), [step]);
@@ -356,7 +365,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       setActiveTrackState({ data, trackNumber: undefined });
       setVersion((v) => v + 1);
     },
-    [data, allEvents, apply]
+    [data, allEvents, apply],
   );
 
   const renameTrack = useCallback(
@@ -367,7 +376,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       // saves the song under the new track name
       pianoRollEdits$.next(data);
     },
-    [data]
+    [data],
   );
 
   const history = data ? getEditHistory(data) : undefined;
@@ -411,7 +420,35 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, addTrack, deleteTrack, renameTrack, solo, toggleSolo, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [
+      sources,
+      source,
+      setSourceId,
+      tracks,
+      activeTrack,
+      setActiveTrack,
+      addTrack,
+      deleteTrack,
+      renameTrack,
+      solo,
+      toggleSolo,
+      playhead$,
+      data,
+      allEvents,
+      events,
+      inactiveEvents,
+      selection,
+      setSelection,
+      apply,
+      undo,
+      redo,
+      loaded,
+      setLoaded,
+      version,
+      chordToChoose,
+      chooseChordMode,
+      closeChordChoice,
+    ],
   );
 
   return (

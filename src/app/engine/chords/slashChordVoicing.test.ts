@@ -30,8 +30,8 @@ const preferred = (root: number, intervals: number[], mode: ChordPlayMode) => {
         voicings.push(
           ...new FretChordsGenerator(0, neck, 12, cache).processFret(
             intervals,
-            note
-          )
+            note,
+          ),
         );
       }
     }
@@ -40,13 +40,13 @@ const preferred = (root: number, intervals: number[], mode: ChordPlayMode) => {
     voicings,
     "high",
     6,
-    mode
+    mode,
   );
   return variation
     .map((stringOctaveNote, i) =>
       stringOctaveNote === undefined
         ? undefined
-        : { stringOctaveNote, fingerIndex: fingerAssignment[i] }
+        : { stringOctaveNote, fingerIndex: fingerAssignment[i] },
     )
     .filter((x): x is StringOctaveNoteWithFingerPosition => x !== undefined);
 };
@@ -55,8 +55,8 @@ const toTab = (notes: StringOctaveNoteWithFingerPosition[]) =>
   [5, 4, 3, 2, 1, 0]
     .map(
       (string) =>
-        notes.find((x) => x.stringOctaveNote.string === string)?.stringOctaveNote
-          .fret ?? "x"
+        notes.find((x) => x.stringOctaveNote.string === string)
+          ?.stringOctaveNote.fret ?? "x",
     )
     .join("");
 

@@ -7,7 +7,7 @@ import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const ToggleMetronomeWhenRecordingCheckbox: React.FC = (props) => {
   const toggleMetronomeWhenRecording = useSettingsSelector(
-    (s) => s.toggleMetronomeWhenRecording
+    (s) => s.toggleMetronomeWhenRecording,
   );
   const dispatch = useDispatch();
 

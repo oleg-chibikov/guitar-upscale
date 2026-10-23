@@ -1,9 +1,6 @@
 import { ChordMode, ChordModeVariations } from "@/app/data/chordModes";
 import { NOTE_COUNT, Note } from "@/app/data/notes";
-import {
-  buildAllChordsLayout,
-  buildKeyChordsLayout,
-} from "./chordGridLayout";
+import { buildAllChordsLayout, buildKeyChordsLayout } from "./chordGridLayout";
 
 const mode = (name: string, intervals: number[]): ChordMode => ({
   description: name,
@@ -27,7 +24,7 @@ const columnFor = (chordMode: ChordMode): ChordModeVariations => ({
   variationsByNote: Array.from({ length: NOTE_COUNT }, (_, root) =>
     chordMode.intervals.every((i) => E_MINOR.has((root + i) % NOTE_COUNT))
       ? [{ variation: [], fingerAssignment: [], hasBarreOnIndexFinger: false }]
-      : []
+      : [],
   ),
 });
 

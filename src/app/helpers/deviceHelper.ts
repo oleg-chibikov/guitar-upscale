@@ -15,6 +15,6 @@ if (typeof window !== "undefined") {
   ];
 
   isMobileDeviceValue = mobileKeywords.some((keyword) =>
-    userAgent.includes(keyword)
+    userAgent.includes(keyword),
   );
 }

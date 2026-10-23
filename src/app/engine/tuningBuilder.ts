@@ -51,7 +51,7 @@ function getStringOctaves(tuning: Note[], baseOctave: number): OctaveNote[] {
 function generateTuning(
   rootNote: Note,
   type: TuningType,
-  stringCount: number = 6
+  stringCount: number = 6,
 ): Note[] {
   let tuning: Note[] = [];
 
@@ -140,7 +140,7 @@ function processRootNote(
   stringCounts: number[],
   tuningTypes: TuningType[],
   rootNote: Note,
-  tunings: { [key: string]: TuningData }
+  tunings: { [key: string]: TuningData },
 ) {
   for (const stringCount of stringCounts) {
     for (const type of tuningTypes) {

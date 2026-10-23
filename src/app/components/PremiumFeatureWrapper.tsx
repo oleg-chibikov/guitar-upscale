@@ -1,10 +1,13 @@
 import { FC } from "react";
 import { WithChildren } from "../helpers/withChildren";
-import { PremiumFeaturesWithSession, getPremiumFeatures } from "@/lib/premiumFeatures";
+import {
+  PremiumFeaturesWithSession,
+  getPremiumFeatures,
+} from "@/lib/premiumFeatures";
 
 interface PremiumFeatureWrapperProps extends WithChildren {
   shouldRender: (
-    premiumFeaturesWithSession: PremiumFeaturesWithSession
+    premiumFeaturesWithSession: PremiumFeaturesWithSession,
   ) => boolean;
 }
 

@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   target.closest(
-    'input, textarea, select, [contenteditable="true"], [aria-expanded="true"], [role="listbox"], [role="menu"]'
+    'input, textarea, select, [contenteditable="true"], [aria-expanded="true"], [role="listbox"], [role="menu"]',
   ) !== null;
 
 const isDropdown = (target: EventTarget | null) =>
@@ -24,8 +24,15 @@ const toolKeys: Record<string, PianoRollTool> = {
 };
 
 export const usePianoRollShortcuts = () => {
-  const { undo, redo, chordToChoose, tracks, activeTrack, setActiveTrack, toggleSolo } =
-    usePianoRoll();
+  const {
+    undo,
+    redo,
+    chordToChoose,
+    tracks,
+    activeTrack,
+    setActiveTrack,
+    toggleSolo,
+  } = usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
   const { togglePlay, seekTo } = usePianoRollTransport();
@@ -40,9 +47,31 @@ export const usePianoRollShortcuts = () => {
     const index = order.indexOf(activeTrack?.trackNumber);
     setActiveTrack(order[(index + direction + order.length) % order.length]);
   };
-  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack, toggleSolo });
+  const latest = useRef({
+    undo,
+    redo,
+    actions,
+    zoomBy,
+    zoomToFit,
+    togglePlay,
+    seekTo,
+    paused,
+    stepTrack,
+    toggleSolo,
+  });
   useLayoutEffect(() => {
-    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack, toggleSolo };
+    latest.current = {
+      undo,
+      redo,
+      actions,
+      zoomBy,
+      zoomToFit,
+      togglePlay,
+      seekTo,
+      paused,
+      stepTrack,
+      toggleSolo,
+    };
   });
 
   useEffect(() => {
@@ -72,7 +101,16 @@ export const usePianoRollShortcuts = () => {
       if (latest.current.paused || isTyping(e.target) || e.defaultPrevented) {
         return;
       }
-      const { undo, redo, actions, zoomBy, zoomToFit, seekTo, stepTrack, toggleSolo } = latest.current;
+      const {
+        undo,
+        redo,
+        actions,
+        zoomBy,
+        zoomToFit,
+        seekTo,
+        stepTrack,
+        toggleSolo,
+      } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 

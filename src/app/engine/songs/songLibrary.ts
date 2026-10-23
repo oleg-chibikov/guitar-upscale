@@ -35,7 +35,7 @@ type IndexEntry = {
 export const readSong = async (
   bytes: ArrayBuffer,
   fileName: string,
-  format: SongFormat
+  format: SongFormat,
 ): Promise<Song> => {
   if (format === "midi") {
     const { readMidiSong } = await import("@/app/engine/songs/midiReader");
@@ -147,7 +147,7 @@ const getSongNotes = (song: Song): Note[] =>
     ...track.chords.flatMap((chord) =>
       chord.name !== undefined
         ? [parseChordNoteAndAlterations(chord.name).chordBaseNote]
-        : chord.notes?.map((note) => note.note) ?? []
+        : (chord.notes?.map((note) => note.note) ?? []),
     ),
   ]);
 
@@ -170,9 +170,9 @@ export const detectSongScale = (song: Song): ScaleAndGroup => {
       detected = result.scales?.reduce<ScaleAndGroup | undefined>(
         (best, scale) =>
           !best || getScaleSize(scale) < getScaleSize(best) ? scale : best,
-        undefined
+        undefined,
       );
-    }
+    },
   );
   return detected ?? { group: SPECIAL, scale: CHROMATIC, note: Note.E };
 };
@@ -240,10 +240,10 @@ export const wipeExamplesCache = () => {
 export const getScaleExample = async (
   scaleGroup: string,
   scale: string,
-  chosen?: Example
+  chosen?: Example,
 ): Promise<Example | undefined> => {
   const candidates = (await getExamples()).filter(
-    (example) => example.scaleGroup === scaleGroup && example.scale === scale
+    (example) => example.scaleGroup === scaleGroup && example.scale === scale,
   );
   if (!candidates.length) {
     return undefined;
@@ -270,7 +270,7 @@ export const bindExampleEvents = (example: Example, events: EventsByTick) => {
   exampleByEvents.set(events, example);
   const infos = getTrackInfos(events);
   example.song?.tracks.forEach(({ name, instrument }, trackNumber) =>
-    infos.set(trackNumber, { name, instrument })
+    infos.set(trackNumber, { name, instrument }),
   );
 };
 
@@ -283,9 +283,8 @@ const saveEdits = async (events: EventsByTick) => {
   if (!example) {
     return;
   }
-  const { eventsToSong, getSongFileName, songToGuitarPro } = await import(
-    "@/app/engine/songs/songExport"
-  );
+  const { eventsToSong, getSongFileName, songToGuitarPro } =
+    await import("@/app/engine/songs/songExport");
   const list = await getExamples();
   const isCopy = !example.isUserSong;
   const song = eventsToSong(events, example);
@@ -317,7 +316,7 @@ const saveEdits = async (events: EventsByTick) => {
       setAndShowAlert({
         message: `Saved your edits as ${getExampleName(saved)}`,
         alertType: AlertType.Success,
-      })
+      }),
     );
   } else if (index !== -1) {
     list[index] = saved;

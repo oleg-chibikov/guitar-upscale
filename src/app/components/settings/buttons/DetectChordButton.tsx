@@ -20,7 +20,7 @@ export const DetectChordButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
   const chordIsBeingDetected = useSettingsSelector(
-    (s) => s.chordIsBeingDetected
+    (s) => s.chordIsBeingDetected,
   );
 
   const setupChordDetector = useChordDetectorSetup();
@@ -48,8 +48,8 @@ export const DetectChordButton: React.FC = (props) => {
         chordsAreLoading
           ? "Wait for the chords to load before detecting"
           : chordIsBeingDetected
-          ? "Stop detecting chord"
-          : "Detect chord"
+            ? "Stop detecting chord"
+            : "Detect chord"
       }
       isActive={chordIsBeingDetected}
       activeBg="error"
@@ -65,7 +65,7 @@ export const DetectChordButton: React.FC = (props) => {
                 " notes on different strings to detect a chord",
               alertType: AlertType.Neutral,
               alertTimeout: 5000,
-            })
+            }),
           );
         }
         dispatch(setChordIsBeingDetected(!chordIsBeingDetected));

@@ -11,7 +11,7 @@ export const AboutButton: FC = () => {
       onPress={() => {
         window.open(
           "https://github.com/oleg-chibikov/guitar-upscale-assets/blob/main/documentation.md",
-          "_blank"
+          "_blank",
         );
       }}
     />

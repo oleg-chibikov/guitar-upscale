@@ -12,12 +12,11 @@ export const useScaleDetectorSetup = () => {
 
     // async load detector module and set its functions to settings on the first detect action.
     const { scaleDetector } = await import("@/app/engine/scales/scaleDetector");
-    const { scaleDetectorBuilder } = await import(
-      "@/app/engine/scales/scaleDetectorBuilder"
-    );
+    const { scaleDetectorBuilder } =
+      await import("@/app/engine/scales/scaleDetectorBuilder");
     setScaleDetectorFunctions(
       scaleDetectorBuilder.clear.bind(scaleDetectorBuilder),
-      scaleDetector.addScaleToDetectorLookup.bind(scaleDetector)
+      scaleDetector.addScaleToDetectorLookup.bind(scaleDetector),
     );
   };
 };

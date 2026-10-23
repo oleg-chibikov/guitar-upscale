@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { FC } from "react";
 
 const PianoRollDialog = dynamic(
-  async () => (await import("./PianoRollDialog")).PianoRollDialog
+  async () => (await import("./PianoRollDialog")).PianoRollDialog,
 );
 
 export const PianoRollDialogWrapper: FC = () => {

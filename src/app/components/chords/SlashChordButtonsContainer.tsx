@@ -20,7 +20,7 @@ export const SlashChordButtonsContainer = () => {
   // the neck only holds notes of the current scale
   const notesInKey = useMemo(
     () => new Set(neck?.flat().map((x) => x?.note)),
-    [neck]
+    [neck],
   );
 
   const toggleDrawer = () => {
@@ -102,7 +102,7 @@ export const SlashChordButtonsContainer = () => {
           },
         }}
       >
-        <Box className="flex items-stretch flex-col gap-1 overflow-auto h-full w-full">
+        <Box className="flex h-full w-full flex-col items-stretch gap-1 overflow-auto">
           {Array.from({ length: NOTE_COUNT }, (_, index) => (
             <Button
               className="h-5"

@@ -23,7 +23,7 @@ export const getWholeScale = (playFullString: boolean): EventsByTick => {
   const capo = capoValue;
   neck.forEach((neckString, index) => {
     const stringCopy = [...neckString].filter(
-      (x) => x !== null && x !== undefined && x.fret >= capo
+      (x) => x !== null && x !== undefined && x.fret >= capo,
     ) as StringOctaveNote[];
     neckCopy[reverse ? stringCount - 1 - index : index] = stringCopy;
   });

@@ -41,7 +41,7 @@ type PlayButtonProps = UsePlayParams;
 const getExampleChoices = (examplesMap: ExamplesMap | undefined) => {
   const choices: Example[] = [];
   examplesMap?.forEach((scales) =>
-    scales.forEach((examples) => choices.push(...examples))
+    scales.forEach((examples) => choices.push(...examples)),
   );
   choices.sort((a, b) => getExampleName(a).localeCompare(getExampleName(b)));
   return choices;
@@ -81,7 +81,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
       }
       pending.current = choice;
     },
-    [dispatch, handlePlay]
+    [dispatch, handlePlay],
   );
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           const subscription = songPlayRequests.subscribe(startExample);
           unsubscribe = () => subscription.unsubscribe();
         }
-      }
+      },
     );
     return () => {
       active = false;
@@ -124,7 +124,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
   const choices = params.decodeExample ? getExampleChoices(examplesMap) : [];
   const canChoose = choices.length > 0;
   const shownChoices = choices.filter((choice) =>
-    matchesExampleSearch(choice, search)
+    matchesExampleSearch(choice, search),
   );
   const isCurrent = (choice: Example) =>
     choice.scaleGroup === scaleGroup && choice.scale === scale;
@@ -165,9 +165,8 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
     if (!params.decodeExample) {
       return;
     }
-    const { downloadEventsAsGuitarPro } = await import(
-      "@/app/engine/songs/songExport"
-    );
+    const { downloadEventsAsGuitarPro } =
+      await import("@/app/engine/songs/songExport");
     await downloadEventsAsGuitarPro(await params.decodeExample(choice), choice);
   };
 
@@ -184,10 +183,10 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           isWaiting
             ? "Waiting for player to get ready..."
             : isPlaying
-            ? "Replay"
-            : canChoose
-            ? "Play (hold to pick a song)"
-            : "Play"
+              ? "Replay"
+              : canChoose
+                ? "Play (hold to pick a song)"
+                : "Play"
         }
         icon={
           isWaiting ? <HourglassTop /> : isPlaying ? <Replay /> : <PlayArrow />
@@ -264,7 +263,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
               onClick={(event) => {
                 event.stopPropagation();
                 void downloadChosen(choice).catch((error) =>
-                  console.error("Cannot download the song", error)
+                  console.error("Cannot download the song", error),
                 );
               }}
             >

@@ -23,7 +23,7 @@ const ONE_MINUTE = 1 * 60 * 1000;
 
 function sortByItemId(
   itemA: { itemId: string },
-  itemB: { itemId: string }
+  itemB: { itemId: string },
 ): number {
   if (itemA.itemId === "guitar_upscale.composer") {
     return -1; // itemA should come before itemB
@@ -75,7 +75,7 @@ export const useGooglePlayAuth = () => {
 
         console.log(
           `Existing purchases: ${existingPurchases.length}; subscription tier`,
-          subscriptionTier
+          subscriptionTier,
         );
         return (
           (existingPurchases.length && !hasGooglePlaySubscription) ||
@@ -100,7 +100,7 @@ export const useGooglePlayAuth = () => {
             };
           } else if (result.status === ApiCallResult.SkipProcessing) {
             console.log(
-              "Skipped permissions mismatch processing. Subscription is cancelled"
+              "Skipped permissions mismatch processing. Subscription is cancelled",
             );
             return {
               shouldReload: false,
@@ -111,7 +111,7 @@ export const useGooglePlayAuth = () => {
                 message:
                   "There's a purchase listed in Google Play but it cannot be acknowledged due to an error",
                 alertType: AlertType.Error,
-              })
+              }),
             );
             return {
               shouldReload: false,
@@ -133,7 +133,7 @@ export const useGooglePlayAuth = () => {
                 message:
                   "There are no subscriptions listed in Google Play but logout cannot be processed due to an error",
                 alertType: AlertType.Error,
-              })
+              }),
             );
             return {
               shouldReload: false,
@@ -142,7 +142,7 @@ export const useGooglePlayAuth = () => {
         }
       },
       () => {},
-      () => {}
+      () => {},
     );
   };
 

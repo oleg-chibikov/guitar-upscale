@@ -27,7 +27,7 @@ export const ScaleDetectionAlert: FC = () => {
         setAndShowAlert({
           message: "Switched to " + formatScale(data),
           alertType: AlertType.Success,
-        })
+        }),
       );
     } finally {
       setPreventScaleDetectorFlush(false);

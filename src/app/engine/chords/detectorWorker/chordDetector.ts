@@ -33,7 +33,7 @@ class ChordDetector {
 
   findMatches(
     notes: StringOctaveNote[],
-    callback: (data: ChordDetectorCallbackData) => void
+    callback: (data: ChordDetectorCallbackData) => void,
   ) {
     console.log("Detecting chord");
     if (notes.length < MIN_NOTES_TO_DETECT_CHORD) {
@@ -48,7 +48,7 @@ class ChordDetector {
     }
     const serializedChord = this.serializeChord(
       notes,
-      "?" // wildcard - any char
+      "?", // wildcard - any char
     );
     const matchedValues = this.trie.wildcardMatches(serializedChord);
     console.log("Matched values from trie", matchedValues);
@@ -94,7 +94,7 @@ class ChordDetector {
       .map((item) =>
         typeof item === "number"
           ? String.fromCharCode(item + START_ASCII_CODE)
-          : item
+          : item,
       )
       .join("");
   }

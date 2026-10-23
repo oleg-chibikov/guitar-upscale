@@ -1,5 +1,10 @@
 import type { Preview } from "@/app/components/pianoRoll/useNoteAreaInteraction";
-import { isSharp, Note, NOTE_COUNT, serializeOctaveNote } from "@/app/data/notes";
+import {
+  isSharp,
+  Note,
+  NOTE_COUNT,
+  serializeOctaveNote,
+} from "@/app/data/notes";
 import {
   BEATS_IN_BAR,
   PITCH_AXIS_WIDTH,
@@ -11,7 +16,12 @@ import {
 } from "@/app/data/pianoRollConstants";
 import { MAX_VOLUME } from "@/app/data/volume";
 import { ChordOrNote, getChordOrNoteText } from "@/app/engine/eventsByTick";
-import { fromPitch, pitchToY, tickToX, Zoom } from "@/app/engine/pianoRoll/geometry";
+import {
+  fromPitch,
+  pitchToY,
+  tickToX,
+  Zoom,
+} from "@/app/engine/pianoRoll/geometry";
 import {
   getEventDuration,
   getEventPitch,
@@ -131,7 +141,7 @@ export const hitTestNote = (
   selection: ReadonlySet<string>,
   zoom: Zoom,
   x: number,
-  y: number
+  y: number,
 ): { id: string; edge: ResizeEdge | undefined } | undefined => {
   const test = (selected: boolean) => {
     for (let i = events.length - 1; i >= 0; i--) {
@@ -142,7 +152,12 @@ export const hitTestNote = (
       const left = tickToX(tick, zoom);
       const top = pitchToY(getEventPitch(event), zoom);
       const width = blockWidth(event, zoom);
-      if (x < left || x >= left + width || y < top || y >= top + zoom.noteHeight) {
+      if (
+        x < left ||
+        x >= left + width ||
+        y < top ||
+        y >= top + zoom.noteHeight
+      ) {
         continue;
       }
       const endHandle = Math.min(RESIZE_HANDLE_PX, width / 2);
@@ -185,10 +200,29 @@ const collectBlocks = ({
       const target = preview.targets.get(event.id);
       if (target) {
         if (preview.copy) {
-          blocks.push({ tick, event, pitch, selected: false, ghost: false, inactive: false });
-          ghosts.push({ ...target, event, selected: true, ghost: true, inactive: false });
+          blocks.push({
+            tick,
+            event,
+            pitch,
+            selected: false,
+            ghost: false,
+            inactive: false,
+          });
+          ghosts.push({
+            ...target,
+            event,
+            selected: true,
+            ghost: true,
+            inactive: false,
+          });
         } else {
-          blocks.push({ ...target, event, selected, ghost: false, inactive: false });
+          blocks.push({
+            ...target,
+            event,
+            selected,
+            ghost: false,
+            inactive: false,
+          });
         }
         continue;
       }
@@ -207,7 +241,14 @@ const collectBlocks = ({
         continue;
       }
     }
-    blocks.push({ tick, event, pitch, selected, ghost: false, inactive: false });
+    blocks.push({
+      tick,
+      event,
+      pitch,
+      selected,
+      ghost: false,
+      inactive: false,
+    });
   }
   if (preview?.kind === "draw") {
     ghosts.push({
@@ -235,7 +276,7 @@ const drawVerticalLines = (
   from: number,
   to: number,
   top: number,
-  height: number
+  height: number,
 ) => {
   ctx.fillStyle = color;
   for (let x = Math.floor(from / spacing) * spacing; x < to; x += spacing) {
@@ -249,7 +290,7 @@ const drawGrid = (
   left: number,
   right: number,
   top: number,
-  bottom: number
+  bottom: number,
 ) => {
   const { zoom, scalePattern, baseNote, snapTicks } = scene;
   const h = zoom.noteHeight;
@@ -272,14 +313,22 @@ const drawGrid = (
   if (beatWidth >= MIN_LINE_SPACING_PX) {
     drawVerticalLines(ctx, BEAT_LINE, beatWidth, left, right, top, height);
   }
-  drawVerticalLines(ctx, BAR_LINE, beatWidth * BEATS_IN_BAR, left, right, top, height);
+  drawVerticalLines(
+    ctx,
+    BAR_LINE,
+    beatWidth * BEATS_IN_BAR,
+    left,
+    right,
+    top,
+    height,
+  );
 };
 
 const drawBlock = (
   ctx: CanvasRenderingContext2D,
   { tick, event, pitch, selected, ghost, inactive }: Block,
   zoom: Zoom,
-  trackColors: Map<number, number> | undefined
+  trackColors: Map<number, number> | undefined,
 ) => {
   const x = tickToX(tick, zoom);
   const y = pitchToY(pitch, zoom);
@@ -312,7 +361,8 @@ const drawBlock = (
   const opacity = ctx.globalAlpha;
   if (velocity !== undefined) {
     ctx.globalAlpha =
-      opacity * (MIN_VELOCITY_ALPHA + (1 - MIN_VELOCITY_ALPHA) * (velocity / MAX_VOLUME));
+      opacity *
+      (MIN_VELOCITY_ALPHA + (1 - MIN_VELOCITY_ALPHA) * (velocity / MAX_VOLUME));
   }
   ctx.fill();
   ctx.globalAlpha = opacity;
@@ -349,13 +399,19 @@ const drawBlock = (
 const drawNoteArea = (
   ctx: CanvasRenderingContext2D,
   scene: PianoRollScene,
-  viewport: Viewport
+  viewport: Viewport,
 ) => {
   const { zoom, width, height, preview, loopLengthTicks, loopRange } = scene;
   const left = Math.max(0, viewport.scrollLeft);
   const top = Math.max(0, viewport.scrollTop);
-  const right = Math.min(width, viewport.scrollLeft + viewport.width - PITCH_AXIS_WIDTH);
-  const bottom = Math.min(height, viewport.scrollTop + viewport.height - TIMELINE_HEIGHT);
+  const right = Math.min(
+    width,
+    viewport.scrollLeft + viewport.width - PITCH_AXIS_WIDTH,
+  );
+  const bottom = Math.min(
+    height,
+    viewport.scrollTop + viewport.height - TIMELINE_HEIGHT,
+  );
 
   drawGrid(ctx, scene, left, right, top, bottom);
 
@@ -382,7 +438,7 @@ const drawNoteArea = (
       preview.x + 0.5,
       preview.y + 0.5,
       Math.max(0, preview.width - 1),
-      Math.max(0, preview.height - 1)
+      Math.max(0, preview.height - 1),
     );
   }
 
@@ -411,10 +467,13 @@ const drawNoteArea = (
 const drawTimeline = (
   ctx: CanvasRenderingContext2D,
   { zoom, width, loopRange }: PianoRollScene,
-  viewport: Viewport
+  viewport: Viewport,
 ) => {
   const left = Math.max(0, viewport.scrollLeft);
-  const right = Math.min(width, viewport.scrollLeft + viewport.width - PITCH_AXIS_WIDTH);
+  const right = Math.min(
+    width,
+    viewport.scrollLeft + viewport.width - PITCH_AXIS_WIDTH,
+  );
   const bottom = TIMELINE_HEIGHT - 1;
   ctx.fillStyle = "#e5e7eb";
   ctx.fillRect(left, 0, right - left, TIMELINE_HEIGHT);
@@ -429,7 +488,15 @@ const drawTimeline = (
   const beatWidth = TICKS_IN_BEAT * zoom.pixelsPerTick;
   if (beatWidth >= MIN_LINE_SPACING_PX) {
     const tickHeight = TIMELINE_HEIGHT / 3;
-    drawVerticalLines(ctx, "#9ca3af", beatWidth, left, right, bottom - tickHeight, tickHeight);
+    drawVerticalLines(
+      ctx,
+      "#9ca3af",
+      beatWidth,
+      left,
+      right,
+      bottom - tickHeight,
+      tickHeight,
+    );
   }
 
   const barWidth = TICKS_IN_BAR * zoom.pixelsPerTick;
@@ -443,7 +510,9 @@ const drawTimeline = (
   ctx.textBaseline = "bottom";
   ctx.textAlign = "left";
   // a label starting left of the view can still show its tail
-  const firstBar = Math.max(0, Math.floor((left - MIN_BAR_LABEL_SPACING_PX) / step)) * labelEvery;
+  const firstBar =
+    Math.max(0, Math.floor((left - MIN_BAR_LABEL_SPACING_PX) / step)) *
+    labelEvery;
   for (let bar = firstBar; bar * barWidth < right; bar += labelEvery) {
     const x = bar * barWidth;
     ctx.fillStyle = "#4b5563";
@@ -456,11 +525,14 @@ const drawTimeline = (
 const drawPitchAxis = (
   ctx: CanvasRenderingContext2D,
   { zoom, baseNote, scalePattern, snapToScale, pressedPitch }: PianoRollScene,
-  viewport: Viewport
+  viewport: Viewport,
 ) => {
   const h = zoom.noteHeight;
   const top = Math.max(0, viewport.scrollTop);
-  const bottom = Math.min(PITCH_COUNT * h, viewport.scrollTop + viewport.height - TIMELINE_HEIGHT);
+  const bottom = Math.min(
+    PITCH_COUNT * h,
+    viewport.scrollTop + viewport.height - TIMELINE_HEIGHT,
+  );
   ctx.fillStyle = KEY_WHITE;
   ctx.fillRect(0, top, PITCH_AXIS_WIDTH, bottom - top);
   ctx.strokeStyle = "#D1D5DB";
@@ -469,7 +541,8 @@ const drawPitchAxis = (
   ctx.textAlign = "left";
 
   const highest = PITCH_COUNT - 1 - Math.max(0, Math.floor(top / h));
-  const lowest = PITCH_COUNT - 1 - Math.min(PITCH_COUNT - 1, Math.floor(bottom / h));
+  const lowest =
+    PITCH_COUNT - 1 - Math.min(PITCH_COUNT - 1, Math.floor(bottom / h));
   for (let pitch = lowest; pitch <= highest; pitch++) {
     const y = pitchToY(pitch, zoom);
     const octaveNote = fromPitch(pitch);
@@ -478,7 +551,11 @@ const drawPitchAxis = (
     const inScale = !snapToScale || scalePattern.has(octaveNote.note);
 
     if (sharp) {
-      ctx.fillStyle = lit ? "#1e3a8a" : inScale ? KEY_BLACK : KEY_BLACK_OUT_OF_SCALE;
+      ctx.fillStyle = lit
+        ? "#1e3a8a"
+        : inScale
+          ? KEY_BLACK
+          : KEY_BLACK_OUT_OF_SCALE;
       ctx.fillRect(0, y, BLACK_KEY_WIDTH, h);
     } else {
       if (lit || !inScale) {
@@ -506,7 +583,11 @@ const drawPitchAxis = (
             ? KEY_LABEL_WHITE
             : KEY_LABEL_OUT_OF_SCALE;
       ctx.font = `${isBaseNote ? "bold " : ""}${Math.min(11, h - 4)}px Arial`;
-      ctx.fillText(serializeOctaveNote(octaveNote), sharp ? 4 : BLACK_KEY_WIDTH + 6, y + h / 2);
+      ctx.fillText(
+        serializeOctaveNote(octaveNote),
+        sharp ? 4 : BLACK_KEY_WIDTH + 6,
+        y + h / 2,
+      );
     }
   }
 };
@@ -523,7 +604,13 @@ export const pitchAtAxisPoint = (zoom: Zoom, x: number, y: number) => {
   return rowPitch;
 };
 
-const clipRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
+const clipRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) => {
   ctx.beginPath();
   ctx.rect(x, y, w, h);
   ctx.clip();
@@ -532,7 +619,7 @@ const clipRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number
 export const drawScene = (
   ctx: CanvasRenderingContext2D,
   scene: PianoRollScene,
-  viewport: Viewport
+  viewport: Viewport,
 ) => {
   const { scrollLeft, scrollTop, width, height } = viewport;
   ctx.fillStyle = BACKGROUND;
@@ -567,7 +654,7 @@ export const drawPlayhead = (
   ctx: CanvasRenderingContext2D,
   tick: number,
   zoom: Zoom,
-  viewport: Viewport
+  viewport: Viewport,
 ) => {
   const x = PITCH_AXIS_WIDTH + tickToX(tick, zoom) - viewport.scrollLeft;
   if (x < PITCH_AXIS_WIDTH - 6 || x > viewport.width + 6) {

@@ -46,7 +46,7 @@ export function getPatternById(id: number): StrummingPattern | undefined {
 
 function savePatternsToLocalStorage(): void {
   const customPatterns = Array.from(strummingPatternsMap.values()).filter(
-    (pattern) => pattern.id > lastStrummingPatternId
+    (pattern) => pattern.id > lastStrummingPatternId,
   );
   localStorage.setItem("strummingPatterns", JSON.stringify(customPatterns));
 }
@@ -57,7 +57,7 @@ export function getAllPatterns(): StrummingPattern[] {
 
 export function getCustomPatterns(): StrummingPattern[] {
   return Array.from(strummingPatternsMap.values()).filter(
-    (pattern) => pattern.id > lastStrummingPatternId
+    (pattern) => pattern.id > lastStrummingPatternId,
   );
 }
 

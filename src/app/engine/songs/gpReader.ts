@@ -29,13 +29,13 @@ type PlayedBar = { index: number; start: number };
 const getPlayedBars = (
   alphaTab: typeof AlphaTab,
   score: AlphaTab.model.Score,
-  settings: AlphaTab.Settings
+  settings: AlphaTab.Settings,
 ): PlayedBar[] => {
   const midiFile = new alphaTab.midi.MidiFile();
   const generator = new alphaTab.midi.MidiFileGenerator(
     score,
     settings,
-    new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile)
+    new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile),
   );
   generator.generate();
   return generator.tickLookup.masterBars.map((lookup) => ({
@@ -46,7 +46,7 @@ const getPlayedBars = (
 
 const readTrack = (
   track: AlphaTab.model.Track,
-  playedBars: PlayedBar[]
+  playedBars: PlayedBar[],
 ): SongTrack | undefined => {
   const staff = track.staves.at(0);
   if (staff === undefined || staff.isPercussion) {
@@ -135,13 +135,13 @@ const readTrack = (
 
 export const readGuitarProSong = async (
   bytes: Uint8Array,
-  fileName: string
+  fileName: string,
 ): Promise<Song> => {
   const alphaTab = await import("@coderline/alphatab");
   const settings = new alphaTab.Settings();
   const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
     bytes,
-    settings
+    settings,
   );
   const playedBars = getPlayedBars(alphaTab, score, settings);
   const fromName = parseBandAndTitle(fileName);

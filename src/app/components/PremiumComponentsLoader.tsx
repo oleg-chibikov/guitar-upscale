@@ -16,59 +16,51 @@ import { DetectChordButton } from "./settings/buttons/DetectChordButton";
 
 const RecordButton = dynamic(
   async () =>
-    (await import("@/app/components/playPanel/RecordButton")).RecordButton
+    (await import("@/app/components/playPanel/RecordButton")).RecordButton,
 );
 const SkinSelector = dynamic(
   async () =>
     (await import("@/app/components/settings/selectors/SkinSelector"))
-      .SkinSelector
+      .SkinSelector,
 );
 const PlaybackTypeSelector = dynamic(
   async () =>
     (await import("@/app/components/settings/selectors/PlaybackTypeSelector"))
-      .PlaybackTypeSelector
+      .PlaybackTypeSelector,
 );
 const PremiumPlayButton = dynamic(
   async () =>
     (await import("@/app/components/playPanel/PremiumPlayButton"))
-      .PremiumPlayButton
+      .PremiumPlayButton,
 );
 const InstrumentSelector = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/selectors/instrument/InstrumentSelector"
-      )
-    ).InstrumentSelector
+      await import("@/app/components/settings/selectors/instrument/InstrumentSelector")
+    ).InstrumentSelector,
 );
 const ChordInstrumentSelector = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/selectors/instrument/ChordInstrumentSelector"
-      )
-    ).InstrumentSelector
+      await import("@/app/components/settings/selectors/instrument/ChordInstrumentSelector")
+    ).InstrumentSelector,
 );
 const ReverbStrengthSlider = dynamic(
   async () =>
     (await import("@/app/components/settings/sliders/ReverbStrengthSlider"))
-      .ReverbStrengthSlider
+      .ReverbStrengthSlider,
 );
 const ToggleMetronomeWhenRecordingCheckbox = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox"
-      )
-    ).ToggleMetronomeWhenRecordingCheckbox
+      await import("@/app/components/settings/checkboxes/ToggleMetronomeWhenRecordingCheckbox")
+    ).ToggleMetronomeWhenRecordingCheckbox,
 );
 const SaveMidiImmediatelyCheckbox = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/checkboxes/SaveMidiImmediatelyCheckbox"
-      )
-    ).SaveMidiImmediatelyCheckbox
+      await import("@/app/components/settings/checkboxes/SaveMidiImmediatelyCheckbox")
+    ).SaveMidiImmediatelyCheckbox,
 );
 // const ErudaConsoleControl = dynamic(
 //   async () =>
@@ -77,7 +69,7 @@ const SaveMidiImmediatelyCheckbox = dynamic(
 // );
 
 export const premiumFeaturesToMap = (
-  features: PremiumFeatures
+  features: PremiumFeatures,
 ): Map<PremiumFeatureKeys, PremiumComponent> => {
   const premiumComponents = new Map<PremiumFeatureKeys, PremiumComponent>();
   const convertKeyToComponent = (key: string) => {
@@ -127,7 +119,7 @@ export const premiumFeaturesToMap = (
       // Map entries are serialized as an array to the client, so each element needs a key.
       premiumComponents.set(
         key as PremiumFeatureKeys,
-        <Fragment key={key}>{convertKeyToComponent(key)}</Fragment>
+        <Fragment key={key}>{convertKeyToComponent(key)}</Fragment>,
       );
     }
   });

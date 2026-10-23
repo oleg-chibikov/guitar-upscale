@@ -22,7 +22,7 @@ const getCancelReason = (purchase: SubscriptionPurchaseV2) => {
 
 const getPaymentState = (
   purchase: SubscriptionPurchaseV2,
-  isFreeTrial: boolean
+  isFreeTrial: boolean,
 ) => {
   switch (purchase.subscriptionState) {
     case "SUBSCRIPTION_STATE_PENDING":
@@ -30,17 +30,19 @@ const getPaymentState = (
     case "SUBSCRIPTION_STATE_ON_HOLD":
       return PaymentState.PAYMENT_PENDING;
     default:
-      return isFreeTrial ? PaymentState.FREE_TRIAL : PaymentState.PAYMENT_RECEIVED;
+      return isFreeTrial
+        ? PaymentState.FREE_TRIAL
+        : PaymentState.PAYMENT_RECEIVED;
   }
 };
 
 // Google removed purchases.subscriptions.get, so the v2 response is mapped to the v1 fields the app reads.
 export const fromSubscriptionPurchaseV2 = (
   purchase: SubscriptionPurchaseV2,
-  purchaseToken: string
+  purchaseToken: string,
 ): SubscriptionPurchase => {
   const lineItem = [...(purchase.lineItems ?? [])].sort(
-    (a, b) => toMillis(b.expiryTime) - toMillis(a.expiryTime)
+    (a, b) => toMillis(b.expiryTime) - toMillis(a.expiryTime),
   )[0];
 
   return SubscriptionPurchase.fromApiResponse(
@@ -51,7 +53,7 @@ export const fromSubscriptionPurchaseV2 = (
       autoRenewing: lineItem?.autoRenewingPlan?.autoRenewEnabled === true,
       paymentState: getPaymentState(
         purchase,
-        lineItem?.offerPhase?.freeTrial !== undefined
+        lineItem?.offerPhase?.freeTrial !== undefined,
       ),
       cancelReason: getCancelReason(purchase),
       acknowledgementState:
@@ -64,6 +66,6 @@ export const fromSubscriptionPurchaseV2 = (
         ? PurchaseType.TEST
         : PurchaseType.NORMAL,
     },
-    purchaseToken
+    purchaseToken,
   );
 };

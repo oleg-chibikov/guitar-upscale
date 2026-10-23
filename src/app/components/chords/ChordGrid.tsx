@@ -48,7 +48,9 @@ interface Cell {
 }
 
 const easeInOut = (progress: number) =>
-  progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+  progress < 0.5
+    ? 2 * progress * progress
+    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
 const getPulseScale = (startedAt: number | undefined, now: number) => {
   if (startedAt === undefined || now - startedAt >= PULSE_MS) {
@@ -61,7 +63,11 @@ const getPulseScale = (startedAt: number | undefined, now: number) => {
     : PULSE_SCALE + (1 - PULSE_SCALE) * easeInOut(progress * 2 - 1);
 };
 
-const getFill = (palette: Palette, state: ChordCellState, isDisabled: boolean) => {
+const getFill = (
+  palette: Palette,
+  state: ChordCellState,
+  isDisabled: boolean,
+) => {
   if (isDisabled) {
     return palette.disabled;
   }
@@ -91,7 +97,11 @@ const getCursor = (state: ChordCellState, isDisabled: boolean) => {
   return state.isPlaying || (!isDisabled && !state.isClicked) ? "pointer" : "";
 };
 
-const fitText = (ctx: CanvasRenderingContext2D, text: string, width: number) => {
+const fitText = (
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  width: number,
+) => {
   if (ctx.measureText(text).width <= width) {
     return text;
   }
@@ -108,7 +118,7 @@ const drawCells = (
   cellHeight: number,
   palette: Palette,
   store: ChordGridStore,
-  now: number
+  now: number,
 ) => {
   ctx.font = FONT;
   ctx.textAlign = "center";
@@ -133,7 +143,7 @@ const drawCells = (
         x + BORDER / 2,
         y + BORDER / 2,
         CELL_WIDTH - BORDER,
-        cellHeight - BORDER
+        cellHeight - BORDER,
       );
     }
 
@@ -141,7 +151,7 @@ const drawCells = (
     ctx.fillText(
       fitText(ctx, label, CELL_WIDTH - 2 * TEXT_PADDING),
       x + CELL_WIDTH / 2,
-      y + cellHeight / 2
+      y + cellHeight / 2,
     );
     ctx.restore();
   }
@@ -177,7 +187,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
       x: column * (CELL_WIDTH + GAP),
       y: row * (cellHeight + GAP),
       isDisabled,
-    })
+    }),
   );
 
   const drawRef = useRef<(ctx: CanvasRenderingContext2D) => void>(() => {});
@@ -257,7 +267,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
         x >= cell.x &&
         x < cell.x + CELL_WIDTH &&
         y >= cell.y &&
-        y < cell.y + cellHeight
+        y < cell.y + cellHeight,
     );
     e.currentTarget.style.cursor = cell
       ? getCursor(store.get(cell.chordName), cell.isDisabled)

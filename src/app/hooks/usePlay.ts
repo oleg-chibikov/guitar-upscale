@@ -41,7 +41,7 @@ export interface UsePlayParams {
 
 export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
-    (s) => s.guitarSettingsUpdateCount
+    (s) => s.guitarSettingsUpdateCount,
   );
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
   const [isWaiting, setIsWaiting] = useState(false);
@@ -56,66 +56,69 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   const dispatch = useDispatch();
 
-  const handlePlay = useCallback(async (chosen?: Example) => {
-    if (isWaitingRef.current) {
-      console.log(
-        LOG_PREFIX +
-          "Already waiting for playback to start, skipping new request"
-      );
-      return;
-    }
-    updateWaiting(true);
-    try {
-      if (chosen && isPlayingValue && !checkLooperPlaying()) {
-        await stop(dispatch);
+  const handlePlay = useCallback(
+    async (chosen?: Example) => {
+      if (isWaitingRef.current) {
+        console.log(
+          LOG_PREFIX +
+            "Already waiting for playback to start, skipping new request",
+        );
+        return;
       }
+      updateWaiting(true);
+      try {
+        if (chosen && isPlayingValue && !checkLooperPlaying()) {
+          await stop(dispatch);
+        }
 
-      if (isPlayingValue) {
-        if (checkLooperPlaying()) {
-          await continueLooper();
+        if (isPlayingValue) {
+          if (checkLooperPlaying()) {
+            await continueLooper();
+            return;
+          }
+
+          if (pianoRollData) {
+            updateWaiting(false);
+            await replay(dispatch, pianoRollData);
+            return;
+          }
           return;
         }
 
-        if (pianoRollData) {
-          updateWaiting(false);
-          await replay(dispatch, pianoRollData);
+        console.log(LOG_PREFIX, "Loading examples");
+        const example: Example | undefined = await loadExample(
+          decodeExample,
+          dispatch,
+          chosen,
+        );
+
+        await loadInstruments(example);
+
+        const {
+          eventsByTick,
+          message,
+        }: { eventsByTick: EventsByTick; message: string } = await decode(
+          decodeExample,
+          example,
+        );
+
+        if (!eventsByTick.hasItems) {
           return;
         }
-        return;
+
+        await playExampleOrScale(
+          example,
+          dispatch,
+          message,
+          eventsByTick,
+          updateWaiting,
+        );
+      } finally {
+        updateWaiting(false);
       }
-
-      console.log(LOG_PREFIX, "Loading examples");
-      const example: Example | undefined = await loadExample(
-        decodeExample,
-        dispatch,
-        chosen
-      );
-
-      await loadInstruments(example);
-
-      const {
-        eventsByTick,
-        message,
-      }: { eventsByTick: EventsByTick; message: string } = await decode(
-        decodeExample,
-        example
-      );
-
-      if (!eventsByTick.hasItems) {
-        return;
-      }
-
-      await playExampleOrScale(
-        example,
-        dispatch,
-        message,
-        eventsByTick,
-        updateWaiting
-      );
-    } finally {
-      updateWaiting(false);
-    }
-  }, [dispatch, decodeExample]);
+    },
+    [dispatch, decodeExample],
+  );
 
   useEffect(() => {
     // stop playing when any of dependencies changes
@@ -167,7 +170,7 @@ async function playExampleOrScale(
   dispatch: Dispatch<UnknownAction>,
   message: string,
   eventsByTick: EventsByTick,
-  updateWaiting: (value: boolean) => void
+  updateWaiting: (value: boolean) => void,
 ) {
   // Start playback
   console.log(LOG_PREFIX + "Waiting for playback to start...");
@@ -187,12 +190,12 @@ async function playExampleOrScale(
 
       // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
       console.log(
-        LOG_PREFIX + "The playback has started. Removing the waiting mark"
+        LOG_PREFIX + "The playback has started. Removing the waiting mark",
       );
 
       updateWaiting(false);
     },
-    getStartBarPosition(example)
+    getStartBarPosition(example),
   );
 }
 
@@ -203,7 +206,7 @@ async function loadInstruments(example: Example | undefined) {
     example?.song?.tracks.map((track) =>
       track.instrument !== undefined
         ? loadInstrument(track.instrument, reverbStrengthValue)
-        : Promise.resolve()
+        : Promise.resolve(),
     ) ?? [];
 
   await Promise.all(trackInstrumentPromises);
@@ -212,13 +215,12 @@ async function loadInstruments(example: Example | undefined) {
 async function loadExample(
   decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
   dispatch: Dispatch<UnknownAction>,
-  chosen?: Example
+  chosen?: Example,
 ) {
   let example: Example | undefined;
   if (decodeExample && playbackTypeValue === melodyType) {
-    const { getScaleExample, wipeExamplesCache } = await import(
-      "@/app/engine/songs/songLibrary"
-    );
+    const { getScaleExample, wipeExamplesCache } =
+      await import("@/app/engine/songs/songLibrary");
     if (wipeExampleCacheTriggerValue) {
       wipeExamplesCache();
       clearWipeExampleCacheTrigger();
@@ -242,7 +244,7 @@ function getStartBarPosition(example: Example | undefined) {
 
 async function decode(
   decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
-  example: Example | undefined
+  example: Example | undefined,
 ) {
   let eventsByTick: EventsByTick;
   let message: string;
@@ -256,9 +258,8 @@ async function decode(
       isFullStringScalePlayback ? " (full string)" : ""
     }`;
 
-    const { getWholeScale } = await import(
-      "@/app/engine/decoders/scaleDecoder"
-    );
+    const { getWholeScale } =
+      await import("@/app/engine/decoders/scaleDecoder");
     eventsByTick = getWholeScale(isFullStringScalePlayback);
   }
   return { eventsByTick, message };

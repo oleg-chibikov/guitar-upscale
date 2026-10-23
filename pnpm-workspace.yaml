@@ -5,8 +5,8 @@ packages:
   # if required, exclude some directories
   - "!**/test/**"
 allowBuilds:
-  '@parcel/watcher': false
-  '@vercel/speed-insights': false
+  "@parcel/watcher": false
+  "@vercel/speed-insights": false
   midi-writer-js: false
   unrs-resolver: false
 ignore-workspace-root-check: true

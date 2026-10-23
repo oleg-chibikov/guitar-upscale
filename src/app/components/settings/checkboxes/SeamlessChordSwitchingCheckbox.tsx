@@ -6,7 +6,7 @@ import { CheckBox } from "../../uiFramework/CheckBox";
 
 export const SeamlessChordSwitchingCheckbox: React.FC = (props) => {
   const seamlessChordSwitching = useSettingsSelector(
-    (s) => s.seamlessChordSwitching
+    (s) => s.seamlessChordSwitching,
   );
   const dispatch = useDispatch();
 

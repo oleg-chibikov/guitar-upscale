@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import { Slider, SliderProps } from "./Slider";
 
-export interface StepSliderProps
-  extends Omit<SliderProps, "step" | "minimumValue" | "maximumValue"> {
+export interface StepSliderProps extends Omit<
+  SliderProps,
+  "step" | "minimumValue" | "maximumValue"
+> {
   steps: number[];
 }
 

@@ -48,7 +48,7 @@ export function blockLongPress() {
         });
       }
     },
-    { capture: true, passive: false }
+    { capture: true, passive: false },
   );
 
   document.addEventListener(
@@ -69,11 +69,11 @@ export function blockLongPress() {
         }
         findScroller(touch.target as Element)?.scrollBy(
           last.x - touch.clientX,
-          last.y - touch.clientY
+          last.y - touch.clientY,
         );
       }
     },
-    { capture: true, passive: true }
+    { capture: true, passive: true },
   );
 
   const forget = (event: TouchEvent) => {

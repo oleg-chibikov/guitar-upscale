@@ -57,7 +57,7 @@ export class MidiRecorder implements NoteRecorder {
   addNoteAtGlobalTick(
     note: StringOctaveNote,
     trackNumber: number,
-    instrument: Instrument
+    instrument: Instrument,
   ) {
     if (!this.isRecording || !this.midiEvents || !this.eventsByTick) {
       return;
@@ -97,12 +97,12 @@ export class MidiRecorder implements NoteRecorder {
             note.instrument ?? "acoustic_guitar_nylon",
             eventsAtTick.tick,
             event.duration,
-            note.velocity
+            note.velocity,
           );
         }
         if (chord) {
           const preferredVariations = chordPreferredVariationsByName.get(
-            chord.chord
+            chord.chord,
           );
           if (preferredVariations) {
             for (const chordNote of preferredVariations.variation) {
@@ -116,7 +116,7 @@ export class MidiRecorder implements NoteRecorder {
                   DEFAULT_CHORD_TRACK_NUMBER,
                 chord.metadata.trackInstrument ?? "acoustic_guitar_nylon",
                 eventsAtTick.tick,
-                event.duration
+                event.duration,
               );
             }
           }
@@ -131,13 +131,13 @@ export class MidiRecorder implements NoteRecorder {
     instrument: Instrument,
     tick: number,
     durationTicks?: number,
-    velocity = MAX_VOLUME
+    velocity = MAX_VOLUME,
   ) {
     if (!this.isRecording || !this.midiEvents) {
       return;
     }
     console.log(
-      `Recording ${getNoteText(note.note)}${note.octave}; delta: ${tick} ticks`
+      `Recording ${getNoteText(note.note)}${note.octave}; delta: ${tick} ticks`,
     );
 
     const trackKey = this.getTrackKey(trackNumber, instrument);
@@ -164,7 +164,7 @@ export class MidiRecorder implements NoteRecorder {
         channel: 1,
         sequential: false,
         tick: (tick + this.TICK_SHIFT) * (128 / TICKS_IN_BEAT), // ticks in the program are not the same as ticks in midi-writer-js, so we need to adjust them
-      })
+      }),
     );
   }
 

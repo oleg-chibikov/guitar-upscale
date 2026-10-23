@@ -18,7 +18,7 @@ class MidiSaver {
 
   getFileName(extension?: string) {
     return `Guitar upscale | ${scaleGroupValue} - ${scaleValue} | {${tempoBpmValue} BPM} | ${getNoteText(
-      capoValue
+      capoValue,
     )} | ${this.getFormattedDateTime()}.${extension ?? "mid"}`;
   }
 

@@ -17,7 +17,7 @@ const isPlayable = (mode: ChordModeVariations, note: Note) =>
  */
 export const buildAllChordsLayout = (
   columns: ChordModeVariations[],
-  notes: Note[]
+  notes: Note[],
 ): ChordGridCell[] =>
   notes.flatMap((note, row) =>
     columns.map((mode, column) => ({
@@ -26,7 +26,7 @@ export const buildAllChordsLayout = (
       column,
       row,
       isDisabled: !isPlayable(mode, note),
-    }))
+    })),
   );
 
 /**
@@ -36,14 +36,17 @@ export const buildAllChordsLayout = (
 export const buildKeyChordsLayout = (
   columns: ChordModeVariations[],
   root: Note,
-  rowsPerColumn: number
+  rowsPerColumn: number,
 ): ChordGridCell[] => {
   const chords: { chordName: string; root: Note }[] = [];
   for (let step = 0; step < NOTE_COUNT; step++) {
     const note = (root + step) % NOTE_COUNT;
     const mode = columns.find((mode) => isPlayable(mode, note));
     if (mode) {
-      chords.push({ chordName: getChordName(note, mode.chordMode), root: note });
+      chords.push({
+        chordName: getChordName(note, mode.chordMode),
+        root: note,
+      });
     }
   }
   return chords.map((chord, index) => ({

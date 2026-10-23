@@ -18,12 +18,10 @@ const downloadMidi = async (data: EventsByTick) => {
 };
 
 const downloadGuitarPro = async (data: EventsByTick) => {
-  const { getExampleForEvents } = await import(
-    "@/app/engine/songs/songLibrary"
-  );
-  const { downloadEventsAsGuitarPro } = await import(
-    "@/app/engine/songs/songExport"
-  );
+  const { getExampleForEvents } =
+    await import("@/app/engine/songs/songLibrary");
+  const { downloadEventsAsGuitarPro } =
+    await import("@/app/engine/songs/songExport");
   await downloadEventsAsGuitarPro(data, getExampleForEvents(data));
 };
 
@@ -45,7 +43,7 @@ export const DownloadButton: React.FC = () => {
         setAndShowAlert({
           message: "Cannot download the song",
           alertType: AlertType.Error,
-        })
+        }),
       );
     }
   };

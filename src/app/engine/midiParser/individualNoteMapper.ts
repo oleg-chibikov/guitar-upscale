@@ -4,7 +4,7 @@ import { octaveNoteToStringOctaveNoteMap } from "@/app/engine/generateNeckRepres
 
 export function addIndividualNote(
   event: NotePlayEvent,
-  previousNote: StringOctaveNote | undefined
+  previousNote: StringOctaveNote | undefined,
 ) {
   const { octaveNote } = event;
   const serializedOctaveNote = serializeOctaveNote(octaveNote);
@@ -16,7 +16,7 @@ export function addIndividualNote(
   ) {
     console.error(
       "note %s is not in the scale. Skipping it",
-      serializedOctaveNote
+      serializedOctaveNote,
     );
     return undefined;
   } else {
@@ -26,13 +26,13 @@ export function addIndividualNote(
 
 function chooseBestPosition(
   positions: StringOctaveNote[],
-  previousPosition: StringOctaveNote | undefined
+  previousPosition: StringOctaveNote | undefined,
 ): StringOctaveNote {
   if (!previousPosition) {
     // No previous position, choose the lowest fret
     return positions.reduce(
       (best, pos) => (pos.fret < best.fret ? pos : best),
-      positions[0]
+      positions[0],
     );
   }
 

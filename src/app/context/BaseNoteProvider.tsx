@@ -14,14 +14,14 @@ interface BaseNoteContextType {
 }
 
 const BaseNoteContext = createContext<BaseNoteContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useBaseNoteContext = () => {
   const context = useContext(BaseNoteContext);
   if (context === undefined) {
     throw new Error(
-      "useBaseNoteContext must be used within a BaseNoteProvider"
+      "useBaseNoteContext must be used within a BaseNoteProvider",
     );
   }
   return context;

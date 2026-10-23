@@ -27,8 +27,8 @@ const generateVoicings = (root: number, intervals: number[]) => {
         voicings.push(
           ...new FretChordsGenerator(0, neck, 12, cache).processFret(
             intervals,
-            note
-          )
+            note,
+          ),
         );
       }
     }
@@ -83,7 +83,7 @@ describe("chord voicings", () => {
 
   it("puts the thumb at or behind the other fingers", () => {
     expect(generateVoicings(5, [0, 4, 7]).map(toTab)).toContain(
-      "1x3211 T-3211"
+      "1x3211 T-3211",
     );
 
     for (let root = 0; root < 12; root++) {
@@ -109,19 +109,19 @@ describe("preferred variation", () => {
         generateVoicings(root, intervals),
         "high",
         6,
-        mode
-      )
+        mode,
+      ),
     );
 
   it("picks the usual fingering for open chords", () => {
     expect(pick(7, [0, 4, 7], ChordPlayMode.Preferred_Variation)).toBe(
-      "320003 21---3"
+      "320003 21---3",
     );
     expect(pick(2, [0, 4, 7], ChordPlayMode.Preferred_Variation)).toBe(
-      "xx0232 ---132"
+      "xx0232 ---132",
     );
     expect(pick(2, [0, 4, 7, 10], ChordPlayMode.Preferred_Variation)).toBe(
-      "xx0212 ---213"
+      "xx0212 ---213",
     );
   });
 

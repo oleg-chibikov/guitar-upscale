@@ -7,7 +7,7 @@ export const playSound = (
   note: OctaveNote,
   volume: number,
   soundfont: Soundfont | SplendidGrandPiano,
-  durationMs: number
+  durationMs: number,
 ) => {
   resumeAudio();
   return soundfont.start({
@@ -47,7 +47,7 @@ const getAudioContext = () => {
 
 export const loadInstrument = async (
   instrument: Instrument,
-  reverbStrength: number
+  reverbStrength: number,
 ) => {
   const key = `${instrument}_${reverbStrength}`;
   let soundfont = soundfontMap.get(key);

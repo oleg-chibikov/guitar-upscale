@@ -41,19 +41,29 @@ type WriteOptions = {
 };
 
 type Placed = { string: number; fret: number; chord?: string };
-type Hit = { tick: number; duration: number; notes: Placed[]; velocity?: number };
+type Hit = {
+  tick: number;
+  duration: number;
+  notes: Placed[];
+  velocity?: number;
+};
 type Beat = Hit & { tied: boolean };
 
 // Guitar Pro keeps loudness per beat, from ppp (0) to fff (7). The default f plays at full volume
 const FORTE = 5;
 
 export const dynamicsToVelocity = (dynamics: number): number | undefined =>
-  dynamics >= FORTE ? undefined : Math.round((127 * (dynamics + 1)) / (FORTE + 1));
+  dynamics >= FORTE
+    ? undefined
+    : Math.round((127 * (dynamics + 1)) / (FORTE + 1));
 
 export const velocityToDynamics = (velocity: number | undefined): number =>
   velocity === undefined
     ? FORTE
-    : Math.min(FORTE, Math.max(0, Math.round((velocity * (FORTE + 1)) / 127) - 1));
+    : Math.min(
+        FORTE,
+        Math.max(0, Math.round((velocity * (FORTE + 1)) / 127) - 1),
+      );
 
 const toMidi = (note: OctaveNote) => note.octave * 12 + note.note;
 
@@ -71,7 +81,7 @@ export const voiceChord = (name: string, tuning: number[]): number[] => {
   const findFret = (string: number, wanted: (pc: number) => boolean) =>
     [0, 1, 2, 3, 4].find((fret) => wanted((tuning[string] + fret) % 12));
   const bassIndex = lowFirst.findIndex(
-    (string) => findFret(string, (pc) => pc === rootPc) !== undefined
+    (string) => findFret(string, (pc) => pc === rootPc) !== undefined,
   );
   if (bassIndex === -1) {
     return frets;
@@ -141,7 +151,7 @@ const getChordHits = (track: SongTrack, tuning: number[]): Hit[] => {
     const barEnd = (Math.floor(tick / TICKS_IN_BAR) + 1) * TICKS_IN_BAR;
     const duration = Math.max(
       1,
-      Math.round(Math.min(next, barEnd + TICKS_IN_BAR * 3) - tick)
+      Math.round(Math.min(next, barEnd + TICKS_IN_BAR * 3) - tick),
     );
     const frets =
       chord.frets ??
@@ -150,7 +160,7 @@ const getChordHits = (track: SongTrack, tuning: number[]): Hit[] => {
       ? frets.flatMap((fret, string) =>
           fret !== undefined && fret >= 0
             ? [{ string, fret, chord: chord.name }]
-            : []
+            : [],
         )
       : (chord.notes ?? []).map((n) => placePitch(toMidi(n), tuning));
     return { tick, duration, notes };
@@ -167,7 +177,8 @@ const toVoices = (hits: Hit[]): Hit[][] => {
       const sameBeat =
         last.tick === hit.tick &&
         last.duration === hit.duration &&
-        velocityToDynamics(last.velocity) === velocityToDynamics(hit.velocity) &&
+        velocityToDynamics(last.velocity) ===
+          velocityToDynamics(hit.velocity) &&
         hit.notes.every((n) => !last.notes.some((x) => x.string === n.string));
       if (sameBeat) {
         last.notes.push(...hit.notes);
@@ -190,7 +201,7 @@ const toVoices = (hits: Hit[]): Hit[][] => {
       a[a.length - 1].tick + a[a.length - 1].duration <=
       b[b.length - 1].tick + b[b.length - 1].duration
         ? a
-        : b
+        : b,
     );
     const last = voice[voice.length - 1];
     if (last.tick < hit.tick) {
@@ -232,7 +243,7 @@ const splitLength = (length: number) => {
 
 export const writeGuitarPro = async (
   song: Song,
-  options: WriteOptions = {}
+  options: WriteOptions = {},
 ): Promise<Uint8Array> => {
   const alphaTab: typeof AlphaTab = await import("@coderline/alphatab");
   const m = alphaTab.model;
@@ -272,8 +283,8 @@ export const writeGuitarPro = async (
   const end = Math.max(
     1,
     ...prepared.flatMap((p) =>
-      p.voices.flat().map((hit) => hit.tick + hit.duration)
-    )
+      p.voices.flat().map((hit) => hit.tick + hit.duration),
+    ),
   );
   const barStarts = [0];
   for (let start = pickup || TICKS_IN_BAR; start < end; start += TICKS_IN_BAR)
@@ -289,7 +300,7 @@ export const writeGuitarPro = async (
     if (index === 0) {
       masterBar.isAnacrusis = pickup > 0;
       masterBar.tempoAutomations.push(
-        m.Automation.buildTempoAutomation(false, 0, song.tempo ?? 120, 2)
+        m.Automation.buildTempoAutomation(false, 0, song.tempo ?? 120, 2),
       );
     }
     score.addMasterBar(masterBar);
@@ -316,7 +327,7 @@ export const writeGuitarPro = async (
         const chord = new m.Chord();
         chord.name = name;
         chord.strings = tuning.map(
-          (_, string) => hit.notes.find((n) => n.string === string)?.fret ?? -1
+          (_, string) => hit.notes.find((n) => n.string === string)?.fret ?? -1,
         );
         chord.showDiagram = true;
         chord.showName = true;
@@ -363,7 +374,7 @@ export const writeGuitarPro = async (
             gpBeat.duration = part.value as AlphaTab.model.Duration;
             gpBeat.dots = part.dots;
             gpBeat.dynamics = velocityToDynamics(
-              beat?.velocity
+              beat?.velocity,
             ) as AlphaTab.model.DynamicValue;
             for (const note of beat?.notes ?? []) {
               const gpNote = new m.Note();
@@ -374,7 +385,7 @@ export const writeGuitarPro = async (
               gpBeat.addNote(gpNote);
             }
             const chordName = beat?.notes.find(
-              (n) => n.chord !== undefined
+              (n) => n.chord !== undefined,
             )?.chord;
             if (chordName !== undefined && i === 0 && beat?.tied !== true) {
               gpBeat.chordId = chordName;
@@ -383,7 +394,7 @@ export const writeGuitarPro = async (
           });
         };
         for (const beat of (beatsByVoice[v] ?? []).filter(
-          (b) => b.tick >= barStart && b.tick < end
+          (b) => b.tick >= barStart && b.tick < end,
         )) {
           if (beat.tick > tick) addBeat(beat.tick - tick);
           addBeat(beat.duration, beat);

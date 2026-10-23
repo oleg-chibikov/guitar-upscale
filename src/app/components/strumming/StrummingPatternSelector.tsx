@@ -13,12 +13,12 @@ import { useDispatch } from "react-redux";
 const StrummingPatternSelector: React.FC = () => {
   const strummingPatternId = useSettingsSelector((s) => s.strummingPatternId);
   const strummingPatternChangedTrigger = useSettingsSelector(
-    (s) => s.strummingPatternChangedTrigger
+    (s) => s.strummingPatternChangedTrigger,
   );
 
   const dispatch = useDispatch();
   const [patterns, setPatterns] = useState<StrummingPattern[]>(
-    chordStrummingPatterns
+    chordStrummingPatterns,
   );
 
   useEffect(() => {

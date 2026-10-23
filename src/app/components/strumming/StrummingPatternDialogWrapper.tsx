@@ -7,13 +7,13 @@ import React from "react";
 import { useDispatch } from "react-redux";
 
 const StrummingPatternDialog = dynamic(
-  async () => (await import("./StrummingPatternDialog")).StrummingPatternDialog
+  async () => (await import("./StrummingPatternDialog")).StrummingPatternDialog,
 );
 
 export const StrummingPatternDialogWrapper: React.FC = () => {
   const dispatch = useDispatch();
   const strummingPatternEditorExpanded = useUiSelector(
-    (s) => s.strummingPatternEditorExpanded
+    (s) => s.strummingPatternEditorExpanded,
   );
   return (
     <>

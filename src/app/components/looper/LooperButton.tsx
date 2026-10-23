@@ -64,7 +64,7 @@ export const LooperButton: React.FC<LooperButtonProps> = ({
   const isDisabled = !hasRecording;
 
   return (
-    <div className="flex flex-col gap-1 items-center">
+    <div className="flex flex-col items-center gap-1">
       <IconButtonWrapper
         icon={isRecording ? <StopCircle /> : <FiberManualRecord />}
         isActive={isRecording}

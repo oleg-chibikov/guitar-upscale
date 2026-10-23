@@ -17,7 +17,7 @@ import { PatreonDialogAuthButton } from "./PatreonDialogAuthButton";
 const GooglePlayPurchaseSection = React.lazy(() =>
   import("./GooglePlayPurchaseSection").then((module) => ({
     default: module.GooglePlayPurchaseSection,
-  }))
+  })),
 );
 
 type AllowedKeys = Exclude<
@@ -127,15 +127,15 @@ export const PurchaseOptionsDialog: FC<DialogProps> = ({
           : undefined
       }
     >
-      <div className="flex flex-row gap-4 items-center justify-center">
+      <div className="flex flex-row items-center justify-center gap-4">
         {session !== null ? (
           <UserAvatar
             user={session.user}
-            className="left-4 top-4"
+            className="top-4 left-4"
             style={{ position: "absolute" }}
           />
         ) : null}
-        <div className="ml-16 mr-16 flex flex-col gap-1 items-center justify-center">
+        <div className="mr-16 ml-16 flex flex-col items-center justify-center gap-1">
           <>
             <Typography>
               {"Subscription level:"}{" "}
@@ -155,7 +155,7 @@ export const PurchaseOptionsDialog: FC<DialogProps> = ({
         </div>
       </div>
       {isOnline ? (
-        <div className="mt-2 flex w-full flex-col gap-2 items-stretch justify-center">
+        <div className="mt-2 flex w-full flex-col items-stretch justify-center gap-2">
           {/* This button is visible only on Android. The user can subscribe or change subscription there. It is not visible if already subscribed with another provider */}
           {hasDigitalGoodsService &&
             (!subscriptionTier ||

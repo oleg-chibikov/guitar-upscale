@@ -5,7 +5,10 @@ import * as alphaTab from "@coderline/alphatab";
 import fs from "fs";
 import path from "path";
 import { scalesMap } from "../src/app/data/scaleDefinitions.ts";
-import { pickSongScale, toNoteMask } from "../src/app/engine/songs/songScale.ts";
+import {
+  pickSongScale,
+  toNoteMask,
+} from "../src/app/engine/songs/songScale.ts";
 
 const SONGS_DIR = "public/songs";
 const SONG_FILE = /\.(gp|gp3|gp4|gp5|gpx)$/i;
@@ -17,12 +20,17 @@ const parseFileName = (fileName) => {
   const separator = name.indexOf(" - ");
   return separator === -1
     ? { band: "", title: name }
-    : { band: name.slice(0, separator).trim(), title: name.slice(separator + 3).trim() };
+    : {
+        band: name.slice(0, separator).trim(),
+        title: name.slice(separator + 3).trim(),
+      };
 };
 
 // The app plays a tab note from the string and the fret, and any other note from its pitch
 const getPitch = (note, tuning) =>
-  note.isStringed && tuning.length ? tuning[tuning.length - note.string] + note.fret : note.realValue;
+  note.isStringed && tuning.length
+    ? tuning[tuning.length - note.string] + note.fret
+    : note.realValue;
 
 const getSongNotes = (score) =>
   score.tracks.flatMap((track) => {
@@ -32,8 +40,10 @@ const getSongNotes = (score) =>
     }
     return staff.bars.flatMap((bar) =>
       bar.voices.flatMap((voice) =>
-        voice.beats.flatMap((beat) => beat.notes.map((note) => getPitch(note, staff.tuning) - E))
-      )
+        voice.beats.flatMap((beat) =>
+          beat.notes.map((note) => getPitch(note, staff.tuning) - E),
+        ),
+      ),
     );
   });
 
@@ -43,7 +53,10 @@ const entries = fs
   .filter((entry) => entry.isFile() && SONG_FILE.test(entry.name))
   .map(({ name }) => {
     const bytes = new Uint8Array(fs.readFileSync(path.join(SONGS_DIR, name)));
-    const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes, settings);
+    const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+      bytes,
+      settings,
+    );
     const fromName = parseFileName(name);
     return {
       path: name,
@@ -54,5 +67,8 @@ const entries = fs
   })
   .sort((a, b) => a.path.localeCompare(b.path));
 
-fs.writeFileSync(path.join(SONGS_DIR, "index.json"), JSON.stringify(entries, null, 2) + "\n");
+fs.writeFileSync(
+  path.join(SONGS_DIR, "index.json"),
+  JSON.stringify(entries, null, 2) + "\n",
+);
 console.log(`Listed ${entries.length} songs in ${SONGS_DIR}/index.json`);

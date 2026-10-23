@@ -18,7 +18,7 @@ import React, { ReactNode } from "react";
 const DisabledRecordButton = dynamic(
   async () =>
     (await import("@/app/components/settings/buttons/DisabledRecordButton"))
-      .DisabledRecordButton
+      .DisabledRecordButton,
 );
 
 export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({

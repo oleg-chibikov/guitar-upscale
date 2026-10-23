@@ -20,7 +20,8 @@ export const PIANO_ROLL_CHORD_DIALOG = "piano-roll-chord-dialog";
  */
 export const ChordModeDialog: React.FC = () => {
   const { data, chordToChoose, closeChordChoice, apply } = usePianoRoll();
-  const state = chordToChoose !== undefined ? data?.getEvent(chordToChoose) : undefined;
+  const state =
+    chordToChoose !== undefined ? data?.getEvent(chordToChoose) : undefined;
   const event = state?.event;
 
   if (!data || !event?.chord) {
@@ -41,11 +42,11 @@ export const ChordModeDialog: React.FC = () => {
     >
       {modes.length === 0 ? (
         <Alert severity="warning">
-          No chords on this note with the current chord settings. Move the
-          chord to another note or turn on more chord modes.
+          No chords on this note with the current chord settings. Move the chord
+          to another note or turn on more chord modes.
         </Alert>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
+        <div className="grid grid-cols-3 gap-1 sm:grid-cols-4">
           {modes.map((mode) => {
             const name = getChordName(root, mode);
             return (

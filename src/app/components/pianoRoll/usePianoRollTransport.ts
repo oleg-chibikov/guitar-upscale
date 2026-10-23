@@ -43,9 +43,8 @@ export const usePianoRollTransport = () => {
   const play = useCallback(async () => {
     if (data?.hasItems !== true) return;
     if (looperChannel !== undefined) {
-      const { setPlayingInLooperChannel } = await import(
-        "@/app/engine/looper/looper"
-      );
+      const { setPlayingInLooperChannel } =
+        await import("@/app/engine/looper/looper");
       setPlayingInLooperChannel(looperChannel, true);
       dispatch(triggerLooperStateUpdate());
       return;
@@ -67,7 +66,7 @@ export const usePianoRollTransport = () => {
     (tick: number) => {
       if (data && !isLoop) seek(data, tick, isPlayingValue);
     },
-    [data, isLoop]
+    [data, isLoop],
   );
 
   const clearLoopOutside = useCallback(
@@ -77,7 +76,7 @@ export const usePianoRollTransport = () => {
         setLoopRange(data, undefined);
       }
     },
-    [data]
+    [data],
   );
 
   // plays the range over and over, starting right away
@@ -88,11 +87,29 @@ export const usePianoRollTransport = () => {
       seek(data, range.start, isPlayingValue);
       if (!isPlayingValue) void play();
     },
-    [data, isLoop, play]
+    [data, isLoop, play],
   );
 
   return useMemo(
-    () => ({ isPlaying, isLoop, play, stop, togglePlay, seekTo, loopRange, clearLoopOutside }),
-    [isPlaying, isLoop, play, stop, togglePlay, seekTo, loopRange, clearLoopOutside]
+    () => ({
+      isPlaying,
+      isLoop,
+      play,
+      stop,
+      togglePlay,
+      seekTo,
+      loopRange,
+      clearLoopOutside,
+    }),
+    [
+      isPlaying,
+      isLoop,
+      play,
+      stop,
+      togglePlay,
+      seekTo,
+      loopRange,
+      clearLoopOutside,
+    ],
   );
 };

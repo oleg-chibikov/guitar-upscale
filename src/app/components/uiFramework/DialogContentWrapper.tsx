@@ -8,9 +8,7 @@ import { useUiSelector } from "@/app/hooks/storeHooks";
 import { DialogContent } from "@mui/material";
 
 interface DialogContentWrapperProps
-  extends WithClassName,
-    WithChildren,
-    WithStyle {
+  extends WithClassName, WithChildren, WithStyle {
   id?: string;
   onClose?: () => void;
   headerText?: string;
@@ -37,9 +35,9 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
       style={style}
       className={`${className !== undefined ? `${className} ` : ""} ${
         theme === Theme.Light
-          ? "bg-accented_background-light border-border-light text-foreground-light"
-          : "bg-accented_background-dark border-border-dark text-foreground-dark"
-      } border-2 flex flex-col gap-2`}
+          ? "border-border-light bg-accented_background-light text-foreground-light"
+          : "border-border-dark bg-accented_background-dark text-foreground-dark"
+      } flex flex-col gap-2 border-2`}
     >
       {headerText !== undefined && (
         <DialogHeader text={headerText} onClose={onClose} />

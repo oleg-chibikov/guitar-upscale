@@ -10,40 +10,40 @@ export const getPreferredChordVariation = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number,
-  type: ChordPlayMode
+  type: ChordPlayMode,
 ): ChordBuilderInfo => {
   switch (type) {
     case ChordPlayMode.Barre:
       return getBestOf(
         chordVariations.filter(isBarreChord),
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       );
     case ChordPlayMode.With_Thumb:
       return getBestOf(
         chordVariations.filter(
-          (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === THUMB
+          (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === THUMB,
         ),
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       );
     case ChordPlayMode.Preferred_Variation_With_Min_Notes:
       return getPreferredChordVariationWithMinNotes(
         chordVariations,
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       );
     case ChordPlayMode.Preferred_Variation_With_Max_Notes:
       return getPreferredChordVariationWithMaxNotes(
         chordVariations,
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       );
     case ChordPlayMode.Preferred_Variation:
       return getGeneralPreferredChordVariation(
         chordVariations,
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       );
     default:
       return chordVariations[0];
@@ -53,11 +53,11 @@ export const getPreferredChordVariation = (
 const getGeneralPreferredChordVariation = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
-  numberOfStrings: number
+  numberOfStrings: number,
 ): ChordBuilderInfo => {
   const calculateVariationScore = (variation: ChordBuilderInfo): number => {
     const playedNotes = variation.variation.filter(
-      (note): note is StringOctaveNote => note !== undefined
+      (note): note is StringOctaveNote => note !== undefined,
     );
 
     if (playedNotes.length === 0) return Infinity; // Penalize empty variations
@@ -111,7 +111,7 @@ const getGeneralPreferredChordVariation = (
         }
         return score;
       },
-      0
+      0,
     );
 
     // 7. Penalty for using the same note from the same octave
@@ -120,7 +120,7 @@ const getGeneralPreferredChordVariation = (
         .slice(index + 1)
         .filter(
           (otherNote) =>
-            otherNote.note === note.note && otherNote.octave === note.octave
+            otherNote.note === note.note && otherNote.octave === note.octave,
         );
       return score + duplicates.length * 1.5; // Adjust the multiplier as needed
     }, 0);
@@ -176,13 +176,13 @@ const isBarreChord = ({
 const getBestOf = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference,
-  numberOfStrings: number
+  numberOfStrings: number,
 ): ChordBuilderInfo =>
   chordVariations.length
     ? getGeneralPreferredChordVariation(
         chordVariations,
         stringPreference,
-        numberOfStrings
+        numberOfStrings,
       )
     : chordVariations[0];
 
@@ -230,41 +230,43 @@ const getFingeringScore = ({
 const getPreferredChordVariationWithMinNotes = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference,
-  numberOfStrings: number
+  numberOfStrings: number,
 ) => {
   const minPlayedNotes = Math.min(
     ...chordVariations.map(
-      (v) => v.variation.filter((note) => note !== undefined).length
-    )
+      (v) => v.variation.filter((note) => note !== undefined).length,
+    ),
   );
   const variationsWithMinNotes = chordVariations.filter(
     (v) =>
-      v.variation.filter((note) => note !== undefined).length === minPlayedNotes
+      v.variation.filter((note) => note !== undefined).length ===
+      minPlayedNotes,
   );
   return getGeneralPreferredChordVariation(
     variationsWithMinNotes,
     stringPreference,
-    numberOfStrings
+    numberOfStrings,
   );
 };
 
 const getPreferredChordVariationWithMaxNotes = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference,
-  numberOfStrings: number
+  numberOfStrings: number,
 ) => {
   const maxPlayedNotes = Math.max(
     ...chordVariations.map(
-      (v) => v.variation.filter((note) => note !== undefined).length
-    )
+      (v) => v.variation.filter((note) => note !== undefined).length,
+    ),
   );
   const variationsWithMinNotes = chordVariations.filter(
     (v) =>
-      v.variation.filter((note) => note !== undefined).length === maxPlayedNotes
+      v.variation.filter((note) => note !== undefined).length ===
+      maxPlayedNotes,
   );
   return getGeneralPreferredChordVariation(
     variationsWithMinNotes,
     stringPreference,
-    numberOfStrings
+    numberOfStrings,
   );
 };

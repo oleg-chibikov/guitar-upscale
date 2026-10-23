@@ -54,7 +54,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   const isGracePeriodRef = useRef<boolean>(false);
   const wasPlayedLastRef = useRef<boolean>(false);
   const isInImmediateChordGracePeriodRef = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
 
   const publishState = useCallback(() => {
@@ -103,7 +103,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     onClickedChange,
     onPlayingChange,
     onGracePeriodChange,
-    publishState
+    publishState,
   );
 
   const onChordPressRef = useRef(onChordPress);
@@ -122,7 +122,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     const animate = () => store.pulse(chordName);
 
     const handleChordEvent = async (
-      metadata: ChordMetadata | ChordClearMetadata
+      metadata: ChordMetadata | ChordClearMetadata,
     ) => {
       if (isDisabled) {
         return;
@@ -209,7 +209,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 function processClearChord(
   chordName: string,
   wasPlayedLastRef: React.MutableRefObject<boolean>,
-  publishState: () => void
+  publishState: () => void,
 ) {
   console.log("Clear previous chord marker: " + chordName);
   wasPlayedLastRef.current = false;

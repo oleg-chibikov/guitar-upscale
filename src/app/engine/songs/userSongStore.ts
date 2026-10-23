@@ -29,7 +29,7 @@ const openDb = () =>
 
 const run = async <T>(
   mode: IDBTransactionMode,
-  action: (store: IDBObjectStore) => IDBRequest<T>
+  action: (store: IDBObjectStore) => IDBRequest<T>,
 ) => {
   const db = await openDb();
   try {
@@ -49,7 +49,7 @@ export const getUserSongs = async (): Promise<UserSongRecord[]> => {
   }
   return run(
     "readonly",
-    (store) => store.getAll() as IDBRequest<UserSongRecord[]>
+    (store) => store.getAll() as IDBRequest<UserSongRecord[]>,
   );
 };
 

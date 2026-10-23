@@ -46,14 +46,14 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
     }, [pattern.timeSignature]);
 
     return (
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row items-center gap-2">
         <Tooltip title="Remove Cells">
           <IconButton disabled={pattern.strums.length <= 1} onClick={onRemove}>
             <RemoveIcon />
           </IconButton>
         </Tooltip>
         <div
-          className="overflow-x-auto py-4 grid gap-x-1 w-full"
+          className="grid w-full gap-x-1 overflow-x-auto py-4"
           style={{
             gridTemplateColumns: getGridTemplateColumns,
           }}
@@ -79,7 +79,7 @@ export const StrumGrid: React.FC<StrumGridProps> = React.memo(
         </Tooltip>
       </div>
     );
-  }
+  },
 );
 
 interface StrumCellProps {
@@ -101,17 +101,15 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
     return (
       <button
         onClick={handleClick}
-        className={`w-6 h-6 border border-gray-300 flex items-center justify-center text-xs
-        ${
+        className={`flex h-6 w-6 items-center justify-center border border-gray-300 text-xs ${
           !isBeatCell
             ? theme === Theme.Light
               ? "bg-panel-light"
               : "bg-panel-dark"
             : theme === Theme.Light
-            ? "bg-secondary-light"
-            : "bg-secondary-dark"
-        }
-        ${
+              ? "bg-secondary-light"
+              : "bg-secondary-dark"
+        } ${
           theme === Theme.Light
             ? "text-foreground-light"
             : "text-foreground-dark"
@@ -120,7 +118,7 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
         {strum}
       </button>
     );
-  }
+  },
 );
 StrumGrid.displayName = "StrumGrid";
 StrumCell.displayName = "StrumCell";

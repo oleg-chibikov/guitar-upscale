@@ -21,7 +21,7 @@ export const CancelSubscriptionDialog: FC<
   const cancelSubscription = getCancelSubscription(
     params,
     hasDigitalGoodsService,
-    dispatch
+    dispatch,
   );
 
   const purchaseData = purchaseOption.purchaseData;

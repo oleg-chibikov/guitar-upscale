@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { FC } from "react";
 
 const SettingsView = dynamic(
-  async () => (await import("./SettingsView")).SettingsView
+  async () => (await import("./SettingsView")).SettingsView,
 );
 
 export const SettingsViewWrapper: FC<WithPremiumComponents> = ({

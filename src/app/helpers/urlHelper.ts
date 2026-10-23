@@ -1,7 +1,7 @@
 // Function to reload the page with a new query string parameter
 export const reloadPageWithQueryParam = (
   paramName: string,
-  paramValue: string
+  paramValue: string,
 ) => {
   console.log("Reloading page");
   // Get the current URL

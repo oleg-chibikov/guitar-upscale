@@ -22,12 +22,12 @@ export type LooperPlayerOptions = {
  */
 export const getLoopLengthTicks = (
   stopBarTick: number,
-  stoppedInFirstHalfOfBar: boolean
+  stoppedInFirstHalfOfBar: boolean,
 ) =>
   // Stopping in the first half of a bar drops that bar, so a late press doesn't add a nearly empty bar
   Math.max(
     TICKS_IN_BAR,
-    stoppedInFirstHalfOfBar ? stopBarTick : stopBarTick + TICKS_IN_BAR
+    stoppedInFirstHalfOfBar ? stopBarTick : stopBarTick + TICKS_IN_BAR,
   );
 
 export class LooperPlayer {
@@ -62,7 +62,9 @@ export class LooperPlayer {
     }
     // the next pass sets its start before the clock gets there, so wrap negative positions too
     const length = this.options.loopLengthTicks;
-    return (((globalCurrentTick - this.loopStartTick) % length) + length) % length;
+    return (
+      (((globalCurrentTick - this.loopStartTick) % length) + length) % length
+    );
   }
 
   async playLoop(): Promise<void> {
@@ -83,7 +85,7 @@ export class LooperPlayer {
       items = this.options.eventsByTick.items;
       this.loopStartTick = loopStartTick;
       let resolveCurrentLoop: (
-        value: void | PromiseLike<void>
+        value: void | PromiseLike<void>,
       ) => void = () => {};
       this.currentLoopPromise = new Promise<void>((resolve) => {
         resolveCurrentLoop = resolve;
@@ -92,7 +94,7 @@ export class LooperPlayer {
       console.log(
         LOG_PREFIX + "Loop starts at global tick %d, length %d ticks",
         loopStartTick,
-        loopLengthTicks
+        loopLengthTicks,
       );
 
       for (const { tick, events } of items) {
@@ -100,7 +102,7 @@ export class LooperPlayer {
           console.log(
             LOG_PREFIX +
               "Recorded tick %d is past the loop end. Skipping the rest of the events",
-            tick
+            tick,
           );
           break;
         }
@@ -110,7 +112,7 @@ export class LooperPlayer {
           console.log(
             LOG_PREFIX +
               "Recorded tick %d is earlier than the current tick. Skipping it",
-            tick
+            tick,
           );
           continue;
         }
@@ -124,7 +126,7 @@ export class LooperPlayer {
         playAllNotes(
           getAudibleEvents(this.options.eventsByTick, events),
           LOG_PREFIX,
-          tick
+          tick,
         );
       }
 
@@ -134,7 +136,7 @@ export class LooperPlayer {
         !waited &&
         !(await this.waitForGlobalTick(
           loopStartTick + loopLengthTicks,
-          checkFinished
+          checkFinished,
         ))
       ) {
         resolveCurrentLoop();
@@ -154,7 +156,7 @@ export class LooperPlayer {
         LOG_PREFIX +
           "Current tick %d is not later than the first event tick %d. Starting the loop in the current bar",
         tickInBar,
-        firstEventTick
+        firstEventTick,
       );
       return globalCurrentLastBarTick;
     }
@@ -163,14 +165,14 @@ export class LooperPlayer {
       LOG_PREFIX +
         "Current tick %d is later than the first event tick %d. Starting the loop in the next bar",
       tickInBar,
-      firstEventTick
+      firstEventTick,
     );
     return globalCurrentLastBarTick + TICKS_IN_BAR;
   }
 
   private async waitForGlobalTick(
     targetTick: number,
-    checkFinished: () => boolean
+    checkFinished: () => boolean,
   ) {
     while (globalCurrentTick < targetTick) {
       // A stopped clock resolves every wait straight away, so looping here would freeze the page

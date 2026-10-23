@@ -16,12 +16,7 @@ import { isChordModeAvailable } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { getNativeContext } from "@/app/helpers/canvas/konvaHelpers";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
 import Konva from "konva";
-import React, {
-  RefObject,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from "react";
+import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
 import { Layer, Shape, Stage } from "react-konva";
 import { Observable } from "rxjs";
 
@@ -46,7 +41,12 @@ interface PianoRollCanvasProps {
   // x in grid px
   onSeek: (x: number, exact: boolean) => void;
   // dragging along the ruler picks a range to loop, from the press to the pointer
-  onRulerRange: (fromX: number, toX: number, exact: boolean, phase: RulerRangePhase) => void;
+  onRulerRange: (
+    fromX: number,
+    toX: number,
+    exact: boolean,
+    phase: RulerRangePhase,
+  ) => void;
   onKeyPress: (pitch: number) => void;
 }
 
@@ -186,7 +186,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       if (hit) {
         cursor = hit.edge ? "ew-resize" : "move";
         const event: ChordOrNote | undefined = events.find(
-          ({ event }) => event.id === hit.id
+          ({ event }) => event.id === hit.id,
         )?.event;
         if (event && !isChordModeAvailable(event)) {
           title = UNAVAILABLE_CHORD_TITLE;
@@ -213,7 +213,8 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       updateHoverRef.current({ ...lastHover.current, altKey: e.altKey });
     };
     const clearAlt = () => {
-      if (lastHover.current) updateHoverRef.current({ ...lastHover.current, altKey: false });
+      if (lastHover.current)
+        updateHoverRef.current({ ...lastHover.current, altKey: false });
     };
     document.addEventListener("keydown", handleAlt);
     document.addEventListener("keyup", handleAlt);
@@ -284,7 +285,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
 
   const handlePointerEnd = (
     e: React.PointerEvent<HTMLDivElement>,
-    cancelled: boolean
+    cancelled: boolean,
   ) => {
     const region = regions.current.get(e.pointerId);
     regions.current.delete(e.pointerId);
@@ -292,7 +293,12 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       const drag = rulerDrag.current;
       rulerDrag.current = undefined;
       if (drag?.dragging === true) {
-        onRulerRange(drag.x, gridX(e), e.shiftKey, cancelled ? "cancel" : "commit");
+        onRulerRange(
+          drag.x,
+          gridX(e),
+          e.shiftKey,
+          cancelled ? "cancel" : "commit",
+        );
       }
     }
     if (region === "notes") {
@@ -332,7 +338,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
                 drawScene(
                   getNativeContext(context),
                   sceneRef.current,
-                  viewportRef.current()
+                  viewportRef.current(),
                 );
               }
             }}
@@ -346,7 +352,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
                   getNativeContext(context),
                   playheadTick.current,
                   sceneRef.current.zoom,
-                  viewportRef.current()
+                  viewportRef.current(),
                 );
               }
             }}

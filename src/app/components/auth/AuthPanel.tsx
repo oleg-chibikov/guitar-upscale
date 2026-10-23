@@ -9,7 +9,7 @@ import { OpenAuthDialogButton } from "./OpenAuthDialogButton";
 import { SignedInButton } from "./SignedInButton";
 
 const PurchaseOptionsDialog = dynamic(
-  async () => (await import("./PurchaseOptionsDialog")).PurchaseOptionsDialog
+  async () => (await import("./PurchaseOptionsDialog")).PurchaseOptionsDialog,
 );
 
 // https://docs.patreon.com/#oauth
@@ -36,13 +36,11 @@ export const AuthPanel: React.FC = () => {
       id={AUTH_PANEL_ID}
       className={`fixed flex flex-col justify-center ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      }
-        ${`maxhmd:hmd:p-1 maxhmd:border-2 ${
-          theme === Theme.Light
-            ? "maxhmd:bg-accented_background-light maxhmd:border-border-light maxhmd:text-foreground-light"
-            : "maxhmd:bg-accented_background-dark  maxhmd:border-border-dark maxhmd:text-foreground-dark"
-        }`}
-         z-20 top-1`}
+      } ${`maxhmd:hmd:p-1 maxhmd:border-2 ${
+        theme === Theme.Light
+          ? "maxhmd:border-border-light maxhmd:bg-accented_background-light maxhmd:text-foreground-light"
+          : "maxhmd:border-border-dark maxhmd:bg-accented_background-dark maxhmd:text-foreground-dark"
+      }`} top-1 z-20`}
     >
       {session?.user || subscriptionTier ? (
         <SignedInButton openDialog={handleOpenDialog} user={session?.user} />

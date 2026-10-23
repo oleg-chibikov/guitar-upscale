@@ -81,7 +81,7 @@ const findSong = async () => {
   const query = positionals.join(" ");
   if (!query) fail(HELP);
   const songs = await getJson(
-    `https://www.songsterr.com/api/songs?pattern=${encodeURIComponent(query)}`
+    `https://www.songsterr.com/api/songs?pattern=${encodeURIComponent(query)}`,
   );
   const song = songs.find((s) => s.hasPlayer) ?? fail(`No song for "${query}"`);
   return song.songId;
@@ -89,7 +89,7 @@ const findSong = async () => {
 
 const loadTrack = (meta, index) =>
   getJson(
-    `https://dqsljvtekg760.cloudfront.net/${meta.songId}/${meta.revisionId}/${meta.image}/${index}.json`
+    `https://dqsljvtekg760.cloudfront.net/${meta.songId}/${meta.revisionId}/${meta.image}/${index}.json`,
   );
 
 // Same steps as src/app/data/tempo.ts, so the tempo slider can show the value.
@@ -105,7 +105,7 @@ const tempoSteps = () => {
 
 const snapTempo = (tempo) =>
   tempoSteps().reduce((best, step) =>
-    Math.abs(step - tempo) < Math.abs(best - tempo) ? step : best
+    Math.abs(step - tempo) < Math.abs(best - tempo) ? step : best,
   );
 
 // The index names the scale the notes fit best, which may be smaller than this one
@@ -113,13 +113,17 @@ const listScales = () =>
   Array.from(scalesMap.entries()).flatMap(([group, scales]) =>
     Array.from(scales.entries())
       .filter(([name]) => name !== CHROMATIC)
-      .map(([name, intervals]) => ({ group, name, notes: new Set([0, ...intervals]) }))
+      .map(([name, intervals]) => ({
+        group,
+        name,
+        notes: new Set([0, ...intervals]),
+      })),
   );
 
 const listSong = (meta, measures) => {
   console.log(`${meta.artist} - ${meta.title} (song ${meta.songId})\n`);
   meta.tracks.forEach((t, i) =>
-    console.log(`track ${i}: ${t.instrument} | ${t.name}`)
+    console.log(`track ${i}: ${t.instrument} | ${t.name}`),
   );
   console.log("\nSections (measure numbers as on the site):");
   measures.forEach((m, i) => {
@@ -153,7 +157,8 @@ const readNotes = (track, from, to) => {
   let rounded = false;
   const capo = track.capo ?? 0;
   let signature = [4, 4];
-  for (let i = 0; i < from; i++) signature = track.measures[i].signature ?? signature;
+  for (let i = 0; i < from; i++)
+    signature = track.measures[i].signature ?? signature;
   for (let i = from; i <= to; i++) {
     signature = track.measures[i].signature ?? signature;
     const barStart = tick;
@@ -207,7 +212,7 @@ const pickShift = (tonic, melody) => {
     melody.filter((n) => n.pitch + shift < LOWEST || n.pitch + shift > HIGHEST)
       .length;
   return [up, up - 12, up + 12, up - 24, up + 24].sort(
-    (a, b) => outside(a) - outside(b) || Math.abs(a) - Math.abs(b)
+    (a, b) => outside(a) - outside(b) || Math.abs(a) - Math.abs(b),
   )[0];
 };
 
@@ -221,7 +226,7 @@ const pickScale = (scales, melody, bass) => {
   const missed = (s) =>
     counts.reduce((sum, c, i) => sum + (s.notes.has(i) ? 0 : c), 0);
   return [...scales].sort(
-    (a, b) => missed(a) - missed(b) || a.notes.size - b.notes.size
+    (a, b) => missed(a) - missed(b) || a.notes.size - b.notes.size,
   )[0];
 };
 
@@ -249,7 +254,7 @@ const placeMelody = (notes, sourceTuning) => {
         .sort(
           (a, b) =>
             Math.abs(fretOn(pitch, a) - lastFret) -
-              Math.abs(fretOn(pitch, b) - lastFret) || a - b
+              Math.abs(fretOn(pitch, b) - lastFret) || a - b,
         )[0];
     }
     lastFret = fretOn(pitch, string);
@@ -263,7 +268,9 @@ const simplifyBass = (notes, barStarts) => {
   let lastBeat = -1;
   let lastBar = -1;
   let lastPitch;
-  for (const n of [...notes].sort((a, b) => a.tick - b.tick || a.pitch - b.pitch)) {
+  for (const n of [...notes].sort(
+    (a, b) => a.tick - b.tick || a.pitch - b.pitch,
+  )) {
     const beat = Math.floor(n.tick / 4);
     if (beat === lastBeat) continue;
     const bar = barStarts.filter((s) => s <= n.tick).length - 1;
@@ -304,9 +311,14 @@ const pickChords = (bass, melody, barStarts, length, scale) => {
     const held = new Map();
     inHalf.forEach((n) => {
       const next = bass.find((x) => x.tick > n.tick)?.tick ?? end;
-      held.set(pc(n.pitch), (held.get(pc(n.pitch)) ?? 0) + Math.min(next, end) - n.tick);
+      held.set(
+        pc(n.pitch),
+        (held.get(pc(n.pitch)) ?? 0) + Math.min(next, end) - n.tick,
+      );
     });
-    const rootPc = [...held.keys()].sort((a, b) => held.get(b) - held.get(a))[0];
+    const rootPc = [...held.keys()].sort(
+      (a, b) => held.get(b) - held.get(a),
+    )[0];
     const root = inHalf.find((n) => pc(n.pitch) === rootPc);
     const heard = melody.filter((n) => n.tick >= start && n.tick < end);
     let best;
@@ -353,7 +365,9 @@ const main = async () => {
   const melodyRaw = readNotes(melodyTrack, from, to);
   if (!melodyRaw.notes.length) fail("The melody track is empty in this range");
 
-  const bassIndex = opts["no-bass"] ? undefined : opts.bass ?? meta.popularTrackBass;
+  const bassIndex = opts["no-bass"]
+    ? undefined
+    : (opts.bass ?? meta.popularTrackBass);
   const bassRaw =
     bassIndex === undefined || bassIndex === null
       ? undefined
@@ -367,7 +381,7 @@ const main = async () => {
     : guessTonic(
         bassNotes.length
           ? bassNotes
-          : lowestNotes(melodyRaw.notes, melodyRaw.barStarts)
+          : lowestNotes(melodyRaw.notes, melodyRaw.barStarts),
       );
   if (tonic < 0) fail(`Unknown tonic "${opts.tonic}"`);
   const shift = pickShift(tonic, melodyRaw.notes);
@@ -375,8 +389,8 @@ const main = async () => {
 
   const scales = listScales();
   const scale = opts.scale
-    ? scales.find((s) => `${s.group}/${s.name}` === opts.scale) ??
-      fail(`Unknown scale "${opts.scale}"`)
+    ? (scales.find((s) => `${s.group}/${s.name}` === opts.scale) ??
+      fail(`Unknown scale "${opts.scale}"`))
     : pickScale(scales, melodyRaw.notes.map(shifted), bassNotes.map(shifted));
   const changed = new Map();
   const moveToScale = (n) => {
@@ -388,7 +402,10 @@ const main = async () => {
     return { ...n, pitch };
   };
 
-  const melody = placeMelody(melodyRaw.notes.map(moveToScale), melodyTrack.tuning);
+  const melody = placeMelody(
+    melodyRaw.notes.map(moveToScale),
+    melodyTrack.tuning,
+  );
   const bass = placeBass(bassNotes.map(moveToScale));
   const chordRoots = (
     bass.length
@@ -400,22 +417,31 @@ const main = async () => {
     melody,
     melodyRaw.barStarts,
     melodyRaw.length,
-    scale
+    scale,
   );
 
   const tempos = melodyTrack.automations?.tempo ?? [];
   const bpm =
-    tempos.filter((a) => a.measure <= from).at(-1)?.bpm ?? tempos[0]?.bpm ?? 120;
+    tempos.filter((a) => a.measure <= from).at(-1)?.bpm ??
+    tempos[0]?.bpm ??
+    120;
 
   // One step is a 16th note, 4 app ticks. A song above 180 BPM gets half the tempo and 32nds instead
   const isFast = bpm > 180;
   const TICKS_IN_STEP = isFast ? 2 : 4;
   const tempo = snapTempo(isFast ? bpm / 2 : bpm);
-  const tuning = STANDARD.map((midi) => ({ octave: Math.floor(midi / 12), note: midi % 12 }));
+  const tuning = STANDARD.map((midi) => ({
+    octave: Math.floor(midi / 12),
+    note: midi % 12,
+  }));
   const tabTrack = (name, notes) => ({
     name,
     tuning,
-    tabNotes: notes.map((n) => ({ tick: n.tick * TICKS_IN_STEP, string: n.string, fret: n.fret })),
+    tabNotes: notes.map((n) => ({
+      tick: n.tick * TICKS_IN_STEP,
+      string: n.string,
+      fret: n.fret,
+    })),
     pitchNotes: [],
     chords: [],
   });
@@ -424,7 +450,10 @@ const main = async () => {
   if (chords.length)
     tracks.push({
       ...tabTrack("Chords", []),
-      chords: chords.map((c) => ({ tick: c.tick * TICKS_IN_STEP, name: c.name })),
+      chords: chords.map((c) => ({
+        tick: c.tick * TICKS_IN_STEP,
+        name: c.name,
+      })),
     });
 
   const band = opts.band ?? meta.artist;
@@ -438,10 +467,12 @@ const main = async () => {
     changed.forEach((count, key) => console.log(`  ${key} (${count})`));
   }
   if (melodyRaw.rounded) console.log("Some notes were rounded to 16ths.");
-  if (!bass.length) console.log("No bass found, chords follow the lowest notes.");
+  if (!bass.length)
+    console.log("No bass found, chords follow the lowest notes.");
   if (!chords.length) console.log("No chord fits the scale.");
 
-  if (chords.length) console.log(`Chords: ${chords.map((c) => c.name).join(" ")}`);
+  if (chords.length)
+    console.log(`Chords: ${chords.map((c) => c.name).join(" ")}`);
 
   if (opts["dry-run"]) return;
 
@@ -449,13 +480,20 @@ const main = async () => {
   const fileName = `${toFileName(band)} - ${toFileName(title)}.gp`;
   const file = join(dir, fileName);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(file, await writeGuitarPro({ band, title, tempo, root: E, tracks }));
+  writeFileSync(
+    file,
+    await writeGuitarPro({ band, title, tempo, root: E, tracks }),
+  );
   console.log(`Saved to ${file}`);
   if (dir === SONGS_DIR) {
-    execFileSync(process.execPath, [...process.execArgv, resolve(ROOT, "scripts/build-song-index.mjs")], {
-      cwd: ROOT,
-      stdio: "inherit",
-    });
+    execFileSync(
+      process.execPath,
+      [...process.execArgv, resolve(ROOT, "scripts/build-song-index.mjs")],
+      {
+        cwd: ROOT,
+        stdio: "inherit",
+      },
+    );
   }
 };
 

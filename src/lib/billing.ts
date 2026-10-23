@@ -153,7 +153,7 @@ export class Purchase {
   static fromApiResponse<T>(
     apiResponse: T,
     purchaseToken: string,
-    productId: string
+    productId: string,
   ): Purchase {
     const purchase = new Purchase();
     // Field names correspond so can leverage auto-mapping
@@ -300,7 +300,7 @@ export class SubscriptionPurchase extends Purchase {
    */
   static fromApiResponse<T>(
     apiResponse: T,
-    purchaseToken: string
+    purchaseToken: string,
   ): SubscriptionPurchase {
     const subPurchase = new SubscriptionPurchase();
     // Field names correspond so can leverage auto-mapping
@@ -316,13 +316,13 @@ export class SubscriptionPurchase extends Purchase {
       subPurchase.expiryTimeMillis = Number(subPurchase.expiryTimeMillis);
     if (subPurchase.autoResumeTimeMillis)
       subPurchase.autoResumeTimeMillis = Number(
-        subPurchase.autoResumeTimeMillis
+        subPurchase.autoResumeTimeMillis,
       );
     if (subPurchase.priceAmountMicros)
       subPurchase.priceAmountMicros = Number(subPurchase.priceAmountMicros);
     if (subPurchase.userCancellationTimeMillis)
       subPurchase.userCancellationTimeMillis = Number(
-        subPurchase.userCancellationTimeMillis
+        subPurchase.userCancellationTimeMillis,
       );
     if (subPurchase.purchaseTimeMillis)
       subPurchase.purchaseTimeMillis = Number(subPurchase.purchaseTimeMillis);

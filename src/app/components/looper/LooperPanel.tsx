@@ -24,10 +24,10 @@ export const LooperPanel: React.FC = () => {
   const localGuitarSettingsUpdateCount = useRef<number>(0);
 
   const guitarSettingsUpdateCount = useSettingsSelector(
-    (s) => s.guitarSettingsUpdateCount
+    (s) => s.guitarSettingsUpdateCount,
   );
   const looperStateUpdateTrigger = useSettingsSelector(
-    (s) => s.looperStateUpdateTrigger
+    (s) => s.looperStateUpdateTrigger,
   );
   const dispatch = useDispatch();
   useEffect(() => {

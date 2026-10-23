@@ -35,7 +35,7 @@ const getMaxTier = (tiers: (Tier | undefined)[]): Tier | undefined => {
 
 const handle = async (
   req: NextApiRequest,
-  res: NextApiResponse<SubscriptionActionResponseData>
+  res: NextApiResponse<SubscriptionActionResponseData>,
 ) => {
   const subscriptionToCancel = await getSubscriptionFromRequest(req, res, {
     allowCancelled: false,
@@ -52,7 +52,7 @@ const handle = async (
   const anotherCancelledSubscription =
     await getCancelledSubscriptionFromRequest(req, res);
   const subscriptionToCancelTier = tierMap.get(
-    subscriptionToCancel.params.itemId
+    subscriptionToCancel.params.itemId,
   );
   if (!anotherCancelledSubscription) {
     if (mode === CancellationMode.Revoke) {

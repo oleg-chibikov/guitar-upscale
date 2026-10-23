@@ -3,7 +3,7 @@ export function interpolate(
   lowerBound: number,
   upperBound: number,
   lowerValue: number,
-  upperValue: number
+  upperValue: number,
 ): number {
   if (x >= lowerBound && x <= upperBound) {
     const slope = (upperValue - lowerValue) / (upperBound - lowerBound);

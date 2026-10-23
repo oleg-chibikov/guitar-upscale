@@ -23,7 +23,7 @@ const countNotes = (mask: number) => {
 // A song fits a scale that holds every note of the song. The smallest such scale wins, a tie goes to the one listed first
 export const pickSongScale = (
   noteMask: number,
-  scales: Map<string, Map<string, Scale>>
+  scales: Map<string, Map<string, Scale>>,
 ) => {
   let best: { scaleGroup: string; scale: string; size: number } | undefined;
   for (const [scaleGroup, groupScales] of Array.from(scales.entries())) {

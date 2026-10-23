@@ -55,7 +55,7 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
   }, [highlight]);
 
   const handleTextFieldClick = (
-    event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>
+    event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>,
   ) => {
     const { clientX, clientY } = "touches" in event ? event.touches[0] : event;
     setStartPosition({ x: clientX, y: clientY });
@@ -68,11 +68,11 @@ export const ValueDialogControl: React.FC<ValueDialogControlProps> = ({
       <div
         onMouseDown={hasTouchInput ? undefined : handleTextFieldClick}
         onTouchStart={!hasTouchInput ? undefined : handleTextFieldClick}
-        className={`flex flex-row gap-1 justify-around items-center w-16 p-1 ${
+        className={`flex w-16 flex-row items-center justify-around gap-1 p-1 ${
           theme === Theme.Light
-            ? "text-select_foreground-light bg-select_background-light"
-            : "text-select_foreground-dark bg-select_background-dark"
-        } text-xs h-8 cursor-pointer ${highlight ? "highlight" : ""}`}
+            ? "bg-select_background-light text-select_foreground-light"
+            : "bg-select_background-dark text-select_foreground-dark"
+        } h-8 cursor-pointer text-xs ${highlight ? "highlight" : ""}`}
       >
         <div>{icon}</div>
         <div className="flex flex-col items-center gap-0.5 leading-none">

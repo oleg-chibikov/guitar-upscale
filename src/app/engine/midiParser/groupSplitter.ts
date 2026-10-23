@@ -5,7 +5,7 @@ import { serializeOctaveNote } from "@/app/data/notes";
 const TOLERANCE_TICKS = TICKS_IN_HALF_BEAT / 2; // we assume a chord consists of notes that are close to each other within half beat
 
 export function groupEventsByTickWithTolerance(
-  events: NotePlayEvent[]
+  events: NotePlayEvent[],
 ): Map<number, NotePlayEvent[]> {
   // Assume events are already sorted
   const groupedEventsMap: Map<number, NotePlayEvent[]> = new Map();

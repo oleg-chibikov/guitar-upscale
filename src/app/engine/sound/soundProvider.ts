@@ -14,15 +14,15 @@ export const playNote = async (
   volume?: number,
   instrument?: Instrument,
   reverbStrength?: number,
-  durationMs?: number
+  durationMs?: number,
 ) => {
   playSound(
     note,
     volume ?? volumeValue,
     await loadInstrument(
       instrument ?? instrumentValue,
-      reverbStrength ?? reverbStrengthValue
+      reverbStrength ?? reverbStrengthValue,
     ),
-    durationMs ?? beatToMilliseconds(tempoBpmValue)
+    durationMs ?? beatToMilliseconds(tempoBpmValue),
   );
 };

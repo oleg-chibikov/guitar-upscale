@@ -94,7 +94,7 @@ const play = async ({
       (fromChord === true ? chordInstrumentValue : instrumentValue),
     // instrumentRef.current ?? instrument,
     undefined,
-    durationMs
+    durationMs,
   );
 };
 
@@ -119,7 +119,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   midiRecorder.addNoteAtGlobalTick(
     noteMetadata.stringOctaveNote,
     trackNumber,
-    trackInstrument
+    trackInstrument,
   );
 
   if (
@@ -131,7 +131,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordNote(
       noteMetadata.stringOctaveNote,
       trackNumber,
-      trackInstrument
+      trackInstrument,
     );
   }
 
@@ -176,7 +176,7 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
   ) {
     const { looperState } = await import("./looper/looper");
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordChord(
-      chordWithMetadata
+      chordWithMetadata,
     );
   }
 });

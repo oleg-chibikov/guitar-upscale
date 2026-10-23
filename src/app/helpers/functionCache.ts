@@ -1,4 +1,6 @@
-export class FunctionCache<T extends (...args: Parameters<T>) => ReturnType<T>> {
+export class FunctionCache<
+  T extends (...args: Parameters<T>) => ReturnType<T>,
+> {
   private cache: Map<string, ReturnType<T>> = new Map();
 
   LOG_PREFIX = "Cache: ";

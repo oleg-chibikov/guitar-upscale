@@ -37,14 +37,14 @@ export const getTrackInfos = (data: EventsByTick): Map<number, TrackInfo> => {
 export const getEventTrack = (event: ChordOrNote): number =>
   event.note
     ? event.note.trackNumber
-    : event.chord?.metadata.trackNumber ?? DEFAULT_CHORD_TRACK_NUMBER;
+    : (event.chord?.metadata.trackNumber ?? DEFAULT_CHORD_TRACK_NUMBER);
 
 /**
  * The named tracks plus any track the events use, in track order
  */
 export const listTracks = (
   events: EventForTick[],
-  infos: ReadonlyMap<number, TrackInfo> = new Map()
+  infos: ReadonlyMap<number, TrackInfo> = new Map(),
 ): PianoRollTrack[] => {
   const used = new Set(events.map(({ event }) => getEventTrack(event)));
   const tracks = new Map<number, PianoRollTrack>();
@@ -85,14 +85,14 @@ export const listTracks = (
  */
 export const addTrackInfo = (
   data: EventsByTick,
-  tracks: PianoRollTrack[]
+  tracks: PianoRollTrack[],
 ): number => {
   const infos = getTrackInfos(data);
   const trackNumber =
     Math.max(
       -1,
       ...infos.keys(),
-      ...tracks.map(({ trackNumber }) => trackNumber)
+      ...tracks.map(({ trackNumber }) => trackNumber),
     ) + 1;
   infos.set(trackNumber, { name: `Track ${trackNumber + 1}` });
   return trackNumber;
@@ -107,7 +107,7 @@ const getInfo = (data: EventsByTick, track: PianoRollTrack): TrackInfo =>
 export const renameTrackInfo = (
   data: EventsByTick,
   track: PianoRollTrack,
-  name: string
+  name: string,
 ) => {
   getTrackInfos(data).set(track.trackNumber, {
     ...getInfo(data, track),
@@ -127,7 +127,7 @@ export const removeTrackInfo = (data: EventsByTick, track: PianoRollTrack) => {
  */
 export const withTrack = (
   event: ChordOrNote,
-  track: PianoRollTrack
+  track: PianoRollTrack,
 ): ChordOrNote => {
   if (event.note) {
     return {

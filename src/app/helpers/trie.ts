@@ -68,7 +68,7 @@ export class Trie implements TrieInterface {
     prefix: string,
     root: Node,
     len: number,
-    wildcardMatches: Set<string>
+    wildcardMatches: Set<string>,
   ): void {
     // if (!root) {
     //   return;
@@ -88,7 +88,7 @@ export class Trie implements TrieInterface {
           prefix + key,
           child,
           len + 1,
-          wildcardMatches
+          wildcardMatches,
         );
       }
     } else if (char === Trie.WILDCARD_STAR) {
@@ -99,7 +99,7 @@ export class Trie implements TrieInterface {
           prefix + key,
           child,
           len,
-          wildcardMatches
+          wildcardMatches,
         );
       }
     } else {
@@ -110,7 +110,7 @@ export class Trie implements TrieInterface {
           prefix + char,
           child,
           len + 1,
-          wildcardMatches
+          wildcardMatches,
         );
       }
     }

@@ -7,8 +7,10 @@ import {
   IconButtonWrapperProps,
 } from "../../uiFramework/IconButton";
 
-interface NoPremiumButtonProps
-  extends Omit<IconButtonWrapperProps, "icon" | "tooltip" | "onPress"> {
+interface NoPremiumButtonProps extends Omit<
+  IconButtonWrapperProps,
+  "icon" | "tooltip" | "onPress"
+> {
   planName: string;
   functionalityDescription: string;
   icon: React.ReactElement;
@@ -35,7 +37,7 @@ export const NoPremiumButton: React.FC<NoPremiumButtonProps> = ({
           setAndShowAlert({
             message: warningMessage,
             alertType: AlertType.Warning,
-          })
+          }),
         )
       }
     />

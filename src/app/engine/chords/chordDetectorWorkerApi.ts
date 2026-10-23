@@ -8,7 +8,7 @@ import { Chord, Neck, StringOctaveNote } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
 
 const worker = new Worker(
-  new URL("./detectorWorker/chordDetectorWorker.ts", import.meta.url)
+  new URL("./detectorWorker/chordDetectorWorker.ts", import.meta.url),
 );
 
 class ChordDetectorWorkerApi {
@@ -29,7 +29,7 @@ class ChordDetectorWorkerApi {
                   }
                   seenVariations.add(variation);
                   return true;
-                })
+                }),
             ),
           },
         },
@@ -40,11 +40,11 @@ class ChordDetectorWorkerApi {
 
   findMatches(
     notes: StringOctaveNote[],
-    callback: (data: ChordDetectorCallbackData) => void
+    callback: (data: ChordDetectorCallbackData) => void,
   ): Promise<ChordDetectorCallbackData> {
     return new Promise((resolve) => {
       const handleMessage = (
-        event: MessageEvent<WorkerMessageWrapper<ChordDetectorCallbackMessage>>
+        event: MessageEvent<WorkerMessageWrapper<ChordDetectorCallbackMessage>>,
       ) => {
         const { type, payload } = event.data.data;
         if (type === "findMatchesResult") {

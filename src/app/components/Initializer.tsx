@@ -49,13 +49,13 @@ export const Initializer: React.FC = () => {
       document.body.removeEventListener(
         "keydown",
         handleFirstInteraction,
-        true
+        true,
       );
       document.body.removeEventListener("click", handleFirstInteraction, true);
       document.body.removeEventListener(
         "touchstart",
         handleFirstInteraction,
-        true
+        true,
       );
     };
 
@@ -122,21 +122,21 @@ export const Initializer: React.FC = () => {
           event.preventDefault();
         }
       },
-      true
+      true,
     );
 
     // A long press opens the context menu, and the phone vibrates mid-play.
     document.addEventListener(
       "contextmenu",
       (event) => event.preventDefault(),
-      true
+      true,
     );
     blockLongPress();
 
     if (typeof navigator.serviceWorker !== "undefined") {
       void navigator.serviceWorker.register(
         `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`,
-        { updateViaCache: "none" }
+        { updateViaCache: "none" },
       );
     }
   }, []);

@@ -9,7 +9,7 @@ import { IconButtonWrapper } from "../../uiFramework/IconButton";
 export const OpenStrummingSettingsButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const strummingSettingsExpanded = useUiSelector(
-    (s) => s.strummingSettingsExpanded
+    (s) => s.strummingSettingsExpanded,
   );
   return (
     <IconButtonWrapper

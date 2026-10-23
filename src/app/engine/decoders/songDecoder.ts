@@ -26,7 +26,7 @@ const toPitch = (octaveNote: OctaveNote) =>
 
 export const shiftOctaveNote = (
   octaveNote: OctaveNote,
-  semitones: number
+  semitones: number,
 ): OctaveNote => {
   const value = octaveNote.octave * NOTE_COUNT + octaveNote.note + semitones;
   return {
@@ -99,7 +99,7 @@ export class SongDecoder {
           pitchNote.octaveNote,
           pitchNote.duration,
           previousNote,
-          pitchNote.velocity
+          pitchNote.velocity,
         ) ?? previousNote;
     }
 
@@ -113,7 +113,7 @@ export class SongDecoder {
     result: EventsByTick,
     track: SongTrack,
     trackNumber: number,
-    tabNote: TabNote
+    tabNote: TabNote,
   ) {
     const trackTuning = track.tuning ?? [];
     const songString = trackTuning.at(tabNote.string);
@@ -149,7 +149,7 @@ export class SongDecoder {
             note: stringOctaveNote,
             velocity: tabNote.velocity,
           },
-          tabNote.duration
+          tabNote.duration,
         );
         return;
       }
@@ -164,7 +164,7 @@ export class SongDecoder {
       shiftOctaveNote(songString, tabNote.fret),
       tabNote.duration,
       undefined,
-      tabNote.velocity
+      tabNote.velocity,
     );
   }
 
@@ -176,7 +176,7 @@ export class SongDecoder {
     octaveNote: OctaveNote,
     duration: number | undefined,
     previousNote?: StringOctaveNote,
-    velocity?: number
+    velocity?: number,
   ) {
     const stringOctaveNote = addIndividualNote(
       {
@@ -185,7 +185,7 @@ export class SongDecoder {
         duration: duration ?? 0,
         velocity: velocity ?? 127,
       },
-      previousNote
+      previousNote,
     );
     if (stringOctaveNote) {
       result.addEventAtTick(
@@ -196,7 +196,7 @@ export class SongDecoder {
           note: stringOctaveNote,
           velocity,
         },
-        duration !== undefined ? Math.max(1, Math.round(duration)) : undefined
+        duration !== undefined ? Math.max(1, Math.round(duration)) : undefined,
       );
     }
     return stringOctaveNote;
@@ -206,7 +206,7 @@ export class SongDecoder {
     result: EventsByTick,
     track: SongTrack,
     trackNumber: number,
-    chord: SongChord
+    chord: SongChord,
   ) {
     const name =
       chord.name !== undefined
@@ -232,7 +232,7 @@ export class SongDecoder {
           chord.tick,
           octaveNote,
           undefined,
-          previousNote
+          previousNote,
         ) ?? previousNote;
     }
   }

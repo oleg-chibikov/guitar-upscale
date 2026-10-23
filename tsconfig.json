@@ -3,23 +3,13 @@
     "compilerOptions": {
       "module": "commonjs",
       "paths": {
-        "@/*": [
-          "./src/*"
-        ]
+        "@/*": ["./src/*"]
       }
     }
   },
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": [
-      "node",
-      "jest",
-      "digital-goods-browser"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node", "jest", "digital-goods-browser"],
     "rootDir": ".",
     "allowJs": true,
     "skipLibCheck": true,
@@ -38,9 +28,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
+      "@/*": ["./src/*"],
       "midi-writer-js/build/types/*": [
         "./node_modules/midi-writer-js/build/types/*"
       ]
@@ -56,7 +44,5 @@
     "src/pages/_app.tsx",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

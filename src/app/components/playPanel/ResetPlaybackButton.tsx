@@ -1,10 +1,7 @@
 import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { usePianoRollData } from "@/app/hooks/usePianoRollData";
-import {
-  isPlayingValue,
-  stopMetronomeIfIdle,
-} from "@/app/store/settingsSlice";
+import { isPlayingValue, stopMetronomeIfIdle } from "@/app/store/settingsSlice";
 import { setPianoRollExpanded } from "@/app/store/uiSlice";
 import Clear from "@mui/icons-material/Clear";
 import React, { Dispatch, useState } from "react";

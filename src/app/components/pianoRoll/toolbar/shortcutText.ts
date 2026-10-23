@@ -1,5 +1,6 @@
 const isMac = () =>
-  typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+  typeof navigator !== "undefined" &&
+  /Mac|iPhone|iPad/.test(navigator.platform);
 
 export const modKey = () => (isMac() ? "⌘" : "Ctrl");
 

@@ -40,7 +40,7 @@ describe("fromSubscriptionPurchaseV2", () => {
           { ...active.lineItems[0], expiryTime: "2999-01-01T00:00:00Z" },
         ],
       },
-      "token"
+      "token",
     );
 
     expect(result.paymentState).toBe(PaymentState.PAYMENT_PENDING);
@@ -49,20 +49,16 @@ describe("fromSubscriptionPurchaseV2", () => {
 
   it("maps the cancel reason", () => {
     const cancel = (canceledStateContext: object) =>
-      fromSubscriptionPurchaseV2(
-        { ...active, canceledStateContext },
-        "token"
-      ).cancelReason;
+      fromSubscriptionPurchaseV2({ ...active, canceledStateContext }, "token")
+        .cancelReason;
 
     expect(cancel({ userInitiatedCancellation: {} })).toBe(CancelReason.USER);
     expect(cancel({ systemInitiatedCancellation: {} })).toBe(
-      CancelReason.SYSTEM
+      CancelReason.SYSTEM,
     );
-    expect(cancel({ replacementCancellation: {} })).toBe(
-      CancelReason.REPLACED
-    );
+    expect(cancel({ replacementCancellation: {} })).toBe(CancelReason.REPLACED);
     expect(cancel({ developerInitiatedCancellation: {} })).toBe(
-      CancelReason.DEVELOPER
+      CancelReason.DEVELOPER,
     );
   });
 
@@ -77,7 +73,7 @@ describe("fromSubscriptionPurchaseV2", () => {
           { expiryTime: "2026-03-01T00:00:00Z", offerPhase: { freeTrial: {} } },
         ],
       },
-      "token"
+      "token",
     );
 
     expect(result.expiryTimeMillis).toBe(Date.UTC(2026, 2, 1));

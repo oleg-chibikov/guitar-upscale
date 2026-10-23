@@ -9,7 +9,7 @@ export const getSoloTrack = (data: EventsByTick): number | undefined =>
 
 export const setSoloTrack = (
   data: EventsByTick,
-  trackNumber: number | undefined
+  trackNumber: number | undefined,
 ) => {
   if (trackNumber !== undefined) {
     soloTrack = { data, trackNumber };
@@ -23,12 +23,12 @@ export const setSoloTrack = (
  */
 export const getAudibleEvents = (
   data: EventsByTick,
-  events: ChordOrNote[] | Set<ChordOrNote>
+  events: ChordOrNote[] | Set<ChordOrNote>,
 ): ChordOrNote[] | Set<ChordOrNote> => {
   const trackNumber = getSoloTrack(data);
   return trackNumber === undefined
     ? events
     : Array.from(events).filter(
-        (event) => getEventTrack(event) === trackNumber
+        (event) => getEventTrack(event) === trackNumber,
       );
 };

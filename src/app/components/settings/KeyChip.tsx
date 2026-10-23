@@ -19,10 +19,8 @@ import React, { ReactNode, useState } from "react";
 const DisabledDetectScaleButton = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/buttons/DisabledDetectScaleButton"
-      )
-    ).DisabledDetectScaleButton
+      await import("@/app/components/settings/buttons/DisabledDetectScaleButton")
+    ).DisabledDetectScaleButton,
 );
 
 /**
@@ -38,7 +36,7 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
   const tuning = useSettingsSelector((s) => s.tuning);
   const capo = useSettingsSelector((s) => s.capo);
   const scaleIsBeingDetected = useSettingsSelector(
-    (s) => s.scaleIsBeingDetected
+    (s) => s.scaleIsBeingDetected,
   );
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [wasDetecting, setWasDetecting] = useState(scaleIsBeingDetected);
@@ -59,8 +57,7 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
     capo,
   });
   // the panel sits on the side opposite the chords
-  const side =
-    chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left";
+  const side = chordsDisplayMode === ChordsDisplayMode.Left ? "right" : "left";
 
   return (
     <>
@@ -79,11 +76,11 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
           justifyContent: "space-between",
         }}
       >
-        <span className="flex flex-col items-start min-w-0 leading-tight">
-          <span className="font-semibold truncate max-w-full">
+        <span className="flex min-w-0 flex-col items-start leading-tight">
+          <span className="max-w-full truncate font-semibold">
             {scaleIsBeingDetected ? "Detecting scale" : title}
           </span>
-          <span className="text-xs opacity-80 truncate max-w-full">
+          <span className="max-w-full truncate text-xs opacity-80">
             {scaleIsBeingDetected ? "Tap notes on the neck" : details}
           </span>
         </span>
@@ -97,10 +94,10 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
         transformOrigin={{ vertical: "top", horizontal: side }}
       >
         <section
-          className={`p-3 grid gap-2 items-center ${
+          className={`grid items-center gap-2 p-3 ${
             theme === Theme.Light
-              ? "text-foreground-light bg-panel-light"
-              : "text-foreground-dark bg-panel-dark"
+              ? "bg-panel-light text-foreground-light"
+              : "bg-panel-dark text-foreground-dark"
           }`}
           style={{ gridTemplateColumns: "auto minmax(180px, 1fr)" }}
         >

@@ -32,12 +32,12 @@ export const ChangeSubscriptionDialog: FC<
   const makePurchase = getMakePurchase(
     params,
     hasDigitalGoodsService,
-    dispatch
+    dispatch,
   );
 
   const existingNotCancelledPurchaseOption = getExistingNonCancelledPurchase(
     allPurchasedOptions,
-    purchaseOption
+    purchaseOption,
   );
 
   if (!existingNotCancelledPurchaseOption) {
@@ -45,10 +45,10 @@ export const ChangeSubscriptionDialog: FC<
   }
 
   const existingSubscriptionExpirationDate = msToFormattedDate(
-    existingNotCancelledPurchaseOption?.expirationDateMs
+    existingNotCancelledPurchaseOption?.expirationDateMs,
   );
   const existingSubscriptionSubscribedDate = msToFormattedDate(
-    existingNotCancelledPurchaseOption?.subscribedDateMs
+    existingNotCancelledPurchaseOption?.subscribedDateMs,
   );
   const existingSubscriptionExpirationDateText =
     existingSubscriptionExpirationDate !== undefined

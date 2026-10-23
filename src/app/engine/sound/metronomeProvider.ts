@@ -8,7 +8,7 @@ export const loadMetronome = async () => {
 
 export const playMetronomeBeat = async (
   isAccented: boolean,
-  baseVolume: number
+  baseVolume: number,
 ) => {
   const metronomeBeatNote: OctaveNote = {
     note: Note.C,
@@ -18,6 +18,6 @@ export const playMetronomeBeat = async (
     metronomeBeatNote,
     Math.min(baseVolume + (isAccented ? 20 : 0), MAX_VOLUME),
     await loadMetronome(),
-    1000
+    1000,
   );
 };

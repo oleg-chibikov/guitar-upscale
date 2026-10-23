@@ -29,7 +29,7 @@ export const getSlashChordVoicing = (
   notes: StringOctaveNoteWithFingerPosition[],
   slashNote: Note,
   neck: Neck,
-  capo: number
+  capo: number,
 ): StringOctaveNoteWithFingerPosition[] | undefined => {
   if (!notes.length) {
     return;
@@ -43,7 +43,7 @@ export const getSlashChordVoicing = (
 
   const stringCount = Math.min(
     MAX_STRING_INDEX_FOR_CHORD_GENERATION + 1,
-    neck.length
+    neck.length,
   );
   for (let string = 0; string < stringCount; string++) {
     for (let fret = capo; fret < neck[string].length; fret++) {
@@ -55,7 +55,7 @@ export const getSlashChordVoicing = (
       const kept = notes.filter(
         (x) =>
           x.stringOctaveNote.string < string &&
-          getPitch(x.stringOctaveNote) > pitch
+          getPitch(x.stringOctaveNote) > pitch,
       );
       if (kept.length < 2) {
         continue;
@@ -64,7 +64,7 @@ export const getSlashChordVoicing = (
         const { minAllowedFretIndex, maxAllowedFretIndex } =
           getPossibleFretRangeForChord(
             kept.map((x) => x.stringOctaveNote),
-            capo
+            capo,
           );
         if (fret < minAllowedFretIndex || fret > maxAllowedFretIndex) {
           continue;
@@ -77,7 +77,7 @@ export const getSlashChordVoicing = (
           { stringOctaveNote: candidate, fingerIndex: undefined },
         ],
         missingNotes: [...chordNotes].filter(
-          (note) => note !== slashNote && !keptNotes.has(note)
+          (note) => note !== slashNote && !keptNotes.has(note),
         ).length,
         droppedNotes: notes.length - kept.length,
         distance: fret === capo ? 0 : Math.abs(fret - bassNote.fret),

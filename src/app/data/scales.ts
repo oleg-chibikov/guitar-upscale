@@ -9,7 +9,7 @@ export type { Scale } from "@/app/data/scaleDefinitions";
 export const getScalePattern = (
   scaleGroup: string,
   scale: string,
-  useShiftedNotes: boolean = false
+  useShiftedNotes: boolean = false,
 ) => {
   let scaleNotes = scalesMap.get(scaleGroup)?.get(scale)?.concat([0]);
   if (useShiftedNotes) {

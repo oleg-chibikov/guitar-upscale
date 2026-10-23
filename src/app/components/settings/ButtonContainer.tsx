@@ -14,16 +14,14 @@ import { OpenStrummingSettingsButton } from "./buttons/OpenStrummingSettingsButt
 const DisabledDetectChordButton = dynamic(
   async () =>
     (
-      await import(
-        "@/app/components/settings/buttons/DisabledDetectChordButton"
-      )
-    ).DisabledDetectChordButton
+      await import("@/app/components/settings/buttons/DisabledDetectChordButton")
+    ).DisabledDetectChordButton,
 );
 
 const DisabledSongUploadButton = dynamic(
   async () =>
     (await import("@/app/components/settings/buttons/DisabledSongUploadButton"))
-      .DisabledSongUploadButton
+      .DisabledSongUploadButton,
 );
 
 export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({

@@ -15,7 +15,7 @@ import { StrummingPatternSelector } from "./StrummingPatternSelector";
 export const StrummingSettings: FC = () => {
   const dispatch = useDispatch();
   const strummingSettingsExpanded = useUiSelector(
-    (s) => s.strummingSettingsExpanded
+    (s) => s.strummingSettingsExpanded,
   );
   const close = () => dispatch(setStrummingSettingsExpanded(false));
 

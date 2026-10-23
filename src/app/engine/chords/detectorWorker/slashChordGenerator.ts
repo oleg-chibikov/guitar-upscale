@@ -10,7 +10,7 @@ export type SlashChord = {
 export function* getSlashChordsForVariation(
   chordVariation: Chord,
   neck: Neck,
-  capo: number
+  capo: number,
 ): Generator<SlashChord | undefined> {
   const bassNoteStringIndex = lastNonUndefinedIndex(chordVariation);
   if (bassNoteStringIndex === -1) {
@@ -34,7 +34,7 @@ export function* getSlashChordsForVariation(
     // Create a new chord variation with the original bass note removed if necessary
     const newChordVariation = removeBassNote
       ? chordVariation.map((fret, index) =>
-          index === bassNoteStringIndex ? undefined : fret
+          index === bassNoteStringIndex ? undefined : fret,
         )
       : chordVariation;
 
@@ -60,7 +60,7 @@ export function* getSlashChordsForVariation(
 
 const getSlashChord = (
   chordVariation: Chord,
-  bassNote: StringOctaveNote
+  bassNote: StringOctaveNote,
 ): SlashChord | undefined => {
   if (chordVariation[bassNote.string]?.note === bassNote.note) {
     // no need to apply a slash chord when the bass note is the same as in the original chord

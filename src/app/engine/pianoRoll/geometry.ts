@@ -40,5 +40,5 @@ export const getContentHeight = (zoom: Zoom) => PITCH_COUNT * zoom.noteHeight;
 export const getTotalTicks = (lastEventEndTick: number) =>
   Math.max(
     MIN_BARS * TICKS_IN_BAR,
-    (Math.ceil(lastEventEndTick / TICKS_IN_BAR) + TRAILING_BARS) * TICKS_IN_BAR
+    (Math.ceil(lastEventEndTick / TICKS_IN_BAR) + TRAILING_BARS) * TICKS_IN_BAR,
   );

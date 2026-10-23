@@ -39,7 +39,7 @@ export const getFretboardLayout = (
   stringCount: number,
   widthStep: number,
   rowHeight: number,
-  stringTilt: StringTilt
+  stringTilt: StringTilt,
 ): FretboardLayout => {
   const initialWidth = (NOTE_COUNT + 1) * widthStep;
   const columns: FretColumn[] = [];
@@ -89,10 +89,10 @@ export const findFretHit = (
   x: number,
   y: number,
   hasNote: (string: number, fret: number) => boolean,
-  stringCount: number
+  stringCount: number,
 ): FretHit | undefined => {
   const column = layout.columns.find(
-    ({ left, width }) => x >= left && x < left + width
+    ({ left, width }) => x >= left && x < left + width,
   );
   if (!column) {
     return undefined;

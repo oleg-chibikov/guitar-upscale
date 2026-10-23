@@ -9,7 +9,7 @@ import {
 
 export const clearSubscriptionCookie = async <T extends ResponseData>(
   req: NextApiRequest,
-  res: NextApiResponse<T>
+  res: NextApiResponse<T>,
 ) => {
   await deleteCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, {
     req,
@@ -21,7 +21,7 @@ export const clearSubscriptionCookie = async <T extends ResponseData>(
 export const setSubscriptionCookie = async (
   params: PurchaseParams,
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) => {
   const value = getCookieValue(params);
   await setCookie(GOOGLE_PLAY_SUBSCRIPTION_COOKIE_KEY, value, {

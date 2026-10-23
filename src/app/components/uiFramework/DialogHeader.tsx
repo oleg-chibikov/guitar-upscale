@@ -30,7 +30,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
     >
       {text}
       {onClose && (
-        <Box className="right-6 absolute top-1/2 translate-y-[-50%]">
+        <Box className="absolute top-1/2 right-6 translate-y-[-50%]">
           <CloseIcon onPress={onClose} />
         </Box>
       )}

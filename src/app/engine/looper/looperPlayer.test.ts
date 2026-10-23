@@ -37,7 +37,7 @@ jest.mock("@/app/engine/playerHelper", () => ({
 const play = async (
   ticks: number[],
   loopLengthTicks: number,
-  count: number
+  count: number,
 ) => {
   const player = new LooperPlayer({
     eventsByTick: {

@@ -37,18 +37,35 @@ jest.mock("@/app/data/chordModes", () => ({
 // C has major and minor, D only minor, E has no chords
 jest.mock("@/app/engine/chords/chordModesByNote", () => ({
   getModesForNote: (note: number) =>
-    note === 0 ? new Set([major, minor]) : note === 2 ? new Set([minor]) : undefined,
+    note === 0
+      ? new Set([major, minor])
+      : note === 2
+        ? new Set([minor])
+        : undefined,
 }));
 // the neck plays octaves 2 to 5
 jest.mock("@/app/engine/generateNeckRepresentation", () => {
   const map = new Map();
-  const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const names = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B",
+  ];
   for (let octave = 2; octave <= 5; octave++) {
     names.forEach((name, note) =>
       map.set(`${name}${octave}`, [
         { octave, note, string: 1, fret: note },
         { octave, note, string: 2, fret: note + 5 },
-      ])
+      ]),
     );
   }
   return { octaveNoteToStringOctaveNoteMap: map };
@@ -172,8 +189,12 @@ describe("piano roll operations", () => {
   it("steps through the scale", () => {
     const { data } = setup();
     const scale = new Set([Note.C, Note.E, Note.G]);
-    expect(resolveTranspose(data, ["a"], 1, scale).get("a")?.pitch).toBe(C4 + 4);
-    expect(resolveTranspose(data, ["a"], -1, scale).get("a")?.pitch).toBe(C4 - 5);
+    expect(resolveTranspose(data, ["a"], 1, scale).get("a")?.pitch).toBe(
+      C4 + 4,
+    );
+    expect(resolveTranspose(data, ["a"], -1, scale).get("a")?.pitch).toBe(
+      C4 - 5,
+    );
     expect(resolveTranspose(data, ["a"], 12).get("a")?.pitch).toBe(C4 + 12);
   });
 
@@ -209,7 +230,11 @@ describe("piano roll operations", () => {
   });
 
   describe("chords", () => {
-    const chordAt = (id: string, chord: string, pitch: number): ChordOrNote => ({
+    const chordAt = (
+      id: string,
+      chord: string,
+      pitch: number,
+    ): ChordOrNote => ({
       id,
       chord: { chord, metadata: { octaveNote: fromPitch(pitch) } },
     });

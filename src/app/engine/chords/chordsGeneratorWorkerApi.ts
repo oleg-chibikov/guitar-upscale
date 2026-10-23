@@ -19,9 +19,10 @@ const WORKER_COUNT = Math.max(
   1,
   Math.min(
     4,
-    (typeof navigator === "undefined" ? 2 : navigator.hardwareConcurrency || 2) -
-      1
-  )
+    (typeof navigator === "undefined"
+      ? 2
+      : navigator.hardwareConcurrency || 2) - 1,
+  ),
 );
 
 // A worker takes hundreds of milliseconds to start, so the pool starts early and stays alive between generations.
@@ -32,8 +33,8 @@ const startWorkers = () => {
   while (workers.length < WORKER_COUNT) {
     workers.push(
       new Worker(
-        new URL("./generatorWorker/chordsGeneratorWorker.ts", import.meta.url)
-      )
+        new URL("./generatorWorker/chordsGeneratorWorker.ts", import.meta.url),
+      ),
     );
   }
 };
@@ -41,7 +42,7 @@ const startWorkers = () => {
 startWorkers();
 
 export const setPromiseToResolveWhenChordsAreLoaded = (
-  resolve: () => void | undefined
+  resolve: () => void | undefined,
 ) => {
   chordsWaitResolve = resolve;
 };
@@ -61,14 +62,14 @@ export const generateChords = (
   neck: Neck,
   capo: number,
   onChordModeProcessed: (chordModeVariations: ChordModeVariations) => void,
-  onComplete: () => void
+  onComplete: () => void,
 ) => {
   console.log("Start generating chords");
 
   const allModes = [...chordModes, ...advancedChordModes];
   // Modes finish out of order across workers. They wait here so the callers get them in list order.
   const finished: (ChordModeVariations | null | undefined)[] = new Array(
-    allModes.length
+    allModes.length,
   );
   let nextModeToSend = 0;
   let nextModeToEmit = 0;
@@ -113,7 +114,7 @@ export const generateChords = (
     let currentIndex: number | undefined;
 
     worker.onmessage = (
-      event: WorkerMessageWrapper<GenerateChordsCallbackMessage>
+      event: WorkerMessageWrapper<GenerateChordsCallbackMessage>,
     ) => {
       if (currentIndex === undefined) {
         return;
@@ -123,7 +124,7 @@ export const generateChords = (
         case "chordModeProcessed": {
           const { chordModeVariations } = event.data;
           console.log(
-            `Chord mode ${chordModeVariations.chordMode.name} (index: ${currentIndex}) has been processed`
+            `Chord mode ${chordModeVariations.chordMode.name} (index: ${currentIndex}) has been processed`,
           );
           finished[currentIndex] = chordModeVariations;
           break;

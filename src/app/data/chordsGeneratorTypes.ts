@@ -10,10 +10,9 @@ export type GenerateChordsRequest = {
   chordModes: ChordMode[];
 };
 
-export type GenerateChordsWorkerMessage =
-  | {
-      type: "start";
-    } & GenerateChordsRequest;
+export type GenerateChordsWorkerMessage = {
+  type: "start";
+} & GenerateChordsRequest;
 
 export type GenerateChordsCallback = {
   chordModeVariations: ChordModeVariations;

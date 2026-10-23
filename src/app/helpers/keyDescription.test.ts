@@ -11,7 +11,7 @@ describe("describeKey", () => {
         scale: "Aeolian / Natural",
         tuningName: "E standard",
         capo: 0,
-      })
+      }),
     ).toEqual({
       title: "E Minor",
       details: "Aeolian / Natural · E standard",
@@ -26,7 +26,7 @@ describe("describeKey", () => {
         scale: "Dorian",
         tuningName: "E standard",
         capo: 3,
-      }).details
+      }).details,
     ).toBe("Dorian · E standard · Capo 3");
   });
 
@@ -38,7 +38,7 @@ describe("describeKey", () => {
         scale: CHROMATIC,
         tuningName: "E standard",
         capo: 0,
-      })
+      }),
     ).toEqual({ title: "All notes", details: "E standard" });
   });
 });

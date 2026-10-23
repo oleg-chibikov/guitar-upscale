@@ -10,5 +10,5 @@ export const cartesian = <T>(...args: T[][]): (T | null)[][] =>
       }
       return acc.flatMap((x) => curr.map((y) => [...x, y]));
     },
-    [[]]
+    [[]],
   );

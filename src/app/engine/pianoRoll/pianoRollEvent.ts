@@ -31,7 +31,7 @@ export const getEventPitch = (event: ChordOrNote): number => {
     chord.metadata.octaveNote ?? {
       octave: DEFAULT_CHORD_OCTAVE,
       note: parseChordNoteAndAlterations(chord.chord).chordBaseNote,
-    }
+    },
   );
 };
 
@@ -53,7 +53,7 @@ const modeOrderIndex = (mode: ChordMode) => {
  */
 export const getChordModesForPitch = (pitch: number): ChordMode[] =>
   Array.from(getModesForNote(fromPitch(pitch).note) ?? []).sort(
-    (a, b) => modeOrderIndex(a) - modeOrderIndex(b)
+    (a, b) => modeOrderIndex(a) - modeOrderIndex(b),
   );
 
 /**
@@ -70,10 +70,10 @@ export const isChordModeAvailable = (event: ChordOrNote): boolean => {
 
 const findStringOctaveNote = (
   pitch: number,
-  preferredString?: number
+  preferredString?: number,
 ): StringOctaveNote | undefined => {
   const candidates = octaveNoteToStringOctaveNoteMap.get(
-    serializeOctaveNote(fromPitch(pitch))
+    serializeOctaveNote(fromPitch(pitch)),
   );
   if (!candidates || candidates.length === 0) {
     return undefined;
@@ -101,14 +101,17 @@ export type PitchChange = {
 export const withPitch = (
   event: ChordOrNote,
   pitch: number,
-  preferredChordMode?: ChordMode
+  preferredChordMode?: ChordMode,
 ): PitchChange | undefined => {
   if (getEventPitch(event) === pitch && preferredChordMode === undefined) {
     return { event, chordModeChanged: false };
   }
 
   if (event.note) {
-    const stringOctaveNote = findStringOctaveNote(pitch, event.note.note.string);
+    const stringOctaveNote = findStringOctaveNote(
+      pitch,
+      event.note.note.string,
+    );
     if (!stringOctaveNote) {
       return undefined;
     }
@@ -141,7 +144,7 @@ export const withPitch = (
 
 export const withDuration = (
   event: ChordOrNote,
-  duration: number
+  duration: number,
 ): ChordOrNote => ({ ...event, duration: Math.max(1, Math.round(duration)) });
 
 /**
@@ -154,7 +157,7 @@ export const createNoteEvent = (
     trackNumber?: number;
     instrument?: Instrument;
     looperChannel?: number;
-  }
+  },
 ): ChordOrNote | undefined => {
   const stringOctaveNote = findStringOctaveNote(pitch);
   if (!stringOctaveNote) {

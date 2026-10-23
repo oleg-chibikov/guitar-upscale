@@ -62,7 +62,7 @@ export const PianoRoll: React.FC = () => {
       tracks.length > 1
         ? new Map(tracks.map(({ trackNumber }, index) => [trackNumber, index]))
         : undefined,
-    [tracks]
+    [tracks],
   );
   const loopLengthTicks = source?.loopLengthTicks;
   const { scalePattern } = useScaleContext();
@@ -81,9 +81,9 @@ export const PianoRoll: React.FC = () => {
     () =>
       allEvents.reduce(
         (end, { tick, event }) => Math.max(end, tick + getEventDuration(event)),
-        0
+        0,
       ),
-    [allEvents]
+    [allEvents],
   );
   const totalTicks = getTotalTicks(Math.max(lastEndTick, loopLengthTicks ?? 0));
   const width = tickToX(totalTicks, zoom);
@@ -94,7 +94,7 @@ export const PianoRoll: React.FC = () => {
       const tick = Math.max(0, x / zoom.pixelsPerTick);
       return exact ? Math.round(tick) : snapTick(tick, snapTicks);
     },
-    [snapTicks, zoom]
+    [snapTicks, zoom],
   );
 
   // a click on the ruler moves the playhead. Shift turns off the grid
@@ -104,15 +104,15 @@ export const PianoRoll: React.FC = () => {
       clearLoopOutside(tick);
       seekTo(tick);
     },
-    [xToTick, clearLoopOutside, seekTo]
+    [xToTick, clearLoopOutside, seekTo],
   );
 
   const [savedLoop, setSavedLoop] = useState<LoopRange | undefined>(() =>
-    data ? getLoopRange(data) : undefined
+    data ? getLoopRange(data) : undefined,
   );
   useEffect(() => {
     const subscription = loopRange$.subscribe(() =>
-      setSavedLoop(data ? getLoopRange(data) : undefined)
+      setSavedLoop(data ? getLoopRange(data) : undefined),
     );
     return () => subscription.unsubscribe();
   }, [data]);
@@ -131,12 +131,12 @@ export const PianoRoll: React.FC = () => {
       setDraftLoop(phase === "drag" ? range : undefined);
       if (phase === "commit" && range) loopRange(range);
     },
-    [isLoop, xToTick, loopRange]
+    [isLoop, xToTick, loopRange],
   );
 
   const handleKeyPress = useCallback(
     (pitch: number) => void playNote(fromPitch(pitch)),
-    []
+    [],
   );
 
   const { preview, handlers } = useNoteAreaInteraction({
@@ -156,7 +156,7 @@ export const PianoRoll: React.FC = () => {
       setViewportSize({
         width: scroller.clientWidth,
         height: scroller.clientHeight,
-      })
+      }),
     );
     observer.observe(scroller);
     return () => observer.disconnect();
@@ -209,7 +209,7 @@ export const PianoRoll: React.FC = () => {
   return (
     <div
       ref={scrollerRef}
-      className="relative w-full h-full overflow-auto overscroll-contain"
+      className="relative h-full w-full overflow-auto overscroll-contain"
       style={{ background: BACKGROUND }}
     >
       <div
@@ -217,7 +217,7 @@ export const PianoRoll: React.FC = () => {
         style={{ width: contentWidth, height: contentHeight }}
       >
         <div
-          className="sticky left-0 top-0"
+          className="sticky top-0 left-0"
           style={{ width: viewportWidth, height: viewportHeight }}
         >
           {viewportWidth > 0 && viewportHeight > 0 && (

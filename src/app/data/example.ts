@@ -22,7 +22,7 @@ export const getExampleName = (example: Pick<Example, "band" | "title">) =>
 // Every word of the query has to appear somewhere in the name or the scale.
 export const matchesExampleSearch = (
   example: Pick<Example, "band" | "title" | "scale" | "scaleGroup">,
-  query: string
+  query: string,
 ) => {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const text = [getExampleName(example), example.scale, example.scaleGroup]

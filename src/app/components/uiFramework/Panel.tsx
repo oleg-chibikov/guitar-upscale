@@ -21,14 +21,14 @@ export const Panel: FC<
       style={style}
       className={`${className !== undefined ? `${className} ` : ""}border-2 ${
         theme === Theme.Light
-          ? "bg-panel-light border-border-light"
-          : "bg-panel-dark border-border-dark"
+          ? "border-border-light bg-panel-light"
+          : "border-border-dark bg-panel-dark"
       } flex ${
         // it should be on the opposite side of chords to avoid overlapping
         chordsDisplayMode === ChordsDisplayMode.Left && enableReverse
           ? "flex-row-reverse"
           : "flex-row"
-      } gap-1 items-center overflow-auto overscroll-contain`}
+      } items-center gap-1 overflow-auto overscroll-contain`}
     >
       {children}
     </section>

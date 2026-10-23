@@ -15,7 +15,7 @@ export const chordPreferredVariationsByName = new Map<
 
 export function setPreferredVariationsForChordMode(
   chordModeVariations: ChordModeVariations,
-  type: ChordPlayMode
+  type: ChordPlayMode,
 ) {
   const chordMode = chordModeVariations.chordMode;
   for (let note = 0; note < NOTE_COUNT; note++) {
@@ -27,7 +27,7 @@ export function setPreferredVariationsForChordMode(
       variationsForNote,
       chordMode.name === "5" ? "low" : "high", // Power chords prefer lower strings
       stringCountValue,
-      type
+      type,
     );
     const chordName = getChordName(note, chordMode);
     chordPreferredVariationsByName.set(chordName, preferredVariationsForNote);

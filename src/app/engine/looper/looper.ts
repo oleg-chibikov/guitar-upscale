@@ -55,7 +55,7 @@ export const stopLooperPlayback = () => {
 
 export const setRecordingInLooperChannel = (
   channel: number,
-  value: boolean
+  value: boolean,
 ) => {
   const looperChannel = looperState[channel];
   if (
@@ -159,7 +159,7 @@ export const startMetronomeIfNeeded = (dispatch: Dispatch<UnknownAction>) => {
 
 const initializeChannel = (
   looperChannel: LooperChannelState,
-  channel: number
+  channel: number,
 ) => {
   setPlayingInLooperChannel(channel, false);
   looperChannel.looperRecorder.clear();

@@ -7,7 +7,7 @@ import {
 } from "@/app/store/settingsSlice";
 
 export const replaceBassNoteWithSlash = (
-  variation: StringOctaveNoteWithFingerPosition[]
+  variation: StringOctaveNoteWithFingerPosition[],
 ) => {
   if (slashChordBassNoteValue === undefined || !neckValue) {
     return;
@@ -16,7 +16,7 @@ export const replaceBassNoteWithSlash = (
     variation,
     slashChordBassNoteValue,
     neckValue,
-    capoValue
+    capoValue,
   );
   if (!voicing) {
     return;

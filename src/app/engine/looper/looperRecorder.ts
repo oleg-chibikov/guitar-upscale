@@ -76,7 +76,7 @@ export class LooperRecorder {
 
     const loopLengthTicks = getLoopLengthTicks(
       globalCurrentLastBarTick - this.absoluteTickAtTheBeginningOfFirstEventBar,
-      currentTick < TICKS_IN_HALF_BAR
+      currentTick < TICKS_IN_HALF_BAR,
     );
 
     this.looperPlayer = new LooperPlayer({
@@ -120,7 +120,7 @@ export class LooperRecorder {
   recordNote(
     note: StringOctaveNote,
     trackNumber: number,
-    instrument: Instrument
+    instrument: Instrument,
   ) {
     if (
       !this.isRecording ||
@@ -165,7 +165,7 @@ export class LooperRecorder {
         console.log(
           LOG_PREFIX +
             "The first event at tick %d is within a half beat from the new bar. Shifting the ticks by 1 bar and setting the first tick to 1",
-          relativeTick
+          relativeTick,
         );
         return 1; // ticks are 1-based
       }
@@ -173,7 +173,7 @@ export class LooperRecorder {
       // subsequent event
       if (globalCurrentTick <= this.absoluteTickAtTheBeginningOfFirstEventBar) {
         console.log(
-          "The event is not first and the new bar hasn't yet started. Ignoring the event"
+          "The event is not first and the new bar hasn't yet started. Ignoring the event",
         );
         return undefined;
       }

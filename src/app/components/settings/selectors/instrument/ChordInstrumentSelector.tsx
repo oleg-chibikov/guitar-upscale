@@ -11,7 +11,7 @@ import { BaseInstrumentSelector } from "./BaseInstrumentSelector";
 const InstrumentSelector: React.FC = () => {
   const chordInstrument = useSettingsSelector((s) => s.chordInstrument);
   const chordInstrumentGroup = useSettingsSelector(
-    (s) => s.chordInstrumentGroup
+    (s) => s.chordInstrumentGroup,
   );
   const dispatch = useDispatch();
   return (

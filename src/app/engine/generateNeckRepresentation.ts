@@ -20,7 +20,7 @@ export const generateNeckRepresentation = (
   scalePattern: Set<Note>,
   stringTuning: OctaveNote[],
   baseNote: Note,
-  capo: number
+  capo: number,
 ): Neck => {
   octaveNoteToStringOctaveNoteMap.clear();
   const neck: Neck = [];
@@ -59,7 +59,7 @@ export const generateNeckRepresentation = (
           addOrUpdateMapArray(
             octaveNoteToStringOctaveNoteMap,
             serializedOctaveNote,
-            stringOctaveNote
+            stringOctaveNote,
           );
         }
       }

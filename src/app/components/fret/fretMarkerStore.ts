@@ -1,8 +1,5 @@
 import { MAX_STRING_INDEX_FOR_CHORD_GENERATION } from "@/app/data/chordsGeneratorTypes";
-import {
-  StringOctaveNote,
-  serializeStringOctaveNote,
-} from "@/app/data/notes";
+import { StringOctaveNote, serializeStringOctaveNote } from "@/app/data/notes";
 import {
   ClearNoteMetadata,
   NoteMetadata,
@@ -94,7 +91,7 @@ export class FretMarkerStore {
         const key = serializeStringOctaveNote(stringOctaveNote);
         keys.push(key);
         NoteToFretMarkerEventMap.set(key, (metadata) =>
-          this.handleNote(stringOctaveNote, metadata)
+          this.handleNote(stringOctaveNote, metadata),
         );
       }
     }
@@ -105,7 +102,7 @@ export class FretMarkerStore {
 
   private async handleNote(
     stringOctaveNote: StringOctaveNote,
-    metadata: NoteMetadata | ClearNoteMetadata
+    metadata: NoteMetadata | ClearNoteMetadata,
   ) {
     const state = this.getOrCreate(stringOctaveNote);
     try {
@@ -121,9 +118,8 @@ export class FretMarkerStore {
         noteMetadata.skipChordDetection !== true
       ) {
         // this module is only loaded once the chord detection button is pressed
-        const { chordDetectorBuilder } = await import(
-          "@/app/engine/chords/chordDetectorBuilder"
-        );
+        const { chordDetectorBuilder } =
+          await import("@/app/engine/chords/chordDetectorBuilder");
         state.isChordBeingDetected = true;
         void chordDetectorBuilder.addNote({
           stringOctaveNote,
@@ -138,9 +134,8 @@ export class FretMarkerStore {
         scaleIsBeingDetectedValue &&
         noteMetadata.skipChordDetection !== true
       ) {
-        const { scaleDetectorBuilder } = await import(
-          "@/app/engine/scales/scaleDetectorBuilder"
-        );
+        const { scaleDetectorBuilder } =
+          await import("@/app/engine/scales/scaleDetectorBuilder");
         state.isScaleBeingDetected = true;
         scaleDetectorBuilder.addNote({
           stringOctaveNote,

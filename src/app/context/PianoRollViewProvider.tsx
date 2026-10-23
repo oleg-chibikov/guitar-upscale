@@ -45,7 +45,7 @@ export const usePianoRollView = () => {
   const context = useContext(PianoRollViewContext);
   if (context === undefined) {
     throw new Error(
-      "usePianoRollView must be used within a PianoRollViewProvider"
+      "usePianoRollView must be used within a PianoRollViewProvider",
     );
   }
   return context;
@@ -66,7 +66,7 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
   const noteHeight = usePianoRollSelector((s) => s.noteHeight);
   const zoom = useMemo(
     () => ({ pixelsPerTick, noteHeight }),
-    [pixelsPerTick, noteHeight]
+    [pixelsPerTick, noteHeight],
   );
   const pendingScroll = useRef<PendingScroll | undefined>(undefined);
   const zoomRef = useRef(zoom);
@@ -99,7 +99,7 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
       pendingScroll.current = scroll;
       dispatch(setPianoRollZoom(clamped));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const zoomTo = useCallback(
@@ -129,7 +129,7 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
           row * applied.noteHeight + TIMELINE_HEIGHT - offsetY;
       });
     },
-    [applyZoom]
+    [applyZoom],
   );
 
   const zoomBy = useCallback(
@@ -140,10 +140,10 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
           pixelsPerTick: current.pixelsPerTick * factorX,
           noteHeight: current.noteHeight * factorY,
         },
-        anchor
+        anchor,
       );
     },
-    [zoomTo]
+    [zoomTo],
   );
 
   const zoomToFit = useCallback(() => {
@@ -151,7 +151,7 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
     if (!scroller || !events.length) return;
     const start = Math.min(...events.map(({ tick }) => tick));
     const end = Math.max(
-      ...events.map(({ tick, event }) => tick + getEventDuration(event))
+      ...events.map(({ tick, event }) => tick + getEventDuration(event)),
     );
     const pitches = events.map(({ event }) => getEventPitch(event));
     const top = Math.max(...pitches);
@@ -169,13 +169,13 @@ export const PianoRollViewProvider: React.FC<{ children: ReactNode }> = ({
           (width - (end - start) * applied.pixelsPerTick) / 2;
         scroller.scrollTop =
           pitchToY(top, applied) - (height - rows * applied.noteHeight) / 2;
-      }
+      },
     );
   }, [applyZoom, events]);
 
   const value = useMemo(
     () => ({ scrollerRef, zoom, zoomTo, zoomBy, zoomToFit }),
-    [zoom, zoomTo, zoomBy, zoomToFit]
+    [zoom, zoomTo, zoomBy, zoomToFit],
   );
 
   return (

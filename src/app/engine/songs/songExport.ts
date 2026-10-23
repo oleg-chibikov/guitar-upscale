@@ -87,15 +87,15 @@ export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
       const name = isChords
         ? "Chords"
         : track.instrument !== undefined
-        ? getInstrumentLabel(track.instrument)
-        : "Melody";
+          ? getInstrumentLabel(track.instrument)
+          : "Melody";
       return { ...track, name };
     })
     // a chords track keeps the instrument from the settings
     .map((track) =>
       isChordsTrackName(track.name)
         ? { ...track, instrument: undefined }
-        : track
+        : track,
     );
 
   return {
@@ -123,7 +123,7 @@ export const downloadBytes = (bytes: Uint8Array, fileName: string) => {
   const url = URL.createObjectURL(
     new Blob([bytes as Uint8Array<ArrayBuffer>], {
       type: "application/octet-stream",
-    })
+    }),
   );
   const link = document.createElement("a");
   link.href = url;
@@ -136,7 +136,7 @@ export const downloadBytes = (bytes: Uint8Array, fileName: string) => {
 
 export const downloadEventsAsGuitarPro = async (
   events: EventsByTick,
-  example?: Example
+  example?: Example,
 ) => {
   const song = eventsToSong(events, example);
   downloadBytes(await songToGuitarPro(song), getSongFileName(song));

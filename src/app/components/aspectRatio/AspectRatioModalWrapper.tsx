@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { FC } from "react";
 
 const AspectRatioModal = dynamic(
-  async () => (await import("./AspectRatioModal")).AspectRatioModal
+  async () => (await import("./AspectRatioModal")).AspectRatioModal,
 );
 
 export const AspectRatioModalWrapper: FC = () => {

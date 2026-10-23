@@ -5,7 +5,10 @@ import {
 } from "@/app/components/pianoRoll/toolbar/PianoRollTrackControls";
 import { Group } from "@/app/components/pianoRoll/toolbar/ToolbarGroup";
 import { PianoRollVelocityControl } from "@/app/components/pianoRoll/toolbar/PianoRollVelocityControl";
-import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText";
+import {
+  altKey,
+  modKey,
+} from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
@@ -115,7 +118,12 @@ const transposeButtons: {
   icon: ReactNode;
   key: string;
 }[] = [
-  { steps: -1, octave: true, icon: <KeyboardDoubleArrowDown />, key: "Shift+Down" },
+  {
+    steps: -1,
+    octave: true,
+    icon: <KeyboardDoubleArrowDown />,
+    key: "Shift+Down",
+  },
   { steps: -1, octave: false, icon: <KeyboardArrowDown />, key: "Down" },
   { steps: 1, octave: false, icon: <KeyboardArrowUp />, key: "Up" },
   { steps: 1, octave: true, icon: <KeyboardDoubleArrowUp />, key: "Shift+Up" },
@@ -150,183 +158,183 @@ export const PianoRollToolbar: React.FC = () => {
 
   return (
     <ThemeProvider theme={toolbarTheme}>
-    <div className="flex flex-col gap-1.5 px-1.5 py-1.5 bg-neutral-800 border-b border-neutral-700 md:flex-row md:flex-wrap md:items-center">
-      {/* a narrow screen keeps one row of main buttons. The rest opens with More */}
-      <div className="flex flex-row items-center gap-1.5 overflow-x-auto md:contents">
-      {sources.length > 1 && (
-        <Group>
-          <SelectWrapper
-            className="min-w-24"
-            tooltip="Track to edit: the melody or a looper channel"
-            options={sources.map(({ id, label }) => ({ value: id, label }))}
-            value={source?.id ?? ""}
-            onChange={(value) => setSourceId(String(value))}
-          />
-        </Group>
-      )}
-      <PianoRollTrackPicker renaming={renaming} setRenaming={setRenaming} />
-      <Group>
-        <IconButtonWrapper
-          icon={<SkipPrevious />}
-          tooltip="Move the playhead to the start (Home)"
-          onPress={() => transport.seekTo(0)}
-          disabled={transport.isLoop}
-        />
-        <IconButtonWrapper
-          icon={transport.isPlaying ? <Stop /> : <PlayArrow />}
-          tooltip={
-            transport.isPlaying
-              ? "Stop (Space)"
-              : transport.isLoop
-              ? "Play the loop (Space)"
-              : "Play these notes from the playhead (Space)"
-          }
-          onPress={() => void transport.togglePlay()}
-          isActive={transport.isPlaying}
-        />
-      </Group>
-      <Group>
-        <IconButtonWrapper
-          icon={<Undo />}
-          tooltip={`Undo${undoLabel !== undefined ? ` ${undoLabel.toLowerCase()}` : ""} (${mod}+Z)`}
-          onPress={undo}
-          disabled={!canUndo}
-        />
-        <IconButtonWrapper
-          icon={<Redo />}
-          tooltip={`Redo${redoLabel !== undefined ? ` ${redoLabel.toLowerCase()}` : ""} (${mod}+Shift+Z)`}
-          onPress={redo}
-          disabled={!canRedo}
-        />
-      </Group>
-      <Group>
-        {tools.map(({ tool: value, icon, tooltip }) => (
-          <IconButtonWrapper
-            key={value}
-            icon={icon}
-            tooltip={tooltip.replace("Alt", altKey())}
-            onPress={() => dispatch(setPianoRollTool(value))}
-            isActive={tool === value}
-          />
-        ))}
-      </Group>
-      <Group className="ml-auto md:hidden">
-        <IconButtonWrapper
-          icon={<MoreHoriz />}
-          tooltip={showMore ? "Hide the other buttons" : "More buttons"}
-          onPress={() => setShowMore(!showMore)}
-          isActive={showMore}
-        />
-      </Group>
+      <div className="flex flex-col gap-1.5 border-b border-neutral-700 bg-neutral-800 px-1.5 py-1.5 md:flex-row md:flex-wrap md:items-center">
+        {/* a narrow screen keeps one row of main buttons. The rest opens with More */}
+        <div className="flex flex-row items-center gap-1.5 overflow-x-auto md:contents">
+          {sources.length > 1 && (
+            <Group>
+              <SelectWrapper
+                className="min-w-24"
+                tooltip="Track to edit: the melody or a looper channel"
+                options={sources.map(({ id, label }) => ({ value: id, label }))}
+                value={source?.id ?? ""}
+                onChange={(value) => setSourceId(String(value))}
+              />
+            </Group>
+          )}
+          <PianoRollTrackPicker renaming={renaming} setRenaming={setRenaming} />
+          <Group>
+            <IconButtonWrapper
+              icon={<SkipPrevious />}
+              tooltip="Move the playhead to the start (Home)"
+              onPress={() => transport.seekTo(0)}
+              disabled={transport.isLoop}
+            />
+            <IconButtonWrapper
+              icon={transport.isPlaying ? <Stop /> : <PlayArrow />}
+              tooltip={
+                transport.isPlaying
+                  ? "Stop (Space)"
+                  : transport.isLoop
+                    ? "Play the loop (Space)"
+                    : "Play these notes from the playhead (Space)"
+              }
+              onPress={() => void transport.togglePlay()}
+              isActive={transport.isPlaying}
+            />
+          </Group>
+          <Group>
+            <IconButtonWrapper
+              icon={<Undo />}
+              tooltip={`Undo${undoLabel !== undefined ? ` ${undoLabel.toLowerCase()}` : ""} (${mod}+Z)`}
+              onPress={undo}
+              disabled={!canUndo}
+            />
+            <IconButtonWrapper
+              icon={<Redo />}
+              tooltip={`Redo${redoLabel !== undefined ? ` ${redoLabel.toLowerCase()}` : ""} (${mod}+Shift+Z)`}
+              onPress={redo}
+              disabled={!canRedo}
+            />
+          </Group>
+          <Group>
+            {tools.map(({ tool: value, icon, tooltip }) => (
+              <IconButtonWrapper
+                key={value}
+                icon={icon}
+                tooltip={tooltip.replace("Alt", altKey())}
+                onPress={() => dispatch(setPianoRollTool(value))}
+                isActive={tool === value}
+              />
+            ))}
+          </Group>
+          <Group className="ml-auto md:hidden">
+            <IconButtonWrapper
+              icon={<MoreHoriz />}
+              tooltip={showMore ? "Hide the other buttons" : "More buttons"}
+              onPress={() => setShowMore(!showMore)}
+              isActive={showMore}
+            />
+          </Group>
+        </div>
+        <div
+          className={`${showMore ? "flex" : "hidden"} flex-row flex-wrap items-center gap-1.5 md:contents`}
+        >
+          <PianoRollTrackEdits renaming={renaming} setRenaming={setRenaming} />
+          <Group>
+            <PianoRollSnapSelector />
+            <IconButtonWrapper
+              icon={<AlignHorizontalLeft />}
+              tooltip={`Quantize: move ${actions.hasSelection ? "the selected" : "all"} notes onto the grid (Q)`}
+              onPress={actions.quantize}
+            />
+            <IconButtonWrapper
+              icon={<LibraryMusic />}
+              tooltip={
+                isChromatic
+                  ? "Keep notes in the scale: the scale has all 12 notes, so pick another scale to use it"
+                  : "Keep notes in the scale when moving and drawing"
+              }
+              onPress={() => dispatch(setSnapToScale(!snapToScale))}
+              isActive={snapToScale && !isChromatic}
+              disabled={isChromatic}
+            />
+          </Group>
+          <Group>
+            {transposeButtons.map(({ steps, octave, icon, key }) => (
+              <IconButtonWrapper
+                key={key}
+                icon={icon}
+                tooltip={`Move ${actions.hasSelection ? "the selected" : "all"} notes ${steps > 0 ? "up" : "down"} ${octave ? "an octave" : snapToScale && !isChromatic ? "a scale step" : "a semitone"} (${key})`}
+                onPress={() => actions.transpose(steps, octave, true)}
+              />
+            ))}
+          </Group>
+          <Group>
+            <IconButtonWrapper
+              icon={<ContentCopy />}
+              tooltip={`Drag copies notes (or hold ${altKey()})`}
+              onPress={() => dispatch(setCopyMode(!copyMode))}
+              isActive={copyMode}
+            />
+            <IconButtonWrapper
+              icon={<CompareArrows />}
+              tooltip={`Drag notes in time or in pitch only (or hold ${mod})`}
+              onPress={() => dispatch(setAxisLock(!axisLock))}
+              isActive={axisLock}
+            />
+          </Group>
+          <Group>
+            <IconButtonWrapper
+              icon={<ContentCut />}
+              tooltip={`Cut (${mod}+X)`}
+              onPress={actions.cut}
+              disabled={!actions.hasSelection}
+            />
+            <IconButtonWrapper
+              icon={<ContentPaste />}
+              tooltip={`Paste (${mod}+V)`}
+              onPress={actions.paste}
+            />
+            <IconButtonWrapper
+              icon={<ControlPointDuplicate />}
+              tooltip={`Duplicate (${mod}+D)`}
+              onPress={actions.duplicate}
+              disabled={!actions.hasSelection}
+            />
+            <IconButtonWrapper
+              icon={<Delete />}
+              tooltip="Delete (Del)"
+              onPress={actions.deleteSelection}
+              disabled={!actions.hasSelection}
+            />
+          </Group>
+          <PianoRollVelocityControl />
+          <Group>
+            <IconButtonWrapper
+              icon={<ZoomOut />}
+              tooltip="Zoom out (G, or Ctrl+wheel)"
+              onPress={() => zoomBy(1 / ZOOM_STEP, 1)}
+            />
+            <IconButtonWrapper
+              icon={<ZoomIn />}
+              tooltip="Zoom in (H, or Ctrl+wheel)"
+              onPress={() => zoomBy(ZOOM_STEP, 1)}
+            />
+            <IconButtonWrapper
+              icon={<UnfoldLess />}
+              tooltip="Shorter rows (Shift+G, or Alt+wheel)"
+              onPress={() => zoomBy(1, 1 / ZOOM_STEP)}
+            />
+            <IconButtonWrapper
+              icon={<UnfoldMore />}
+              tooltip="Taller rows (Shift+H, or Alt+wheel)"
+              onPress={() => zoomBy(1, ZOOM_STEP)}
+            />
+            <IconButtonWrapper
+              icon={<FitScreen />}
+              tooltip="Fit all notes (F)"
+              onPress={zoomToFit}
+            />
+            <IconButtonWrapper
+              icon={<KeyboardTab />}
+              tooltip="Follow the playhead during playback. The view stays put while notes are selected"
+              onPress={() => dispatch(setFollowPlayback(!followPlayback))}
+              isActive={followPlayback}
+            />
+          </Group>
+        </div>
       </div>
-      <div
-        className={`${showMore ? "flex" : "hidden"} flex-row flex-wrap items-center gap-1.5 md:contents`}
-      >
-      <PianoRollTrackEdits renaming={renaming} setRenaming={setRenaming} />
-      <Group>
-        <PianoRollSnapSelector />
-        <IconButtonWrapper
-          icon={<AlignHorizontalLeft />}
-          tooltip={`Quantize: move ${actions.hasSelection ? "the selected" : "all"} notes onto the grid (Q)`}
-          onPress={actions.quantize}
-        />
-        <IconButtonWrapper
-          icon={<LibraryMusic />}
-          tooltip={
-            isChromatic
-              ? "Keep notes in the scale: the scale has all 12 notes, so pick another scale to use it"
-              : "Keep notes in the scale when moving and drawing"
-          }
-          onPress={() => dispatch(setSnapToScale(!snapToScale))}
-          isActive={snapToScale && !isChromatic}
-          disabled={isChromatic}
-        />
-      </Group>
-      <Group>
-        {transposeButtons.map(({ steps, octave, icon, key }) => (
-          <IconButtonWrapper
-            key={key}
-            icon={icon}
-            tooltip={`Move ${actions.hasSelection ? "the selected" : "all"} notes ${steps > 0 ? "up" : "down"} ${octave ? "an octave" : snapToScale && !isChromatic ? "a scale step" : "a semitone"} (${key})`}
-            onPress={() => actions.transpose(steps, octave, true)}
-          />
-        ))}
-      </Group>
-      <Group>
-        <IconButtonWrapper
-          icon={<ContentCopy />}
-          tooltip={`Drag copies notes (or hold ${altKey()})`}
-          onPress={() => dispatch(setCopyMode(!copyMode))}
-          isActive={copyMode}
-        />
-        <IconButtonWrapper
-          icon={<CompareArrows />}
-          tooltip={`Drag notes in time or in pitch only (or hold ${mod})`}
-          onPress={() => dispatch(setAxisLock(!axisLock))}
-          isActive={axisLock}
-        />
-      </Group>
-      <Group>
-        <IconButtonWrapper
-          icon={<ContentCut />}
-          tooltip={`Cut (${mod}+X)`}
-          onPress={actions.cut}
-          disabled={!actions.hasSelection}
-        />
-        <IconButtonWrapper
-          icon={<ContentPaste />}
-          tooltip={`Paste (${mod}+V)`}
-          onPress={actions.paste}
-        />
-        <IconButtonWrapper
-          icon={<ControlPointDuplicate />}
-          tooltip={`Duplicate (${mod}+D)`}
-          onPress={actions.duplicate}
-          disabled={!actions.hasSelection}
-        />
-        <IconButtonWrapper
-          icon={<Delete />}
-          tooltip="Delete (Del)"
-          onPress={actions.deleteSelection}
-          disabled={!actions.hasSelection}
-        />
-      </Group>
-      <PianoRollVelocityControl />
-      <Group>
-        <IconButtonWrapper
-          icon={<ZoomOut />}
-          tooltip="Zoom out (G, or Ctrl+wheel)"
-          onPress={() => zoomBy(1 / ZOOM_STEP, 1)}
-        />
-        <IconButtonWrapper
-          icon={<ZoomIn />}
-          tooltip="Zoom in (H, or Ctrl+wheel)"
-          onPress={() => zoomBy(ZOOM_STEP, 1)}
-        />
-        <IconButtonWrapper
-          icon={<UnfoldLess />}
-          tooltip="Shorter rows (Shift+G, or Alt+wheel)"
-          onPress={() => zoomBy(1, 1 / ZOOM_STEP)}
-        />
-        <IconButtonWrapper
-          icon={<UnfoldMore />}
-          tooltip="Taller rows (Shift+H, or Alt+wheel)"
-          onPress={() => zoomBy(1, ZOOM_STEP)}
-        />
-        <IconButtonWrapper
-          icon={<FitScreen />}
-          tooltip="Fit all notes (F)"
-          onPress={zoomToFit}
-        />
-        <IconButtonWrapper
-          icon={<KeyboardTab />}
-          tooltip="Follow the playhead during playback. The view stays put while notes are selected"
-          onPress={() => dispatch(setFollowPlayback(!followPlayback))}
-          isActive={followPlayback}
-        />
-      </Group>
-      </div>
-    </div>
     </ThemeProvider>
   );
 };

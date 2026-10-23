@@ -8,7 +8,7 @@ import { StepSlider } from "../../uiFramework/StepSlider";
 
 export const ChordStrummingDelaySlider: React.FC = () => {
   const chordStrummingDelayMs = useSettingsSelector(
-    (s) => s.chordStrummingDelayMs
+    (s) => s.chordStrummingDelayMs,
   );
   const dispatch = useDispatch();
 

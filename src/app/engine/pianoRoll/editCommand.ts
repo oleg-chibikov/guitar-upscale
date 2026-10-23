@@ -19,7 +19,7 @@ export type Direction = "forward" | "backward";
 export const applyCommand = (
   data: EventsByTick,
   command: EditCommand,
-  direction: Direction
+  direction: Direction,
 ) => {
   const from = direction === "forward" ? "before" : "after";
   const to = direction === "forward" ? "after" : "before";
@@ -38,26 +38,34 @@ export const applyCommand = (
 };
 
 const isSameState = (a: EventState, b: EventState) =>
-  a === b || (a !== null && b !== null && a.tick === b.tick && a.event === b.event);
+  a === b ||
+  (a !== null && b !== null && a.tick === b.tick && a.event === b.event);
 
 export class CommandBuilder {
   private changes = new Map<string, EventChange>();
 
-  constructor(private data: EventsByTick, private label: string) {}
+  constructor(
+    private data: EventsByTick,
+    private label: string,
+  ) {}
 
   set(id: string, after: EventState): this {
     const existing = this.changes.get(id);
     if (existing) {
       existing.after = after;
     } else {
-      this.changes.set(id, { id, before: this.data.getEvent(id) ?? null, after });
+      this.changes.set(id, {
+        id,
+        before: this.data.getEvent(id) ?? null,
+        after,
+      });
     }
     return this;
   }
 
   build(): EditCommand | undefined {
     const changes = Array.from(this.changes.values()).filter(
-      (change) => !isSameState(change.before, change.after)
+      (change) => !isSameState(change.before, change.after),
     );
     return changes.length ? { label: this.label, changes } : undefined;
   }

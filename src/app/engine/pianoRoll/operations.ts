@@ -5,7 +5,10 @@ import {
   EventForTick,
   EventsByTick,
 } from "@/app/engine/eventsByTick";
-import { CommandBuilder, EditCommand } from "@/app/engine/pianoRoll/editCommand";
+import {
+  CommandBuilder,
+  EditCommand,
+} from "@/app/engine/pianoRoll/editCommand";
 import { clampPitch, fromPitch } from "@/app/engine/pianoRoll/geometry";
 import {
   canPlaceAtPitch,
@@ -44,7 +47,7 @@ export const resolveMove = (
   ids: Iterable<string>,
   deltaTick: number,
   deltaPitch: number,
-  scalePattern?: Set<Note>
+  scalePattern?: Set<Note>,
 ): Map<string, MoveTarget> => {
   const states = existing(data, ids);
   const minTick = Math.min(...states.map((s) => s.tick));
@@ -60,7 +63,7 @@ export const resolveMove = (
     return scalePattern ? snapPitchToScale(target, scalePattern) : target;
   };
   const pitchFits = states.every(({ event }) =>
-    canPlaceAtPitch(event, pitchFor(event))
+    canPlaceAtPitch(event, pitchFor(event)),
   );
 
   return new Map(
@@ -70,7 +73,7 @@ export const resolveMove = (
         tick: tick + safeDeltaTick,
         pitch: pitchFits ? pitchFor(event) : getEventPitch(event),
       },
-    ])
+    ]),
   );
 };
 
@@ -82,7 +85,7 @@ export const resolveTranspose = (
   data: EventsByTick,
   ids: Iterable<string>,
   steps: number,
-  scalePattern?: Set<Note>
+  scalePattern?: Set<Note>,
 ): Map<string, MoveTarget> => {
   const states = existing(data, ids);
   const direction = Math.sign(steps);
@@ -105,10 +108,10 @@ export const resolveTranspose = (
     states.map(({ tick, event }) => [
       event.id,
       { tick, pitch: stepPitch(getEventPitch(event)) },
-    ])
+    ]),
   );
   const fits = states.every(({ event }) =>
-    canPlaceAtPitch(event, targets.get(event.id)!.pitch)
+    canPlaceAtPitch(event, targets.get(event.id)!.pitch),
   );
   return fits ? targets : new Map();
 };
@@ -116,7 +119,7 @@ export const resolveTranspose = (
 export const moveEvents = (
   data: EventsByTick,
   targets: Map<string, MoveTarget>,
-  copy: boolean
+  copy: boolean,
 ): EditResult => {
   const builder = new CommandBuilder(data, copy ? "Copy notes" : "Move notes");
   const selection: string[] = [];
@@ -144,7 +147,7 @@ export const moveEvents = (
 
 export const deleteEvents = (
   data: EventsByTick,
-  ids: Iterable<string>
+  ids: Iterable<string>,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Delete notes");
   existing(data, ids).forEach(({ event }) => builder.set(event.id, null));
@@ -154,7 +157,7 @@ export const deleteEvents = (
 export const addEvent = (
   data: EventsByTick,
   tick: number,
-  event: ChordOrNote
+  event: ChordOrNote,
 ): EditResult => ({
   command: new CommandBuilder(data, "Add note")
     .set(event.id, { tick, event })
@@ -176,7 +179,7 @@ export const resolveResize = (
   edge: ResizeEdge,
   deltaTick: number,
   snapTicks: number,
-  snapEnabled = true
+  snapEnabled = true,
 ): Map<string, ResizeTarget> => {
   const anchor = data.getEvent(anchorId);
   const result = new Map<string, ResizeTarget>();
@@ -184,9 +187,7 @@ export const resolveResize = (
     return result;
   }
   const anchorEdge =
-    edge === "end"
-      ? anchor.tick + getEventDuration(anchor.event)
-      : anchor.tick;
+    edge === "end" ? anchor.tick + getEventDuration(anchor.event) : anchor.tick;
   const rawEdge = anchorEdge + deltaTick;
   const snappedDelta =
     (snapEnabled ? snapTick(rawEdge, snapTicks) : Math.round(rawEdge)) -
@@ -204,7 +205,7 @@ export const resolveResize = (
       const end = tick + duration;
       const start = Math.max(
         0,
-        Math.min(end - minDuration, tick + snappedDelta)
+        Math.min(end - minDuration, tick + snappedDelta),
       );
       result.set(event.id, { tick: start, duration: end - start });
     }
@@ -214,7 +215,7 @@ export const resolveResize = (
 
 export const resizeEvents = (
   data: EventsByTick,
-  targets: Map<string, ResizeTarget>
+  targets: Map<string, ResizeTarget>,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Resize notes");
   targets.forEach(({ tick, duration }, id) => {
@@ -237,7 +238,7 @@ export const quantizeEvents = (
   data: EventsByTick,
   ids: Iterable<string>,
   snapTicks: number,
-  strength = 1
+  strength = 1,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Quantize");
   const states = existing(data, ids);
@@ -261,7 +262,7 @@ export const quantizeEvents = (
 export const setVelocity = (
   data: EventsByTick,
   ids: Iterable<string>,
-  velocity: number
+  velocity: number,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Change volume");
   const states = existing(data, ids);
@@ -285,7 +286,7 @@ export const pasteEvents = (
   clipboard: EventForTick[],
   atTick: number,
   // the notes land in this track instead of the one they were copied from
-  track?: PianoRollTrack
+  track?: PianoRollTrack,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Paste");
   const selection: string[] = [];
@@ -303,7 +304,7 @@ export const pasteEvents = (
 export const setChordMode = (
   data: EventsByTick,
   id: string,
-  mode: ChordMode
+  mode: ChordMode,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Change chord");
   const state = data.getEvent(id);
@@ -313,7 +314,11 @@ export const setChordMode = (
   if (state && change) {
     builder.set(id, { tick: state.tick, event: change.event });
   }
-  return { command: builder.build(), selection: [id], chordsWithChangedMode: [] };
+  return {
+    command: builder.build(),
+    selection: [id],
+    chordsWithChangedMode: [],
+  };
 };
 
 /**
@@ -322,7 +327,7 @@ export const setChordMode = (
 export const getSpan = (states: EventForTick[]) => {
   const start = Math.min(...states.map((s) => s.tick));
   const end = Math.max(
-    ...states.map((s) => s.tick + getEventDuration(s.event))
+    ...states.map((s) => s.tick + getEventDuration(s.event)),
   );
   return { start, end };
 };

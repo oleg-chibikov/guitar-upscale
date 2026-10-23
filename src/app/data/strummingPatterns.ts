@@ -130,7 +130,7 @@ export type StrumDirection = "" | "↑" | "↓";
 
 // this function gets the number of slots for the patternEditorUI
 export const getDefaultSlotsForTimeSignature = (
-  timeSignature: TimeSignature
+  timeSignature: TimeSignature,
 ): number => {
   switch (timeSignature) {
     case TimeSignature.ONE_BAR:

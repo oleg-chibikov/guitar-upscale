@@ -35,12 +35,12 @@ export const ValueDialogControlDialog: React.FC<
         setHighlight(true); // Trigger highlight
       }
     },
-    [startPosition, startIndex, steps, setValue, setHighlight]
+    [startPosition, startIndex, steps, setValue, setHighlight],
   );
 
   const handleMouseMove = useCallback(
     (event: MouseEvent) => handleMove(event.clientX, event.clientY),
-    [handleMove]
+    [handleMove],
   );
 
   const handleTouchMove = useCallback(
@@ -50,7 +50,7 @@ export const ValueDialogControlDialog: React.FC<
         handleMove(touch.clientX, touch.clientY);
       }
     },
-    [handleMove]
+    [handleMove],
   );
 
   useEffect(() => {

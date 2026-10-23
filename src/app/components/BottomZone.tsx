@@ -14,7 +14,7 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
 
   return (
     <div
-      className={`flex flex-row gap-1 fixed bottom-1 items-end ${
+      className={`fixed bottom-1 flex flex-row items-end gap-1 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "right-1" : "left-1"
       }`}
       style={pianoRollExpanded ? { zIndex: 9999999 } : undefined} // should be displayed over the dialog

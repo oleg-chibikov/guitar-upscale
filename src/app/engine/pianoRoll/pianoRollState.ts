@@ -7,7 +7,7 @@ import { UnknownAction } from "redux";
 export let pianoRollData: EventsByTick | undefined;
 export const setPianoRollData = (
   data: EventsByTick | undefined,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch<UnknownAction>,
 ) => {
   pianoRollData = data;
   resetPlayhead(data);

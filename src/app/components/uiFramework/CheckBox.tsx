@@ -20,7 +20,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
 
   const theme = useUiSelector((s) => s.theme);
   return (
-    <div className="flex flex-row gap-2 items-center">
+    <div className="flex flex-row items-center gap-2">
       <Checkbox
         size="small"
         className={`mr-2 ${

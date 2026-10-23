@@ -52,7 +52,7 @@ export class RecursiveChordGenerator {
       newMin: number;
       newMax: number;
     },
-    sharedArrayCache: SharedArrayCache
+    sharedArrayCache: SharedArrayCache,
   ) {
     this.capo = capo;
     this.neck = neck;
@@ -68,13 +68,10 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[]
+    results: ChordBuilderInfo[],
   ): void => {
     // Each string left adds one note at most. Too few strings for the missing notes means no chord down this branch.
-    if (
-      countBits(requiredNotesMask & ~state.usedNotesMask) >
-      stringIndex + 1
-    ) {
+    if (countBits(requiredNotesMask & ~state.usedNotesMask) > stringIndex + 1) {
       return;
     }
 
@@ -93,12 +90,16 @@ export class RecursiveChordGenerator {
         state,
         minAllowedFretIndex,
         maxAllowedFretIndex,
-        results
+        results,
       );
     }
 
     const lastFret = maxAllowedFretIndex ?? this.maxFretToProcess;
-    for (let fret = minAllowedFretIndex ?? this.capo + 1; fret <= lastFret; fret++) {
+    for (
+      let fret = minAllowedFretIndex ?? this.capo + 1;
+      fret <= lastFret;
+      fret++
+    ) {
       const stringOctaveNote = neckString[fret];
       if (
         stringOctaveNote !== null &&
@@ -111,7 +112,7 @@ export class RecursiveChordGenerator {
           state,
           minAllowedFretIndex,
           maxAllowedFretIndex,
-          results
+          results,
         );
       }
     }
@@ -122,7 +123,7 @@ export class RecursiveChordGenerator {
       state,
       minAllowedFretIndex,
       maxAllowedFretIndex,
-      results
+      results,
     );
   };
 
@@ -132,14 +133,14 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[]
+    results: ChordBuilderInfo[],
   ) {
     // we cannot continue any existing barre anymore when muting a string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
     if (
       this.checkIfThereIsBarreOnHigherFret(
         -1, // check all fingers
         this.capo,
-        state.barreFretByFingerIndex
+        state.barreFretByFingerIndex,
       )
     ) {
       return;
@@ -157,7 +158,7 @@ export class RecursiveChordGenerator {
       state,
       minAllowedFretIndex, // leave limits and previously used finger/fret intact
       maxAllowedFretIndex,
-      results
+      results,
     );
 
     available[0] = a0;
@@ -173,14 +174,14 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[]
+    results: ChordBuilderInfo[],
   ) {
     // we cannot continue any existing barre anymore when using an open string. if it exists we cannot continue as the barre has to occupy all the strings up to the highest
     if (
       this.checkIfThereIsBarreOnHigherFret(
         -1, // check all fingers
         stringOctaveNote.fret,
-        state.barreFretByFingerIndex
+        state.barreFretByFingerIndex,
       )
     ) {
       return;
@@ -202,7 +203,7 @@ export class RecursiveChordGenerator {
       state,
       minAllowedFretIndex, // leave limits intact
       maxAllowedFretIndex,
-      results
+      results,
     );
 
     available[0] = a0;
@@ -221,7 +222,7 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[]
+    results: ChordBuilderInfo[],
   ) {
     const fret = stringOctaveNote.fret;
     const available = state.availableFretByFingerIndex;
@@ -249,7 +250,7 @@ export class RecursiveChordGenerator {
           stringIndex,
           fret,
           currentFingerIndex,
-          state
+          state,
         )
       ) {
         continue;
@@ -259,7 +260,7 @@ export class RecursiveChordGenerator {
         this.checkIfThereIsBarreOnHigherFret(
           currentFingerIndex,
           fret,
-          state.barreFretByFingerIndex
+          state.barreFretByFingerIndex,
         )
       ) {
         continue;
@@ -269,7 +270,7 @@ export class RecursiveChordGenerator {
         this.isInvalidDistanceBetweenCurrentAndPreviousFingers(
           currentFingerIndex,
           state,
-          fret
+          fret,
         )
       ) {
         continue;
@@ -279,7 +280,7 @@ export class RecursiveChordGenerator {
         this.isInvalidDistanceBetweenCurrentAndNextFingers(
           currentFingerIndex,
           state,
-          fret
+          fret,
         )
       ) {
         continue;
@@ -294,7 +295,7 @@ export class RecursiveChordGenerator {
         this.checkHasSameFretUsedByDifferentFinger(
           currentFingerIndex,
           state,
-          fret
+          fret,
         )
       ) {
         continue;
@@ -304,7 +305,7 @@ export class RecursiveChordGenerator {
       const { newMin, newMax } = this.updateMinAndMaxFretPositions(
         minAllowedFretIndex,
         maxAllowedFretIndex,
-        fret
+        fret,
       );
 
       const [a0, a1, a2, a3] = available;
@@ -319,7 +320,7 @@ export class RecursiveChordGenerator {
       state.chordBuilder[stringIndex] = stringOctaveNote;
       state.maxFingerUsedByFret[fret] = Math.max(
         previousMaxFinger ?? currentFingerIndex,
-        currentFingerIndex
+        currentFingerIndex,
       );
 
       // this finger can only be used for barre on higher strings
@@ -340,7 +341,7 @@ export class RecursiveChordGenerator {
         state,
         newMin,
         newMax,
-        results
+        results,
       );
 
       available[0] = a0;
@@ -359,7 +360,7 @@ export class RecursiveChordGenerator {
   private updateMinAndMaxFretPositions(
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    fret: number
+    fret: number,
   ) {
     let newMin: OptionalNumber;
     let newMax: OptionalNumber;
@@ -377,12 +378,12 @@ export class RecursiveChordGenerator {
 
       newMin = Math.max(
         fret - getPossibleFullFingerStretch(minAllowedFretIndex),
-        minAllowedFretIndex
+        minAllowedFretIndex,
       );
 
       newMax = Math.min(
         fret + getPossibleFullFingerStretch(fret),
-        maxAllowedFretIndex
+        maxAllowedFretIndex,
       );
     }
     return { newMin, newMax };
@@ -392,7 +393,7 @@ export class RecursiveChordGenerator {
     currentStringIndex: number,
     fret: number,
     currentFingerIndex: number,
-    state: RecursiveContainers
+    state: RecursiveContainers,
   ) {
     // going through each of the previous strings
     for (
@@ -401,14 +402,12 @@ export class RecursiveChordGenerator {
       lowerStringIndex++
     ) {
       // if we used a finger 1 on a lower string at a fret 5 it means that we can use fingers 2 and 3 on a frets >= 5 and we can use finger 0 on fret <= 5
-      let fingerUsedOnLowerString =
-        state.fingerAssignment[lowerStringIndex];
+      let fingerUsedOnLowerString = state.fingerAssignment[lowerStringIndex];
       // The thumb wraps around the neck behind the index finger, so it ranks below finger 0
       if (fingerUsedOnLowerString === THUMB) {
         fingerUsedOnLowerString = -1;
       }
-      let fretUsedOnLowerString =
-        state.chordBuilder[lowerStringIndex]?.fret;
+      let fretUsedOnLowerString = state.chordBuilder[lowerStringIndex]?.fret;
       if (fretUsedOnLowerString === this.capo) {
         fretUsedOnLowerString = undefined;
       }
@@ -443,7 +442,7 @@ export class RecursiveChordGenerator {
     state: RecursiveContainers,
     minAllowedFretIndex: OptionalNumber,
     maxAllowedFretIndex: OptionalNumber,
-    results: ChordBuilderInfo[]
+    results: ChordBuilderInfo[],
   ) {
     if (stringIndex > 0) {
       this.findChordNotesRecursive(
@@ -452,7 +451,7 @@ export class RecursiveChordGenerator {
         state,
         minAllowedFretIndex,
         maxAllowedFretIndex,
-        results
+        results,
       );
       return;
     }
@@ -464,7 +463,7 @@ export class RecursiveChordGenerator {
     results.push({
       variation: this.sharedArrayCache.getVariation(state.chordBuilder),
       fingerAssignment: this.sharedArrayCache.getFingerAssignment(
-        state.fingerAssignment
+        state.fingerAssignment,
       ),
       hasBarreOnIndexFinger: state.barreFretByFingerIndex[0] !== undefined, // 0 is the index finger
     });
@@ -472,7 +471,7 @@ export class RecursiveChordGenerator {
 
   private preventCurrentBarresToContinueOnHigherStrings(
     availableFretByFingerIndex: OptionalNumberArray,
-    afterFret?: number
+    afterFret?: number,
   ) {
     // if a string is muted it means that we cannot reuse the barre fingers anymore. We are setting all these fingers to -1 meaning they won't be reused.
     // for the fingers that are still not used we can continue using them (including as barre)
@@ -488,7 +487,7 @@ export class RecursiveChordGenerator {
   private checkIfThereIsBarreOnHigherFret(
     currentFingerIndex: number,
     fret: number,
-    barreFretByFingerIndex: OptionalNumberArray
+    barreFretByFingerIndex: OptionalNumberArray,
   ) {
     for (let i = currentFingerIndex + 1; i < NON_THUMB_FINGER_COUNT; i++) {
       const barreFretOnOtherFinger = barreFretByFingerIndex[i];
@@ -506,7 +505,7 @@ export class RecursiveChordGenerator {
   private checkHasFurtherFingerOnLowerFrets = (
     state: RecursiveContainers,
     fret: number,
-    currentFingerIndex: number
+    currentFingerIndex: number,
   ) => {
     const maxFingerUsedOnThisFret = state.maxFingerUsedByFret[fret];
     return (
@@ -518,7 +517,7 @@ export class RecursiveChordGenerator {
   private isInvalidDistanceBetweenCurrentAndPreviousFingers = (
     currentFingerIndex: number,
     state: RecursiveContainers,
-    fret: number
+    fret: number,
   ) => {
     for (
       let previousFingerIndex = currentFingerIndex - 1;
@@ -533,7 +532,7 @@ export class RecursiveChordGenerator {
             fretUsedByPreviousFinger,
             fret,
             previousFingerIndex,
-            currentFingerIndex
+            currentFingerIndex,
           )
         ) {
           return true;
@@ -549,7 +548,7 @@ export class RecursiveChordGenerator {
   private isInvalidDistanceBetweenCurrentAndNextFingers = (
     currentFingerIndex: number,
     state: RecursiveContainers,
-    fret: number
+    fret: number,
   ) => {
     for (
       let previousFingerIndex = currentFingerIndex + 1;
@@ -564,7 +563,7 @@ export class RecursiveChordGenerator {
             fret,
             fretUsedByNextFinger,
             currentFingerIndex,
-            previousFingerIndex
+            previousFingerIndex,
           )
         ) {
           return true;
@@ -580,7 +579,7 @@ export class RecursiveChordGenerator {
   private checkHasSameFretUsedByDifferentFinger = (
     currentFingerIndex: number,
     state: RecursiveContainers,
-    fret: number
+    fret: number,
   ) => {
     for (let i = 0; i < NON_THUMB_FINGER_COUNT; i++) {
       if (i === currentFingerIndex) {

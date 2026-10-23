@@ -34,7 +34,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
       <ScaleDetectionDialogWrapper />
       {loadingMessage !== undefined ? (
         <main
-          className={`flex flex-col gap-2 justify-center align-middle items-center text-center text-2xl ${
+          className={`flex flex-col items-center justify-center gap-2 text-center align-middle text-2xl ${
             theme === Theme.Light
               ? "bg-background-light text-foreground-light"
               : "bg-background-dark text-foreground-dark"

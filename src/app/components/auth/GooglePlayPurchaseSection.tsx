@@ -20,12 +20,12 @@ import { GooglePlayPurchaseOptionButton } from "./GooglePlayPurchaseOptionButton
 
 const CancelSubscriptionDialog = dynamic(
   async () =>
-    (await import("./CancelSubscriptionDialog")).CancelSubscriptionDialog
+    (await import("./CancelSubscriptionDialog")).CancelSubscriptionDialog,
 );
 
 const ChangeSubscriptionDialog = dynamic(
   async () =>
-    (await import("./ChangeSubscriptionDialog")).ChangeSubscriptionDialog
+    (await import("./ChangeSubscriptionDialog")).ChangeSubscriptionDialog,
 );
 
 interface GooglePlaySubscribeSectionProps {
@@ -90,7 +90,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
       try {
         const digitalGoodsService = await buildDigitalGoodsService();
         const availablePurchaseOptions = (await digitalGoodsService.getDetails(
-          Array.from(tierMap.keys())
+          Array.from(tierMap.keys()),
         )) as GuitarUpscaleSpecificDigitalGoodsProductDetails[];
 
         const existingPurchases =
@@ -99,7 +99,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
           availablePurchaseOptions.map(async (availablePurchaseOption) => {
             const tier = tierMap.get(availablePurchaseOption.itemId);
             const correspondingPurchasedItem = existingPurchases.find(
-              (x) => x.itemId === availablePurchaseOption.itemId
+              (x) => x.itemId === availablePurchaseOption.itemId,
             );
             let purchaseDataFromBackend: GetPurchaseResponseData | undefined;
             if (correspondingPurchasedItem) {
@@ -114,7 +114,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
                   setAndShowAlert({
                     message: `Cannot get details of "${tier}" due to an error`,
                     alertType: AlertType.Error,
-                  })
+                  }),
                 );
 
                 setHasFailedOptions(true);
@@ -141,21 +141,21 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
 
             console.log("Available purchase option", result);
             return result;
-          })
+          }),
         );
 
         setPurchaseOptions(options);
         setAllPurchasedOptions(
           options
             .filter((x) => x.purchaseData)
-            .map((x) => x.purchaseData) as PurchasedOption[]
+            .map((x) => x.purchaseData) as PurchasedOption[],
         );
       } catch (ex: unknown) {
         dispatch(
           setAndShowAlert({
             message: "Cannot get purchase options " + ex,
             alertType: AlertType.Error,
-          })
+          }),
         );
         setHasFailedOptions(true);
       } finally {
@@ -210,7 +210,7 @@ export const GooglePlayPurchaseSection: FC<GooglePlaySubscribeSectionProps> = ({
         />
       )}
       <ul
-        className="grid gap-y-2 items-stretch"
+        className="grid items-stretch gap-y-2"
         style={{
           gridTemplateColumns: "8fr 10fr 1fr 2fr 2fr",
         }}

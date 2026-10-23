@@ -14,7 +14,7 @@ describe("readGuitarProSong", () => {
   it("keeps chords on the Chords track and the melody as tab", async () => {
     const song = await readGuitarProSong(
       new Uint8Array(fs.readFileSync(NUMB)),
-      "Linkin Park - Numb.gp"
+      "Linkin Park - Numb.gp",
     );
 
     expect(song.band).toBe("Linkin Park");
@@ -52,7 +52,7 @@ const note = (
   deltaTime: number,
   noteNumber: number,
   on: boolean,
-  channel = 0
+  channel = 0,
 ): AnyEvent => ({
   type: "channel",
   subtype: on ? "noteOn" : "noteOff",
@@ -195,7 +195,7 @@ describe("writeGuitarPro", () => {
     const [lead, chords] = back.tracks;
     expect(lead.instrument).toBe("distortion_guitar");
     const sorted = [...lead.tabNotes].sort(
-      (a, b) => a.tick - b.tick || a.string - b.string
+      (a, b) => a.tick - b.tick || a.string - b.string,
     );
     expect(sorted).toEqual([
       { tick: 0, string: 0, fret: 3, duration: 8 },
@@ -232,7 +232,7 @@ describe("writeGuitarPro", () => {
 
     const back = await readGuitarProSong(await writeGuitarPro(song), "x.gp");
     const sorted = [...back.tracks[0].tabNotes].sort(
-      (a, b) => a.tick - b.tick || a.string - b.string
+      (a, b) => a.tick - b.tick || a.string - b.string,
     );
     expect(sorted.map((n) => n.velocity)).toEqual([64, 21, undefined]);
   });

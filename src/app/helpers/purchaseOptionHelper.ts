@@ -6,7 +6,7 @@ import {
 import { GuitarUpscaleSpecificDigitalGoodsProductDetails } from "../digitalGoodsBrowser";
 
 export const getBillingPeriod = (
-  purchaseOption: GuitarUpscaleSpecificDigitalGoodsProductDetails
+  purchaseOption: GuitarUpscaleSpecificDigitalGoodsProductDetails,
 ) => {
   switch (purchaseOption.subscriptionPeriod) {
     case "P1W":
@@ -33,31 +33,31 @@ export const isPurchaseCancelled = (purchaseOption: PurchaseOption) => {
 };
 
 export const getChangeAction = (
-  existingNotCancelledPurchaseOption?: PurchasedOption
+  existingNotCancelledPurchaseOption?: PurchasedOption,
 ) =>
   !existingNotCancelledPurchaseOption
     ? undefined
     : existingNotCancelledPurchaseOption.tier === "Composer"
-    ? "Downgrade"
-    : "Upgrade";
+      ? "Downgrade"
+      : "Upgrade";
 
 // Another non cancelled option different from purchaseOption
 // If it exists - we should change the existing subscription instead of subscribing to the new one
 // There should be only once such option
 export const getExistingNonCancelledPurchase = (
   allPurchasedOptions: PurchasedOption[],
-  purchaseOption: PurchaseOption // search for something other than this
+  purchaseOption: PurchaseOption, // search for something other than this
 ) =>
   allPurchasedOptions.find(
-    (x) => !x.isCancelled && x.tier !== purchaseOption.tier
+    (x) => !x.isCancelled && x.tier !== purchaseOption.tier,
   );
 
 // Another cancelled option different from purchaseOption
 // If it exists we should take its tier into account when granting permissions (on backend)
 export const getExistingCancelledPurchase = (
   allPurchasedOptions: PurchasedOption[],
-  purchaseOption: PurchaseOption // search for something other than this
+  purchaseOption: PurchaseOption, // search for something other than this
 ) =>
   allPurchasedOptions.find(
-    (x) => x.isCancelled && x.tier !== purchaseOption.tier
+    (x) => x.isCancelled && x.tier !== purchaseOption.tier,
   );

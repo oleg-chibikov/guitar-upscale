@@ -31,7 +31,7 @@ export const playChordOrNote = ({ note, chord, duration }: ChordOrNote) => {
 export const playAllNotes = (
   eventsToPlay: ChordOrNote[] | Set<ChordOrNote>,
   logPrefix: string,
-  tick: number
+  tick: number,
 ) => {
   console.log(logPrefix + "Playing events at tick %d", tick);
   eventsToPlay.forEach(playChordOrNote);
@@ -41,7 +41,7 @@ export const waitForTick = async (
   tickToWaitFor: number,
   currentTick: number,
   checkFinished: () => boolean,
-  logPrefix: string
+  logPrefix: string,
 ) => {
   const ticksToWait = tickToWaitFor - currentTick;
   console.log(logPrefix + "Waiting for %d ticks", ticksToWait);

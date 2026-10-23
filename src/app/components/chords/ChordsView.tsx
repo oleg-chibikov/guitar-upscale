@@ -53,14 +53,14 @@ const COMPACT_CHORDS_WIDTH = 220;
 const CHORDS_RENDER_INTERVAL_MS = 150;
 const KEY_CHORDS_PER_COLUMN = 4;
 
-export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = ({
-  mainRef,
-}) => {
+export const ChordsView: React.FC<{
+  mainRef: RefObject<HTMLElement | null>;
+}> = ({ mainRef }) => {
   const guitarSettingsUpdateCount = useSettingsSelector(
-    (s) => s.guitarSettingsUpdateCount
+    (s) => s.guitarSettingsUpdateCount,
   );
   const chordDetectorAvailable = useSettingsSelector(
-    (s) => s.chordDetectorAvailable
+    (s) => s.chordDetectorAvailable,
   );
   const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
   const chordPlayMode = useSettingsSelector((s) => s.chordPlayMode);
@@ -114,7 +114,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
     }
     regeneratePreferredVariationsForAllModes(
       chordModeVariationsRef.current,
-      chordPlayMode
+      chordPlayMode,
     );
   }, [chordPlayMode, chordsAreLoading]);
 
@@ -133,9 +133,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
       ) {
         return;
       }
-      const { chordDetectorWorkerApi } = await import(
-        "@/app/engine/chords/chordDetectorWorkerApi"
-      );
+      const { chordDetectorWorkerApi } =
+        await import("@/app/engine/chords/chordDetectorWorkerApi");
 
       abortGeneratingChords();
 
@@ -158,7 +157,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
 
           setPreferredVariationsForChordMode(
             variations,
-            chordPlayModeBeforeGeneration
+            chordPlayModeBeforeGeneration,
           );
           setChordModeForNotes(variations);
           addChordsToDetectorLookup?.(variations);
@@ -173,10 +172,10 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
           if (chordPlayModeValue !== chordPlayModeBeforeGeneration) {
             regeneratePreferredVariationsForAllModes(
               chordModeVariationsRef.current,
-              chordPlayModeValue
+              chordPlayModeValue,
             );
           }
-        }
+        },
       );
     };
 
@@ -202,14 +201,14 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   }
 
   const notes = Array.from({ length: NOTE_COUNT }, (_, note) => note).filter(
-    (note) => useSharpChords || !isSharp(note)
+    (note) => useSharpChords || !isSharp(note),
   );
   const layout = allChordsShown
     ? buildAllChordsLayout(chordModeVariations, notes)
     : buildKeyChordsLayout(
         chordModeVariations,
         getShiftedNote(capo, tuning),
-        KEY_CHORDS_PER_COLUMN
+        KEY_CHORDS_PER_COLUMN,
       );
   const cellHeight =
     allChordsShown && useSharpChords ? SMALL_CELL_HEIGHT : LARGE_CELL_HEIGHT;
@@ -217,9 +216,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   return (
     <Expander
       id={CHORDS_VIEW_ID}
-      className={`opacity-95 fixed ${
+      className={`fixed opacity-95 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } z-20 bottom-1`}
+      } bottom-1 z-20`}
       expanded={chordsExpanded}
       expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
       handleExpansion={handleExpansion}
@@ -245,7 +244,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
         <section
           ref={ref}
           {...{ [NO_LONG_PRESS_ATTRIBUTE]: true }}
-          className={`overscroll-contain overflow-auto`}
+          className={`overflow-auto overscroll-contain`}
           style={{
             maxWidth:
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
@@ -287,7 +286,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
                 }}
               />
             );
-          })
+          }),
         )}
       </div>
     </Expander>
@@ -296,7 +295,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
 
 function regeneratePreferredVariationsForAllModes(
   chordModeVariations: ChordModeVariations[],
-  chordPlayMode: ChordPlayMode
+  chordPlayMode: ChordPlayMode,
 ) {
   chordPreferredVariationsByName.clear();
   chordModeVariations.forEach((variations) => {
@@ -306,7 +305,7 @@ function regeneratePreferredVariationsForAllModes(
 
 function toggleOverflow(
   isStrummingClicked: boolean,
-  ref: RefObject<HTMLElement | null>
+  ref: RefObject<HTMLElement | null>,
 ) {
   if (isStrummingClicked) {
     // only allow scrolling when nothing is strumming. It's inconvenient when the scrolling is enabled while strumming - easy to unintentionally scroll

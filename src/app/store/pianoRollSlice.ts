@@ -72,7 +72,7 @@ export const PianoRollSlice = createSlice({
     },
     setPianoRollZoom(
       state,
-      action: PayloadAction<{ pixelsPerTick?: number; noteHeight?: number }>
+      action: PayloadAction<{ pixelsPerTick?: number; noteHeight?: number }>,
     ) {
       const { pixelsPerTick, noteHeight } = action.payload;
       if (pixelsPerTick !== undefined) {

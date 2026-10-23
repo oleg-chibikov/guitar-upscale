@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 export const ChordStrummingImmediateGracePeriodSlider: React.FC = () => {
   const chordStrummingImmediateGracePeriodMs = useSettingsSelector(
-    (s) => s.chordStrummingImmediateGracePeriodMs
+    (s) => s.chordStrummingImmediateGracePeriodMs,
   );
   const dispatch = useDispatch();
 

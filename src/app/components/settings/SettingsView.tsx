@@ -42,7 +42,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       <UseChordAlterationCheckbox />
       {
         premiumComponents.get(
-          "toggleMetronomeWhenRecordingCheckbox"
+          "toggleMetronomeWhenRecordingCheckbox",
         ) as ReactNode
       }
       {premiumComponents.get("saveMidiImmediatelyCheckbox") as ReactNode}

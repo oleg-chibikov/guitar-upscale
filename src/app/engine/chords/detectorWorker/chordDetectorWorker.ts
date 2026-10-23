@@ -13,7 +13,7 @@ let neckValue: Neck | null = null;
 let capoValue: number = 0;
 
 const addChordsToDetectorLookup = (
-  chordModeVariations: ChordModeVariations
+  chordModeVariations: ChordModeVariations,
 ) => {
   const modeKey = getModeText(chordModeVariations.chordMode);
   chordModeVariations.variationsByNote.forEach((variationsForNote, note) => {
@@ -23,7 +23,7 @@ const addChordsToDetectorLookup = (
       const slashChordsGenerator = getSlashChordsForVariation(
         variation.variation,
         neckValue!,
-        capoValue
+        capoValue,
       );
       let result = slashChordsGenerator.next();
 
@@ -32,7 +32,7 @@ const addChordsToDetectorLookup = (
         if (slashChord) {
           chordDetector.addChordToDetectorLookup!(
             slashChord.variation,
-            `${fullKey}/${getNoteText(slashChord.bassNote.note)}`
+            `${fullKey}/${getNoteText(slashChord.bassNote.note)}`,
           );
         }
         result = slashChordsGenerator.next();
@@ -48,7 +48,7 @@ const setNeckAndCapo = (neck: Neck, value: number) => {
 };
 
 self.onmessage = (
-  event: MessageEvent<WorkerMessageWrapper<ChordDetectorWorkerMessage>>
+  event: MessageEvent<WorkerMessageWrapper<ChordDetectorWorkerMessage>>,
 ) => {
   const { type, payload } = event.data.data;
 

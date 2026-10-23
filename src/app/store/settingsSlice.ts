@@ -73,7 +73,8 @@ interface WithCustomStrummingPatternId {
 }
 
 interface SettingsState
-  extends WithMetronome,
+  extends
+    WithMetronome,
     WithIsPaused,
     WithNeck,
     WithControls,
@@ -213,7 +214,7 @@ const onGuitarSettingsUpdate = (
     WithNeck &
     CanUpdateGuitarSettings &
     WithChordIsBeingDetected &
-    WithScaleIsBeingDetected
+    WithScaleIsBeingDetected,
 ) => {
   const scalePattern = getScalePattern(state.scaleGroup, state.scale);
 
@@ -222,7 +223,7 @@ const onGuitarSettingsUpdate = (
     scalePattern,
     getOctaveNotesForTuning(tuningValue),
     getShiftedNote(capo, tuningValue),
-    capo
+    capo,
   );
   state.neck = neck;
   state.stringCount = neck.length;
@@ -284,9 +285,7 @@ export const waitForPauseToBeReleased = async (): Promise<
 
 let resolvePause: (
   value:
-    | PauseResolveValue
-    | PromiseLike<PauseResolveValue | undefined>
-    | undefined
+    PauseResolveValue | PromiseLike<PauseResolveValue | undefined> | undefined,
 ) => void = () => null;
 
 const recreatePausePromise = () => {
@@ -304,7 +303,7 @@ const updateIsPaused = (value: boolean, state: WithIsPaused) => {
 
 const updateScaleIsBeingDetected = (
   state: WithScaleIsBeingDetected,
-  value: boolean
+  value: boolean,
 ) => {
   state.scaleIsBeingDetected = value;
   scaleIsBeingDetectedValue = value;
@@ -315,7 +314,7 @@ const updateScaleIsBeingDetected = (
 
 const updateStrummingPatternId = (
   state: WithCustomStrummingPatternId,
-  id: number
+  id: number,
 ) => {
   state.strummingPatternId = id;
   strummingPatternIdValue = id;
@@ -439,7 +438,7 @@ export const settingsSlice = createSlice({
     },
     setTempoBpm: (
       state,
-      action: PayloadAction<{ tempo: number; updateInterval: boolean }>
+      action: PayloadAction<{ tempo: number; updateInterval: boolean }>,
     ) => {
       const newValue = action.payload.tempo;
       if (tempoBpmValue === newValue) {
@@ -460,7 +459,7 @@ export const settingsSlice = createSlice({
     },
     setChordStrummingImmediateGracePeriodMs(
       state,
-      action: PayloadAction<number>
+      action: PayloadAction<number>,
     ) {
       state.chordStrummingImmediateGracePeriodMs = action.payload;
       chordStrummingImmediateGracePeriodMsValue = action.payload;
@@ -499,7 +498,7 @@ export const settingsSlice = createSlice({
     },
     setChordInstrumentGroup: (
       state,
-      action: PayloadAction<InstrumentGroup>
+      action: PayloadAction<InstrumentGroup>,
     ) => {
       state.chordInstrumentGroup = action.payload;
     },

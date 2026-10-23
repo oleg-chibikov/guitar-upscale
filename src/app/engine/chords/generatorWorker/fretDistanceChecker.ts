@@ -2,7 +2,7 @@ export function isWithinAllowedDistance(
   leftFingerFret: number,
   rightFingerFret: number,
   leftFinger: number,
-  rightFinger: number
+  rightFinger: number,
 ): boolean {
   validateFingers(leftFinger, rightFinger);
 
@@ -11,13 +11,13 @@ export function isWithinAllowedDistance(
     maxStretch = getAdjacentFingerStretch(
       leftFinger,
       rightFinger,
-      leftFingerFret
+      leftFingerFret,
     );
   } else {
     maxStretch = getNonAdjacentFingerStretch(
       leftFinger,
       rightFinger,
-      leftFingerFret
+      leftFingerFret,
     );
   }
 
@@ -32,7 +32,7 @@ export const getPossibleFullFingerStretch = (leftFingerFret: number) =>
 function getNonAdjacentFingerStretch(
   leftFinger: number,
   rightFinger: number,
-  leftFingerFret: number
+  leftFingerFret: number,
 ): number {
   if (leftFinger === 0 && rightFinger === 2) {
     return getMaxStretchForIndexFinger(leftFingerFret) + 1;
@@ -50,7 +50,7 @@ function getNonAdjacentFingerStretch(
 function getAdjacentFingerStretch(
   leftFinger: number,
   rightFinger: number,
-  fret: number
+  fret: number,
 ): number {
   if (leftFinger === 0 && rightFinger === 1) {
     return getMaxStretchForIndexFinger(fret);

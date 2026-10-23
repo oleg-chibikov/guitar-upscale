@@ -22,7 +22,7 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
     const theme = useUiSelector((s) => s.theme);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [patternIdToDelete, setPatternIdToDelete] = useState<number | null>(
-      null
+      null,
     );
 
     const handleDeleteClick = (id: number) => {
@@ -58,7 +58,7 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
               : "bg-accented_background-dark"
           } shadow-md`}
         >
-          <table className="w-full relative">
+          <table className="relative w-full">
             <thead className="sticky top-0 z-10">
               <tr
                 className={
@@ -140,7 +140,7 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
         />
       </>
     );
-  }
+  },
 );
 
 PatternList.displayName = "PatternList";

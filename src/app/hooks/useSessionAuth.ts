@@ -27,7 +27,7 @@ export const useSessionAuth = () => {
           setAndShowAlert({
             message: "Authentication error",
             alertType: AlertType.Error,
-          })
+          }),
         );
         removeParamsFromQuery();
       }
@@ -45,8 +45,8 @@ export const useSessionAuth = () => {
               isSignedIn && !session
                 ? "Signed in, but no session is present"
                 : session && !isSignedIn
-                ? "Session is present but not signed in"
-                : undefined,
+                  ? "Session is present but not signed in"
+                  : undefined,
           }),
         () => {
           dispatch(setIsSignedIn(!isSignedIn)); // apparently the status in store doesn't match the real sign in status - eliminate the mismatch
@@ -54,7 +54,7 @@ export const useSessionAuth = () => {
         },
         () => {
           checkError();
-        }
+        },
       );
     };
 

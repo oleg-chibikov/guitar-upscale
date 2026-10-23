@@ -24,18 +24,18 @@ export const Alert: React.FC = () => {
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>
       <div
         onClick={() => dispatch(hideAlert())}
-        className={`fixed cursor-pointer top-3 left-0 right-0 m-auto flex items-center justify-center w-96 p-4 ${
+        className={`fixed top-3 right-0 left-0 m-auto flex w-96 cursor-pointer items-center justify-center p-4 ${
           alertType === AlertType.Error
             ? "bg-red-500"
             : alertType === AlertType.Warning
-            ? "bg-yellow-500"
-            : alertType === AlertType.Success
-            ? "bg-green-500"
-            : "bg-slate-200"
+              ? "bg-yellow-500"
+              : alertType === AlertType.Success
+                ? "bg-green-500"
+                : "bg-slate-200"
         } opacity-90`}
         style={{ zIndex: 9999 }}
       >
-        <Typography className="flex items-center text-base text-center text-gray-800 whitespace-pre-wrap">
+        <Typography className="flex items-center text-center text-base whitespace-pre-wrap text-gray-800">
           {alertMessage}
         </Typography>
       </div>

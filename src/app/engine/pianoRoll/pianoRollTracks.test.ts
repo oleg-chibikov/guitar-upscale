@@ -40,9 +40,11 @@ describe("piano roll tracks", () => {
       new Map([
         [0, { name: "Lead" }],
         [1, { name: "Rhythm", instrument: "distortion_guitar" as const }],
-      ])
+      ]),
     );
-    expect(tracks.map(({ trackNumber, label }) => [trackNumber, label])).toEqual([
+    expect(
+      tracks.map(({ trackNumber, label }) => [trackNumber, label]),
+    ).toEqual([
       [0, "Lead"],
       [1, "Rhythm"],
       [3, "Overdriven Guitar"],
@@ -58,7 +60,11 @@ describe("piano roll tracks", () => {
   });
 
   it("moves a note and a chord to another track", () => {
-    const track = { trackNumber: 2, label: "Vocals", instrument: "voice_oohs" as const };
+    const track = {
+      trackNumber: 2,
+      label: "Vocals",
+      instrument: "voice_oohs" as const,
+    };
     expect(withTrack(note("a", 0), track).note).toMatchObject({
       trackNumber: 2,
       instrument: "voice_oohs",

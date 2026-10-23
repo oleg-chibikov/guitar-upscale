@@ -26,7 +26,7 @@ class ChordsGenerator {
     this.neck = neck;
     this.maxFretToProcess = Math.min(
       this.capo + NOTE_COUNT,
-      neck[0].length - 1
+      neck[0].length - 1,
     );
 
     const chordModesCount = chordModes.length;
@@ -68,14 +68,14 @@ class ChordsGenerator {
 
     console.warn(
       "Chord %s doesn't have a perfect fifth, developer to adjust",
-      chordMode.name
+      chordMode.name,
     );
   };
 
   private processIntervalsInChordMode = (
     intervalsToUse: number[],
     variationsToFill: ChordVariationsByNote,
-    sharedArrayCache: SharedArrayCache
+    sharedArrayCache: SharedArrayCache,
   ) => {
     for (
       let stringIndex = MAX_STRING_INDEX_FOR_CHORD_GENERATION; // TODO: We are intentionally limit chords to 6 strings. We don't search for them on the lower string as it requires too much memory to store. We can undo this if there's a better way to store all the chords in a trie for the chord detector // this.neck.length - 1; // starting from the lowest (thickest) string
@@ -98,12 +98,12 @@ class ChordsGenerator {
           this.capo,
           this.neck,
           this.maxFretToProcess,
-          sharedArrayCache
+          sharedArrayCache,
         );
 
         const newVariationsForNoteAndMode = fretChordsGenerator.processFret(
           intervalsToUse,
-          currentStringOctaveNote
+          currentStringOctaveNote,
         );
 
         const variationsForNote =
@@ -124,7 +124,7 @@ class ChordsGenerator {
     this.processIntervalsInChordMode(
       chordMode.intervals,
       variationsByNote,
-      sharedArrayCache
+      sharedArrayCache,
     );
     const intervalsWithoutPerfectFifth =
       this.buildIntervalsWithoutPerfectFifth(chordMode);
@@ -132,7 +132,7 @@ class ChordsGenerator {
       this.processIntervalsInChordMode(
         intervalsWithoutPerfectFifth,
         variationsByNote,
-        sharedArrayCache
+        sharedArrayCache,
       );
     }
 

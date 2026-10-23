@@ -4,7 +4,7 @@ export const convertToTitleCase = (inputStr: string): string => {
 
   // Capitalize each word
   const capitalizedWords: string[] = words.map(
-    (word) => word.charAt(0).toUpperCase() + word.slice(1)
+    (word) => word.charAt(0).toUpperCase() + word.slice(1),
   );
 
   // Join the words with spaces

@@ -56,7 +56,7 @@ export const PatternEditor: React.FC<PatternEditorProps> = ({
 
   return (
     <>
-      <div className="flex flex-row justify-start items-center gap-2">
+      <div className="flex flex-row items-center justify-start gap-2">
         <Typography>Each cell represents</Typography>
         <EnumSelector
           enumObj={TimeSignature}
