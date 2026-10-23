@@ -37,16 +37,16 @@ Code: [Fretboard.tsx](../src/app/components/fret/Fretboard.tsx), [fretboardLayou
 
 ## Scale, tuning and capo
 
-The control panel sets what the fretboard shows.
+The key button at the start of the control panel says what the fretboard shows, such as "E Minor" over "Aeolian / Natural · E standard". A press opens the pickers.
 
 - **Style and scale** pick a scale group, then a scale. Groups run from Minor and Major to Gypsy, Blues and Bebop Jazz. `Chromatic (All notes)` sits under Special.
 - **Tuning** standard `EBGDAE` by default. The list has standard, drop, celtic, folk, cross and open tunings. Each comes on any root note, for 6, 7 or 8 strings.
 - **Root note** the open low string sets the root of the scale. Standard tuning gives E. Another tuning root or a capo changes the key.
-- **Capo** moves the root note and the sound up by frets.
+- **Capo** "No capo" or a fret, such as "Fret 3 (G)". The note in brackets is the new root. The key button shows "Capo 3" while it is on.
 
 A change to scale, tuning or capo stops playback, rebuilds the chords and clears the looper.
 
-Code: [ScaleAndGroupSelector.tsx](../src/app/components/settings/selectors/ScaleAndGroupSelector.tsx), [CapoAndTuningSelector.tsx](../src/app/components/settings/selectors/CapoAndTuningSelector.tsx), [scales.ts](../src/app/data/scales.ts), [tunings.ts](../src/app/data/tunings.ts).
+Code: [KeyChip.tsx](../src/app/components/settings/KeyChip.tsx), [keyDescription.ts](../src/app/helpers/keyDescription.ts), [selectors/](../src/app/components/settings/selectors/), [scales.ts](../src/app/data/scales.ts), [tunings.ts](../src/app/data/tunings.ts).
 
 ## Chords
 
@@ -180,10 +180,10 @@ Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadBu
 
 ## Chord and scale detection
 
-[Explorer] Two buttons in the control panel name what the person taps. One runs at a time.
+[Explorer] Detect chord sits in the control panel. Detect scale sits behind the key button. One runs at a time.
 
 - **Detect chord** tap at least 3 notes on different strings. A message lists the matching chords. A second tap on a marked note removes it.
-- **Detect scale** switches to the chromatic scale. Tap at least 5 different notes, then a dialog suggests scales to switch to.
+- **Detect scale** switches to the chromatic scale and closes the pickers. The key button turns red and says "Detecting scale". Tap at least 5 different notes, then a dialog suggests scales to switch to.
 
 Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChordButton.tsx), [DetectScaleButton.tsx](../src/app/components/settings/buttons/DetectScaleButton.tsx), [chordDetectorBuilder.ts](../src/app/engine/chords/chordDetectorBuilder.ts), [scaleDetectorBuilder.ts](../src/app/engine/scales/scaleDetectorBuilder.ts), [ScaleDetectionDialog](../src/app/components/alert/).
 
@@ -201,7 +201,7 @@ The gear button opens a drawer. Each value survives a reload.
 
 "Reset settings" at the bottom puts the defaults back.
 
-The control panel holds the settings people change while playing: scale, tuning, capo, volume, metronome volume, tempo and chord strum delay. It also has fullscreen (desktop), about, strumming, piano roll, detection and upload buttons.
+The control panel holds the settings people change while playing. It opens with the key button: scale, tuning, capo and scale detection. Next come the settings, piano roll, strumming, detect chord, upload, fullscreen (desktop) and about buttons, then volume, metronome volume, tempo and chord strum delay. The arrow at the end hides everything but the key button.
 
 Code: [SettingsView.tsx](../src/app/components/settings/SettingsView.tsx), [ControlPanel.tsx](../src/app/components/settings/ControlPanel.tsx), [settingsSlice.ts](../src/app/store/settingsSlice.ts), [uiSlice.ts](../src/app/store/uiSlice.ts).
 

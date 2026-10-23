@@ -19,8 +19,12 @@ export const CapoSelector: React.FC = () => {
         dispatch(setCapo(value));
       }}
       customLabel={(_, value) => {
+        if (value === 0) {
+          return "No capo";
+        }
+        // the note is the root the capo gives
         const note = getShiftedNote(value, tuning);
-        return getNoteText(note) + "(" + (value === 0 ? "" : "+") + value + ")";
+        return `Fret ${value} (${getNoteText(note)})`;
       }}
     />
   );

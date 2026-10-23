@@ -26,52 +26,31 @@ const DisabledSongUploadButton = dynamic(
       .DisabledSongUploadButton
 );
 
-const DisabledDetectScaleButton = dynamic(
-  async () =>
-    (
-      await import(
-        "@/app/components/settings/buttons/DisabledDetectScaleButton"
-      )
-    ).DisabledDetectScaleButton
-);
-
 export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
   style,
   premiumComponents,
 }) => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   return (
-    <section className="flex flex-col gap-1" style={style}>
-      <div
-        className={`flex flex-row gap-1 ${
-          chordsDisplayMode === ChordsDisplayMode.Left
-            ? "justify-end"
-            : "justify-start"
-        }`}
-      >
-        <OpenSettingsButton />
-        {!isMobileDeviceValue && <FullscreenButton />}
-        {(premiumComponents.get("chordDetection") as ReactNode) ?? (
-          <DisabledDetectChordButton />
-        )}
-        {(premiumComponents.get("midiUpload") as ReactNode) ?? (
-          <DisabledSongUploadButton />
-        )}
-      </div>
-      <div
-        className={`flex flex-row gap-1 ${
-          chordsDisplayMode === ChordsDisplayMode.Left
-            ? "justify-end"
-            : "justify-start"
-        }`}
-      >
-        <PianoRollButton />
-        <OpenStrummingSettingsButton />
-        {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
-          <DisabledDetectScaleButton />
-        )}
-        <AboutButton />
-      </div>
+    <section
+      className={`flex flex-row gap-1 ${
+        chordsDisplayMode === ChordsDisplayMode.Left
+          ? "flex-row-reverse"
+          : "flex-row"
+      }`}
+      style={style}
+    >
+      <OpenSettingsButton />
+      <PianoRollButton />
+      <OpenStrummingSettingsButton />
+      {(premiumComponents.get("chordDetection") as ReactNode) ?? (
+        <DisabledDetectChordButton />
+      )}
+      {(premiumComponents.get("midiUpload") as ReactNode) ?? (
+        <DisabledSongUploadButton />
+      )}
+      {!isMobileDeviceValue && <FullscreenButton />}
+      <AboutButton />
     </section>
   );
 };

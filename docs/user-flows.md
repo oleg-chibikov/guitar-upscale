@@ -29,7 +29,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-  A[Open control panel] --> B[Pick style and scale]
+  A[Press the key button] --> B[Pick style and scale]
   B --> C[Pick tuning and capo]
   C --> D[Fretboard shows the scale]
   D --> E[Press Play]
@@ -39,7 +39,7 @@ flowchart LR
   F -- Melody --> I[A song in this scale]
 ```
 
-1. Open the control panel and pick a style, then a scale.
+1. Press the key button at the start of the control panel, such as "E Minor". Pick a style, then a scale.
 2. Set the tuning and capo. The scale root is the open low string, so these two set the key.
 3. Press Play, or Space, to hear the scale.
 4. With Explorer, set "Playback type" to Melody in Settings. Play then picks a song written in the scale and sets its tempo.
@@ -86,7 +86,7 @@ flowchart LR
   end
 ```
 
-1. Press "Detect chord" or "Detect scale" in the control panel. Only one runs at a time.
+1. Press "Detect chord" in the control panel. For a scale, press the key button, then "Detect scale". Only one runs at a time.
 2. Tap the notes heard in the song. A second tap on a marked note removes it.
 3. Read the result, then press the button again to stop.
 
