@@ -190,7 +190,7 @@ flowchart LR
 [Explorer]
 
 1. Set the key and tuning in the control panel.
-2. Right click or hold Play to open the song list.
+2. Right click or hold Play to open the song list. Type in the search field to find the song.
 3. Press the download icon next to a song. The `.gp` file is in the key and tuning from the settings, with saved edits.
 
 ## Get a paid tier

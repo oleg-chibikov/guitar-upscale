@@ -109,7 +109,7 @@ Playback types, picked in Settings [Explorer]:
 
 Without Explorer, Play plays the scale.
 
-Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo. Uploaded songs say "uploaded" and have a delete button.
+Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. The search field stays at the top of the menu while it scrolls. It keeps songs whose name or scale holds every typed word. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo. Uploaded songs say "uploaded" and have a delete button.
 
 Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/hooks/usePlay.ts), [midiPlayer.ts](../src/app/engine/midiPlayer.ts), [songLibrary.ts](../src/app/engine/songs/songLibrary.ts), [public/songs/](../public/songs/).
 
