@@ -149,6 +149,7 @@ The piano roll edits a track note by note. It opens from the control panel.
 - **Snap** picks the grid step. "Keep notes in the scale" holds drawn and moved notes on scale notes. A scale with all 12 notes turns the button off.
 - **Chords** a chord shows as one block. A double click or double tap opens a dialog with the chord types on that root.
 - **Transport** play, playhead to start, follow the playhead, undo and redo. The view stops following while notes are selected.
+- **Loop a range** a drag along the ruler loops the melody between the two points and starts it right away. A click on the ruler outside the range drops the loop.
 
 The first note drawn into the empty melody makes that melody the one that plays and downloads. The full key list is in the [root README](../README.md#piano-roll-keys).
 

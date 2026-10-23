@@ -36,6 +36,7 @@ const BLACK_KEY_WIDTH = PITCH_AXIS_WIDTH * 0.6;
 const LABEL_FONT_FAMILY = "ui-sans-serif, system-ui, sans-serif";
 const PLAYHEAD = "#ef4444";
 const LOOP_END = "#fbbf24";
+const LOOP_RANGE = "#22d3ee";
 
 // Tailwind colours of the old DOM notes
 const NOTE_COLORS = {
@@ -56,6 +57,8 @@ export interface PianoRollScene {
   selection: ReadonlySet<string>;
   preview: Preview | undefined;
   loopLengthTicks: number | undefined;
+  // the melody range picked on the ruler, end exclusive
+  loopRange: { start: number; end: number } | undefined;
   pressedPitch: number | undefined;
 }
 
@@ -289,7 +292,7 @@ const drawNoteArea = (
   scene: PianoRollScene,
   viewport: Viewport
 ) => {
-  const { zoom, width, height, preview, loopLengthTicks } = scene;
+  const { zoom, width, height, preview, loopLengthTicks, loopRange } = scene;
   const left = Math.max(0, viewport.scrollLeft);
   const top = Math.max(0, viewport.scrollTop);
   const right = Math.min(width, viewport.scrollLeft + viewport.width - PITCH_AXIS_WIDTH);
@@ -324,6 +327,16 @@ const drawNoteArea = (
     );
   }
 
+  if (loopRange) {
+    const startX = tickToX(loopRange.start, zoom);
+    const endX = tickToX(loopRange.end, zoom);
+    ctx.fillStyle = "rgba(34,211,238,0.07)";
+    ctx.fillRect(startX, 0, endX - startX, height);
+    ctx.fillStyle = LOOP_RANGE;
+    ctx.fillRect(startX, 0, 1, height);
+    ctx.fillRect(endX - 1, 0, 1, height);
+  }
+
   if (loopLengthTicks !== undefined) {
     // notes past the loop end don't play
     const loopX = tickToX(loopLengthTicks, zoom);
@@ -338,7 +351,7 @@ const drawNoteArea = (
 
 const drawTimeline = (
   ctx: CanvasRenderingContext2D,
-  { zoom, width }: PianoRollScene,
+  { zoom, width, loopRange }: PianoRollScene,
   viewport: Viewport
 ) => {
   const left = Math.max(0, viewport.scrollLeft);
@@ -346,6 +359,11 @@ const drawTimeline = (
   const bottom = TIMELINE_HEIGHT - 1;
   ctx.fillStyle = "#e5e7eb";
   ctx.fillRect(left, 0, right - left, TIMELINE_HEIGHT);
+  if (loopRange) {
+    const startX = tickToX(loopRange.start, zoom);
+    ctx.fillStyle = "rgba(34,211,238,0.55)";
+    ctx.fillRect(startX, 0, tickToX(loopRange.end, zoom) - startX, bottom);
+  }
   ctx.fillStyle = "#9ca3af";
   ctx.fillRect(left, bottom, right - left, 1);
 

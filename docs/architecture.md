@@ -307,6 +307,7 @@ The piano roll edits an `EventsByTick` in place, through commands that undo.
 - **Drawing** [PianoRollCanvas.tsx](../src/app/components/pianoRoll/PianoRollCanvas.tsx) draws with Konva. [geometry.ts](../src/app/engine/pianoRoll/geometry.ts) maps ticks and pitches to pixels.
 - **Input** [useNoteAreaInteraction.ts](../src/app/components/pianoRoll/useNoteAreaInteraction.ts) handles mouse and touch. [usePianoRollShortcuts.ts](../src/app/components/pianoRoll/usePianoRollShortcuts.ts) handles keys.
 - **Playhead** the melody uses `playheadTick$` from [playhead.ts](../src/app/engine/pianoRoll/playhead.ts). A loop computes its playhead from the clock.
+- **Loop range** `loopRange$` in [playhead.ts](../src/app/engine/pianoRoll/playhead.ts) holds the melody range picked on the ruler. [midiPlayer.ts](../src/app/engine/midiPlayer.ts) jumps back to its start at its end.
 
 ## Sound
 

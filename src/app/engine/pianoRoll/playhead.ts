@@ -8,6 +8,26 @@ let startTick = 0;
 let startData: EventsByTick | undefined;
 let pendingSeek: number | undefined;
 
+// end is exclusive
+export interface LoopRange {
+  start: number;
+  end: number;
+}
+
+// the range of the melody that plays over and over. Picked on the piano roll ruler
+export const loopRange$ = new BehaviorSubject<
+  { data: EventsByTick; range: LoopRange } | undefined
+>(undefined);
+
+export const getLoopRange = (data: EventsByTick): LoopRange | undefined => {
+  const loop = loopRange$.value;
+  return loop?.data === data ? loop.range : undefined;
+};
+
+export const setLoopRange = (data: EventsByTick, range: LoopRange | undefined) => {
+  loopRange$.next(range ? { data, range } : undefined);
+};
+
 /**
  * Where playback of this melody starts. A new melody starts at its beginning.
  */
@@ -26,6 +46,9 @@ export const returnToStart = (data: EventsByTick) => {
 };
 
 export const resetPlayhead = (data: EventsByTick | undefined) => {
+  if (loopRange$.value && loopRange$.value.data !== data) {
+    loopRange$.next(undefined);
+  }
   if (data !== startData) {
     startData = data;
     startTick = 0;

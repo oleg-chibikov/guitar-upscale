@@ -1,9 +1,17 @@
-import { PianoRollCanvas } from "@/app/components/pianoRoll/PianoRollCanvas";
+import {
+  PianoRollCanvas,
+  RulerRangePhase,
+} from "@/app/components/pianoRoll/PianoRollCanvas";
 import { BACKGROUND } from "@/app/components/pianoRoll/pianoRollDrawing";
 import { useNoteAreaInteraction } from "@/app/components/pianoRoll/useNoteAreaInteraction";
 import { useFollowPlayhead } from "@/app/components/pianoRoll/useFollowPlayhead";
 import { usePianoRollShortcuts } from "@/app/components/pianoRoll/usePianoRollShortcuts";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
+import {
+  getLoopRange,
+  LoopRange,
+  loopRange$,
+} from "@/app/engine/pianoRoll/playhead";
 import { snapTick } from "@/app/engine/pianoRoll/snap";
 import { useBaseNoteContext } from "@/app/context/BaseNoteProvider";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
@@ -37,7 +45,7 @@ const WHEEL_ZOOM_SPEED = 0.0025;
 
 export const PianoRoll: React.FC = () => {
   const { scrollerRef, zoom, zoomBy, zoomTo } = usePianoRollView();
-  const { events, selection, loaded, setLoaded, source, playhead$ } =
+  const { events, selection, loaded, setLoaded, source, playhead$, data } =
     usePianoRoll();
   const loopLengthTicks = source?.loopLengthTicks;
   const { scalePattern } = useScaleContext();
@@ -47,7 +55,8 @@ export const PianoRoll: React.FC = () => {
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const snapTicks = getTicksForTimeSignature(snap);
 
-  const { seekTo } = usePianoRollTransport();
+  const { seekTo, loopRange, clearLoopOutside, isLoop } =
+    usePianoRollTransport();
   usePianoRollShortcuts();
   useFollowPlayhead(scrollerRef, zoom);
 
@@ -63,13 +72,49 @@ export const PianoRoll: React.FC = () => {
   const width = tickToX(totalTicks, zoom);
   const height = getContentHeight(zoom);
 
-  // pressing or dragging on the ruler moves the playhead. Shift turns off the grid
-  const handleSeek = useCallback(
+  const xToTick = useCallback(
     (x: number, exact: boolean) => {
       const tick = Math.max(0, x / zoom.pixelsPerTick);
-      seekTo(exact ? Math.round(tick) : snapTick(tick, snapTicks));
+      return exact ? Math.round(tick) : snapTick(tick, snapTicks);
     },
-    [seekTo, snapTicks, zoom]
+    [snapTicks, zoom]
+  );
+
+  // a click on the ruler moves the playhead. Shift turns off the grid
+  const handleSeek = useCallback(
+    (x: number, exact: boolean) => {
+      const tick = xToTick(x, exact);
+      clearLoopOutside(tick);
+      seekTo(tick);
+    },
+    [xToTick, clearLoopOutside, seekTo]
+  );
+
+  const [savedLoop, setSavedLoop] = useState<LoopRange | undefined>(() =>
+    data ? getLoopRange(data) : undefined
+  );
+  useEffect(() => {
+    const subscription = loopRange$.subscribe(() =>
+      setSavedLoop(data ? getLoopRange(data) : undefined)
+    );
+    return () => subscription.unsubscribe();
+  }, [data]);
+  const [draftLoop, setDraftLoop] = useState<LoopRange | undefined>();
+
+  // a drag on the ruler loops the range under it as soon as the button goes up
+  const handleRulerRange = useCallback(
+    (fromX: number, toX: number, exact: boolean, phase: RulerRangePhase) => {
+      if (isLoop) return;
+      const from = xToTick(fromX, exact);
+      const to = xToTick(toX, exact);
+      const range =
+        from === to
+          ? undefined
+          : { start: Math.min(from, to), end: Math.max(from, to) };
+      setDraftLoop(phase === "drag" ? range : undefined);
+      if (phase === "commit" && range) loopRange(range);
+    },
+    [isLoop, xToTick, loopRange]
   );
 
   const handleKeyPress = useCallback(
@@ -171,6 +216,7 @@ export const PianoRoll: React.FC = () => {
                 selection,
                 preview,
                 loopLengthTicks,
+                loopRange: isLoop ? undefined : (draftLoop ?? savedLoop),
               }}
               scrollerRef={scrollerRef}
               viewportWidth={viewportWidth}
@@ -179,6 +225,7 @@ export const PianoRoll: React.FC = () => {
               tool={tool}
               noteHandlers={handlers}
               onSeek={handleSeek}
+              onRulerRange={handleRulerRange}
               onKeyPress={handleKeyPress}
             />
           )}

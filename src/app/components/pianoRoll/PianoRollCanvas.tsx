@@ -45,14 +45,21 @@ interface PianoRollCanvasProps {
   noteHandlers: NoteAreaHandlers;
   // x in grid px
   onSeek: (x: number, exact: boolean) => void;
+  // dragging along the ruler picks a range to loop, from the press to the pointer
+  onRulerRange: (fromX: number, toX: number, exact: boolean, phase: RulerRangePhase) => void;
   onKeyPress: (pitch: number) => void;
 }
+
+export type RulerRangePhase = "drag" | "commit" | "cancel";
 
 type Region = "corner" | "timeline" | "keys" | "notes";
 
 type HoverPoint = { clientX: number; clientY: number; altKey: boolean };
 
 const PRESS_HIGHLIGHT_MS = 200;
+
+// a shorter move on the ruler counts as a click
+const RULER_DRAG_THRESHOLD_PX = 4;
 
 const toolCursor: Record<PianoRollTool, string> = {
   [PianoRollTool.Select]: "default",
@@ -76,6 +83,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
   tool,
   noteHandlers,
   onSeek,
+  onRulerRange,
   onKeyPress,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,6 +94,9 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
   const pressedPitch = useRef<number | undefined>(undefined);
   const playheadTick = useRef(0);
   const lastHover = useRef<HoverPoint | undefined>(undefined);
+  const rulerDrag = useRef<
+    { clientX: number; x: number; dragging: boolean } | undefined
+  >(undefined);
 
   const sceneRef = useRef<PianoRollScene | undefined>(undefined);
   const viewport = (): Viewport => ({
@@ -134,11 +145,8 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     return x < PITCH_AXIS_WIDTH ? "keys" : "notes";
   };
 
-  const seek = (e: React.PointerEvent<HTMLDivElement>) => {
-    const { x } = toLocal(e);
-    const scrollLeft = scrollerRef.current?.scrollLeft ?? 0;
-    onSeek(x - PITCH_AXIS_WIDTH + scrollLeft, e.shiftKey);
-  };
+  const gridX = (e: { clientX: number; clientY: number }) =>
+    toLocal(e).x - PITCH_AXIS_WIDTH + (scrollerRef.current?.scrollLeft ?? 0);
 
   const pressKey = (y: number, x: number) => {
     const { zoom } = scene;
@@ -165,8 +173,8 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     let cursor = "";
     let title = "";
     if (region === "timeline") {
-      cursor = "text";
-      title = `${BEATS_IN_BAR}/4`;
+      cursor = "pointer";
+      title = `${BEATS_IN_BAR}/4. Drag to loop a range`;
     } else if (region === "keys") {
       cursor = "pointer";
     } else if (region === "notes") {
@@ -223,10 +231,13 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     const region = e.button === 1 ? "notes" : regionAt(point);
     regions.current.set(e.pointerId, region);
     switch (region) {
-      case "timeline":
+      case "timeline": {
         e.currentTarget.setPointerCapture(e.pointerId);
-        seek(e);
+        const x = gridX(e);
+        rulerDrag.current = { clientX: e.clientX, x, dragging: false };
+        onSeek(x, e.shiftKey);
         return;
+      }
       case "keys":
         e.currentTarget.setPointerCapture(e.pointerId);
         lastKeyY.current = e.clientY;
@@ -241,9 +252,19 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const region = regions.current.get(e.pointerId);
     switch (region) {
-      case "timeline":
-        seek(e);
+      case "timeline": {
+        const drag = rulerDrag.current;
+        if (!drag) return;
+        if (
+          !drag.dragging &&
+          Math.abs(e.clientX - drag.clientX) < RULER_DRAG_THRESHOLD_PX
+        ) {
+          return;
+        }
+        drag.dragging = true;
+        onRulerRange(drag.x, gridX(e), e.shiftKey, "drag");
         return;
+      }
       case "keys": {
         // dragging the keyboard scrolls it, as the page used to
         const scroller = scrollerRef.current;
@@ -268,6 +289,13 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
   ) => {
     const region = regions.current.get(e.pointerId);
     regions.current.delete(e.pointerId);
+    if (region === "timeline") {
+      const drag = rulerDrag.current;
+      rulerDrag.current = undefined;
+      if (drag?.dragging === true) {
+        onRulerRange(drag.x, gridX(e), e.shiftKey, cancelled ? "cancel" : "commit");
+      }
+    }
     if (region === "notes") {
       if (cancelled) {
         noteHandlers.onPointerCancel(e);

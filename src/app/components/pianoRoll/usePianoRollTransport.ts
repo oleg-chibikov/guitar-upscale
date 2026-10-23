@@ -1,5 +1,10 @@
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
-import { seek } from "@/app/engine/pianoRoll/playhead";
+import {
+  getLoopRange,
+  LoopRange,
+  seek,
+  setLoopRange,
+} from "@/app/engine/pianoRoll/playhead";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import {
   isPlayingValue,
@@ -57,7 +62,7 @@ export const usePianoRollTransport = () => {
     }
   }, [isPlaying, play, stop]);
 
-  // a loop runs in step with the bar clock, so only the melody can jump
+  // a looper track runs in step with the bar clock, so only the melody can jump
   const seekTo = useCallback(
     (tick: number) => {
       if (data && !isLoop) seek(data, tick, isPlayingValue);
@@ -65,8 +70,29 @@ export const usePianoRollTransport = () => {
     [data, isLoop]
   );
 
+  const clearLoopOutside = useCallback(
+    (tick: number) => {
+      const loop = data && getLoopRange(data);
+      if (data && loop && (tick < loop.start || tick >= loop.end)) {
+        setLoopRange(data, undefined);
+      }
+    },
+    [data]
+  );
+
+  // plays the range over and over, starting right away
+  const loopRange = useCallback(
+    (range: LoopRange) => {
+      if (!data || isLoop) return;
+      setLoopRange(data, range);
+      seek(data, range.start, isPlayingValue);
+      if (!isPlayingValue) void play();
+    },
+    [data, isLoop, play]
+  );
+
   return useMemo(
-    () => ({ isPlaying, isLoop, play, stop, togglePlay, seekTo }),
-    [isPlaying, isLoop, play, stop, togglePlay, seekTo]
+    () => ({ isPlaying, isLoop, play, stop, togglePlay, seekTo, loopRange, clearLoopOutside }),
+    [isPlaying, isLoop, play, stop, togglePlay, seekTo, loopRange, clearLoopOutside]
   );
 };

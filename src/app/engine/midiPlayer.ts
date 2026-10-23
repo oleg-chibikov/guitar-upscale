@@ -6,6 +6,7 @@ import {
 } from "@/app/engine/clock/mainClock";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import {
+  getLoopRange,
   getStartTick,
   publishPlayhead,
   returnToStart,
@@ -95,7 +96,11 @@ class MidiPlayer {
     };
 
     try {
-      while (currentTick <= lastTick) {
+      const isInLoop = () => {
+        const loop = getLoopRange(eventsByTick);
+        return loop !== undefined && currentTick < loop.end;
+      };
+      while (currentTick <= lastTick || isInLoop()) {
         if (checkFinished()) {
           console.log(logPrefix + "Finished playback prematurely");
           return false;
@@ -152,6 +157,17 @@ class MidiPlayer {
         }
 
         currentTick++;
+
+        const loop = getLoopRange(eventsByTick);
+        if (loop && currentTick === loop.end) {
+          // the loop end works like a seek to the loop start
+          currentTick = loop.start;
+          isAligned = false;
+          canMoveClock = true;
+          if (isLastEventValue) {
+            store.dispatch(setIsLastEvent(false));
+          }
+        }
 
         // this can change anytime
         lastTick = eventsByTick.lastTick;

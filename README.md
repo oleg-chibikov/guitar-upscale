@@ -40,6 +40,7 @@ The app installs as a PWA, so it also works from the home screen.
 | Ctrl or Cmd + C, X, V, D | Copy, cut, paste at the playhead, duplicate |
 | G, H, F | Zoom out, zoom in, fit all notes. Shift zooms the rows |
 | Home | Playhead to the start |
+| Drag along the ruler | Loop the melody between the two points |
 
 On a touch screen, hold empty space and drag to select an area, and pinch to zoom. The toolbar toggles stand in for Alt and Ctrl.
 
