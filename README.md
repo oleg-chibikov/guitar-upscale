@@ -71,6 +71,10 @@ People add their own songs in the app with the upload button [Composer]. It take
 
 In a MIDI file a track named `Chords` plays as chords. A text or marker event like `Am` at the chord names it. Other tracks play as notes, with no chord guessing.
 
+- **Download a song** hold Play and press the download icon next to it. The file is a `.gp` in the key and tuning from the settings, uploads in `.gp5`, `.gpx` or MIDI included.
+- **Edit a song** change notes in the piano roll. The edits save on their own: an uploaded song updates, a built-in song gets an own copy named "(edited)".
+- **Download the edits** the Download button saves what plays now as `.gp`. Hold it for MIDI.
+
 ## Add a song from Songsterr
 
 `pnpm songsterr` downloads a song from Songsterr and saves it as a Guitar Pro file in `public/songs`.

@@ -95,7 +95,7 @@ The play panel plays, steps through and saves what is loaded.
 | **Pause** | pauses, and a second press goes on from the same spot |
 | **Previous, next** | steps one event back or forward |
 | **Reset** | after a confirm, stops playback and drops the loaded melody |
-| **Download** | saves the loaded melody as a `.mid` file. Shows once a melody exists |
+| **Download** | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
 | **Metronome** | turns the click on and off |
 | **Record** | records MIDI [Composer]. See [MIDI recording](#midi-recording) |
 
@@ -165,8 +165,10 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 - **Chords** only a track named `Chords` plays chords. The chord name comes from the file, or from the notes when the file has none.
 - **Other tracks** play their notes as written, with no chord guessing.
 - **Delete** hold Play and press the bin next to an uploaded song.
+- **Download** hold Play and press the download icon next to any song. The `.gp` file is in the key and tuning from the settings.
+- **Edits** a piano roll edit saves a second after the last change. An uploaded song updates. A built-in song gets an own copy named "(edited)", and the built-in file stays as it was.
 
-Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [songs/](../src/app/engine/songs/).
+Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).
 
 ## Chord and scale detection
 

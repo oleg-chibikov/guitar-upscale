@@ -6,7 +6,7 @@ import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "nod
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { toFileName, writeGuitarPro } from "./lib/gpWriter.mjs";
+import { writeGuitarPro } from "../src/app/engine/songs/gpWriter.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SCALES_FILE = resolve(ROOT, "src/app/data/scales.ts");
@@ -343,6 +343,12 @@ const pickChords = (bass, melody, barStarts, length, scale) => {
   return chords;
 };
 
+// Folder and file names can't hold "/", so "Aeolian / Natural" sits in "Aeolian - Natural".
+const toFileName = (text) =>
+  text
+    .replace(/\s*\/\s*/g, (match) => (match.trim() === match ? "-" : " - "))
+    .replace(/[\\:*?"<>|]/g, "");
+
 // A rerun replaces the old copy of the same song, even under another scale.
 const removeOldCopies = (dir, fileName) => {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -423,16 +429,22 @@ const main = async () => {
   const bpm =
     tempos.filter((a) => a.measure <= from).at(-1)?.bpm ?? tempos[0]?.bpm ?? 120;
 
-  // One step is a 16th note, so the tempo doubles
-  const toTab = (notes) =>
-    notes.map((n) => ({ step: n.tick, string: n.string, fret: n.fret }));
-  const tracks = [{ name: "Melody", program: 24, notes: toTab(melody) }];
-  if (bass.length) tracks.push({ name: "Melody 2", program: 24, notes: toTab(bass) });
+  // One step is a 16th note played as an app half beat of 8 ticks, so the tempo doubles
+  const TICKS_IN_STEP = 8;
+  const tuning = STANDARD.map((midi) => ({ octave: Math.floor(midi / 12), note: midi % 12 }));
+  const tabTrack = (name, notes) => ({
+    name,
+    tuning,
+    tabNotes: notes.map((n) => ({ tick: n.tick * TICKS_IN_STEP, string: n.string, fret: n.fret })),
+    pitchNotes: [],
+    chords: [],
+  });
+  const tracks = [tabTrack("Melody", melody)];
+  if (bass.length) tracks.push(tabTrack("Melody 2", bass));
   if (chords.length)
     tracks.push({
-      name: "Chords",
-      program: 24,
-      chords: chords.map((c) => ({ step: c.tick, name: c.name })),
+      ...tabTrack("Chords", []),
+      chords: chords.map((c) => ({ tick: c.tick * TICKS_IN_STEP, name: c.name })),
     });
 
   const band = opts.band ?? meta.artist;
@@ -458,7 +470,7 @@ const main = async () => {
   const file = join(dir, toFileName(scale.group), toFileName(scale.name), fileName);
   removeOldCopies(dir, basename(file));
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, writeGuitarPro({ band, title, tempo: snapTempo(bpm * 2), tracks }));
+  writeFileSync(file, await writeGuitarPro({ band, title, tempo: snapTempo(bpm * 2), root: E, tracks }));
   console.log(`Saved to ${file}`);
   if (dir === SONGS_DIR) {
     execFileSync(process.execPath, [resolve(ROOT, "scripts/build-song-index.mjs")], {

@@ -225,6 +225,7 @@ flowchart LR
   E --> MP["midiPlayer"]
   E --> LP["looperPlayer"]
   E --> SAVE["midiSaver<br/>.mid download"]
+  E -->|songExport| GPW["gpWriter<br/>.gp download and saved edits"]
 ```
 
 ## Playback
@@ -236,6 +237,7 @@ flowchart LR
 - **Choice of data** [usePlay.ts](../src/app/hooks/usePlay.ts) picks what Play plays: a song example, the scale, or a replay of the loaded melody.
 - **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `public/songs/index.json` with the songs kept in the browser. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
 - **Chords** only a track named `Chords` gives chords, so chords stay apart from the melody. [songDecoder.ts](../src/app/engine/decoders/songDecoder.ts) plays them by name and moves the song to the key in the settings.
+- **Edits and downloads** [songExport.ts](../src/app/engine/songs/songExport.ts) turns the loaded events back into a `Song` and [gpWriter.ts](../src/app/engine/songs/gpWriter.ts) writes it as `.gp`. A piano roll edit fires `pianoRollEdits$`, and [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) saves the song it came from.
 
 ## Recording
 

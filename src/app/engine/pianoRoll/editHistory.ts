@@ -1,10 +1,11 @@
 import { EventsByTick } from "@/app/engine/eventsByTick";
-import {
-  applyCommand,
-  EditCommand,
-} from "@/app/engine/pianoRoll/editCommand";
+import { applyCommand, EditCommand } from "@/app/engine/pianoRoll/editCommand";
+import { Subject } from "rxjs";
 
 const MAX_HISTORY = 500;
+
+// Tells which track changed after an edit, an undo or a redo
+export const pianoRollEdits$ = new Subject<EventsByTick>();
 
 /**
  * Undo and redo by replaying the stored changes of each command backward or forward
@@ -22,6 +23,7 @@ export class EditHistory {
       this.done.shift();
     }
     this.undone = [];
+    pianoRollEdits$.next(this.data);
   }
 
   undo(): EditCommand | undefined {
@@ -29,6 +31,7 @@ export class EditHistory {
     if (command) {
       applyCommand(this.data, command, "backward");
       this.undone.push(command);
+      pianoRollEdits$.next(this.data);
     }
     return command;
   }
@@ -38,6 +41,7 @@ export class EditHistory {
     if (command) {
       applyCommand(this.data, command, "forward");
       this.done.push(command);
+      pianoRollEdits$.next(this.data);
     }
     return command;
   }

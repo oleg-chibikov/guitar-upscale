@@ -17,7 +17,7 @@ export const SongUploadButton: React.FC = () => {
   const [isAdding, setIsAdding] = useState(false);
   const chordsAreLoading = useSettingsSelector((s) => s.chordsAreLoading);
   const scaleDetectorAvailable = useSettingsSelector(
-    (s) => s.scaleDetectorAvailable,
+    (s) => s.scaleDetectorAvailable
   );
 
   // the scale detector picks the scale each song goes under
@@ -33,8 +33,9 @@ export const SongUploadButton: React.FC = () => {
     }
     setIsAdding(true);
     try {
-      const { addUserSongs, songPlayRequests } =
-        await import("@/app/engine/songs/songLibrary");
+      const { addUserSongs, songPlayRequests } = await import(
+        "@/app/engine/songs/songLibrary"
+      );
       const added = await addUserSongs(files);
       const first = added.at(0);
       if (first === undefined) {
@@ -44,10 +45,12 @@ export const SongUploadButton: React.FC = () => {
         setAndShowAlert({
           message:
             added.length === 1
-              ? `Added ${getExampleName(first)} to ${first.scale} (${first.scaleGroup})`
+              ? `Added ${getExampleName(first)} to ${first.scale} (${
+                  first.scaleGroup
+                })`
               : `Added ${added.length} songs. Hold Play to pick one`,
           alertType: AlertType.Success,
-        }),
+        })
       );
       songPlayRequests.next(first);
     } catch (error) {
@@ -58,7 +61,7 @@ export const SongUploadButton: React.FC = () => {
             error instanceof Error ? error.message : String(error)
           }`,
           alertType: AlertType.Error,
-        }),
+        })
       );
     } finally {
       setIsAdding(false);
@@ -85,8 +88,8 @@ export const SongUploadButton: React.FC = () => {
           isAdding
             ? "Adding the songs..."
             : chordsAreLoading
-              ? "Add Guitar Pro or MIDI songs (chords are still loading)"
-              : "Add Guitar Pro or MIDI songs"
+            ? "Add Guitar Pro or MIDI songs (chords are still loading)"
+            : "Add Guitar Pro or MIDI songs"
         }
       />
     </Fragment>

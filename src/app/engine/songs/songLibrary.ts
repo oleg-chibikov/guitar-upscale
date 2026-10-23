@@ -1,30 +1,30 @@
+import { AlertType } from "@/app/data/alertType";
 import { DistinctNoteMarker } from "@/app/data/midiParser/distinctNoteMarker";
-import { Example, ExamplesMap } from "@/app/data/example";
+import { Example, ExamplesMap, getExampleName } from "@/app/data/example";
 import { NOTE_COUNT, Note, initNotesArray } from "@/app/data/notes";
 import { CHROMATIC, SPECIAL, scalesMap } from "@/app/data/scales";
 import { Song, SongFormat, getSongFormat } from "@/app/data/song";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
+import { EventsByTick } from "@/app/engine/eventsByTick";
+import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
 import { scaleDetector } from "@/app/engine/scales/scaleDetector";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import { toFileName } from "@/app/engine/songs/songHelpers";
 import {
   UserSongRecord,
   deleteUserSong,
   getUserSongs,
   saveUserSong,
 } from "@/app/engine/songs/userSongStore";
-import { Subject } from "rxjs";
+import { store } from "@/app/store/store";
+import { setAndShowAlert } from "@/app/store/uiSlice";
+import { Subject, debounceTime } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 const SONGS_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/songs`;
 
 // One line of public/songs/index.json. Folders give the scale group and the scale
 type IndexEntry = { path: string; band: string; title: string };
-
-// Folder and file names can't hold "/", so "Aeolian / Natural" sits in "Aeolian - Natural"
-export const toFileName = (text: string) =>
-  text
-    .replace(/\s*\/\s*/g, (match) => (match.trim() === match ? "-" : " - "))
-    .replace(/[\\:*?"<>|]/g, "");
 
 const findScale = (groupFolder: string, scaleFolder: string) => {
   for (const [group, scales] of Array.from(scalesMap.entries())) {
@@ -43,7 +43,7 @@ const findScale = (groupFolder: string, scaleFolder: string) => {
 export const readSong = async (
   bytes: ArrayBuffer,
   fileName: string,
-  format: SongFormat,
+  format: SongFormat
 ): Promise<Song> => {
   if (format === "midi") {
     const { readMidiSong } = await import("@/app/engine/songs/midiReader");
@@ -160,7 +160,7 @@ const getSongNotes = (song: Song): Note[] =>
     ...track.chords.flatMap((chord) =>
       chord.name !== undefined
         ? [parseChordNoteAndAlterations(chord.name).chordBaseNote]
-        : (chord.notes?.map((note) => note.note) ?? []),
+        : chord.notes?.map((note) => note.note) ?? []
     ),
   ]);
 
@@ -183,9 +183,9 @@ export const detectSongScale = (song: Song): ScaleAndGroup => {
       detected = result.scales?.reduce<ScaleAndGroup | undefined>(
         (best, scale) =>
           !best || getScaleSize(scale) < getScaleSize(best) ? scale : best,
-        undefined,
+        undefined
       );
-    },
+    }
   );
   return detected ?? { group: SPECIAL, scale: CHROMATIC, note: Note.E };
 };
@@ -253,10 +253,10 @@ export const wipeExamplesCache = () => {
 export const getScaleExample = async (
   scaleGroup: string,
   scale: string,
-  chosen?: Example,
+  chosen?: Example
 ): Promise<Example | undefined> => {
   const candidates = (await getExamples()).filter(
-    (example) => example.scaleGroup === scaleGroup && example.scale === scale,
+    (example) => example.scaleGroup === scaleGroup && example.scale === scale
   );
   if (!candidates.length) {
     return undefined;
@@ -275,3 +275,71 @@ export const getScaleExample = async (
   lastExample.song ??= await lastExample.load();
   return lastExample;
 };
+
+// The events a song decodes to, so a piano roll edit finds its song
+const exampleByEvents = new WeakMap<EventsByTick, Example>();
+
+export const bindExampleEvents = (example: Example, events: EventsByTick) => {
+  exampleByEvents.set(events, example);
+};
+
+export const getExampleForEvents = (events: EventsByTick | undefined) =>
+  events ? exampleByEvents.get(events) : undefined;
+
+// An edit to an uploaded song updates it. An edit to a built-in song saves an own copy
+const saveEdits = async (events: EventsByTick) => {
+  const example = exampleByEvents.get(events);
+  if (!example) {
+    return;
+  }
+  const { eventsToSong, getSongFileName, songToGuitarPro } = await import(
+    "@/app/engine/songs/songExport"
+  );
+  const list = await getExamples();
+  const isCopy = !example.isUserSong;
+  const song = eventsToSong(events, example);
+  if (isCopy) {
+    song.title = `${song.title} (edited)`;
+  }
+  const bytes = await songToGuitarPro(song);
+  const record: UserSongRecord = {
+    id: isCopy ? uuidv4() : example.id.replace(/^user:/, ""),
+    fileName: getSongFileName(song),
+    format: "gp",
+    bytes: bytes.slice().buffer,
+    band: song.band,
+    title: song.title,
+    scaleGroup: example.scaleGroup,
+    scale: example.scale,
+    root: song.root,
+    addedAt: Date.now(),
+  };
+  await saveUserSong(record);
+
+  const saved = toUserExample(record);
+  saved.song = song;
+  saved.decodedTracks = events;
+  exampleByEvents.set(events, saved);
+  const index = list.indexOf(example);
+  if (isCopy) {
+    // the built-in song plays from its file again
+    example.decodedTracks = undefined;
+    list.push(saved);
+    store.dispatch(
+      setAndShowAlert({
+        message: `Saved your edits as ${getExampleName(saved)}`,
+        alertType: AlertType.Success,
+      })
+    );
+  } else if (index !== -1) {
+    list[index] = saved;
+  }
+  notify();
+};
+
+let saving = Promise.resolve();
+pianoRollEdits$.pipe(debounceTime(1000)).subscribe((events) => {
+  saving = saving
+    .then(() => saveEdits(events))
+    .catch((error) => console.error("Cannot save the edited song", error));
+});

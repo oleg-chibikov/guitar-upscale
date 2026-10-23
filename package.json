@@ -20,7 +20,7 @@
     "build-and-deploy-web-prod-2": "npm run build && npm run deploy-surge-co.uk",
     "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge",
     "update-all": "ncu --upgrade && pnpm i",
-    "songsterr": "node scripts/songsterr-example.mjs",
+    "songsterr": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/songsterr-example.mjs",
     "songs:index": "node scripts/build-song-index.mjs",
     "generate-chords": "ts-node --require ./tsconfig-paths-bootstrap.js src/utilities/generateChords.ts"
   },

@@ -26,7 +26,7 @@ const toPitch = (octaveNote: OctaveNote) =>
 
 export const shiftOctaveNote = (
   octaveNote: OctaveNote,
-  semitones: number,
+  semitones: number
 ): OctaveNote => {
   const value = octaveNote.octave * NOTE_COUNT + octaveNote.note + semitones;
   return {
@@ -35,12 +35,17 @@ export const shiftOctaveNote = (
   };
 };
 
-// Songs in E keep the old behaviour: they move by the capo and the tuning shift
+// Songs in E keep the old behaviour: they move by the capo and the tuning shift.
+// Other songs take the smallest move to the key in the settings
 const getSemitoneShift = (root: Note) => {
+  const settingsShift = capoValue + (tunings[tuningValue].shift ?? 0);
   const rootOffset = (root - Note.E + NOTE_COUNT) % NOTE_COUNT;
-  const signedRootOffset =
-    rootOffset > NOTE_COUNT / 2 ? rootOffset - NOTE_COUNT : rootOffset;
-  return capoValue + (tunings[tuningValue].shift ?? 0) - signedRootOffset;
+  if (rootOffset === 0) {
+    return settingsShift;
+  }
+  const shift =
+    (((settingsShift - rootOffset) % NOTE_COUNT) + NOTE_COUNT) % NOTE_COUNT;
+  return shift > NOTE_COUNT / 2 ? shift - NOTE_COUNT : shift;
 };
 
 export const transposeChordName = (chord: string, semitones: number) => {
@@ -94,7 +99,7 @@ export class SongDecoder {
           pitchNote.octaveNote,
           pitchNote.duration,
           previousNote,
-          pitchNote.velocity,
+          pitchNote.velocity
         ) ?? previousNote;
     }
 
@@ -108,7 +113,7 @@ export class SongDecoder {
     result: EventsByTick,
     track: SongTrack,
     trackNumber: number,
-    tabNote: TabNote,
+    tabNote: TabNote
   ) {
     const trackTuning = track.tuning ?? [];
     const songString = trackTuning.at(tabNote.string);
@@ -143,7 +148,7 @@ export class SongDecoder {
             instrument: track.instrument,
             note: stringOctaveNote,
           },
-          tabNote.duration,
+          tabNote.duration
         );
         return;
       }
@@ -156,7 +161,7 @@ export class SongDecoder {
       trackNumber,
       tabNote.tick,
       shiftOctaveNote(songString, tabNote.fret),
-      tabNote.duration,
+      tabNote.duration
     );
   }
 
@@ -168,7 +173,7 @@ export class SongDecoder {
     octaveNote: OctaveNote,
     duration: number | undefined,
     previousNote?: StringOctaveNote,
-    velocity?: number,
+    velocity?: number
   ) {
     const stringOctaveNote = addIndividualNote(
       {
@@ -177,7 +182,7 @@ export class SongDecoder {
         duration: duration ?? 0,
         velocity: velocity ?? 127,
       },
-      previousNote,
+      previousNote
     );
     if (stringOctaveNote) {
       result.addEventAtTick(
@@ -188,7 +193,7 @@ export class SongDecoder {
           note: stringOctaveNote,
           velocity,
         },
-        duration !== undefined ? Math.max(1, Math.round(duration)) : undefined,
+        duration !== undefined ? Math.max(1, Math.round(duration)) : undefined
       );
     }
     return stringOctaveNote;
@@ -198,7 +203,7 @@ export class SongDecoder {
     result: EventsByTick,
     track: SongTrack,
     trackNumber: number,
-    chord: SongChord,
+    chord: SongChord
   ) {
     const name =
       chord.name !== undefined
@@ -224,7 +229,7 @@ export class SongDecoder {
           chord.tick,
           octaveNote,
           undefined,
-          previousNote,
+          previousNote
         ) ?? previousNote;
     }
   }

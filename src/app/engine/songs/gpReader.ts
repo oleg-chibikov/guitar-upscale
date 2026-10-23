@@ -28,13 +28,13 @@ type PlayedBar = { index: number; start: number };
 const getPlayedBars = (
   alphaTab: typeof AlphaTab,
   score: AlphaTab.model.Score,
-  settings: AlphaTab.Settings,
+  settings: AlphaTab.Settings
 ): PlayedBar[] => {
   const midiFile = new alphaTab.midi.MidiFile();
   const generator = new alphaTab.midi.MidiFileGenerator(
     score,
     settings,
-    new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile),
+    new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile)
   );
   generator.generate();
   return generator.tickLookup.masterBars.map((lookup) => ({
@@ -45,7 +45,7 @@ const getPlayedBars = (
 
 const readTrack = (
   track: AlphaTab.model.Track,
-  playedBars: PlayedBar[],
+  playedBars: PlayedBar[]
 ): SongTrack | undefined => {
   const staff = track.staves.at(0);
   if (staff === undefined || staff.isPercussion) {
@@ -68,16 +68,26 @@ const readTrack = (
     chords: [],
   };
 
+  // a tied note adds its length to the note it continues
+  const lengthOwners = new Map<AlphaTab.model.Note, { duration?: number }>();
   for (const playedBar of playedBars) {
     const bar = staff.bars[playedBar.index];
     for (const voice of bar?.voices ?? []) {
       for (const beat of voice.beats) {
+        const duration = Math.max(1, toAppTicks(beat.playbackDuration));
+        for (const note of beat.notes) {
+          const origin = note.isTieDestination ? note.tieOrigin : null;
+          const owner = origin ? lengthOwners.get(origin) : undefined;
+          if (origin && owner) {
+            owner.duration = (owner.duration ?? 0) + duration;
+            lengthOwners.set(note, owner);
+          }
+        }
         const notes = beat.notes.filter((note) => !note.isTieDestination);
         if (beat.isRest || notes.length === 0) {
           continue;
         }
         const tick = toAppTicks(playedBar.start + beat.playbackStart);
-        const duration = Math.max(1, toAppTicks(beat.playbackDuration));
 
         if (isChords) {
           const chord: SongChord = {
@@ -101,12 +111,15 @@ const readTrack = (
               duration,
             };
             result.tabNotes.push(tabNote);
+            lengthOwners.set(note, tabNote);
           } else {
-            result.pitchNotes.push({
+            const pitchNote = {
               tick,
               octaveNote: midiToOctaveNote(note.realValue),
               duration,
-            });
+            };
+            result.pitchNotes.push(pitchNote);
+            lengthOwners.set(note, pitchNote);
           }
         }
       }
@@ -118,13 +131,13 @@ const readTrack = (
 
 export const readGuitarProSong = async (
   bytes: Uint8Array,
-  fileName: string,
+  fileName: string
 ): Promise<Song> => {
   const alphaTab = await import("@coderline/alphatab");
   const settings = new alphaTab.Settings();
   const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
     bytes,
-    settings,
+    settings
   );
   const playedBars = getPlayedBars(alphaTab, score, settings);
   const fromName = parseBandAndTitle(fileName);

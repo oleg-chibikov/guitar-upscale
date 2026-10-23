@@ -17,7 +17,7 @@ export const matchChordMode = (sortedNotes: OctaveNote[]) => {
   for (const root of roots) {
     for (const mode of modes) {
       const tones = new Set(
-        mode.intervals.map((interval) => (root + interval) % NOTE_COUNT),
+        mode.intervals.map((interval) => (root + interval) % NOTE_COUNT)
       );
       const fifth = (root + 7) % NOTE_COUNT;
       const skipsFifth =

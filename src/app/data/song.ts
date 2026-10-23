@@ -18,7 +18,13 @@ export type PitchNote = {
 };
 
 // A chord known by its name, or by its notes when the file has no name for it
-export type SongChord = { tick: number; name?: string; notes?: OctaveNote[] };
+export type SongChord = {
+  tick: number;
+  name?: string;
+  notes?: OctaveNote[];
+  // the shape to write in a file, frets from the highest string
+  frets?: (number | undefined)[];
+};
 
 export type SongTrack = {
   name: string;

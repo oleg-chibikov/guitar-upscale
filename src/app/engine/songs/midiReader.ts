@@ -135,13 +135,12 @@ const readPart = (part: Part, chordNames: ChordName[]): SongTrack => {
 
   if (isChordsTrackName(name)) {
     for (const [tick, group] of Array.from(
-      groupEventsByTickWithTolerance(part.events).entries(),
+      groupEventsByTickWithTolerance(part.events).entries()
     )) {
       const chord: SongChord = {
         tick,
         name: chordNames.find(
-          (chordName) =>
-            Math.abs(chordName.tick - tick) <= CHORD_NAME_TOLERANCE,
+          (chordName) => Math.abs(chordName.tick - tick) <= CHORD_NAME_TOLERANCE
         )?.name,
       };
       if (chord.name === undefined) {

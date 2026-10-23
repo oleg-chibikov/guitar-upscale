@@ -1,4 +1,4 @@
-import { DownloadMidiButton } from "@/app/components/playPanel/DownloadMidiButton";
+import { DownloadButton } from "@/app/components/playPanel/DownloadButton";
 import { MetronomeButton } from "@/app/components/playPanel/MetronomeButton";
 import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
 import { PauseButton } from "@/app/components/playPanel/PauseButton";
@@ -28,7 +28,7 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       <PauseButton />
       <NextEventButton />
       <ResetPlaybackButton />
-      <DownloadMidiButton />
+      <DownloadButton />
       {/* <ShareMidiButton /> */}
       <MetronomeButton />
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (

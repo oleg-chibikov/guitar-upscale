@@ -14,8 +14,9 @@ export const useExamples = () => {
     let unsubscribe: (() => void) | undefined;
 
     const subscribe = async () => {
-      const { getExamples, subscribeToLibrary, toExamplesMap } =
-        await import("@/app/engine/songs/songLibrary");
+      const { getExamples, subscribeToLibrary, toExamplesMap } = await import(
+        "@/app/engine/songs/songLibrary"
+      );
       const refresh = async () => {
         const examples = await getExamples();
         if (active) {

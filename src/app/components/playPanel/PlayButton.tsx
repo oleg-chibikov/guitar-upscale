@@ -13,6 +13,7 @@ import {
   setScaleGroup,
 } from "@/app/store/settingsSlice";
 import Delete from "@mui/icons-material/Delete";
+import Download from "@mui/icons-material/Download";
 import HourglassTop from "@mui/icons-material/HourglassTop";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import Replay from "@mui/icons-material/Replay";
@@ -26,7 +27,7 @@ type PlayButtonProps = UsePlayParams;
 const getExampleChoices = (examplesMap: ExamplesMap | undefined) => {
   const choices: Example[] = [];
   examplesMap?.forEach((scales) =>
-    scales.forEach((examples) => choices.push(...examples)),
+    scales.forEach((examples) => choices.push(...examples))
   );
   choices.sort((a, b) => getExampleName(a).localeCompare(getExampleName(b)));
   return choices;
@@ -64,7 +65,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
       }
       pending.current = choice;
     },
-    [dispatch, handlePlay],
+    [dispatch, handlePlay]
   );
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           const subscription = songPlayRequests.subscribe(startExample);
           unsubscribe = () => subscription.unsubscribe();
         }
-      },
+      }
     );
     return () => {
       active = false;
@@ -114,6 +115,16 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
     startExample(choice);
   };
 
+  const downloadChosen = async (choice: Example) => {
+    if (!params.decodeExample) {
+      return;
+    }
+    const { downloadEventsAsGuitarPro } = await import(
+      "@/app/engine/songs/songExport"
+    );
+    await downloadEventsAsGuitarPro(await params.decodeExample(choice), choice);
+  };
+
   const removeChosen = async (choice: Example) => {
     const { removeUserSong } = await import("@/app/engine/songs/songLibrary");
     await removeUserSong(choice);
@@ -127,10 +138,10 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
           isWaiting
             ? "Waiting for player to get ready..."
             : isPlaying
-              ? "Replay"
-              : canChoose
-                ? "Play (hold to pick a song)"
-                : "Play"
+            ? "Replay"
+            : canChoose
+            ? "Play (hold to pick a song)"
+            : "Play"
         }
         icon={
           isWaiting ? <HourglassTop /> : isPlaying ? <Replay /> : <PlayArrow />
@@ -161,6 +172,20 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
                   : undefined,
               }}
             />
+            <IconButton
+              edge={choice.isUserSong ? undefined : "end"}
+              size="small"
+              aria-label={`Download ${getExampleName(choice)}`}
+              title="Download as Guitar Pro, in the key from the settings"
+              onClick={(event) => {
+                event.stopPropagation();
+                void downloadChosen(choice).catch((error) =>
+                  console.error("Cannot download the song", error)
+                );
+              }}
+            >
+              <Download fontSize="small" />
+            </IconButton>
             {choice.isUserSong && (
               <IconButton
                 edge="end"

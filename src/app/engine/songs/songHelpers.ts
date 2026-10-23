@@ -42,3 +42,9 @@ export const normalizeChordName = (text: string): string | undefined => {
       : letter + accidental;
   return root + suffix;
 };
+
+// Folder and file names can't hold "/", so "Aeolian / Natural" sits in "Aeolian - Natural"
+export const toFileName = (text: string) =>
+  text
+    .replace(/\s*\/\s*/g, (match) => (match.trim() === match ? "-" : " - "))
+    .replace(/[\\:*?"<>|]/g, "");

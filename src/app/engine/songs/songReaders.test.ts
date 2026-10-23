@@ -1,10 +1,12 @@
 import { Note } from "@/app/data/notes";
+import { Song } from "@/app/data/song";
 import fs from "fs";
 import { AnyEvent, write } from "midifile-ts";
 import { matchChordMode } from "./chordNameMatcher";
 import { readGuitarProSong } from "./gpReader";
+import { writeGuitarPro } from "./gpWriter";
 import { readMidiSong } from "./midiReader";
-import { normalizeChordName } from "./songHelpers";
+import { midiToOctaveNote, normalizeChordName } from "./songHelpers";
 
 const NUMB = "public/songs/Minor/Aeolian - Natural/Linkin Park - Numb.gp";
 
@@ -12,7 +14,7 @@ describe("readGuitarProSong", () => {
   it("keeps chords on the Chords track and the melody as tab", async () => {
     const song = await readGuitarProSong(
       new Uint8Array(fs.readFileSync(NUMB)),
-      "Linkin Park - Numb.gp",
+      "Linkin Park - Numb.gp"
     );
 
     expect(song.band).toBe("Linkin Park");
@@ -50,7 +52,7 @@ const note = (
   deltaTime: number,
   noteNumber: number,
   on: boolean,
-  channel = 0,
+  channel = 0
 ): AnyEvent => ({
   type: "channel",
   subtype: on ? "noteOn" : "noteOff",
@@ -145,5 +147,65 @@ describe("matchChordMode", () => {
 
   it("leaves unknown note sets to the detector", () => {
     expect(matchChordMode(notes(61, 60))).toBeUndefined();
+  });
+});
+
+describe("writeGuitarPro", () => {
+  const standard = [64, 59, 55, 50, 45, 40].map(midiToOctaveNote);
+
+  it("keeps notes, lengths, chords and the pickup through a round trip", async () => {
+    const song: Song = {
+      band: "Band",
+      title: "Title",
+      tempo: 97,
+      root: Note.E,
+      pickupTicks: 16,
+      tracks: [
+        {
+          name: "Lead",
+          instrument: "distortion_guitar",
+          tuning: standard,
+          tabNotes: [
+            { tick: 0, string: 0, fret: 3, duration: 8 },
+            // crosses the bar line at tick 16 and overlaps the next note
+            { tick: 8, string: 1, fret: 5, duration: 40 },
+            { tick: 16, string: 0, fret: 7, duration: 16 },
+          ],
+          pitchNotes: [
+            { tick: 32, octaveNote: midiToOctaveNote(52), duration: 4 },
+          ],
+          chords: [
+            { tick: 16, name: "Em", frets: [0, 0, 0, 2, 2, 0] },
+            { tick: 80, name: "C" },
+          ],
+        },
+      ],
+    };
+
+    const bytes = await writeGuitarPro(song, { getProgram: () => 30 });
+    const back = await readGuitarProSong(bytes, "x.gp");
+
+    expect([back.band, back.title, back.tempo, back.pickupTicks]).toEqual([
+      "Band",
+      "Title",
+      97,
+      16,
+    ]);
+    expect(back.tracks.map((t) => t.name)).toEqual(["Lead", "Chords"]);
+    const [lead, chords] = back.tracks;
+    expect(lead.instrument).toBe("distortion_guitar");
+    const sorted = [...lead.tabNotes].sort(
+      (a, b) => a.tick - b.tick || a.string - b.string
+    );
+    expect(sorted).toEqual([
+      { tick: 0, string: 0, fret: 3, duration: 8 },
+      { tick: 8, string: 1, fret: 5, duration: 40 },
+      { tick: 16, string: 0, fret: 7, duration: 16 },
+      { tick: 32, string: 3, fret: 2, duration: 4 },
+    ]);
+    expect(chords.chords.map((c) => [c.tick, c.name])).toEqual([
+      [16, "Em"],
+      [80, "C"],
+    ]);
   });
 });
