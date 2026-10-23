@@ -45,8 +45,25 @@ const WHEEL_ZOOM_SPEED = 0.0025;
 
 export const PianoRoll: React.FC = () => {
   const { scrollerRef, zoom, zoomBy, zoomTo } = usePianoRollView();
-  const { events, selection, loaded, setLoaded, source, playhead$, data } =
-    usePianoRoll();
+  const {
+    allEvents,
+    events,
+    inactiveEvents,
+    tracks,
+    selection,
+    loaded,
+    setLoaded,
+    source,
+    playhead$,
+    data,
+  } = usePianoRoll();
+  const trackColors = useMemo(
+    () =>
+      tracks.length > 1
+        ? new Map(tracks.map(({ trackNumber }, index) => [trackNumber, index]))
+        : undefined,
+    [tracks]
+  );
   const loopLengthTicks = source?.loopLengthTicks;
   const { scalePattern } = useScaleContext();
   const { baseNote } = useBaseNoteContext();
@@ -62,11 +79,11 @@ export const PianoRoll: React.FC = () => {
 
   const lastEndTick = useMemo(
     () =>
-      events.reduce(
+      allEvents.reduce(
         (end, { tick, event }) => Math.max(end, tick + getEventDuration(event)),
         0
       ),
-    [events]
+    [allEvents]
   );
   const totalTicks = getTotalTicks(Math.max(lastEndTick, loopLengthTicks ?? 0));
   const width = tickToX(totalTicks, zoom);
@@ -213,6 +230,8 @@ export const PianoRoll: React.FC = () => {
                 scalePattern,
                 baseNote,
                 events,
+                inactiveEvents,
+                trackColors,
                 selection,
                 preview,
                 loopLengthTicks,

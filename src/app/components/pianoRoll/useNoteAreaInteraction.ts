@@ -7,7 +7,7 @@ import {
   PITCH_AXIS_WIDTH,
   TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
-import { ChordOrNote, EventsByTick } from "@/app/engine/eventsByTick";
+import { ChordOrNote, EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import {
   pitchToY,
   tickToX,
@@ -32,6 +32,7 @@ import {
   getEventPitch,
   withPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
+import { PianoRollTrack } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { floorTick, snapPitchToScale, snapTick } from "@/app/engine/pianoRoll/snap";
 import { playChordOrNote } from "@/app/engine/playerHelper";
 import { usePianoRollSelector } from "@/app/hooks/storeHooks";
@@ -132,18 +133,27 @@ const eventRect = (tick: number, event: ChordOrNote, zoom: Zoom) => ({
   height: zoom.noteHeight,
 });
 
-const findNoteTemplate = (data: EventsByTick, selection: ReadonlySet<string>) => {
+const findNoteTemplate = (
+  data: EventsByTick,
+  events: EventForTick[],
+  selection: ReadonlySet<string>,
+  activeTrack: PianoRollTrack | undefined
+) => {
   const fromSelection = Array.from(selection)
     .map((id) => data.getEvent(id)?.event.note)
     .find((note) => note !== undefined);
   const note =
-    fromSelection ?? data.flatItems.find(({ event }) => event.note)?.event.note;
-  return note
-    ? {
-        trackNumber: note.trackNumber,
-        instrument: note.instrument,
-        looperChannel: note.looperChannel,
-      }
+    fromSelection ?? events.find(({ event }) => event.note)?.event.note;
+  if (note) {
+    return {
+      trackNumber: note.trackNumber,
+      instrument: note.instrument,
+      looperChannel: note.looperChannel,
+    };
+  }
+  // the first note in an empty track
+  return activeTrack
+    ? { trackNumber: activeTrack.trackNumber, instrument: activeTrack.instrument }
     : undefined;
 };
 
@@ -159,7 +169,7 @@ export const useNoteAreaInteraction = ({
   // touch screens have no Alt or Ctrl, so toolbar toggles stand in for them
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
-  const { data, events, selection, setSelection, apply, chooseChordMode } =
+  const { data, events, selection, setSelection, apply, chooseChordMode, activeTrack } =
     usePianoRoll();
   const lastTap = useRef<{ id: string; time: number } | undefined>(undefined);
   const [preview, setPreview] = useState<Preview | undefined>();
@@ -169,7 +179,7 @@ export const useNoteAreaInteraction = ({
   const inertiaFrame = useRef<number | undefined>(undefined);
 
   // the handlers read the latest values through a ref, so listeners stay stable during a drag
-  const latest = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock };
+  const latest = { data, events, selection, zoom, snapTicks, scalePattern, tool, copyMode, axisLock, activeTrack };
   const state = useRef(latest);
   useLayoutEffect(() => {
     state.current = latest;
@@ -532,11 +542,15 @@ export const useNoteAreaInteraction = ({
   );
 
   const startDraw = (x: number, y: number) => {
-    const { data, zoom, snapTicks, selection } = state.current;
+    const { data, events, zoom, snapTicks, selection, activeTrack } = state.current;
     if (!data) return;
     const tick = floorTick(xToTick(x, zoom), snapTicks);
     const pitch = snapPitch(yToPitch(y, zoom));
-    const event = createNoteEvent(pitch, snapTicks, findNoteTemplate(data, selection));
+    const event = createNoteEvent(
+      pitch,
+      snapTicks,
+      findNoteTemplate(data, events, selection, activeTrack)
+    );
     if (!event) return;
     playChordOrNote(event);
     gestureRef.current = { kind: "draw", tick, event };

@@ -1,4 +1,5 @@
 import { PianoRollSnapSelector } from "@/app/components/pianoRoll/toolbar/PianoRollSnapSelector";
+import { getTrackColor } from "@/app/components/pianoRoll/pianoRollDrawing";
 import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
@@ -45,6 +46,8 @@ import { useDispatch } from "react-redux";
 
 const Divider = () => <div className="w-px h-6 bg-gray-600 mx-0.5" />;
 
+const ALL_TRACKS = "all";
+
 const Group: React.FC<{ children: ReactNode }> = ({ children }) => (
   <div className="flex flex-row items-center">{children}</div>
 );
@@ -78,6 +81,9 @@ export const PianoRollToolbar: React.FC = () => {
     sources,
     source,
     setSourceId,
+    tracks,
+    activeTrack,
+    setActiveTrack,
   } = usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
@@ -102,6 +108,27 @@ export const PianoRollToolbar: React.FC = () => {
             options={sources.map(({ id, label }) => ({ value: id, label }))}
             value={source?.id ?? ""}
             onChange={(value) => setSourceId(String(value))}
+          />
+          <Divider />
+        </>
+      )}
+      {tracks.length > 1 && (
+        <>
+          <SelectWrapper
+            className="min-w-28"
+            tooltip="Track to edit (T). The other tracks stay in view, dimmed"
+            options={[
+              { value: ALL_TRACKS, label: "All tracks" },
+              ...tracks.map(({ trackNumber, label }, index) => ({
+                value: trackNumber,
+                label,
+                color: getTrackColor(index),
+              })),
+            ]}
+            value={activeTrack?.trackNumber ?? ALL_TRACKS}
+            onChange={(value) =>
+              setActiveTrack(value === ALL_TRACKS ? undefined : Number(value))
+            }
           />
           <Divider />
         </>

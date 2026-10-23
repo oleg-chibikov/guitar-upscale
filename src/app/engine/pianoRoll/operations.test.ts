@@ -22,7 +22,10 @@ let nextId = 0;
 jest.mock("@/app/engine/eventIdGenerator", () => ({
   IdGenerator: { generate: (prefix = "") => `${prefix}${nextId++}` },
 }));
-jest.mock("@/app/engine/eventBus", () => ({ DEFAULT_NOTE_TRACK_NUMBER: 0 }));
+jest.mock("@/app/engine/eventBus", () => ({
+  DEFAULT_NOTE_TRACK_NUMBER: 0,
+  DEFAULT_CHORD_TRACK_NUMBER: 1,
+}));
 jest.mock("@/app/data/chordModes", () => ({
   chordModeOrder: ["", "m"],
   getModeSuffix: (chord: string) => chord.substring(chord[1] === "#" ? 2 : 1),
@@ -174,6 +177,23 @@ describe("piano roll operations", () => {
     new EditHistory(data).execute(result.command!);
     const ticks = result.selection.map((id) => data.getEvent(id)?.tick);
     expect(ticks).toEqual([64, 80]);
+  });
+
+  it("pastes into the track being edited", () => {
+    const { data } = setup();
+    const clipboard = [data.getEvent("a")!];
+    const track = {
+      trackNumber: 2,
+      label: "Guitar 2",
+      instrument: "distortion_guitar" as const,
+    };
+    const result = pasteEvents(data, clipboard, 64, track);
+    new EditHistory(data).execute(result.command!);
+    const pasted = data.getEvent(result.selection[0])?.event.note;
+    expect(pasted?.trackNumber).toBe(2);
+    expect(pasted?.instrument).toBe("distortion_guitar");
+    // the copied note stays in its own track
+    expect(data.getEvent("a")?.event.note?.trackNumber).toBe(0);
   });
 
   describe("chords", () => {

@@ -19,7 +19,7 @@ import { useMemo } from "react";
  * Edits on the selection, shared by the toolbar and the keyboard shortcuts
  */
 export const usePianoRollActions = () => {
-  const { data, events, selection, setSelection, apply, playhead$ } =
+  const { data, events, selection, setSelection, apply, playhead$, activeTrack } =
     usePianoRoll();
   const { scalePattern } = useScaleContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
@@ -41,7 +41,7 @@ export const usePianoRollActions = () => {
     };
 
     const pasteAt = (tick: number) => {
-      if (data) apply(pasteEvents(data, getClipboard(), tick));
+      if (data) apply(pasteEvents(data, getClipboard(), tick, activeTrack));
     };
 
     return {
@@ -99,5 +99,5 @@ export const usePianoRollActions = () => {
         );
       },
     };
-  }, [data, events, selection, setSelection, apply, snapTicks, snapToScale, scalePattern, playhead$]);
+  }, [data, events, selection, setSelection, apply, snapTicks, snapToScale, scalePattern, playhead$, activeTrack]);
 };

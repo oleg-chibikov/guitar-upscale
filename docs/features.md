@@ -145,6 +145,7 @@ Code: [looper/](../src/app/components/looper/), [looper.ts](../src/app/engine/lo
 The piano roll edits a track note by note. It opens from the control panel.
 
 - **Track picker** the melody or any looper channel with a recording. An empty melody is ready to draw in.
+- **Song tracks** a song with several tracks, such as 2 guitars and vocals, shows each track in its own colour. Picking one track edits only its notes. The other tracks stay in view at low opacity and ignore clicks. New and pasted notes go into the picked track. `T` steps through the tracks.
 - **Tools** select, draw and erase. Notes can move, stretch, copy and quantize to the grid.
 - **Snap** picks the grid step. "Keep notes in the scale" holds drawn and moved notes on scale notes. A scale with all 12 notes turns the button off.
 - **Chords** a chord shows as one block. A double click or double tap opens a dialog with the chord types on that root.

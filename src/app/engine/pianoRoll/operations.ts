@@ -15,6 +15,10 @@ import {
   withDuration,
   withPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
+import {
+  PianoRollTrack,
+  withTrack,
+} from "@/app/engine/pianoRoll/pianoRollTracks";
 import { snapPitchToScale, snapTick } from "@/app/engine/pianoRoll/snap";
 
 export type EditResult = {
@@ -254,14 +258,16 @@ export const quantizeEvents = (
 export const pasteEvents = (
   data: EventsByTick,
   clipboard: EventForTick[],
-  atTick: number
+  atTick: number,
+  // the notes land in this track instead of the one they were copied from
+  track?: PianoRollTrack
 ): EditResult => {
   const builder = new CommandBuilder(data, "Paste");
   const selection: string[] = [];
   if (clipboard.length) {
     const firstTick = Math.min(...clipboard.map((s) => s.tick));
     clipboard.forEach(({ tick, event }) => {
-      const copy = cloneWithNewId(event);
+      const copy = cloneWithNewId(track ? withTrack(event, track) : event);
       builder.set(copy.id, { tick: tick - firstTick + atTick, event: copy });
       selection.push(copy.id);
     });

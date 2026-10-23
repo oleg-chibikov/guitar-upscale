@@ -24,7 +24,8 @@ const toolKeys: Record<string, PianoRollTool> = {
 };
 
 export const usePianoRollShortcuts = () => {
-  const { undo, redo, chordToChoose } = usePianoRoll();
+  const { undo, redo, chordToChoose, tracks, activeTrack, setActiveTrack } =
+    usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
   const { togglePlay, seekTo } = usePianoRollTransport();
@@ -32,9 +33,16 @@ export const usePianoRollShortcuts = () => {
   // the listener stays put and reads the latest state through the ref
   // the chord dialog on top takes the keyboard
   const paused = chordToChoose !== undefined;
-  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused });
+  // T steps through All tracks, then each track, then back to All
+  const stepTrack = (direction: number) => {
+    if (tracks.length < 2) return;
+    const order = [undefined, ...tracks.map(({ trackNumber }) => trackNumber)];
+    const index = order.indexOf(activeTrack?.trackNumber);
+    setActiveTrack(order[(index + direction + order.length) % order.length]);
+  };
+  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack });
   useLayoutEffect(() => {
-    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused };
+    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack };
   });
 
   useEffect(() => {
@@ -64,7 +72,7 @@ export const usePianoRollShortcuts = () => {
       if (latest.current.paused || isTyping(e.target) || e.defaultPrevented) {
         return;
       }
-      const { undo, redo, actions, zoomBy, zoomToFit, seekTo } = latest.current;
+      const { undo, redo, actions, zoomBy, zoomToFit, seekTo, stepTrack } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 
@@ -98,6 +106,8 @@ export const usePianoRollShortcuts = () => {
         seekTo(0);
       } else if (!mod && key === "f") {
         zoomToFit();
+      } else if (!mod && !e.altKey && key === "t") {
+        stepTrack(e.shiftKey ? -1 : 1);
       } else if (!mod && !e.altKey && toolKeys[key] !== undefined) {
         dispatch(setPianoRollTool(toolKeys[key]));
       } else {

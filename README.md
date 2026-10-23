@@ -30,6 +30,7 @@ The app installs as a PWA, so it also works from the home screen.
 | --- | --- |
 | Space | Play or stop the shown track from the playhead |
 | 1, 2, 3 | Select, draw, erase |
+| T, Shift + T | Next or previous track to edit, then all tracks |
 | Hold Alt | Draw notes with any tool |
 | Alt + drag a note | Copy the notes |
 | Ctrl or Cmd + drag | Keep the drag in time or in pitch |

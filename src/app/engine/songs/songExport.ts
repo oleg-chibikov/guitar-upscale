@@ -1,6 +1,10 @@
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { Example, getExampleName } from "@/app/data/example";
-import { Instrument, getProgramForInstrument } from "@/app/data/instruments";
+import {
+  Instrument,
+  getInstrumentLabel,
+  getProgramForInstrument,
+} from "@/app/data/instruments";
 import { Song, SongTrack, isChordsTrackName } from "@/app/data/song";
 import { getOctaveNotesForTuning } from "@/app/data/tunings";
 import { chordPreferredVariationsByName } from "@/app/engine/chords/chordNotesByName";
@@ -15,13 +19,6 @@ import {
   tempoBpmValue,
   tuningValue,
 } from "@/app/store/settingsSlice";
-
-const humanize = (instrument: Instrument) =>
-  instrument
-    .split("_")
-    .filter(Boolean)
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
 
 const getChordFrets = (name: string) => {
   const variation = chordPreferredVariationsByName.get(name)?.variation;
@@ -87,7 +84,7 @@ export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
       const name = isChords
         ? "Chords"
         : track.instrument !== undefined
-        ? humanize(track.instrument)
+        ? getInstrumentLabel(track.instrument)
         : "Melody";
       return { ...track, name };
     })

@@ -18,6 +18,7 @@ import {
   isChordModeAvailable,
   withPitch,
 } from "@/app/engine/pianoRoll/pianoRollEvent";
+import { getEventTrack } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { ResizeEdge } from "@/app/engine/pianoRoll/operations";
 
 export const BACKGROUND = "#1e272b";
@@ -46,6 +47,21 @@ const NOTE_COLORS = {
   noteSelected: { fill: "#bef264", border: "#ffffff", text: "#1a2e05" },
 };
 
+// notes of a song with several tracks take the colour of their track. The first track keeps the green
+const TRACK_NOTE_COLORS = [
+  NOTE_COLORS.note,
+  { fill: "#ea580c", border: "#431407", text: "#ffffff" },
+  { fill: "#9333ea", border: "#3b0764", text: "#ffffff" },
+  { fill: "#db2777", border: "#500724", text: "#ffffff" },
+  { fill: "#0891b2", border: "#083344", text: "#ffffff" },
+  { fill: "#ca8a04", border: "#422006", text: "#ffffff" },
+];
+
+const INACTIVE_TRACK_ALPHA = 0.3;
+
+export const getTrackColor = (index: number) =>
+  TRACK_NOTE_COLORS[index % TRACK_NOTE_COLORS.length].fill;
+
 export interface PianoRollScene {
   zoom: Zoom;
   width: number;
@@ -54,6 +70,10 @@ export interface PianoRollScene {
   scalePattern: Set<Note>;
   baseNote: Note;
   events: { tick: number; event: ChordOrNote }[];
+  // notes of the tracks not being edited. They show dimmed and ignore the pointer
+  inactiveEvents: { tick: number; event: ChordOrNote }[];
+  // the colour slot of each track. Undefined paints every note green
+  trackColors: Map<number, number> | undefined;
   selection: ReadonlySet<string>;
   preview: Preview | undefined;
   loopLengthTicks: number | undefined;
@@ -75,6 +95,7 @@ interface Block {
   pitch: number;
   selected: boolean;
   ghost: boolean;
+  inactive: boolean;
 }
 
 const rowColor = (note: Note, scalePattern: Set<Note>, baseNote: Note) => {
@@ -126,7 +147,20 @@ export const hitTestNote = (
   return test(true) ?? test(false);
 };
 
-const collectBlocks = ({ events, selection, preview }: PianoRollScene) => {
+const collectBlocks = ({
+  events,
+  inactiveEvents,
+  selection,
+  preview,
+}: PianoRollScene) => {
+  const inactive: Block[] = inactiveEvents.map(({ tick, event }) => ({
+    tick,
+    event,
+    pitch: getEventPitch(event),
+    selected: false,
+    ghost: false,
+    inactive: true,
+  }));
   const blocks: Block[] = [];
   const ghosts: Block[] = [];
   for (const { tick, event } of events) {
@@ -139,10 +173,10 @@ const collectBlocks = ({ events, selection, preview }: PianoRollScene) => {
       const target = preview.targets.get(event.id);
       if (target) {
         if (preview.copy) {
-          blocks.push({ tick, event, pitch, selected: false, ghost: false });
-          ghosts.push({ ...target, event, selected: true, ghost: true });
+          blocks.push({ tick, event, pitch, selected: false, ghost: false, inactive: false });
+          ghosts.push({ ...target, event, selected: true, ghost: true, inactive: false });
         } else {
-          blocks.push({ ...target, event, selected, ghost: false });
+          blocks.push({ ...target, event, selected, ghost: false, inactive: false });
         }
         continue;
       }
@@ -156,11 +190,12 @@ const collectBlocks = ({ events, selection, preview }: PianoRollScene) => {
           pitch,
           selected,
           ghost: false,
+          inactive: false,
         });
         continue;
       }
     }
-    blocks.push({ tick, event, pitch, selected, ghost: false });
+    blocks.push({ tick, event, pitch, selected, ghost: false, inactive: false });
   }
   if (preview?.kind === "draw") {
     ghosts.push({
@@ -169,10 +204,12 @@ const collectBlocks = ({ events, selection, preview }: PianoRollScene) => {
       pitch: getEventPitch(preview.event),
       selected: true,
       ghost: true,
+      inactive: false,
     });
   }
-  // selected notes are drawn over the others
+  // the dimmed tracks sit under the one being edited, selected notes over the rest
   return [
+    ...inactive,
     ...blocks.filter(({ selected }) => !selected),
     ...blocks.filter(({ selected }) => selected),
     ...ghosts,
@@ -228,24 +265,26 @@ const drawGrid = (
 
 const drawBlock = (
   ctx: CanvasRenderingContext2D,
-  { tick, event, pitch, selected, ghost }: Block,
-  zoom: Zoom
+  { tick, event, pitch, selected, ghost, inactive }: Block,
+  zoom: Zoom,
+  trackColors: Map<number, number> | undefined
 ) => {
   const x = tickToX(tick, zoom);
   const y = pitchToY(pitch, zoom);
   const width = blockWidth(event, zoom);
   const height = zoom.noteHeight;
   const isChord = isChordEvent(event);
+  const trackColor = trackColors?.get(getEventTrack(event));
   const colors = isChord
     ? selected
       ? NOTE_COLORS.chordSelected
       : NOTE_COLORS.chord
     : selected
       ? NOTE_COLORS.noteSelected
-      : NOTE_COLORS.note;
+      : TRACK_NOTE_COLORS[(trackColor ?? 0) % TRACK_NOTE_COLORS.length];
 
   ctx.save();
-  ctx.globalAlpha = ghost ? 0.6 : 1;
+  ctx.globalAlpha = inactive ? INACTIVE_TRACK_ALPHA : ghost ? 0.6 : 1;
   if (selected) {
     ctx.strokeStyle = "rgba(0,0,0,0.6)";
     ctx.lineWidth = 1;
@@ -262,7 +301,7 @@ const drawBlock = (
   ctx.strokeStyle = colors.border;
   ctx.stroke();
 
-  if (!ghost && !isChordModeAvailable(event)) {
+  if (!ghost && !inactive && !isChordModeAvailable(event)) {
     ctx.setLineDash([6, 4]);
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 2;
@@ -311,7 +350,7 @@ const drawNoteArea = (
     ) {
       continue;
     }
-    drawBlock(ctx, block, zoom);
+    drawBlock(ctx, block, zoom, scene.trackColors);
   }
 
   if (preview?.kind === "rubber") {

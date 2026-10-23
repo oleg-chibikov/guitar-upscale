@@ -5,7 +5,8 @@ import { MenuItem, Select, Tooltip } from "@mui/material";
 import React from "react";
 
 interface SelectWrapperProps extends WithClassName {
-  options: { value: string | number; label: string }[];
+  // a colour shows as a dot before the label
+  options: { value: string | number; label: string; color?: string }[];
   value: string | number;
   onChange: (value: string | number) => void;
   disabled?: boolean;
@@ -52,6 +53,12 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
+          {option.color !== undefined && (
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-full mr-1.5 shrink-0"
+              style={{ background: option.color }}
+            />
+          )}
           {option.label}
         </MenuItem>
       ))}

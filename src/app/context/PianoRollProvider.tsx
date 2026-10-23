@@ -8,6 +8,12 @@ import {
   setPianoRollData,
 } from "@/app/engine/pianoRoll/pianoRollState";
 import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
+import {
+  getEventTrack,
+  listTracks,
+  PianoRollTrack,
+  TrackInfo,
+} from "@/app/engine/pianoRoll/pianoRollTracks";
 import { BehaviorSubject } from "rxjs";
 import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import { useDispatch } from "react-redux";
@@ -37,10 +43,20 @@ interface PianoRollContextType {
   sources: PianoRollSource[];
   source: PianoRollSource | undefined;
   setSourceId: (id: string) => void;
+  // the tracks of the shown melody, for example 2 guitars and vocals
+  tracks: PianoRollTrack[];
+  // the track being edited. Undefined edits every track at once
+  activeTrack: PianoRollTrack | undefined;
+  setActiveTrack: (trackNumber: number | undefined) => void;
   // the playhead of the shown track: the melody player's or the loop's
   playhead$: BehaviorSubject<number>;
   data: EventsByTick | undefined;
+  // every note of the melody, the dimmed tracks included
+  allEvents: EventForTick[];
+  // the notes that can be edited: the active track's, or every note
   events: EventForTick[];
+  // the other tracks' notes, drawn dimmed
+  inactiveEvents: EventForTick[];
   selection: ReadonlySet<string>;
   setSelection: (ids: Iterable<string>) => void;
   // runs the edit through the undo history and selects what it returns
@@ -151,6 +167,26 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   const source = sources.find((s) => s.id === sourceId) ?? sources.at(0);
   const data = source?.data;
 
+  // an uploaded or built-in song names its tracks. Other melodies get names from their instruments
+  const [songTracks, setSongTracks] = useState<{
+    data: EventsByTick | undefined;
+    tracks: (TrackInfo | undefined)[];
+  }>({ data: undefined, tracks: [] });
+  useEffect(() => {
+    if (!data || source?.looperChannel !== undefined) return;
+    let cancelled = false;
+    void import("@/app/engine/songs/songLibrary").then(
+      ({ getExampleForEvents }) => {
+        if (cancelled) return;
+        const tracks = getExampleForEvents(data)?.song?.tracks ?? [];
+        setSongTracks({ data, tracks });
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [data, source?.looperChannel]);
+
   // each track scrolls to its notes the first time it shows. Closing the piano roll forgets it
   const [scrolledTrack, setScrolledTrack] = useState<EventsByTick | undefined>();
   const [wasExpanded, setWasExpanded] = useState(pianoRollExpanded);
@@ -177,26 +213,75 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
   }, [positionInLoop, loopPlayhead$]);
   const playhead$ = positionInLoop ? loopPlayhead$ : playheadTick$;
 
-  // a selection belongs to one melody and drops when another one loads
-  const [selectionState, setSelectionState] = useState<{
-    data: EventsByTick | undefined;
-    ids: ReadonlySet<string>;
-  }>({ data: undefined, ids: new Set() });
-  const selection = useMemo(
-    () =>
-      selectionState.data === data ? selectionState.ids : new Set<string>(),
-    [selectionState, data]
-  );
-
-  const events = useMemo(
+  const allEvents = useMemo(
     () => data?.flatItems ?? [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data, version]
   );
 
+  const tracks = useMemo(
+    () =>
+      listTracks(
+        allEvents,
+        songTracks.data === data ? songTracks.tracks : undefined
+      ),
+    [allEvents, songTracks, data]
+  );
+
+  // the track being edited belongs to one melody, like the selection
+  const [activeTrackState, setActiveTrackState] = useState<{
+    data: EventsByTick | undefined;
+    trackNumber: number | undefined;
+  }>({ data: undefined, trackNumber: undefined });
+  const activeTrack =
+    activeTrackState.data === data
+      ? tracks.find(
+          ({ trackNumber }) => trackNumber === activeTrackState.trackNumber
+        )
+      : undefined;
+
+  const { events, inactiveEvents } = useMemo(() => {
+    if (!activeTrack) {
+      return { events: allEvents, inactiveEvents: [] };
+    }
+    const isActive = ({ event }: EventForTick) =>
+      getEventTrack(event) === activeTrack.trackNumber;
+    return {
+      events: allEvents.filter(isActive),
+      inactiveEvents: allEvents.filter((item) => !isActive(item)),
+    };
+  }, [allEvents, activeTrack]);
+
+  // a selection belongs to one melody and drops when another one loads
+  const [selectionState, setSelectionState] = useState<{
+    data: EventsByTick | undefined;
+    ids: ReadonlySet<string>;
+  }>({ data: undefined, ids: new Set() });
+  const selection = useMemo(() => {
+    if (selectionState.data !== data) {
+      return new Set<string>();
+    }
+    if (!activeTrack) {
+      return selectionState.ids;
+    }
+    // an undo can touch a dimmed track. Its notes stay unselected
+    const editable = new Set(events.map(({ event }) => event.id));
+    return new Set(
+      Array.from(selectionState.ids).filter((id) => editable.has(id))
+    );
+  }, [selectionState, data, activeTrack, events]);
+
   const setSelection = useCallback(
     (ids: Iterable<string>) => {
       setSelectionState({ data, ids: new Set(ids) });
+    },
+    [data]
+  );
+
+  const setActiveTrack = useCallback(
+    (trackNumber: number | undefined) => {
+      setActiveTrackState({ data, trackNumber });
+      setSelectionState({ data, ids: new Set() });
     },
     [data]
   );
@@ -258,9 +343,14 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       sources,
       source,
       setSourceId,
+      tracks,
+      activeTrack,
+      setActiveTrack,
       playhead$,
       data,
+      allEvents,
       events,
+      inactiveEvents,
       selection,
       setSelection,
       apply,
@@ -278,7 +368,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, source, setSourceId, playhead$, data, events, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

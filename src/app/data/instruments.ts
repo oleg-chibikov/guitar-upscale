@@ -202,5 +202,13 @@ export const getInstrumentForProgram = (
   program: number
 ): Instrument | undefined => gmInstruments[program];
 
+// "distortion_guitar" reads as "Distortion Guitar"
+export const getInstrumentLabel = (instrument: Instrument) =>
+  instrument
+    .split("_")
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+
 export const getProgramForInstrument = (instrument: Instrument): number =>
   Math.max(0, gmInstruments.indexOf(instrument));
