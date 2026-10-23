@@ -5,6 +5,7 @@ import {
   isPlayingValue,
   stopMetronomeIfIdle,
 } from "@/app/store/settingsSlice";
+import { setPianoRollExpanded } from "@/app/store/uiSlice";
 import Clear from "@mui/icons-material/Clear";
 import React, { Dispatch, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -30,6 +31,7 @@ export const ResetPlaybackButton: React.FC = () => {
   const handleReset = async () => {
     setOpen(false);
     setPianoRollData(undefined, dispatch);
+    dispatch(setPianoRollExpanded(false));
     // must be after setting data to undefined
     if (isPlayingValue) {
       await stop(dispatch);
