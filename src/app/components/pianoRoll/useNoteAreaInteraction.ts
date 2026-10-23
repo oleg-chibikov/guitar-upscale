@@ -95,7 +95,9 @@ type Gesture =
       last: Point & { time: number };
       velocity: { x: number; y: number };
       moved: boolean;
-      longPress: ReturnType<typeof setTimeout>;
+      // a middle button drag pans without inertia and keeps the selection
+      mouse: boolean;
+      longPress: ReturnType<typeof setTimeout> | undefined;
     };
 
 export interface NoteAreaInteractionOptions {
@@ -516,6 +518,7 @@ export const useNoteAreaInteraction = ({
           return;
         case "pan":
           clearTimeout(gesture.longPress);
+          if (gesture.mouse) return;
           if (!gesture.moved) {
             setSelection([]);
           } else if (performance.now() - gesture.last.time < 80) {
@@ -542,6 +545,22 @@ export const useNoteAreaInteraction = ({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType === "mouse" && e.button === 1 && !gestureRef.current) {
+        stopInertia();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        e.currentTarget.style.cursor = "grabbing";
+        const pointer = { clientX: e.clientX, clientY: e.clientY };
+        gestureRef.current = {
+          kind: "pan",
+          start: pointer,
+          last: { ...pointer, time: performance.now() },
+          velocity: { x: 0, y: 0 },
+          moved: true,
+          mouse: true,
+          longPress: undefined,
+        };
+        return;
+      }
       if (e.button !== 0 && e.pointerType === "mouse") return;
       const { data, selection } = state.current;
       // holding Alt draws whatever tool is picked. Alt on a note still copies it
@@ -648,6 +667,7 @@ export const useNoteAreaInteraction = ({
         last: { ...pointer, time: performance.now() },
         velocity: { x: 0, y: 0 },
         moved: false,
+        mouse: false,
         longPress: setTimeout(() => {
           if (gestureRef.current !== gesture || gesture.moved) return;
           navigator.vibrate?.(10);

@@ -220,7 +220,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const point = toLocal(e);
-    const region = regionAt(point);
+    const region = e.button === 1 ? "notes" : regionAt(point);
     regions.current.set(e.pointerId, region);
     switch (region) {
       case "timeline":
@@ -276,6 +276,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       }
     }
     lastKeyY.current = undefined;
+    if (e.pointerType === "mouse") updateHover(e);
   };
 
   return (
@@ -284,6 +285,10 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       className="touch-none select-none"
       style={{ width: viewportWidth, height: viewportHeight }}
       onPointerDown={handlePointerDown}
+      // the middle button pans the roll instead of starting the browser's autoscroll
+      onMouseDown={(e) => {
+        if (e.button === 1) e.preventDefault();
+      }}
       onPointerMove={handlePointerMove}
       onPointerUp={(e) => handlePointerEnd(e, false)}
       onPointerCancel={(e) => handlePointerEnd(e, true)}
