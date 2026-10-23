@@ -57,6 +57,20 @@ You need Node 24 and pnpm.
 - **Tests** `pnpm exec jest`
 - **Build** `pnpm exec next build`
 
+## Add a song from Songsterr
+
+`pnpm songsterr` downloads a song from Songsterr and adds it to [`scaleExamples.ts`](src/app/data/scaleExamples.ts) as an example.
+
+1. `pnpm songsterr "wintersun beyond the dark sun"` lists the tracks and sections.
+2. `pnpm songsterr "wintersun beyond the dark sun" --from 4 --to 16` adds measures 4 to 16.
+
+- **Key** the song moves to an E tonic, since the app builds every scale from E.
+- **Scale** the script picks the scale from `scales.ts` with the fewest notes outside it, and moves those notes to the nearest scale note. It prints each change.
+- **Tracks** melody, a bass with one note per beat, and chords built on the bass.
+- **Rerun** replaces the example with the same band and title.
+
+`--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
+
 ## Deploy
 
 Each push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The workflow lints, tests, builds a static export and publishes it to GitHub Pages.

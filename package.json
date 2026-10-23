@@ -19,6 +19,7 @@
     "build-and-deploy-web-prod-2": "npm run build && npm run deploy-surge-co.uk",
     "build-and-deploy-web-all": "npm run build && npm run deploy-surge-co.uk && npm run deploy-surge-org.uk && npm run deploy-surge",
     "update-all": "ncu --upgrade && pnpm i",
+    "songsterr": "node scripts/songsterr-example.mjs",
     "generate-chords": "ts-node --require ./tsconfig-paths-bootstrap.js src/utilities/generateChords.ts"
   },
   "dependencies": {
