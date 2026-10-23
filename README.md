@@ -26,23 +26,23 @@ The app installs as a PWA, so it also works from the home screen.
 
 ## Piano roll keys
 
-| Key | Action |
-| --- | --- |
-| Space | Play or stop the shown track from the playhead |
-| 1, 2, 3 | Select, draw, erase |
-| T, Shift + T | Next or previous track to edit, then all tracks |
-| S | Play only the picked track, or every track again |
-| Hold Alt | Draw notes with any tool |
-| Alt + drag a note | Copy the notes |
-| Ctrl or Cmd + drag | Keep the drag in time or in pitch |
-| Middle button + drag | Move the view |
-| Arrows | Move the selection a grid step or a scale step. Shift moves an octave |
-| Q | Quantize to the grid |
-| Ctrl or Cmd + Z, Shift + Z | Undo, redo |
-| Ctrl or Cmd + C, X, V, D | Copy, cut, paste at the playhead, duplicate |
-| G, H, F | Zoom out, zoom in, fit all notes. Shift zooms the rows |
-| Home | Playhead to the start |
-| Drag along the ruler | Loop the melody between the two points |
+| Key                        | Action                                                                |
+| -------------------------- | --------------------------------------------------------------------- |
+| Space                      | Play or stop the shown track from the playhead                        |
+| 1, 2, 3                    | Select, draw, erase                                                   |
+| T, Shift + T               | Next or previous track to edit, then all tracks                       |
+| S                          | Play only the picked track, or every track again                      |
+| Hold Alt                   | Draw notes with any tool                                              |
+| Alt + drag a note          | Copy the notes                                                        |
+| Ctrl or Cmd + drag         | Keep the drag in time or in pitch                                     |
+| Middle button + drag       | Move the view                                                         |
+| Arrows                     | Move the selection a grid step or a scale step. Shift moves an octave |
+| Q                          | Quantize to the grid                                                  |
+| Ctrl or Cmd + Z, Shift + Z | Undo, redo                                                            |
+| Ctrl or Cmd + C, X, V, D   | Copy, cut, paste at the playhead, duplicate                           |
+| G, H, F                    | Zoom out, zoom in, fit all notes. Shift zooms the rows                |
+| Home                       | Playhead to the start                                                 |
+| Drag along the ruler       | Loop the melody between the two points                                |
 
 On a touch screen, hold empty space and drag to select an area, and pinch to zoom. The toolbar toggles stand in for Alt and Ctrl.
 
@@ -58,6 +58,7 @@ You need Node 24 and pnpm.
 
 ## Checks
 
+- **Format** `pnpm format` rewrites files with Prettier. The pre-commit hook does it for staged files.
 - **Lint** `pnpm exec eslint .`
 - **Tests** `pnpm exec jest`
 - **Build** `pnpm exec next build`
@@ -97,7 +98,7 @@ In a MIDI file a track named `Chords` plays as chords. A text or marker event li
 
 ## Deploy
 
-Each push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The workflow lints, tests, builds a static export and publishes it to GitHub Pages.
+Each push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The workflow checks formatting, lints, tests, builds a static export and publishes it to GitHub Pages.
 
 The Pages copy runs with sign-in off. The static export has no server, so the workflow deletes `src/pages/api` before the build.
 
@@ -109,12 +110,12 @@ Sign-in is off by default, and every visitor gets the Composer tier. Set `NEXT_P
 
 With sign-in on, the server needs these variables:
 
-| Variable | What it is for |
-| --- | --- |
-| `PATREON_CLIENT_ID`, `PATREON_CLIENT_SECRET` | Sign-in through Patreon |
-| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY` | Checks Google Play subscriptions |
-| `ANDROID_PACKAGE_ID` | The Android app id on Google Play |
-| `COMPOSER_WHITELIST`, `EXPLORER_WHITELIST` | Emails that get a tier for free |
+| Variable                                     | What it is for                    |
+| -------------------------------------------- | --------------------------------- |
+| `PATREON_CLIENT_ID`, `PATREON_CLIENT_SECRET` | Sign-in through Patreon           |
+| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`  | Checks Google Play subscriptions  |
+| `ANDROID_PACKAGE_ID`                         | The Android app id on Google Play |
+| `COMPOSER_WHITELIST`, `EXPLORER_WHITELIST`   | Emails that get a tier for free   |
 
 ## Android app
 

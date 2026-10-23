@@ -45,18 +45,18 @@ flowchart TB
 
 ## Where the code sits
 
-| Folder | What it holds |
-| --- | --- |
-| [src/app/components](../src/app/components) | UI, one folder per screen part: `fret`, `chords`, `strumming`, `playPanel`, `looper`, `pianoRoll`, `settings`, `auth` |
-| [src/app/components/uiFramework](../src/app/components/uiFramework) | shared MUI wrappers: buttons, dialogs, sliders, selectors |
-| [src/app/context](../src/app/context) | React contexts: theme, tier, scale, piano roll |
-| [src/app/store](../src/app/store) | Redux slices and the persisted store |
-| [src/app/engine](../src/app/engine) | sound, clock, event bus, players, recorders, chord and scale maths |
-| [src/app/data](../src/app/data) | static data: scales, tunings, instruments, chord types, patterns, songs |
-| [src/app/hooks](../src/app/hooks) | hooks that link React to the engine: `usePlay`, `useStrumming`, auth checks |
-| [src/app/helpers](../src/app/helpers) | small helpers: canvas drawing, device checks, debounce, a trie |
-| [src/lib](../src/lib) | server code: NextAuth, tiers, Google Play billing |
-| [src/pages/api](../src/pages/api) | API routes. The GitHub Pages build deletes this folder |
+| Folder                                                              | What it holds                                                                                                         |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [src/app/components](../src/app/components)                         | UI, one folder per screen part: `fret`, `chords`, `strumming`, `playPanel`, `looper`, `pianoRoll`, `settings`, `auth` |
+| [src/app/components/uiFramework](../src/app/components/uiFramework) | shared MUI wrappers: buttons, dialogs, sliders, selectors                                                             |
+| [src/app/context](../src/app/context)                               | React contexts: theme, tier, scale, piano roll                                                                        |
+| [src/app/store](../src/app/store)                                   | Redux slices and the persisted store                                                                                  |
+| [src/app/engine](../src/app/engine)                                 | sound, clock, event bus, players, recorders, chord and scale maths                                                    |
+| [src/app/data](../src/app/data)                                     | static data: scales, tunings, instruments, chord types, patterns, songs                                               |
+| [src/app/hooks](../src/app/hooks)                                   | hooks that link React to the engine: `usePlay`, `useStrumming`, auth checks                                           |
+| [src/app/helpers](../src/app/helpers)                               | small helpers: canvas drawing, device checks, debounce, a trie                                                        |
+| [src/lib](../src/lib)                                               | server code: NextAuth, tiers, Google Play billing                                                                     |
+| [src/pages/api](../src/pages/api)                                   | API routes. The GitHub Pages build deletes this folder                                                                |
 
 ## Start-up
 
@@ -118,14 +118,14 @@ flowchart TD
 
 [ContextProvider.tsx](../src/app/context/ContextProvider.tsx) wraps the app in this order, outermost first.
 
-| Order | Provider | Gives |
-| --- | --- | --- |
-| 1 | `SessionProvider` | the NextAuth session. Only with sign-in on |
-| 2 | Redux `Provider` | the store |
-| 3 | `MuiThemeProvider` | light or dark MUI theme |
-| 4 | `DigitalGoodsServiceInfoProvider` | whether the Google Play Digital Goods API exists |
-| 5 | `PremiumFeaturesProvider` | the feature flags, copied into `authSlice` |
-| 6 | `PersistGate` | holds rendering until `localStorage` loads |
+| Order | Provider                          | Gives                                            |
+| ----- | --------------------------------- | ------------------------------------------------ |
+| 1     | `SessionProvider`                 | the NextAuth session. Only with sign-in on       |
+| 2     | Redux `Provider`                  | the store                                        |
+| 3     | `MuiThemeProvider`                | light or dark MUI theme                          |
+| 4     | `DigitalGoodsServiceInfoProvider` | whether the Google Play Digital Goods API exists |
+| 5     | `PremiumFeaturesProvider`         | the feature flags, copied into `authSlice`       |
+| 6     | `PersistGate`                     | holds rendering until `localStorage` loads       |
 
 [PianoRollDialog.tsx](../src/app/components/pianoRoll/PianoRollDialog.tsx) adds its own providers: `ScaleProvider` and `BaseNoteProvider` for the scale and root note, then `PianoRollProvider` and `PianoRollViewProvider` for tracks and view.
 
@@ -133,12 +133,12 @@ flowchart TD
 
 ### Redux slices
 
-| Slice | Holds |
-| --- | --- |
-| [settingsSlice](../src/app/store/settingsSlice.ts) | scale, tuning, capo, instruments, tempo, volumes, chord and strumming options, play and record flags |
-| [uiSlice](../src/app/store/uiSlice.ts) | theme, display modes, open panels, alerts, suggested scales, fretboard size |
-| [pianoRollSlice](../src/app/store/pianoRollSlice.ts) | piano roll tool, snap, zoom, follow playhead |
-| [authSlice](../src/app/store/authSlice.ts) | sign-in state and tier |
+| Slice                                                | Holds                                                                                                |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [settingsSlice](../src/app/store/settingsSlice.ts)   | scale, tuning, capo, instruments, tempo, volumes, chord and strumming options, play and record flags |
+| [uiSlice](../src/app/store/uiSlice.ts)               | theme, display modes, open panels, alerts, suggested scales, fretboard size                          |
+| [pianoRollSlice](../src/app/store/pianoRollSlice.ts) | piano roll tool, snap, zoom, follow playhead                                                         |
+| [authSlice](../src/app/store/authSlice.ts)           | sign-in state and tier                                                                               |
 
 - **Saving** `redux-persist` writes the store to `localStorage` under `root`. A transform drops short-lived fields such as alerts and play flags.
 - **Versions** [store.ts](../src/app/store/store.ts) has a `VERSION`. A saved store with another version gets wiped, so a breaking change needs a bump.
@@ -154,12 +154,12 @@ Engine code runs outside React and can't call hooks. So [settingsSlice.ts](../sr
 
 Some data is too big or too mutable for Redux. It lives in modules, and a Redux counter tells React when it changed.
 
-| Data | Module | React learns about changes from |
-| --- | --- | --- |
-| loaded melody | [pianoRollState.ts](../src/app/engine/pianoRoll/pianoRollState.ts) | `showReplayTrigger` |
-| looper channels | [looper.ts](../src/app/engine/looper/looper.ts) | `looperStateUpdateTrigger` |
+| Data                  | Module                                                                       | React learns about changes from        |
+| --------------------- | ---------------------------------------------------------------------------- | -------------------------------------- |
+| loaded melody         | [pianoRollState.ts](../src/app/engine/pianoRoll/pianoRollState.ts)           | `showReplayTrigger`                    |
+| looper channels       | [looper.ts](../src/app/engine/looper/looper.ts)                              | `looperStateUpdateTrigger`             |
 | custom strum patterns | [strummingPatternsStorage.ts](../src/app/engine/strummingPatternsStorage.ts) | `localStorage` key `strummingPatterns` |
-| chord shapes | [chordNotesByName.ts](../src/app/engine/chords/chordNotesByName.ts) | `chordsAreLoading` |
+| chord shapes          | [chordNotesByName.ts](../src/app/engine/chords/chordNotesByName.ts)          | `chordsAreLoading`                     |
 
 A change to scale, tuning or capo bumps `guitarSettingsUpdateCount`. Playback, the looper and the chords reset on that bump.
 
@@ -358,14 +358,14 @@ sequenceDiagram
   end
 ```
 
-| Route | Does |
-| --- | --- |
-| `POST /api/purchases/acknowledge` | checks a new purchase, acknowledges it, sets the cookie |
-| `POST /api/purchases/change` | upgrade or downgrade. Revokes the old plan, or defers the new one |
-| `POST /api/purchases/cancel` | refunds inside the grace period, else cancels at the end date |
-| `GET /api/purchases/get` | subscription dates and how it can be cancelled |
-| `POST /api/purchases/logout` | clears the cookie |
-| `/api/auth/[...nextauth]` | Patreon sign-in through NextAuth |
+| Route                             | Does                                                              |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `POST /api/purchases/acknowledge` | checks a new purchase, acknowledges it, sets the cookie           |
+| `POST /api/purchases/change`      | upgrade or downgrade. Revokes the old plan, or defers the new one |
+| `POST /api/purchases/cancel`      | refunds inside the grace period, else cancels at the end date     |
+| `GET /api/purchases/get`          | subscription dates and how it can be cancelled                    |
+| `POST /api/purchases/logout`      | clears the cookie                                                 |
+| `/api/auth/[...nextauth]`         | Patreon sign-in through NextAuth                                  |
 
 The Google Play code is in [hooks/useGooglePlayAuth.ts](../src/app/hooks/useGooglePlayAuth.ts), [lib/purchases.ts](../src/lib/purchases.ts) and [lib/subscriptionHelper.ts](../src/lib/subscriptionHelper.ts).
 
@@ -374,7 +374,7 @@ The Google Play code is in [hooks/useGooglePlayAuth.ts](../src/app/hooks/useGoog
 ```mermaid
 flowchart LR
   Push["push to main"] --> CI["ci.yml"]
-  CI --> Lint["eslint"] --> Test["jest"]
+  CI --> Format["prettier --check"] --> Lint["eslint"] --> Test["jest"]
   Test --> Strip["delete src/pages/api"]
   Strip --> Build["next build<br/>STATIC_EXPORT=true"]
   Build --> Pages["GitHub Pages"]
@@ -389,11 +389,11 @@ flowchart LR
 
 ## Where to start a change
 
-| To change | Start in |
-| --- | --- |
-| a scale or a scale group | [scales.ts](../src/app/data/scales.ts) |
-| a chord type | [chordModes.ts](../src/app/data/chordModes.ts) |
-| a built-in strum pattern | [strummingPatterns.ts](../src/app/data/strummingPatterns.ts) |
-| a built-in song | a `.gp` file in [public/songs/](../public/songs/), then `pnpm songs:index`. It picks the scale with [songScale.ts](../src/app/engine/songs/songScale.ts) |
-| what a tier unlocks | [premiumFeatures.ts](../src/lib/premiumFeatures.ts) and [PremiumComponentsLoader.tsx](../src/app/components/PremiumComponentsLoader.tsx) |
-| a saved setting | the slice, then bump `VERSION` in [store.ts](../src/app/store/store.ts) if old data breaks |
+| To change                | Start in                                                                                                                                                 |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a scale or a scale group | [scales.ts](../src/app/data/scales.ts)                                                                                                                   |
+| a chord type             | [chordModes.ts](../src/app/data/chordModes.ts)                                                                                                           |
+| a built-in strum pattern | [strummingPatterns.ts](../src/app/data/strummingPatterns.ts)                                                                                             |
+| a built-in song          | a `.gp` file in [public/songs/](../public/songs/), then `pnpm songs:index`. It picks the scale with [songScale.ts](../src/app/engine/songs/songScale.ts) |
+| what a tier unlocks      | [premiumFeatures.ts](../src/lib/premiumFeatures.ts) and [PremiumComponentsLoader.tsx](../src/app/components/PremiumComponentsLoader.tsx)                 |
+| a saved setting          | the slice, then bump `VERSION` in [store.ts](../src/app/store/store.ts) if old data breaks                                                               |

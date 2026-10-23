@@ -29,6 +29,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm exec prettier --check .
+
       - run: pnpm exec eslint .
 
       - run: pnpm exec jest
