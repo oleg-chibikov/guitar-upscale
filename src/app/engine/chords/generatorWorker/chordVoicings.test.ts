@@ -20,7 +20,7 @@ const neck = generateNeckRepresentation(ALL_NOTES, STANDARD_TUNING, 0, 0);
 const generateVoicings = (root: number, intervals: number[]) => {
   const cache = new SharedArrayCache();
   const voicings: ChordBuilderInfo[] = [];
-  for (let string = 5; string >= intervals.length; string--) {
+  for (let string = 5; string >= intervals.length - 1; string--) {
     for (let fret = 0; fret < 12; fret++) {
       const note = neck[string][fret]!;
       if (note.note === root) {
@@ -64,6 +64,21 @@ describe("chord voicings", () => {
     expect(tabs(5, [0, 4, 7])).toContain("133211 134211");
     expect(tabs(9, [0, 3, 7])).toContain("x02210 --231-");
     expect(tabs(11, [0, 3, 7])).toContain("x24432 -13421");
+    expect(tabs(2, [0, 4, 7, 10])).toContain("xx0212 ---213");
+  });
+
+  it("keeps the fingers within a hand span", () => {
+    for (let root = 0; root < 12; root++) {
+      for (const voicing of generateVoicings(root, [0, 4, 7, 10])) {
+        const fingerFrets = voicing.variation
+          .filter((_, string) => voicing.fingerAssignment[string] !== THUMB)
+          .map((note) => note?.fret ?? 0)
+          .filter((fret) => fret > 0);
+        const lowestFret = Math.min(...fingerFrets);
+        const span = Math.max(...fingerFrets) - lowestFret;
+        expect(span).toBeLessThanOrEqual(lowestFret >= 8 ? 5 : 4);
+      }
+    }
   });
 
   it("puts the thumb at or behind the other fingers", () => {
@@ -104,6 +119,9 @@ describe("preferred variation", () => {
     );
     expect(pick(2, [0, 4, 7], ChordPlayMode.Preferred_Variation)).toBe(
       "xx0232 ---132"
+    );
+    expect(pick(2, [0, 4, 7, 10], ChordPlayMode.Preferred_Variation)).toBe(
+      "xx0212 ---213"
     );
   });
 

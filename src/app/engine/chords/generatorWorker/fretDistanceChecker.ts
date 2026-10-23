@@ -35,13 +35,13 @@ function getNonAdjacentFingerStretch(
   leftFingerFret: number
 ): number {
   if (leftFinger === 0 && rightFinger === 2) {
-    return getMaxStretchForIndexFinger(leftFingerFret) + 2;
+    return getMaxStretchForIndexFinger(leftFingerFret) + 1;
   }
   if (leftFinger === 0 && rightFinger === 3) {
-    return getMaxStretchForIndexFinger(leftFingerFret) + 3;
+    return getMaxStretchForIndexFinger(leftFingerFret) + 2;
   }
   if (leftFinger === 1 && rightFinger === 3) {
-    return 4;
+    return 3;
   }
   return 0; // This case shouldn't happen due to the previous validation
 }
@@ -58,16 +58,9 @@ function getAdjacentFingerStretch(
   return 2; // for all the other fingers it's max 2 frets at any position
 }
 
-// Determine the maximum stretch capabilities based on fret positions
+// Frets get narrower from the 8th, so the hand spans one more fret there: index to pinky is 4 frets below it, 5 above
 function getMaxStretchForIndexFinger(fret: number): number {
-  if (fret >= 1 && fret <= 2) {
-    return 2;
-  } else if (fret >= 3 && fret <= 7) {
-    return 3;
-  } else if (fret >= 8) {
-    return 4;
-  }
-  return 2; // Default stretch if not found in predefined ranges
+  return fret >= 8 ? 3 : 2;
 }
 
 // Ensure valid finger numbers (0-3)

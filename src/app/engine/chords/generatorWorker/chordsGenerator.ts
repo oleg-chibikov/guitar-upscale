@@ -79,7 +79,7 @@ class ChordsGenerator {
   ) => {
     for (
       let stringIndex = MAX_STRING_INDEX_FOR_CHORD_GENERATION; // TODO: We are intentionally limit chords to 6 strings. We don't search for them on the lower string as it requires too much memory to store. We can undo this if there's a better way to store all the chords in a trie for the chord detector // this.neck.length - 1; // starting from the lowest (thickest) string
-      stringIndex >= intervalsToUse.length;
+      stringIndex >= intervalsToUse.length - 1;
       stringIndex--
     ) {
       const neckString = this.neck[stringIndex];
