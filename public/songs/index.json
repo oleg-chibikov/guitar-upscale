@@ -39,7 +39,7 @@
     "band": "Amaranthe",
     "title": "Call Out My Name",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Amaranthe - Digital World.gp",
@@ -67,7 +67,7 @@
     "band": "Amaranthe",
     "title": "Helix",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Amaranthe - Hunger (chorus).gp",
@@ -123,7 +123,7 @@
     "band": "Antonio Vivaldi",
     "title": "Summer (Presto)",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "ATB - 9 PM (Till I Come).gp",
@@ -276,8 +276,8 @@
     "path": "In Flames - State of Slow Decay.gp",
     "band": "In Flames",
     "title": "State of Slow Decay",
-    "scaleGroup": "Middle Eastern",
-    "scale": "Mohammedan / Harmonic"
+    "scaleGroup": "Minor",
+    "scale": "Harmonic"
   },
   {
     "path": "In Flames - The Quiet Place.gp",
@@ -431,7 +431,7 @@
     "band": "Rammstein",
     "title": "Mein Herz brennt",
     "scaleGroup": "Minor",
-    "scale": "Melodic"
+    "scale": "Harmonic"
   },
   {
     "path": "Rammstein - Mutter (chorus).gp",
@@ -571,7 +571,7 @@
     "band": "Ария",
     "title": "Беспечный ангел",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Ария - Осколок льда.gp",
@@ -592,14 +592,14 @@
     "band": "Ария",
     "title": "Там высоко",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Ария - Штиль.gp",
     "band": "Ария",
     "title": "Штиль",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Кино - Кукушка.gp",
@@ -634,7 +634,7 @@
     "band": "Мельница",
     "title": "Воин вереска",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Мельница - Господин горных дорог.gp",
@@ -648,14 +648,14 @@
     "band": "Мельница",
     "title": "Дракон",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Мельница - Королевна.gp",
     "band": "Мельница",
     "title": "Королевна",
     "scaleGroup": "Minor",
-    "scale": "Harmonic Bebop + #4"
+    "scale": "Harmonic Bebop"
   },
   {
     "path": "Мельница - Ночная кобыла.gp",

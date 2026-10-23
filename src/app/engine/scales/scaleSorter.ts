@@ -1,5 +1,5 @@
-import { scalesMap } from "@/app/data/scales";
-import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import { scalesMap } from "@/app/data/scaleDefinitions";
+import type { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 
 export const sortScales = (scales: ScaleAndGroup[]): ScaleAndGroup[] =>
   scales.sort((a, b) => {
@@ -19,7 +19,7 @@ export const sortScales = (scales: ScaleAndGroup[]): ScaleAndGroup[] =>
       const aScaleIndex = scaleOrder.indexOf(a.scale);
       const bScaleIndex = scaleOrder.indexOf(b.scale);
       if (aScaleIndex !== bScaleIndex) {
-        return aGroupIndex - bGroupIndex;
+        return aScaleIndex - bScaleIndex;
       }
 
       // within the same scale sort by note

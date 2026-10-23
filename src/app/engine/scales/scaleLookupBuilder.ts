@@ -60,17 +60,11 @@ export const rebuildScaleDetectorLookup = () => {
       const fullScaleNotes = [0].concat(scaleNotesWithoutZero);
       const scaleString = JSON.stringify(fullScaleNotes);
 
-      // If the scale is encountered more than once, log the duplicate
+      // A scale listed twice, such as harmonic minor, is detected under its first name only
       if (encounteredScales.has(scaleString)) {
-        console.log(
-          `Duplicate found: Scale '${scaleName}' in '${group}' duplicates '${encounteredScales.get(
-            scaleString,
-          )}'`,
-        );
-      } else {
-        // Otherwise, add the scale to the map
-        encounteredScales.set(scaleString, scaleName);
+        continue;
       }
+      encounteredScales.set(scaleString, scaleName);
       if (group === "Special") {
         // don't use special scales for detection
         continue;
