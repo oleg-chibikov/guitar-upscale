@@ -27,6 +27,14 @@ const ROW_IN_SCALE = "#37474f";
 const ROW_IN_SCALE_SHARP = "#2e3c43";
 const ROW_OUT_OF_SCALE = "#1e272b";
 const ROW_LINE = "rgba(0,0,0,0.35)";
+const KEY_WHITE = "#FFFFFF";
+const KEY_BLACK = "#000000";
+const KEY_WHITE_OUT_OF_SCALE = "#D1D5DB";
+const KEY_BLACK_OUT_OF_SCALE = "#6B7280";
+const KEY_LABEL_WHITE = "#6B7280";
+const KEY_LABEL_BLACK = "#9CA3AF";
+const KEY_LABEL_OUT_OF_SCALE = "#9CA3AF";
+const KEY_LABEL_BLACK_OUT_OF_SCALE = "#D1D5DB";
 const BAR_LINE = "#90a4ae";
 const BEAT_LINE = "rgba(144,164,174,0.45)";
 const SNAP_LINE = "rgba(144,164,174,0.16)";
@@ -435,13 +443,13 @@ const drawTimeline = (
 
 const drawPitchAxis = (
   ctx: CanvasRenderingContext2D,
-  { zoom, baseNote, pressedPitch }: PianoRollScene,
+  { zoom, baseNote, scalePattern, pressedPitch }: PianoRollScene,
   viewport: Viewport
 ) => {
   const h = zoom.noteHeight;
   const top = Math.max(0, viewport.scrollTop);
   const bottom = Math.min(PITCH_COUNT * h, viewport.scrollTop + viewport.height - TIMELINE_HEIGHT);
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = KEY_WHITE;
   ctx.fillRect(0, top, PITCH_AXIS_WIDTH, bottom - top);
   ctx.strokeStyle = "#D1D5DB";
   ctx.lineWidth = 1;
@@ -455,13 +463,14 @@ const drawPitchAxis = (
     const octaveNote = fromPitch(pitch);
     const sharp = isSharp(octaveNote.note);
     const lit = pressedPitch === pitch;
+    const inScale = scalePattern.has(octaveNote.note);
 
     if (sharp) {
-      ctx.fillStyle = lit ? "#4b5563" : "#000000";
+      ctx.fillStyle = lit ? "#1e3a8a" : inScale ? KEY_BLACK : KEY_BLACK_OUT_OF_SCALE;
       ctx.fillRect(0, y, BLACK_KEY_WIDTH, h);
     } else {
-      if (lit) {
-        ctx.fillStyle = "#bfdbfe";
+      if (lit || !inScale) {
+        ctx.fillStyle = lit ? "#bfdbfe" : KEY_WHITE_OUT_OF_SCALE;
         ctx.fillRect(0, y, PITCH_AXIS_WIDTH, h);
       }
       // a white key edge only where two white keys meet
@@ -475,7 +484,15 @@ const drawPitchAxis = (
 
     if (h >= 10) {
       const isBaseNote = octaveNote.note === baseNote;
-      ctx.fillStyle = sharp ? "#9CA3AF" : isBaseNote ? "#000000" : "#6B7280";
+      ctx.fillStyle = sharp
+        ? inScale
+          ? KEY_LABEL_BLACK
+          : KEY_LABEL_BLACK_OUT_OF_SCALE
+        : isBaseNote
+          ? KEY_BLACK
+          : inScale
+            ? KEY_LABEL_WHITE
+            : KEY_LABEL_OUT_OF_SCALE;
       ctx.font = `${isBaseNote ? "bold " : ""}${Math.min(11, h - 4)}px Arial`;
       ctx.fillText(serializeOctaveNote(octaveNote), sharp ? 4 : BLACK_KEY_WIDTH + 6, y + h / 2);
     }
