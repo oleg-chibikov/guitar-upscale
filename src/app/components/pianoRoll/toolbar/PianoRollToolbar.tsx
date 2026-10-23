@@ -1,5 +1,9 @@
 import { PianoRollSnapSelector } from "@/app/components/pianoRoll/toolbar/PianoRollSnapSelector";
-import { PianoRollTrackControls } from "@/app/components/pianoRoll/toolbar/PianoRollTrackControls";
+import {
+  PianoRollTrackEdits,
+  PianoRollTrackPicker,
+} from "@/app/components/pianoRoll/toolbar/PianoRollTrackControls";
+import { Group } from "@/app/components/pianoRoll/toolbar/ToolbarGroup";
 import { PianoRollVelocityControl } from "@/app/components/pianoRoll/toolbar/PianoRollVelocityControl";
 import { altKey, modKey } from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
@@ -40,20 +44,52 @@ import UnfoldMore from "@mui/icons-material/UnfoldMore";
 import ZoomIn from "@mui/icons-material/ZoomIn";
 import ZoomOut from "@mui/icons-material/ZoomOut";
 import LibraryMusic from "@mui/icons-material/LibraryMusic";
+import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import NearMe from "@mui/icons-material/NearMe";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import SkipPrevious from "@mui/icons-material/SkipPrevious";
 import Stop from "@mui/icons-material/Stop";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { useDispatch } from "react-redux";
+import { createTheme, Theme, ThemeProvider } from "@mui/material";
 
-const Divider = () => <div className="w-px h-6 bg-gray-600 mx-0.5" />;
-
-const Group: React.FC<{ children: ReactNode }> = ({ children }) => (
-  <div className="flex flex-row items-center">{children}</div>
-);
+// the toolbar stays dark in both app themes, so its buttons and fields drop the app colours
+const toolbarTheme = (outer: Theme) =>
+  createTheme(outer, {
+    components: {
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "transparent",
+            color: "#d4d4d4",
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+            "&.MuiIconButton-colorPrimary": {
+              backgroundColor: "rgba(83, 118, 146, 0.55)",
+              color: "#e0efff",
+            },
+            "&.Mui-disabled": { color: "rgba(255, 255, 255, 0.25)" },
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: { root: { color: "#e5e5e5" } },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: { backgroundColor: "transparent" },
+          notchedOutline: { border: "none" },
+        },
+      },
+      MuiSelect: {
+        styleOverrides: {
+          select: { color: "#e5e5e5" },
+          icon: { color: "rgba(255, 255, 255, 0.5)" },
+        },
+      },
+    },
+  });
 
 const tools: { tool: PianoRollTool; icon: ReactNode; tooltip: string }[] = [
   {
@@ -109,11 +145,16 @@ export const PianoRollToolbar: React.FC = () => {
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
   const dispatch = useDispatch();
   const mod = modKey();
+  const [showMore, setShowMore] = useState(false);
+  const [renaming, setRenaming] = useState(false);
 
   return (
-    <div className="flex flex-row flex-wrap items-center gap-1 px-1 py-0.5 bg-gray-800 border-b border-gray-700">
+    <ThemeProvider theme={toolbarTheme}>
+    <div className="flex flex-col gap-1.5 px-1.5 py-1.5 bg-neutral-800 border-b border-neutral-700 md:flex-row md:flex-wrap md:items-center">
+      {/* a narrow screen keeps one row of main buttons. The rest opens with More */}
+      <div className="flex flex-row items-center gap-1.5 overflow-x-auto md:contents">
       {sources.length > 1 && (
-        <>
+        <Group>
           <SelectWrapper
             className="min-w-24"
             tooltip="Track to edit: the melody or a looper channel"
@@ -121,11 +162,9 @@ export const PianoRollToolbar: React.FC = () => {
             value={source?.id ?? ""}
             onChange={(value) => setSourceId(String(value))}
           />
-          <Divider />
-        </>
+        </Group>
       )}
-      <PianoRollTrackControls />
-      <Divider />
+      <PianoRollTrackPicker renaming={renaming} setRenaming={setRenaming} />
       <Group>
         <IconButtonWrapper
           icon={<SkipPrevious />}
@@ -146,7 +185,6 @@ export const PianoRollToolbar: React.FC = () => {
           isActive={transport.isPlaying}
         />
       </Group>
-      <Divider />
       <Group>
         <IconButtonWrapper
           icon={<Undo />}
@@ -161,7 +199,6 @@ export const PianoRollToolbar: React.FC = () => {
           disabled={!canRedo}
         />
       </Group>
-      <Divider />
       <Group>
         {tools.map(({ tool: value, icon, tooltip }) => (
           <IconButtonWrapper
@@ -173,7 +210,19 @@ export const PianoRollToolbar: React.FC = () => {
           />
         ))}
       </Group>
-      <Divider />
+      <Group className="ml-auto md:hidden">
+        <IconButtonWrapper
+          icon={<MoreHoriz />}
+          tooltip={showMore ? "Hide the other buttons" : "More buttons"}
+          onPress={() => setShowMore(!showMore)}
+          isActive={showMore}
+        />
+      </Group>
+      </div>
+      <div
+        className={`${showMore ? "flex" : "hidden"} flex-row flex-wrap items-center gap-1.5 md:contents`}
+      >
+      <PianoRollTrackEdits renaming={renaming} setRenaming={setRenaming} />
       <Group>
         <PianoRollSnapSelector />
         <IconButtonWrapper
@@ -193,7 +242,6 @@ export const PianoRollToolbar: React.FC = () => {
           disabled={isChromatic}
         />
       </Group>
-      <Divider />
       <Group>
         {transposeButtons.map(({ steps, octave, icon, key }) => (
           <IconButtonWrapper
@@ -204,7 +252,6 @@ export const PianoRollToolbar: React.FC = () => {
           />
         ))}
       </Group>
-      <Divider />
       <Group>
         <IconButtonWrapper
           icon={<ContentCopy />}
@@ -219,7 +266,6 @@ export const PianoRollToolbar: React.FC = () => {
           isActive={axisLock}
         />
       </Group>
-      <Divider />
       <Group>
         <IconButtonWrapper
           icon={<ContentCut />}
@@ -245,9 +291,7 @@ export const PianoRollToolbar: React.FC = () => {
           disabled={!actions.hasSelection}
         />
       </Group>
-      <Divider />
       <PianoRollVelocityControl />
-      <Divider />
       <Group>
         <IconButtonWrapper
           icon={<ZoomOut />}
@@ -281,6 +325,8 @@ export const PianoRollToolbar: React.FC = () => {
           isActive={followPlayback}
         />
       </Group>
+      </div>
     </div>
+    </ThemeProvider>
   );
 };

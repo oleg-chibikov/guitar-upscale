@@ -144,6 +144,7 @@ Code: [looper/](../src/app/components/looper/), [looper.ts](../src/app/engine/lo
 
 The piano roll edits a track note by note. It opens from the control panel.
 
+- **Narrow screen** one row keeps the track picker, play, undo and the tools. The `⋯` button opens the rest.
 - **Track picker** the melody or any looper channel with a recording. An empty melody is ready to draw in.
 - **Song tracks** a song with several tracks, such as 2 guitars and vocals, shows each track in its own colour. Picking one track edits only its notes. The other tracks stay in view at low opacity. A click on one of their notes picks that note's track. New and pasted notes go into the picked track. `T` steps through the tracks.
 - **Track edits** buttons next to the track picker add an empty track, rename the picked track and delete it. Undo brings back the notes of a deleted track. A new name goes into the saved song.

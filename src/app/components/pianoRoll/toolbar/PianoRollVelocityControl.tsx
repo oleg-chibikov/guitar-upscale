@@ -35,7 +35,7 @@ export const PianoRollVelocityControl: React.FC = () => {
           : "Select notes to set their volume"
       }
     >
-      <div className="flex flex-row items-center gap-1 px-1 text-gray-300">
+      <div className="flex flex-row items-center gap-1 h-8 px-2 shrink-0 rounded-md bg-white/5 text-gray-300">
         <VolumeUp fontSize="small" />
         <input
           type="range"

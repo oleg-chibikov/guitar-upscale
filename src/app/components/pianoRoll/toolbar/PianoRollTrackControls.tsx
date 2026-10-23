@@ -7,36 +7,35 @@ import Headphones from "@mui/icons-material/Headphones";
 import PlaylistAdd from "@mui/icons-material/PlaylistAdd";
 import PlaylistRemove from "@mui/icons-material/PlaylistRemove";
 import { TextField } from "@mui/material";
-import React, { useRef, useState } from "react";
+import { Group } from "@/app/components/pianoRoll/toolbar/ToolbarGroup";
+import React, { useRef } from "react";
 
 const ALL_TRACKS = "all";
 
-export const PianoRollTrackControls: React.FC = () => {
-  const {
-    tracks,
-    activeTrack,
-    setActiveTrack,
-    addTrack,
-    deleteTrack,
-    renameTrack,
-    solo,
-    toggleSolo,
-  } = usePianoRoll();
-  const [renaming, setRenaming] = useState(false);
-  const cancelled = useRef(false);
+interface RenameProps {
+  renaming: boolean;
+  setRenaming: (renaming: boolean) => void;
+}
 
-  const startRename = () => {
-    cancelled.current = false;
-    setRenaming(true);
-  };
+/**
+ * The track picker and the solo button. The name field takes the picker's place while renaming
+ */
+export const PianoRollTrackPicker: React.FC<RenameProps> = ({
+  renaming,
+  setRenaming,
+}) => {
+  const { tracks, activeTrack, setActiveTrack, renameTrack, solo, toggleSolo } =
+    usePianoRoll();
+  const cancelled = useRef(false);
 
   const finishRename = (name: string) => {
     if (activeTrack && !cancelled.current) renameTrack(activeTrack, name);
+    cancelled.current = false;
     setRenaming(false);
   };
 
   return (
-    <div className="flex flex-row items-center">
+    <Group>
       {renaming && activeTrack ? (
         <TextField
           size="small"
@@ -88,6 +87,18 @@ export const PianoRollTrackControls: React.FC = () => {
         disabled={!activeTrack}
         isActive={solo && activeTrack !== undefined}
       />
+    </Group>
+  );
+};
+
+export const PianoRollTrackEdits: React.FC<RenameProps> = ({
+  renaming,
+  setRenaming,
+}) => {
+  const { activeTrack, addTrack, deleteTrack } = usePianoRoll();
+
+  return (
+    <Group>
       <IconButtonWrapper
         icon={<PlaylistAdd />}
         tooltip="Add a track"
@@ -96,7 +107,7 @@ export const PianoRollTrackControls: React.FC = () => {
       <IconButtonWrapper
         icon={<DriveFileRenameOutline />}
         tooltip={activeTrack ? "Rename the track" : "Pick a track to rename it"}
-        onPress={startRename}
+        onPress={() => setRenaming(true)}
         disabled={!activeTrack}
         isActive={renaming}
       />
@@ -110,6 +121,6 @@ export const PianoRollTrackControls: React.FC = () => {
         onPress={() => activeTrack && deleteTrack(activeTrack)}
         disabled={!activeTrack}
       />
-    </div>
+    </Group>
   );
 };
