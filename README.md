@@ -30,7 +30,8 @@ The app installs as a PWA, so it also works from the home screen.
 | --- | --- |
 | Space | Play or stop the shown track from the playhead |
 | 1, 2, 3 | Select, draw, erase |
-| Alt + drag | Copy the notes |
+| Hold Alt | Draw notes with any tool |
+| Alt + drag a note | Copy the notes |
 | Ctrl or Cmd + drag | Keep the drag in time or in pitch |
 | Arrows | Move the selection a grid step or a scale step. Shift moves an octave |
 | Q | Quantize to the grid |

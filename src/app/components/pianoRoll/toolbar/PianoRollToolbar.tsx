@@ -56,7 +56,7 @@ const tools: { tool: PianoRollTool; icon: ReactNode; tooltip: string }[] = [
   {
     tool: PianoRollTool.Draw,
     icon: <Edit />,
-    tooltip: "Draw notes (2). Drag right to make a note longer",
+    tooltip: "Draw notes (2, or hold Alt). Drag right to make a note longer",
   },
   {
     tool: PianoRollTool.Erase,
@@ -143,7 +143,7 @@ export const PianoRollToolbar: React.FC = () => {
           <IconButtonWrapper
             key={value}
             icon={icon}
-            tooltip={tooltip}
+            tooltip={tooltip.replace("Alt", altKey())}
             onPress={() => dispatch(setPianoRollTool(value))}
             isActive={tool === value}
           />
@@ -234,7 +234,7 @@ export const PianoRollToolbar: React.FC = () => {
         />
         <IconButtonWrapper
           icon={<KeyboardTab />}
-          tooltip="Follow the playhead during playback"
+          tooltip="Follow the playhead during playback. The view stays put while notes are selected"
           onPress={() => dispatch(setFollowPlayback(!followPlayback))}
           isActive={followPlayback}
         />

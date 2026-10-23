@@ -543,7 +543,9 @@ export const useNoteAreaInteraction = ({
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.button !== 0 && e.pointerType === "mouse") return;
-      const { data, selection, tool } = state.current;
+      const { data, selection } = state.current;
+      // holding Alt draws whatever tool is picked. Alt on a note still copies it
+      const tool = e.altKey ? PianoRollTool.Draw : state.current.tool;
       if (!data) return;
       stopInertia();
       if (e.pointerType === "touch") {

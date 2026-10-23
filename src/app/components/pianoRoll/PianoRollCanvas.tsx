@@ -50,6 +50,8 @@ interface PianoRollCanvasProps {
 
 type Region = "corner" | "timeline" | "keys" | "notes";
 
+type HoverPoint = { clientX: number; clientY: number; altKey: boolean };
+
 const PRESS_HIGHLIGHT_MS = 200;
 
 const toolCursor: Record<PianoRollTool, string> = {
@@ -83,6 +85,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
   const lastKeyY = useRef<number | undefined>(undefined);
   const pressedPitch = useRef<number | undefined>(undefined);
   const playheadTick = useRef(0);
+  const lastHover = useRef<HoverPoint | undefined>(undefined);
 
   const sceneRef = useRef<PianoRollScene | undefined>(undefined);
   const viewport = (): Viewport => ({
@@ -153,8 +156,10 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     }, PRESS_HIGHLIGHT_MS);
   };
 
-  const updateHover = (e: React.PointerEvent<HTMLDivElement>) => {
-    const container = e.currentTarget;
+  const updateHover = (e: HoverPoint) => {
+    const container = containerRef.current;
+    if (!container) return;
+    lastHover.current = e;
     const point = toLocal(e);
     const region = regionAt(point);
     let cursor = "";
@@ -183,12 +188,35 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
           title = UNAVAILABLE_CHORD_TITLE;
         }
       } else {
-        cursor = toolCursor[tool];
+        cursor = toolCursor[e.altKey ? PianoRollTool.Draw : tool];
       }
     }
     container.style.cursor = cursor;
     container.title = title;
   };
+  const updateHoverRef = useRef(updateHover);
+  useLayoutEffect(() => {
+    updateHoverRef.current = updateHover;
+  });
+
+  // holding Alt swaps the cursor to the pen without moving the mouse
+  useEffect(() => {
+    const handleAlt = (e: KeyboardEvent) => {
+      if (e.key !== "Alt" || !lastHover.current) return;
+      updateHoverRef.current({ ...lastHover.current, altKey: e.altKey });
+    };
+    const clearAlt = () => {
+      if (lastHover.current) updateHoverRef.current({ ...lastHover.current, altKey: false });
+    };
+    document.addEventListener("keydown", handleAlt);
+    document.addEventListener("keyup", handleAlt);
+    window.addEventListener("blur", clearAlt);
+    return () => {
+      document.removeEventListener("keydown", handleAlt);
+      document.removeEventListener("keyup", handleAlt);
+      window.removeEventListener("blur", clearAlt);
+    };
+  }, []);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const point = toLocal(e);
@@ -259,6 +287,7 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
       onPointerMove={handlePointerMove}
       onPointerUp={(e) => handlePointerEnd(e, false)}
       onPointerCancel={(e) => handlePointerEnd(e, true)}
+      onPointerLeave={() => (lastHover.current = undefined)}
       onDoubleClick={(e) => {
         if (regionAt(toLocal(e)) === "notes") noteHandlers.onDoubleClick(e);
       }}

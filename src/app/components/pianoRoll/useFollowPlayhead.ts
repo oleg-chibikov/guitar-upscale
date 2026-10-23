@@ -11,21 +11,23 @@ import { RefObject, useEffect } from "react";
 const PAGE_MARGIN_PX = 40;
 
 /**
- * Turns the page when the playhead leaves the view during playback, as Cubase's autoscroll does
+ * Turns the page when the playhead leaves the view during playback, as Cubase's autoscroll does.
+ * The page stays put while notes are selected, so the selection doesn't scroll away
  */
 export const useFollowPlayhead = (
   scrollerRef: RefObject<HTMLDivElement | null>,
   zoom: Zoom
 ) => {
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
-  const { playhead$, source } = usePianoRoll();
+  const { playhead$, source, selection } = usePianoRoll();
+  const hasSelection = selection.size > 0;
   const isMelodyPlaying = useSettingsSelector((s) => s.isPlaying);
   const isLooperPlaying = useSettingsSelector((s) => s.isLooperPlaying);
   const isPlaying =
     source?.looperChannel !== undefined ? isLooperPlaying : isMelodyPlaying;
 
   useEffect(() => {
-    if (!followPlayback || !isPlaying) return;
+    if (!followPlayback || !isPlaying || hasSelection) return;
     const subscription = playhead$.subscribe((tick) => {
       const scroller = scrollerRef.current;
       if (!scroller) return;
@@ -37,5 +39,5 @@ export const useFollowPlayhead = (
       }
     });
     return () => subscription.unsubscribe();
-  }, [followPlayback, isPlaying, scrollerRef, zoom, playhead$]);
+  }, [followPlayback, isPlaying, hasSelection, scrollerRef, zoom, playhead$]);
 };
