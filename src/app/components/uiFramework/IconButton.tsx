@@ -6,7 +6,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { ReactNode } from "react";
+import React, { MouseEvent, ReactNode, useRef } from "react";
+
+const LONG_PRESS_MS = 500;
 
 type MuiIconButtonColor = MuiIconButtonProps["color"];
 
@@ -20,6 +22,8 @@ export interface IconButtonWrapperProps extends WithClassName, WithId {
   tooltip: string;
   disabled?: boolean;
   allowHandlerInDisabledState?: boolean;
+  // fires on a press held for LONG_PRESS_MS or a right click
+  onLongPress?: (anchor: HTMLElement) => void;
 }
 
 export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
@@ -34,8 +38,46 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   className,
   disabled = false,
   allowHandlerInDisabledState,
+  onLongPress,
   ...rest
 }) => {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const firedLongPress = useRef(false);
+
+  const cancelLongPress = () => clearTimeout(timer.current);
+
+  const longPressProps = onLongPress && {
+    onPointerDown: (event: React.PointerEvent<HTMLElement>) => {
+      if (event.button !== 0) {
+        return;
+      }
+      firedLongPress.current = false;
+      const anchor = event.currentTarget;
+      timer.current = setTimeout(() => {
+        firedLongPress.current = true;
+        onLongPress(anchor);
+      }, LONG_PRESS_MS);
+    },
+    onPointerUp: cancelLongPress,
+    onPointerLeave: cancelLongPress,
+    onPointerCancel: cancelLongPress,
+    onContextMenu: (event: MouseEvent<HTMLElement>) => {
+      event.preventDefault();
+      cancelLongPress();
+      if (!firedLongPress.current) {
+        onLongPress(event.currentTarget);
+      }
+    },
+  };
+
+  const handleClick = () => {
+    if (firedLongPress.current) {
+      firedLongPress.current = false;
+      return;
+    }
+    onPress();
+  };
+
   const getColor = (): MuiIconButtonProps["color"] => {
     if (disabled) {
       return "warning";
@@ -54,13 +96,16 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
           <IconButton
             id={id}
             disabled={allowHandlerInDisabledState !== true && disabled}
-            onClick={onPress}
+            onClick={handleClick}
             color={getColor()}
             size="small"
             sx={{
               borderRadius: 0,
               padding: "4px",
+              WebkitTouchCallout: "none",
+              userSelect: "none",
             }}
+            {...longPressProps}
             {...rest}
           >
             <div className="relative inline-flex items-center justify-center">

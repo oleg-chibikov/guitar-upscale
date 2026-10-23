@@ -265,7 +265,9 @@ export const wipeExamplesCache = () => {
   }
 };
 
-export const getRandomScaleExample = async (): Promise<Example | undefined> => {
+export const getScaleExample = async (
+  chosen?: Example
+): Promise<Example | undefined> => {
   const groupScales = examplesMap.get(scaleGroupValue);
   const examples = groupScales?.get(scaleValue);
   if (!examples) {
@@ -280,5 +282,7 @@ export const getRandomScaleExample = async (): Promise<Example | undefined> => {
     })
   );
   await Promise.all(instrumentLoadPromises);
-  return getRandomRecord(examples);
+  return chosen && examples.includes(chosen)
+    ? chosen
+    : getRandomRecord(examples);
 };

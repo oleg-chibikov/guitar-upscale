@@ -55,7 +55,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
   const dispatch = useDispatch();
 
-  const handlePlay = useCallback(async () => {
+  const handlePlay = useCallback(async (chosen?: Example) => {
     if (isWaitingRef.current) {
       console.log(
         LOG_PREFIX +
@@ -65,6 +65,10 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     }
     updateWaiting(true);
     try {
+      if (chosen && isPlayingValue && !checkLooperPlaying()) {
+        await stop(dispatch);
+      }
+
       if (isPlayingValue) {
         if (checkLooperPlaying()) {
           await continueLooper();
@@ -82,7 +86,8 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       console.log(LOG_PREFIX, "Loading examples");
       const example: Example | undefined = await loadExample(
         decodeExample,
-        dispatch
+        dispatch,
+        chosen
       );
 
       await loadInstruments(example);
@@ -144,6 +149,12 @@ async function replay(dispatch: Dispatch<UnknownAction>, data: EventsByTick) {
   await playMidi(dispatch, data, LOG_PREFIX);
 }
 
+async function stop(dispatch: Dispatch<UnknownAction>) {
+  setPianoRollData(undefined, dispatch);
+  const { stopPlayback } = await import("@/app/engine/midiPlayer");
+  await stopPlayback(dispatch, LOG_PREFIX);
+}
+
 async function continueLooper() {
   console.log(LOG_PREFIX + "Stopping looper playback");
   const { stopLooperPlayback } = await import("@/app/engine/looper/looper");
@@ -199,18 +210,19 @@ async function loadInstruments(example: Example | undefined) {
 
 async function loadExample(
   decodeExample: ((example: Example) => Promise<EventsByTick>) | undefined,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch<UnknownAction>,
+  chosen?: Example
 ) {
   let example: Example | undefined;
   if (decodeExample && playbackTypeValue === melodyType) {
-    const { getRandomScaleExample, wipeExamplesCache } = await import(
+    const { getScaleExample, wipeExamplesCache } = await import(
       "@/app/data/scaleExamples"
     );
     if (wipeExampleCacheTriggerValue) {
       wipeExamplesCache();
       clearWipeExampleCacheTrigger();
     }
-    example = await getRandomScaleExample();
+    example = await getScaleExample(chosen);
     const tempo = example?.tempo;
     if (tempo !== undefined && tempo !== tempoBpmValue) {
       dispatch(setTempoBpm({ tempo: tempo, updateInterval: true }));
