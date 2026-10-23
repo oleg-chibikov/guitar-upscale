@@ -100,6 +100,11 @@
     "title": "Trinity"
   },
   {
+    "path": "Minor/Aeolian - Natural/ATB - 9 PM (Till I Come).gp",
+    "band": "Guitar Upscale",
+    "title": "Special Chromatic (All notes)"
+  },
+  {
     "path": "Minor/Aeolian - Natural/Breaking Benjamin - The Diary Of Jane.gp",
     "band": "Breaking Benjamin",
     "title": "The Diary Of Jane"
@@ -458,11 +463,6 @@
     "path": "Minor/Phrygian/Кино - Кукушка.gp",
     "band": "Кино",
     "title": "Кукушка"
-  },
-  {
-    "path": "Special/Chromatic (All notes)/ATB - 9 PM (Till I Come).gp",
-    "band": "ATB",
-    "title": "9 PM (Till I Come)"
   },
   {
     "path": "Various Exotic/Moorish Phrygian/In Flames - Borders and Shading.gp",
