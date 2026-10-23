@@ -8,6 +8,7 @@ Guitar Upscale is a guitar you play in the browser. The person taps notes on a f
 | [features.md](features.md) | learn what each part of the screen does |
 | [user-flows.md](user-flows.md) | follow a person through common tasks |
 | [architecture.md](architecture.md) | find your way around the code |
+| [chords.md](chords.md) | see how chord shapes and fingerings are built, in Russian |
 
 ## The app in one picture
 
