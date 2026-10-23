@@ -1076,6 +1076,8 @@ const getRandomRecord = <T>(array: T[]): T => {
   return array[randomIndex];
 };
 
+let lastExample: Example | undefined;
+
 export const wipeExamplesCache = () => {
   console.log("Wiping example cache");
   for (const [, mapForScaleGroup] of Array.from(examplesMap.entries())) {
@@ -1104,7 +1106,14 @@ export const getScaleExample = async (
     })
   );
   await Promise.all(instrumentLoadPromises);
-  return chosen && examples.includes(chosen)
-    ? chosen
-    : getRandomRecord(examples);
+  if (chosen && examples.includes(chosen)) {
+    lastExample = chosen;
+    return chosen;
+  }
+  const candidates =
+    examples.length > 1
+      ? examples.filter((example) => example !== lastExample)
+      : examples;
+  lastExample = getRandomRecord(candidates);
+  return lastExample;
 };
