@@ -407,8 +407,10 @@ const main = async () => {
   const bpm =
     tempos.filter((a) => a.measure <= from).at(-1)?.bpm ?? tempos[0]?.bpm ?? 120;
 
-  // One step is a 16th note played as an app half beat of 8 ticks, so the tempo doubles
-  const TICKS_IN_STEP = 8;
+  // One step is a 16th note, 4 app ticks. A song above 180 BPM gets half the tempo and 32nds instead
+  const isFast = bpm > 180;
+  const TICKS_IN_STEP = isFast ? 2 : 4;
+  const tempo = snapTempo(isFast ? bpm / 2 : bpm);
   const tuning = STANDARD.map((midi) => ({ octave: Math.floor(midi / 12), note: midi % 12 }));
   const tabTrack = (name, notes) => ({
     name,
@@ -447,7 +449,7 @@ const main = async () => {
   const fileName = `${toFileName(band)} - ${toFileName(title)}.gp`;
   const file = join(dir, fileName);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(file, await writeGuitarPro({ band, title, tempo: snapTempo(bpm * 2), root: E, tracks }));
+  writeFileSync(file, await writeGuitarPro({ band, title, tempo, root: E, tracks }));
   console.log(`Saved to ${file}`);
   if (dir === SONGS_DIR) {
     execFileSync(process.execPath, [...process.execArgv, resolve(ROOT, "scripts/build-song-index.mjs")], {
