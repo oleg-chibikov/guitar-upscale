@@ -25,6 +25,7 @@ interface UiState {
   skin: CombinedSkinType;
   settingsExpanded: boolean;
   chordsExpanded: boolean;
+  allChordsShown: boolean;
   controlPanelExpanded: boolean;
   strummingSettingsExpanded: boolean;
   strummingPatternEditorExpanded: boolean;
@@ -51,6 +52,7 @@ const initialState: UiState = {
   skin: Skin.Guitar4,
   settingsExpanded: false,
   chordsExpanded: true,
+  allChordsShown: false,
   controlPanelExpanded: true,
   strummingSettingsExpanded: false,
   strummingPatternEditorExpanded: false,
@@ -121,6 +123,9 @@ export const uiSlice = createSlice({
     },
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
+    },
+    setAllChordsShown: (state, action: PayloadAction<boolean>) => {
+      state.allChordsShown = action.payload;
     },
     setControlPanelExpanded(state, action: PayloadAction<boolean>) {
       state.controlPanelExpanded = action.payload;
@@ -230,6 +235,7 @@ export const {
   setSkinBasedOnStringCount,
   setSettingsExpanded,
   setChordsExpanded,
+  setAllChordsShown,
   setControlPanelExpanded,
   setStrummingSettingsExpanded,
   setStrummingPatternEditorExpanded,

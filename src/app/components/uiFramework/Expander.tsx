@@ -8,7 +8,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   expanded: boolean;
@@ -16,6 +16,8 @@ interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   title: string;
   reverseIcon?: boolean;
   expandOnlyOnIcon?: boolean;
+  // shown in the header next to the title. A press on it doesn't toggle the expander
+  headerAction?: ReactNode;
 }
 
 export const Expander: FC<ExpanderProps> = ({
@@ -28,6 +30,7 @@ export const Expander: FC<ExpanderProps> = ({
   title,
   reverseIcon = false,
   expandOnlyOnIcon = false,
+  headerAction,
 }) => {
   const theme = useUiSelector((s) => s.theme);
   return (
@@ -89,7 +92,17 @@ export const Expander: FC<ExpanderProps> = ({
           id={id}
           aria-controls={id}
         >
-          <Typography variant="overline">{title}</Typography>
+          <div className="flex flex-row items-center justify-between gap-2 w-full">
+            <Typography variant="overline">{title}</Typography>
+            {headerAction !== undefined && (
+              <span
+                style={{ pointerEvents: "auto" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {headerAction}
+              </span>
+            )}
+          </div>
         </AccordionSummary>
         <AccordionDetails
           className="flex flex-col gap-2"

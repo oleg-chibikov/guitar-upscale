@@ -8,6 +8,7 @@ import {
 } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
 import { NOTE_COUNT, isSharp } from "@/app/data/notes";
+import { getShiftedNote } from "@/app/data/tunings";
 import {
   addChordsToDetectorLookup,
   clearChordDetector,
@@ -37,17 +38,20 @@ import {
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
-import { setChordsExpanded } from "@/app/store/uiSlice";
+import { setAllChordsShown, setChordsExpanded } from "@/app/store/uiSlice";
+import { Button } from "@mui/material";
 import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
-import { ChordGrid } from "./ChordGrid";
+import { ChordGrid, LARGE_CELL_HEIGHT, SMALL_CELL_HEIGHT } from "./ChordGrid";
+import { buildAllChordsLayout, buildKeyChordsLayout } from "./chordGridLayout";
 import { ChordGridStore } from "./chordGridStore";
 
 const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 const CHORDS_RENDER_INTERVAL_MS = 150;
+const KEY_CHORDS_PER_COLUMN = 4;
 
 export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = ({
   mainRef,
@@ -93,6 +97,10 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   const useSharpChords = useUiSelector((s) => s.useSharpChords);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
+  const allChordsShown = useUiSelector((s) => s.allChordsShown);
+  const capo = useSettingsSelector((s) => s.capo);
+  const tuning = useSettingsSelector((s) => s.tuning);
+  const slashChordBassNote = useSettingsSelector((s) => s.slashChordBassNote);
   const hasTouchInput = useInputChecker();
 
   const dispatch = useDispatch();
@@ -196,6 +204,15 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
   const notes = Array.from({ length: NOTE_COUNT }, (_, note) => note).filter(
     (note) => useSharpChords || !isSharp(note)
   );
+  const layout = allChordsShown
+    ? buildAllChordsLayout(chordModeVariations, notes)
+    : buildKeyChordsLayout(
+        chordModeVariations,
+        getShiftedNote(capo, tuning),
+        KEY_CHORDS_PER_COLUMN
+      );
+  const cellHeight =
+    allChordsShown && useSharpChords ? SMALL_CELL_HEIGHT : LARGE_CELL_HEIGHT;
 
   return (
     <Expander
@@ -207,9 +224,23 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
       expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
       handleExpansion={handleExpansion}
       title="Chords"
+      headerAction={
+        chordsExpanded ? (
+          <Button
+            component="span"
+            size="small"
+            sx={{ minWidth: 0, py: 0, lineHeight: 1.5 }}
+            onClick={() => dispatch(setAllChordsShown(!allChordsShown))}
+          >
+            {allChordsShown ? "In key" : "All"}
+          </Button>
+        ) : undefined
+      }
     >
       <div className="relative flex flex-row gap-0.5">
-        <SlashChordButtonsContainer />
+        {(allChordsShown || slashChordBassNote !== undefined) && (
+          <SlashChordButtonsContainer />
+        )}
 
         <section
           ref={ref}
@@ -224,8 +255,8 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
           }}
         >
           <ChordGrid
-            columns={chordModeVariations}
-            notes={notes}
+            layout={layout}
+            cellHeight={cellHeight}
             store={store}
             scrollerRef={ref}
             hasTouchInput={hasTouchInput}
@@ -238,7 +269,9 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
               <ChordButton
                 key={title}
                 store={store}
-                isHidden={!useSharpChords && isSharp(noteIndex)}
+                isHidden={
+                  allChordsShown && !useSharpChords && isSharp(noteIndex)
+                }
                 chordMode={chordMode.chordMode}
                 note={noteIndex}
                 variations={chordMode.variationsByNote[noteIndex] ?? []}

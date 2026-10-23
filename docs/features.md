@@ -50,11 +50,12 @@ Code: [ScaleAndGroupSelector.tsx](../src/app/components/settings/selectors/Scale
 
 ## Chords
 
-The chords panel lists the chords that fit the scale on each note.
+The chords panel opens on the chords of the key: one chord per scale note, from the root up. Each is the first chord type that fits the scale, such as `Em F#dim G Am Bm C D` for E minor. The chords fill a column of 4, then the next one.
 
+- **All** in the panel header opens the full grid: every root note against every chord type. Chords outside the scale show grey. **In key** goes back.
 - **Tap a chord** it plays once, strummed string by string.
 - **Hold a chord** it strums with the chosen pattern until release. See [Strumming](#strumming).
-- **Slash chords** extra buttons play the chord over another bass note, such as `C/E`.
+- **Slash chords** the `Bass note` strip in the full grid plays the chord over another bass note, such as `C/E`. The key view shows the strip only while a bass note is on.
 - **Basic chord types** major and minor are free. More types such as 7th, sus and dim need Explorer.
 
 Settings that change how a chord sounds:
@@ -64,7 +65,7 @@ Settings that change how a chord sounds:
 | **Chord play mode** | Settings | picks the shape: round robin, preferred, fewest or most notes, barre, with thumb, first, random |
 | **Notes to play in chord** | Settings | caps how many strings sound |
 | **Delay between notes in chord** | Control panel | time between strings in one strum |
-| **Show chords for ♯ notes** | Settings | adds chords on sharp roots |
+| **Show chords for ♯ notes** | Settings | adds chords on sharp roots to the full grid |
 | **Alternate chords (↑↓)** | Settings | flips the strum direction on each press |
 
 Web Workers build the chord shapes when the app starts or the guitar settings change. The rows fill in one chord type at a time as the workers finish.

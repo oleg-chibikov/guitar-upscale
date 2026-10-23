@@ -1,5 +1,3 @@
-import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
-import { Note } from "@/app/data/notes";
 import { findClosestCell } from "@/app/engine/chords/chordButtonHitAreas";
 import {
   getNativeContext,
@@ -18,10 +16,11 @@ import Konva from "konva";
 import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
 import { Layer, Shape, Stage } from "react-konva";
 import { ChordCellState, ChordGridStore, PULSE_MS } from "./chordGridStore";
+import { ChordGridCell } from "./chordGridLayout";
 
 const CELL_WIDTH = 64;
-const SMALL_CELL_HEIGHT = 24;
-const LARGE_CELL_HEIGHT = 32;
+export const SMALL_CELL_HEIGHT = 24;
+export const LARGE_CELL_HEIGHT = 32;
 const GAP = 2;
 const BORDER = 2;
 const TEXT_PADDING = 2;
@@ -29,8 +28,8 @@ const PULSE_SCALE = 0.5;
 const FONT = `${BUTTON_FONT_STYLE} 12px ${BUTTON_FONT_FAMILY}`;
 
 interface ChordGridProps {
-  columns: ChordModeVariations[];
-  notes: Note[];
+  layout: ChordGridCell[];
+  cellHeight: number;
   store: ChordGridStore;
   // the element that scrolls the grid. Presses snap only to buttons inside it
   scrollerRef: RefObject<HTMLElement | null>;
@@ -148,32 +147,27 @@ const drawCells = (
  * The chord buttons, drawn on one canvas. A press plays the closest playable chord.
  */
 export const ChordGrid: React.FC<ChordGridProps> = ({
-  columns,
-  notes,
+  layout,
+  cellHeight,
   store,
   scrollerRef,
   hasTouchInput,
 }) => {
   const theme = useUiSelector((s) => s.theme);
-  const useSharpChords = useUiSelector((s) => s.useSharpChords);
-  const cellHeight = useSharpChords ? SMALL_CELL_HEIGHT : LARGE_CELL_HEIGHT;
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
 
-  const width = columns.length * (CELL_WIDTH + GAP) - GAP;
-  const height = notes.length * (cellHeight + GAP) - GAP;
+  const columnCount = Math.max(0, ...layout.map((c) => c.column + 1));
+  const rowCount = Math.max(0, ...layout.map((c) => c.row + 1));
+  const width = Math.max(0, columnCount * (CELL_WIDTH + GAP) - GAP);
+  const height = Math.max(0, rowCount * (cellHeight + GAP) - GAP);
 
-  const cells: Cell[] = [];
-  notes.forEach((note, row) => {
-    columns.forEach(({ chordMode, variationsByNote }, column) => {
-      cells.push({
-        chordName: getChordName(note, chordMode),
-        x: column * (CELL_WIDTH + GAP),
-        y: row * (cellHeight + GAP),
-        isDisabled: !(variationsByNote[note]?.length ?? 0),
-      });
-    });
-  });
+  const cells: Cell[] = layout.map(({ chordName, column, row, isDisabled }) => ({
+    chordName,
+    x: column * (CELL_WIDTH + GAP),
+    y: row * (cellHeight + GAP),
+    isDisabled,
+  }));
 
   const drawRef = useRef<(ctx: CanvasRenderingContext2D) => void>(() => {});
   useLayoutEffect(() => {
