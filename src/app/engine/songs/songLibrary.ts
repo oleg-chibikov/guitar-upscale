@@ -298,9 +298,6 @@ const saveEdits = async (events: EventsByTick) => {
   const list = await getExamples();
   const isCopy = !example.isUserSong;
   const song = eventsToSong(events, example);
-  if (isCopy) {
-    song.title = `${song.title} (edited)`;
-  }
   const bytes = await songToGuitarPro(song);
   const record: UserSongRecord = {
     id: isCopy ? uuidv4() : example.id.replace(/^user:/, ""),

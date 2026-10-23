@@ -166,7 +166,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 - **Other tracks** play their notes as written, with no chord guessing.
 - **Delete** hold Play and press the bin next to an uploaded song.
 - **Download** hold Play and press the download icon next to any song. The `.gp` file is in the key and tuning from the settings.
-- **Edits** a piano roll edit saves a second after the last change. An uploaded song updates. A built-in song gets an own copy named "(edited)", and the built-in file stays as it was.
+- **Edits** a piano roll edit saves a second after the last change. An uploaded song updates. A built-in song gets an own copy under the same name, and the built-in file stays as it was.
 
 Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).
 

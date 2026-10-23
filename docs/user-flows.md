@@ -165,7 +165,7 @@ flowchart TD
 4. Press Space to play the track. A loop plays in time with the looper.
 5. Close the dialog and press Download to save the melody as `.gp`. Hold Download for `.mid`.
 
-Edits to a song save on their own. An uploaded song updates in place. A built-in song gets its own copy named "(edited)".
+Edits to a song save on their own. An uploaded song updates in place. A built-in song gets its own copy under the same name.
 
 ## Add your own song
 
