@@ -63,7 +63,7 @@ flowchart TD
 ```
 
 1. Open strumming settings from the control panel and pick a pattern. The pattern dialog adds and edits custom ones.
-2. Set the tempo in the control panel. Turn on the metronome in the play panel to hear the beat.
+2. Set the tempo in the play panel. Turn on the metronome next to it to hear the beat.
 3. Hold a chord button. The chord sounds at once, and the pattern goes on in time with the clock.
 4. Press the next chord while still holding, or right after release.
 5. A quick tap plays the chord once and skips the pattern.

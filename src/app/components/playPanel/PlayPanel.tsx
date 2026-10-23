@@ -5,10 +5,13 @@ import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
 import { ResetPlaybackButton } from "@/app/components/playPanel/ResetPlaybackButton";
+import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
+import { VolumeControl } from "@/app/components/settings/valueDialogControls/VolumeControl";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { PLAY_PANEL_ID } from "@/app/data/elementIds";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
+import { useUiSelector } from "@/app/hooks/storeHooks";
 import dynamic from "next/dynamic";
 import React, { ReactNode } from "react";
 
@@ -21,6 +24,7 @@ const DisabledRecordButton = dynamic(
 export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
   premiumComponents,
 }) => {
+  const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   return (
     <Panel id={PLAY_PANEL_ID}>
       <PreviousEventButton />
@@ -33,6 +37,13 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       <MetronomeButton />
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
         <DisabledRecordButton />
+      )}
+      {/* over the piano roll the bar keeps to the transport buttons */}
+      {!pianoRollExpanded && (
+        <>
+          <TempoControl />
+          <VolumeControl />
+        </>
       )}
     </Panel>
   );

@@ -1,8 +1,4 @@
 import { KeyChip } from "@/app/components/settings/KeyChip";
-import { ChordStrummingDelayControl } from "@/app/components/settings/valueDialogControls/ChordStrummingDelayControl";
-import { MetronomeVolumeControl } from "@/app/components/settings/valueDialogControls/MetronomeVolumeControl";
-import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
-import { VolumeControl } from "@/app/components/settings/valueDialogControls/VolumeControl";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
@@ -36,17 +32,7 @@ export const ControlPanel: React.FC<WithPremiumComponents> = ({
     >
       <KeyChip premiumComponents={premiumComponents} />
       {controlPanelExpanded && (
-        <>
-          <ButtonContainer premiumComponents={premiumComponents} />
-          <div className="flex flex-col gap-1">
-            <VolumeControl />
-            <MetronomeVolumeControl />
-          </div>
-          <div className="flex flex-col gap-1">
-            <TempoControl />
-            <ChordStrummingDelayControl />
-          </div>
-        </>
+        <ButtonContainer premiumComponents={premiumComponents} />
       )}
       <IconButtonWrapper
         icon={towardsEdge ? <ChevronRight /> : <ChevronLeft />}

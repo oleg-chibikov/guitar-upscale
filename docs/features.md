@@ -64,7 +64,7 @@ Settings that change how a chord sounds:
 | --- | --- | --- |
 | **Chord play mode** | Settings | picks the shape: round robin, preferred, fewest or most notes, barre, with thumb, first, random |
 | **Notes to play in chord** | Settings | caps how many strings sound |
-| **Delay between notes in chord** | Control panel | time between strings in one strum |
+| **Delay between notes in chord** | Strumming | time between strings in one strum |
 | **Show chords for ♯ notes** | Settings | adds chords on sharp roots to the full grid |
 | **Alternate chords (↑↓)** | Settings | flips the strum direction on each press |
 
@@ -80,6 +80,7 @@ A held chord plays a strumming pattern in time with the clock.
 - **Pattern length** each step is a bar, half bar, beat, 1/8, 1/16, 1/32 or 1/64.
 - **Wait for pattern to finish** a release lets the pattern play to its end.
 - **Chord switching amidst pattern** a new chord takes over the running pattern without a restart.
+- **Delay between notes in chord** the time between strings in one strum, from 0 ms.
 - **Immediate chord grace period** a short window after the first press. A release inside it plays the chord once and skips the pattern.
 
 Custom patterns stay in `localStorage` under the `strummingPatterns` key.
@@ -99,6 +100,8 @@ The play panel plays, steps through and saves what is loaded.
 | **Download** | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
 | **Metronome** | turns the click on and off |
 | **Record** | records MIDI [Composer]. See [MIDI recording](#midi-recording) |
+| **Tempo** | shows the BPM. A press opens a slider. Hidden while the piano roll is open |
+| **Volume** | shows the playback volume. A press opens a slider. Hidden while the piano roll is open |
 
 Space starts playback from anywhere on the page. The piano roll takes Space for its own player while open.
 
@@ -201,7 +204,7 @@ The gear button opens a drawer. Each value survives a reload.
 
 "Reset settings" at the bottom puts the defaults back.
 
-The control panel holds the settings people change while playing. It opens with the key button: scale, tuning, capo and scale detection. Next come the settings, piano roll, strumming, detect chord, upload, fullscreen (desktop) and about buttons, then volume, metronome volume, tempo and chord strum delay. The arrow at the end hides everything but the key button.
+The control panel opens with the key button: scale, tuning, capo and scale detection. Next come the settings, piano roll, strumming, detect chord, upload, fullscreen (desktop) and about buttons. The arrow at the end hides everything but the key button. Tempo and volume sit in the play panel.
 
 Code: [SettingsView.tsx](../src/app/components/settings/SettingsView.tsx), [ControlPanel.tsx](../src/app/components/settings/ControlPanel.tsx), [settingsSlice.ts](../src/app/store/settingsSlice.ts), [uiSlice.ts](../src/app/store/uiSlice.ts).
 

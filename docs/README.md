@@ -36,9 +36,9 @@ flowchart LR
 | Part | What the person does with it |
 | --- | --- |
 | **Fretboard** | taps notes, sees the scale and the chord shapes |
-| **Control panel** | picks the scale, tuning, capo, tempo and volume |
-| **Chords** | taps a chord to play it, holds it to strum |
-| **Play panel** | plays the scale or a song, records MIDI, downloads it |
+| **Control panel** | picks the scale, tuning and capo, opens settings and the tools |
+| **Chords** | taps a chord of the key to play it, holds it to strum. "All" shows every chord |
+| **Play panel** | plays the scale or a song, sets tempo and volume, records MIDI, downloads it |
 | **Looper** | records short loops on separate channels and stacks them |
 | **Piano roll** | edits a melody or a loop note by note |
 

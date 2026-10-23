@@ -17,7 +17,7 @@ export const ChordStrummingDelaySlider: React.FC = () => {
   };
 
   return (
-    <ControlWithLabel label="Chord strumming delay">
+    <ControlWithLabel label="Delay between notes in chord">
       <StepSlider
         onValueChange={handleSliderChange}
         value={chordStrummingDelayMs}
