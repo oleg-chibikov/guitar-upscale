@@ -8,7 +8,7 @@ import { writeGuitarPro } from "./gpWriter";
 import { readMidiSong } from "./midiReader";
 import { midiToOctaveNote, normalizeChordName } from "./songHelpers";
 
-const NUMB = "public/songs/Minor/Aeolian - Natural/Linkin Park - Numb.gp";
+const NUMB = "public/songs/Linkin Park - Numb.gp";
 
 describe("readGuitarProSong", () => {
   it("keeps chords on the Chords track and the melody as tab", async () => {

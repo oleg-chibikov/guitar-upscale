@@ -9,7 +9,6 @@ import { EventsByTick } from "@/app/engine/eventsByTick";
 import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
 import { scaleDetector } from "@/app/engine/scales/scaleDetector";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
-import { toFileName } from "@/app/engine/songs/songHelpers";
 import {
   UserSongRecord,
   deleteUserSong,
@@ -23,21 +22,13 @@ import { v4 as uuidv4 } from "uuid";
 
 const SONGS_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/songs`;
 
-// One line of public/songs/index.json. Folders give the scale group and the scale
-type IndexEntry = { path: string; band: string; title: string };
-
-const findScale = (groupFolder: string, scaleFolder: string) => {
-  for (const [group, scales] of Array.from(scalesMap.entries())) {
-    if (toFileName(group) !== groupFolder) {
-      continue;
-    }
-    for (const scale of Array.from(scales.keys())) {
-      if (toFileName(scale) === scaleFolder) {
-        return { scaleGroup: group, scale };
-      }
-    }
-  }
-  return undefined;
+// One line of public/songs/index.json. pnpm songs:index picks the scale from the song's notes
+type IndexEntry = {
+  path: string;
+  band: string;
+  title: string;
+  scaleGroup: string;
+  scale: string;
 };
 
 export const readSong = async (
@@ -64,27 +55,22 @@ const loadBuiltInExamples = async (): Promise<Example[]> => {
   }
 
   return entries.flatMap((entry) => {
-    const [groupFolder, scaleFolder] = entry.path.split("/");
-    const found = findScale(groupFolder, scaleFolder);
-    if (!found) {
-      console.warn("No scale matches the song folder", entry.path);
+    if (scalesMap.get(entry.scaleGroup)?.has(entry.scale) !== true) {
+      console.warn("The song index names an unknown scale", entry);
       return [];
     }
-    const url = `${SONGS_URL}/${entry.path
-      .split("/")
-      .map(encodeURIComponent)
-      .join("/")}`;
-    const fileName = entry.path.split("/").pop() ?? entry.path;
+    const url = `${SONGS_URL}/${encodeURIComponent(entry.path)}`;
     return [
       {
         id: `builtin:${entry.path}`,
         band: entry.band,
         title: entry.title,
-        ...found,
+        scaleGroup: entry.scaleGroup,
+        scale: entry.scale,
         isUserSong: false,
         load: async () => {
           const response = await fetch(url);
-          return readSong(await response.arrayBuffer(), fileName, "gp");
+          return readSong(await response.arrayBuffer(), entry.path, "gp");
         },
       },
     ];

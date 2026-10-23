@@ -2,14 +2,14 @@
 // Downloads a song from Songsterr and saves it as a Guitar Pro file in public/songs.
 // The app builds every scale from E, so the song is moved to an E tonic first.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { CHROMATIC, scalesMap } from "../src/app/data/scaleDefinitions.ts";
 import { writeGuitarPro } from "../src/app/engine/songs/gpWriter.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SCALES_FILE = resolve(ROOT, "src/app/data/scales.ts");
 const SONGS_DIR = resolve(ROOT, "public/songs");
 const NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split(" ");
 const STANDARD = [64, 59, 55, 50, 45, 40];
@@ -67,7 +67,7 @@ const fail = (message) => {
 
 const pc = (pitch) => ((pitch % 12) + 12) % 12;
 
-// Scale intervals in scales.ts count from E.
+// Scale intervals in scaleDefinitions.ts count from E.
 const inScale = (scale, pitch) => scale.notes.has(pc(pitch - E));
 
 const getJson = async (url) => {
@@ -108,26 +108,13 @@ const snapTempo = (tempo) =>
     Math.abs(step - tempo) < Math.abs(best - tempo) ? step : best
   );
 
-const parseScales = () => {
-  const text = readFileSync(SCALES_FILE, "utf8");
-  const scales = [];
-  const groupRe =
-    /\n {2}\[\n {4}("[^"]+"|SPECIAL),\n {4}new Map\(\[([\s\S]*?)\n {4}\]\),/g;
-  for (const [, rawGroup, body] of text.matchAll(groupRe)) {
-    const group = rawGroup === "SPECIAL" ? "Special" : JSON.parse(rawGroup);
-    for (const [, name, rawIntervals] of body.matchAll(
-      /\[\s*"([^"]+)",\s*\[([\d,\s]*)\]\s*\]/g
-    )) {
-      if (name === "Chromatic (All notes)") continue;
-      const intervals = rawIntervals
-        .split(",")
-        .map(Number)
-        .filter((x) => x > 0 && x < 12);
-      scales.push({ group, name, notes: new Set([0, ...intervals]) });
-    }
-  }
-  return scales;
-};
+// The index names the scale the notes fit best, which may be smaller than this one
+const listScales = () =>
+  Array.from(scalesMap.entries()).flatMap(([group, scales]) =>
+    Array.from(scales.entries())
+      .filter(([name]) => name !== CHROMATIC)
+      .map(([name, intervals]) => ({ group, name, notes: new Set([0, ...intervals]) }))
+  );
 
 const listSong = (meta, measures) => {
   console.log(`${meta.artist} - ${meta.title} (song ${meta.songId})\n`);
@@ -349,15 +336,6 @@ const toFileName = (text) =>
     .replace(/\s*\/\s*/g, (match) => (match.trim() === match ? "-" : " - "))
     .replace(/[\\:*?"<>|]/g, "");
 
-// A rerun replaces the old copy of the same song, even under another scale.
-const removeOldCopies = (dir, fileName) => {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) removeOldCopies(path, fileName);
-    else if (entry.name === fileName) rmSync(path);
-  }
-};
-
 const main = async () => {
   if (opts.help) return console.log(HELP);
   const songId = await findSong();
@@ -395,7 +373,7 @@ const main = async () => {
   const shift = pickShift(tonic, melodyRaw.notes);
   const shifted = (n) => ({ ...n, pitch: n.pitch + shift });
 
-  const scales = parseScales();
+  const scales = listScales();
   const scale = opts.scale
     ? scales.find((s) => `${s.group}/${s.name}` === opts.scale) ??
       fail(`Unknown scale "${opts.scale}"`)
@@ -467,13 +445,12 @@ const main = async () => {
 
   const dir = resolve(opts.dir ?? SONGS_DIR);
   const fileName = `${toFileName(band)} - ${toFileName(title)}.gp`;
-  const file = join(dir, toFileName(scale.group), toFileName(scale.name), fileName);
-  removeOldCopies(dir, basename(file));
-  mkdirSync(dirname(file), { recursive: true });
+  const file = join(dir, fileName);
+  mkdirSync(dir, { recursive: true });
   writeFileSync(file, await writeGuitarPro({ band, title, tempo: snapTempo(bpm * 2), root: E, tracks }));
   console.log(`Saved to ${file}`);
   if (dir === SONGS_DIR) {
-    execFileSync(process.execPath, [resolve(ROOT, "scripts/build-song-index.mjs")], {
+    execFileSync(process.execPath, [...process.execArgv, resolve(ROOT, "scripts/build-song-index.mjs")], {
       cwd: ROOT,
       stdio: "inherit",
     });
