@@ -63,13 +63,18 @@ export const usePianoRollActions = () => {
         if (!data || !states.length) return;
         apply(pasteEvents(data, states, getSpan(states).end));
       },
-      transpose: (steps: number, octave: boolean) => {
-        if (!data || !selection.size) return;
+      // the toolbar buttons move every note when nothing is selected, like quantize
+      transpose: (steps: number, octave: boolean, orAll = false) => {
+        const ids =
+          selection.size || !orAll
+            ? selection
+            : new Set(events.map(({ event }) => event.id));
+        if (!data || !ids.size) return;
         const targets = octave
-          ? resolveTranspose(data, selection, steps * 12)
+          ? resolveTranspose(data, ids, steps * 12)
           : resolveTranspose(
               data,
-              selection,
+              ids,
               steps,
               snapToScale ? scalePattern : undefined
             );

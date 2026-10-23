@@ -30,6 +30,10 @@ import Delete from "@mui/icons-material/Delete";
 import AlignHorizontalLeft from "@mui/icons-material/AlignHorizontalLeft";
 import Edit from "@mui/icons-material/Edit";
 import FitScreen from "@mui/icons-material/FitScreen";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardDoubleArrowDown from "@mui/icons-material/KeyboardDoubleArrowDown";
+import KeyboardDoubleArrowUp from "@mui/icons-material/KeyboardDoubleArrowUp";
 import KeyboardTab from "@mui/icons-material/KeyboardTab";
 import UnfoldLess from "@mui/icons-material/UnfoldLess";
 import UnfoldMore from "@mui/icons-material/UnfoldMore";
@@ -67,6 +71,18 @@ const tools: { tool: PianoRollTool; icon: ReactNode; tooltip: string }[] = [
     icon: <CleaningServices />,
     tooltip: "Erase notes (3). Drag across notes to erase them all",
   },
+];
+
+const transposeButtons: {
+  steps: number;
+  octave: boolean;
+  icon: ReactNode;
+  key: string;
+}[] = [
+  { steps: -1, octave: true, icon: <KeyboardDoubleArrowDown />, key: "Shift+Down" },
+  { steps: -1, octave: false, icon: <KeyboardArrowDown />, key: "Down" },
+  { steps: 1, octave: false, icon: <KeyboardArrowUp />, key: "Up" },
+  { steps: 1, octave: true, icon: <KeyboardDoubleArrowUp />, key: "Shift+Up" },
 ];
 
 export const PianoRollToolbar: React.FC = () => {
@@ -176,6 +192,17 @@ export const PianoRollToolbar: React.FC = () => {
           isActive={snapToScale && !isChromatic}
           disabled={isChromatic}
         />
+      </Group>
+      <Divider />
+      <Group>
+        {transposeButtons.map(({ steps, octave, icon, key }) => (
+          <IconButtonWrapper
+            key={key}
+            icon={icon}
+            tooltip={`Move ${actions.hasSelection ? "the selected" : "all"} notes ${steps > 0 ? "up" : "down"} ${octave ? "an octave" : snapToScale && !isChromatic ? "a scale step" : "a semitone"} (${key})`}
+            onPress={() => actions.transpose(steps, octave, true)}
+          />
+        ))}
       </Group>
       <Divider />
       <Group>
