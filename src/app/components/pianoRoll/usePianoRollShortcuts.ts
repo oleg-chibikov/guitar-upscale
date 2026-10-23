@@ -24,7 +24,7 @@ const toolKeys: Record<string, PianoRollTool> = {
 };
 
 export const usePianoRollShortcuts = () => {
-  const { undo, redo, chordToChoose, tracks, activeTrack, setActiveTrack } =
+  const { undo, redo, chordToChoose, tracks, activeTrack, setActiveTrack, toggleSolo } =
     usePianoRoll();
   const actions = usePianoRollActions();
   const { zoomBy, zoomToFit } = usePianoRollView();
@@ -40,9 +40,9 @@ export const usePianoRollShortcuts = () => {
     const index = order.indexOf(activeTrack?.trackNumber);
     setActiveTrack(order[(index + direction + order.length) % order.length]);
   };
-  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack });
+  const latest = useRef({ undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack, toggleSolo });
   useLayoutEffect(() => {
-    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack };
+    latest.current = { undo, redo, actions, zoomBy, zoomToFit, togglePlay, seekTo, paused, stepTrack, toggleSolo };
   });
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export const usePianoRollShortcuts = () => {
       if (latest.current.paused || isTyping(e.target) || e.defaultPrevented) {
         return;
       }
-      const { undo, redo, actions, zoomBy, zoomToFit, seekTo, stepTrack } = latest.current;
+      const { undo, redo, actions, zoomBy, zoomToFit, seekTo, stepTrack, toggleSolo } = latest.current;
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 
@@ -108,6 +108,8 @@ export const usePianoRollShortcuts = () => {
         zoomToFit();
       } else if (!mod && !e.altKey && key === "t") {
         stepTrack(e.shiftKey ? -1 : 1);
+      } else if (!mod && !e.altKey && !e.shiftKey && key === "s") {
+        toggleSolo();
       } else if (!mod && !e.altKey && toolKeys[key] !== undefined) {
         dispatch(setPianoRollTool(toolKeys[key]));
       } else {

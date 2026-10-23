@@ -8,6 +8,7 @@ import {
   setPianoRollData,
 } from "@/app/engine/pianoRoll/pianoRollState";
 import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
+import { setSoloTrack } from "@/app/engine/pianoRoll/soloTrack";
 import {
   addTrackInfo,
   getEventTrack,
@@ -56,6 +57,9 @@ interface PianoRollContextType {
   // deletes the track's notes through the undo history
   deleteTrack: (track: PianoRollTrack) => void;
   renameTrack: (track: PianoRollTrack, name: string) => void;
+  // only the picked track plays. With all tracks picked every track plays
+  solo: boolean;
+  toggleSolo: () => void;
   // the playhead of the shown track: the melody player's or the loop's
   playhead$: BehaviorSubject<number>;
   data: EventsByTick | undefined;
@@ -239,6 +243,16 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     };
   }, [allEvents, activeTrack]);
 
+  const [solo, setSolo] = useState(false);
+  const toggleSolo = useCallback(() => setSolo((value) => !value), []);
+  const soloTrackNumber = solo ? activeTrack?.trackNumber : undefined;
+  useEffect(() => {
+    if (!data) return;
+    setSoloTrack(data, soloTrackNumber);
+    // a closed piano roll lets every track play again
+    return () => setSoloTrack(data, undefined);
+  }, [data, soloTrackNumber]);
+
   // a selection belongs to one melody and drops when another one loads
   const [selectionState, setSelectionState] = useState<{
     data: EventsByTick | undefined;
@@ -373,6 +387,8 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       addTrack,
       deleteTrack,
       renameTrack,
+      solo,
+      toggleSolo,
       playhead$,
       data,
       allEvents,
@@ -395,7 +411,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     }),
     // version changes whenever the history does
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, addTrack, deleteTrack, renameTrack, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
+    [sources, source, setSourceId, tracks, activeTrack, setActiveTrack, addTrack, deleteTrack, renameTrack, solo, toggleSolo, playhead$, data, allEvents, events, inactiveEvents, selection, setSelection, apply, undo, redo, loaded, setLoaded, version, chordToChoose, chooseChordMode, closeChordChoice]
   );
 
   return (

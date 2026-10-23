@@ -3,6 +3,7 @@ import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import DriveFileRenameOutline from "@mui/icons-material/DriveFileRenameOutline";
+import Headphones from "@mui/icons-material/Headphones";
 import PlaylistAdd from "@mui/icons-material/PlaylistAdd";
 import PlaylistRemove from "@mui/icons-material/PlaylistRemove";
 import { TextField } from "@mui/material";
@@ -18,6 +19,8 @@ export const PianoRollTrackControls: React.FC = () => {
     addTrack,
     deleteTrack,
     renameTrack,
+    solo,
+    toggleSolo,
   } = usePianoRoll();
   const [renaming, setRenaming] = useState(false);
   const cancelled = useRef(false);
@@ -72,6 +75,19 @@ export const PianoRollTrackControls: React.FC = () => {
           />
         )
       )}
+      <IconButtonWrapper
+        icon={<Headphones />}
+        tooltip={
+          activeTrack
+            ? solo
+              ? "Play every track (S)"
+              : "Play only this track (S)"
+            : "Pick a track to play it alone (S)"
+        }
+        onPress={toggleSolo}
+        disabled={!activeTrack}
+        isActive={solo && activeTrack !== undefined}
+      />
       <IconButtonWrapper
         icon={<PlaylistAdd />}
         tooltip="Add a track"

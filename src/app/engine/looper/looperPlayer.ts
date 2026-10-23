@@ -1,5 +1,6 @@
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { getAudibleEvents } from "@/app/engine/pianoRoll/soloTrack";
 import { playAllNotes } from "@/app/engine/playerHelper";
 import {
   globalCurrentLastBarTick,
@@ -120,7 +121,11 @@ export class LooperPlayer {
           return;
         }
 
-        playAllNotes(events, LOG_PREFIX, tick);
+        playAllNotes(
+          getAudibleEvents(this.options.eventsByTick, events),
+          LOG_PREFIX,
+          tick
+        );
       }
 
       // a pass with nothing to play, say after the piano roll deleted every note, still waits out the loop.

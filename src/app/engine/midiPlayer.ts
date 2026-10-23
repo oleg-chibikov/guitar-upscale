@@ -14,6 +14,7 @@ import {
   takePendingSeek,
 } from "@/app/engine/pianoRoll/playhead";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
+import { getAudibleEvents } from "@/app/engine/pianoRoll/soloTrack";
 import {
   recreatePlaybackPromise,
   waitForPlaybackToFinish,
@@ -148,7 +149,11 @@ class MidiPlayer {
 
         const events = eventsByTick.getEvents(currentTick);
         if (events) {
-          playAllNotes(events, logPrefix, currentTick);
+          playAllNotes(
+            getAudibleEvents(eventsByTick, events),
+            logPrefix,
+            currentTick
+          );
         }
         publishPlayhead(currentTick);
 
@@ -197,7 +202,11 @@ class MidiPlayer {
         if (!prevData) {
           return currentTick;
         }
-        playAllNotes(prevData.events, logPrefix, prevData.tick);
+        playAllNotes(
+          getAudibleEvents(eventsByTick, prevData.events),
+          logPrefix,
+          prevData.tick
+        );
         store.dispatch(setIsLastEvent(false));
 
         if (eventsByTick.getPreviousEvents(prevData.tick) === undefined) {
@@ -210,7 +219,11 @@ class MidiPlayer {
         if (!nextData) {
           return currentTick;
         }
-        playAllNotes(nextData.events, logPrefix, nextData.tick);
+        playAllNotes(
+          getAudibleEvents(eventsByTick, nextData.events),
+          logPrefix,
+          nextData.tick
+        );
         store.dispatch(setIsFirstEvent(false));
 
         if (nextData.tick === eventsByTick.lastTick) {

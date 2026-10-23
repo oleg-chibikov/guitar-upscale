@@ -147,6 +147,7 @@ The piano roll edits a track note by note. It opens from the control panel.
 - **Track picker** the melody or any looper channel with a recording. An empty melody is ready to draw in.
 - **Song tracks** a song with several tracks, such as 2 guitars and vocals, shows each track in its own colour. Picking one track edits only its notes. The other tracks stay in view at low opacity. A click on one of their notes picks that note's track. New and pasted notes go into the picked track. `T` steps through the tracks.
 - **Track edits** buttons next to the track picker add an empty track, rename the picked track and delete it. Undo brings back the notes of a deleted track. A new name goes into the saved song.
+- **Solo** the headphones button plays only the picked track. With all tracks picked every track plays. `S` turns it on and off. Closing the piano roll lets every track play again.
 - **Note volume** a slider sets the volume (MIDI velocity) of the selected notes. A quieter note shows paler. The volume plays back, goes into MIDI downloads and into Guitar Pro files as dynamics, from ppp to f.
 - **Tools** select, draw and erase. Notes can move, stretch, copy and quantize to the grid.
 - **Snap** picks the grid step. "Keep notes in the scale" holds drawn and moved notes on scale notes. A scale with all 12 notes turns the button off.
