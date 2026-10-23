@@ -1,5 +1,7 @@
 import { THUMB } from "@/app/data/chordFingerConstants";
 import { ChordBuilderInfo } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
+import { getPreferredChordVariation } from "@/app/engine/chords/chordVariationHelper";
 import { FretChordsGenerator } from "@/app/engine/chords/generatorWorker/fretChordsGenerator";
 import { SharedArrayCache } from "@/app/engine/chords/generatorWorker/sharedArrayCache";
 import { generateNeckRepresentation } from "@/app/engine/generateNeckRepresentation";
@@ -82,5 +84,31 @@ describe("chord voicings", () => {
         expect(Math.min(...fingerFrets)).toBeGreaterThanOrEqual(thumbFret);
       }
     }
+  });
+});
+
+describe("preferred variation", () => {
+  const pick = (root: number, intervals: number[], mode: ChordPlayMode) =>
+    toTab(
+      getPreferredChordVariation(
+        generateVoicings(root, intervals),
+        "high",
+        6,
+        mode
+      )
+    );
+
+  it("picks the usual fingering for open chords", () => {
+    expect(pick(7, [0, 4, 7], ChordPlayMode.Preferred_Variation)).toBe(
+      "320003 21---3"
+    );
+    expect(pick(2, [0, 4, 7], ChordPlayMode.Preferred_Variation)).toBe(
+      "xx0232 ---132"
+    );
+  });
+
+  it("picks the nearest E or A shape for barre chords", () => {
+    expect(pick(2, [0, 4, 7], ChordPlayMode.Barre)).toBe("x57775 -12341");
+    expect(pick(9, [0, 3, 7], ChordPlayMode.Barre)).toBe("577555 134111");
   });
 });

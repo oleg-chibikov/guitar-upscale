@@ -1,3 +1,4 @@
+import { THUMB } from "@/app/data/chordFingerConstants";
 import { ChordBuilderInfo, ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { StringOctaveNote } from "@/app/data/notes";
@@ -13,15 +14,19 @@ export const getPreferredChordVariation = (
 ): ChordBuilderInfo => {
   switch (type) {
     case ChordPlayMode.Barre:
-      return chordVariations.filter(
-        (x) =>
-          x.hasBarreOnIndexFinger &&
-          x.fingerAssignment[x.fingerAssignment.length - 1] !== 4
-      )[0];
+      return getBestOf(
+        chordVariations.filter(isBarreChord),
+        stringPreference,
+        numberOfStrings
+      );
     case ChordPlayMode.With_Thumb:
-      return chordVariations.filter(
-        (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === 4
-      )[0];
+      return getBestOf(
+        chordVariations.filter(
+          (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === THUMB
+        ),
+        stringPreference,
+        numberOfStrings
+      );
     case ChordPlayMode.Preferred_Variation_With_Min_Notes:
       return getPreferredChordVariationWithMinNotes(
         chordVariations,
@@ -131,11 +136,95 @@ const getGeneralPreferredChordVariation = (
     );
   };
 
-  return chordVariations.reduce((best, current) => {
-    return calculateVariationScore(current) < calculateVariationScore(best)
-      ? current
-      : best;
-  });
+  // The fingering only decides between equal frets
+  let best = chordVariations[0];
+  let bestScore = calculateVariationScore(best);
+  let bestFingeringScore = getFingeringScore(best);
+  for (let i = 1; i < chordVariations.length; i++) {
+    const current = chordVariations[i];
+    const score = calculateVariationScore(current);
+    if (score > bestScore) {
+      continue;
+    }
+    const fingeringScore = getFingeringScore(current);
+    if (score < bestScore || fingeringScore < bestFingeringScore) {
+      best = current;
+      bestScore = score;
+      bestFingeringScore = fingeringScore;
+    }
+  }
+  return best;
+};
+
+// The index finger frets the bass and lies across the higher strings, as in the E and A shapes
+const isBarreChord = ({
+  variation,
+  fingerAssignment,
+  hasBarreOnIndexFinger,
+}: ChordBuilderInfo) => {
+  if (!hasBarreOnIndexFinger) {
+    return false;
+  }
+  for (let string = variation.length - 1; string >= 0; string--) {
+    if (variation[string] !== undefined) {
+      return fingerAssignment[string] === 0;
+    }
+  }
+  return false;
+};
+
+const getBestOf = (
+  chordVariations: ChordVariations,
+  stringPreference: StringPreference,
+  numberOfStrings: number
+): ChordBuilderInfo =>
+  chordVariations.length
+    ? getGeneralPreferredChordVariation(
+        chordVariations,
+        stringPreference,
+        numberOfStrings
+      )
+    : chordVariations[0];
+
+const getFingeringScore = ({
+  variation,
+  fingerAssignment,
+}: ChordBuilderInfo): number => {
+  let score = 0;
+  let firstFret = Infinity;
+  for (let string = 0; string < variation.length; string++) {
+    const finger = fingerAssignment[string];
+    const fret = variation[string]?.fret;
+    if (finger !== undefined && finger !== THUMB && fret !== undefined) {
+      firstFret = Math.min(firstFret, fret);
+    }
+  }
+
+  const stringCountByFinger = [0, 0, 0, 0];
+  for (let string = 0; string < variation.length; string++) {
+    const finger = fingerAssignment[string];
+    const fret = variation[string]?.fret;
+    if (finger === undefined || fret === undefined) {
+      continue;
+    }
+    if (finger === THUMB) {
+      score += 1;
+      continue;
+    }
+    stringCountByFinger[finger]++;
+    // One finger per fret. Reaching with a lower finger is harder than bunching up.
+    const offset = fret - firstFret;
+    score +=
+      finger < offset ? (offset - finger) * 0.3 : (finger - offset) * 0.1;
+  }
+
+  // A barre takes effort, so the same frets without one win
+  for (const count of stringCountByFinger) {
+    if (count > 1) {
+      score += 0.5;
+    }
+  }
+  return score;
 };
 
 const getPreferredChordVariationWithMinNotes = (
