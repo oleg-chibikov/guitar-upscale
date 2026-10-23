@@ -823,25 +823,6 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
         "Harmonic Bebop + #4",
         [
           {
-            band: "ATB",
-            title: "9 PM (Till I Come)",
-            tempo: 260,
-            tracks: [
-              {
-                melody:
-                  "(____*29_9_1-1_9___*18___8___8_1-01-11-08________*25_7_987___9___*18___8_1-01-11-08____)2",
-              },
-              {
-                melody:
-                  "(*50_______________0_______________*43_______________*53_______________)2",
-              },
-              {
-                melody:
-                  "(<Em>________________________________<C>________________<G>________________)2",
-              },
-            ],
-          },
-          {
             band: "Ludwig van Beethoven",
             title: "Für Elise",
             tempo: 150,
@@ -1466,6 +1447,30 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
   [
     "Various Exotic",
     new Map([
+      [
+        "Eight Tone Spanish",
+        [
+          {
+            band: "ATB",
+            title: "9 PM (Till I Come)",
+            tempo: 260,
+            tracks: [
+              {
+                melody:
+                  "(____*29_9_1-0_9___*18___8___8_91-198________*25_7_9_7___9___*18___8_91-198____)2",
+              },
+              {
+                melody:
+                  "(*50_______________0_______________*43_______________*53_______________)2",
+              },
+              {
+                melody:
+                  "(<Em>________________________________<C>________________<G>________________)2",
+              },
+            ],
+          },
+        ],
+      ],
       [
         "Narayan",
         [
