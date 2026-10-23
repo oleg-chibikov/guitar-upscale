@@ -116,11 +116,15 @@ export const examplesMap: Map<string, Map<string, Example[]>> = new Map([
             tracks: [
               {
                 melody:
-                  "*29_9_9_____*18_____________________*25_7_7_____*15___8_________________*29_9_9_____*18___8___8_1-0___*25_______5_7_7_____*15___8___8_____*27_______",
+                  "(____*29_9_______*18___8___8_____________*25_7_______*29___*18___8_________)2",
               },
               {
                 melody:
-                  "<Em>________________________________<C>________________________________<Em>________________________<C>________________________________<D>________",
+                  "(*50_______________0_______________*43_______________*53_______________)2",
+              },
+              {
+                melody:
+                  "(<Em>________________________________<C>________________<G>________________)2",
               },
             ],
           },
@@ -1156,9 +1160,16 @@ export const getScaleExample = async (
     })
   );
   await Promise.all(instrumentLoadPromises);
-  if (chosen && examples.includes(chosen)) {
-    lastExample = chosen;
-    return chosen;
+  // the menu may hold examples from an older copy of this module, so match by name
+  const match =
+    chosen &&
+    examples.find(
+      (example) =>
+        example.band === chosen.band && example.title === chosen.title
+    );
+  if (match) {
+    lastExample = match;
+    return match;
   }
   const candidates =
     examples.length > 1
