@@ -108,14 +108,14 @@ sequenceDiagram
   alt Save MIDI right after recording is on
     M-->>P: .mid file downloads
   else
-    P->>P: press Download later
+    P->>P: press Download later for .gp, hold it for .mid
   end
 ```
 
 1. Turn on "Start metronome when recording" in Settings for a click track.
 2. Press Record and play. Notes and chords go to separate tracks.
 3. Press Stop. The cross next to it drops the take instead.
-4. Press Play to hear the take, or Download to save it.
+4. Press Play to hear the take, or Download to save it as `.gp`. Hold Download for a `.mid` file.
 
 ## Build a song with the looper
 
@@ -156,31 +156,42 @@ flowchart TD
   G --> H{Done?}
   H -- no --> F
   H -- yes --> I[Close, then Download in the play panel]
+  F -. song edits .-> J[Saved to the song list after 1 second]
 ```
 
 1. Open the piano roll from the control panel.
 2. Pick the track: the melody or a loop.
 3. Edit with the toolbar or the keys in the [root README](../README.md#piano-roll-keys). Double click a chord to change its type.
 4. Press Space to play the track. A loop plays in time with the looper.
-5. Close the dialog and press Download to save the melody.
+5. Close the dialog and press Download to save the melody as `.gp`. Hold Download for `.mid`.
 
-## Play a MIDI file
+Edits to a song save on their own. An uploaded song updates in place. A built-in song gets its own copy named "(edited)".
+
+## Add your own song
 
 [Composer]
 
 ```mermaid
 flowchart LR
-  A[Press upload] --> B[Pick a .mid file]
-  B --> C[Tempo set from file]
-  C --> D[Scale detected and selected]
-  D --> E[Chords matched to shapes]
-  E --> F[File plays on the fretboard]
-  F --> G[Edit in piano roll]
+  A[Press upload] --> B[Pick a .gp, .gp3 to .gp5, .gpx or .mid file]
+  B --> C[Scale detected]
+  C --> D[Song joins the list under that scale]
+  D --> E[Song plays on the fretboard]
+  E --> F[Edit in piano roll]
 ```
 
 1. Wait for the chords to finish loading. The upload button stays disabled until then.
-2. Press upload and pick a `.mid` file.
+2. Press upload and pick a Guitar Pro or MIDI file. A track named `Chords` plays as chords.
 3. Watch the file play on the fretboard, then open the piano roll to edit it.
+4. Later, right click or hold Play to pick the song again. The bin icon deletes it.
+
+## Download a song as Guitar Pro
+
+[Explorer]
+
+1. Set the key and tuning in the control panel.
+2. Right click or hold Play to open the song list.
+3. Press the download icon next to a song. The `.gp` file is in the key and tuning from the settings, with saved edits.
 
 ## Get a paid tier
 
