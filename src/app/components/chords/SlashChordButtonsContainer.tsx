@@ -6,6 +6,7 @@ import { setSlashChordsExpanded } from "@/app/store/uiSlice";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Box, Button, Drawer, IconButton, Typography } from "@mui/material";
+import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 
 const DRAWER_WIDTH = 32;
@@ -15,6 +16,12 @@ export const SlashChordButtonsContainer = () => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const slashChordsExpanded = useUiSelector((s) => s.slashChordsExpanded);
   const slashChordBassNote = useSettingsSelector((s) => s.slashChordBassNote);
+  const neck = useSettingsSelector((s) => s.neck);
+  // the neck only holds notes of the current scale
+  const notesInKey = useMemo(
+    () => new Set(neck?.flat().map((x) => x?.note)),
+    [neck]
+  );
 
   const toggleDrawer = () => {
     dispatch(setSlashChordsExpanded(!slashChordsExpanded));
@@ -101,6 +108,7 @@ export const SlashChordButtonsContainer = () => {
               className="h-5"
               key={index}
               variant={slashChordBassNote === index ? "contained" : "outlined"}
+              disabled={!notesInKey.has(index) && slashChordBassNote !== index}
               onClick={() => dispatch(setSlashChordBassNote(index))}
               size="small"
             >

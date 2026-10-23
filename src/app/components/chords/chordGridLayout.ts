@@ -3,6 +3,7 @@ import { NOTE_COUNT, Note } from "@/app/data/notes";
 
 export interface ChordGridCell {
   chordName: string;
+  root: Note;
   column: number;
   row: number;
   isDisabled: boolean;
@@ -21,6 +22,7 @@ export const buildAllChordsLayout = (
   notes.flatMap((note, row) =>
     columns.map((mode, column) => ({
       chordName: getChordName(note, mode.chordMode),
+      root: note,
       column,
       row,
       isDisabled: !isPlayable(mode, note),
@@ -36,16 +38,16 @@ export const buildKeyChordsLayout = (
   root: Note,
   rowsPerColumn: number
 ): ChordGridCell[] => {
-  const chordNames: string[] = [];
+  const chords: { chordName: string; root: Note }[] = [];
   for (let step = 0; step < NOTE_COUNT; step++) {
     const note = (root + step) % NOTE_COUNT;
     const mode = columns.find((mode) => isPlayable(mode, note));
     if (mode) {
-      chordNames.push(getChordName(note, mode.chordMode));
+      chords.push({ chordName: getChordName(note, mode.chordMode), root: note });
     }
   }
-  return chordNames.map((chordName, index) => ({
-    chordName,
+  return chords.map((chord, index) => ({
+    ...chord,
     column: Math.floor(index / rowsPerColumn),
     row: index % rowsPerColumn,
     isDisabled: false,

@@ -260,6 +260,7 @@ export const ChordsView: React.FC<{ mainRef: RefObject<HTMLElement | null> }> = 
             store={store}
             scrollerRef={ref}
             hasTouchInput={hasTouchInput}
+            bassNote={slashChordBassNote}
           />
         </section>
         {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) =>

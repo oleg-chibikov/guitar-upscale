@@ -11,6 +11,7 @@ import {
   RED_500,
   getPalette,
 } from "@/app/helpers/canvas/palette";
+import { Note } from "@/app/data/notes";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import Konva from "konva";
 import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
@@ -34,10 +35,13 @@ interface ChordGridProps {
   // the element that scrolls the grid. Presses snap only to buttons inside it
   scrollerRef: RefObject<HTMLElement | null>;
   hasTouchInput: boolean;
+  // the bass note picked in the Bass note strip
+  bassNote?: Note;
 }
 
 interface Cell {
   chordName: string;
+  label: string;
   x: number;
   y: number;
   isDisabled: boolean;
@@ -109,7 +113,7 @@ const drawCells = (
   ctx.font = FONT;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  for (const { chordName, x, y, isDisabled } of cells) {
+  for (const { chordName, label, x, y, isDisabled } of cells) {
     const state = store.get(chordName);
     const scale = getPulseScale(state.pulseStartedAt, now);
     ctx.save();
@@ -135,7 +139,7 @@ const drawCells = (
 
     ctx.fillStyle = isDisabled ? GRAY_500 : palette.foreground;
     ctx.fillText(
-      fitText(ctx, chordName, CELL_WIDTH - 2 * TEXT_PADDING),
+      fitText(ctx, label, CELL_WIDTH - 2 * TEXT_PADDING),
       x + CELL_WIDTH / 2,
       y + cellHeight / 2
     );
@@ -152,6 +156,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
   store,
   scrollerRef,
   hasTouchInput,
+  bassNote,
 }) => {
   const theme = useUiSelector((s) => s.theme);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -162,12 +167,18 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
   const width = Math.max(0, columnCount * (CELL_WIDTH + GAP) - GAP);
   const height = Math.max(0, rowCount * (cellHeight + GAP) - GAP);
 
-  const cells: Cell[] = layout.map(({ chordName, column, row, isDisabled }) => ({
-    chordName,
-    x: column * (CELL_WIDTH + GAP),
-    y: row * (cellHeight + GAP),
-    isDisabled,
-  }));
+  const cells: Cell[] = layout.map(
+    ({ chordName, root, column, row, isDisabled }) => ({
+      chordName,
+      label:
+        bassNote === undefined || bassNote === root || isDisabled
+          ? chordName
+          : `${chordName}/${Note[bassNote]}`,
+      x: column * (CELL_WIDTH + GAP),
+      y: row * (cellHeight + GAP),
+      isDisabled,
+    })
+  );
 
   const drawRef = useRef<(ctx: CanvasRenderingContext2D) => void>(() => {});
   useLayoutEffect(() => {
