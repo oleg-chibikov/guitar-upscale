@@ -154,9 +154,6 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
         if (metadata.chordMode === undefined) {
           metadata.chordMode = chordMode;
         }
-        if (metadata.octaveNote === undefined) {
-          metadata.octaveNote = { note, octave: 5 };
-        }
         const delayMs = metadata.strummingDelayMs ?? chordStrummingDelayMsValue;
         const params: ChordPlayParameters = {
           ...metadata,
