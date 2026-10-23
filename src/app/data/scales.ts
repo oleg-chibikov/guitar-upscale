@@ -28,6 +28,7 @@ export const scalesMap: Map<string, Map<string, Scale>> = new Map([
       ["Locrian", [1, 3, 5, 6, 8, 10]],
       ["Locrian + Major", [1, 3, 5, 6, 7, 8, 10]],
       ["Harmonic Bebop + #4", [2, 3, 5, 6, 7, 8, 10, 11]],
+      ["Phrygian Aeolian + b5", [1, 2, 3, 5, 6, 7, 8, 10]],
       ["Melodic", [2, 3, 5, 7, 9, 11]],
       ["Dorian", [2, 3, 5, 7, 9, 10]],
       ["Pentatonic Minor", [3, 5, 7, 10]],
