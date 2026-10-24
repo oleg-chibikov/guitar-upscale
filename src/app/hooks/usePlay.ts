@@ -42,6 +42,14 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 const LOG_PREFIX = "usePlay: ";
 
+// a space typed into a search or a name field stays a space
+const isTextField = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target instanceof HTMLTextAreaElement ||
+    (target instanceof HTMLInputElement &&
+      !["checkbox", "radio", "range", "button"].includes(target.type)));
+
 export interface UsePlayParams {
   decodeExample?: (example: Example) => Promise<EventsByTick>;
 }
@@ -164,7 +172,11 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   useEffect(() => {
     const handleKeyPress = async (event: KeyboardEvent) => {
       // the piano roll takes Space for its own playback and marks it handled
-      if (event.code === "Space" && !event.defaultPrevented) {
+      if (
+        event.code === "Space" &&
+        !event.defaultPrevented &&
+        !isTextField(event.target)
+      ) {
         // during playback Space pauses, as the pause button does
         if (isPlayingValue && !checkLooperPlaying()) {
           event.preventDefault();
