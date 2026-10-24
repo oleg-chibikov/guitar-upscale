@@ -11,7 +11,7 @@ import {
 } from "./purchaseParams";
 import { fetchSubscriptionPurchase } from "./purchases";
 import { SubscriptionProvider } from "./subscriptionProvider";
-import { Tier, TierInfo, tierMap } from "./tier";
+import { Tier, TierInfo, TierKey, tierMap } from "./tier";
 
 const composerWhitelist = new Set<string>(
   process.env.COMPOSER_WHITELIST?.split(","),
@@ -29,24 +29,34 @@ const getDataFromSubscriptionCookie = async () => {
     console.log("No value in subscription cookie");
     return undefined;
   }
-  console.log("Value in subscription cookie", value);
   return getDataFromCookieValue(value);
 };
 
+// The cookie is not signed, so the tier comes from what Google says the token bought.
 const getGooglePlaySubscriptionTierFromCookie = async () => {
   const subscriptionData = await getDataFromSubscriptionCookie();
-  if (subscriptionData) {
+  if (!subscriptionData) {
+    return undefined;
+  }
+  try {
     const subscription = await fetchSubscriptionPurchase(subscriptionData);
-    if (subscription !== undefined) {
-      return tierMap.get(subscriptionData.itemId);
+    if (
+      subscription.productId !== subscriptionData.itemId ||
+      !subscription.isEntitlementActive()
+    ) {
+      console.log("Subscription cookie doesn't match an active purchase");
+      return undefined;
     }
+    return tierMap.get(subscription.productId as TierKey);
+  } catch {
+    return undefined;
   }
 };
 
 const getTierFromPatreonApi = async (accessToken: string) => {
   // Getting tier name from patreon API
 
-  console.log("Getting tier from Patreon api using token", accessToken);
+  console.log("Getting tier from Patreon api");
 
   // tiers by priority asc
   const orderedTargetTierIds = ["22790257", "22790278"];
@@ -66,8 +76,6 @@ const getTierFromPatreonApi = async (accessToken: string) => {
     }
 
     const responseData = await response.json();
-
-    console.log("Patreon API result", responseData);
 
     const includedTiers = responseData.included?.filter(
       (item: { type: "tier" | unknown; id: string }) =>

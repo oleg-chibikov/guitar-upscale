@@ -71,8 +71,6 @@ export async function fetchSubscriptionPurchase(
     )?.data;
     console.log("Fetch subscription response");
 
-    console.log("Linked token", apiResponse.linkedPurchaseToken);
-
     return fromSubscriptionPurchaseV2(apiResponse, params.purchaseToken);
   } catch (error) {
     console.error("Error fetching subscription", error);

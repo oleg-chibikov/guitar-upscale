@@ -1,6 +1,6 @@
 "use server";
 
-import { TierKey } from "@/lib/tier";
+import { TierKey, tierMap } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CancellationMode, ResponseData } from "./apiTypes";
@@ -59,8 +59,23 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
     return; // Exit early if validation fails
   }
 
+  if (!tierMap.has(itemId)) {
+    res
+      .status(HttpStatusCode.BadRequest)
+      .json({ error: "Unknown subscription item" } as T);
+    return;
+  }
+
   const params: PurchaseParams = { itemId, purchaseToken };
   const subscription = await fetchSubscriptionPurchase(params);
+
+  // The client sends itemId, so it must match what Google says the token bought.
+  if (subscription.productId !== itemId) {
+    res
+      .status(HttpStatusCode.BadRequest)
+      .json({ error: "Purchase does not match the subscription item" } as T);
+    return;
+  }
 
   if (!allowCancelled && subscription?.cancelReason !== CancelReason.NONE) {
     const message = "Subscription is already cancelled";

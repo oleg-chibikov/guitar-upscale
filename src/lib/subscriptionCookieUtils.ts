@@ -32,5 +32,5 @@ export const setSubscriptionCookie = async (
     secure: true,
     httpOnly: true,
   });
-  console.log("Subscription cookie set", value);
+  console.log("Subscription cookie set", params.itemId);
 };

@@ -17,13 +17,27 @@ type ApiMethodHandlers = {
   [key in Uppercase<Method>]?: NextApiHandler;
 };
 
+const maskTokens = (params: unknown) => {
+  if (typeof params !== "object" || params === null) {
+    return params;
+  }
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      /token/i.test(key) && typeof value === "string"
+        ? "…" + value.slice(-4)
+        : value,
+    ]),
+  );
+};
+
 // Note: client consumer (callApi method) is built the way so that EACH response should have some json output regardless of its status
 export const apiHandler = (handler: ApiMethodHandlers) => {
   return async (req: NextApiRequest, res: NextApiResponse<ErrorResponse>) => {
     try {
       console.log("Request", {
-        body: req.body,
-        query: req.query,
+        body: maskTokens(req.body),
+        query: maskTokens(req.query),
         method: req.method,
       });
       const method =
@@ -68,7 +82,7 @@ const errorHandler = (err: unknown, res: NextApiResponse<ErrorResponse>) => {
     // default to 500 server error
     console.error(err);
     return res.status(HttpStatusCode.InternalServerError).json({
-      error: { message: "Internal Server Error", err: err },
+      error: { message: "Internal Server Error" },
       status: createHttpError.isHttpError(err)
         ? err.statusCode
         : HttpStatusCode.InternalServerError,

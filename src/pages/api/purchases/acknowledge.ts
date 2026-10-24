@@ -33,6 +33,13 @@ const handle = async (
     return;
   }
 
+  if (!subscriptionData.subscription.isEntitlementActive()) {
+    res.status(HttpStatusCode.Gone).json({
+      error: "Subscription has expired",
+    } as ChangeSubscriptionActionResponseData);
+    return;
+  }
+
   await acknowledge(subscriptionData);
 
   const cancelledSubscription = await getCancelledSubscriptionFromRequest(
