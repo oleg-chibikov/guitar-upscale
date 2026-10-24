@@ -36,14 +36,17 @@ export const BottomZone: React.FC<
       }
     >
       <div
-        className={`flex min-w-0 grow flex-col gap-1 ${
+        className={`relative flex min-w-0 grow flex-col gap-1 ${
           chordsOnLeft ? "items-end" : "items-start"
         }`}
       >
         {hasLooper && (
-          // stays mounted while hidden so the loops keep their state
+          // Stays mounted while hidden so the loops keep their state.
+          // Floats above the bar, so opening it doesn't push the chords to another line.
           <Panel
-            className={`${WRAPPING_PANEL} flex-wrap`}
+            className={`${WRAPPING_PANEL} absolute bottom-full mb-1 w-max max-w-[calc(100vw-0.5rem)] flex-wrap ${
+              chordsOnLeft ? "right-0" : "left-0"
+            }`}
             style={
               looperExpanded && !pianoRollExpanded
                 ? undefined
