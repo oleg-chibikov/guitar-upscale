@@ -4,6 +4,10 @@ import { Note, NOTE_COUNT } from "@/app/data/notes";
 type ChordModesForNote = Set<ChordMode> | undefined;
 type ChordsModesByNote = ChordModesForNote[];
 const chordModesByNote: ChordsModesByNote = [];
+let version = 0;
+
+// bumps on every change, so a canvas can tell when to redraw
+export const getChordModesVersion = () => version;
 
 export const getModesForNote = (note: Note): ChordModesForNote =>
   chordModesByNote[note];
@@ -18,8 +22,10 @@ export function setChordModeForNotes(chordModeVariations: ChordModeVariations) {
     modesSetForNote.add(chordModeVariations.chordMode);
     chordModesByNote[note] = modesSetForNote;
   }
+  version++;
 }
 
 export const resetChordModesForNotes = () => {
   chordModesByNote.length = 0;
+  version++;
 };

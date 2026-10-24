@@ -12,12 +12,20 @@ import {
   TIMELINE_HEIGHT,
 } from "@/app/data/pianoRollConstants";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
+import { getChordModesVersion } from "@/app/engine/chords/chordModesByNote";
 import { isChordModeAvailable } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { getNativeContext } from "@/app/helpers/canvas/konvaHelpers";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
 import Konva from "konva";
-import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { Layer, Shape, Stage } from "react-konva";
+import { shallowEqual } from "react-redux";
 import { Observable } from "rxjs";
 
 type Handler<E> = (e: E) => void;
@@ -106,8 +114,35 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     height: viewportHeight,
   });
   const viewportRef = useRef(viewport);
+  const drawn = useRef<
+    | {
+        scene: typeof scene;
+        width: number;
+        height: number;
+        chordModesVersion: number;
+      }
+    | undefined
+  >(undefined);
+  // the parent builds a new scene object on every render, so compare its fields
   useLayoutEffect(() => {
     viewportRef.current = viewport;
+    const chordModesVersion = getChordModesVersion();
+    const last = drawn.current;
+    if (
+      last &&
+      last.width === viewportWidth &&
+      last.height === viewportHeight &&
+      last.chordModesVersion === chordModesVersion &&
+      shallowEqual(last.scene, scene)
+    ) {
+      return;
+    }
+    drawn.current = {
+      scene,
+      width: viewportWidth,
+      height: viewportHeight,
+      chordModesVersion,
+    };
     sceneRef.current = { ...scene, pressedPitch: pressedPitch.current };
     mainLayerRef.current?.batchDraw();
     playheadLayerRef.current?.batchDraw();
@@ -312,6 +347,27 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     if (e.pointerType === "mouse") updateHover(e);
   };
 
+  // stable, so react-konva doesn't redraw the layers on every render
+  const drawMain = useCallback((context: Konva.Context) => {
+    if (sceneRef.current) {
+      drawScene(
+        getNativeContext(context),
+        sceneRef.current,
+        viewportRef.current(),
+      );
+    }
+  }, []);
+  const drawPlayheadLayer = useCallback((context: Konva.Context) => {
+    if (sceneRef.current) {
+      drawPlayhead(
+        getNativeContext(context),
+        playheadTick.current,
+        sceneRef.current.zoom,
+        viewportRef.current(),
+      );
+    }
+  }, []);
+
   return (
     <div
       ref={containerRef}
@@ -332,31 +388,10 @@ export const PianoRollCanvas: React.FC<PianoRollCanvasProps> = ({
     >
       <Stage width={viewportWidth} height={viewportHeight} listening={false}>
         <Layer ref={mainLayerRef} listening={false}>
-          <Shape
-            sceneFunc={(context) => {
-              if (sceneRef.current) {
-                drawScene(
-                  getNativeContext(context),
-                  sceneRef.current,
-                  viewportRef.current(),
-                );
-              }
-            }}
-          />
+          <Shape sceneFunc={drawMain} />
         </Layer>
         <Layer ref={playheadLayerRef} listening={false}>
-          <Shape
-            sceneFunc={(context) => {
-              if (sceneRef.current) {
-                drawPlayhead(
-                  getNativeContext(context),
-                  playheadTick.current,
-                  sceneRef.current.zoom,
-                  viewportRef.current(),
-                );
-              }
-            }}
-          />
+          <Shape sceneFunc={drawPlayheadLayer} />
         </Layer>
       </Stage>
     </div>
