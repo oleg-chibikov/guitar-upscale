@@ -75,6 +75,12 @@ export const loadInstrument = async (
 
   soundfontMap.set(key, soundfont);
 
-  await soundfont.load;
+  try {
+    await soundfont.load;
+  } catch (error) {
+    // a failed download gets another try on the next call
+    soundfontMap.delete(key);
+    throw error;
+  }
   return soundfont;
 };

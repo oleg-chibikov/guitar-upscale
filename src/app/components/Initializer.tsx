@@ -1,3 +1,4 @@
+import { AlertType } from "@/app/data/alertType";
 import { Theme } from "@/app/data/theme";
 import { blockLongPress } from "@/app/helpers/longPressBlocker";
 import { useUiSelector } from "@/app/hooks/storeHooks";
@@ -20,7 +21,7 @@ import {
   instrumentValue,
   reverbStrengthValue,
 } from "../store/settingsSlice";
-import { initUi } from "../store/uiSlice";
+import { initUi, setAndShowAlert } from "../store/uiSlice";
 
 const AuthInitializer: React.FC = () => {
   useSessionAuth();
@@ -63,17 +64,29 @@ export const Initializer: React.FC = () => {
       remove();
       console.log("Preloading sounds...");
       // first click anywhere loads instruments
-      await Promise.all([
-        loadInstrument(instrumentValue, reverbStrengthValue),
-        loadInstrument(chordInstrumentValue, reverbStrengthValue),
-        loadMetronome(),
-      ]);
-      await Promise.all([
-        playNote({ note: Note.E, octave: 1 }, 0),
-        playNote({ note: Note.E, octave: 1 }, 0),
-        playMetronomeBeat(false, 0),
-      ]);
-      console.log("Loaded sounds");
+      try {
+        await Promise.all([
+          loadInstrument(instrumentValue, reverbStrengthValue),
+          loadInstrument(chordInstrumentValue, reverbStrengthValue),
+          loadMetronome(),
+        ]);
+        await Promise.all([
+          playNote({ note: Note.E, octave: 1 }, 0),
+          playNote({ note: Note.E, octave: 1 }, 0),
+          playMetronomeBeat(false, 0),
+        ]);
+        console.log("Loaded sounds");
+      } catch (error) {
+        console.error("Cannot load sounds", error);
+        dispatch(
+          setAndShowAlert({
+            message:
+              "Some sounds didn't load. Check the connection, they load again on the next note.",
+            alertType: AlertType.Error,
+            alertTimeout: 5000,
+          }),
+        );
+      }
     };
 
     document.body.addEventListener("scroll", handleFirstInteraction, true);
@@ -84,7 +97,7 @@ export const Initializer: React.FC = () => {
     return () => {
       remove();
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const mainBg =

@@ -28,8 +28,9 @@ export const ResetSettingsButton: React.FC = () => {
         open={open}
         onClose={handleClose}
         onConfirm={handleConfirmReset}
-        title="Confirm reset"
-        content="Are you sure you want to reset settings? This action cannot be undone."
+        title="Reset the settings?"
+        content="Every setting goes back to its default. You can't undo it."
+        confirmButtonText="Reset"
       />
     </>
   );

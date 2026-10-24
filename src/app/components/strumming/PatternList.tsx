@@ -136,8 +136,9 @@ export const PatternList: React.FC<PatternListProps> = React.memo(
           open={deleteDialogOpen}
           onClose={handleCancelDelete}
           onConfirm={handleConfirmDelete}
-          title="Confirm Delete"
-          content="Are you sure you want to delete this pattern? This action cannot be undone."
+          title="Delete the pattern?"
+          content="This removes the strumming pattern. You can't undo it."
+          confirmButtonText="Delete"
         />
       </>
     );

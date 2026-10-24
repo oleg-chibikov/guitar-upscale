@@ -43,8 +43,9 @@ export const ClearLooperButton: React.FC<CanSetLooperState> = ({
         open={open}
         onClose={handleClose}
         onConfirm={handleConfirmClear}
-        title="Confirm clear"
-        content="Are you sure you want to clear the looper state? This action cannot be undone."
+        title="Clear the looper?"
+        content="This removes every recorded loop. You can't undo it."
+        confirmButtonText="Clear looper"
       />
     </>
   );

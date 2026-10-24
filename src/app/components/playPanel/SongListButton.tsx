@@ -7,7 +7,10 @@ import {
   matchesExampleSearch,
 } from "@/app/data/example";
 import { EventsByTick } from "@/app/engine/eventsByTick";
+import { ConfirmationDialog } from "@/app/components/uiFramework/ConfirmationDialog";
+import { AlertType } from "@/app/data/alertType";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import { setAndShowAlert } from "@/app/store/uiSlice";
 import CloudDownload from "@mui/icons-material/CloudDownload";
 import Delete from "@mui/icons-material/Delete";
 import Download from "@mui/icons-material/Download";
@@ -28,6 +31,7 @@ import {
 } from "@mui/material";
 import dynamic from "next/dynamic";
 import React, { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 const SongsterrImportDialog = dynamic(
@@ -60,6 +64,8 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
   const scaleDetectorAvailable = useSettingsSelector(
     (s) => s.scaleDetectorAvailable,
   );
+  const dispatch = useDispatch();
+  const [pendingDelete, setPendingDelete] = useState<Example>();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [search, setSearch] = useState("");
   // the search text the Songsterr dialog opened with, undefined while it is closed
@@ -117,9 +123,30 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
     await downloadEventsAsGuitarPro(await decodeExample(choice), choice);
   };
 
+  const showError = (message: string, error: unknown) => {
+    console.error(message, error);
+    dispatch(
+      setAndShowAlert({
+        message: `${message}: ${error instanceof Error ? error.message : String(error)}`,
+        alertType: AlertType.Error,
+        alertTimeout: 5000,
+      }),
+    );
+  };
+
   const removeChosen = async (choice: Example) => {
     const { removeUserSong } = await import("@/app/engine/songs/songLibrary");
     await removeUserSong(choice);
+  };
+
+  const confirmDelete = () => {
+    const choice = pendingDelete;
+    setPendingDelete(undefined);
+    if (choice) {
+      removeChosen(choice).catch((error) =>
+        showError("Cannot delete the song", error),
+      );
+    }
   };
 
   // the person's songs come first: they can be renamed and deleted
@@ -161,8 +188,8 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
         title="Download as Guitar Pro, in the key from the settings"
         onClick={(event) => {
           event.stopPropagation();
-          void downloadChosen(choice).catch((error) =>
-            console.error("Cannot download the song", error),
+          downloadChosen(choice).catch((error) =>
+            showError("Cannot download the song", error),
           );
         }}
       >
@@ -176,7 +203,7 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
           title="Delete your song"
           onClick={(event) => {
             event.stopPropagation();
-            void removeChosen(choice);
+            setPendingDelete(choice);
           }}
         >
           <Delete fontSize="small" />
@@ -304,6 +331,14 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
           handleCloseDialog={() => setSongsterrQuery(undefined)}
         />
       )}
+      <ConfirmationDialog
+        open={pendingDelete !== undefined}
+        onClose={() => setPendingDelete(undefined)}
+        onConfirm={confirmDelete}
+        title="Delete the song?"
+        content={`This removes ${pendingDelete ? getExampleName(pendingDelete) : "the song"} from your songs. You can't undo it.`}
+        confirmButtonText="Delete"
+      />
     </>
   );
 };

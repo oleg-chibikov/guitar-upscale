@@ -123,6 +123,7 @@ export const SongsterrImportDialog: React.FC<SongsterrImportDialogProps> = ({
         } catch (e) {
           if (!isStale) {
             console.error(LOG_PREFIX + "Searching", e);
+            setResults([]);
             setError(errorText(e));
           }
         } finally {
