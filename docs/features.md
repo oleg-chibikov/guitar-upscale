@@ -210,10 +210,9 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 
 1. Type a band or a song. The list fills in once typing stops. Pick a song from it.
 2. Pick the melody track and the bass track. The bass picks the chords. "None" takes the chords from the lowest melody notes.
-3. Pick the bars: press a section chip, or drag the two ends of the slider.
-4. Press Add. The song moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
+3. Press Add. The whole song goes in. It moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
 
-- **Name** a part of the song gets the section name, or "bars 5-12", after the title.
+- **Bars** the dialog takes every bar. Cut the extra ones in the piano roll.
 - **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes and hides the button.
 
 Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [SongsterrImportDialog.tsx](../src/app/components/settings/buttons/SongsterrImportDialog.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).

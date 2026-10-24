@@ -40,19 +40,13 @@ type ImportOptions = {
   meta: SongsterrMeta;
   melodyTrack: SongsterrTrack;
   bassIndex?: number;
-  from: number;
-  to: number;
-  title: string;
 };
 
-// Builds a Guitar Pro file from the measures and adds it to the person's songs.
+// Builds a Guitar Pro file from the whole track and adds it to the person's songs.
 export const importSongsterrSong = async ({
   meta,
   melodyTrack,
   bassIndex,
-  from,
-  to,
-  title,
 }: ImportOptions): Promise<{
   example: Example;
   result: SongsterrConvertResult;
@@ -65,15 +59,15 @@ export const importSongsterrSong = async ({
     meta,
     melodyTrack,
     bassTrack,
-    from,
-    to,
-    title,
+    from: 0,
+    to: melodyTrack.measures.length - 1,
+    title: meta.title,
     scales: listScales(scalesMap, CHROMATIC),
   });
   const bytes = await writeGuitarPro(result.song);
   const file = new File(
     [bytes as Uint8Array<ArrayBuffer>],
-    `${meta.artist} - ${title}.gp`,
+    `${meta.artist} - ${meta.title}.gp`,
   );
   const [example] = await addUserSongs([file]);
   return { example, result };

@@ -7,9 +7,7 @@ import { getExampleName } from "@/app/data/example";
 import {
   SongsterrMeta,
   SongsterrSearchResult,
-  SongsterrSection,
   SongsterrTrack,
-  listSections,
 } from "@/app/engine/songs/songsterr";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import Search from "@mui/icons-material/Search";
@@ -17,13 +15,11 @@ import {
   Alert,
   Autocomplete,
   Button,
-  Chip,
   CircularProgress,
   DialogActions,
   InputAdornment,
   ListItemText,
   MenuItem,
-  Slider,
   TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -34,7 +30,10 @@ const NO_BASS = -1;
 const SEARCH_DELAY_MS = 400;
 const MIN_QUERY_LENGTH = 2;
 
-type Range = [number, number];
+// The theme paints select text black for the light SelectWrapper background.
+const selectTextSx = {
+  "& .MuiInputBase-root .MuiSelect-select": { color: "text.primary" },
+};
 
 const errorText = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
@@ -42,20 +41,6 @@ const errorText = (error: unknown) =>
 const trackLabel = (meta: SongsterrMeta, index: number) => {
   const track = meta.tracks[index];
   return `${index + 1}. ${track.name || track.instrument} (${track.instrument})`;
-};
-
-// The title tells apart songs added from different parts of one song.
-const getTitle = (
-  meta: SongsterrMeta,
-  [from, to]: Range,
-  measureCount: number,
-  sections: SongsterrSection[],
-) => {
-  if (from === 0 && to === measureCount - 1) {
-    return meta.title;
-  }
-  const section = sections.find((s) => s.from === from && s.to === to);
-  return `${meta.title} (${section?.name ?? `bars ${from + 1}-${to + 1}`})`;
 };
 
 export const SongsterrImportDialog: React.FC<DialogProps> = ({
@@ -73,14 +58,10 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   const [trackIndex, setTrackIndex] = useState(0);
   const [bassIndex, setBassIndex] = useState(NO_BASS);
   const [melodyTrack, setMelodyTrack] = useState<SongsterrTrack>();
-  const [range, setRange] = useState<Range>([0, 0]);
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
 
   const isQueryLongEnough = searchText.trim().length >= MIN_QUERY_LENGTH;
-
-  const measureCount = melodyTrack?.measures.length ?? 0;
-  const sections = melodyTrack ? listSections(melodyTrack.measures) : [];
 
   const run = async (label: string, task: () => Promise<void>) => {
     setBusy(label);
@@ -136,11 +117,6 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
     const track = await loadSongsterrTrack(songMeta, index);
     setTrackIndex(index);
     setMelodyTrack(track);
-    setRange(([from, to]) =>
-      to > 0 && to < track.measures.length
-        ? [from, to]
-        : [0, track.measures.length - 1],
-    );
   };
 
   const chooseSong = (chosen: SongsterrSearchResult | null) => {
@@ -157,7 +133,6 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
       const { loadSongsterrMeta } =
         await import("@/app/engine/songs/songsterrImport");
       const songMeta = await loadSongsterrMeta(chosen.songId);
-      setRange([0, 0]);
       setMeta(songMeta);
       setBassIndex(songMeta.popularTrackBass ?? NO_BASS);
       await loadTrack(songMeta, songMeta.popularTrack ?? 0);
@@ -178,9 +153,6 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
         meta,
         melodyTrack,
         bassIndex: bassIndex === NO_BASS ? undefined : bassIndex,
-        from: range[0],
-        to: range[1],
-        title: getTitle(meta, range, measureCount, sections),
       });
       dispatch(
         setAndShowAlert({
@@ -266,6 +238,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
             select
             size="small"
             label="Melody track"
+            sx={selectTextSx}
             value={trackIndex}
             disabled={busy !== undefined}
             onChange={(e) => void chooseTrack(Number(e.target.value))}
@@ -280,6 +253,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
             select
             size="small"
             label="Bass track, it picks the chords"
+            sx={selectTextSx}
             value={bassIndex}
             disabled={busy !== undefined}
             onChange={(e) => setBassIndex(Number(e.target.value))}
@@ -294,41 +268,11 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
         </>
       )}
 
-      {meta && melodyTrack && (
-        <>
-          {sections.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {sections.map((section) => (
-                <Chip
-                  key={section.from}
-                  size="small"
-                  label={`${section.name} (${section.from + 1})`}
-                  color={
-                    range[0] === section.from && range[1] === section.to
-                      ? "primary"
-                      : "default"
-                  }
-                  onClick={() => setRange([section.from, section.to])}
-                />
-              ))}
-            </div>
-          )}
-          <span>
-            Bars {range[0] + 1} to {range[1] + 1} of {measureCount}
-          </span>
-          <Slider
-            className="mx-2 w-auto"
-            min={1}
-            max={measureCount}
-            value={[range[0] + 1, range[1] + 1]}
-            valueLabelDisplay="auto"
-            disableSwap
-            onChange={(_, value) => {
-              const [from, to] = value as number[];
-              setRange([from - 1, to - 1]);
-            }}
-          />
-        </>
+      {melodyTrack && (
+        <span>
+          Adds all {melodyTrack.measures.length} bars. Cut them in the piano
+          roll.
+        </span>
       )}
 
       <DialogActions>
