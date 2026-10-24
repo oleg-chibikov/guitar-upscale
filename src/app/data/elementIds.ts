@@ -14,3 +14,4 @@ export const CANCEL_SUBSCRIPTION_DIALOG = "cancel-subscription-dialog";
 export const PURCHASE_OPTIONS_DIALOG = "purchase-options-dialog";
 export const CONFIRMATION_DIALOG = "confirmation-dialog";
 export const PIANO_ROLL_DIALOG = "piano-roll-dialog";
+export const SONGSTERR_IMPORT_DIALOG = "songsterr-import-dialog";

@@ -3,6 +3,7 @@ import "server-only";
 import { AdvancedChordModesLoader } from "@/app/components/AdvancedChordModesLoader";
 import { DetectScaleButton } from "@/app/components/settings/buttons/DetectScaleButton";
 import { SongUploadButton } from "@/app/components/settings/buttons/SongUploadButton";
+import { SongsterrImportButton } from "@/app/components/settings/buttons/SongsterrImportButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
 import { Fragment } from "react";
@@ -89,7 +90,13 @@ export const premiumFeaturesToMap = (
       case "scaleDetection":
         return <DetectScaleButton />;
       case "midiUpload":
-        return <SongUploadButton />;
+        return (
+          <>
+            <SongUploadButton />
+            {/* the static export has no API routes to reach Songsterr through */}
+            {process.env.STATIC_EXPORT !== "true" && <SongsterrImportButton />}
+          </>
+        );
       case "playbackTypeSelection":
         return <PlaybackTypeSelector />;
       case "advancedChords":

@@ -94,6 +94,8 @@ In a MIDI file a track named `Chords` plays as chords. A text or marker event li
 - **Tracks** melody, a bass with one note per beat, and a `Chords` track built on the bass.
 - **Rerun** replaces the file with the same band and title, and refreshes `index.json`.
 
+The app has the same steps in a dialog: the cloud button next to upload adds the song to your songs in the browser. The script and the dialog share [songsterr.ts](src/app/engine/songs/songsterr.ts).
+
 `--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--scale`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
 
 ## Deploy
