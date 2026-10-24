@@ -110,7 +110,7 @@ describe("preferred variation", () => {
         "high",
         6,
         mode,
-      ),
+      )!,
     );
 
   it("picks the usual fingering for open chords", () => {

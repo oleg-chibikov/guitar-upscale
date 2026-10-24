@@ -30,6 +30,8 @@ export function setPreferredVariationsForChordMode(
       type,
     );
     const chordName = getChordName(note, chordMode);
-    chordPreferredVariationsByName.set(chordName, preferredVariationsForNote);
+    if (preferredVariationsForNote) {
+      chordPreferredVariationsByName.set(chordName, preferredVariationsForNote);
+    }
   }
 }

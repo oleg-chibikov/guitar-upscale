@@ -1,4 +1,5 @@
 import { ChordMode, ChordModeVariations } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { NOTE_COUNT, Note } from "@/app/data/notes";
 import { buildAllChordsLayout, buildKeyChordsLayout } from "./chordGridLayout";
 
@@ -40,7 +41,11 @@ const columnsWithSevenths = [MAJOR, MINOR, DIM, MAJ7, M7].map((m) =>
 
 describe("buildKeyChordsLayout", () => {
   it("lists the chords of the key from the root", () => {
-    const cells = buildKeyChordsLayout(columns, Note.E);
+    const cells = buildKeyChordsLayout(
+      columns,
+      Note.E,
+      ChordPlayMode.Preferred_Variation,
+    );
     expect(cells.map((c) => c.chordName)).toEqual([
       "Em",
       "F#dim",
@@ -53,7 +58,11 @@ describe("buildKeyChordsLayout", () => {
   });
 
   it("fills a row before starting the next, in a square grid", () => {
-    const cells = buildKeyChordsLayout(columns, Note.E);
+    const cells = buildKeyChordsLayout(
+      columns,
+      Note.E,
+      ChordPlayMode.Preferred_Variation,
+    );
     expect(cells.map((c) => [c.column, c.row])).toEqual([
       [0, 0],
       [1, 0],
@@ -68,7 +77,11 @@ describe("buildKeyChordsLayout", () => {
 
 describe("buildKeyChordsLayout with seventh chords", () => {
   it("fills the empty cells with a seventh chord on the root and the fifth", () => {
-    const cells = buildKeyChordsLayout(columnsWithSevenths, Note.E);
+    const cells = buildKeyChordsLayout(
+      columnsWithSevenths,
+      Note.E,
+      ChordPlayMode.Preferred_Variation,
+    );
     expect(cells.map((c) => c.chordName)).toEqual([
       "Em",
       "F#dim",
@@ -88,6 +101,7 @@ describe("buildKeyChordsLayout with seventh chords", () => {
     const cells = buildKeyChordsLayout(
       [MAJOR, MINOR, DIM, MAJ7, M7].map((m) => columnFor(m, scale)),
       Note.E,
+      ChordPlayMode.Preferred_Variation,
     );
     expect(cells.map((c) => c.chordName)).toEqual(["Em", "G", "Bm", "D"]);
   });
@@ -95,11 +109,37 @@ describe("buildKeyChordsLayout with seventh chords", () => {
 
 describe("buildAllChordsLayout", () => {
   it("greys out the chords outside the scale", () => {
-    const cells = buildAllChordsLayout(columns, [Note.E]);
+    const cells = buildAllChordsLayout(
+      columns,
+      [Note.E],
+      ChordPlayMode.Preferred_Variation,
+    );
     expect(cells.map((c) => [c.chordName, c.isDisabled])).toEqual([
       ["E", true],
       ["Em", false],
       ["Edim", true],
     ]);
+  });
+});
+
+describe("a play mode the chord has no shape for", () => {
+  // the test shapes have no barre
+  it("greys out the chord in the key", () => {
+    const cells = buildKeyChordsLayout(columns, Note.E, ChordPlayMode.Barre);
+    expect(cells.map((c) => c.chordName)).toEqual([
+      "Em",
+      "F#dim",
+      "G",
+      "Am",
+      "Bm",
+      "C",
+      "D",
+    ]);
+    expect(cells.every((c) => c.isDisabled)).toBe(true);
+  });
+
+  it("greys out the chord among all chords", () => {
+    const cells = buildAllChordsLayout(columns, [Note.E], ChordPlayMode.Barre);
+    expect(cells.map((c) => c.isDisabled)).toEqual([true, true, true]);
   });
 });

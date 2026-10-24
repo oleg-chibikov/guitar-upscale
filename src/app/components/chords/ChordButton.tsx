@@ -30,6 +30,8 @@ interface ChordButtonProps {
   chordName: string;
   variations: ChordVariations;
   isHidden: boolean;
+  // true when the chord has no shape for the current play mode
+  isDisabled: boolean;
   onStrummingStateChange: (value: boolean) => void;
   chordMode: ChordMode;
   note: Note;
@@ -43,13 +45,13 @@ const ChordButtonComponent: React.FC<ChordButtonProps> = ({
   chordName,
   variations,
   isHidden,
+  isDisabled,
   chordMode,
   note,
   onStrummingStateChange,
   store,
 }) => {
   const hasTouchInput = useInputChecker();
-  const isDisabled = !variations.length; // TODO: hide if there's no preferred variation of current type
   const isClickedRef = useRef<boolean>(false);
   const isPlayingRef = useRef<boolean>(false);
   const isGracePeriodRef = useRef<boolean>(false);

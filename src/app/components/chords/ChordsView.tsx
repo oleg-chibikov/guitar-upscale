@@ -22,6 +22,7 @@ import {
   chordPreferredVariationsByName,
   setPreferredVariationsForChordMode,
 } from "@/app/engine/chords/chordNotesByName";
+import { hasVariationForPlayMode } from "@/app/engine/chords/chordVariationHelper";
 import {
   abortGeneratingChords,
   generateChords,
@@ -230,8 +231,12 @@ export const ChordsView: React.FC<{
     (note) => useSharpChords || !isSharp(note),
   );
   const layout = allChordsShown
-    ? buildAllChordsLayout(chordModeVariations, notes)
-    : buildKeyChordsLayout(chordModeVariations, getShiftedNote(capo, tuning));
+    ? buildAllChordsLayout(chordModeVariations, notes, chordPlayMode)
+    : buildKeyChordsLayout(
+        chordModeVariations,
+        getShiftedNote(capo, tuning),
+        chordPlayMode,
+      );
   const cellHeight = !allChordsShown
     ? KEY_CELL_HEIGHT
     : useSharpChords
@@ -300,6 +305,8 @@ export const ChordsView: React.FC<{
         {Array.from({ length: NOTE_COUNT }).map((_, noteIndex) =>
           chordModeVariations.map((chordMode) => {
             const title = getChordName(noteIndex, chordMode.chordMode);
+            const variations =
+              chordMode.variationsByNote[noteIndex] ?? NO_VARIATIONS;
             return (
               <ChordButton
                 key={title}
@@ -307,11 +314,10 @@ export const ChordsView: React.FC<{
                 isHidden={
                   allChordsShown && !useSharpChords && isSharp(noteIndex)
                 }
+                isDisabled={!hasVariationForPlayMode(variations, chordPlayMode)}
                 chordMode={chordMode.chordMode}
                 note={noteIndex}
-                variations={
-                  chordMode.variationsByNote[noteIndex] ?? NO_VARIATIONS
-                }
+                variations={variations}
                 chordName={title}
                 onStrummingStateChange={handleStrummingStateChange}
               />

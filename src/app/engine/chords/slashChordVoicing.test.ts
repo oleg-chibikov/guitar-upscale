@@ -41,7 +41,7 @@ const preferred = (root: number, intervals: number[], mode: ChordPlayMode) => {
     "high",
     6,
     mode,
-  );
+  )!;
   return variation
     .map((stringOctaveNote, i) =>
       stringOctaveNote === undefined

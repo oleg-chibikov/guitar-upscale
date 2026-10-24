@@ -1,5 +1,7 @@
 import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
+import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { NOTE_COUNT, Note } from "@/app/data/notes";
+import { hasVariationForPlayMode } from "@/app/engine/chords/chordVariationHelper";
 
 export interface ChordGridCell {
   chordName: string;
@@ -12,12 +14,20 @@ export interface ChordGridCell {
 const isPlayable = (mode: ChordModeVariations, note: Note) =>
   (mode.variationsByNote[note]?.length ?? 0) > 0;
 
+const isPlayableIn = (
+  playMode: ChordPlayMode,
+  mode: ChordModeVariations,
+  note: Note,
+) => hasVariationForPlayMode(mode.variationsByNote[note] ?? [], playMode);
+
 /**
  * Every chord: one row per root note, one column per chord type.
+ * A chord without a shape for the play mode is greyed out.
  */
 export const buildAllChordsLayout = (
   columns: ChordModeVariations[],
   notes: Note[],
+  playMode: ChordPlayMode,
 ): ChordGridCell[] =>
   notes.flatMap((note, row) =>
     columns.map((mode, column) => ({
@@ -25,7 +35,7 @@ export const buildAllChordsLayout = (
       root: note,
       column,
       row,
-      isDisabled: !isPlayable(mode, note),
+      isDisabled: !isPlayableIn(playMode, mode, note),
     })),
   );
 
@@ -39,12 +49,18 @@ const isSeventhChord = ({ chordMode }: ChordModeVariations) =>
  * One chord per scale note, from the root up: the first chord type that fits the scale.
  * The chords fill a row, then the next one, in a grid as close to a square as they allow.
  * The empty cells left in the last row get a seventh chord on the root, then on the fifth.
+ * A chord without a shape for the play mode keeps its place and is greyed out.
  */
 export const buildKeyChordsLayout = (
   columns: ChordModeVariations[],
   root: Note,
+  playMode: ChordPlayMode,
 ): ChordGridCell[] => {
-  const chords: { chordName: string; root: Note }[] = [];
+  const chords: {
+    chordName: string;
+    root: Note;
+    mode: ChordModeVariations;
+  }[] = [];
   const modeByNote = new Map<Note, ChordModeVariations>();
   for (let step = 0; step < NOTE_COUNT; step++) {
     const note = (root + step) % NOTE_COUNT;
@@ -54,6 +70,7 @@ export const buildKeyChordsLayout = (
       chords.push({
         chordName: getChordName(note, mode.chordMode),
         root: note,
+        mode,
       });
     }
   }
@@ -69,14 +86,15 @@ export const buildKeyChordsLayout = (
           isPlayable(mode, note),
       );
       return modeByNote.has(note) && mode
-        ? [{ chordName: getChordName(note, mode.chordMode), root: note }]
+        ? [{ chordName: getChordName(note, mode.chordMode), root: note, mode }]
         : [];
     })
     .slice(0, emptyCells);
-  return [...chords, ...extras].map((chord, index) => ({
-    ...chord,
+  return [...chords, ...extras].map(({ chordName, root, mode }, index) => ({
+    chordName,
+    root,
     column: index % columnCount,
     row: Math.floor(index / columnCount),
-    isDisabled: false,
+    isDisabled: !isPlayableIn(playMode, mode, root),
   }));
 };

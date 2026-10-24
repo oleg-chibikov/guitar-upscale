@@ -6,24 +6,40 @@ import { calculateAverage } from "@/app/helpers/arrayHelper";
 
 type StringPreference = "high" | "low";
 
+const isThumbChord = ({ fingerAssignment }: ChordBuilderInfo) =>
+  fingerAssignment[fingerAssignment.length - 1] === THUMB;
+
+// Barre and With_Thumb play only the shapes of their kind. A chord without one stays silent.
+const getVariationsForPlayMode = (
+  chordVariations: ChordVariations,
+  type: ChordPlayMode,
+) => {
+  switch (type) {
+    case ChordPlayMode.Barre:
+      return chordVariations.filter(isBarreChord);
+    case ChordPlayMode.With_Thumb:
+      return chordVariations.filter(isThumbChord);
+    default:
+      return chordVariations;
+  }
+};
+
+export const hasVariationForPlayMode = (
+  chordVariations: ChordVariations,
+  type: ChordPlayMode,
+) => getVariationsForPlayMode(chordVariations, type).length > 0;
+
 export const getPreferredChordVariation = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference = "high",
   numberOfStrings: number,
   type: ChordPlayMode,
-): ChordBuilderInfo => {
+): ChordBuilderInfo | undefined => {
   switch (type) {
     case ChordPlayMode.Barre:
-      return getBestOf(
-        chordVariations.filter(isBarreChord),
-        stringPreference,
-        numberOfStrings,
-      );
     case ChordPlayMode.With_Thumb:
       return getBestOf(
-        chordVariations.filter(
-          (x) => x.fingerAssignment[x.fingerAssignment.length - 1] === THUMB,
-        ),
+        getVariationsForPlayMode(chordVariations, type),
         stringPreference,
         numberOfStrings,
       );
@@ -177,14 +193,14 @@ const getBestOf = (
   chordVariations: ChordVariations,
   stringPreference: StringPreference,
   numberOfStrings: number,
-): ChordBuilderInfo =>
+): ChordBuilderInfo | undefined =>
   chordVariations.length
     ? getGeneralPreferredChordVariation(
         chordVariations,
         stringPreference,
         numberOfStrings,
       )
-    : chordVariations[0];
+    : undefined;
 
 const getFingeringScore = ({
   variation,
