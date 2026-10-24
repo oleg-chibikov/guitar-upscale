@@ -19,7 +19,6 @@ import {
   Chip,
   CircularProgress,
   DialogActions,
-  IconButton,
   InputAdornment,
   List,
   ListItemButton,
@@ -172,23 +171,18 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
           autoFocus
           fullWidth
           size="small"
-          placeholder="Band or song"
+          placeholder="Band or song, then Enter"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           slotProps={{
             input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    type="submit"
-                    aria-label="Search"
-                    disabled={!query.trim() || busy !== undefined}
-                  >
-                    <Search />
-                  </IconButton>
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search fontSize="small" />
                 </InputAdornment>
               ),
             },
+            htmlInput: { enterKeyHint: "search" },
           }}
         />
       </form>
