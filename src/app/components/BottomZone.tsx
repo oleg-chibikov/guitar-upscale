@@ -60,7 +60,7 @@ export const BottomZone: React.FC<
           </Panel>
         )}
         <Panel
-          className={`${WRAPPING_PANEL} w-full flex-wrap-reverse ${
+          className={`${WRAPPING_PANEL} flex-wrap-reverse ${
             chordsOnLeft ? "justify-end" : "justify-start"
           }`}
         >
