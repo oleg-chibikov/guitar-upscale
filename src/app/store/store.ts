@@ -1,7 +1,7 @@
 // store.ts
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, Reducer } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import { PersistedState, persistReducer, persistStore } from "redux-persist";
+import { createMigrate, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./authSlice";
@@ -10,91 +10,63 @@ import pianoRollReducer from "./pianoRollSlice";
 import settingsReducer from "./settingsSlice";
 import uiReducer from "./uiSlice";
 
-const rootReducer = combineReducers({
-  pianoRoll: pianoRollReducer,
-  settings: settingsReducer,
-  ui: uiReducer,
-  auth: authReducer,
-});
-
+// Raising it drops the saved state of every slice
 const VERSION = 11;
 
-const persistConfig = {
-  key: "root",
-  version: VERSION,
-  storage,
-  migrate: (state: PersistedState) => {
-    if (typeof window === "undefined") {
-      return Promise.resolve(state);
-    }
-    console.log("Checking migration needed");
-    const storedVersionRaw = localStorage.getItem("reduxPersist:root:version");
-    const setCurrentVersionToLocalStorage = () => {
-      console.log("Setting version " + VERSION);
-      localStorage.setItem("reduxPersist:root:version", VERSION.toString());
-    };
-    if (storedVersionRaw === null) {
-      void persistor.purge(); // if there is something before introducing versions
-      setCurrentVersionToLocalStorage();
-      return Promise.resolve(state);
-    }
-    const storedVersion = parseInt(storedVersionRaw);
-    console.log("Currently stored version: " + storedVersion);
-    if (storedVersion !== VERSION) {
-      console.log(
-        "Purging version" +
-          storedVersion +
-          " as there is a newer version " +
-          VERSION,
-      );
-      // Clear previous state if version has changed
-      void persistor.purge();
-      setCurrentVersionToLocalStorage();
-    }
-    return Promise.resolve(state);
-  },
-  transforms: [
-    {
-      in: (state: PersistedState) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const newState = { ...state } as any; // TODO: I don't understand it fully, but it works like this
-        delete newState.neck;
-        delete newState.stringCount;
-        delete newState.settingsExpanded;
-        // delete newState.chordsExpanded; // chords could stay expanded
-        // delete newState.controlPanelExpanded; // control panel could stay expanded
-        delete newState.strummingSettingsExpanded;
-        delete newState.strummingPatternEditorExpanded;
-        delete newState.showAlert;
-        delete newState.alertType;
-        delete newState.alertTimeout;
-        delete newState.alertMessage;
-        delete newState.suggestedScales;
-        delete newState.showScalesAlert;
-        delete newState.isMetronomeActive;
-        delete newState.chordIsBeingDetected;
-        delete newState.scaleIsBeingDetected;
-        delete newState.isRecording;
-        delete newState.subscriptionTier;
-        delete newState.premiumFeatures;
-        delete newState.isLastEvent;
-        delete newState.isFirstEvent;
-        delete newState.showAspectRatio;
-        delete newState.chordModesCount;
-        delete newState.guitarSettingsUpdateCount;
-        delete newState.chordsAreLoading;
-        return newState;
-      },
-      out: (state: PersistedState) => state, // No transformation needed when deserializing
-    },
-  ],
-};
+// the whole state used to sit under one key
+if (typeof window !== "undefined") {
+  localStorage.removeItem("persist:root");
+  localStorage.removeItem("reduxPersist:root:version");
+}
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistSlice = <S>(
+  key: string,
+  reducer: Reducer<S>,
+  blacklist: (keyof S & string)[] = [],
+) =>
+  persistReducer(
+    {
+      key,
+      version: VERSION,
+      storage,
+      blacklist,
+      migrate: createMigrate({ [VERSION]: () => undefined }),
+    },
+    reducer,
+  );
+
+const rootReducer = combineReducers({
+  pianoRoll: persistSlice("pianoRoll", pianoRollReducer),
+  settings: persistSlice("settings", settingsReducer, [
+    "neck",
+    "stringCount",
+    "isMetronomeActive",
+    "chordIsBeingDetected",
+    "scaleIsBeingDetected",
+    "isRecording",
+    "isLastEvent",
+    "isFirstEvent",
+    "guitarSettingsUpdateCount",
+    "chordsAreLoading",
+  ]),
+  ui: persistSlice("ui", uiReducer, [
+    "settingsExpanded",
+    "strummingSettingsExpanded",
+    "strummingPatternEditorExpanded",
+    "showAlert",
+    "alertType",
+    "alertTimeout",
+    "alertMessage",
+    "suggestedScales",
+    "showScalesAlert",
+    "showAspectRatio",
+  ]),
+  auth: persistSlice("auth", authReducer, ["subscriptionTier"]),
+});
 
 export const store = configureStore({
   devTools: true,
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(looperGuard), // The application stores a Set to improve its performance
 });

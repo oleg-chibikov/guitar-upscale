@@ -140,8 +140,8 @@ flowchart TD
 | [pianoRollSlice](../src/app/store/pianoRollSlice.ts) | piano roll tool, snap, zoom, follow playhead                                                         |
 | [authSlice](../src/app/store/authSlice.ts)           | sign-in state and tier                                                                               |
 
-- **Saving** `redux-persist` writes the store to `localStorage` under `root`. A transform drops short-lived fields such as alerts and play flags.
-- **Versions** [store.ts](../src/app/store/store.ts) has a `VERSION`. A saved store with another version gets wiped, so a breaking change needs a bump.
+- **Saving** `redux-persist` writes each slice to `localStorage` under its own key, such as `persist:settings`. The `blacklist` of a slice in [store.ts](../src/app/store/store.ts) keeps short-lived fields such as alerts and play flags out.
+- **Versions** [store.ts](../src/app/store/store.ts) has a `VERSION`. `createMigrate` wipes a slice saved with an older version, so a breaking change needs a bump.
 
 ### Values the engine reads
 
