@@ -228,7 +228,7 @@ Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadBu
 [Explorer] Detect chord sits in the control panel. Detect scale sits behind the key button. One runs at a time.
 
 - **Detect chord** tap at least 3 notes on different strings. A message lists the matching chords. A second tap on a marked note removes it.
-- **Detect scale** switches to the chromatic scale and closes the pickers. The key button turns red and says "Detecting scale". Tap at least 5 different notes, then a dialog suggests scales to switch to.
+- **Detect scale** switches to the chromatic scale and closes the pickers. The key button turns red and says "Detecting scale". Tap at least 5 different notes, then a dialog suggests scales to switch to. Stopping without a pick brings the old scale back.
 
 Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChordButton.tsx), [DetectScaleButton.tsx](../src/app/components/settings/buttons/DetectScaleButton.tsx), [chordDetectorBuilder.ts](../src/app/engine/chords/chordDetectorBuilder.ts), [scaleDetectorBuilder.ts](../src/app/engine/scales/scaleDetectorBuilder.ts), [ScaleDetectionDialog](../src/app/components/alert/).
 
