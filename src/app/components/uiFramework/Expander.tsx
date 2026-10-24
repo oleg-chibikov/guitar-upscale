@@ -8,7 +8,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, Ref } from "react";
 
 interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   expanded: boolean;
@@ -18,6 +18,7 @@ interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   expandOnlyOnIcon?: boolean;
   // shown in the header next to the title. A press on it doesn't toggle the expander
   headerAction?: ReactNode;
+  ref?: Ref<HTMLElement>;
 }
 
 export const Expander: FC<ExpanderProps> = ({
@@ -31,10 +32,12 @@ export const Expander: FC<ExpanderProps> = ({
   reverseIcon = false,
   expandOnlyOnIcon = false,
   headerAction,
+  ref,
 }) => {
   const theme = useUiSelector((s) => s.theme);
   return (
     <section
+      ref={ref}
       style={style}
       className={`${className} rounded-xl border p-1.5 ${
         theme === Theme.Light

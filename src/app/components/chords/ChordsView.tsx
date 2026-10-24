@@ -38,9 +38,20 @@ import {
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
-import { setAllChordsShown, setChordsExpanded } from "@/app/store/uiSlice";
+import {
+  setAllChordsShown,
+  setChordsExpanded,
+  setChordsWidth,
+} from "@/app/store/uiSlice";
 import { Button } from "@mui/material";
-import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
 import {
@@ -112,6 +123,23 @@ export const ChordsView: React.FC<{
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
+
+  const observeWidth = useCallback(
+    (element: HTMLElement | null) => {
+      if (element === null) {
+        return;
+      }
+      const observer = new ResizeObserver(([entry]) =>
+        dispatch(setChordsWidth(Math.ceil(entry.borderBoxSize[0].inlineSize))),
+      );
+      observer.observe(element);
+      return () => {
+        observer.disconnect();
+        dispatch(setChordsWidth(0));
+      };
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     if (chordsAreLoading) {
@@ -224,6 +252,7 @@ export const ChordsView: React.FC<{
   return (
     <Expander
       id={CHORDS_VIEW_ID}
+      ref={observeWidth}
       className={`fixed opacity-95 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } bottom-1 z-20`}
