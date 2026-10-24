@@ -8,6 +8,7 @@ import { NowPlaying } from "@/app/components/playPanel/NowPlaying";
 import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { useWakeLock } from "@/app/hooks/useWakeLock";
 import { isAuthEnabled } from "@/lib/featureFlags";
 import { ReactNode, useRef } from "react";
 import { Theme } from "../data/theme";
@@ -27,6 +28,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
   const loadingMessage = useUiSelector((s) => s.loadingMessage);
   const theme = useUiSelector((s) => s.theme);
   const mainRef = useRef<HTMLElement>(null);
+  useWakeLock();
 
   return (
     <>
