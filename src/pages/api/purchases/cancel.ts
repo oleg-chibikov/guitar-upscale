@@ -44,13 +44,17 @@ const handle = async (
   if (!subscriptionToCancel) {
     return undefined;
   }
+  const anotherCancelledSubscription =
+    await getCancelledSubscriptionFromRequest(req, res);
+  // a bad cancelled subscription gets a 400 before anything changes at Google
+  if (res.headersSent) {
+    return undefined;
+  }
+
   const mode = await cancel(subscriptionToCancel);
 
   let newTier: Tier | undefined;
   let tierChanged: boolean;
-
-  const anotherCancelledSubscription =
-    await getCancelledSubscriptionFromRequest(req, res);
   const subscriptionToCancelTier = tierMap.get(
     subscriptionToCancel.params.itemId,
   );

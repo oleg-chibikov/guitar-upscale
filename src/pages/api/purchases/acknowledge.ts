@@ -40,12 +40,16 @@ const handle = async (
     return;
   }
 
-  await acknowledge(subscriptionData);
-
   const cancelledSubscription = await getCancelledSubscriptionFromRequest(
     req,
     res,
   );
+  // a bad cancelled subscription gets a 400 before anything changes at Google
+  if (res.headersSent) {
+    return;
+  }
+
+  await acknowledge(subscriptionData);
 
   let newTier: Tier;
   let tierChanged: boolean;
