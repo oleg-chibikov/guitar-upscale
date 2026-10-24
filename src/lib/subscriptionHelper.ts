@@ -2,10 +2,10 @@
 
 import { TierKey, tierMap } from "@/lib/tier";
 import { HttpStatusCode } from "axios";
+import { differenceInDays, intervalToDuration } from "date-fns";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CancellationMode, ResponseData } from "./apiTypes";
 import { CancelReason, SubscriptionPurchase } from "./billing";
-import { msToTime } from "./dateHelper";
 import { PurchaseParams } from "./purchaseParams";
 import {
   acknowledgeSubscriptionPurchase,
@@ -124,25 +124,28 @@ export async function defer(
   const newSubscriptionDesiredExpiryTimeMs =
     newSubscriptionDesiredStartTimeMs + currentSubscriptionDurationMs;
 
-  const expiryTimeDifference =
-    newSubscriptionDesiredExpiryTimeMs - newSubscriptionCurrentExpiryTimeMs;
-
-  const differenceObject = msToTime(expiryTimeDifference);
+  const expiryDaysDifference = differenceInDays(
+    newSubscriptionDesiredExpiryTimeMs,
+    newSubscriptionCurrentExpiryTimeMs,
+  );
   console.log(
     `Deferring subscription %s;
         desired start time: %o;
         desired expiry time: %o;
         current expiry time: %o,
         duration: %o;
-        expiry time difference: %o`,
+        expiry time difference in days: %o`,
     purchasedSubscription.params.itemId,
     new Date(newSubscriptionDesiredStartTimeMs),
     new Date(newSubscriptionDesiredExpiryTimeMs),
     new Date(newSubscriptionCurrentExpiryTimeMs),
-    msToTime(currentSubscriptionDurationMs),
-    differenceObject,
+    intervalToDuration({
+      start: purchasedSubscription.subscription.startTimeMillis,
+      end: purchasedSubscription.subscription.expiryTimeMillis,
+    }),
+    expiryDaysDifference,
   );
-  if (differenceObject.days >= 1 && differenceObject.days <= 365) {
+  if (expiryDaysDifference >= 1 && expiryDaysDifference <= 365) {
     try {
       await deferSubscription(
         purchasedSubscription.params,
