@@ -10,6 +10,7 @@ import { AboutButton } from "./buttons/AboutButton";
 import { FullscreenButton } from "./buttons/FullscreenButton";
 import { OpenSettingsButton } from "./buttons/OpenSettingsButton";
 import { OpenStrummingSettingsButton } from "./buttons/OpenStrummingSettingsButton";
+import { ReloadButton } from "./buttons/ReloadButton";
 
 const DisabledDetectChordButton = dynamic(
   async () =>
@@ -48,6 +49,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
         <DisabledSongUploadButton />
       )}
       {!isMobileDeviceValue && <FullscreenButton />}
+      <ReloadButton />
       <AboutButton />
     </section>
   );
