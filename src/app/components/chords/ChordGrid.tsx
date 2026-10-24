@@ -6,7 +6,6 @@ import {
 import {
   BUTTON_FONT_FAMILY,
   BUTTON_FONT_STYLE,
-  GRAY_500,
   Palette,
   RED_500,
   getPalette,
@@ -183,7 +182,7 @@ const drawCell = (
     ctx.stroke();
   }
 
-  ctx.fillStyle = isDisabled ? GRAY_500 : palette.foreground;
+  ctx.fillStyle = isDisabled ? palette.disabledForeground : palette.foreground;
   ctx.fillText(
     fitText(ctx, label, CELL_WIDTH - 2 * TEXT_PADDING),
     x + CELL_WIDTH / 2,

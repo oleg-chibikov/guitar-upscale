@@ -10,6 +10,8 @@ import { DialogContent } from "@mui/material";
 interface DialogContentWrapperProps
   extends WithClassName, WithChildren, WithStyle {
   id?: string;
+  // the dialog points aria-labelledby at the header with this id
+  titleId?: string;
   onClose?: () => void;
   headerText?: string;
   contentClassName?: string;
@@ -18,6 +20,7 @@ interface DialogContentWrapperProps
 
 export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
   id,
+  titleId,
   children,
   className,
   style,
@@ -31,7 +34,6 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
   return (
     <section
       id={id}
-      aria-labelledby={id}
       style={style}
       className={`${className !== undefined ? `${className} ` : ""} ${
         theme === Theme.Light
@@ -40,7 +42,7 @@ export const DialogContentWrapper: React.FC<DialogContentWrapperProps> = ({
       } flex flex-col gap-2 border-2`}
     >
       {headerText !== undefined && (
-        <DialogHeader text={headerText} onClose={onClose} />
+        <DialogHeader id={titleId} text={headerText} onClose={onClose} />
       )}
       {headerText === undefined && onClose && (
         <CloseIcon onPress={onClose} className="absolute top-6 right-6 z-10" />

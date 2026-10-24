@@ -39,6 +39,7 @@ export const AutoQuantizeButton: React.FC = () => {
           </Badge>
         }
         isActive={autoQuantize}
+        toggle
         tooltip={
           autoQuantize
             ? `Auto quantize is on: recorded and looped notes snap to ${quantize}. Hold to choose the length`

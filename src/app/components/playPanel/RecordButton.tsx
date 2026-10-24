@@ -39,12 +39,16 @@ import {
 import React, { Dispatch, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { UnknownAction } from "redux";
+import { ConfirmationDialog } from "../uiFramework/ConfirmationDialog";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 
 const LOG_PREFIX = "RecordButton: ";
 
 // the song the take goes into as new tracks. Undefined makes a new song
 let trackTarget: LoadedSong | undefined;
+let recordingStartedAt = 0;
+// a shorter take drops without asking
+const CONFIRM_CANCEL_AFTER_MS = 3000;
 
 async function startRecording(
   dispatch: Dispatch<UnknownAction>,
@@ -53,6 +57,7 @@ async function startRecording(
   const { midiRecorder } =
     await import("@/app/engine/midiRecorder/midiRecorder");
   trackTarget = target;
+  recordingStartedAt = Date.now();
   dispatch(setIsRecording(true));
   tryToggleInterval(true);
   if (target) {
@@ -143,6 +148,8 @@ export const RecordButton: React.FC = (props) => {
   const loadedSong = useLoadedSong();
   const dispatch = useDispatch();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  // the start time of the take the cancel dialog is for
+  const [confirmCancelFor, setConfirmCancelFor] = useState<number>();
   const intoTrack = recordTarget === RecordTarget.NewTrack && !!loadedSong;
 
   // a take over a song ends with the song
@@ -197,9 +204,26 @@ export const RecordButton: React.FC = (props) => {
           icon={<Cancel />}
           isActive={true}
           tooltip="Cancel recording"
-          onPress={() => void stopRecording(dispatch, false)}
+          onPress={() => {
+            if (Date.now() - recordingStartedAt > CONFIRM_CANCEL_AFTER_MS) {
+              setConfirmCancelFor(recordingStartedAt);
+            } else {
+              void stopRecording(dispatch, false);
+            }
+          }}
         />
       )}
+      <ConfirmationDialog
+        open={isRecording && confirmCancelFor === recordingStartedAt}
+        onClose={() => setConfirmCancelFor(undefined)}
+        onConfirm={() => {
+          setConfirmCancelFor(undefined);
+          void stopRecording(dispatch, false);
+        }}
+        title="Drop this take?"
+        content="The notes you just played won't be saved."
+        confirmButtonText="Drop take"
+      />
       <IconButtonWrapper
         {...props}
         icon={isRecording ? <StopCircle /> : recordIcon}

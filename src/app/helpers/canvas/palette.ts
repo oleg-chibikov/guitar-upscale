@@ -21,6 +21,8 @@ const light = {
   accentStrongest: "#9B3320",
   disabled: "#dadada",
   disabledMatch: "#8a8888",
+  // text on a disabled cell
+  disabledForeground: "#4b5563",
   notePress: "rgb(235, 188, 102)",
   bar: "#f6e7d2eb",
   barBorder: "#d9bfae",
@@ -54,6 +56,7 @@ const dark: Palette = {
   accentStrongest: "#B103BC",
   disabled: "#8c8c8c",
   disabledMatch: "#5c5c5c",
+  disabledForeground: "#111827",
   notePress: "rgb(99, 9, 245)",
   bar: "#202020eb",
   barBorder: "#444444",

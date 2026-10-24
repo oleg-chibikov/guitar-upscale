@@ -135,7 +135,7 @@ Hold the button, or right click it, to pick where the take goes. The pick starts
 - **A new song** the take goes to the song list as "Recording" with the date and time. It loads as the current song.
 - **A new track in this song** the loaded song plays from the playhead and the take lines up with it. The take lands in new tracks named "Take 1" and on, one for notes and one for chords. Recording stops when the song ends. A `+` on the button shows this mode.
 - **Stop** saves the take. A take with no notes isn't saved.
-- **Cancel** a second button drops the take.
+- **Cancel** a second button drops the take. A take longer than 3 seconds asks first.
 - **Save MIDI file immediately after recording** downloads the `.mid` file on stop.
 
 Without a loaded song, a press records a new song. Undo in the piano roll takes a new track out again.
@@ -228,7 +228,7 @@ Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadBu
 [Explorer] Detect chord sits in the control panel. Detect scale sits behind the key button. One runs at a time.
 
 - **Detect chord** tap at least 3 notes on different strings. A message lists the matching chords. A second tap on a marked note removes it.
-- **Detect scale** switches to the chromatic scale and closes the pickers. The key button turns red and says "Detecting scale". Tap at least 5 different notes, then a dialog suggests scales to switch to.
+- **Detect scale** switches to the chromatic scale and closes the pickers. The key button turns red and says "Detecting scale". Tap at least 5 different notes, then a dialog suggests scales to switch to. Stopping without a pick brings the old scale back.
 
 Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChordButton.tsx), [DetectScaleButton.tsx](../src/app/components/settings/buttons/DetectScaleButton.tsx), [chordDetectorBuilder.ts](../src/app/engine/chords/chordDetectorBuilder.ts), [scaleDetectorBuilder.ts](../src/app/engine/scales/scaleDetectorBuilder.ts), [ScaleDetectionDialog](../src/app/components/alert/).
 
@@ -236,17 +236,21 @@ Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChord
 
 The gear button opens a drawer. Each value survives a reload.
 
-| Group         | Settings                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Look**      | theme (light, dark, match OS), note display mode, chords display mode, skin [Composer]                              |
-| **Chords**    | chord play mode, notes to play in chord, ♯ chords, alternate chords                                                 |
-| **Sound**     | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only] |
-| **Playback**  | playback type [Explorer]                                                                                            |
-| **Recording** | start metronome when recording, save MIDI right after recording [Composer]                                          |
+| Group         | Settings                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Look**      | theme (dark, light, match system: follows the OS as it changes), note display mode, chords display mode, skin [Composer] |
+| **Chords**    | chord play mode, notes to play in chord, ♯ chords, alternate chords                                                      |
+| **Sound**     | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only]      |
+| **Playback**  | playback type [Explorer]                                                                                                 |
+| **Recording** | start metronome when recording, save MIDI right after recording [Composer]                                               |
 
 "Reset settings" at the bottom puts the defaults back.
 
 The control panel opens with the key button: scale, tuning, capo and scale detection. Next come the settings, piano roll, strumming, detect chord, upload, fullscreen (desktop), reload page and about buttons. The arrow at the end hides everything but the key button. Tempo and volume sit in the play panel.
+
+Reload page asks first while a recording runs or the looper has unsaved loops. Closing the tab then asks too.
+
+On a phone held upright, a tip asks to turn the phone sideways. The neck doesn't fit otherwise. A narrow control panel scrolls sideways.
 
 Code: [SettingsView.tsx](../src/app/components/settings/SettingsView.tsx), [ControlPanel.tsx](../src/app/components/settings/ControlPanel.tsx), [settingsSlice.ts](../src/app/store/settingsSlice.ts), [uiSlice.ts](../src/app/store/uiSlice.ts).
 

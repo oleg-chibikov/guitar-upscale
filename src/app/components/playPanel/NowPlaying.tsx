@@ -12,7 +12,7 @@ import { setPianoRollExpanded } from "@/app/store/uiSlice";
 import Close from "@mui/icons-material/Close";
 import FiberManualRecord from "@mui/icons-material/FiberManualRecord";
 import MusicNote from "@mui/icons-material/MusicNote";
-import { IconButton, InputBase, Tooltip } from "@mui/material";
+import { ButtonBase, IconButton, InputBase, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -146,12 +146,29 @@ export const NowPlaying: React.FC = () => {
     }
     return (
       <Tooltip title={canRename ? `${name}. Click to rename` : name}>
-        <span
-          className={`truncate ${canRename ? "cursor-text" : ""}`}
-          onClick={canRename ? () => setDraftName(name) : undefined}
-        >
-          {name}
-        </span>
+        {canRename ? (
+          <ButtonBase
+            component="span"
+            aria-label={`Rename ${name}`}
+            className="cursor-text truncate"
+            sx={{
+              display: "block",
+              font: "inherit",
+              "&.Mui-focusVisible": {
+                outline: "2px solid",
+                outlineColor: "primary.main",
+              },
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              setDraftName(name);
+            }}
+          >
+            {name}
+          </ButtonBase>
+        ) : (
+          <span className="truncate">{name}</span>
+        )}
       </Tooltip>
     );
   };

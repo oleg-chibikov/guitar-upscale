@@ -8,14 +8,18 @@ import { NowPlaying } from "@/app/components/playPanel/NowPlaying";
 import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { warnBeforeUnload } from "@/app/helpers/unsavedWork";
 import { useWakeLock } from "@/app/hooks/useWakeLock";
 import { isAuthEnabled } from "@/lib/featureFlags";
+import { setTheme } from "@/app/store/uiSlice";
 import dynamic from "next/dynamic";
-import { ReactNode, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
+import { RotateHint } from "./RotateHint";
 import { AlertWrapper } from "./alert/AlertWrapper";
 import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
@@ -30,8 +34,27 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
 }) => {
   const loadingMessage = useUiSelector((s) => s.loadingMessage);
   const theme = useUiSelector((s) => s.theme);
+  const followOs = useUiSelector((s) => s.followOs);
+  const dispatch = useDispatch();
   const mainRef = useRef<HTMLElement>(null);
   useWakeLock();
+
+  useEffect(() => {
+    if (!followOs) {
+      return;
+    }
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () =>
+      dispatch(setTheme(query.matches ? Theme.Dark : Theme.Light));
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, [followOs, dispatch]);
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, []);
 
   return (
     <>
@@ -52,6 +75,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
       ) : (
         <main ref={mainRef} className="overflow-auto">
           <ControlPanel premiumComponents={premiumComponents} />
+          <RotateHint />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           {isAuthEnabled && <AuthPanel />}

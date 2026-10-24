@@ -249,7 +249,6 @@ export const ChordsView: React.FC<{
       headerAction={
         chordsExpanded ? (
           <Button
-            component="span"
             size="small"
             sx={{
               minWidth: 0,

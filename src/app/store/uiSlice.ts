@@ -15,7 +15,8 @@ import {
 import { Theme } from "@/app/data/theme";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import { stringCountValue } from "@/app/store/settingsSlice";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, UnknownAction, createSlice } from "@reduxjs/toolkit";
+import { REHYDRATE } from "redux-persist";
 import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 
@@ -41,6 +42,8 @@ interface UiState {
   suggestedScales: ScaleAndGroup[] | undefined;
   showScalesAlert: boolean;
   theme: Theme;
+  // the theme tracks the OS light or dark setting
+  followOs: boolean;
   fretboardScaleX: number;
   fretboardScaleY: number;
   lockRatio: boolean;
@@ -69,6 +72,7 @@ const initialState: UiState = {
   suggestedScales: undefined,
   showScalesAlert: false,
   theme: initialTheme,
+  followOs: true,
   fretboardScaleX: 1,
   fretboardScaleY: 1,
   lockRatio: false,
@@ -160,7 +164,10 @@ export const uiSlice = createSlice({
       state.showAlert = true;
       state.alertMessage = action.payload.message;
       state.alertType = action.payload.alertType ?? AlertType.Neutral;
-      state.alertTimeout = action.payload.alertTimeout ?? 2000;
+      // long messages stay up long enough to read
+      state.alertTimeout =
+        action.payload.alertTimeout ??
+        Math.max(3000, action.payload.message.length * 60);
     },
     hideAlert(state) {
       state.showAlert = false;
@@ -176,6 +183,9 @@ export const uiSlice = createSlice({
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;
       themeValue = action.payload;
+    },
+    setFollowOs(state, action: PayloadAction<boolean>) {
+      state.followOs = action.payload;
     },
     setFretboardScaleX(state, action: PayloadAction<number>) {
       state.fretboardScaleX = action.payload;
@@ -232,6 +242,22 @@ export const uiSlice = createSlice({
       state.showAspectRatio = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    // saved state from before followOs: only an untouched MatchOS follows the OS
+    builder.addMatcher(
+      (
+        action: UnknownAction,
+      ): action is UnknownAction & {
+        key: string;
+        payload?: Partial<UiState>;
+      } => action.type === REHYDRATE && action.key === "ui",
+      (state, action) => {
+        if (action.payload && action.payload.followOs === undefined) {
+          state.followOs = action.payload.theme === Theme.MatchOS;
+        }
+      },
+    );
+  },
 });
 
 export const {
@@ -254,6 +280,7 @@ export const {
   setSuggestedScales,
   hideScalesAlert,
   setTheme,
+  setFollowOs,
   setFretboardScaleX,
   setFretboardScaleY,
   setLockRatio,

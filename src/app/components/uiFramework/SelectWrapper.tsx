@@ -2,6 +2,7 @@ import { Theme } from "@/app/data/theme";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { MenuItem, Select, Tooltip } from "@mui/material";
+import { useControlLabelId } from "./ControlWithLabel";
 import React from "react";
 
 interface SelectWrapperProps extends WithClassName {
@@ -22,10 +23,13 @@ export const SelectWrapper: React.FC<SelectWrapperProps> = ({
   tooltip,
 }) => {
   const theme = useUiSelector((s) => s.theme);
+  const labelId = useControlLabelId();
 
   const selectComponent = (
     <Select
       disabled={disabled}
+      // names the select and its option list after the ControlWithLabel label
+      labelId={labelId}
       SelectDisplayProps={{ style: { paddingRight: "20px" } }}
       value={value}
       onChange={(event) =>

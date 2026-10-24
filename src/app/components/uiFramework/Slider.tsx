@@ -4,6 +4,7 @@ import { WithClassName } from "@/app/helpers/withClassName";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Typography } from "@mui/material";
 import React from "react";
+import { useControlLabelId } from "./ControlWithLabel";
 
 export interface SliderProps extends WithClassName {
   onValueChange: (value: number) => void;
@@ -31,6 +32,7 @@ export const Slider: React.FC<SliderProps> = ({
 }) => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const theme = useUiSelector((s) => s.theme);
+  const labelId = useControlLabelId();
   return (
     <div
       className={`flex items-center ${
@@ -48,6 +50,7 @@ export const Slider: React.FC<SliderProps> = ({
       >
         <input
           type="range"
+          aria-labelledby={labelId}
           className={`cursor-pointer ${
             theme === Theme.Light
               ? "accent-primary-light"
