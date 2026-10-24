@@ -76,7 +76,7 @@ Code: [chords/](../src/app/components/chords/), [chordModes.ts](../src/app/data/
 
 A held chord plays a strumming pattern in time with the clock.
 
-- **Pattern** pick one from the list, or build a new one with up strokes, down strokes and rests.
+- **Pattern** the arrows button in the control panel lists the patterns. A tap picks one. You can also build a new one with up strokes, down strokes and rests.
 - **Pattern length** each step is a bar, half bar, beat, 1/8, 1/16, 1/32 or 1/64.
 - **Wait for pattern to finish** a release lets the pattern play to its end.
 - **Chord switching amidst pattern** a new chord takes over the running pattern without a restart.

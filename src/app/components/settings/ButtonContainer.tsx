@@ -1,4 +1,5 @@
 import { PianoRollButton } from "@/app/components/pianoRoll/PianoRollButton";
+import { StrummingPatternButton } from "@/app/components/strumming/StrummingPatternButton";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
@@ -42,6 +43,7 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
       <OpenSettingsButton />
       <PianoRollButton />
       <OpenStrummingSettingsButton />
+      <StrummingPatternButton />
       {(premiumComponents.get("chordDetection") as ReactNode) ?? (
         <DisabledDetectChordButton />
       )}

@@ -5,6 +5,7 @@ import { ScaleDetectionDialogWrapper } from "@/app/components/alert/ScaleDetecti
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { PianoRollDialogWrapper } from "@/app/components/pianoRoll/PianoRollDialogWrapper";
 import { NowPlaying } from "@/app/components/playPanel/NowPlaying";
+import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { isAuthEnabled } from "@/lib/featureFlags";
@@ -51,6 +52,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <ChordsView mainRef={mainRef} />
           {isAuthEnabled && <AuthPanel />}
           <StrummingSettingsWrapper />
+          <StrummingPatternDialogWrapper />
           <BottomZone premiumComponents={premiumComponents} />
           <NowPlaying />
           <AspectRatioModalWrapper />

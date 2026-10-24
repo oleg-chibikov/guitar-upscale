@@ -31,12 +31,11 @@ export const buildAllChordsLayout = (
 
 /**
  * One chord per scale note, from the root up: the first chord type that fits the scale.
- * The chords fill a column, then the next one.
+ * The chords fill a column, then the next one, in a grid as close to a square as they allow.
  */
 export const buildKeyChordsLayout = (
   columns: ChordModeVariations[],
   root: Note,
-  rowsPerColumn: number,
 ): ChordGridCell[] => {
   const chords: { chordName: string; root: Note }[] = [];
   for (let step = 0; step < NOTE_COUNT; step++) {
@@ -49,6 +48,8 @@ export const buildKeyChordsLayout = (
       });
     }
   }
+  const columnCount = Math.ceil(Math.sqrt(chords.length));
+  const rowsPerColumn = Math.ceil(chords.length / columnCount);
   return chords.map((chord, index) => ({
     ...chord,
     column: Math.floor(index / rowsPerColumn),

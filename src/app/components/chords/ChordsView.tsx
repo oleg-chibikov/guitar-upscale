@@ -38,20 +38,9 @@ import {
   setChordIsBeingDetected,
   setChordsAreLoading,
 } from "@/app/store/settingsSlice";
-import {
-  setAllChordsShown,
-  setChordsExpanded,
-  setChordsWidth,
-} from "@/app/store/uiSlice";
+import { setAllChordsShown, setChordsExpanded } from "@/app/store/uiSlice";
 import { Button } from "@mui/material";
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
 import {
@@ -67,7 +56,6 @@ const TOP_RESERVED_HEIGHT = 100;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 const CHORDS_RENDER_INTERVAL_MS = 150;
-const KEY_CHORDS_PER_COLUMN = 4;
 
 export const ChordsView: React.FC<{
   mainRef: RefObject<HTMLElement | null>;
@@ -123,23 +111,6 @@ export const ChordsView: React.FC<{
   const handleExpansion = () => {
     dispatch(setChordsExpanded(!chordsExpanded));
   };
-
-  const observeWidth = useCallback(
-    (element: HTMLElement | null) => {
-      if (element === null) {
-        return;
-      }
-      const observer = new ResizeObserver(([entry]) =>
-        dispatch(setChordsWidth(Math.ceil(entry.borderBoxSize[0].inlineSize))),
-      );
-      observer.observe(element);
-      return () => {
-        observer.disconnect();
-        dispatch(setChordsWidth(0));
-      };
-    },
-    [dispatch],
-  );
 
   useEffect(() => {
     if (chordsAreLoading) {
@@ -238,11 +209,7 @@ export const ChordsView: React.FC<{
   );
   const layout = allChordsShown
     ? buildAllChordsLayout(chordModeVariations, notes)
-    : buildKeyChordsLayout(
-        chordModeVariations,
-        getShiftedNote(capo, tuning),
-        KEY_CHORDS_PER_COLUMN,
-      );
+    : buildKeyChordsLayout(chordModeVariations, getShiftedNote(capo, tuning));
   const cellHeight = !allChordsShown
     ? KEY_CELL_HEIGHT
     : useSharpChords
@@ -252,7 +219,6 @@ export const ChordsView: React.FC<{
   return (
     <Expander
       id={CHORDS_VIEW_ID}
-      ref={observeWidth}
       className={`fixed opacity-95 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
       } bottom-1 z-20`}

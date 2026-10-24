@@ -32,7 +32,7 @@ const columns = [MAJOR, MINOR, DIM].map(columnFor);
 
 describe("buildKeyChordsLayout", () => {
   it("lists the chords of the key from the root", () => {
-    const cells = buildKeyChordsLayout(columns, Note.E, 4);
+    const cells = buildKeyChordsLayout(columns, Note.E);
     expect(cells.map((c) => c.chordName)).toEqual([
       "Em",
       "F#dim",
@@ -44,16 +44,16 @@ describe("buildKeyChordsLayout", () => {
     ]);
   });
 
-  it("fills a column before starting the next", () => {
-    const cells = buildKeyChordsLayout(columns, Note.E, 4);
+  it("fills a column before starting the next, in a square grid", () => {
+    const cells = buildKeyChordsLayout(columns, Note.E);
     expect(cells.map((c) => [c.column, c.row])).toEqual([
       [0, 0],
       [0, 1],
       [0, 2],
-      [0, 3],
       [1, 0],
       [1, 1],
       [1, 2],
+      [2, 0],
     ]);
   });
 });

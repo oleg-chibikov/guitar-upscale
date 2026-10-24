@@ -1,11 +1,13 @@
 import { ChordStrummingImmediateGracePeriodSlider } from "@/app/components/settings/sliders/ChordStrummingImmediateGracePeriodSlider";
 import { ChordStrummingDelaySlider } from "@/app/components/settings/sliders/ChordStrummingSlider";
-import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { DialogWrapper } from "@/app/components/uiFramework/DialogWrapper";
 import { STRUMMING_SETTINGS_PANEL_ID } from "@/app/data/elementIds";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import { setStrummingSettingsExpanded } from "@/app/store/uiSlice";
-import { Alert } from "@mui/material";
+import {
+  setStrummingPatternEditorExpanded,
+  setStrummingSettingsExpanded,
+} from "@/app/store/uiSlice";
+import { Alert, Button } from "@mui/material";
 import { FC } from "react";
 import { useDispatch } from "react-redux";
 import { SeamlessChordSwitchingCheckbox } from "../settings/checkboxes/SeamlessChordSwitchingCheckbox";
@@ -32,7 +34,12 @@ export const StrummingSettings: FC = () => {
       <ChordStrummingImmediateGracePeriodSlider />
       <Alert severity="info">Long press the chord to strum</Alert>
       <StrummingPatternSelector />
-      <StrummingPatternDialogWrapper />
+      <Button
+        variant="contained"
+        onClick={() => dispatch(setStrummingPatternEditorExpanded(true))}
+      >
+        Open Strumming Pattern Editor
+      </Button>
     </DialogWrapper>
   );
 };

@@ -25,8 +25,6 @@ interface UiState {
   skin: CombinedSkinType;
   settingsExpanded: boolean;
   chordsExpanded: boolean;
-  // the bottom bar keeps clear of the chords panel by this many pixels
-  chordsWidth: number;
   looperExpanded: boolean;
   allChordsShown: boolean;
   controlPanelExpanded: boolean;
@@ -55,7 +53,6 @@ const initialState: UiState = {
   skin: Skin.Guitar4,
   settingsExpanded: false,
   chordsExpanded: true,
-  chordsWidth: 0,
   looperExpanded: false,
   allChordsShown: false,
   controlPanelExpanded: true,
@@ -128,9 +125,6 @@ export const uiSlice = createSlice({
     },
     setChordsExpanded: (state, action: PayloadAction<boolean>) => {
       state.chordsExpanded = action.payload;
-    },
-    setChordsWidth: (state, action: PayloadAction<number>) => {
-      state.chordsWidth = action.payload;
     },
     setLooperExpanded: (state, action: PayloadAction<boolean>) => {
       state.looperExpanded = action.payload;
@@ -246,7 +240,6 @@ export const {
   setSkinBasedOnStringCount,
   setSettingsExpanded,
   setChordsExpanded,
-  setChordsWidth,
   setLooperExpanded,
   setAllChordsShown,
   setControlPanelExpanded,

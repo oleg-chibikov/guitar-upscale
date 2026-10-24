@@ -9,8 +9,6 @@ import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Typography } from "@mui/material";
 import { ReactNode } from "react";
 
-// screen edge on both sides plus the gap to the chords
-const CHORDS_GAP = 12;
 // the inner bare panels hand their buttons to the frame, so a long bar wraps button by button
 const WRAPPING_PANEL = "pointer-events-auto max-w-full [&>section]:contents";
 
@@ -20,22 +18,20 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const looperExpanded = useUiSelector((s) => s.looperExpanded);
-  const chordsWidth = useUiSelector((s) => s.chordsWidth);
   const looper = premiumComponents.get("looper") as ReactNode;
   const hasLooper = looper !== undefined && looper !== null;
+  // the buttons sit on the side away from the chords. The chords panel covers the bar where they meet
+  const chordsOnLeft = chordsDisplayMode === ChordsDisplayMode.Left;
 
   return (
     <div
-      className={`pointer-events-none fixed bottom-1 flex flex-col gap-1 ${
-        chordsDisplayMode === ChordsDisplayMode.Left
-          ? "right-1 items-end"
-          : "left-1 items-start"
+      className={`pointer-events-none fixed inset-x-1 bottom-1 flex flex-col gap-1 ${
+        chordsOnLeft ? "items-end" : "items-start"
       }`}
-      style={{
-        maxWidth: `calc(100vw - ${chordsWidth > 0 ? chordsWidth + CHORDS_GAP : 8}px)`,
+      style={
         // should be displayed over the dialog
-        ...(pianoRollExpanded ? { zIndex: 9999999 } : {}),
-      }}
+        pianoRollExpanded ? { zIndex: 9999999 } : undefined
+      }
     >
       {hasLooper && (
         // stays mounted while hidden so the loops keep their state
@@ -56,7 +52,11 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
           {looper}
         </Panel>
       )}
-      <Panel className={`${WRAPPING_PANEL} flex-wrap-reverse`}>
+      <Panel
+        className={`${WRAPPING_PANEL} w-full flex-wrap-reverse ${
+          chordsOnLeft ? "justify-end" : "justify-start"
+        }`}
+      >
         <PlayPanel premiumComponents={premiumComponents} />
         {!pianoRollExpanded && (
           <>

@@ -49,7 +49,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A[Open strumming settings] --> B[Pick or build a pattern]
+  A[Open the pattern menu] --> B[Pick or build a pattern]
   B --> C[Hold first chord]
   C --> D[Pattern strums in time]
   D --> E{Next chord pressed?}
@@ -62,7 +62,7 @@ flowchart TD
   G --> D
 ```
 
-1. Open strumming settings from the control panel and pick a pattern. The pattern dialog adds and edits custom ones.
+1. Press the arrows button in the control panel and tap a pattern. "Edit patterns" at the bottom adds and edits custom ones.
 2. Set the tempo in the play panel. Turn on the metronome next to it to hear the beat.
 3. Hold a chord button. The chord sounds at once, and the pattern goes on in time with the clock.
 4. Press the next chord while still holding, or right after release.
