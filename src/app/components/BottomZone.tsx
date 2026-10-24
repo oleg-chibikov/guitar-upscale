@@ -6,8 +6,10 @@ import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { setBottomBarHeight } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
-import { ReactNode } from "react";
+import { ReactNode, useCallback } from "react";
+import { useDispatch } from "react-redux";
 
 // the inner bare panels hand their buttons to the frame, so a long bar wraps button by button
 const WRAPPING_PANEL = "pointer-events-auto max-w-full [&>section]:contents";
@@ -20,8 +22,28 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
   const looperExpanded = useUiSelector((s) => s.looperExpanded);
   const looper = premiumComponents.get("looper") as ReactNode;
   const hasLooper = looper !== undefined && looper !== null;
-  // the buttons sit on the side away from the chords. The chords panel covers the bar where they meet
+  // the buttons sit on the side away from the chords
   const chordsOnLeft = chordsDisplayMode === ChordsDisplayMode.Left;
+  const dispatch = useDispatch();
+
+  const observeHeight = useCallback(
+    (element: HTMLElement | null) => {
+      if (element === null) {
+        return;
+      }
+      const observer = new ResizeObserver(([entry]) =>
+        dispatch(
+          setBottomBarHeight(Math.ceil(entry.borderBoxSize[0].blockSize)),
+        ),
+      );
+      observer.observe(element);
+      return () => {
+        observer.disconnect();
+        dispatch(setBottomBarHeight(0));
+      };
+    },
+    [dispatch],
+  );
 
   return (
     <div
@@ -53,6 +75,7 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
         </Panel>
       )}
       <Panel
+        ref={observeHeight}
         className={`${WRAPPING_PANEL} w-full flex-wrap-reverse ${
           chordsOnLeft ? "justify-end" : "justify-start"
         }`}

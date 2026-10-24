@@ -20,7 +20,7 @@ flowchart TB
   FB --- BZ
 ```
 
-- **Chords display mode** in Settings moves the chords to the left or right. The control panel and the bottom bar buttons move to the other side. The bottom bar spans the screen width, and the chords panel sits over it.
+- **Chords display mode** in Settings moves the chords to the left or right. The control panel and the bottom bar buttons move to the other side. The bottom bar spans the screen width, and the chords panel sits above it.
 - **Dialogs** settings, strumming and the piano roll open as drawers or full dialogs over the fretboard.
 
 ## Fretboard

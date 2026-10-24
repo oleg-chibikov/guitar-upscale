@@ -53,6 +53,8 @@ import { buildAllChordsLayout, buildKeyChordsLayout } from "./chordGridLayout";
 import { ChordGridStore } from "./chordGridStore";
 
 const TOP_RESERVED_HEIGHT = 100;
+// the screen edge under the bottom bar and the gap above it
+const BOTTOM_BAR_MARGIN = 8;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 const CHORDS_RENDER_INTERVAL_MS = 150;
@@ -102,6 +104,7 @@ export const ChordsView: React.FC<{
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
   const allChordsShown = useUiSelector((s) => s.allChordsShown);
+  const bottomBarHeight = useUiSelector((s) => s.bottomBarHeight);
   const capo = useSettingsSelector((s) => s.capo);
   const tuning = useSettingsSelector((s) => s.tuning);
   const slashChordBassNote = useSettingsSelector((s) => s.slashChordBassNote);
@@ -221,7 +224,8 @@ export const ChordsView: React.FC<{
       id={CHORDS_VIEW_ID}
       className={`fixed opacity-95 ${
         chordsDisplayMode === ChordsDisplayMode.Left ? "left-1" : "right-1"
-      } bottom-1 z-20`}
+      } z-20`}
+      style={{ bottom: bottomBarHeight + BOTTOM_BAR_MARGIN }}
       expanded={chordsExpanded}
       expandOnlyOnIcon={chordsExpanded} // if the chords are expanded - it's usually very easy to accidentally collapse them while playing. therefore we allow collapsing only on icon tap rather than the whole summary header
       handleExpansion={handleExpansion}
@@ -259,7 +263,10 @@ export const ChordsView: React.FC<{
               height < MIN_HEIGHT_TO_SHOW_LARGE_CHORDS
                 ? COMPACT_CHORDS_WIDTH
                 : Math.max(130, width - HORIZONTAL_RESERVED_WIDTH), // when height is large there's enough space under the guitar to show full chords. It should also leave enough space for the other components on the page (auth header on the top and aspect ratio slider on the side)
-            maxHeight: Math.min(330, height - TOP_RESERVED_HEIGHT),
+            maxHeight: Math.min(
+              330,
+              height - TOP_RESERVED_HEIGHT - bottomBarHeight,
+            ),
           }}
         >
           <ChordGrid
