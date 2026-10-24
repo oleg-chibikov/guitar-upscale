@@ -1,7 +1,7 @@
 import { TrackKey } from "@/app/data/trackKey";
 import Midi from "midi-writer-js";
 import type { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
-import { Instrument } from "../../data/instruments";
+import { Instrument, getProgramForInstrument } from "../../data/instruments";
 import { getNoteText } from "../../data/notes";
 import {
   capoValue,
@@ -9,6 +9,15 @@ import {
   scaleValue,
   tempoBpmValue,
 } from "../../store/settingsSlice";
+
+const DRUM_CHANNEL = 10;
+const CHANNEL_COUNT = 16;
+
+// 1-based like midi-writer-js note events. Channel 10 plays drums in General MIDI, so tracks skip it
+export const getTrackChannel = (trackIndex: number) => {
+  const channel = (trackIndex % (CHANNEL_COUNT - 1)) + 1;
+  return channel >= DRUM_CHANNEL ? channel + 1 : channel;
+};
 
 class MidiSaver {
   generateAndSave(midiEvents: Map<TrackKey, NoteEvent[]>) {
@@ -59,17 +68,22 @@ class MidiSaver {
   }
 
   private generateMidiData(midiEvents: Map<string, NoteEvent[]>): Blob {
-    const tracks = Array.from(midiEvents).map(([trackKey, notes]) => {
-      // Create a track with MIDI events
+    const tracks = Array.from(midiEvents).map(([trackKey, notes], index) => {
       const track = new Midi.Track();
-      // Define an instrument (optional):
-      const { instrument, trackNumber } = this.reverseTrackKey(trackKey);
+      const { instrument } = this.reverseTrackKey(trackKey);
+      const channel = getTrackChannel(index);
 
-      track.addEvent(new Midi.ProgramChangeEvent({ instrument: trackNumber }));
+      // the program change counts channels from 0, the note events from 1
+      track.addEvent(
+        new Midi.ProgramChangeEvent({
+          instrument: getProgramForInstrument(instrument),
+          channel: channel - 1,
+        }),
+      );
       track.setTempo(tempoBpmValue);
       track.addInstrumentName(instrument);
       track.addTrackName(instrument);
-      track.addEvent(notes);
+      track.addEvent(notes, () => ({ channel }));
       return track;
     });
 
