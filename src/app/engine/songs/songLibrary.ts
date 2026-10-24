@@ -4,6 +4,7 @@ import { Example, ExamplesMap, getExampleName } from "@/app/data/example";
 import { NOTE_COUNT, Note, initNotesArray } from "@/app/data/notes";
 import { CHROMATIC, SPECIAL, scalesMap } from "@/app/data/scales";
 import { Song, SongFormat, getSongFormat } from "@/app/data/song";
+import { getShiftedNote } from "@/app/data/tunings";
 import { parseChordNoteAndAlterations } from "@/app/engine/chords/chordParser";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
@@ -17,10 +18,16 @@ import {
   getUserSongs,
   saveUserSong,
 } from "@/app/engine/songs/userSongStore";
-import { scaleGroupValue, scaleValue } from "@/app/store/settingsSlice";
+import type { SongKey } from "@/app/engine/songs/songExport";
+import {
+  capoValue,
+  scaleGroupValue,
+  scaleValue,
+  tuningValue,
+} from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
-import { Subject, debounceTime } from "rxjs";
+import { Subject, debounceTime, map } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 const SONGS_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/songs`;
@@ -287,7 +294,11 @@ export type SongSnapshot = {
   scale: string;
 };
 
-const saveEdits = async (events: EventsByTick, written?: Song) => {
+const saveEdits = async (
+  events: EventsByTick,
+  written?: Song,
+  key?: SongKey,
+) => {
   const example = exampleByEvents.get(events);
   if (!example) {
     return;
@@ -298,7 +309,7 @@ const saveEdits = async (events: EventsByTick, written?: Song) => {
   const isCopy = !example.isUserSong;
   const song = written
     ? { ...written, band: example.band, title: example.title }
-    : eventsToSong(events, example);
+    : eventsToSong(events, example, key);
   const bytes = await songToGuitarPro(song);
   const record: UserSongRecord = {
     id: isCopy ? uuidv4() : example.id.replace(/^user:/, ""),
@@ -336,11 +347,23 @@ const saveEdits = async (events: EventsByTick, written?: Song) => {
 };
 
 let saving = Promise.resolve();
-pianoRollEdits$.pipe(debounceTime(1000)).subscribe((events) => {
-  saving = saving
-    .then(() => saveEdits(events))
-    .catch((error) => console.error("Cannot save the edited song", error));
-});
+pianoRollEdits$
+  .pipe(
+    // a capo or key change within the second re-decodes the song, and these events keep the old one
+    map((events) => ({
+      events,
+      key: {
+        root: getShiftedNote(capoValue, tuningValue),
+        tuning: tuningValue,
+      },
+    })),
+    debounceTime(1000),
+  )
+  .subscribe(({ events, key }) => {
+    saving = saving
+      .then(() => saveEdits(events, undefined, key))
+      .catch((error) => console.error("Cannot save the edited song", error));
+  });
 
 // a later edit to the same events saves after the song exists
 const enqueueSave = <T>(task: () => Promise<T>): Promise<T> => {

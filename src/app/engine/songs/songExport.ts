@@ -5,8 +5,9 @@ import {
   getInstrumentLabel,
   getProgramForInstrument,
 } from "@/app/data/instruments";
+import { Note } from "@/app/data/notes";
 import { Song, SongTrack, isChordsTrackName } from "@/app/data/song";
-import { getOctaveNotesForTuning } from "@/app/data/tunings";
+import { Tuning, getOctaveNotesForTuning } from "@/app/data/tunings";
 import { chordPreferredVariationsByName } from "@/app/engine/chords/chordNotesByName";
 import { getCurrentRoot } from "@/app/engine/decoders/songDecoder";
 import { DEFAULT_CHORD_TRACK_NUMBER } from "@/app/engine/eventBus";
@@ -35,9 +36,16 @@ const getChordFrets = (name: string) => {
   return frets;
 };
 
-// The song as it sounds now: in the key and tuning from the settings, with the piano roll edits
-export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
-  const tuning = getOctaveNotesForTuning(tuningValue);
+// the key and tuning the events were decoded in
+export type SongKey = { root: Note; tuning: Tuning };
+
+// The song with the piano roll edits, in the given key and tuning or the ones from the settings
+export const eventsToSong = (
+  events: EventsByTick,
+  example?: Example,
+  key?: SongKey,
+): Song => {
+  const tuning = getOctaveNotesForTuning(key?.tuning ?? tuningValue);
   const infos = getTrackInfos(events);
   const tracks = new Map<number, SongTrack>();
   const getTrack = (trackNumber: number, instrument?: Instrument) => {
@@ -102,7 +110,7 @@ export const eventsToSong = (events: EventsByTick, example?: Example): Song => {
     band: example?.band ?? "Guitar Upscale",
     title: example?.title ?? `${scaleGroupValue} ${scaleValue}`,
     tempo: tempoBpmValue,
-    root: getCurrentRoot(),
+    root: key?.root ?? getCurrentRoot(),
     pickupTicks: example?.song?.pickupTicks,
     tracks: named,
   };
