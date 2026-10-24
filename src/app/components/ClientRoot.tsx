@@ -8,6 +8,7 @@ import { NowPlaying } from "@/app/components/playPanel/NowPlaying";
 import { StrummingPatternDialogWrapper } from "@/app/components/strumming/StrummingPatternDialogWrapper";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
+import { warnBeforeUnload } from "@/app/helpers/unsavedWork";
 import { useWakeLock } from "@/app/hooks/useWakeLock";
 import { isAuthEnabled } from "@/lib/featureFlags";
 import { setTheme } from "@/app/store/uiSlice";
@@ -46,6 +47,11 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
     query.addEventListener("change", apply);
     return () => query.removeEventListener("change", apply);
   }, [followOs, dispatch]);
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, []);
 
   return (
     <>
