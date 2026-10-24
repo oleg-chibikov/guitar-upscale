@@ -23,8 +23,9 @@ export const Alert: React.FC = () => {
   return (
     <Slide direction="down" in={showAlert} mountOnEnter unmountOnExit>
       <div
+        role={alertType === AlertType.Error ? "alert" : "status"}
         onClick={() => dispatch(hideAlert())}
-        className={`fixed top-3 right-0 left-0 m-auto flex w-96 cursor-pointer items-center justify-center p-4 ${
+        className={`fixed top-3 right-0 left-0 m-auto flex w-[min(24rem,calc(100vw-16px))] cursor-pointer items-center justify-center p-4 ${
           alertType === AlertType.Error
             ? "bg-red-500"
             : alertType === AlertType.Warning
@@ -35,7 +36,11 @@ export const Alert: React.FC = () => {
         } opacity-90`}
         style={{ zIndex: 9999 }}
       >
-        <Typography className="flex items-center text-center text-base whitespace-pre-wrap text-gray-800">
+        <Typography
+          className={`flex items-center text-center text-base whitespace-pre-wrap ${
+            alertType === AlertType.Error ? "text-gray-900" : "text-gray-800"
+          }`}
+        >
           {alertMessage}
         </Typography>
       </div>

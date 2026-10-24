@@ -159,7 +159,10 @@ export const uiSlice = createSlice({
       state.showAlert = true;
       state.alertMessage = action.payload.message;
       state.alertType = action.payload.alertType ?? AlertType.Neutral;
-      state.alertTimeout = action.payload.alertTimeout ?? 2000;
+      // long messages stay up long enough to read
+      state.alertTimeout =
+        action.payload.alertTimeout ??
+        Math.max(3000, action.payload.message.length * 60);
     },
     hideAlert(state) {
       state.showAlert = false;
