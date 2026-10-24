@@ -3,7 +3,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { preload } from "react-dom";
+import { DEFAULT_SKIN } from "./data/skin";
 import "./globals.css";
+import { getAssetsForSkin } from "./helpers/skinHelper";
 import { WithChildren } from "./helpers/withChildren";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -16,10 +18,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<WithChildren>) {
-  preload(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/skins/guitar.webp`, {
-    as: "image",
-    type: "image/webp",
-  });
+  preload(
+    `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/skins${getAssetsForSkin(DEFAULT_SKIN)}`,
+    {
+      as: "image",
+      type: "image/webp",
+    },
+  );
   return (
     <html lang="en">
       <head>

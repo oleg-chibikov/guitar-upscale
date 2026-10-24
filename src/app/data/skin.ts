@@ -20,3 +20,6 @@ export type EightStringSkinType =
   (typeof EightStringSkin)[keyof typeof EightStringSkin];
 export type CombinedSkinType =
   SkinType | SevenStringSkinType | EightStringSkinType;
+
+// The skin a new visitor sees. The page preloads its image
+export const DEFAULT_SKIN: CombinedSkinType = Skin.Guitar4;

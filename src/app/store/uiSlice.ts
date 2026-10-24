@@ -7,6 +7,7 @@ import {
 } from "@/app/data/fretboardZoomLimits";
 import {
   CombinedSkinType,
+  DEFAULT_SKIN,
   EightStringSkin,
   SevenStringSkin,
   Skin,
@@ -51,7 +52,7 @@ interface UiState {
 const initialState: UiState = {
   noteDisplayMode: NoteDisplayMode.Fret,
   chordsDisplayMode: ChordsDisplayMode.Left,
-  skin: Skin.Guitar4,
+  skin: DEFAULT_SKIN,
   settingsExpanded: false,
   chordsExpanded: true,
   looperExpanded: false,
