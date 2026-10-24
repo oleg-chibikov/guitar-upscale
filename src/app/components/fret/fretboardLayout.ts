@@ -5,7 +5,9 @@ import { StringTilt } from "@/app/helpers/skinHelper";
 const WIDTH_FACTOR = 1.06;
 // The gap between the header row and the first string
 export const HEADER_GAP = 40;
-export const HEADER_CELL_HEIGHT = 36;
+export const HEADER_CELL_HEIGHT = 20;
+// The fret number row ends this far above the first string
+const HEADER_TO_STRING_GAP = 34;
 export const FRET_LINE_HEIGHT = 20;
 export const FRET_LINE_WIDTH = 2;
 export const MARKER_RADIUS = 14;
@@ -32,7 +34,7 @@ export interface FretboardLayout {
 
 /**
  * Positions of frets and strings in px, before the aspect ratio sliders scale them.
- * Fret 0 sits at x 0, the top of the fret number row at y 0.
+ * Fret 0 sits at x 0. The first string row starts at y rowHeight + HEADER_GAP.
  */
 export const getFretboardLayout = (
   fretCount: number,
@@ -67,7 +69,8 @@ export const getFretboardLayout = (
     columns,
     width: last.left + last.width,
     height: firstStringTop + stringCount * rowHeight,
-    headerCenterY: rowHeight / 2,
+    headerCenterY:
+      firstStringTop - HEADER_TO_STRING_GAP - HEADER_CELL_HEIGHT / 2,
     getStringCenterY: (string, fret) =>
       firstStringTop +
       string * rowHeight +
