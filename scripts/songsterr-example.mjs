@@ -6,15 +6,23 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import {
+  getInstrumentForProgram,
+  getProgramForInstrument,
+} from "../src/app/data/instruments.ts";
 import { CHROMATIC, scalesMap } from "../src/app/data/scaleDefinitions.ts";
 import { writeGuitarPro } from "../src/app/engine/songs/gpWriter.ts";
 import {
   NOTE_NAMES,
   convertSongsterr,
   findSection,
+  isSongsterrDrums,
+  listExtraTrackIndexes,
   listScales,
   listSections,
+  songsterrProgram,
   songsterrSearchUrl,
+  songsterrTrackName,
   songsterrTrackUrl,
 } from "../src/app/engine/songs/songsterr.ts";
 
@@ -29,6 +37,7 @@ Without --section or --from/--to it lists the tracks and sections and stops.
   --track N         melody track (default: the most popular one)
   --bass N          bass track (default: the most popular bass track)
   --no-bass         skip the bass and the chords
+  --extra N,N|all   more tracks with their own instruments, "all" skips drums
   --section NAME    take the measures of one section, e.g. "Chorus"
   --from N --to N   measure range, 1-based and inclusive, as on the site
   --tonic NOTE      tonic of the source, e.g. "C#" (default: guessed from the bass)
@@ -44,6 +53,7 @@ const { values: opts, positionals } = parseArgs({
     track: { type: "string" },
     bass: { type: "string" },
     "no-bass": { type: "boolean" },
+    extra: { type: "string" },
     section: { type: "string" },
     from: { type: "string" },
     to: { type: "string" },
@@ -82,7 +92,9 @@ const loadTrack = (meta, index) => getJson(songsterrTrackUrl(meta, index));
 const listSong = (meta, measures) => {
   console.log(`${meta.artist} - ${meta.title} (song ${meta.songId})\n`);
   meta.tracks.forEach((t, i) =>
-    console.log(`track ${i}: ${t.instrument} | ${t.name}`),
+    console.log(
+      `track ${i}: ${t.instrument} | ${t.name}${isSongsterrDrums(t) ? " (drums)" : ""}`,
+    ),
   );
   console.log("\nSections (measure numbers as on the site):");
   listSections(measures).forEach((s) =>
@@ -131,6 +143,35 @@ const main = async () => {
       ? undefined
       : await loadTrack(meta, Number(bassIndex));
 
+  // a Songsterr track goes into the song once
+  const bassNumber =
+    bassIndex === undefined || bassIndex === null
+      ? undefined
+      : Number(bassIndex);
+  const taken = [melodyIndex, bassNumber];
+  const extraIndexes =
+    opts.extra === "all"
+      ? listExtraTrackIndexes(meta).filter((i) => !taken.includes(i))
+      : (opts.extra?.split(",").map(Number) ?? []);
+  extraIndexes.forEach((index, i) => {
+    if (!meta.tracks[index]) fail(`No track ${index}`);
+    if (taken.includes(index) || extraIndexes.indexOf(index) !== i)
+      fail(`Track ${index} is picked twice`);
+  });
+  if (bassNumber === melodyIndex)
+    fail(`Track ${melodyIndex} can't be the melody and the bass`);
+  const extraTracks = await Promise.all(
+    extraIndexes.map(async (index) => {
+      const program = songsterrProgram(meta.tracks[index]);
+      return {
+        track: await loadTrack(meta, index),
+        name: songsterrTrackName(meta.tracks[index]),
+        instrument:
+          program === undefined ? undefined : getInstrumentForProgram(program),
+      };
+    }),
+  );
+
   const tonic = opts.tonic ? NOTE_NAMES.indexOf(opts.tonic) : undefined;
   if (tonic === -1) fail(`Unknown tonic "${opts.tonic}"`);
   const scales = listScales(scalesMap, CHROMATIC);
@@ -145,6 +186,7 @@ const main = async () => {
       meta,
       melodyTrack,
       bassTrack,
+      extraTracks,
       from,
       to,
       scales,
@@ -173,6 +215,7 @@ const main = async () => {
     console.log("No bass found, chords follow the lowest notes.");
   if (!chordNames.length) console.log("No chord fits the scale.");
   else console.log(`Chords: ${chordNames.join(" ")}`);
+  console.log(`Tracks: ${song.tracks.map((t) => t.name).join(", ")}`);
 
   if (opts["dry-run"]) return;
 
@@ -180,7 +223,13 @@ const main = async () => {
   const fileName = `${toFileName(band)} - ${toFileName(title)}.gp`;
   const file = join(dir, fileName);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(file, await writeGuitarPro(song));
+  const bytes = await writeGuitarPro(song, {
+    getProgram: (track) =>
+      track.instrument === undefined
+        ? undefined
+        : getProgramForInstrument(track.instrument),
+  });
+  writeFileSync(file, bytes);
   console.log(`Saved to ${file}`);
   if (dir === SONGS_DIR) {
     execFileSync(

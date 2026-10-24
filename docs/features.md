@@ -212,9 +212,12 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 
 1. Type a band or a song. The list fills in once typing stops. Pick a song from it.
 2. Pick the melody track and the bass track. The bass picks the chords. "None" takes the chords from the lowest melody notes.
-3. Press Add. The whole song goes in. It moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
+3. Tick more tracks, such as a second guitar, vocals or a flute. Every track except drums starts ticked.
+4. Press Add. The whole song goes in. It moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
 
 - **Bars** the dialog takes every bar. Cut the extra ones in the piano roll.
+- **One role per track** a Songsterr track goes in once. The melody list greys out the bass track, the bass list greys out the melody, and "More tracks" leaves both out.
+- **Instruments** each extra track plays with its Songsterr instrument. Its notes move into the scale with the melody.
 - **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes, so it calls `/api/songsterr` on `guitar-upscale.vercel.app`. Those routes allow requests from `oleg-chibikov.github.io` ([cors.ts](../src/lib/cors.ts)).
 
 Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [SongsterrImportDialog.tsx](../src/app/components/settings/buttons/SongsterrImportDialog.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).

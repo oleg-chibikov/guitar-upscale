@@ -1,5 +1,6 @@
 // Turns Songsterr tracks into a Song moved to an E tonic, since the app builds every scale from E.
 // It imports only types, so the scripts can load it with Node's type stripping.
+import type { Instrument } from "../../data/instruments";
 import type { Note, OctaveNote } from "../../data/notes";
 import type { Song, SongTrack } from "../../data/song";
 
@@ -10,6 +11,8 @@ export type SongsterrSearchResult = {
 };
 
 export type SongsterrTrackInfo = {
+  // a General MIDI program, or 1024 for drums
+  instrumentId?: number;
   instrument: string;
   name: string;
   isEmpty?: boolean;
@@ -69,6 +72,31 @@ export const songsterrMetaUrl = (songId: number) =>
 // The track files allow any origin, so the browser loads them directly.
 export const songsterrTrackUrl = (meta: SongsterrMeta, index: number) =>
   `https://dqsljvtekg760.cloudfront.net/${meta.songId}/${meta.revisionId}/${meta.image}/${index}.json`;
+
+const DRUMS_INSTRUMENT_ID = 1024;
+
+export const isSongsterrDrums = (info: SongsterrTrackInfo) =>
+  info.instrumentId === DRUMS_INSTRUMENT_ID || /drum/i.test(info.instrument);
+
+// Tracks a song can take on top of the melody and the bass: drums and empty tracks stay out.
+export const listExtraTrackIndexes = (meta: SongsterrMeta) =>
+  meta.tracks.flatMap((info, index) =>
+    isSongsterrDrums(info) || info.isEmpty === true ? [] : [index],
+  );
+
+// The General MIDI program of a track, undefined for drums.
+export const songsterrProgram = (info: SongsterrTrackInfo) =>
+  info.instrumentId !== undefined && info.instrumentId < 128
+    ? info.instrumentId
+    : undefined;
+
+// A name starting with "Melody" or "Chords" would change how the app plays the track.
+export const songsterrTrackName = (info: SongsterrTrackInfo) => {
+  const name = info.name.trim() || info.instrument;
+  return /^\s*(melody|chords)/i.test(name)
+    ? `${info.instrument} ${name}`
+    : name;
+};
 
 export const NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split(" ");
 const STANDARD = [64, 59, 55, 50, 45, 40];
@@ -218,11 +246,11 @@ const MELODY_WEIGHT = 3;
 const pickScale = (
   scales: ScaleOption[],
   melody: RawNote[],
-  bass: RawNote[],
+  others: RawNote[],
 ) => {
   const counts = new Array<number>(12).fill(0);
   melody.forEach((n) => (counts[pc(n.pitch - E)] += MELODY_WEIGHT));
-  bass.forEach((n) => counts[pc(n.pitch - E)]++);
+  others.forEach((n) => counts[pc(n.pitch - E)]++);
   const missed = (s: ScaleOption) =>
     counts.reduce((sum, c, i) => sum + (s.notes.has(i) ? 0 : c), 0);
   return [...scales].sort(
@@ -241,24 +269,31 @@ const fretOn = (pitch: number, string: number) => pitch - STANDARD[string];
 const fits = (pitch: number, string: number) =>
   fretOn(pitch, string) >= 0 && fretOn(pitch, string) <= MAX_FRET;
 
+// Notes struck together get different strings. A chord note with no free string drops out.
 const placeMelody = (notes: RawNote[], sourceTuning: number[]) => {
   let lastFret = 5;
-  return notes.map((n): PlacedNote => {
+  const taken = new Map<number, Set<number>>();
+  return notes.flatMap((n): PlacedNote[] => {
     let pitch = n.pitch;
     while (pitch < LOWEST) pitch += 12;
     while (pitch > HIGHEST) pitch -= 12;
-    let string = n.string;
-    if (sourceTuning.length !== 6 || !fits(pitch, string)) {
+    const used = taken.get(n.tick) ?? new Set<number>();
+    const isFree = (s: number) => fits(pitch, s) && !used.has(s);
+    let string: number | undefined = n.string;
+    if (sourceTuning.length !== 6 || !isFree(string)) {
       string = [0, 1, 2, 3, 4, 5]
-        .filter((s) => fits(pitch, s))
+        .filter(isFree)
         .sort(
           (a, b) =>
             Math.abs(fretOn(pitch, a) - lastFret) -
               Math.abs(fretOn(pitch, b) - lastFret) || a - b,
         )[0];
     }
+    if (string === undefined) return [];
+    used.add(string);
+    taken.set(n.tick, used);
     lastFret = fretOn(pitch, string);
-    return { ...n, pitch, string, fret: lastFret };
+    return [{ ...n, pitch, string, fret: lastFret }];
   });
 };
 
@@ -349,10 +384,19 @@ const pickChords = (
   return chords;
 };
 
+export type SongsterrExtraTrack = {
+  track: SongsterrTrack;
+  name: string;
+  // undefined plays the track with the instrument picked in the settings
+  instrument?: Instrument;
+};
+
 export type SongsterrConvertOptions = {
   meta: SongsterrMeta;
   melodyTrack: SongsterrTrack;
   bassTrack?: SongsterrTrack;
+  // more tracks that go in whole, each with its own instrument
+  extraTracks?: SongsterrExtraTrack[];
   from: number;
   to: number;
   scales: ScaleOption[];
@@ -379,6 +423,7 @@ export const convertSongsterr = ({
   meta,
   melodyTrack,
   bassTrack,
+  extraTracks = [],
   from,
   to,
   scales,
@@ -396,6 +441,10 @@ export const convertSongsterr = ({
     bassRaw !== undefined && bassRaw.notes.length > 0
       ? simplifyBass(bassRaw.notes, melodyRaw.barStarts)
       : [];
+  const extrasRaw = extraTracks.map((extra) => ({
+    ...extra,
+    notes: readNotes(extra.track, from, to).notes,
+  }));
 
   const tonic =
     wantedTonic ??
@@ -409,7 +458,11 @@ export const convertSongsterr = ({
 
   const scale =
     wantedScale ??
-    pickScale(scales, melodyRaw.notes.map(shifted), bassNotes.map(shifted));
+    pickScale(
+      scales,
+      melodyRaw.notes.map(shifted),
+      [...bassNotes, ...extrasRaw.flatMap((extra) => extra.notes)].map(shifted),
+    );
   const changed = new Map<string, number>();
   const moveToScale = (n: RawNote) => {
     const pitch = fitToScale(n.pitch + shift, scale);
@@ -452,8 +505,13 @@ export const convertSongsterr = ({
     octave: Math.floor(midi / 12),
     note: (midi % 12) as Note,
   }));
-  const tabTrack = (name: string, notes: PlacedNote[]): SongTrack => ({
+  const tabTrack = (
+    name: string,
+    notes: PlacedNote[],
+    instrument?: Instrument,
+  ): SongTrack => ({
     name,
+    instrument,
     tuning,
     tabNotes: notes.map((n) => ({
       tick: n.tick * ticksInStep,
@@ -465,6 +523,16 @@ export const convertSongsterr = ({
   });
   const tracks = [tabTrack("Melody", melody)];
   if (bass.length) tracks.push(tabTrack("Melody 2", bass));
+  const usedNames = new Set(tracks.map((t) => t.name));
+  extrasRaw.forEach((extra) => {
+    const notes = placeMelody(extra.notes.map(moveToScale), extra.track.tuning);
+    if (!notes.length) return;
+    // two Songsterr tracks can share a name, such as two unnamed violins
+    let name = extra.name;
+    for (let i = 2; usedNames.has(name); i++) name = `${extra.name} ${i}`;
+    usedNames.add(name);
+    tracks.push(tabTrack(name, notes, extra.instrument));
+  });
   if (chords.length)
     tracks.push({
       ...tabTrack("Chords", []),

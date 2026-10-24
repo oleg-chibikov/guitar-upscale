@@ -1,14 +1,21 @@
 import { Example } from "@/app/data/example";
+import {
+  getInstrumentForProgram,
+  getProgramForInstrument,
+} from "@/app/data/instruments";
 import { CHROMATIC, scalesMap } from "@/app/data/scales";
 import { writeGuitarPro } from "@/app/engine/songs/gpWriter";
 import { addUserSongs } from "@/app/engine/songs/songLibrary";
 import {
   SongsterrConvertResult,
+  SongsterrExtraTrack,
   SongsterrMeta,
   SongsterrSearchResult,
   SongsterrTrack,
   convertSongsterr,
   listScales,
+  songsterrProgram,
+  songsterrTrackName,
   songsterrTrackUrl,
 } from "@/app/engine/songs/songsterr";
 
@@ -45,6 +52,7 @@ type ImportOptions = {
   meta: SongsterrMeta;
   melodyTrack: SongsterrTrack;
   bassIndex?: number;
+  extraIndexes?: number[];
 };
 
 // Builds a Guitar Pro file from the whole track and adds it to the person's songs.
@@ -52,24 +60,41 @@ export const importSongsterrSong = async ({
   meta,
   melodyTrack,
   bassIndex,
+  extraIndexes = [],
 }: ImportOptions): Promise<{
   example: Example;
   result: SongsterrConvertResult;
 }> => {
-  const bassTrack =
-    bassIndex === undefined
-      ? undefined
-      : await loadSongsterrTrack(meta, bassIndex);
+  const loadExtra = async (index: number): Promise<SongsterrExtraTrack> => {
+    const info = meta.tracks[index];
+    const program = songsterrProgram(info);
+    return {
+      track: await loadSongsterrTrack(meta, index),
+      name: songsterrTrackName(info),
+      instrument:
+        program === undefined ? undefined : getInstrumentForProgram(program),
+    };
+  };
+  const [bassTrack, extraTracks] = await Promise.all([
+    bassIndex === undefined ? undefined : loadSongsterrTrack(meta, bassIndex),
+    Promise.all(extraIndexes.map(loadExtra)),
+  ]);
   const result = convertSongsterr({
     meta,
     melodyTrack,
     bassTrack,
+    extraTracks,
     from: 0,
     to: melodyTrack.measures.length - 1,
     title: meta.title,
     scales: listScales(scalesMap, CHROMATIC),
   });
-  const bytes = await writeGuitarPro(result.song);
+  const bytes = await writeGuitarPro(result.song, {
+    getProgram: (track) =>
+      track.instrument === undefined
+        ? undefined
+        : getProgramForInstrument(track.instrument),
+  });
   const file = new File(
     [bytes as Uint8Array<ArrayBuffer>],
     `${meta.artist} - ${meta.title}.gp`,

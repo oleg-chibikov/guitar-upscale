@@ -5,8 +5,10 @@ import {
   SongsterrTrack,
   convertSongsterr,
   findSection,
+  listExtraTrackIndexes,
   listScales,
   listSections,
+  songsterrTrackName,
 } from "@/app/engine/songs/songsterr";
 
 const STANDARD = [64, 59, 55, 50, 45, 40];
@@ -107,5 +109,85 @@ describe("convertSongsterr", () => {
     expect(() =>
       convertSongsterr({ meta, melodyTrack: track, from: 1, to: 1, scales }),
     ).toThrow("empty");
+  });
+
+  it("adds extra tracks with their own instruments and names", () => {
+    const result = convertSongsterr({
+      meta,
+      melodyTrack: track,
+      extraTracks: [
+        { track, name: "Violin", instrument: "violin" },
+        { track, name: "Violin", instrument: "violin" },
+        { track: { ...track, measures: [rest, rest, rest] }, name: "Flute" },
+      ],
+      from: 0,
+      to: 2,
+      scales,
+    });
+    const extras = result.song.tracks.slice(1);
+    expect(extras.map((t) => [t.name, t.instrument])).toEqual([
+      ["Violin", "violin"],
+      ["Violin 2", "violin"],
+      ["Chords", undefined],
+    ]);
+    expect(extras[0].tabNotes).toEqual(result.song.tracks[0].tabNotes);
+  });
+
+  it("gives notes struck together different strings", () => {
+    const chord: SongsterrTrack = {
+      tuning: STANDARD,
+      measures: [
+        {
+          voices: [
+            {
+              beats: [
+                {
+                  duration: [1, 1],
+                  notes: [
+                    { string: 4, fret: 0 },
+                    { string: 4, fret: 7 },
+                    { string: 3, fret: 2 },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const result = convertSongsterr({
+      meta,
+      melodyTrack: chord,
+      from: 0,
+      to: 0,
+      scales,
+    });
+    const strings = result.song.tracks[0].tabNotes.map((n) => n.string);
+    expect(new Set(strings).size).toBe(strings.length);
+  });
+});
+
+describe("listExtraTrackIndexes", () => {
+  it("leaves out drums and empty tracks", () => {
+    expect(
+      listExtraTrackIndexes({
+        ...meta,
+        tracks: [
+          { instrumentId: 30, instrument: "Distortion Guitar", name: "" },
+          { instrumentId: 1024, instrument: "Drums", name: "Drummer" },
+          { instrumentId: 73, instrument: "Flute", name: "", isEmpty: true },
+          { instrumentId: 33, instrument: "Electric Bass (finger)", name: "" },
+        ],
+      }),
+    ).toEqual([0, 3]);
+  });
+});
+
+describe("songsterrTrackName", () => {
+  it("keeps a name from turning the track into the melody or chords", () => {
+    expect(songsterrTrackName({ instrument: "Flute", name: "" })).toBe("Flute");
+    expect(songsterrTrackName({ instrument: "Piano", name: "Chords" })).toBe(
+      "Piano Chords",
+    );
   });
 });

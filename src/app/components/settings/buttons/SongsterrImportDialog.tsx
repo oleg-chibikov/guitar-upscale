@@ -8,6 +8,7 @@ import {
   SongsterrMeta,
   SongsterrSearchResult,
   SongsterrTrack,
+  listExtraTrackIndexes,
 } from "@/app/engine/songs/songsterr";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import Search from "@mui/icons-material/Search";
@@ -15,6 +16,7 @@ import {
   Alert,
   Autocomplete,
   Button,
+  Checkbox,
   CircularProgress,
   DialogActions,
   InputAdornment,
@@ -38,10 +40,17 @@ const selectTextSx = {
 const errorText = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
-const trackLabel = (meta: SongsterrMeta, index: number) => {
-  const track = meta.tracks[index];
-  return `${index + 1}. ${track.name || track.instrument} (${track.instrument})`;
-};
+const trackName = (meta: SongsterrMeta, index: number) =>
+  meta.tracks[index].name || meta.tracks[index].instrument;
+
+const trackLabel = (meta: SongsterrMeta, index: number) =>
+  `${index + 1}. ${trackName(meta, index)} (${meta.tracks[index].instrument})`;
+
+// A multiple select gives an array, or a comma separated string after autofill.
+const toIndexes = (value: unknown) =>
+  (Array.isArray(value) ? value : String(value).split(","))
+    .filter((index) => index !== "")
+    .map(Number);
 
 export const SongsterrImportDialog: React.FC<DialogProps> = ({
   isOpen,
@@ -57,11 +66,21 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   const [meta, setMeta] = useState<SongsterrMeta>();
   const [trackIndex, setTrackIndex] = useState(0);
   const [bassIndex, setBassIndex] = useState(NO_BASS);
+  const [extraIndexes, setExtraIndexes] = useState<number[]>([]);
   const [melodyTrack, setMelodyTrack] = useState<SongsterrTrack>();
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
 
   const isQueryLongEnough = searchText.trim().length >= MIN_QUERY_LENGTH;
+  // a Songsterr track goes into the song once, so the melody and the bass stay out of this list
+  const extraOptions = meta
+    ? listExtraTrackIndexes(meta).filter(
+        (index) => index !== trackIndex && index !== bassIndex,
+      )
+    : [];
+  const pickedExtras = extraOptions.filter((index) =>
+    extraIndexes.includes(index),
+  );
 
   const run = async (label: string, task: () => Promise<void>) => {
     setBusy(label);
@@ -133,9 +152,12 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
       const { loadSongsterrMeta } =
         await import("@/app/engine/songs/songsterrImport");
       const songMeta = await loadSongsterrMeta(chosen.songId);
+      const melodyIndex = songMeta.popularTrack ?? 0;
+      const bass = songMeta.popularTrackBass ?? NO_BASS;
       setMeta(songMeta);
-      setBassIndex(songMeta.popularTrackBass ?? NO_BASS);
-      await loadTrack(songMeta, songMeta.popularTrack ?? 0);
+      setBassIndex(bass === melodyIndex ? NO_BASS : bass);
+      setExtraIndexes(listExtraTrackIndexes(songMeta));
+      await loadTrack(songMeta, melodyIndex);
     });
 
   const chooseTrack = (index: number) =>
@@ -153,6 +175,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
         meta,
         melodyTrack,
         bassIndex: bassIndex === NO_BASS ? undefined : bassIndex,
+        extraIndexes: pickedExtras,
       });
       dispatch(
         setAndShowAlert({
@@ -244,7 +267,11 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
             onChange={(e) => void chooseTrack(Number(e.target.value))}
           >
             {meta.tracks.map((_, index) => (
-              <MenuItem key={index} value={index}>
+              <MenuItem
+                key={index}
+                value={index}
+                disabled={index === bassIndex}
+              >
                 {trackLabel(meta, index)}
               </MenuItem>
             ))}
@@ -260,11 +287,49 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
           >
             <MenuItem value={NO_BASS}>None</MenuItem>
             {meta.tracks.map((_, index) => (
-              <MenuItem key={index} value={index}>
+              <MenuItem
+                key={index}
+                value={index}
+                disabled={index === trackIndex}
+              >
                 {trackLabel(meta, index)}
               </MenuItem>
             ))}
           </TextField>
+          {extraOptions.length > 0 && (
+            <TextField
+              select
+              size="small"
+              label="More tracks, drums stay out"
+              sx={selectTextSx}
+              value={pickedExtras}
+              disabled={busy !== undefined}
+              onChange={(e) => setExtraIndexes(toIndexes(e.target.value))}
+              slotProps={{
+                inputLabel: { shrink: true },
+                select: {
+                  multiple: true,
+                  displayEmpty: true,
+                  renderValue: (selected) =>
+                    (selected as number[]).length === 0
+                      ? "None"
+                      : (selected as number[])
+                          .map((index) => trackName(meta, index))
+                          .join(", "),
+                },
+              }}
+            >
+              {extraOptions.map((index) => (
+                <MenuItem key={index} value={index}>
+                  <Checkbox
+                    size="small"
+                    checked={pickedExtras.includes(index)}
+                  />
+                  <ListItemText primary={trackLabel(meta, index)} />
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
         </>
       )}
 

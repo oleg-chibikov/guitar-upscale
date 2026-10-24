@@ -34,7 +34,8 @@ const handle = async (
     image: meta.image,
     artist: meta.artist,
     title: meta.title,
-    tracks: meta.tracks.map(({ instrument, name, isEmpty }) => ({
+    tracks: meta.tracks.map(({ instrumentId, instrument, name, isEmpty }) => ({
+      instrumentId,
       instrument,
       name,
       isEmpty,

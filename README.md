@@ -92,11 +92,12 @@ In a MIDI file a track named `Chords` plays as chords. A text or marker event li
 - **Key** the song moves to an E tonic, since the app builds every scale from E.
 - **Scale** the script picks the scale from `scaleDefinitions.ts` with the fewest notes outside it, or the one from `--scale "Minor/Dorian"`. It moves those notes to the nearest scale note. It prints each change. `index.json` may then list a smaller scale that holds every note.
 - **Tracks** melody, a bass with one note per beat, and a `Chords` track built on the bass.
+- **More tracks** `--extra 2,5` or `--extra all` adds more Songsterr tracks whole, each with its own instrument. `all` skips drums. A track takes one role only.
 - **Rerun** replaces the file with the same band and title, and refreshes `index.json`.
 
 The app has the same steps in a dialog: the cloud button next to upload adds the song to your songs in the browser. The script and the dialog share [songsterr.ts](src/app/engine/songs/songsterr.ts).
 
-`--help` lists the options: `--section`, `--track`, `--bass`, `--tonic`, `--scale`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
+`--help` lists the options: `--section`, `--track`, `--bass`, `--extra`, `--tonic`, `--scale`, `--dry-run` and more. Songsterr has no public API, so the script can break when the site changes.
 
 ## Deploy
 
