@@ -69,6 +69,7 @@
 
 @custom-variant maxhmd (@media (max-height: 600px));
 @custom-variant maxhlg (@media (max-height: 800px));
+@custom-variant portraittouch (@media (orientation: portrait) and (pointer: coarse));
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,

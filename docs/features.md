@@ -248,6 +248,8 @@ The gear button opens a drawer. Each value survives a reload.
 
 The control panel opens with the key button: scale, tuning, capo and scale detection. Next come the settings, piano roll, strumming, detect chord, upload, fullscreen (desktop), reload page and about buttons. The arrow at the end hides everything but the key button. Tempo and volume sit in the play panel.
 
+On a phone held upright, a tip asks to turn the phone sideways. The neck doesn't fit otherwise. A narrow control panel scrolls sideways.
+
 Code: [SettingsView.tsx](../src/app/components/settings/SettingsView.tsx), [ControlPanel.tsx](../src/app/components/settings/ControlPanel.tsx), [settingsSlice.ts](../src/app/store/settingsSlice.ts), [uiSlice.ts](../src/app/store/uiSlice.ts).
 
 ## Instruments and sound

@@ -15,6 +15,7 @@ import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
+import { RotateHint } from "./RotateHint";
 import { AlertWrapper } from "./alert/AlertWrapper";
 import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
@@ -49,6 +50,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
       ) : (
         <main ref={mainRef} className="overflow-auto">
           <ControlPanel premiumComponents={premiumComponents} />
+          <RotateHint />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
           {isAuthEnabled && <AuthPanel />}
