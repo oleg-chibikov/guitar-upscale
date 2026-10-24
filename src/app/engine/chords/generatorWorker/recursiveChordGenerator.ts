@@ -7,8 +7,6 @@ import {
 } from "@/app/engine/chords/generatorWorker/fretDistanceChecker";
 import { SharedArrayCache } from "@/app/engine/chords/generatorWorker/sharedArrayCache";
 
-// TODO: Possible finger alignment when using thumb
-
 type OptionalNumber = number | undefined;
 type OptionalNumberArray = OptionalNumber[];
 
@@ -149,7 +147,6 @@ export class RecursiveChordGenerator {
     const available = state.availableFretByFingerIndex;
     const [a0, a1, a2, a3] = available;
 
-    // TODO: note sure if this makes for a muted string sense but safer to keep
     this.preventCurrentBarresToContinueOnHigherStrings(available);
 
     this.processNoteRecursively(
@@ -194,7 +191,6 @@ export class RecursiveChordGenerator {
     state.usedNotesMask |= noteBit(stringOctaveNote.note);
     state.chordBuilder[stringIndex] = stringOctaveNote;
 
-    // TODO: note sure if this makes for an open string sense but safer to keep
     this.preventCurrentBarresToContinueOnHigherStrings(available);
 
     this.processNoteRecursively(

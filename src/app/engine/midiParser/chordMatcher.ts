@@ -20,7 +20,6 @@ export async function extractChordFromNotes(
     return undefined;
   }
   const variations = getPossibleNotesArrangementOnNeck(sortedNotes)
-    // TODO: Do we need to filter out the null values here? later we'll add them back during serializing for detection
     .map((variation) => variation.filter((x) => x) as StringOctaveNote[])
     .sort(
       // sorting to put the variations with the highest number of notes first (it might give the better matching chord if different variations are matching different chords)
@@ -47,8 +46,6 @@ export async function extractChordFromNotes(
 }
 
 function getPossibleNotesArrangementOnNeck(sortedNotes: OctaveNote[]) {
-  // TODO: this function is similar to getPossibleNotes in chordsGenerator, but still slightly different. Can we merge them somehow?
-
   const appendNextNoteRecursive = (
     indexOfNoteEvent: number,
     stringToPutNextNote: number,

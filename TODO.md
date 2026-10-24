@@ -1,15 +1,36 @@
-More chords
-more examples
-High string at the bottom mode
+# TODO
 
-info about chord detection
-https://www.oolimo.com/en/guitar-chords/analyze
-or https://jguitar.com/chordname
+Задачи по важности. Сложность: лёгкая за час-два, средняя за день, сложная за несколько дней.
 
-Can we avoid using pre-built chords for chord detection?
+## Важно: это видно человеку
 
-## Long term
+| Задача                                                                                                                                              | Сложность | Где                                                                                |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------- |
+| **Больше песен-примеров** в списке песен                                                                                                            | лёгкая    | [public/songs](public/songs), [build-song-index.mjs](scripts/build-song-index.mjs) |
+| **Форма обратной связи**                                                                                                                            | лёгкая    |                                                                                    |
+| **Метроном отстаёт на старте.** Перед каждым щелчком он ждёт `loadMetronomeProvider()`                                                              | лёгкая    | [MetronomeButton.tsx](src/app/components/playPanel/MetronomeButton.tsx)            |
+| **Больше типов аккордов**                                                                                                                           | средняя   | [chordModes.ts](src/app/data/chordModes.ts)                                        |
+| **Справка по распознаванию аккордов**, как в [oolimo](https://www.oolimo.com/en/guitar-chords/analyze) или [jguitar](https://jguitar.com/chordname) | средняя   |                                                                                    |
 
-Ads
-Feedback form
-youtube videos for each scale
+## Полезно: новые возможности
+
+| Задача                                                                                                                                                             | Сложность | Где                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ---------------------------------------------------------------------------------------------- |
+| **Режим «тонкая струна внизу»** на грифе                                                                                                                           | средняя   |                                                                                                |
+| **Аккорды на 7 и больше струнах.** Сейчас аккорды строятся на 6 струнах, иначе детектору не хватает памяти. Нужен компактный способ хранить аккорды                | сложная   | [chordsGenerator.ts](src/app/engine/chords/generatorWorker/chordsGenerator.ts)                 |
+| **Распознавание аккордов без готового списка.** Сейчас детектор сверяет ноты со всеми заранее построенными аккордами                                               | сложная   | [chordDetector.ts](src/app/engine/chords/detectorWorker/chordDetector.ts)                      |
+| **Аппликатуры с большим пальцем** учитывают, как при этом стоят остальные пальцы                                                                                   | сложная   | [recursiveChordGenerator.ts](src/app/engine/chords/generatorWorker/recursiveChordGenerator.ts) |
+| **Подписка Google Play привязана к аккаунту.** Сейчас один токен могут взять несколько человек. Нужна база пользователей. Важно, только когда включена авторизация | сложная   | [subscriptionHelper.ts](src/lib/subscriptionHelper.ts)                                         |
+
+## Чистка кода
+
+| Задача                                                                                                                                                                     | Сложность | Где                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Проверить барре у заглушённой и открытой струны.** `preventCurrentBarresToContinueOnHigherStrings` вызывается там на всякий случай. Сравнить аппликатуры с вызовом и без | лёгкая    | [recursiveChordGenerator.ts](src/app/engine/chords/generatorWorker/recursiveChordGenerator.ts)                                          |
+| **Строи гитары считать при сборке.** Сейчас браузер строит их при каждом запуске                                                                                           | лёгкая    | [tuningBuilder.ts](src/app/engine/tuningBuilder.ts)                                                                                     |
+| **Аккорд для детектора массивом по всем струнам.** `chordMatcher` выкидывает пустые струны, а `serializeChord` вставляет их обратно и для этого читает `stringCountValue`  | средняя   | [chordMatcher.ts](src/app/engine/midiParser/chordMatcher.ts), [chordDetector.ts](src/app/engine/chords/detectorWorker/chordDetector.ts) |
+
+## Когда-нибудь
+
+- **Реклама.**
+- **Видео с YouTube** к каждому ладу.

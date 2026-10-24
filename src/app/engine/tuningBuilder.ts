@@ -1,7 +1,5 @@
 import { NOTE_COUNT, Note, OctaveNote } from "@/app/data/notes";
 
-// TODO: Can we do that on a server side?
-
 interface TuningData {
   name: string;
   shift?: number;

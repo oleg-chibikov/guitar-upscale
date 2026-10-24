@@ -73,14 +73,11 @@ class ChordDetector {
     const serializedChord: (number | MissingChar)[] = [];
 
     // Initialize the serializedChord with '?' for each position
-
-    // TODO: don't import stringCountValue. instead pass the chord as notes for all the strings. now it contains only non-undefined ones
     for (let i = 0; i < this.stringCount; i++) {
       serializedChord.push(missingChar);
     }
 
     // Populate serializedChord with note values where string is set
-    // TODO: Chord is already generated as an array by string - can we utilize it here?
     chord.forEach((stringOctaveNote) => {
       if (!stringOctaveNote) {
         return;
