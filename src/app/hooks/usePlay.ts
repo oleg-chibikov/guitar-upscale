@@ -43,13 +43,14 @@ const melodyType = PlaybackType.Melody;
 const fullStringScaleType = PlaybackType.FullStringScale;
 const LOG_PREFIX = "usePlay: ";
 
-// a space typed into a search or a name field stays a space
-const isTextField = (target: EventTarget | null) =>
-  target instanceof HTMLElement &&
-  (target.isContentEditable ||
-    target instanceof HTMLTextAreaElement ||
-    (target instanceof HTMLInputElement &&
-      !["checkbox", "radio", "range", "button"].includes(target.type)));
+// Space on a focused control types or presses that control
+const INTERACTIVE_SELECTOR =
+  "button,a,input,select,textarea,[contenteditable],[role=button],[role=checkbox],[role=switch],[role=slider],[role=combobox],[role=menuitem],[role=option],[role=tab]";
+
+const isInteractive = (target: EventTarget | null) =>
+  target instanceof Element &&
+  (target.closest(INTERACTIVE_SELECTOR) !== null ||
+    (target instanceof HTMLElement && target.isContentEditable));
 
 export interface UsePlayParams {
   decodeExample?: (example: Example) => Promise<EventsByTick>;
@@ -176,7 +177,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       if (
         event.code === "Space" &&
         !event.defaultPrevented &&
-        !isTextField(event.target)
+        !isInteractive(event.target)
       ) {
         // during playback Space pauses, as the pause button does
         if (isPlayingValue && !checkLooperPlaying()) {
