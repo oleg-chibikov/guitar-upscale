@@ -5,7 +5,7 @@ import {
   getModeSuffix,
 } from "@/app/data/chordModes";
 import { Instrument } from "@/app/data/instruments";
-import { serializeOctaveNote, StringOctaveNote } from "@/app/data/notes";
+import { Note, serializeOctaveNote, StringOctaveNote } from "@/app/data/notes";
 import {
   DEFAULT_CHORD_OCTAVE,
   DEFAULT_EVENT_DURATION,
@@ -22,6 +22,18 @@ export const isChordEvent = (event: ChordOrNote) => event.chord !== undefined;
 export const getEventDuration = (event: ChordOrNote) =>
   event.duration ?? DEFAULT_EVENT_DURATION;
 
+// the piano roll asks for the pitch of every note on each draw, and parsing a chord name is slow
+const chordBaseNotes = new Map<string, Note>();
+
+const getChordBaseNote = (chordName: string): Note => {
+  let note = chordBaseNotes.get(chordName);
+  if (note === undefined) {
+    note = parseChordNoteAndAlterations(chordName).chordBaseNote;
+    chordBaseNotes.set(chordName, note);
+  }
+  return note;
+};
+
 export const getEventPitch = (event: ChordOrNote): number => {
   if (event.note) {
     return toPitch(event.note.note);
@@ -30,7 +42,7 @@ export const getEventPitch = (event: ChordOrNote): number => {
   return toPitch(
     chord.metadata.octaveNote ?? {
       octave: DEFAULT_CHORD_OCTAVE,
-      note: parseChordNoteAndAlterations(chord.chord).chordBaseNote,
+      note: getChordBaseNote(chord.chord),
     },
   );
 };
