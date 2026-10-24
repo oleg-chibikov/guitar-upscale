@@ -385,7 +385,7 @@ flowchart LR
 - **Static export** [next.config.mjs](../next.config.mjs) sets `output: "export"` when `STATIC_EXPORT=true`. `NEXT_PUBLIC_BASE_PATH` sets the sub path.
 - **Server build** a plain `next build` keeps the API routes for sign-in.
 - **PWA** [sw.js](../public/sw.js) caches responses network first. [manifest.json](../public/manifest.json) asks for fullscreen landscape.
-- **Tests** Jest covers `EventsByTick`, the Guitar Pro and MIDI song readers, the looper player, piano roll edits, chord button and fretboard layout, the trie and Google Play subscription parsing.
+- **Tests** Jest covers `EventsByTick`, the Guitar Pro and MIDI song readers, song transposing, the looper player, piano roll edits and geometry, strum timing, chord button and fretboard layout, the trie and Google Play subscription parsing.
 
 ## Where to start a change
 
