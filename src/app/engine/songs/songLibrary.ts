@@ -218,18 +218,21 @@ export const addUserSongs = async (files: File[]): Promise<Example[]> => {
   return added;
 };
 
-export const removeUserSong = async (example: Example) => {
-  if (!example.isUserSong) {
-    return;
-  }
-  await deleteUserSong(example.id.replace(/^user:/, ""));
-  const list = await getExamples();
-  const index = list.indexOf(example);
-  if (index !== -1) {
-    list.splice(index, 1);
-  }
-  notify();
-};
+// queued behind the saves, so a save running now can't bring the song back
+export const removeUserSong = (example: Example) =>
+  enqueueSave(async () => {
+    if (!example.isUserSong) {
+      return;
+    }
+    await deleteUserSong(example.id.replace(/^user:/, ""));
+    const list = await getExamples();
+    // a save in the meantime puts a new copy of the song in the list
+    const index = list.findIndex((song) => song.id === example.id);
+    if (index !== -1) {
+      list.splice(index, 1);
+    }
+    notify();
+  });
 
 // The upload button asks the play button to play a song it just added
 export const songPlayRequests = new Subject<Example>();
@@ -306,6 +309,10 @@ const saveEdits = async (
   const { eventsToSong, getSongFileName, songToGuitarPro } =
     await import("@/app/engine/songs/songExport");
   const list = await getExamples();
+  if (example.isUserSong && !list.includes(example)) {
+    // the person deleted the song
+    return;
+  }
   const isCopy = !example.isUserSong;
   const song = written
     ? { ...written, band: example.band, title: example.title }
