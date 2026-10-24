@@ -26,8 +26,6 @@ interface UiState {
   settingsExpanded: boolean;
   chordsExpanded: boolean;
   looperExpanded: boolean;
-  // the chords panel sits this many pixels up, over the bottom bar
-  bottomBarHeight: number;
   allChordsShown: boolean;
   controlPanelExpanded: boolean;
   strummingSettingsExpanded: boolean;
@@ -56,7 +54,6 @@ const initialState: UiState = {
   settingsExpanded: false,
   chordsExpanded: true,
   looperExpanded: false,
-  bottomBarHeight: 0,
   allChordsShown: false,
   controlPanelExpanded: true,
   strummingSettingsExpanded: false,
@@ -131,9 +128,6 @@ export const uiSlice = createSlice({
     },
     setLooperExpanded: (state, action: PayloadAction<boolean>) => {
       state.looperExpanded = action.payload;
-    },
-    setBottomBarHeight: (state, action: PayloadAction<number>) => {
-      state.bottomBarHeight = action.payload;
     },
     setAllChordsShown: (state, action: PayloadAction<boolean>) => {
       state.allChordsShown = action.payload;
@@ -247,7 +241,6 @@ export const {
   setSettingsExpanded,
   setChordsExpanded,
   setLooperExpanded,
-  setBottomBarHeight,
   setAllChordsShown,
   setControlPanelExpanded,
   setStrummingSettingsExpanded,

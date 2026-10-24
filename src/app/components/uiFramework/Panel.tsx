@@ -5,14 +5,14 @@ import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";
 import { WithStyle } from "@/app/helpers/withStyle";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import { FC, Ref } from "react";
+import { FC } from "react";
 
 export const Panel: FC<
   WithChildren &
     WithClassName &
     WithStyle &
     // bare drops the frame, for a group inside another bar
-    WithId & { enableReverse?: boolean; bare?: boolean; ref?: Ref<HTMLElement> }
+    WithId & { enableReverse?: boolean; bare?: boolean }
 > = ({
   children,
   className,
@@ -20,7 +20,6 @@ export const Panel: FC<
   id,
   enableReverse = false,
   bare = false,
-  ref,
 }) => {
   const theme = useUiSelector((s) => s.theme);
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
@@ -33,7 +32,6 @@ export const Panel: FC<
       }`;
   return (
     <section
-      ref={ref}
       id={id}
       style={style}
       className={`${className !== undefined ? `${className} ` : ""}${frame} flex ${

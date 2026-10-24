@@ -49,11 +49,13 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           <ControlPanel premiumComponents={premiumComponents} />
           <Fretboard />
           <SettingsViewWrapper premiumComponents={premiumComponents} />
-          <ChordsView mainRef={mainRef} />
           {isAuthEnabled && <AuthPanel />}
           <StrummingSettingsWrapper />
           <StrummingPatternDialogWrapper />
-          <BottomZone premiumComponents={premiumComponents} />
+          <BottomZone
+            premiumComponents={premiumComponents}
+            chords={<ChordsView mainRef={mainRef} />}
+          />
           <NowPlaying />
           <AspectRatioModalWrapper />
           <PianoRollDialogWrapper />

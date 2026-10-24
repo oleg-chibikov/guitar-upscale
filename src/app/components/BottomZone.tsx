@@ -6,17 +6,15 @@ import { Panel } from "@/app/components/uiFramework/Panel";
 import { ChordsDisplayMode } from "@/app/data/chordsDisplayMode";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import { setBottomBarHeight } from "@/app/store/uiSlice";
 import { Typography } from "@mui/material";
-import { ReactNode, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { ReactNode } from "react";
 
 // the inner bare panels hand their buttons to the frame, so a long bar wraps button by button
 const WRAPPING_PANEL = "pointer-events-auto max-w-full [&>section]:contents";
 
-export const BottomZone: React.FC<WithPremiumComponents> = ({
-  premiumComponents,
-}) => {
+export const BottomZone: React.FC<
+  WithPremiumComponents & { chords: ReactNode }
+> = ({ premiumComponents, chords }) => {
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const looperExpanded = useUiSelector((s) => s.looperExpanded);
@@ -24,76 +22,70 @@ export const BottomZone: React.FC<WithPremiumComponents> = ({
   const hasLooper = looper !== undefined && looper !== null;
   // the buttons sit on the side away from the chords
   const chordsOnLeft = chordsDisplayMode === ChordsDisplayMode.Left;
-  const dispatch = useDispatch();
-
-  const observeHeight = useCallback(
-    (element: HTMLElement | null) => {
-      if (element === null) {
-        return;
-      }
-      const observer = new ResizeObserver(([entry]) =>
-        dispatch(
-          setBottomBarHeight(Math.ceil(entry.borderBoxSize[0].blockSize)),
-        ),
-      );
-      observer.observe(element);
-      return () => {
-        observer.disconnect();
-        dispatch(setBottomBarHeight(0));
-      };
-    },
-    [dispatch],
-  );
 
   return (
+    // The bar comes first, so wrap-reverse keeps it on the bottom line. It also flips items-start to the bottom edge.
+    // The chords sit next to it while both fit, and wrap above it when they don't.
     <div
-      className={`pointer-events-none fixed inset-x-1 bottom-1 flex flex-col gap-1 ${
-        chordsOnLeft ? "items-end" : "items-start"
+      className={`pointer-events-none fixed inset-x-1 bottom-1 z-20 flex flex-wrap-reverse items-start gap-1 ${
+        chordsOnLeft ? "flex-row-reverse" : "flex-row"
       }`}
       style={
         // should be displayed over the dialog
         pianoRollExpanded ? { zIndex: 9999999 } : undefined
       }
     >
-      {hasLooper && (
-        // stays mounted while hidden so the loops keep their state
-        <Panel
-          className={`${WRAPPING_PANEL} flex-wrap`}
-          style={
-            looperExpanded && !pianoRollExpanded
-              ? undefined
-              : { display: "none" }
-          }
-        >
-          <Typography
-            variant="body2"
-            sx={{ color: "text.primary", opacity: 0.75, px: 0.5 }}
-          >
-            Looper
-          </Typography>
-          {looper}
-        </Panel>
-      )}
-      <Panel
-        ref={observeHeight}
-        className={`${WRAPPING_PANEL} w-full flex-wrap-reverse ${
-          chordsOnLeft ? "justify-end" : "justify-start"
+      <div
+        className={`flex min-w-0 grow flex-col gap-1 ${
+          chordsOnLeft ? "items-end" : "items-start"
         }`}
       >
-        <PlayPanel premiumComponents={premiumComponents} />
-        {!pianoRollExpanded && (
-          <>
-            {hasLooper && (
-              <>
-                <BarDivider />
-                <LooperToggleButton />
-              </>
-            )}
-            <BarDivider />
-            <AspectRatioButton />
-          </>
+        {hasLooper && (
+          // stays mounted while hidden so the loops keep their state
+          <Panel
+            className={`${WRAPPING_PANEL} flex-wrap`}
+            style={
+              looperExpanded && !pianoRollExpanded
+                ? undefined
+                : { display: "none" }
+            }
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: "text.primary", opacity: 0.75, px: 0.5 }}
+            >
+              Looper
+            </Typography>
+            {looper}
+          </Panel>
         )}
-      </Panel>
+        <Panel
+          className={`${WRAPPING_PANEL} w-full flex-wrap-reverse ${
+            chordsOnLeft ? "justify-end" : "justify-start"
+          }`}
+        >
+          <PlayPanel premiumComponents={premiumComponents} />
+          {!pianoRollExpanded && (
+            <>
+              {hasLooper && (
+                <>
+                  <BarDivider />
+                  <LooperToggleButton />
+                </>
+              )}
+              <BarDivider />
+              <AspectRatioButton />
+            </>
+          )}
+        </Panel>
+      </div>
+      <div
+        className={`pointer-events-auto ${chordsOnLeft ? "mr-auto" : "ml-auto"} ${
+          pianoRollExpanded ? "hidden" : ""
+        }`}
+      >
+        {chords}
+      </div>
     </div>
   );
 };
