@@ -147,6 +147,7 @@ export class RecursiveChordGenerator {
     const available = state.availableFretByFingerIndex;
     const [a0, a1, a2, a3] = available;
 
+    // a barre carried over this muted string would press it
     this.preventCurrentBarresToContinueOnHigherStrings(available);
 
     this.processNoteRecursively(
@@ -191,6 +192,7 @@ export class RecursiveChordGenerator {
     state.usedNotesMask |= noteBit(stringOctaveNote.note);
     state.chordBuilder[stringIndex] = stringOctaveNote;
 
+    // a barre carried over this open string would press it
     this.preventCurrentBarresToContinueOnHigherStrings(available);
 
     this.processNoteRecursively(

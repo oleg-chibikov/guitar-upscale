@@ -100,6 +100,46 @@ describe("chord voicings", () => {
       }
     }
   });
+
+  it("lays a barre only over fretted strings", () => {
+    const chordTypes = [
+      [0, 4, 7],
+      [0, 3, 7],
+      [0, 3, 6],
+      [0, 5, 7],
+      [0, 4, 7, 10],
+      [0, 3, 7, 10],
+      [0, 4, 7, 11],
+    ];
+    const barresOverEmptyStrings: string[] = [];
+    for (const intervals of chordTypes) {
+      for (let root = 0; root < 12; root++) {
+        for (const voicing of generateVoicings(root, intervals)) {
+          const { variation, fingerAssignment } = voicing;
+          for (let finger = 0; finger < 4; finger++) {
+            const strings = fingerAssignment
+              .map((f, string) =>
+                f === finger && (variation[string]?.fret ?? 0) > 0
+                  ? string
+                  : undefined,
+              )
+              .filter((string) => string !== undefined);
+            for (
+              let string = Math.min(...strings);
+              string < Math.max(...strings);
+              string++
+            ) {
+              // the barre would press this muted or open string too
+              if ((variation[string]?.fret ?? 0) === 0) {
+                barresOverEmptyStrings.push(toTab(voicing));
+              }
+            }
+          }
+        }
+      }
+    }
+    expect(barresOverEmptyStrings).toEqual([]);
+  });
 });
 
 describe("preferred variation", () => {
