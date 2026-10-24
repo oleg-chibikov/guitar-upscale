@@ -180,6 +180,7 @@ The piano roll edits a track note by note. It opens from the control panel.
 - **Solo** the headphones button plays only the picked track. With all tracks picked every track plays. `S` turns it on and off. Closing the piano roll lets every track play again.
 - **Note volume** a slider sets the volume (MIDI velocity) of the selected notes. A quieter note shows paler. The volume plays back, goes into MIDI downloads and into Guitar Pro files as dynamics, from ppp to f.
 - **Tools** select, draw and erase. Notes can move, stretch, copy and quantize. See [Quantize](#quantize).
+- **Empty bars** a delete that empties the first bars of a song moves every track left, so the song starts in bar 1. The song ends with its last note. Loops keep their length.
 - **Transpose** arrow buttons move the selected notes a step or an octave up or down. With nothing selected they move every note of the picked track.
 - **Snap** picks the grid step. "Keep notes in the scale" holds drawn and moved notes on scale notes. A scale with all 12 notes turns the button off.
 - **Chords** a chord shows as one block. A double click or double tap opens a dialog with the chord types on that root.

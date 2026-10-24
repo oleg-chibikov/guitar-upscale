@@ -1,4 +1,5 @@
 import { Note } from "@/app/data/notes";
+import { TICKS_IN_BAR } from "@/app/data/pianoRollConstants";
 import { ChordOrNote, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditHistory } from "./editHistory";
 import { fromPitch } from "./geometry";
@@ -147,6 +148,39 @@ describe("piano roll operations", () => {
     expect(data.getEvent("a")).toBeUndefined();
     history.undo();
     expect(data.getEvent("a")?.tick).toBe(0);
+  });
+
+  it("drops the bars a deleted intro leaves empty and undoes it in one step", () => {
+    const data = new EventsByTick();
+    const history = new EditHistory(data);
+    data.insertEvent(16, noteAt("intro", C4));
+    data.insertEvent(TICKS_IN_BAR * 3 + 8, noteAt("verse", C4));
+    data.insertEvent(TICKS_IN_BAR * 4, noteAt("end", C4));
+
+    history.execute(deleteEvents(data, ["intro"], true).command!);
+    // the pickup into the verse stays inside its bar
+    expect(data.getEvent("verse")?.tick).toBe(8);
+    expect(data.getEvent("end")?.tick).toBe(TICKS_IN_BAR);
+    expect(data.lastTick).toBe(TICKS_IN_BAR);
+
+    history.undo();
+    expect(data.getEvent("intro")?.tick).toBe(16);
+    expect(data.getEvent("verse")?.tick).toBe(TICKS_IN_BAR * 3 + 8);
+  });
+
+  it("keeps the start when the delete leaves the first bar alone", () => {
+    const data = new EventsByTick();
+    data.insertEvent(TICKS_IN_BAR * 2, noteAt("a", C4));
+    data.insertEvent(TICKS_IN_BAR * 5, noteAt("b", C4));
+    new EditHistory(data).execute(deleteEvents(data, ["b"], true).command!);
+    expect(data.getEvent("a")?.tick).toBe(TICKS_IN_BAR * 2);
+  });
+
+  it("keeps a loop in place", () => {
+    const { data, history } = setup();
+    data.insertEvent(TICKS_IN_BAR * 2, noteAt("c", C4));
+    history.execute(deleteEvents(data, ["a", "b"]).command!);
+    expect(data.getEvent("c")?.tick).toBe(TICKS_IN_BAR * 2);
   });
 
   it("resizes the end to the grid and keeps a minimum length", () => {

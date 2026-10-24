@@ -28,7 +28,9 @@ export const usePianoRollActions = () => {
     apply,
     playhead$,
     activeTrack,
+    source,
   } = usePianoRoll();
+  const isSong = source?.looperChannel === undefined;
   const { scalePattern } = useScaleContext();
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
@@ -58,11 +60,11 @@ export const usePianoRollActions = () => {
       selectAll: () => setSelection(events.map(({ event }) => event.id)),
       deselect: () => setSelection([]),
       deleteSelection: () => {
-        if (data) apply(deleteEvents(data, selection));
+        if (data) apply(deleteEvents(data, selection, isSong));
       },
       copy,
       cut: () => {
-        if (data && copy().length) apply(deleteEvents(data, selection));
+        if (data && copy().length) apply(deleteEvents(data, selection, isSong));
       },
       // as in Cubase, a paste lands at the playhead
       paste: () => pasteAt(playhead$.value),
@@ -125,5 +127,6 @@ export const usePianoRollActions = () => {
     scalePattern,
     playhead$,
     activeTrack,
+    isSong,
   ]);
 };

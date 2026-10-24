@@ -363,7 +363,11 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       const ids = allEvents
         .filter(({ event }) => getEventTrack(event) === track.trackNumber)
         .map(({ event }) => event.id);
-      const result = deleteEvents(data, ids);
+      const result = deleteEvents(
+        data,
+        ids,
+        source?.looperChannel === undefined,
+      );
       apply({
         ...result,
         command: result.command && { ...result.command, label: "Delete track" },
@@ -371,7 +375,7 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       setActiveTrackState({ data, trackNumber: undefined });
       setVersion((v) => v + 1);
     },
-    [data, allEvents, apply],
+    [data, allEvents, apply, source],
   );
 
   const renameTrack = useCallback(

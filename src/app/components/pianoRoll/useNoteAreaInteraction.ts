@@ -193,6 +193,7 @@ export const useNoteAreaInteraction = ({
     chooseChordMode,
     activeTrack,
     setActiveTrack,
+    source,
   } = usePianoRoll();
   const lastTap = useRef<{ id: string; time: number } | undefined>(undefined);
   const [preview, setPreview] = useState<Preview | undefined>();
@@ -215,6 +216,7 @@ export const useNoteAreaInteraction = ({
     axisLock,
     activeTrack,
     setActiveTrack,
+    isSong: source?.looperChannel === undefined,
   };
   const state = useRef(latest);
   useLayoutEffect(() => {
@@ -551,7 +553,7 @@ export const useNoteAreaInteraction = ({
       lastPointerRef.current = undefined;
       stopAutoScroll();
       setPreview(undefined);
-      const { data } = state.current;
+      const { data, isSong } = state.current;
       if (!gesture || !data) return;
 
       if (cancelled) {
@@ -599,7 +601,7 @@ export const useNoteAreaInteraction = ({
           apply(addEvent(data, gesture.tick, gesture.event));
           return;
         case "erase":
-          apply(deleteEvents(data, gesture.ids));
+          apply(deleteEvents(data, gesture.ids, isSong));
           return;
         case "pinch":
           return;

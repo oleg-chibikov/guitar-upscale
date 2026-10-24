@@ -1,5 +1,6 @@
 import { ChordMode } from "@/app/data/chordModes";
 import { Note } from "@/app/data/notes";
+import { TICKS_IN_BAR } from "@/app/data/pianoRollConstants";
 import {
   ChordOrNote,
   EventForTick,
@@ -148,9 +149,26 @@ export const moveEvents = (
 export const deleteEvents = (
   data: EventsByTick,
   ids: Iterable<string>,
+  // a song drops the bars a delete leaves empty at its start. A loop keeps its length
+  trimLeadingBars = false,
 ): EditResult => {
   const builder = new CommandBuilder(data, "Delete notes");
-  existing(data, ids).forEach(({ event }) => builder.set(event.id, null));
+  const deleted = new Set(existing(data, ids).map(({ event }) => event.id));
+  deleted.forEach((id) => builder.set(id, null));
+
+  if (trimLeadingBars && deleted.size) {
+    const all = data.flatItems;
+    const rest = all.filter(({ event }) => !deleted.has(event.id));
+    const barOf = (tick: number) => Math.floor(tick / TICKS_IN_BAR);
+    // flatItems go in time order, so the first one starts the song
+    if (rest.length && barOf(rest[0].tick) > barOf(all[0].tick)) {
+      const shift = barOf(rest[0].tick) * TICKS_IN_BAR;
+      rest.forEach(({ tick, event }) =>
+        builder.set(event.id, { tick: tick - shift, event }),
+      );
+    }
+  }
+
   return { command: builder.build(), selection: [], chordsWithChangedMode: [] };
 };
 
