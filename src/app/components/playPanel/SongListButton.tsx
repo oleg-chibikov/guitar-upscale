@@ -10,6 +10,8 @@ import { EventsByTick } from "@/app/engine/eventsByTick";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import Delete from "@mui/icons-material/Delete";
 import Download from "@mui/icons-material/Download";
+import LibraryMusic from "@mui/icons-material/LibraryMusic";
+import Person from "@mui/icons-material/Person";
 import QueueMusic from "@mui/icons-material/QueueMusic";
 import Search from "@mui/icons-material/Search";
 import Shuffle from "@mui/icons-material/Shuffle";
@@ -25,6 +27,12 @@ import {
 } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
+
+const groupLabelSx = {
+  lineHeight: "28px",
+  backgroundColor: "transparent",
+  fontSize: 12,
+};
 
 interface SongListButtonProps {
   choices: Example[];
@@ -93,6 +101,69 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
     const { removeUserSong } = await import("@/app/engine/songs/songLibrary");
     await removeUserSong(choice);
   };
+
+  // the person's songs come first: they can be renamed and deleted
+  const songGroups = [
+    { label: "Your songs", songs: shownChoices.filter((c) => c.isUserSong) },
+    {
+      label: "Built-in songs",
+      songs: shownChoices.filter((c) => !c.isUserSong),
+    },
+  ];
+  const showGroupLabels = songGroups[0].songs.length > 0;
+
+  const renderSong = (choice: Example) => (
+    <MenuItem key={choice.id} dense onClick={() => choose(choice)}>
+      <ListItemIcon>
+        {choice.isUserSong ? (
+          <Person fontSize="small" color="primary" titleAccess="Your song" />
+        ) : (
+          <LibraryMusic
+            fontSize="small"
+            color="disabled"
+            titleAccess="Built-in song"
+          />
+        )}
+      </ListItemIcon>
+      <ListItemText
+        primary={getExampleName(choice)}
+        secondary={`${choice.scale} (${choice.scaleGroup})`}
+        slotProps={{
+          primary: isCurrent(choice)
+            ? { sx: { color: "success.main", fontWeight: "bold" } }
+            : undefined,
+        }}
+      />
+      <IconButton
+        edge={choice.isUserSong ? undefined : "end"}
+        size="small"
+        aria-label={`Download ${getExampleName(choice)}`}
+        title="Download as Guitar Pro, in the key from the settings"
+        onClick={(event) => {
+          event.stopPropagation();
+          void downloadChosen(choice).catch((error) =>
+            console.error("Cannot download the song", error),
+          );
+        }}
+      >
+        <Download fontSize="small" />
+      </IconButton>
+      {choice.isUserSong && (
+        <IconButton
+          edge="end"
+          size="small"
+          aria-label={`Delete ${getExampleName(choice)}`}
+          title="Delete your song"
+          onClick={(event) => {
+            event.stopPropagation();
+            void removeChosen(choice);
+          }}
+        >
+          <Delete fontSize="small" />
+        </IconButton>
+      )}
+    </MenuItem>
+  );
 
   return (
     <>
@@ -167,49 +238,24 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
             <ListItemText primary="No songs found" />
           </MenuItem>
         )}
-        {shownChoices.map((choice) => (
-          <MenuItem key={choice.id} dense onClick={() => choose(choice)}>
-            <ListItemText
-              primary={getExampleName(choice)}
-              secondary={`${choice.scale} (${choice.scaleGroup})${
-                choice.isUserSong ? ", uploaded" : ""
-              }`}
-              slotProps={{
-                primary: isCurrent(choice)
-                  ? { sx: { color: "success.main", fontWeight: "bold" } }
-                  : undefined,
-              }}
-            />
-            <IconButton
-              edge={choice.isUserSong ? undefined : "end"}
-              size="small"
-              aria-label={`Download ${getExampleName(choice)}`}
-              title="Download as Guitar Pro, in the key from the settings"
-              onClick={(event) => {
-                event.stopPropagation();
-                void downloadChosen(choice).catch((error) =>
-                  console.error("Cannot download the song", error),
-                );
-              }}
-            >
-              <Download fontSize="small" />
-            </IconButton>
-            {choice.isUserSong && (
-              <IconButton
-                edge="end"
-                size="small"
-                aria-label={`Delete ${getExampleName(choice)}`}
-                title="Delete the uploaded song"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void removeChosen(choice);
-                }}
-              >
-                <Delete fontSize="small" />
-              </IconButton>
-            )}
-          </MenuItem>
-        ))}
+        {songGroups.flatMap(({ label, songs }) =>
+          songs.length === 0
+            ? []
+            : [
+                ...(showGroupLabels
+                  ? [
+                      <ListSubheader
+                        key={label}
+                        disableSticky
+                        sx={groupLabelSx}
+                      >
+                        {label}
+                      </ListSubheader>,
+                    ]
+                  : []),
+                ...songs.map(renderSong),
+              ],
+        )}
       </Menu>
     </>
   );

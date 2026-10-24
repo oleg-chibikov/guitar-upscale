@@ -119,7 +119,7 @@ Playback types, picked in Settings [Explorer]:
 
 Without Explorer, Play plays the scale.
 
-Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. The search field stays at the top of the menu while it scrolls. It keeps songs whose name or scale holds every typed word. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo. Uploaded songs say "uploaded" and have a delete button.
+Right click or hold Play to pick a song [Explorer]. The menu lists every song sorted by name, and songs in the current scale show in green. Your songs (uploaded, recorded, drawn or edited) come first under "Your songs" with a person icon. Built-in songs follow under "Built-in songs" with a music icon. The search field stays at the top of the menu while it scrolls. It keeps songs whose name or scale holds every typed word. A song from another scale switches the scale group, scale and playback type to match, then plays at the song's tempo. Only your songs have a delete button.
 
 Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/hooks/usePlay.ts), [midiPlayer.ts](../src/app/engine/midiPlayer.ts), [songLibrary.ts](../src/app/engine/songs/songLibrary.ts), [public/songs/](../public/songs/).
 
@@ -184,7 +184,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 
 - **Chords** only a track named `Chords` plays chords. The chord name comes from the file, or from the notes when the file has none.
 - **Other tracks** play their notes as written, with no chord guessing.
-- **Delete** hold Play and press the bin next to an uploaded song.
+- **Delete** open the song list and press the bin next to one of your songs. Built-in songs have no bin.
 - **Download** hold Play and press the download icon next to any song. The `.gp` file is in the key and tuning from the settings.
 - **Edits** a piano roll edit saves a second after the last change. An uploaded song updates. A built-in song gets an own copy under the same name, and the built-in file stays as it was.
 
