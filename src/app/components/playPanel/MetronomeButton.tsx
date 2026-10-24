@@ -1,3 +1,4 @@
+import { loadOnce } from "@/app/helpers/loadOnce";
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import {
@@ -26,6 +27,11 @@ export function MdiMetronome() {
   );
 }
 
+// the clock ticks many times a second, so the module loads once
+const loadMetronomeProvider = loadOnce(
+  () => import("@/app/engine/sound/metronomeProvider"),
+);
+
 export const MetronomeButton: React.FC = (props) => {
   const dispatch = useDispatch();
   const isMetronomeActive = useSettingsSelector((s) => s.isMetronomeActive);
@@ -34,9 +40,7 @@ export const MetronomeButton: React.FC = (props) => {
     const sub = MetronomeEventBus.subscribe(async ({ isBar, isBeat }) => {
       if (isMetronomeActiveValue) {
         // console.log("Metronome sound", isBeat, isBar);
-        const playMetronomeBeat = (
-          await import("@/app/engine/sound/metronomeProvider")
-        ).playMetronomeBeat;
+        const { playMetronomeBeat } = await loadMetronomeProvider();
         if (isBar) {
           await playMetronomeBeat(true, metronomeVolumeValue);
         } else if (isBeat) {

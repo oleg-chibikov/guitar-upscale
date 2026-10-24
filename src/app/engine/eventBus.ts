@@ -1,3 +1,4 @@
+import { loadOnce } from "@/app/helpers/loadOnce";
 import { debugLog } from "@/app/helpers/debugLog";
 import { ChordMode } from "@/app/data/chordModes";
 import { Subject } from "rxjs";
@@ -102,6 +103,10 @@ const play = async ({
   );
 };
 
+// loaded on the first note, as they import this module
+const loadMidiRecorder = loadOnce(() => import("./midiRecorder/midiRecorder"));
+const loadLooper = loadOnce(() => import("./looper/looper"));
+
 NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   const fromChord = noteMetadata.fromChord === true;
   void play(noteMetadata);
@@ -112,8 +117,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     fretMarkersFromPreviousChord.add(serialized);
   }
 
-  const midiRecorder = (await import("./midiRecorder/midiRecorder"))
-    .midiRecorder;
+  const { midiRecorder } = await loadMidiRecorder();
   const trackNumber =
     noteMetadata.trackNumber ??
     (fromChord ? DEFAULT_CHORD_TRACK_NUMBER : DEFAULT_NOTE_TRACK_NUMBER);
@@ -134,7 +138,7 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
     noteMetadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {
-    const { looperState } = await import("./looper/looper");
+    const { looperState } = await loadLooper();
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordNote(
       noteMetadata.stringOctaveNote,
       trackNumber,
@@ -173,8 +177,7 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
   const playAction = ChordToChordButtonEventMap.get(chordWithMetadata.chord);
   playAction?.(metadata);
 
-  const midiRecorder = (await import("./midiRecorder/midiRecorder"))
-    .midiRecorder;
+  const { midiRecorder } = await loadMidiRecorder();
   if (metadata.fromPlayback !== true) {
     midiRecorder.addChordAtGlobalTick(chordWithMetadata);
   }
@@ -183,7 +186,7 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
     metadata.looperChannel === undefined &&
     currentlyRecordingLooperChannel !== undefined
   ) {
-    const { looperState } = await import("./looper/looper");
+    const { looperState } = await loadLooper();
     looperState[currentlyRecordingLooperChannel].looperRecorder.recordChord(
       chordWithMetadata,
     );
