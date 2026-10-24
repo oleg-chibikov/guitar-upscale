@@ -29,19 +29,28 @@ export const buildAllChordsLayout = (
     })),
   );
 
+const PERFECT_FIFTH = 7;
+
+const isSeventhChord = ({ chordMode }: ChordModeVariations) =>
+  chordMode.intervals.length === 4 &&
+  (chordMode.intervals.includes(10) || chordMode.intervals.includes(11));
+
 /**
  * One chord per scale note, from the root up: the first chord type that fits the scale.
  * The chords fill a row, then the next one, in a grid as close to a square as they allow.
+ * The empty cells left in the last row get a seventh chord on the root, then on the fifth.
  */
 export const buildKeyChordsLayout = (
   columns: ChordModeVariations[],
   root: Note,
 ): ChordGridCell[] => {
   const chords: { chordName: string; root: Note }[] = [];
+  const modeByNote = new Map<Note, ChordModeVariations>();
   for (let step = 0; step < NOTE_COUNT; step++) {
     const note = (root + step) % NOTE_COUNT;
     const mode = columns.find((mode) => isPlayable(mode, note));
     if (mode) {
+      modeByNote.set(note, mode);
       chords.push({
         chordName: getChordName(note, mode.chordMode),
         root: note,
@@ -49,7 +58,22 @@ export const buildKeyChordsLayout = (
     }
   }
   const columnCount = Math.ceil(Math.sqrt(chords.length));
-  return chords.map((chord, index) => ({
+  const emptyCells =
+    (columnCount - (chords.length % columnCount)) % columnCount;
+  const extras = [root, (root + PERFECT_FIFTH) % NOTE_COUNT]
+    .flatMap((note) => {
+      const mode = columns.find(
+        (mode) =>
+          mode !== modeByNote.get(note) &&
+          isSeventhChord(mode) &&
+          isPlayable(mode, note),
+      );
+      return modeByNote.has(note) && mode
+        ? [{ chordName: getChordName(note, mode.chordMode), root: note }]
+        : [];
+    })
+    .slice(0, emptyCells);
+  return [...chords, ...extras].map((chord, index) => ({
     ...chord,
     column: index % columnCount,
     row: Math.floor(index / columnCount),

@@ -50,7 +50,7 @@ Code: [KeyChip.tsx](../src/app/components/settings/KeyChip.tsx), [keyDescription
 
 ## Chords
 
-The chords panel opens on the chords of the key: one chord per scale note, from the root up. Each is the first chord type that fits the scale, such as `Em F#dim G Am Bm C D` for E minor. The chords fill a grid as close to a square as they allow, row by row.
+The chords panel opens on the chords of the key: one chord per scale note, from the root up. Each is the first chord type that fits the scale, such as `Em F#dim G Am Bm C D` for E minor. The chords fill a grid as close to a square as they allow, row by row. Empty cells in the last row get a seventh chord on the root, then on the fifth, such as `Em7 Bm7`. Seventh chords need Explorer.
 
 - **All** in the panel header opens the full grid: every root note against every chord type. Chords outside the scale show grey. **In key** goes back.
 - **Tap a chord** it plays once, strummed string by string.
