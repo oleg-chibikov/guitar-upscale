@@ -8,3 +8,9 @@ export const setCurrentlyRecordingLooperChannel = (
 };
 
 export const checkLooperPlaying = () => currentlyPlayingLooperChannels.size > 0;
+
+// the song the loops went to last time. Saving again updates it, a clear starts over
+export let looperSong: { id: string; name: string } | undefined;
+export const setLooperSong = (song: typeof looperSong) => {
+  looperSong = song;
+};

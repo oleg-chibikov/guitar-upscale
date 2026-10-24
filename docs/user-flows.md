@@ -145,7 +145,8 @@ stateDiagram-v2
 2. Press record on channel 2 and play a melody over the loop. Press stop.
 3. Add channels with the plus button, up to 8.
 4. Pause and play channels to arrange the parts.
-5. Press save to download each channel mixed into one `.mid` file.
+5. Press save to put the loops in the song list as a song. Press it again later to update that song. Hold it for a `.mid` file.
+6. The saved song loads. Hold Record and pick "A new track in this song" to play a solo over it.
 
 A change to scale, tuning or capo clears the looper. Save first.
 

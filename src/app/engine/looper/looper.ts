@@ -18,6 +18,7 @@ import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
   setCurrentlyRecordingLooperChannel,
+  setLooperSong,
 } from "./looperShared";
 
 export const LOOPER_CHANNEL_INITIAL_COUNT = 2;
@@ -37,6 +38,7 @@ export const looperState: LooperState = [];
 
 export const clearLooperState = () => {
   looperState.forEach(initializeChannel);
+  setLooperSong(undefined);
   stopMetronomeIfNeeded(store.dispatch);
 };
 

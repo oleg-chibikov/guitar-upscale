@@ -344,7 +344,7 @@ const enqueueSave = <T>(task: () => Promise<T>): Promise<T> => {
 };
 
 /**
- * A take or a melody drawn from scratch becomes a song in the list, in the current scale
+ * A take, a melody drawn from scratch or the looper becomes a song in the list, in the current scale
  */
 export const addNewSong = (events: EventsByTick, title: string) =>
   enqueueSave(async () => {
@@ -372,6 +372,23 @@ export const addNewSong = (events: EventsByTick, title: string) =>
     (await getExamples()).push(example);
     notify();
     return example;
+  });
+
+/**
+ * Puts new events into one of the person's songs.
+ * @returns the saved song, or undefined when it's gone from the list
+ */
+export const replaceSongEvents = (id: string, events: EventsByTick) =>
+  enqueueSave(async () => {
+    const example = (await getExamples()).find(
+      (song) => song.id === id && song.isUserSong,
+    );
+    if (!example) {
+      return undefined;
+    }
+    exampleByEvents.set(events, example);
+    await saveEdits(events);
+    return exampleByEvents.get(events);
   });
 
 export const renameUserSong = (example: Example, name: string) =>
