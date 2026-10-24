@@ -6,16 +6,7 @@ export const midiToOctaveNote = (midi: number): OctaveNote => ({
   note: (midi % NOTE_COUNT) as Note,
 });
 
-export const parseBandAndTitle = (fileName: string) => {
-  const name = fileName.replace(/\.[^.]+$/, "");
-  const separator = name.indexOf(" - ");
-  return separator === -1
-    ? { band: "", title: name }
-    : {
-        band: name.slice(0, separator).trim(),
-        title: name.slice(separator + 3).trim(),
-      };
-};
+export { parseBandAndTitle } from "./songFileName";
 
 // Accepts "Em", "Bb7", "F#dim", "C/G" and writes the root with a sharp. Returns undefined for lyrics and other text
 export const normalizeChordName = (text: string): string | undefined => {

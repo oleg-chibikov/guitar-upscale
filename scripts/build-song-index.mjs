@@ -5,6 +5,7 @@ import * as alphaTab from "@coderline/alphatab";
 import fs from "fs";
 import path from "path";
 import { scalesMap } from "../src/app/data/scaleDefinitions.ts";
+import { parseBandAndTitle } from "../src/app/engine/songs/songFileName.ts";
 import {
   pickSongScale,
   toNoteMask,
@@ -14,17 +15,6 @@ const SONGS_DIR = "public/songs";
 const SONG_FILE = /\.(gp|gp3|gp4|gp5|gpx)$/i;
 // The songs are moved to an E tonic, and every scale counts from E
 const E = 4;
-
-const parseFileName = (fileName) => {
-  const name = fileName.replace(/\.[^.]+$/, "");
-  const separator = name.indexOf(" - ");
-  return separator === -1
-    ? { band: "", title: name }
-    : {
-        band: name.slice(0, separator).trim(),
-        title: name.slice(separator + 3).trim(),
-      };
-};
 
 // The app plays a tab note from the string and the fret, and any other note from its pitch
 const getPitch = (note, tuning) =>
@@ -57,7 +47,7 @@ const entries = fs
       bytes,
       settings,
     );
-    const fromName = parseFileName(name);
+    const fromName = parseBandAndTitle(name);
     return {
       path: name,
       band: score.artist?.trim() || fromName.band,
