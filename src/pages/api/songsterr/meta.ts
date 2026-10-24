@@ -1,5 +1,6 @@
 import { SongsterrMeta, songsterrMetaUrl } from "@/app/engine/songs/songsterr";
 import { apiHandler } from "@/lib/apiHelper";
+import { fetchSongsterr, invalidSongsterrAnswer } from "@/lib/songsterrProxy";
 import { allowPagesOrigin } from "@/lib/cors";
 import { HttpStatusCode } from "axios";
 import createHttpError from "http-errors";
@@ -15,7 +16,7 @@ const handle = async (
   if (!Number.isInteger(songId) || songId <= 0) {
     throw new createHttpError.BadRequest("songId must be a positive number");
   }
-  const response = await fetch(songsterrMetaUrl(songId));
+  const response = await fetchSongsterr(songsterrMetaUrl(songId));
   if (response.status === HttpStatusCode.NotFound) {
     throw new createHttpError.NotFound(`No song ${songId} on Songsterr`);
   }
@@ -26,8 +27,14 @@ const handle = async (
       { expose: true },
     );
   }
-  const meta = (await response.json()) as SongsterrMeta;
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  const meta = (await response.json()) as SongsterrMeta | null;
+  if (!Array.isArray(meta?.tracks)) {
+    throw invalidSongsterrAnswer();
+  }
+  res.setHeader(
+    "Cache-Control",
+    "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+  );
   res.status(HttpStatusCode.Ok).json({
     songId: meta.songId,
     revisionId: meta.revisionId,

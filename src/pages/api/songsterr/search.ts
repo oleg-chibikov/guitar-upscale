@@ -3,6 +3,7 @@ import {
   songsterrSearchUrl,
 } from "@/app/engine/songs/songsterr";
 import { apiHandler } from "@/lib/apiHelper";
+import { fetchSongsterr, invalidSongsterrAnswer } from "@/lib/songsterrProxy";
 import { allowPagesOrigin } from "@/lib/cors";
 import { HttpStatusCode } from "axios";
 import createHttpError from "http-errors";
@@ -18,7 +19,7 @@ const handle = async (
   if (!pattern) {
     throw new createHttpError.BadRequest("Type a band or a song to search");
   }
-  const response = await fetch(songsterrSearchUrl(pattern));
+  const response = await fetchSongsterr(songsterrSearchUrl(pattern));
   if (!response.ok) {
     throw createHttpError(
       HttpStatusCode.BadGateway,
@@ -26,15 +27,22 @@ const handle = async (
       { expose: true },
     );
   }
-  const songs = (await response.json()) as (SongsterrSearchResult & {
-    hasPlayer?: boolean;
-  })[];
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  const songs: unknown = await response.json();
+  if (!Array.isArray(songs)) {
+    throw invalidSongsterrAnswer();
+  }
+  res.setHeader(
+    "Cache-Control",
+    "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+  );
   res
     .status(HttpStatusCode.Ok)
     .json(
       songs
-        .filter((s) => s.hasPlayer === true)
+        .filter(
+          (s): s is SongsterrSearchResult & { hasPlayer: true } =>
+            s?.hasPlayer === true,
+        )
         .map(({ songId, artist, title }) => ({ songId, artist, title })),
     );
 };
