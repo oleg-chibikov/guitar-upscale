@@ -1,14 +1,19 @@
 import {
   ChordDetectorCallbackData,
-  ChordDetectorCallbackMessage,
   ChordDetectorWorkerMessage,
 } from "@/app/data/chordDetectorWorkerTypes";
 import { ChordModeVariations } from "@/app/data/chordModes";
 import { Chord, Neck, StringOctaveNote } from "@/app/data/notes";
 import { WorkerMessageWrapper } from "@/app/data/workerTypes";
+import { createWorkerRequests } from "@/app/helpers/workerRequests";
 
 const worker = new Worker(
   new URL("./detectorWorker/chordDetectorWorker.ts", import.meta.url),
+);
+
+const request = createWorkerRequests<ChordDetectorCallbackData>(
+  worker,
+  "findMatchesResult",
 );
 
 class ChordDetectorWorkerApi {
@@ -38,28 +43,18 @@ class ChordDetectorWorkerApi {
     worker.postMessage(message);
   }
 
-  findMatches(
+  async findMatches(
     notes: StringOctaveNote[],
     callback: (data: ChordDetectorCallbackData) => void,
   ): Promise<ChordDetectorCallbackData> {
-    return new Promise((resolve) => {
-      const handleMessage = (
-        event: MessageEvent<WorkerMessageWrapper<ChordDetectorCallbackMessage>>,
-      ) => {
-        const { type, payload } = event.data.data;
-        if (type === "findMatchesResult") {
-          callback(payload);
-          resolve(payload);
-          worker.removeEventListener("message", handleMessage);
-        }
-      };
-
-      worker.addEventListener("message", handleMessage);
+    const data = await request((requestId) => {
       const message: WorkerMessageWrapper<ChordDetectorWorkerMessage> = {
-        data: { type: "findMatches", payload: { notes } },
+        data: { type: "findMatches", payload: { requestId, notes } },
       };
       worker.postMessage(message);
     });
+    callback(data);
+    return data;
   }
 
   setNeckAndCapo(neck: Neck, capoValue: number): void {

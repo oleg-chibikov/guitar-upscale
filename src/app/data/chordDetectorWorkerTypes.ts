@@ -20,6 +20,7 @@ export type AddChordsToDetectorLookupRequest = {
 };
 
 export type FindMatchesRequest = {
+  requestId: number;
   notes: StringOctaveNote[];
 };
 
@@ -44,5 +45,6 @@ export type ChordDetectorWorkerMessage =
 
 export type ChordDetectorCallbackMessage = {
   type: "findMatchesResult";
+  requestId: number;
   payload: ChordDetectorCallbackData;
 };

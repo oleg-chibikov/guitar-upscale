@@ -57,10 +57,10 @@ self.onmessage = (
       addChordsToDetectorLookup(payload.chordModeVariations);
       break;
     case "findMatches": {
-      const { notes } = payload;
+      const { notes, requestId } = payload;
       chordDetector.findMatches(notes, (data: ChordDetectorCallbackData) => {
         const message: WorkerMessageWrapper<ChordDetectorCallbackMessage> = {
-          data: { type: "findMatchesResult", payload: data },
+          data: { type: "findMatchesResult", requestId, payload: data },
         };
         self.postMessage(message);
       });
