@@ -9,17 +9,17 @@ export const getAssetsForSkin = (skin?: CombinedSkinType) => {
   switch (skin) {
     case Skin.Guitar1:
     default:
-      return [`/guitar_low.webp`, `/guitar.webp`];
+      return "/guitar.webp";
     case Skin.Guitar2:
-      return [`/guitar2_low.webp`, `/guitar2.webp`];
+      return "/guitar2.webp";
     case Skin.Guitar3:
-      return [`/guitar3_low.webp`, `/guitar3.webp`];
+      return "/guitar3.webp";
     case Skin.Guitar4:
-      return [`/guitar4_low.webp`, `/guitar4.webp`];
+      return "/guitar4.webp";
     case SevenStringSkin.Guitar5:
-      return [`/guitar5_low.webp`, `/guitar5.webp`];
+      return "/guitar5.webp";
     case EightStringSkin.Guitar6:
-      return [`/guitar6_low.webp`, `/guitar6.webp`];
+      return "/guitar6.webp";
   }
 };
 

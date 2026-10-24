@@ -73,6 +73,7 @@ Each song is a Guitar Pro file in [`public/songs`](public/songs), one file per s
 - **Chords** go on a track named `Chords`. Each chord needs its name above the beat (the chord diagram name in Guitar Pro). The app plays it as its own chord with the strum settings. A beat with no name gets a name from its notes.
 - **Melody** tracks play the tab as written. A track named `Melody` plays with the instrument picked in the app, other tracks keep their own instrument.
 - **List** run `pnpm songs:index` after adding, renaming, removing or editing a file. It writes `public/songs/index.json` with each song's scale, so the app does no scale work on load. `pnpm build` runs it too.
+- **JSON** the same script saves each song as JSON in `public/songs-json`. The app loads a built-in song from it, so it skips the alphaTab download. A test fails when a JSON file is out of date.
 
 People add their own songs in the app with the upload button [Composer]. It takes Guitar Pro (`.gp`, `.gp3` to `.gp5`, `.gpx`) and MIDI files. The browser keeps them, and the scale detector picks the scale.
 

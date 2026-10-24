@@ -235,7 +235,7 @@ flowchart LR
 - **Entry** `playMidi` stores the data as the loaded melody, so the piano roll and download button see it.
 - **Pause** the player awaits `waitForPauseToBeReleased`. Previous and next release one step and pause again.
 - **Choice of data** [usePlay.ts](../src/app/hooks/usePlay.ts) picks what Play plays: a song example, the scale, or a replay of the loaded melody.
-- **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `public/songs/index.json` with the songs kept in the browser. The index already names each song's scale. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
+- **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `public/songs/index.json` with the songs kept in the browser. The index already names each song's scale. A built-in song loads from its JSON in `public/songs-json`, which `pnpm songs:index` writes with gpReader. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
 - **Chords** only a track named `Chords` gives chords, so chords stay apart from the melody. [songDecoder.ts](../src/app/engine/decoders/songDecoder.ts) plays them by name and moves the song to the key in the settings.
 - **Edits and downloads** [songExport.ts](../src/app/engine/songs/songExport.ts) turns the loaded events back into a `Song` and [gpWriter.ts](../src/app/engine/songs/gpWriter.ts) writes it as `.gp`. A piano roll edit fires `pianoRollEdits$`, and [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) saves the song it came from.
 
@@ -384,7 +384,7 @@ flowchart LR
 
 - **Static export** [next.config.mjs](../next.config.mjs) sets `output: "export"` when `STATIC_EXPORT=true`. `NEXT_PUBLIC_BASE_PATH` sets the sub path.
 - **Server build** a plain `next build` keeps the API routes for sign-in.
-- **PWA** [sw.js](../public/sw.js) caches responses network first. [manifest.json](../public/manifest.json) asks for fullscreen landscape.
+- **PWA** [sw.js](../public/sw.js) loads pages network first. Hashed chunks come from the cache first, and songs and skins come from the cache and refresh in the background. [manifest.json](../public/manifest.json) asks for fullscreen landscape.
 - **Tests** Jest covers `EventsByTick`, the Guitar Pro and MIDI song readers, song transposing, the looper player, piano roll edits and geometry, strum timing, chord button and fretboard layout, the trie and Google Play subscription parsing.
 
 ## Where to start a change

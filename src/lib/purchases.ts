@@ -1,4 +1,3 @@
-import { google } from "googleapis";
 import * as billing from "./billing";
 import { PurchaseParams } from "./purchaseParams";
 import { fromSubscriptionPurchaseV2 } from "./subscriptionPurchaseV2";
@@ -9,6 +8,8 @@ import { fromSubscriptionPurchaseV2 } from "./subscriptionPurchaseV2";
 // TODO: Client should be setup once in the init. See nextjs instrumentation thing
 // update - instrumentation worked locally, but didn't work on vercel. I left it as is so far
 const setupClient = async () => {
+  // googleapis takes most of a second to load, so a cold start skips it until a purchase call needs it
+  const { google } = await import("googleapis");
   const jwtClient = new google.auth.JWT({
     email: process.env.GOOGLE_CLIENT_EMAIL,
     key: process.env.GOOGLE_PRIVATE_KEY!.split(String.raw`\n`).join("\n"),

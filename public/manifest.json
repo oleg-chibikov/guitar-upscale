@@ -3,11 +3,6 @@
   "name": "Guitar Upscale - A guitar simulator",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "48x48 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
       "src": "icon192.png",
       "type": "image/png",
       "sizes": "192x192"
