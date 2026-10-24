@@ -1,4 +1,6 @@
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
+import { TimeSignature } from "@/app/data/clockConstants";
+import { setRecordQuantize } from "@/app/engine/recordQuantize";
 import { createSlice, PayloadAction, UnknownAction } from "@reduxjs/toolkit";
 import { Dispatch } from "react";
 import { Instrument, InstrumentGroup } from "../data/instruments";
@@ -115,6 +117,10 @@ interface SettingsState
   showReplayTrigger: boolean;
   saveMidiImmediately: boolean;
   recordTarget: RecordTarget;
+  // the note length the piano roll Q button, the recording and the looper snap to
+  quantize: TimeSignature;
+  // the recording and the looper quantize notes as they come in
+  autoQuantize: boolean;
   nowPlaying?: string; // the name of the song that plays
 }
 
@@ -158,6 +164,8 @@ const initialState: SettingsState = {
   showReplayTrigger: false,
   saveMidiImmediately: true,
   recordTarget: RecordTarget.NewSong,
+  quantize: TimeSignature.SIXTEENTH,
+  autoQuantize: false,
 };
 
 // A values that changes immediately without the need for rerender
@@ -397,6 +405,10 @@ export const settingsSlice = createSlice({
       chordsAreLoadingValue = state.chordsAreLoading;
       slashChordBassNoteValue = state.slashChordBassNote;
       saveMidiImmediatelyValue = state.saveMidiImmediately;
+      // a state saved before quantize came in lacks these
+      state.quantize ??= initialState.quantize;
+      state.autoQuantize ??= initialState.autoQuantize;
+      setRecordQuantize(state.quantize, state.autoQuantize);
       // redux persist may have stored the name of a song that played before the reload
       state.nowPlaying = undefined;
       onGuitarSettingsUpdate(state);
@@ -608,6 +620,14 @@ export const settingsSlice = createSlice({
     setRecordTarget(state, action: PayloadAction<RecordTarget>) {
       state.recordTarget = action.payload;
     },
+    setQuantize(state, action: PayloadAction<TimeSignature>) {
+      state.quantize = action.payload;
+      setRecordQuantize(state.quantize, state.autoQuantize);
+    },
+    setAutoQuantize(state, action: PayloadAction<boolean>) {
+      state.autoQuantize = action.payload;
+      setRecordQuantize(state.quantize, state.autoQuantize);
+    },
   },
 });
 
@@ -655,6 +675,8 @@ export const {
   setSaveMidiImmediately,
   setNowPlaying,
   setRecordTarget,
+  setQuantize,
+  setAutoQuantize,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

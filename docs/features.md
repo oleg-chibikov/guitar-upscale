@@ -100,6 +100,7 @@ The play panel plays, steps through and saves what is loaded.
 | **Download**       | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
 | **Metronome**      | turns the click on and off                                                                                                          |
 | **Record**         | records MIDI [Composer]. Hold it to pick a new song or a new track. See [MIDI recording](#midi-recording)                           |
+| **Auto quantize**  | puts recorded and looped notes on the quantize grid [Composer]. Hold it to pick the length. See [Quantize](#quantize)               |
 | **Tempo**          | shows the BPM. A press opens a slider. Hidden while the piano roll is open                                                          |
 | **Volume**         | shows the playback volume. A press opens a slider. Hidden while the piano roll is open                                              |
 
@@ -157,6 +158,17 @@ A change to scale, tuning or capo clears the looper. Each loop also shows up in 
 
 Code: [looper/](../src/app/components/looper/), [looper.ts](../src/app/engine/looper/looper.ts), [looperSong.ts](../src/app/engine/looper/looperSong.ts), [looperRecorder.ts](../src/app/engine/looper/looperRecorder.ts), [looperPlayer.ts](../src/app/engine/looper/looperPlayer.ts).
 
+## Quantize
+
+One quantize length, from 1/1 to 1/64, serves the piano roll, the recording and the looper. It works like Cubase: 1/16 at start.
+
+- **Auto quantize** the button next to Record. On, it moves each recorded or looped note to the nearest quantize line as it comes in. The note still sounds when played.
+- **Pick the length** hold the Auto quantize button, or use the `Q` list in the piano roll. Picking from the button turns Auto quantize on.
+- **Loop end** a looped note that lands on the line where the loop ends moves to the loop start.
+- **Piano roll** the Q button and the `Q` key move the selected notes, or every note, onto the quantize grid. The grid for drawing stays separate.
+
+Code: [quantize/](../src/app/components/quantize/), [recordQuantize.ts](../src/app/engine/recordQuantize.ts).
+
 ## Piano roll
 
 The piano roll edits a track note by note. It opens from the control panel.
@@ -167,7 +179,7 @@ The piano roll edits a track note by note. It opens from the control panel.
 - **Track edits** buttons next to the track picker add an empty track, rename the picked track and delete it. Undo brings back the notes of a deleted track. A new name goes into the saved song.
 - **Solo** the headphones button plays only the picked track. With all tracks picked every track plays. `S` turns it on and off. Closing the piano roll lets every track play again.
 - **Note volume** a slider sets the volume (MIDI velocity) of the selected notes. A quieter note shows paler. The volume plays back, goes into MIDI downloads and into Guitar Pro files as dynamics, from ppp to f.
-- **Tools** select, draw and erase. Notes can move, stretch, copy and quantize to the grid.
+- **Tools** select, draw and erase. Notes can move, stretch, copy and quantize. See [Quantize](#quantize).
 - **Transpose** arrow buttons move the selected notes a step or an octave up or down. With nothing selected they move every note of the picked track.
 - **Snap** picks the grid step. "Keep notes in the scale" holds drawn and moved notes on scale notes. A scale with all 12 notes turns the button off.
 - **Chords** a chord shows as one block. A double click or double tap opens a dialog with the chord types on that root.

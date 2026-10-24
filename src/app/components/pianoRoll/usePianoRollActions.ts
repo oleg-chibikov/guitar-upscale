@@ -1,3 +1,4 @@
+import { useQuantize } from "@/app/components/quantize/QuantizeSelector";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { useScaleContext } from "@/app/context/ScaleProvider";
 import { getTicksForTimeSignature } from "@/app/data/clockConstants";
@@ -32,6 +33,7 @@ export const usePianoRollActions = () => {
   const snap = usePianoRollSelector((s) => s.pianoRollSnap);
   const snapToScale = usePianoRollSelector((s) => s.snapToScale);
   const snapTicks = getTicksForTimeSignature(snap);
+  const quantizeTicks = getTicksForTimeSignature(useQuantize());
 
   return useMemo(() => {
     const selected = () =>
@@ -98,7 +100,7 @@ export const usePianoRollActions = () => {
         const ids = selection.size
           ? selection
           : events.map(({ event }) => event.id);
-        apply(quantizeEvents(data, ids, snapTicks));
+        apply(quantizeEvents(data, ids, quantizeTicks));
       },
       nudge: (steps: number) => {
         if (!data || !selection.size) return;
@@ -118,6 +120,7 @@ export const usePianoRollActions = () => {
     setSelection,
     apply,
     snapTicks,
+    quantizeTicks,
     snapToScale,
     scalePattern,
     playhead$,

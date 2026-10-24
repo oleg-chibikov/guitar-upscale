@@ -4,6 +4,7 @@ import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
 import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
+import { AutoQuantizeButton } from "@/app/components/quantize/AutoQuantizeButton";
 import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueDialogControls/VolumeControl";
 import { Panel } from "@/app/components/uiFramework/Panel";
@@ -36,6 +37,7 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
         <DisabledRecordButton />
       )}
+      {premiumComponents.has("midiRecorder") && <AutoQuantizeButton />}
       {/* over the piano roll the bar keeps to the transport buttons */}
       {!pianoRollExpanded && (
         <>

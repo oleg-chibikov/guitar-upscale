@@ -9,6 +9,7 @@ import {
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { midiSaver } from "@/app/engine/midiRecorder/midiSaver";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
+import { quantizeRecordedTick } from "@/app/engine/recordQuantize";
 import Midi from "midi-writer-js";
 import type { NoteEvent } from "midi-writer-js/build/types/midi-events/note-event";
 import { Instrument } from "../../data/instruments";
@@ -179,9 +180,10 @@ export class MidiRecorder implements NoteRecorder {
 
   private getRelativeTick() {
     if (this.getTick) {
-      return this.getTick();
+      return quantizeRecordedTick(this.getTick());
     }
-    const currentTick = globalCurrentTick;
+    // the clock counts from a bar line, so a quantized start keeps the take on the grid
+    const currentTick = quantizeRecordedTick(globalCurrentTick);
     if (this.startTick === undefined) {
       this.startTick = currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit
     }

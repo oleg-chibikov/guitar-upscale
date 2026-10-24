@@ -10,6 +10,7 @@ import {
 } from "@/app/engine/looper/looperPlayer";
 import { currentlyRecordingLooperChannel } from "@/app/engine/looper/looperShared";
 import { NoteRecorder } from "@/app/engine/midiRecorder/noteRecorder";
+import { quantizeRecordedTick } from "@/app/engine/recordQuantize";
 import { Instrument } from "../../data/instruments";
 import { StringOctaveNote } from "../../data/notes";
 import {
@@ -78,6 +79,13 @@ export class LooperRecorder {
       globalCurrentLastBarTick - this.absoluteTickAtTheBeginningOfFirstEventBar,
       currentTick < TICKS_IN_HALF_BAR,
     );
+
+    // a note quantized onto the line where the loop ends is the downbeat of the next pass
+    for (const event of [
+      ...(this.eventsByTick.getEvents(loopLengthTicks) ?? []),
+    ]) {
+      this.eventsByTick.insertEvent(0, event);
+    }
 
     this.looperPlayer = new LooperPlayer({
       eventsByTick: this.eventsByTick,
@@ -167,7 +175,7 @@ export class LooperRecorder {
             "The first event at tick %d is within a half beat from the new bar. Shifting the ticks by 1 bar and setting the first tick to 1",
           relativeTick,
         );
-        return 1; // ticks are 1-based
+        return quantizeRecordedTick(1); // ticks are 1-based
       }
     } else {
       // subsequent event
@@ -181,7 +189,7 @@ export class LooperRecorder {
 
     console.log(LOG_PREFIX + "Recorded event at tick", relativeTick);
 
-    return relativeTick;
+    return quantizeRecordedTick(relativeTick);
   }
 
   private initialize() {

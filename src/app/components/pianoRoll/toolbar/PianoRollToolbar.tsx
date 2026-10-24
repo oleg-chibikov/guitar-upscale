@@ -11,6 +11,10 @@ import {
 } from "@/app/components/pianoRoll/toolbar/shortcutText";
 import { usePianoRollActions } from "@/app/components/pianoRoll/usePianoRollActions";
 import { usePianoRollTransport } from "@/app/components/pianoRoll/usePianoRollTransport";
+import {
+  QuantizeSelector,
+  useQuantize,
+} from "@/app/components/quantize/QuantizeSelector";
 import { IconButtonWrapper } from "@/app/components/uiFramework/IconButton";
 import { SelectWrapper } from "@/app/components/uiFramework/SelectWrapper";
 import { usePianoRoll } from "@/app/context/PianoRollProvider";
@@ -151,6 +155,7 @@ export const PianoRollToolbar: React.FC = () => {
   const copyMode = usePianoRollSelector((s) => s.copyMode);
   const axisLock = usePianoRollSelector((s) => s.axisLock);
   const followPlayback = usePianoRollSelector((s) => s.followPlayback);
+  const quantize = useQuantize();
   const dispatch = useDispatch();
   const mod = modKey();
   const [showMore, setShowMore] = useState(false);
@@ -234,11 +239,6 @@ export const PianoRollToolbar: React.FC = () => {
           <Group>
             <PianoRollSnapSelector />
             <IconButtonWrapper
-              icon={<AlignHorizontalLeft />}
-              tooltip={`Quantize: move ${actions.hasSelection ? "the selected" : "all"} notes onto the grid (Q)`}
-              onPress={actions.quantize}
-            />
-            <IconButtonWrapper
               icon={<LibraryMusic />}
               tooltip={
                 isChromatic
@@ -248,6 +248,14 @@ export const PianoRollToolbar: React.FC = () => {
               onPress={() => dispatch(setSnapToScale(!snapToScale))}
               isActive={snapToScale && !isChromatic}
               disabled={isChromatic}
+            />
+          </Group>
+          <Group>
+            <QuantizeSelector className="h-7" />
+            <IconButtonWrapper
+              icon={<AlignHorizontalLeft />}
+              tooltip={`Quantize: move ${actions.hasSelection ? "the selected" : "all"} notes onto the ${quantize} grid (Q)`}
+              onPress={actions.quantize}
             />
           </Group>
           <Group>
