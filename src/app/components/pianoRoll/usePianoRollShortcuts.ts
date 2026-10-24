@@ -4,7 +4,7 @@ import { usePianoRoll } from "@/app/context/PianoRollProvider";
 import { usePianoRollView } from "@/app/context/PianoRollViewProvider";
 import { ZOOM_STEP } from "@/app/data/pianoRollConstants";
 import { PianoRollTool, setPianoRollTool } from "@/app/store/pianoRollSlice";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { Options, useHotkeys } from "react-hotkeys-hook";
 import { useDispatch } from "react-redux";
 
 // keys typed into a field or an open dropdown belong to that control
@@ -37,7 +37,6 @@ export const usePianoRollShortcuts = () => {
   const { zoomBy, zoomToFit } = usePianoRollView();
   const { togglePlay, seekTo } = usePianoRollTransport();
   const dispatch = useDispatch();
-  // the listener stays put and reads the latest state through the ref
   // the chord dialog on top takes the keyboard
   const paused = chordToChoose !== undefined;
   // T steps through All tracks, then each track, then back to All
@@ -47,116 +46,75 @@ export const usePianoRollShortcuts = () => {
     const index = order.indexOf(activeTrack?.trackNumber);
     setActiveTrack(order[(index + direction + order.length) % order.length]);
   };
-  const latest = useRef({
-    undo,
-    redo,
-    actions,
-    zoomBy,
-    zoomToFit,
-    togglePlay,
-    seekTo,
-    paused,
-    stepTrack,
-    toggleSolo,
-  });
-  useLayoutEffect(() => {
-    latest.current = {
-      undo,
-      redo,
-      actions,
-      zoomBy,
-      zoomToFit,
-      togglePlay,
-      seekTo,
-      paused,
-      stepTrack,
-      toggleSolo,
-    };
-  });
 
-  useEffect(() => {
-    // runs before the main Space handler, which loads a new melody, and tells it to skip.
-    // Escape clears the selection before it gets to close the dialog
-    const handleEarlyKeys = (e: KeyboardEvent) => {
-      if (latest.current.paused || isTyping(e.target)) return;
-      if (e.code === "Space" && !isDropdown(e.target)) {
-        e.preventDefault();
-        void latest.current.togglePlay();
-      } else if (e.key === "Escape" && latest.current.actions.hasSelection) {
-        e.preventDefault();
-        e.stopPropagation();
-        latest.current.actions.deselect();
-      }
-    };
-    document.addEventListener("keydown", handleEarlyKeys, { capture: true });
-    return () =>
-      document.removeEventListener("keydown", handleEarlyKeys, {
-        capture: true,
-      });
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // a focused dropdown already used this key, for example an arrow to open its list
-      if (latest.current.paused || isTyping(e.target) || e.defaultPrevented) {
-        return;
-      }
-      const {
-        undo,
-        redo,
-        actions,
-        zoomBy,
-        zoomToFit,
-        seekTo,
-        stepTrack,
-        toggleSolo,
-      } = latest.current;
-      const mod = e.ctrlKey || e.metaKey;
-      const key = e.key.toLowerCase();
-
-      if (key === "delete" || key === "backspace") {
-        actions.deleteSelection();
-      } else if (mod && key === "z" && !e.shiftKey) {
-        undo();
-      } else if (mod && (key === "y" || (key === "z" && e.shiftKey))) {
-        redo();
-      } else if (mod && key === "a") {
-        actions.selectAll();
-      } else if (mod && key === "c") {
-        actions.copy();
-      } else if (mod && key === "x") {
-        actions.cut();
-      } else if (mod && key === "v") {
-        actions.paste();
-      } else if (mod && key === "d") {
-        actions.duplicate();
-      } else if (key === "arrowup" || key === "arrowdown") {
-        actions.transpose(key === "arrowup" ? 1 : -1, e.shiftKey);
-      } else if (key === "arrowleft" || key === "arrowright") {
-        actions.nudge(key === "arrowright" ? 1 : -1);
-      } else if (!mod && (key === "g" || key === "h")) {
-        // G and H zoom out and in as in Cubase. Shift zooms pitch
-        const factor = key === "h" ? ZOOM_STEP : 1 / ZOOM_STEP;
-        zoomBy(e.shiftKey ? 1 : factor, e.shiftKey ? factor : 1);
-      } else if (!mod && key === "q") {
-        actions.quantize();
-      } else if (key === "home") {
-        seekTo(0);
-      } else if (!mod && key === "f") {
-        zoomToFit();
-      } else if (!mod && !e.altKey && key === "t") {
-        stepTrack(e.shiftKey ? -1 : 1);
-      } else if (!mod && !e.altKey && !e.shiftKey && key === "s") {
-        toggleSolo();
-      } else if (!mod && !e.altKey && toolKeys[key] !== undefined) {
-        dispatch(setPianoRollTool(toolKeys[key]));
-      } else {
-        return;
-      }
+  // runs before the main Space handler, which loads a new melody, and tells it to skip.
+  // Escape clears the selection before it gets to close the dialog
+  const early: Options = {
+    eventListenerOptions: { capture: true },
+    ignoreModifiers: true,
+    ignoreEventWhen: (e) => paused || isTyping(e.target),
+  };
+  useHotkeys(
+    "space",
+    (e) => {
+      if (isDropdown(e.target)) return;
       e.preventDefault();
-    };
+      void togglePlay();
+    },
+    early,
+  );
+  useHotkeys(
+    "escape",
+    (e) => {
+      if (!actions.hasSelection) return;
+      e.preventDefault();
+      e.stopPropagation();
+      actions.deselect();
+    },
+    early,
+  );
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch]);
+  // a focused dropdown already used the key, for example an arrow to open its list
+  const main: Options = {
+    preventDefault: true,
+    ignoreEventWhen: (e) => paused || isTyping(e.target) || e.defaultPrevented,
+  };
+  useHotkeys("delete, backspace", () => actions.deleteSelection(), main);
+  useHotkeys("mod+z", () => undo(), main);
+  useHotkeys("mod+y, mod+shift+z", () => redo(), main);
+  useHotkeys("mod+a", () => actions.selectAll(), main);
+  useHotkeys("mod+c", () => actions.copy(), main);
+  useHotkeys("mod+x", () => actions.cut(), main);
+  useHotkeys("mod+v", () => actions.paste(), main);
+  useHotkeys("mod+d", () => actions.duplicate(), main);
+  useHotkeys(
+    "up, down, shift+up, shift+down",
+    (e, { keys }) =>
+      actions.transpose(keys?.[0] === "arrowup" ? 1 : -1, e.shiftKey),
+    main,
+  );
+  useHotkeys(
+    "left, right",
+    (_, { keys }) => actions.nudge(keys?.[0] === "arrowright" ? 1 : -1),
+    main,
+  );
+  // G and H zoom out and in as in Cubase. Shift zooms pitch
+  useHotkeys(
+    "g, h, shift+g, shift+h",
+    (e, { keys }) => {
+      const factor = keys?.[0] === "h" ? ZOOM_STEP : 1 / ZOOM_STEP;
+      zoomBy(e.shiftKey ? 1 : factor, e.shiftKey ? factor : 1);
+    },
+    main,
+  );
+  useHotkeys("q", () => actions.quantize(), main);
+  useHotkeys("home", () => seekTo(0), main);
+  useHotkeys("f", () => zoomToFit(), main);
+  useHotkeys("t, shift+t", (e) => stepTrack(e.shiftKey ? -1 : 1), main);
+  useHotkeys("s", () => toggleSolo(), main);
+  useHotkeys(
+    "1, 2, 3",
+    (_, { keys }) => dispatch(setPianoRollTool(toolKeys[keys?.[0] ?? ""])),
+    main,
+  );
 };
