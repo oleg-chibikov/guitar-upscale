@@ -6,24 +6,3 @@ export function calculateAverage(arr: number[]): number {
 
   return average;
 }
-
-export function findObjectWithMinValue<T>(
-  arr: { object: T; number: number }[],
-): T {
-  const { object: minObject } = arr.reduce((min, current) => {
-    return current.number < min.number ? current : min;
-  });
-
-  return minObject;
-}
-
-export function arrayToMap<T, TKey>(
-  array: T[],
-  keyFn: (value: T) => TKey,
-): Map<TKey, T> {
-  return array.reduce((map, item) => {
-    const key = keyFn(item);
-    map.set(key, item);
-    return map;
-  }, new Map<TKey, T>());
-}
