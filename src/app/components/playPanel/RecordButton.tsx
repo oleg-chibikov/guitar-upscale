@@ -1,6 +1,6 @@
 "use client";
 import { AlertType } from "@/app/data/alertType";
-import { getNewSongName } from "@/app/data/example";
+import { getExampleName, getNewSongName } from "@/app/data/example";
 import { RecordTarget } from "@/app/data/recordTarget";
 import { playheadTick$ } from "@/app/engine/pianoRoll/playhead";
 import {
@@ -126,12 +126,11 @@ async function stopRecording(dispatch: Dispatch<UnknownAction>, save: boolean) {
     await stopPlayback(dispatch, LOG_PREFIX);
   }
   const { addNewSong } = await import("@/app/engine/songs/songLibrary");
-  const name = getNewSongName("Recording");
-  await addNewSong(take, name);
+  const saved = await addNewSong(take, getNewSongName("Recording"));
   setPianoRollData(take, dispatch);
   dispatch(
     setAndShowAlert({
-      message: `Saved ${name} to the song list`,
+      message: `Saved ${getExampleName(saved)} to the song list`,
       alertType: AlertType.Success,
     }),
   );

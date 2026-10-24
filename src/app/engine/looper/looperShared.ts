@@ -14,3 +14,15 @@ export let looperSong: { id: string; name: string } | undefined;
 export const setLooperSong = (song: typeof looperSong) => {
   looperSong = song;
 };
+
+// a loop recorded since the last save
+export let looperHasUnsavedLoops = false;
+export const setLooperHasUnsavedLoops = (value: boolean) => {
+  looperHasUnsavedLoops = value;
+};
+
+// set once the looper loads. Saves the loops while the old key and tuning still hold
+export let saveLoopsBeforeClear: (() => void) | undefined;
+export const setSaveLoopsBeforeClear = (save: () => void) => {
+  saveLoopsBeforeClear = save;
+};

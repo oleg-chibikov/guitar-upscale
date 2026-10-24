@@ -18,8 +18,10 @@ import {
   currentlyPlayingLooperChannels,
   currentlyRecordingLooperChannel,
   setCurrentlyRecordingLooperChannel,
+  setLooperHasUnsavedLoops,
   setLooperSong,
 } from "./looperShared";
+import { registerLooperAutosave } from "./looperAutosave";
 
 export const LOOPER_CHANNEL_INITIAL_COUNT = 2;
 export const LOOPER_CHANNEL_MIN_COUNT = 1;
@@ -39,6 +41,7 @@ export const looperState: LooperState = [];
 export const clearLooperState = () => {
   looperState.forEach(initializeChannel);
   setLooperSong(undefined);
+  setLooperHasUnsavedLoops(false);
   stopMetronomeIfNeeded(store.dispatch);
 };
 
@@ -79,6 +82,9 @@ export const setRecordingInLooperChannel = (
   } else {
     // stop recording
     stopRecording(looperChannel);
+    if (looperChannel.looperRecorder.hasRecording()) {
+      setLooperHasUnsavedLoops(true);
+    }
     // toggleInterval(false); - no need to stop interval as the next command turns it on to play
     // start playing in the current channel right after recording
     setPlayingInLooperChannel(channel, true);
@@ -191,3 +197,4 @@ const stopRecording = (looperChannel: LooperChannelState) => {
 for (let i = 0; i < LOOPER_CHANNEL_INITIAL_COUNT; i++) {
   looperState.push(createChannelState());
 }
+registerLooperAutosave(looperState);

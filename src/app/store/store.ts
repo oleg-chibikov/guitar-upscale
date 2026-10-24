@@ -5,6 +5,7 @@ import { PersistedState, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./authSlice";
+import { looperGuard } from "./looperGuard";
 import pianoRollReducer from "./pianoRollSlice";
 import settingsReducer from "./settingsSlice";
 import uiReducer from "./uiSlice";
@@ -95,7 +96,7 @@ export const store = configureStore({
   devTools: true,
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }), // The application stores a Set to improve its performance
+    getDefaultMiddleware({ serializableCheck: false }).concat(looperGuard), // The application stores a Set to improve its performance
 });
 
 export const persistor = persistStore(store);

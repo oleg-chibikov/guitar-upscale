@@ -1,7 +1,11 @@
 import { AlertType } from "@/app/data/alertType";
 import { getExampleName, getNewSongName } from "@/app/data/example";
 import { LooperState } from "@/app/engine/looper/looper";
-import { looperSong, setLooperSong } from "@/app/engine/looper/looperShared";
+import {
+  looperSong,
+  setLooperHasUnsavedLoops,
+  setLooperSong,
+} from "@/app/engine/looper/looperShared";
 import { setPianoRollData } from "@/app/engine/pianoRoll/pianoRollState";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import LibraryAdd from "@mui/icons-material/LibraryAdd";
@@ -36,22 +40,17 @@ export const SaveLooperRecordingButton: React.FC<
   const [song, setSong] = useState(looperSong);
 
   const saveSong = async () => {
-    const [{ buildLooperSong }, { addNewSong, replaceSongEvents }] =
+    const [{ buildLooperSong, getRecordedLoops }, songLibrary] =
       await Promise.all([
         import("@/app/engine/looper/looperSong"),
         import("@/app/engine/songs/songLibrary"),
       ]);
-    const events = buildLooperSong(
-      Object.values(state).flatMap(({ looperRecorder }, channel) => {
-        const { items, loopLengthTicks } = looperRecorder;
-        return items?.hasItems === true && loopLengthTicks !== undefined
-          ? [{ channel, loop: { events: items, lengthTicks: loopLengthTicks } }]
-          : [];
-      }),
-    );
+    const { addNewSong, replaceSongEvents } = songLibrary;
+    const events = buildLooperSong(getRecordedLoops(state));
     if (!events.hasItems) {
       return;
     }
+    setLooperHasUnsavedLoops(false);
     const saved =
       (looperSong && (await replaceSongEvents(looperSong.id, events))) ??
       (await addNewSong(events, getNewSongName("Loops")));

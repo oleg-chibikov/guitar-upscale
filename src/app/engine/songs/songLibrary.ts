@@ -280,7 +280,14 @@ export const getExampleForEvents = (events: EventsByTick | undefined) =>
   events ? exampleByEvents.get(events) : undefined;
 
 // An edit to an uploaded song updates it. An edit to a built-in song saves an own copy
-const saveEdits = async (events: EventsByTick) => {
+// the song written with the key and tuning it was made in, for a save after a settings change
+export type SongSnapshot = {
+  song: Song;
+  scaleGroup: string;
+  scale: string;
+};
+
+const saveEdits = async (events: EventsByTick, written?: Song) => {
   const example = exampleByEvents.get(events);
   if (!example) {
     return;
@@ -289,7 +296,9 @@ const saveEdits = async (events: EventsByTick) => {
     await import("@/app/engine/songs/songExport");
   const list = await getExamples();
   const isCopy = !example.isUserSong;
-  const song = eventsToSong(events, example);
+  const song = written
+    ? { ...written, band: example.band, title: example.title }
+    : eventsToSong(events, example);
   const bytes = await songToGuitarPro(song);
   const record: UserSongRecord = {
     id: isCopy ? uuidv4() : example.id.replace(/^user:/, ""),
@@ -346,11 +355,25 @@ const enqueueSave = <T>(task: () => Promise<T>): Promise<T> => {
 /**
  * A take, a melody drawn from scratch or the looper becomes a song in the list, in the current scale
  */
-export const addNewSong = (events: EventsByTick, title: string) =>
+export const addNewSong = (
+  events: EventsByTick,
+  name: string,
+  snapshot?: SongSnapshot,
+) =>
   enqueueSave(async () => {
     const { eventsToSong, getSongFileName, songToGuitarPro } =
       await import("@/app/engine/songs/songExport");
-    const song: Song = { ...eventsToSong(events), band: "", title };
+    // two saves in the same minute get "Loops 24 Oct, 22:38" and "Loops 24 Oct, 22:38 2"
+    const taken = new Set((await getExamples()).map(getExampleName));
+    let title = name;
+    for (let number = 2; taken.has(title); number++) {
+      title = `${name} ${number}`;
+    }
+    const song: Song = {
+      ...(snapshot?.song ?? eventsToSong(events)),
+      band: "",
+      title,
+    };
     const bytes = await songToGuitarPro(song);
     const record: UserSongRecord = {
       id: uuidv4(),
@@ -359,8 +382,8 @@ export const addNewSong = (events: EventsByTick, title: string) =>
       bytes: bytes.slice().buffer,
       band: "",
       title,
-      scaleGroup: scaleGroupValue,
-      scale: scaleValue,
+      scaleGroup: snapshot?.scaleGroup ?? scaleGroupValue,
+      scale: snapshot?.scale ?? scaleValue,
       root: song.root,
       addedAt: Date.now(),
     };
@@ -378,7 +401,11 @@ export const addNewSong = (events: EventsByTick, title: string) =>
  * Puts new events into one of the person's songs.
  * @returns the saved song, or undefined when it's gone from the list
  */
-export const replaceSongEvents = (id: string, events: EventsByTick) =>
+export const replaceSongEvents = (
+  id: string,
+  events: EventsByTick,
+  written?: Song,
+) =>
   enqueueSave(async () => {
     const example = (await getExamples()).find(
       (song) => song.id === id && song.isUserSong,
@@ -387,7 +414,7 @@ export const replaceSongEvents = (id: string, events: EventsByTick) =>
       return undefined;
     }
     exampleByEvents.set(events, example);
-    await saveEdits(events);
+    await saveEdits(events, written);
     return exampleByEvents.get(events);
   });
 

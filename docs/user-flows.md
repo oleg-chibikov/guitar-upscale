@@ -148,7 +148,7 @@ stateDiagram-v2
 5. Press save to put the loops in the song list as a song. Press it again later to update that song. Hold it for a `.mid` file.
 6. The saved song loads. Hold Record and pick "A new track in this song" to play a solo over it.
 
-A change to scale, tuning or capo clears the looper. Save first.
+A change to scale, tuning or capo clears the looper. Unsaved loops go to the song list first.
 
 ## Edit notes in the piano roll
 

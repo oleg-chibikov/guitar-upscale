@@ -149,12 +149,12 @@ Code: [RecordButton.tsx](../src/app/components/playPanel/RecordButton.tsx), [Now
 - **Record** one channel records at a time. Stop, and that channel starts looping straight away.
 - **Loop length** whole bars. A stop in the first half of a bar drops that bar.
 - **Play and pause** each channel has its own button. Channels stay in time with each other.
-- **Save as song** puts the loops in the song list as "Loops" with the date and time, and loads that song. Each channel gets a track, "Loop 1" and on, and its chords get one more. A channel repeats until every loop ends together, up to 32 bars. Past that the song stops at the longest loop.
+- **Save as song** puts the loops in the song list as "Loops" with the date and time, and loads that song. A second song in the same minute gets a number after the time. Each channel gets a track, "Loop 1" and on, and its chords get one more. A channel repeats until every loop ends together, up to 32 bars. Past that the song stops at the longest loop.
 - **Update** after the first save, the same button saves the loops into that song again. A deleted song comes back as a new one.
 - **MIDI** hold the save button to download the channels mixed into one `.mid` file.
 - **Clear** empties the channels. The saved song stays in the list, and the next save makes a new song.
 
-A change to scale, tuning or capo clears the looper. Each loop also shows up in the piano roll as `Loop 1`, `Loop 2` and on.
+A change to scale, tuning or capo clears the looper. Loops recorded since the last save go to the song list first, written in the old key and tuning, and a message names the song. Each loop also shows up in the piano roll as `Loop 1`, `Loop 2` and on.
 
 Code: [looper/](../src/app/components/looper/), [looper.ts](../src/app/engine/looper/looper.ts), [looperSong.ts](../src/app/engine/looper/looperSong.ts), [looperRecorder.ts](../src/app/engine/looper/looperRecorder.ts), [looperPlayer.ts](../src/app/engine/looper/looperPlayer.ts).
 

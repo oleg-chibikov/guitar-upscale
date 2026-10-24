@@ -1,5 +1,6 @@
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { ChordOrNote, EventsByTick } from "@/app/engine/eventsByTick";
+import type { LooperState } from "@/app/engine/looper/looper";
 import { getTrackInfos } from "@/app/engine/pianoRoll/pianoRollTracks";
 
 // longer than this, channels of uneven length stop at the longest loop instead
@@ -97,3 +98,12 @@ export const buildLooperSong = (
   }
   return song;
 };
+
+// after a reload the state comes back as an object, so it goes through Object.values
+export const getRecordedLoops = (state: LooperState) =>
+  Object.values(state).flatMap(({ looperRecorder }, channel) => {
+    const { items, loopLengthTicks } = looperRecorder;
+    return items?.hasItems === true && loopLengthTicks !== undefined
+      ? [{ channel, loop: { events: items, lengthTicks: loopLengthTicks } }]
+      : [];
+  });
