@@ -273,7 +273,7 @@ stateDiagram-v2
   Strumming --> Strumming: other chord pressed
 ```
 
-- **Alignment** a new pattern skips steps so that it lands on the next bar, half bar, beat or half beat.
+- **Alignment** a new pattern skips steps so that it lands on the next bar, half bar, beat or half beat. [strummingTiming.ts](../src/app/engine/strummingTiming.ts) counts the steps.
 - **Release** stops the pattern, or lets it finish when "Wait for pattern to finish" is on.
 - **Switching** with "Chord switching amidst pattern" on, the running pattern takes the new chord.
 
