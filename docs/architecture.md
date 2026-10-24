@@ -236,7 +236,7 @@ flowchart LR
 - **Entry** `playMidi` stores the data as the loaded melody, so the piano roll and download button see it.
 - **Pause** the player awaits `waitForPauseToBeReleased`. Previous and next release one step and pause again.
 - **Choice of data** [usePlay.ts](../src/app/hooks/usePlay.ts) picks what Play plays: a song example, the scale, or a replay of the loaded melody.
-- **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `public/songs/index.json` with the songs kept in the browser. The index already names each song's scale. A built-in song loads from its JSON in `public/songs-json`, which `pnpm songs:index` writes with gpReader. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
+- **Songs** [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) joins the Guitar Pro files listed in `songs/index.json` with the songs kept in the browser. The list already names each song's scale. A built-in song loads from `songs-json/<name>.json`. Route handlers in [src/app/songs/](../src/app/songs/) and [src/app/songs-json/](../src/app/songs-json/) build both from `public/songs` with [songIndex.ts](../src/app/engine/songs/songIndex.ts), and `next build` saves them as files. [gpReader.ts](../src/app/engine/songs/gpReader.ts) and [midiReader.ts](../src/app/engine/songs/midiReader.ts) turn a file into a [`Song`](../src/app/data/song.ts): tab notes, pitch notes and chords per track.
 - **Chords** only a track named `Chords` gives chords, so chords stay apart from the melody. [songDecoder.ts](../src/app/engine/decoders/songDecoder.ts) plays them by name and moves the song to the key in the settings.
 - **Edits and downloads** [songExport.ts](../src/app/engine/songs/songExport.ts) turns the loaded events back into a `Song` and [gpWriter.ts](../src/app/engine/songs/gpWriter.ts) writes it as `.gp`. A piano roll edit fires `pianoRollEdits$`, and [songLibrary.ts](../src/app/engine/songs/songLibrary.ts) saves the song it came from.
 
@@ -390,11 +390,11 @@ flowchart LR
 
 ## Where to start a change
 
-| To change                | Start in                                                                                                                                                 |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| a scale or a scale group | [scales.ts](../src/app/data/scales.ts)                                                                                                                   |
-| a chord type             | [chordModes.ts](../src/app/data/chordModes.ts)                                                                                                           |
-| a built-in strum pattern | [strummingPatterns.ts](../src/app/data/strummingPatterns.ts)                                                                                             |
-| a built-in song          | a `.gp` file in [public/songs/](../public/songs/), then `pnpm songs:index`. It picks the scale with [songScale.ts](../src/app/engine/songs/songScale.ts) |
-| what a tier unlocks      | [premiumFeatures.ts](../src/lib/premiumFeatures.ts) and [PremiumComponentsLoader.tsx](../src/app/components/PremiumComponentsLoader.tsx)                 |
-| a saved setting          | the slice, then bump `VERSION` in [store.ts](../src/app/store/store.ts) if old data breaks                                                               |
+| To change                | Start in                                                                                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a scale or a scale group | [scales.ts](../src/app/data/scales.ts)                                                                                                                                            |
+| a chord type             | [chordModes.ts](../src/app/data/chordModes.ts)                                                                                                                                    |
+| a built-in strum pattern | [strummingPatterns.ts](../src/app/data/strummingPatterns.ts)                                                                                                                      |
+| a built-in song          | a `.gp` file in [public/songs/](../public/songs/). [songIndex.ts](../src/app/engine/songs/songIndex.ts) picks the scale with [songScale.ts](../src/app/engine/songs/songScale.ts) |
+| what a tier unlocks      | [premiumFeatures.ts](../src/lib/premiumFeatures.ts) and [PremiumComponentsLoader.tsx](../src/app/components/PremiumComponentsLoader.tsx)                                          |
+| a saved setting          | the slice, then bump `VERSION` in [store.ts](../src/app/store/store.ts) if old data breaks                                                                                        |

@@ -11,6 +11,7 @@ import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
 import { getTrackInfos } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { scaleDetector } from "@/app/engine/scales/scaleDetector";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import type { SongIndexEntry } from "@/app/engine/songs/songIndex";
 import { SONGS_JSON_DIR, getSongJsonName } from "@/app/engine/songs/songJson";
 import {
   UserSongRecord,
@@ -35,15 +36,6 @@ const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const SONGS_URL = `${BASE_PATH}/songs`;
 const SONGS_JSON_URL = `${BASE_PATH}/${SONGS_JSON_DIR}`;
 
-// One line of public/songs/index.json. pnpm songs:index picks the scale from the song's notes
-type IndexEntry = {
-  path: string;
-  band: string;
-  title: string;
-  scaleGroup: string;
-  scale: string;
-};
-
 export const readSong = async (
   bytes: ArrayBuffer,
   fileName: string,
@@ -58,7 +50,7 @@ export const readSong = async (
 };
 
 const loadBuiltInExamples = async (): Promise<Example[]> => {
-  let entries: IndexEntry[];
+  let entries: SongIndexEntry[];
   try {
     const response = await fetch(`${SONGS_URL}/index.json`);
     entries = await response.json();

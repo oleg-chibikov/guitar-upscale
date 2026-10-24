@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // Downloads a song from Songsterr and saves it as a Guitar Pro file in public/songs.
 // The app builds every scale from E, so the song is moved to an E tonic first.
-import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -242,16 +241,6 @@ const main = async () => {
   });
   writeFileSync(file, bytes);
   console.log(`Saved to ${file}`);
-  if (dir === SONGS_DIR) {
-    execFileSync(
-      process.execPath,
-      [...process.execArgv, resolve(ROOT, "scripts/build-song-index.mjs")],
-      {
-        cwd: ROOT,
-        stdio: "inherit",
-      },
-    );
-  }
 };
 
 main();

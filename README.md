@@ -70,11 +70,11 @@ Each song is a Guitar Pro file in [`public/songs`](public/songs), one file per s
 
 - **Place** `public/songs/<Band> - <Title>.gp`, for example `Santana - Oye Como Va.gp`.
 - **Key** write the song in E. The app moves it to the key picked in the settings.
-- **Scale** `pnpm songs:index` picks it. A scale fits when it holds every note of the song, chords included. The smallest fit wins, and a tie goes to the scale listed first in [`scaleDefinitions.ts`](src/app/data/scaleDefinitions.ts).
+- **Scale** the app picks it from the notes. A scale fits when it holds every note of the song, chords included. The smallest fit wins, and a tie goes to the scale listed first in [`scaleDefinitions.ts`](src/app/data/scaleDefinitions.ts).
 - **Chords** go on a track named `Chords`. Each chord needs its name above the beat (the chord diagram name in Guitar Pro). The app plays it as its own chord with the strum settings. A beat with no name gets a name from its notes.
 - **Melody** tracks play the tab as written. A track named `Melody` plays with the instrument picked in the app, other tracks keep their own instrument.
-- **List** run `pnpm songs:index` after adding, renaming, removing or editing a file. It writes `public/songs/index.json` with each song's scale, so the app does no scale work on load. `pnpm build` runs it too.
-- **JSON** the same script saves each song as JSON in `public/songs-json`. The app loads a built-in song from it, so it skips the alphaTab download. A test fails when a JSON file is out of date.
+- **List** the file is all it takes. [`songs/index.json`](src/app/songs/index.json/route.ts) lists the files in `public/songs` with each song's scale, so the app does no scale work on load. `next dev` builds the list on each request, `next build` saves it as a file.
+- **JSON** [`songs-json/<name>.json`](src/app/songs-json/[name]/route.ts) gives each song as app JSON the same way. The app loads a built-in song from it, so it skips the alphaTab download.
 
 People add their own songs in the app with the upload button [Composer]. It takes Guitar Pro (`.gp`, `.gp3` to `.gp5`, `.gpx`) and MIDI files. The browser keeps them, and the scale detector picks the scale.
 
@@ -92,10 +92,10 @@ In a MIDI file a track named `Chords` plays as chords. A text or marker event li
 2. `pnpm songsterr "wintersun beyond the dark sun" --from 4 --to 16` adds measures 4 to 16.
 
 - **Key** the song moves to an E tonic, since the app builds every scale from E.
-- **Scale** the script picks the scale from `scaleDefinitions.ts` with the fewest notes outside it, or the one from `--scale "Minor/Dorian"`. It moves those notes to the nearest scale note. It prints each change. `index.json` may then list a smaller scale that holds every note.
+- **Scale** the script picks the scale from `scaleDefinitions.ts` with the fewest notes outside it, or the one from `--scale "Minor/Dorian"`. It moves those notes to the nearest scale note. It prints each change. The song list may then show a smaller scale that holds every note.
 - **Tracks** melody, a bass with one note per beat, and a `Chords` track built on the bass.
 - **More tracks** `--extra 2,5` or `--extra all` adds more Songsterr tracks whole, each with its own instrument. A track takes one role only. Drums stay out of every role, since the app plays no drums.
-- **Rerun** replaces the file with the same band and title, and refreshes `index.json`.
+- **Rerun** replaces the file with the same band and title.
 
 The app has the same steps in a dialog: the cloud button next to upload adds the song to your songs in the browser. "Add from Songsterr" in the song list opens it too. The script and the dialog share [songsterr.ts](src/app/engine/songs/songsterr.ts).
 

@@ -1,6 +1,6 @@
 ---
 name: add-song
-description: 'Use when asked to add, import or download a built-in example song, or to grow the song list: "add a song", "add Metallica - One", "import from Songsterr", "more example songs", "добавь песню". Downloads a section from Songsterr with pnpm songsterr, saves it as a Guitar Pro file in public/songs, rebuilds the song index, checks the song in the app and commits it.'
+description: 'Use when asked to add, import or download a built-in example song, or to grow the song list: "add a song", "add Metallica - One", "import from Songsterr", "more example songs", "добавь песню". Downloads a section from Songsterr with pnpm songsterr, saves it as a Guitar Pro file in public/songs, checks the song in the app and commits it.'
 argument-hint: '"<artist> <title>" and optionally a section, e.g. "Chorus"'
 ---
 
@@ -10,11 +10,9 @@ A built-in song is a short part of a real song, moved to E. The app shows it in 
 
 ## What gets written
 
-- **`public/songs/<Band> - <Title>.gp`** the song as a Guitar Pro file.
-- **`public/songs/index.json`** the song list with a scale for each song.
-- **`public/songs-json/<Band> - <Title>.json`** the song as app JSON, so the app loads it without alphaTab.
+`public/songs/<Band> - <Title>.gp`, the song as a Guitar Pro file. Commit it.
 
-The last two come from `pnpm songs:index`. `pnpm songsterr` runs it after a save. Commit all of them.
+The app builds the song list and the song JSON from the files in `public/songs`, so a new file shows up on reload.
 
 ## Steps
 
@@ -28,7 +26,7 @@ The last two come from `pnpm songs:index`. `pnpm songsterr` runs it after a save
    pnpm songsterr "Metallica One" --section "Verse Riff" --dry-run
    ```
 4. Fix what the output shows, then run step 3 again. See [Reading the output](#reading-the-output).
-5. Run the same command without `--dry-run`. It saves the file and rebuilds the index.
+5. Run the same command without `--dry-run`. It saves the file.
 6. Check the song in the app. See [Check in the app](#check-in-the-app).
 7. Run `pnpm exec jest`, then commit with a message like `Add Metallica - One to the built-in songs`.
 
@@ -58,4 +56,4 @@ A narrow scale breaks chords. E Aeolian has no F, so the bII chord of Rammstein 
 ## Replace or remove a song
 
 - **Replace** run `pnpm songsterr` again with the same names. It writes over the file.
-- **Rename or remove** change the file in `public/songs`, then run `pnpm songs:index`.
+- **Rename or remove** change the file in `public/songs`.
