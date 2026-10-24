@@ -233,6 +233,10 @@ export const ChordsView: React.FC<{
               lineHeight: 1.5,
               textTransform: "none",
               fontWeight: 600,
+              // the primary colour is too faint on the header in both themes
+              color: "inherit",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
             }}
             onClick={() => dispatch(setAllChordsShown(!allChordsShown))}
           >
