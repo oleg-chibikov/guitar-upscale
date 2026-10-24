@@ -18,7 +18,7 @@ export const BottomZone: React.FC<
   const chordsDisplayMode = useUiSelector((s) => s.chordsDisplayMode);
   const pianoRollExpanded = useUiSelector((s) => s.pianoRollExpanded);
   const looperExpanded = useUiSelector((s) => s.looperExpanded);
-  const looper = premiumComponents.get("looper") as ReactNode;
+  const looper = premiumComponents.get("looper");
   const hasLooper = looper !== undefined && looper !== null;
   // the buttons sit on the side away from the chords
   const chordsOnLeft = chordsDisplayMode === ChordsDisplayMode.Left;

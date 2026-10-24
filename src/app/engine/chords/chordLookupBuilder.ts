@@ -8,7 +8,7 @@ export const setChordDetectorFunctions = (
   addChordsToDetectorLookup = addChord;
 };
 
-export let clearChordDetector: () => void | undefined;
+export let clearChordDetector: (() => void) | undefined;
 
 export let addChordsToDetectorLookup:
   ((chordModeVariations: ChordModeVariations) => void) | undefined;

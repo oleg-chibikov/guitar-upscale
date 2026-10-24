@@ -1,12 +1,5 @@
 import { debugLog } from "@/app/helpers/debugLog";
-import {
-  TICKS_IN_BAR,
-  TICKS_IN_BEAT,
-  TICKS_IN_HALF_BAR,
-  TICKS_IN_HALF_BEAT,
-  TimeSignature,
-  getTicksForTimeSignature,
-} from "@/app/data/clockConstants";
+import { TimeSignature } from "@/app/data/clockConstants";
 import {
   AUTH_PANEL_ID,
   CHORDS_VIEW_ID,
@@ -17,7 +10,6 @@ import {
   STRUMMING_SETTINGS_PANEL_ID,
 } from "@/app/data/elementIds";
 
-import { StrummingPattern } from "@/app/data/strummingPatterns";
 import { getPatternById } from "@/app/engine/strummingPatternsStorage";
 import { MutableRefObject, useRef } from "react";
 import {
@@ -32,6 +24,7 @@ import {
   waitForNextThirtySecond,
 } from "../engine/clock/mainClock";
 import { ChordEventBus } from "../engine/eventBus";
+import { getIntervalsToSkip } from "../engine/strummingTiming";
 import {
   STRUMMING_LOG_PREFIX,
   areOtherChordsStrumming,
@@ -94,76 +87,6 @@ const play = (
 };
 
 const GRACE_INTERVALS = 2;
-
-enum PromiseType {
-  PressReleased = 1,
-  WaitTimeOver = 2,
-}
-
-const getIntervalsToSkip = (patternObject: StrummingPattern) => {
-  // Get the tick number since the last bar
-  const ticksSinceLastBar = currentTick;
-
-  // Get the number of ticks in one interval of the pattern
-  const ticksInInterval = getTicksForTimeSignature(patternObject.timeSignature);
-
-  // Calculate the total ticks in the pattern
-  const totalTicksInPattern = ticksInInterval * patternObject.strums.length;
-
-  let targetTicks, nextEventName;
-
-  if (totalTicksInPattern >= TICKS_IN_BAR) {
-    // Pattern is at least one bar long, wait for next bar
-    targetTicks = TICKS_IN_BAR;
-    nextEventName = "bar";
-  } else if (totalTicksInPattern >= TICKS_IN_HALF_BAR) {
-    // Pattern is at least half bar long, wait for next half bar
-    targetTicks = TICKS_IN_HALF_BAR;
-    nextEventName = "half bar";
-  } else if (totalTicksInPattern >= TICKS_IN_BEAT) {
-    // Pattern is at least one beat long, wait for next beat
-    targetTicks = TICKS_IN_BEAT;
-    nextEventName = "beat";
-  } else {
-    // Pattern is shorter than one beat, wait for next half beat
-    targetTicks = TICKS_IN_HALF_BEAT;
-    nextEventName = "half beat";
-  }
-
-  // Calculate the tick of the next event
-  const nextEventTick =
-    Math.ceil(ticksSinceLastBar / targetTicks) * targetTicks;
-
-  // Calculate how many ticks remain until the next target event
-  const ticksRemainingToNextEvent = nextEventTick - ticksSinceLastBar;
-
-  // Calculate how many full intervals remain until the next target event
-  const intervalsRemainingToNextEvent = Math.floor(
-    ticksRemainingToNextEvent / ticksInInterval,
-  );
-
-  // Calculate how many strums to skip
-  const totalStrumsInPattern = patternObject.strums.length;
-  const strumsToSkip = totalStrumsInPattern - intervalsRemainingToNextEvent;
-
-  debugLog(
-    STRUMMING_LOG_PREFIX +
-      "Ticks in interval %s: %d, Ticks since last bar: %d, next %s starts at %d tick, ticks remaining to next %s: %d, intervals remaining: %d, intervals to skip: %d",
-    patternObject.timeSignature,
-    ticksInInterval,
-    ticksSinceLastBar,
-    nextEventName,
-    nextEventTick,
-    nextEventName,
-    ticksRemainingToNextEvent,
-    intervalsRemainingToNextEvent,
-    strumsToSkip,
-  );
-
-  // Ensure we don't return a negative number
-  // One interval should be skipped for sure as we played the chord immediately
-  return Math.max(1, strumsToSkip);
-};
 
 const getWaitBetweenFunc = (timeSignature: TimeSignature) => {
   switch (timeSignature) {
@@ -448,7 +371,7 @@ export const useStrumming = (
             isAnyTimerSpecificActivityRunning() &&
             !isOtherChordStrumming
           ) {
-            skipIntervals = getIntervalsToSkip(patternObject);
+            skipIntervals = getIntervalsToSkip(patternObject, currentTick);
             debugLog(
               STRUMMING_LOG_PREFIX +
                 "WAITING - Metronome/play/recording active but no strumming - waiting for the next interval to strum (skipping %d intervals)",
@@ -484,22 +407,17 @@ export const useStrumming = (
         intervalsToSkip = skipIntervals;
       }
 
-      const currentClickPromise = getChordClickedPromise(chordName)?.then(
-        () => PromiseType.WaitTimeOver,
-      );
+      const currentClickPromise = getChordClickedPromise(chordName);
       // either wait for the current strumming to become pending finishing or if nothing is strumming - then for the next interval (or bar if clock is active)
-      const waitForAny = [initialWait().then(() => PromiseType.WaitTimeOver)];
+      const waitForAny: Promise<unknown>[] = [initialWait()];
       // click might get released before the actual wait time - in this case we need to release the wait and stop processing this event
       if (currentClickPromise) {
         waitForAny.push(currentClickPromise);
       }
 
-      const promiseType = await Promise.any(waitForAny);
+      await Promise.any(waitForAny);
 
-      if (
-        promiseType === PromiseType.PressReleased ||
-        !isChordClicked(chordName)
-      ) {
+      if (!isChordClicked(chordName)) {
         debugLog(
           STRUMMING_LOG_PREFIX +
             "Already released mouse/touch after wait. Don't start strumming",

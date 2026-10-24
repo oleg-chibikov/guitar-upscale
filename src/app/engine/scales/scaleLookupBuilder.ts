@@ -92,7 +92,7 @@ export const setScaleDetectorFunctions = (
   rebuildScaleDetectorLookup(); // we need to re-scan all the scales after setting the function
 };
 
-export let clearScaleDetector: () => void | undefined;
+export let clearScaleDetector: (() => void) | undefined;
 
 export let addScaleToDetectorLookup:
   ((scale: Scale, scaleData: ScaleAndGroup) => void) | undefined;

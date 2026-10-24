@@ -6,7 +6,7 @@ import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import dynamic from "next/dynamic";
-import React, { ReactNode } from "react";
+import React from "react";
 import { AboutButton } from "./buttons/AboutButton";
 import { FullscreenButton } from "./buttons/FullscreenButton";
 import { OpenSettingsButton } from "./buttons/OpenSettingsButton";
@@ -44,12 +44,8 @@ export const ButtonContainer: React.FC<WithPremiumComponents & WithStyle> = ({
       <PianoRollButton />
       <OpenStrummingSettingsButton />
       <StrummingPatternButton />
-      {(premiumComponents.get("chordDetection") as ReactNode) ?? (
-        <DisabledDetectChordButton />
-      )}
-      {(premiumComponents.get("midiUpload") as ReactNode) ?? (
-        <DisabledSongUploadButton />
-      )}
+      {premiumComponents.get("chordDetection") ?? <DisabledDetectChordButton />}
+      {premiumComponents.get("midiUpload") ?? <DisabledSongUploadButton />}
       {!isMobileDeviceValue && <FullscreenButton />}
       <ReloadButton />
       <AboutButton />

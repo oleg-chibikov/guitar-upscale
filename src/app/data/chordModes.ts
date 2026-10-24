@@ -51,8 +51,6 @@ export const setAdvancedChordModes = (data: ChordMode[]) => {
   chordModeOrder = buildModeOrder();
 };
 
-export const isAdvancedMode = (mode: ChordMode) => mode.extensions.length > 0;
-
 export const getModeText = (mode: ChordMode): string => mode.name;
 
 const buildModeOrder = (): string[] =>

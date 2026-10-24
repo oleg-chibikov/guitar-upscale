@@ -211,7 +211,6 @@ export let toggleMetronomeWhenRecordingValue: boolean =
 export let wipeExampleCacheTriggerValue: boolean = false;
 export let isLastEventValue: boolean = initialState.isLastEvent;
 export let isFirstEventValue: boolean = initialState.isFirstEvent;
-export let chordsAreLoadingValue: boolean = initialState.chordsAreLoading;
 export let slashChordBassNoteValue: Note | undefined =
   initialState.slashChordBassNote;
 export let saveMidiImmediatelyValue: boolean = initialState.saveMidiImmediately;
@@ -402,7 +401,6 @@ export const settingsSlice = createSlice({
       toggleMetronomeWhenRecordingValue = state.toggleMetronomeWhenRecording;
       neckValue = state.neck;
       stringCountValue = state.stringCount;
-      chordsAreLoadingValue = state.chordsAreLoading;
       slashChordBassNoteValue = state.slashChordBassNote;
       saveMidiImmediatelyValue = state.saveMidiImmediately;
       // a state saved before quantize came in lacks these
@@ -591,7 +589,6 @@ export const settingsSlice = createSlice({
     },
     setChordsAreLoading(state, action: PayloadAction<boolean>) {
       state.chordsAreLoading = action.payload;
-      chordsAreLoadingValue = action.payload;
     },
     setSlashChordBassNote(state, action: PayloadAction<Note | undefined>) {
       const value =

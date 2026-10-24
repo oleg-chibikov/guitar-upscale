@@ -1,5 +1,4 @@
 export const NOTE_COUNT: number = 12;
-export const SHARP_NOTE_COUNT = 5;
 
 export enum Note {
   C = 0,

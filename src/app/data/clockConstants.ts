@@ -1,7 +1,6 @@
 export const BEATS_IN_BAR = 4;
 export const TICKS_IN_HALF_BEAT = 8; // main setting affecting granularity (how many ticks in beat/bar etc) // 8 means 64 ticks in a bar
 export const TICKS_IN_BEAT = TICKS_IN_HALF_BEAT * 2;
-export const HALF_BEATS_IN_BAR = BEATS_IN_BAR * 2;
 export const TICKS_IN_BAR = BEATS_IN_BAR * TICKS_IN_BEAT;
 export const TICKS_IN_HALF_BAR = TICKS_IN_BAR / 2;
 export const TICKS_IN_SIXTEENTH = TICKS_IN_BAR / 16;

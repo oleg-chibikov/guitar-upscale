@@ -15,7 +15,7 @@ import { useSettingsSelector, useUiSelector } from "@/app/hooks/storeHooks";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { Button, Popover, Typography } from "@mui/material";
 import dynamic from "next/dynamic";
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 
 const DisabledDetectScaleButton = dynamic(
   async () =>
@@ -138,7 +138,7 @@ export const KeyChip: React.FC<WithPremiumComponents> = ({
             <CapoSelector />
           </ControlWithLabel>
           <div className="col-span-2 flex flex-row items-center gap-2 pt-1">
-            {(premiumComponents.get("scaleDetection") as ReactNode) ?? (
+            {premiumComponents.get("scaleDetection") ?? (
               <DisabledDetectScaleButton />
             )}
             <Typography variant="body2">
