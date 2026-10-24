@@ -34,8 +34,9 @@ const TEXT_SUBTYPES = new Set(["text", "marker", "lyrics", "cuePoint"]);
 
 export const readMidiSong = (bytes: Uint8Array, fileName: string): Song => {
   const midi = read(bytes);
+  // the player looks notes up by whole ticks
   const toAppTicks = (midiTicks: number) =>
-    (midiTicks / midi.header.ticksPerBeat) * TICKS_IN_BEAT;
+    Math.round((midiTicks / midi.header.ticksPerBeat) * TICKS_IN_BEAT);
   let tempo: number | undefined;
   const chordNames: ChordName[] = [];
   const parts: Part[] = [];
@@ -91,7 +92,7 @@ export const readMidiSong = (bytes: Uint8Array, fileName: string): Song => {
         part.events.push({
           tick: start.tick,
           octaveNote: midiToOctaveNote(event.noteNumber),
-          duration: tick - start.tick,
+          duration: Math.max(1, tick - start.tick),
           velocity: start.velocity,
         });
       }

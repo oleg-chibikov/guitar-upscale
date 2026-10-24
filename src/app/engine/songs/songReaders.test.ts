@@ -119,6 +119,24 @@ describe("readMidiSong", () => {
   });
 });
 
+describe("readMidiSong timing", () => {
+  it("snaps notes to whole ticks and keeps them at least 1 tick long", () => {
+    // 480 MIDI ticks per beat is 30 per app tick
+    const track: AnyEvent[] = [
+      { type: "meta", subtype: "trackName", deltaTime: 0, text: "Lead" },
+      note(100, 64, true, 0),
+      note(5, 64, false, 0),
+      note(300, 67, true, 0),
+      note(20, 67, false, 0),
+    ];
+    const song = readMidiSong(write([track], 480), "Song.mid");
+    const notes = song.tracks[0].pitchNotes;
+    expect(notes.map((n) => n.tick)).toEqual([3, 14]);
+    expect(notes.map((n) => n.duration)).toEqual([1, 1]);
+    notes.forEach((n) => expect(Number.isInteger(n.tick)).toBe(true));
+  });
+});
+
 describe("normalizeChordName", () => {
   it.each([
     ["Em", "Em"],
