@@ -88,8 +88,9 @@ const getTierFromPatreonApi = async (accessToken: string) => {
 
     return tierName;
   } catch (error) {
+    // an expired token or a Patreon outage must not break the page
     console.error("Error fetching tier names:", error);
-    throw error;
+    return undefined;
   }
 };
 
