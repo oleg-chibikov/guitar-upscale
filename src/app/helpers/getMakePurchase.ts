@@ -78,6 +78,14 @@ export const getMakePurchase = (
           existingNotCancelledPurchaseOption,
         );
         actionString = "change";
+        if (result.status === ApiCallResult.SkipProcessing) {
+          // the old plan is cancelled already, so the new one only needs acknowledging
+          result = await acknowledgePurchaseOnBackend(
+            purchaseParams,
+            existingNotCancelledPurchaseOption,
+          );
+          actionString = "acknowledge";
+        }
       } else {
         result = await acknowledgePurchaseOnBackend(
           purchaseParams,
@@ -126,6 +134,11 @@ export const getMakePurchase = (
           READ_MESSAGE_WAIT_TIME,
         );
       } else if (result.status === ApiCallResult.SkipProcessing) {
+        await completeFailedResonse(
+          paymentResponse,
+          dispatch,
+          purchaseOption.tier,
+        );
         const message = `Subscription is already cancelled. Cannot ${actionString} it`;
         console.log(message);
         dispatch(
