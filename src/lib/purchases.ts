@@ -5,9 +5,7 @@ import { fromSubscriptionPurchaseV2 } from "./subscriptionPurchaseV2";
 //https://developers.google.com/android-publisher/api-ref/rest
 //https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest
 
-// TODO: Client should be setup once in the init. See nextjs instrumentation thing
-// update - instrumentation worked locally, but didn't work on vercel. I left it as is so far
-const setupClient = async () => {
+const createClient = async () => {
   // googleapis takes most of a second to load, so a cold start skips it until a purchase call needs it
   const { google } = await import("googleapis");
   const jwtClient = new google.auth.JWT({
@@ -17,12 +15,21 @@ const setupClient = async () => {
   });
 
   // Connect to the Google Play Developer API with JWT Client
-  const playApi = google.androidpublisher({
+  return google.androidpublisher({
     version: "v3",
     auth: jwtClient,
   });
+};
 
-  return playApi;
+// Built on first use and kept while the server instance lives.
+let playApiPromise: ReturnType<typeof createClient> | undefined;
+
+const setupClient = () => {
+  playApiPromise ??= createClient().catch((error) => {
+    playApiPromise = undefined;
+    throw error;
+  });
+  return playApiPromise;
 };
 
 /**
