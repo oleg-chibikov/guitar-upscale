@@ -13,9 +13,10 @@ import {
 } from "@/app/helpers/canvas/palette";
 import { Note } from "@/app/data/notes";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import Konva from "konva";
+import type Konva from "konva";
+import { Animation as KonvaAnimation } from "konva/lib/Animation";
 import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
-import { Layer, Shape, Stage } from "react-konva";
+import { Layer, Shape, Stage } from "react-konva/lib/ReactKonvaCore";
 import { ChordCellState, ChordGridStore, PULSE_MS } from "./chordGridStore";
 import { ChordGridCell } from "./chordGridLayout";
 import { useChordGridTouch } from "./useChordGridTouch";
@@ -304,7 +305,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
     if (!layer) {
       return;
     }
-    const animation = new Konva.Animation(() => {
+    const animation = new KonvaAnimation(() => {
       if (!store.isAnimating(performance.now())) {
         animation.stop();
       }

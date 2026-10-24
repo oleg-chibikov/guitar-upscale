@@ -1,4 +1,4 @@
-import Konva from "konva";
+import type Konva from "konva";
 import { RefObject, useLayoutEffect } from "react";
 
 // canvases past this size fail on mobile Safari

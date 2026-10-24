@@ -38,7 +38,10 @@ import {
   chordStrummingDelayMsValue,
   tuningValue,
 } from "@/app/store/settingsSlice";
-import Konva from "konva";
+import type Konva from "konva";
+import { Animation as KonvaAnimation } from "konva/lib/Animation";
+// react-konva core registers only the core nodes. The fretboard image needs this one too
+import "konva/lib/shapes/Image";
 import React, {
   useCallback,
   useEffect,
@@ -47,7 +50,13 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Group, Image as KonvaImage, Layer, Shape, Stage } from "react-konva";
+import {
+  Group,
+  Image as KonvaImage,
+  Layer,
+  Shape,
+  Stage,
+} from "react-konva/lib/ReactKonvaCore";
 import {
   FRET_LINE_HEIGHT,
   FRET_LINE_WIDTH,
@@ -459,7 +468,7 @@ export const Fretboard: React.FC = () => {
     if (!layer) {
       return;
     }
-    const animation = new Konva.Animation(() => {
+    const animation = new KonvaAnimation(() => {
       if (!store.isAnimating(performance.now())) {
         animation.stop();
       }
