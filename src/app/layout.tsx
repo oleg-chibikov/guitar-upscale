@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { preload } from "react-dom";
 import "./globals.css";
 import { WithChildren } from "./helpers/withChildren";
 
@@ -15,6 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<WithChildren>) {
+  preload(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/skins/guitar.webp`, {
+    as: "image",
+    type: "image/webp",
+  });
   return (
     <html lang="en">
       <head>

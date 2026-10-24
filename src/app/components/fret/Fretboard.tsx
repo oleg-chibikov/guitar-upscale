@@ -64,8 +64,7 @@ import {
 } from "./fretMarkerStore";
 import { useFretboardPinchZoom } from "./useFretboardPinchZoom";
 
-const ASSETS_URL =
-  "https://raw.githubusercontent.com/oleg-chibikov/guitar-upscale-assets/main/";
+const ASSETS_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/skins`;
 // the photo is scaled down to match the fret positions
 const IMAGE_SCALE = 0.662;
 const IMAGE_WIDTH = 5504;
@@ -377,7 +376,7 @@ export const Fretboard: React.FC = () => {
   const boardLayerRef = useRef<Konva.Layer>(null);
   const markersLayerRef = useRef<Konva.Layer>(null);
   const store = useMemo(() => new FretMarkerStore(), []);
-  const image = useImage(ASSETS_URL + getAssetsForSkin(skin)[1]);
+  const image = useImage(ASSETS_URL + getAssetsForSkin(skin));
 
   const stringCount = neck?.length ?? 0;
   const layout = useMemo(() => {
