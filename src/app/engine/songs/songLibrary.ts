@@ -10,6 +10,7 @@ import { pianoRollEdits$ } from "@/app/engine/pianoRoll/editHistory";
 import { getTrackInfos } from "@/app/engine/pianoRoll/pianoRollTracks";
 import { scaleDetector } from "@/app/engine/scales/scaleDetector";
 import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
+import { SONGS_JSON_DIR, getSongJsonName } from "@/app/engine/songs/songJson";
 import {
   UserSongRecord,
   deleteUserSong,
@@ -23,7 +24,9 @@ import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Subject, debounceTime } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
-const SONGS_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/songs`;
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const SONGS_URL = `${BASE_PATH}/songs`;
+const SONGS_JSON_URL = `${BASE_PATH}/${SONGS_JSON_DIR}`;
 
 // One line of public/songs/index.json. pnpm songs:index picks the scale from the song's notes
 type IndexEntry = {
@@ -63,6 +66,7 @@ const loadBuiltInExamples = async (): Promise<Example[]> => {
       return [];
     }
     const url = `${SONGS_URL}/${encodeURIComponent(entry.path)}`;
+    const jsonUrl = `${SONGS_JSON_URL}/${encodeURIComponent(getSongJsonName(entry.path))}`;
     return [
       {
         id: `builtin:${entry.path}`,
@@ -72,6 +76,11 @@ const loadBuiltInExamples = async (): Promise<Example[]> => {
         scale: entry.scale,
         isUserSong: false,
         load: async () => {
+          // The JSON skips the alphaTab download. The .gp file is the fallback
+          const jsonResponse = await fetch(jsonUrl).catch(() => undefined);
+          if (jsonResponse?.ok === true) {
+            return (await jsonResponse.json()) as Song;
+          }
           const response = await fetch(url);
           return readSong(await response.arrayBuffer(), entry.path, "gp");
         },
