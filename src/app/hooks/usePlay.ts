@@ -5,6 +5,7 @@ import {
   pianoRollData,
   setPianoRollData,
 } from "@/app/engine/pianoRoll/pianoRollState";
+import { togglePause } from "@/app/helpers/togglePause";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 import ReactGA from "react-ga4";
@@ -164,7 +165,12 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     const handleKeyPress = async (event: KeyboardEvent) => {
       // the piano roll takes Space for its own playback and marks it handled
       if (event.code === "Space" && !event.defaultPrevented) {
-        // Call your function here
+        // during playback Space pauses, as the pause button does
+        if (isPlayingValue && !checkLooperPlaying()) {
+          event.preventDefault();
+          togglePause(dispatch);
+          return;
+        }
         await handlePlay();
       }
     };
@@ -176,7 +182,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [handlePlay]); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+  }, [handlePlay, dispatch]);
 
   return {
     isWaiting,

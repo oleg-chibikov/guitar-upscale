@@ -1,9 +1,5 @@
+import { togglePause } from "@/app/helpers/togglePause";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
-import {
-  isMetronomeActiveValue,
-  setIsMetronomeActive,
-  setIsPaused,
-} from "@/app/store/settingsSlice";
 import Pause from "@mui/icons-material/Pause";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import React from "react";
@@ -22,14 +18,9 @@ export const PauseButton: React.FC = () => {
     <IconButtonWrapper
       disabled={!isPlaying}
       isActive={false}
-      tooltip={isPaused ? "Continue playing" : "Pause playback"}
+      tooltip={isPaused ? "Continue playing (Space)" : "Pause playback (Space)"}
       icon={isPaused ? <PlayArrow /> : <Pause />}
-      onPress={() => {
-        dispatch(setIsPaused(!isPaused));
-        if (!isPaused && isMetronomeActiveValue) {
-          dispatch(setIsMetronomeActive(false));
-        }
-      }}
+      onPress={() => togglePause(dispatch)}
     />
   );
 };
