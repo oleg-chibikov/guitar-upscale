@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import {
   TICKS_IN_BAR,
   TICKS_IN_HALF_BAR,
@@ -157,7 +158,7 @@ export class LooperRecorder {
   private setStartTickAndGetCurrentTick() {
     let firstEvent = false;
     if (this.absoluteTickAtTheBeginningOfFirstEventBar === undefined) {
-      console.log(LOG_PREFIX + "Absolute start tick", globalCurrentLastBarTick);
+      debugLog(LOG_PREFIX + "Absolute start tick", globalCurrentLastBarTick);
       this.absoluteTickAtTheBeginningOfFirstEventBar = globalCurrentLastBarTick;
       firstEvent = true;
     }
@@ -170,7 +171,7 @@ export class LooperRecorder {
       if (relativeTick > TICKS_IN_BAR - TICKS_IN_HALF_BEAT) {
         // first event is very close to the end of the bar
         this.absoluteTickAtTheBeginningOfFirstEventBar += TICKS_IN_BAR; // Consider the next bar as the starting point
-        console.log(
+        debugLog(
           LOG_PREFIX +
             "The first event at tick %d is within a half beat from the new bar. Shifting the ticks by 1 bar and setting the first tick to 1",
           relativeTick,
@@ -180,14 +181,14 @@ export class LooperRecorder {
     } else {
       // subsequent event
       if (globalCurrentTick <= this.absoluteTickAtTheBeginningOfFirstEventBar) {
-        console.log(
+        debugLog(
           "The event is not first and the new bar hasn't yet started. Ignoring the event",
         );
         return undefined;
       }
     }
 
-    console.log(LOG_PREFIX + "Recorded event at tick", relativeTick);
+    debugLog(LOG_PREFIX + "Recorded event at tick", relativeTick);
 
     return quantizeRecordedTick(relativeTick);
   }

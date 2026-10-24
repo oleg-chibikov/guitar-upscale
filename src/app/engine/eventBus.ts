@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { ChordMode } from "@/app/data/chordModes";
 import { Subject } from "rxjs";
 import { Instrument } from "../data/instruments";
@@ -161,7 +162,7 @@ export const clearPreviousChords = () => {
 };
 
 ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
-  console.log("EventBus: Chord play requested", chordWithMetadata);
+  debugLog("EventBus: Chord play requested", chordWithMetadata);
 
   // don't check for the same chord here - we need to clear the previous variation of the same chord (they might differ)
   clearPreviousChords();

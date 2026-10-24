@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { ChordMode, ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { Note } from "@/app/data/notes";
@@ -149,7 +150,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           chordDetectorBuilder.clear();
         }
 
-        console.log("Playing chord: %s at tick %d", chordName, currentTick);
+        debugLog("Playing chord: %s at tick %d", chordName, currentTick);
         wasPlayedLastRef.current = true;
         publishState();
 
@@ -216,7 +217,7 @@ function processClearChord(
   wasPlayedLastRef: React.MutableRefObject<boolean>,
   publishState: () => void,
 ) {
-  console.log("Clear previous chord marker: " + chordName);
+  debugLog("Clear previous chord marker: " + chordName);
   wasPlayedLastRef.current = false;
   publishState();
 }

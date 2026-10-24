@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import {
   ChordBuilderInfo,
   ChordVariations,
@@ -87,7 +88,7 @@ const playVariation = async (
           fingerIndex: variation.fingerAssignment[i],
         } as StringOctaveNoteWithFingerPosition),
   );
-  console.log(`Playing ${variationKey} variation of ${chordName}`);
+  debugLog(`Playing ${variationKey} variation of ${chordName}`);
 
   const filtered = combinedData.filter(
     (x) => x !== undefined,

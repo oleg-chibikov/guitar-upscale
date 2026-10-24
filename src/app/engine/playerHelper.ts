@@ -1,5 +1,5 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { MAX_VOLUME } from "@/app/data/volume";
-import { waitForNextTick } from "@/app/engine/clock/mainClock";
 import { ChordEventBus, NotePlayEventBus } from "@/app/engine/eventBus";
 import { ChordOrNote } from "@/app/engine/eventsByTick";
 import { tickToMilliseconds } from "@/app/helpers/clockHelper";
@@ -36,22 +36,6 @@ export const playAllNotes = (
   logPrefix: string,
   tick: number,
 ) => {
-  console.log(logPrefix + "Playing events at tick %d", tick);
+  debugLog(logPrefix + "Playing events at tick %d", tick);
   eventsToPlay.forEach(playChordOrNote);
-};
-
-export const waitForTick = async (
-  tickToWaitFor: number,
-  currentTick: number,
-  checkFinished: () => boolean,
-  logPrefix: string,
-) => {
-  const ticksToWait = tickToWaitFor - currentTick;
-  console.log(logPrefix + "Waiting for %d ticks", ticksToWait);
-  for (let i = 0; i < ticksToWait; i++) {
-    if (checkFinished()) {
-      return Promise.resolve();
-    }
-    await waitForNextTick();
-  }
 };
