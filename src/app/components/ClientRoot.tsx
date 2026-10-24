@@ -10,7 +10,9 @@ import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSe
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useWakeLock } from "@/app/hooks/useWakeLock";
 import { isAuthEnabled } from "@/lib/featureFlags";
-import { ReactNode, useRef } from "react";
+import { setTheme } from "@/app/store/uiSlice";
+import { ReactNode, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { GradientCircularProgress } from "./GradientCircularProgress";
@@ -28,8 +30,22 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
 }) => {
   const loadingMessage = useUiSelector((s) => s.loadingMessage);
   const theme = useUiSelector((s) => s.theme);
+  const followOs = useUiSelector((s) => s.followOs);
+  const dispatch = useDispatch();
   const mainRef = useRef<HTMLElement>(null);
   useWakeLock();
+
+  useEffect(() => {
+    if (!followOs) {
+      return;
+    }
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () =>
+      dispatch(setTheme(query.matches ? Theme.Dark : Theme.Light));
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, [followOs, dispatch]);
 
   return (
     <>
