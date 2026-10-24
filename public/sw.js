@@ -2,6 +2,7 @@
 // Hashed chunks don't change, so they come from the cache first. Songs and skins come from the cache too,
 // and refresh in the background.
 const CACHE = "offline-v4";
+// Older offline caches go on update. Other caches, like the "smplr" sound samples, stay.
 // Every deploy adds new chunks, so the oldest entries go once the cache grows past this.
 const MAX_ENTRIES = 400;
 // The worker sits at the app's base path, so its scope ends with it.
@@ -73,7 +74,9 @@ self.addEventListener("activate", (event) => {
     (async () => {
       const names = await caches.keys();
       await Promise.all(
-        names.filter((name) => name !== CACHE).map((name) => caches.delete(name))
+        names
+          .filter((name) => name.startsWith("offline-") && name !== CACHE)
+          .map((name) => caches.delete(name))
       );
       await self.clients.claim();
     })()

@@ -1,7 +1,31 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote, getNoteText } from "@/app/data/notes";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
-import type { Soundfont, SplendidGrandPiano } from "smplr";
+import type { Soundfont, SplendidGrandPiano, Storage } from "smplr";
+
+// Shared with public/sw.js, which keeps this cache when it clears its own
+const SAMPLE_CACHE = "smplr";
+
+// Keeps the samples across visits and offline. smplr's own CacheStorage also
+// keeps failed answers, and then a sound would stay broken for good.
+const sampleStorage: Storage = {
+  fetch: async (url) => {
+    // No Cache API outside https, as on a phone on the LAN
+    if (typeof caches === "undefined") {
+      return fetch(url);
+    }
+    const cache = await caches.open(SAMPLE_CACHE).catch(() => undefined);
+    const cached = await cache?.match(url);
+    if (cached) {
+      return cached;
+    }
+    const response = await fetch(url);
+    if (response.ok && cache) {
+      await cache.put(url, response.clone()).catch(() => {});
+    }
+    return response;
+  },
+};
 
 export const playSound = (
   note: OctaveNote,
@@ -58,11 +82,12 @@ export const loadInstrument = async (
 
   if (instrument === "sampled_piano") {
     const SplendidGrandPiano = (await import("smplr")).SplendidGrandPiano;
-    soundfont = new SplendidGrandPiano(context);
+    soundfont = new SplendidGrandPiano(context, { storage: sampleStorage });
   } else {
     const Soundfont = (await import("smplr")).Soundfont;
     soundfont = new Soundfont(context, {
       instrument: instrument,
+      storage: sampleStorage,
       // kit: "FluidR3_GM", // "MusyngKite" is used by default if not specified
     });
   }
