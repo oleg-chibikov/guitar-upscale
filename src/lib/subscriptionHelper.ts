@@ -34,21 +34,18 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
   res: NextApiResponse<T>,
   { allowCancelled, paramNames, required }: GetSubscriptionParams,
 ): Promise<SubscriptionData | undefined> => {
-  const paramCollection = (
-    req.method === "POST" ? req.body : req.query
-  ) as Record<string, string | null | undefined>;
+  const paramCollection = ((req.method === "POST" ? req.body : req.query) ??
+    {}) as Record<string, unknown>;
   // Extract parameters from the body instead of query
-  const itemId = paramCollection[paramNames?.itemId ?? "itemId"] as
-    TierKey | null | undefined;
-  const purchaseToken =
+  const itemId: unknown = paramCollection[paramNames?.itemId ?? "itemId"];
+  const purchaseToken: unknown =
     paramCollection[paramNames?.purchaseToken ?? "purchaseToken"];
 
+  // a repeated query parameter arrives as an array
   if (
-    itemId === null ||
-    itemId === undefined ||
+    typeof itemId !== "string" ||
     !itemId.length ||
-    purchaseToken === null ||
-    purchaseToken === undefined ||
+    typeof purchaseToken !== "string" ||
     !purchaseToken.length
   ) {
     if (required) {
@@ -59,14 +56,14 @@ export const getSubscriptionFromRequest = async <T extends ResponseData>(
     return; // Exit early if validation fails
   }
 
-  if (!tierMap.has(itemId)) {
+  if (!tierMap.has(itemId as TierKey)) {
     res
       .status(HttpStatusCode.BadRequest)
       .json({ error: "Unknown subscription item" } as T);
     return;
   }
 
-  const params: PurchaseParams = { itemId, purchaseToken };
+  const params: PurchaseParams = { itemId: itemId as TierKey, purchaseToken };
   const subscription = await fetchSubscriptionPurchase(params);
 
   // The client sends itemId, so it must match what Google says the token bought.

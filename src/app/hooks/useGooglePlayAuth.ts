@@ -1,7 +1,7 @@
 import { useAuthSelector } from "@/app/hooks/storeHooks";
 import { SubscriptionProvider } from "@/lib/subscriptionProvider";
 import { TierKey } from "@/lib/tier";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import {
   ApiCallResult,
@@ -44,12 +44,21 @@ export const useGooglePlayAuth = () => {
   // https://medium.com/androiddevelopers/implementing-linkedpurchasetoken-correctly-to-prevent-duplicate-subscriptions-82dfbf7167da
   // https://developer.android.com/google/play/billing/lifecycle/subscriptions#upgrades-downgrades
 
-  useInterval(async () => {
-    void checkPermissionsMismatch();
-  }, ONE_MINUTE);
-
   const dispatch = useDispatch();
+  // the interval and the online check can overlap and reload the page twice
+  const isChecking = useRef(false);
   const checkPermissionsMismatch = async () => {
+    if (isChecking.current) {
+      return;
+    }
+    isChecking.current = true;
+    try {
+      await runPermissionsMismatchCheck();
+    } finally {
+      isChecking.current = false;
+    }
+  };
+  const runPermissionsMismatchCheck = async () => {
     if (!hasDigitalGoodsService) {
       return;
     }
@@ -145,6 +154,10 @@ export const useGooglePlayAuth = () => {
       () => {},
     );
   };
+
+  useInterval(() => {
+    void checkPermissionsMismatch();
+  }, ONE_MINUTE);
 
   useEffect(() => {
     void checkPermissionsMismatch();

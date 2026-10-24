@@ -101,6 +101,9 @@ const StrumCell: React.FC<StrumCellProps> = React.memo(
     return (
       <button
         onClick={handleClick}
+        aria-label={`Strum ${index + 1}: ${
+          strum === "↑" ? "up" : strum === "↓" ? "down" : "none"
+        }`}
         className={`flex h-6 w-6 items-center justify-center border border-gray-300 text-xs ${
           !isBeatCell
             ? theme === Theme.Light
