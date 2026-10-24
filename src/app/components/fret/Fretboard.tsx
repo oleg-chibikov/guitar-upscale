@@ -62,6 +62,7 @@ import {
   FretMarkerStore,
   PRESS_ANIMATION_MS,
 } from "./fretMarkerStore";
+import { useFretboardPinchZoom } from "./useFretboardPinchZoom";
 
 const ASSETS_URL =
   "https://raw.githubusercontent.com/oleg-chibikov/guitar-upscale-assets/main/";
@@ -466,6 +467,8 @@ export const Fretboard: React.FC = () => {
 
   useEffect(() => (neck ? store.register(neck) : undefined), [neck, store]);
 
+  useFretboardPinchZoom(containerRef, !!neck);
+
   if (!neck) {
     return null;
   }
@@ -540,7 +543,12 @@ export const Fretboard: React.FC = () => {
         ref={containerRef}
         id={FRETBOARD}
         className="absolute top-0 left-0 z-10"
-        style={{ width: stageWidth, height: stageHeight }}
+        // the browser keeps scrolling, the pinch goes to useFretboardPinchZoom
+        style={{
+          width: stageWidth,
+          height: stageHeight,
+          touchAction: "pan-x pan-y",
+        }}
         onTouchStartCapture={
           hasTouchInput
             ? (e) => {

@@ -1,5 +1,11 @@
 import { AlertType } from "@/app/data/alertType";
 import {
+  maxXZoom,
+  maxYZoom,
+  minXZoom,
+  minYZoom,
+} from "@/app/data/fretboardZoomLimits";
+import {
   CombinedSkinType,
   EightStringSkin,
   SevenStringSkin,
@@ -13,11 +19,6 @@ import { ChordsDisplayMode } from "../data/chordsDisplayMode";
 import { NoteDisplayMode } from "../data/noteDisplayMode";
 
 const initialTheme = Theme.MatchOS;
-
-export const minXZoom = 1;
-export const maxXZoom = 3;
-export const minYZoom = 0.7;
-export const maxYZoom = 1;
 
 interface UiState {
   noteDisplayMode: NoteDisplayMode;

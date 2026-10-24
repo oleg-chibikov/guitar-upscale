@@ -32,8 +32,9 @@ The fretboard shows the notes of the chosen scale and plays a note on tap.
 - **Note display mode** shows note names, fret numbers or semitones from the root (`Note_Shift`). Open strings show the note name.
 - **Skins** change the look of the neck [Composer].
 - **Size** the size button in the bottom zone opens sliders for width and height. A lock keeps the ratio.
+- **Pinch** two fingers on the neck change its size: a sideways pinch sets the width, an up and down pinch sets the height. Fingers that barely move still play a chord. On a trackpad, pinch or hold Ctrl and scroll.
 
-Code: [Fretboard.tsx](../src/app/components/fret/Fretboard.tsx), [fretboardLayout.ts](../src/app/components/fret/fretboardLayout.ts), [aspectRatio/](../src/app/components/aspectRatio/).
+Code: [Fretboard.tsx](../src/app/components/fret/Fretboard.tsx), [fretboardLayout.ts](../src/app/components/fret/fretboardLayout.ts), [useFretboardPinchZoom.ts](../src/app/components/fret/useFretboardPinchZoom.ts), [aspectRatio/](../src/app/components/aspectRatio/).
 
 ## Scale, tuning and capo
 

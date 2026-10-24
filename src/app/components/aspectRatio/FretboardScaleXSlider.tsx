@@ -1,5 +1,6 @@
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import { maxXZoom, minXZoom, setFretboardScaleX } from "@/app/store/uiSlice";
+import { maxXZoom, minXZoom } from "@/app/data/fretboardZoomLimits";
+import { setFretboardScaleX } from "@/app/store/uiSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { Slider } from "../uiFramework/Slider";
