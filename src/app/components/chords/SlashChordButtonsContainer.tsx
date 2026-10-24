@@ -59,7 +59,14 @@ export const SlashChordButtonsContainer = () => {
           Bass
         </Typography>
 
-        <IconButton size="small" sx={{ p: 0 }} onClick={toggleDrawer}>
+        <IconButton
+          size="small"
+          sx={{ p: 0 }}
+          aria-label={
+            slashChordsExpanded ? "Hide bass notes" : "Show bass notes"
+          }
+          onClick={toggleDrawer}
+        >
           {isLeft ? (
             slashChordsExpanded ? (
               <ChevronLeftIcon fontSize="small" />

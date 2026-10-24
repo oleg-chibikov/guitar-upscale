@@ -8,7 +8,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
-import { FC, ReactNode, Ref } from "react";
+import { FC, ReactNode, Ref, useCallback, useState } from "react";
 
 interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   expanded: boolean;
@@ -16,7 +16,7 @@ interface ExpanderProps extends WithChildren, WithId, WithClassName, WithStyle {
   title: string;
   reverseIcon?: boolean;
   expandOnlyOnIcon?: boolean;
-  // shown in the header next to the title. A press on it doesn't toggle the expander
+  // shown in the header next to the title. It sits outside the summary button, so a press on it doesn't toggle the expander
   headerAction?: ReactNode;
   ref?: Ref<HTMLElement>;
 }
@@ -35,16 +35,39 @@ export const Expander: FC<ExpanderProps> = ({
   ref,
 }) => {
   const theme = useUiSelector((s) => s.theme);
+  // the summary keeps room for the action, so the panel stays wide enough for both
+  const [actionWidth, setActionWidth] = useState(0);
+  const measureAction = useCallback((node: HTMLDivElement | null) => {
+    if (!node) {
+      return;
+    }
+    const observer = new ResizeObserver(() => setActionWidth(node.offsetWidth));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
   return (
     <section
       ref={ref}
       style={style}
-      className={`${className} rounded-xl border p-1.5 ${
+      className={`${className} relative rounded-xl border p-1.5 ${
         theme === Theme.Light
           ? "border-bar_border-light bg-bar-light"
           : "border-bar_border-dark bg-bar-dark"
       }`}
     >
+      {headerAction !== undefined && (
+        // lines up with the summary row, left of the expand icon
+        <div
+          ref={measureAction}
+          className={`absolute top-1.5 right-9 z-10 flex h-7 items-center ${
+            theme === Theme.Light
+              ? "text-foreground-light"
+              : "text-foreground-dark"
+          }`}
+        >
+          {headerAction}
+        </div>
+      )}
       <Accordion
         expanded={expanded}
         onChange={handleExpansion}
@@ -101,12 +124,7 @@ export const Expander: FC<ExpanderProps> = ({
               {title}
             </Typography>
             {headerAction !== undefined && (
-              <span
-                style={{ pointerEvents: "auto" }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {headerAction}
-              </span>
+              <span className="shrink-0" style={{ width: actionWidth }} />
             )}
           </div>
         </AccordionSummary>
