@@ -8,12 +8,25 @@ export const useSettingsSelector = <T>(
   return useSelector((state: RootState) => selector(state.settings));
 };
 
+// fields added after a user saved the state come back undefined from redux-persist
+const withDefaults = new WeakMap<
+  RootState["pianoRoll"],
+  RootState["pianoRoll"]
+>();
+const pianoRollWithDefaults = (pianoRoll: RootState["pianoRoll"]) => {
+  let filled = withDefaults.get(pianoRoll);
+  if (!filled) {
+    filled = { ...pianoRollInitialState, ...pianoRoll };
+    withDefaults.set(pianoRoll, filled);
+  }
+  return filled;
+};
+
 export const usePianoRollSelector = <T>(
   selector: (state: RootState["pianoRoll"]) => T,
 ): T => {
-  // fields added after a user saved the state come back undefined from redux-persist
   return useSelector((state: RootState) =>
-    selector({ ...pianoRollInitialState, ...state.pianoRoll }),
+    selector(pianoRollWithDefaults(state.pianoRoll)),
   );
 };
 

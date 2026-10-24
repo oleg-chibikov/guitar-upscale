@@ -1,4 +1,5 @@
-import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   IconButton as MuiIconButton,
   Tooltip,

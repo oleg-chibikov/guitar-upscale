@@ -16,6 +16,13 @@ const nextConfig = {
   // },
   // Next 16 blocks dev resources for other hosts, so a phone on the LAN gets no client code.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*", "*.local"],
+  // Strumming and playback log on every beat, which costs time on phones.
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? { exclude: ["error", "warn"] }
+        : false,
+  },
   ...(isStaticExport && { output: "export", trailingSlash: true }),
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
 };

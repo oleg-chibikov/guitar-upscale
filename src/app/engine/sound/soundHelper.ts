@@ -1,7 +1,7 @@
 import { Instrument } from "@/app/data/instruments";
 import { OctaveNote, getNoteText } from "@/app/data/notes";
 import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
-import { Soundfont, SplendidGrandPiano } from "smplr";
+import type { Soundfont, SplendidGrandPiano } from "smplr";
 
 export const playSound = (
   note: OctaveNote,

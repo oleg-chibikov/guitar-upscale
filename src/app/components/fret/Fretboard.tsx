@@ -102,6 +102,12 @@ interface DrawState {
   noteDisplayMode: NoteDisplayMode;
 }
 
+const isSameDrawState = (a?: DrawState, b?: DrawState) =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    (Object.keys(a) as (keyof DrawState)[]).every((key) => a[key] === b[key]));
+
 const easeOut = (progress: number) => 1 - Math.pow(1 - progress, 2);
 
 const getMarkerText = (
@@ -425,7 +431,7 @@ export const Fretboard: React.FC = () => {
 
   const drawState = useRef<DrawState | undefined>(undefined);
   useLayoutEffect(() => {
-    drawState.current = neck
+    const next: DrawState | undefined = neck
       ? {
           layout,
           neck,
@@ -437,6 +443,10 @@ export const Fretboard: React.FC = () => {
           noteDisplayMode,
         }
       : undefined;
+    if (isSameDrawState(drawState.current, next)) {
+      return;
+    }
+    drawState.current = next;
     boardLayerRef.current?.batchDraw();
     markersLayerRef.current?.batchDraw();
   });
