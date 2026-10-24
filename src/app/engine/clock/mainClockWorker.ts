@@ -34,7 +34,11 @@ const stopInterval = () => {
 };
 
 const onTick = () => {
-  self.postMessage({ type: "tick" });
+  // the page compares it with its own clock to see how long the tick waited in the queue
+  self.postMessage({
+    type: "tick",
+    sentAt: performance.timeOrigin + performance.now(),
+  });
 };
 
 self.postMessage({ type: "ready" });

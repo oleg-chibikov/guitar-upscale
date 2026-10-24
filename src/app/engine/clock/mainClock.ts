@@ -68,6 +68,10 @@ export let currentThirtySecond = 0;
 export let currentSixtyFourth = 0;
 export let isMainClockActiveValue: boolean = false;
 
+let lastTickDelayMs = 0;
+// how long the last tick waited for the page to be free. A render right after Play holds back the first ticks
+export const getLastTickDelayMs = () => lastTickDelayMs;
+
 export const stopInterval = (resolvePreviousPromises: boolean) => {
   worker?.postMessage({ type: "stop", tempoBpm: tempoBpmValue });
   isMainClockActiveValue = false;
@@ -189,8 +193,9 @@ const onTick = () => {
 
 if (worker) {
   worker.onmessage = (event: MessageEvent) => {
-    const { type } = event.data;
+    const { type, sentAt } = event.data;
     if (type === "tick") {
+      lastTickDelayMs = performance.timeOrigin + performance.now() - sentAt;
       onTick();
     }
   };

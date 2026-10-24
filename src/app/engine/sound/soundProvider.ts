@@ -7,7 +7,7 @@ import {
   tempoBpmValue,
   volumeValue,
 } from "@/app/store/settingsSlice";
-import { loadInstrument, playSound } from "./soundHelper";
+import { getLoadedInstrument, loadInstrument, playSound } from "./soundHelper";
 
 export const playNote = async (
   note: OctaveNote,
@@ -16,13 +16,13 @@ export const playNote = async (
   reverbStrength?: number,
   durationMs?: number,
 ) => {
+  const instrumentToPlay = instrument ?? instrumentValue;
+  const reverb = reverbStrength ?? reverbStrengthValue;
   playSound(
     note,
     volume ?? volumeValue,
-    await loadInstrument(
-      instrument ?? instrumentValue,
-      reverbStrength ?? reverbStrengthValue,
-    ),
+    getLoadedInstrument(instrumentToPlay, reverb) ??
+      (await loadInstrument(instrumentToPlay, reverb)),
     durationMs ?? beatToMilliseconds(tempoBpmValue),
   );
 };

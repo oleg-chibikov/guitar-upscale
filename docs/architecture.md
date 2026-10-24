@@ -172,6 +172,7 @@ A Web Worker ticks so that a busy main thread can't slow the beat.
 - **Waiting** [mainClock.ts](../src/app/engine/clock/mainClock.ts) gives promises: `waitForNextBar`, `waitForNextBeat`, `waitForNextTick` and finer steps.
 - **On demand** `tryToggleInterval` starts the clock for playback, strumming, recording or the metronome. It stops once none of them runs.
 - **Ticks out** each tick also goes to `MetronomeEventBus`, which the metronome and the piano roll playhead use.
+- **Late start** each tick carries the time the worker sent it. A melody skips a tick that waited over 10 ms, up to 8 in a row, so a render after Play doesn't hold back the first note.
 
 ## Events: from a tap to a sound
 

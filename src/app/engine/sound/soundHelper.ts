@@ -42,6 +42,17 @@ export const playSound = (
 };
 
 const soundfontMap = new Map<string, Soundfont | SplendidGrandPiano>();
+// only the instruments whose samples have finished loading
+const loadedSoundfontMap = new Map<string, Soundfont | SplendidGrandPiano>();
+
+const getInstrumentKey = (instrument: Instrument, reverbStrength: number) =>
+  `${instrument}_${reverbStrength}`;
+
+// awaiting even a loaded instrument lets queued work run first, and the note comes late
+export const getLoadedInstrument = (
+  instrument: Instrument,
+  reverbStrength: number,
+) => loadedSoundfontMap.get(getInstrumentKey(instrument, reverbStrength));
 
 let audioContext: AudioContext | undefined;
 
@@ -73,7 +84,7 @@ export const loadInstrument = async (
   instrument: Instrument,
   reverbStrength: number,
 ) => {
-  const key = `${instrument}_${reverbStrength}`;
+  const key = getInstrumentKey(instrument, reverbStrength);
   let soundfont = soundfontMap.get(key);
   if (soundfont) {
     return soundfont;
@@ -107,5 +118,6 @@ export const loadInstrument = async (
     soundfontMap.delete(key);
     throw error;
   }
+  loadedSoundfontMap.set(key, soundfont);
   return soundfont;
 };

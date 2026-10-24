@@ -2,6 +2,7 @@ import { debugLog } from "@/app/helpers/debugLog";
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import {
   getLastTickBarPosition,
+  getLastTickDelayMs,
   setNextTickBarPosition,
   waitForNextTick,
 } from "@/app/engine/clock/mainClock";
@@ -45,6 +46,11 @@ let currentPlaybackId = 0;
 const toBarPosition = (tick: number) =>
   ((tick % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
 
+// a tick that waited longer than this for the page is too late to start a melody on
+const LATE_TICK_MS = 10;
+// a page that stays busy still starts the melody, only late
+const MAX_LATE_TICKS_TO_SKIP = 8;
+
 // a melody keeps its bar position between plays, so a replay or a piano roll play lands on the same beat
 const startBarPositions = new WeakMap<EventsByTick, number>();
 
@@ -82,6 +88,7 @@ class MidiPlayer {
     // a running metronome sets the bar for a new melody. After a seek the clock follows the melody
     let canMoveClock = !isMetronomeActiveValue;
     let isStarted = false;
+    let lateTicksSkipped = 0;
 
     const jumpTo = () => {
       const seekTick = takePendingSeek();
@@ -136,14 +143,25 @@ class MidiPlayer {
 
         if (!isAligned) {
           const barPosition = toBarPosition(currentTick + tickZeroBarPosition);
-          if (barPosition !== getLastTickBarPosition()) {
-            if (canMoveClock && !isClockUsedBesidesMelodyAndMetronome()) {
+          const canMove =
+            canMoveClock && !isClockUsedBesidesMelodyAndMetronome();
+          // a late tick would play the first note late. The next one comes on time once the page is free
+          const isLate =
+            canMove &&
+            lateTicksSkipped < MAX_LATE_TICKS_TO_SKIP &&
+            getLastTickDelayMs() > LATE_TICK_MS;
+          if (barPosition !== getLastTickBarPosition() || isLate) {
+            if (canMove) {
               // start on the next tick instead of waiting up to a bar
               setNextTickBarPosition(barPosition);
+            }
+            if (isLate) {
+              lateTicksSkipped++;
             }
             continue;
           }
           isAligned = true;
+          lateTicksSkipped = 0;
           if (!isStarted) {
             isStarted = true;
             onStarted?.();
