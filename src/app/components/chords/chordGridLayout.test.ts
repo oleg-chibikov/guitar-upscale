@@ -44,16 +44,16 @@ describe("buildKeyChordsLayout", () => {
     ]);
   });
 
-  it("fills a column before starting the next, in a square grid", () => {
+  it("fills a row before starting the next, in a square grid", () => {
     const cells = buildKeyChordsLayout(columns, Note.E);
     expect(cells.map((c) => [c.column, c.row])).toEqual([
       [0, 0],
-      [0, 1],
-      [0, 2],
       [1, 0],
-      [1, 1],
-      [1, 2],
       [2, 0],
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [0, 2],
     ]);
   });
 });
