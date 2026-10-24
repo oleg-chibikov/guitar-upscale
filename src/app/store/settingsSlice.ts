@@ -4,6 +4,7 @@ import { Dispatch } from "react";
 import { Instrument, InstrumentGroup } from "../data/instruments";
 import { Neck, Note } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
+import { RecordTarget } from "../data/recordTarget";
 import { getScalePattern, scalesMap } from "../data/scales";
 import { chordStrummingPatterns } from "../data/strummingPatterns";
 import {
@@ -113,6 +114,7 @@ interface SettingsState
   scaleDetectorAvailable?: boolean; // may be undefined
   showReplayTrigger: boolean;
   saveMidiImmediately: boolean;
+  recordTarget: RecordTarget;
   nowPlaying?: string; // the name of the song that plays
 }
 
@@ -155,6 +157,7 @@ const initialState: SettingsState = {
   chordsAreLoading: false,
   showReplayTrigger: false,
   saveMidiImmediately: true,
+  recordTarget: RecordTarget.NewSong,
 };
 
 // A values that changes immediately without the need for rerender
@@ -602,6 +605,9 @@ export const settingsSlice = createSlice({
     setNowPlaying(state, action: PayloadAction<string | undefined>) {
       state.nowPlaying = action.payload;
     },
+    setRecordTarget(state, action: PayloadAction<RecordTarget>) {
+      state.recordTarget = action.payload;
+    },
   },
 });
 
@@ -648,6 +654,7 @@ export const {
   triggerShowReplay,
   setSaveMidiImmediately,
   setNowPlaying,
+  setRecordTarget,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

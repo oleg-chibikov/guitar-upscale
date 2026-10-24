@@ -1,3 +1,4 @@
+import { getNewSongName } from "@/app/data/example";
 import { MetronomeEventBus } from "@/app/engine/eventBus";
 import { EventForTick, EventsByTick } from "@/app/engine/eventsByTick";
 import { EditCommand } from "@/app/engine/pianoRoll/editCommand";
@@ -166,8 +167,10 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
     };
   }, [pianoRollExpanded, looperStateUpdateTrigger, guitarSettingsUpdateCount]);
 
-  // with nothing loaded the piano roll still offers a blank melody to draw in
-  const blankMelody = useMemo(() => new EventsByTick(), []);
+  // with nothing loaded the piano roll still offers a blank melody to draw in. A closed song leaves a fresh one
+  const hasMelody = melody !== undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const blankMelody = useMemo(() => new EventsByTick(), [hasMelody]);
   const sources = useMemo(
     () => [
       { id: MELODY_SOURCE_ID, label: "Melody", data: melody ?? blankMelody },
@@ -312,8 +315,11 @@ export const PianoRollProvider: React.FC<PianoRollProviderProps> = ({
       }
       getEditHistory(data).execute(command);
       if (data === blankMelody && pianoRollData !== blankMelody) {
-        // the first note makes the blank melody the one that plays and exports
+        // the first note makes the blank melody the one that plays and exports, and a song in the list
         setPianoRollData(blankMelody, dispatch);
+        void import("@/app/engine/songs/songLibrary").then(({ addNewSong }) =>
+          addNewSong(blankMelody, getNewSongName("Melody")),
+        );
       }
       setSelectionState({ data, ids: new Set(newSelection) });
       setVersion((v) => v + 1);

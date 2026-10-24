@@ -106,6 +106,18 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
           return;
         }
 
+        if (decodeExample && choice === undefined && pianoRollData) {
+          // a loaded song from the list, a take or a drawn melody among them, plays again as it is
+          const { getExampleForEvents } =
+            await import("@/app/engine/songs/songLibrary");
+          const loaded = getExampleForEvents(pianoRollData);
+          if (loaded) {
+            updateWaiting(false);
+            await replay(dispatch, pianoRollData, getExampleName(loaded));
+            return;
+          }
+        }
+
         console.log(LOG_PREFIX, "Loading examples");
         const example: Example | undefined = await loadExample(
           decodeExample,

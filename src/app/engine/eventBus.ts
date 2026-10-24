@@ -35,6 +35,8 @@ export type NoteMetadata = TrackMetadata &
     chordFinger?: number;
     skipChordDetection?: boolean;
     looperChannel?: number;
+    // played by the app from a melody, so a recording skips it
+    fromPlayback?: boolean;
   };
 
 export type ChordClearMetadata = {
@@ -47,6 +49,7 @@ export type ChordMetadata = TrackMetadata & {
   looperChannel?: number;
   chordMode?: ChordMode;
   octaveNote?: OctaveNote;
+  fromPlayback?: boolean;
 };
 
 export type ChordWithPlayMetadata = {
@@ -116,11 +119,14 @@ NotePlayEventBus.subscribe(async (noteMetadata: NoteMetadata) => {
   const trackInstrument =
     noteMetadata.trackInstrument ??
     (fromChord ? chordInstrumentValue : instrumentValue);
-  midiRecorder.addNoteAtGlobalTick(
-    noteMetadata.stringOctaveNote,
-    trackNumber,
-    trackInstrument,
-  );
+  if (noteMetadata.fromPlayback !== true) {
+    midiRecorder.addNoteAtGlobalTick(
+      noteMetadata.stringOctaveNote,
+      trackNumber,
+      trackInstrument,
+      fromChord,
+    );
+  }
 
   if (
     !fromChord && // chords are recorded separately
@@ -168,7 +174,9 @@ ChordEventBus.subscribe(async (chordWithMetadata: ChordWithPlayMetadata) => {
 
   const midiRecorder = (await import("./midiRecorder/midiRecorder"))
     .midiRecorder;
-  midiRecorder.addChordAtGlobalTick(chordWithMetadata);
+  if (metadata.fromPlayback !== true) {
+    midiRecorder.addChordAtGlobalTick(chordWithMetadata);
+  }
 
   if (
     metadata.looperChannel === undefined &&

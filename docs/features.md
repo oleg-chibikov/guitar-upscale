@@ -96,14 +96,20 @@ The play panel plays, steps through and saves what is loaded.
 | **Play**           | plays by playback type. Pressed again during playback, it replays from the start                                                    |
 | **Pause**          | pauses, and a second press goes on from the same spot                                                                               |
 | **Previous, next** | steps one event back or forward                                                                                                     |
-| **Reset**          | after a confirm, stops playback and drops the loaded melody                                                                         |
 | **Download**       | saves the loaded melody with its piano roll edits as a Guitar Pro `.gp` file. Hold it for a `.mid` file. Shows once a melody exists |
 | **Metronome**      | turns the click on and off                                                                                                          |
-| **Record**         | records MIDI [Composer]. See [MIDI recording](#midi-recording)                                                                      |
+| **Record**         | records MIDI [Composer]. Hold it to pick a new song or a new track. See [MIDI recording](#midi-recording)                           |
 | **Tempo**          | shows the BPM. A press opens a slider. Hidden while the piano roll is open                                                          |
 | **Volume**         | shows the playback volume. A press opens a slider. Hidden while the piano roll is open                                              |
 
 Space starts playback from anywhere on the page. The piano roll takes Space for its own player while open.
+
+The song plate at the top shows the loaded song from the song list.
+
+- **Name** a click renames an uploaded or recorded song. Enter saves, Escape cancels.
+- **Close** the cross stops playback and unloads the song. The song stays in the list.
+- **Play** with a song loaded and stopped, Play plays that song again.
+- **Recording** the plate turns red with a timer, and says whether the take makes a new song or a new track.
 
 Playback types, picked in Settings [Explorer]:
 
@@ -119,16 +125,19 @@ Code: [playPanel/](../src/app/components/playPanel/), [usePlay.ts](../src/app/ho
 
 ## MIDI recording
 
-[Composer] The record button captures each note and chord the person plays.
+[Composer] The record button captures the notes and chords the person plays. Notes the app plays back stay out of the take.
 
-- **Start** the button turns red. The metronome starts if "Start metronome when recording" is on.
-- **Stop** the recording becomes the melody. The piano roll and the download button pick it up.
-- **Cancel** a second button drops the take without saving.
+Hold the button, or right click it, to pick where the take goes. The pick starts a recording and stays for the next press.
+
+- **A new song** the take goes to the song list as "Recording" with the date and time. It loads as the current song.
+- **A new track in this song** the loaded song plays from the playhead and the take lines up with it. The take lands in new tracks named "Take 1" and on, one for notes and one for chords. Recording stops when the song ends. A `+` on the button shows this mode.
+- **Stop** saves the take. A take with no notes isn't saved.
+- **Cancel** a second button drops the take.
 - **Save MIDI file immediately after recording** downloads the `.mid` file on stop.
 
-Notes and chords go to separate tracks, each with its own instrument.
+Without a loaded song, a press records a new song. Undo in the piano roll takes a new track out again.
 
-Code: [RecordButton.tsx](../src/app/components/playPanel/RecordButton.tsx), [midiRecorder.ts](../src/app/engine/midiRecorder/midiRecorder.ts), [midiSaver.ts](../src/app/engine/midiRecorder/midiSaver.ts).
+Code: [RecordButton.tsx](../src/app/components/playPanel/RecordButton.tsx), [NowPlaying.tsx](../src/app/components/playPanel/NowPlaying.tsx), [recordedTracks.ts](../src/app/engine/pianoRoll/recordedTracks.ts), [midiRecorder.ts](../src/app/engine/midiRecorder/midiRecorder.ts), [midiSaver.ts](../src/app/engine/midiRecorder/midiSaver.ts).
 
 ## Looper
 
@@ -161,7 +170,7 @@ The piano roll edits a track note by note. It opens from the control panel.
 - **Transport** play, playhead to start, follow the playhead, undo and redo. The view stops following while notes are selected.
 - **Loop a range** a drag along the ruler loops the melody between the two points and starts it right away. A click on the ruler outside the range drops the loop.
 
-The first note drawn into the empty melody makes that melody the one that plays and downloads. The full key list is in the [root README](../README.md#piano-roll-keys).
+The first note drawn into the empty melody makes that melody the one that plays and downloads. It also goes to the song list as "Melody" with the date and time. The full key list is in the [root README](../README.md#piano-roll-keys).
 
 Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](../src/app/context/PianoRollProvider.tsx), [engine/pianoRoll/](../src/app/engine/pianoRoll/).
 

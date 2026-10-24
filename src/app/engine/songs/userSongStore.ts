@@ -56,5 +56,11 @@ export const getUserSongs = async (): Promise<UserSongRecord[]> => {
 export const saveUserSong = (record: UserSongRecord) =>
   run("readwrite", (store) => store.put(record));
 
+export const getUserSong = (id: string) =>
+  run(
+    "readonly",
+    (store) => store.get(id) as IDBRequest<UserSongRecord | undefined>,
+  );
+
 export const deleteUserSong = (id: string) =>
   run("readwrite", (store) => store.delete(id));

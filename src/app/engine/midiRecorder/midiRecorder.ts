@@ -28,12 +28,15 @@ export class MidiRecorder implements NoteRecorder {
   private startTick: number | undefined;
   private octaveShift = 0;
   private TICK_SHIFT = 16; // Gap till next bar as starting from 0 for some reason gives corrupted melody
+  // gives the melody tick for a note played now. Unset, the take starts at its first note
+  private getTick: (() => number) | undefined;
 
-  startRecording() {
+  startRecording(getTick?: () => number) {
     this.midiEvents = new Map<TrackKey, NoteEvent[]>();
     this.eventsByTick = new EventsByTick();
     this.isRecording = true;
     this.startTick = undefined;
+    this.getTick = getTick;
   }
 
   getMidiFile() {
@@ -51,6 +54,7 @@ export class MidiRecorder implements NoteRecorder {
     this.midiEvents = undefined;
     this.eventsByTick = undefined;
     this.startTick = undefined;
+    this.getTick = undefined;
     return eventsByTick;
   }
 
@@ -58,6 +62,7 @@ export class MidiRecorder implements NoteRecorder {
     note: StringOctaveNote,
     trackNumber: number,
     instrument: Instrument,
+    fromChord = false,
   ) {
     if (!this.isRecording || !this.midiEvents || !this.eventsByTick) {
       return;
@@ -65,6 +70,10 @@ export class MidiRecorder implements NoteRecorder {
 
     const playAtTick = this.getRelativeTick();
     this.addNoteAtTick(note, trackNumber, instrument, playAtTick);
+    if (fromChord) {
+      // the chord itself is in the melody. Its notes would play it twice
+      return;
+    }
     this.eventsByTick.addEventAtTick(playAtTick, {
       note,
       trackNumber,
@@ -169,6 +178,9 @@ export class MidiRecorder implements NoteRecorder {
   }
 
   private getRelativeTick() {
+    if (this.getTick) {
+      return this.getTick();
+    }
     const currentTick = globalCurrentTick;
     if (this.startTick === undefined) {
       this.startTick = currentTick; // start recording from the first actual note (or from the last bar if instructed like that), not from the Record button hit

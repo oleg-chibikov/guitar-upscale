@@ -4,7 +4,6 @@ import { NextEventButton } from "@/app/components/playPanel/NextEventButton";
 import { PauseButton } from "@/app/components/playPanel/PauseButton";
 import { PlayButton } from "@/app/components/playPanel/PlayButton";
 import { PreviousEventButton } from "@/app/components/playPanel/PreviousEventButton";
-import { ResetPlaybackButton } from "@/app/components/playPanel/ResetPlaybackButton";
 import { TempoControl } from "@/app/components/settings/valueDialogControls/TempoControl";
 import { VolumeControl } from "@/app/components/settings/valueDialogControls/VolumeControl";
 import { Panel } from "@/app/components/uiFramework/Panel";
@@ -31,7 +30,6 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
       <PauseButton />
       <NextEventButton />
-      <ResetPlaybackButton />
       <DownloadButton />
       {/* <ShareMidiButton /> */}
       <MetronomeButton />

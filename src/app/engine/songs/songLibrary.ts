@@ -13,9 +13,11 @@ import { ScaleAndGroup } from "@/app/engine/scales/scaleLookupBuilder";
 import {
   UserSongRecord,
   deleteUserSong,
+  getUserSong,
   getUserSongs,
   saveUserSong,
 } from "@/app/engine/songs/userSongStore";
+import { scaleGroupValue, scaleValue } from "@/app/store/settingsSlice";
 import { store } from "@/app/store/store";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import { Subject, debounceTime } from "rxjs";
@@ -330,3 +332,58 @@ pianoRollEdits$.pipe(debounceTime(1000)).subscribe((events) => {
     .then(() => saveEdits(events))
     .catch((error) => console.error("Cannot save the edited song", error));
 });
+
+// a later edit to the same events saves after the song exists
+const enqueueSave = <T>(task: () => Promise<T>): Promise<T> => {
+  const result = saving.then(task);
+  saving = result.then(
+    () => undefined,
+    (error) => console.error("Cannot save the song", error),
+  );
+  return result;
+};
+
+/**
+ * A take or a melody drawn from scratch becomes a song in the list, in the current scale
+ */
+export const addNewSong = (events: EventsByTick, title: string) =>
+  enqueueSave(async () => {
+    const { eventsToSong, getSongFileName, songToGuitarPro } =
+      await import("@/app/engine/songs/songExport");
+    const song: Song = { ...eventsToSong(events), band: "", title };
+    const bytes = await songToGuitarPro(song);
+    const record: UserSongRecord = {
+      id: uuidv4(),
+      fileName: getSongFileName(song),
+      format: "gp",
+      bytes: bytes.slice().buffer,
+      band: "",
+      title,
+      scaleGroup: scaleGroupValue,
+      scale: scaleValue,
+      root: song.root,
+      addedAt: Date.now(),
+    };
+    await saveUserSong(record);
+    const example = toUserExample(record);
+    example.song = song;
+    example.decodedTracks = events;
+    exampleByEvents.set(events, example);
+    (await getExamples()).push(example);
+    notify();
+    return example;
+  });
+
+export const renameUserSong = (example: Example, name: string) =>
+  enqueueSave(async () => {
+    const id = example.id.replace(/^user:/, "");
+    const record = example.isUserSong ? await getUserSong(id) : undefined;
+    if (!record) {
+      return;
+    }
+    // the whole name goes into the title, so the list shows it as typed
+    example.band = "";
+    example.title = name;
+    await saveUserSong({ ...record, band: "", title: name });
+    notify();
+  });

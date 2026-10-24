@@ -99,23 +99,31 @@ sequenceDiagram
   actor P as Person
   participant R as Record button
   participant M as MIDI recorder
-  participant PR as Piano roll
-  P->>R: press Record
-  R->>M: start, clock and metronome on
+  participant L as Song list
+  P->>R: press Record, or hold it to pick
+  alt A new song
+    R->>M: start, clock and metronome on
+  else A new track in the loaded song
+    R->>M: start in step with the song
+    R->>P: the song plays
+  end
   P->>M: taps notes, plays chords
-  P->>R: press Stop
-  M-->>PR: recording becomes the melody
-  alt Save MIDI right after recording is on
+  P->>R: press Stop, or the song ends
+  alt A new song
+    M-->>L: take saved as "Recording" and loaded
+  else A new track
+    M-->>L: take added to the song as "Take 1"
+  end
+  opt Save MIDI right after recording is on
     M-->>P: .mid file downloads
-  else
-    P->>P: press Download later for .gp, hold it for .mid
   end
 ```
 
 1. Turn on "Start metronome when recording" in Settings for a click track.
-2. Press Record and play. Notes and chords go to separate tracks.
-3. Press Stop. The cross next to it drops the take instead.
-4. Press Play to hear the take, or Download to save it as `.gp`. Hold Download for a `.mid` file.
+2. Hold Record and pick "A new song", or load a song and pick "A new track in this song".
+3. Play. The plate at the top turns red and counts the time.
+4. Press Stop. The cross next to it drops the take instead.
+5. Press Play to hear it. Click the name on the plate to rename it, or press Download for a `.gp` file.
 
 ## Build a song with the looper
 

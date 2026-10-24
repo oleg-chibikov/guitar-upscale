@@ -21,9 +21,12 @@ export const playChordOrNote = ({ note, chord, duration }: ChordOrNote) => {
       trackInstrument: note.instrument,
       trackNumber: note.trackNumber,
       skipChordDetection: true,
+      fromPlayback: true,
     });
   }
   if (chord) {
+    // the chord button passes the metadata on to each note of the chord
+    chord.metadata.fromPlayback = true;
     ChordEventBus.next(chord);
   }
 };
