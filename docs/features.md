@@ -208,7 +208,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 
 ### Add a song from Songsterr
 
-[Composer] The cloud button next to upload opens a dialog. It turns a Songsterr song into a Guitar Pro file and adds it to your songs.
+[Composer] The cloud button next to upload opens a dialog. It turns a Songsterr song into a Guitar Pro file and adds it to your songs. The song list opens the same dialog from "Add from Songsterr", with the list search already typed in.
 
 1. Type a band or a song. The list fills in once typing stops. Pick a song from it.
 2. Pick the melody track and the bass track. The bass picks the chords. "None" takes the chords from the lowest melody notes.
@@ -221,7 +221,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 - **Instruments** each extra track plays with its Songsterr instrument. Its notes move into the scale with the melody.
 - **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes, so it calls `/api/songsterr` on `guitar-upscale.vercel.app`. Those routes allow requests from `oleg-chibikov.github.io` ([cors.ts](../src/lib/cors.ts)).
 
-Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [SongsterrImportDialog.tsx](../src/app/components/settings/buttons/SongsterrImportDialog.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).
+Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [SongsterrImportDialog.tsx](../src/app/components/settings/buttons/SongsterrImportDialog.tsx), [SongListButton.tsx](../src/app/components/playPanel/SongListButton.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).
 
 ## Chord and scale detection
 

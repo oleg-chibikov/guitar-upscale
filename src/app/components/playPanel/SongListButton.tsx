@@ -8,6 +8,7 @@ import {
 } from "@/app/data/example";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { useSettingsSelector } from "@/app/hooks/storeHooks";
+import CloudDownload from "@mui/icons-material/CloudDownload";
 import Delete from "@mui/icons-material/Delete";
 import Download from "@mui/icons-material/Download";
 import LibraryMusic from "@mui/icons-material/LibraryMusic";
@@ -25,8 +26,15 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
+import dynamic from "next/dynamic";
 import React, { useRef, useState } from "react";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
+
+const SongsterrImportDialog = dynamic(
+  async () =>
+    (await import("@/app/components/settings/buttons/SongsterrImportDialog"))
+      .SongsterrImportDialog,
+);
 
 const groupLabelSx = {
   lineHeight: "28px",
@@ -36,19 +44,26 @@ const groupLabelSx = {
 
 interface SongListButtonProps {
   choices: Example[];
+  canImportSongs: boolean;
   decodeExample: (example: Example) => Promise<EventsByTick>;
   onChoose: (choice: SongChoice) => void;
 }
 
 export const SongListButton: React.FC<SongListButtonProps> = ({
   choices,
+  canImportSongs,
   decodeExample,
   onChoose,
 }) => {
   const scaleGroup = useSettingsSelector((s) => s.scaleGroup);
   const scale = useSettingsSelector((s) => s.scale);
+  const scaleDetectorAvailable = useSettingsSelector(
+    (s) => s.scaleDetectorAvailable,
+  );
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [search, setSearch] = useState("");
+  // the search text the Songsterr dialog opened with, undefined while it is closed
+  const [songsterrQuery, setSongsterrQuery] = useState<string>();
   const anchor = useRef<HTMLDivElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
 
@@ -67,6 +82,11 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
   const choose = (choice: SongChoice) => {
     closeMenu();
     onChoose(choice);
+  };
+
+  const openSongsterr = () => {
+    setSongsterrQuery(search.trim());
+    closeMenu();
   };
 
   const handleSearchKeyDown = (event: React.KeyboardEvent) => {
@@ -238,6 +258,26 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
             <ListItemText primary="No songs found" />
           </MenuItem>
         )}
+        {canImportSongs && (
+          <MenuItem
+            dense
+            // the scale detector picks the scale each song goes under
+            disabled={scaleDetectorAvailable === undefined}
+            onClick={openSongsterr}
+          >
+            <ListItemIcon>
+              <CloudDownload fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Add from Songsterr"
+              secondary={
+                search.trim() === ""
+                  ? "Search Songsterr for a song"
+                  : `Search Songsterr for "${search.trim()}"`
+              }
+            />
+          </MenuItem>
+        )}
         {songGroups.flatMap(({ label, songs }) =>
           songs.length === 0
             ? []
@@ -257,6 +297,13 @@ export const SongListButton: React.FC<SongListButtonProps> = ({
               ],
         )}
       </Menu>
+      {songsterrQuery !== undefined && (
+        <SongsterrImportDialog
+          isOpen
+          initialQuery={songsterrQuery}
+          handleCloseDialog={() => setSongsterrQuery(undefined)}
+        />
+      )}
     </>
   );
 };

@@ -53,16 +53,24 @@ const toIndexes = (value: unknown) =>
     .filter((index) => index !== "")
     .map(Number);
 
-export const SongsterrImportDialog: React.FC<DialogProps> = ({
+interface SongsterrImportDialogProps extends DialogProps {
+  // the song list passes its search text, so the dialog starts searching at once
+  initialQuery?: string;
+}
+
+const isLongEnough = (text: string) => text.trim().length >= MIN_QUERY_LENGTH;
+
+export const SongsterrImportDialog: React.FC<SongsterrImportDialogProps> = ({
   isOpen,
   handleCloseDialog,
+  initialQuery = "",
 }) => {
   const dispatch = useDispatch();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   // what the person typed, while query also takes the chosen song's name
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState(initialQuery);
   const [results, setResults] = useState<SongsterrSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [isSearching, setIsSearching] = useState(isLongEnough(initialQuery));
   const [song, setSong] = useState<SongsterrSearchResult | null>(null);
   const [meta, setMeta] = useState<SongsterrMeta>();
   const [trackIndex, setTrackIndex] = useState(0);
@@ -72,7 +80,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
 
-  const isQueryLongEnough = searchText.trim().length >= MIN_QUERY_LENGTH;
+  const isQueryLongEnough = isLongEnough(searchText);
   const playable = meta ? listPlayableTrackIndexes(meta) : [];
   // a Songsterr track goes into the song once, so the melody and the bass stay out of this list
   const extraOptions = playable.filter(
@@ -98,7 +106,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   // Searches once typing stops, and drops answers to older queries.
   useEffect(() => {
     const pattern = searchText.trim();
-    if (pattern.length < MIN_QUERY_LENGTH) {
+    if (!isLongEnough(pattern)) {
       return;
     }
     let isStale = false;
@@ -207,6 +215,10 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
         value={song}
         inputValue={query}
         loading={isQueryLongEnough && isSearching}
+        // a prefilled query shows its results without a keypress
+        openOnFocus={initialQuery !== ""}
+        // keeps the typed text while no song is picked, prefilled text included
+        clearOnBlur={false}
         disabled={busy !== undefined}
         // Songsterr already filtered the options by the query
         filterOptions={(options) => options}
@@ -216,7 +228,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
           setQuery(value);
           if (reason === "input" || reason === "clear") {
             setSearchText(value);
-            setIsSearching(value.trim().length >= MIN_QUERY_LENGTH);
+            setIsSearching(isLongEnough(value));
           }
         }}
         onChange={(_, value) => chooseSong(value)}

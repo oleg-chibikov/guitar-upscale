@@ -110,7 +110,10 @@ export const premiumFeaturesToMap = (
       case "reverbStrength":
         return <ReverbStrengthSlider />;
       case "melodies":
-        return <PremiumPlayButton />;
+        // the song list offers Songsterr to the tiers that have the Songsterr button
+        return (
+          <PremiumPlayButton canImportSongs={features.midiUpload === true} />
+        );
       default:
         return null; // Return null for keys without a mapping
     }

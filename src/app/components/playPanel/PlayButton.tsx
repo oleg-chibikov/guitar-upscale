@@ -25,7 +25,7 @@ import { useDispatch } from "react-redux";
 import { IconButtonWrapper } from "../uiFramework/IconButton";
 import { SongListButton } from "./SongListButton";
 
-type PlayButtonProps = UsePlayParams;
+type PlayButtonProps = UsePlayParams & { canImportSongs?: boolean };
 
 const getExampleChoices = (examplesMap: ExamplesMap | undefined) =>
   [...(examplesMap?.values() ?? [])]
@@ -142,6 +142,7 @@ export const BasePlayButton: React.FC<PlayButtonProps> = (params) => {
       {params.decodeExample && choices.length > 0 && (
         <SongListButton
           choices={choices}
+          canImportSongs={params.canImportSongs === true}
           decodeExample={params.decodeExample}
           onChoose={startExample}
         />

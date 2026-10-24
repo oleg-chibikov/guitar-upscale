@@ -1,8 +1,15 @@
 "use client";
 import { BasePlayButton } from "./PlayButton";
 
-export const PremiumPlayButton: React.FC = () => (
+interface PremiumPlayButtonProps {
+  canImportSongs?: boolean;
+}
+
+export const PremiumPlayButton: React.FC<PremiumPlayButtonProps> = ({
+  canImportSongs,
+}) => (
   <BasePlayButton
+    canImportSongs={canImportSongs}
     decodeExample={async (props) => {
       const decodeExample = (
         await import("@/app/engine/decoders/exampleDecoder")
