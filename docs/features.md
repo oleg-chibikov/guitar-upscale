@@ -208,7 +208,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 
 [Composer] The cloud button next to upload opens a dialog. It turns a Songsterr song into a Guitar Pro file and adds it to your songs.
 
-1. Type a band or a song and press Enter. Pick one of the results.
+1. Type a band or a song. The list fills in once typing stops. Pick a song from it.
 2. Pick the melody track and the bass track. The bass picks the chords. "None" takes the chords from the lowest melody notes.
 3. Pick the bars: press a section chip, or drag the two ends of the slider.
 4. Press Add. The song moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.

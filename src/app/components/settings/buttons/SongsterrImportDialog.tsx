@@ -15,23 +15,24 @@ import { setAndShowAlert } from "@/app/store/uiSlice";
 import Search from "@mui/icons-material/Search";
 import {
   Alert,
+  Autocomplete,
   Button,
   Chip,
   CircularProgress,
   DialogActions,
   InputAdornment,
-  List,
-  ListItemButton,
   ListItemText,
   MenuItem,
   Slider,
   TextField,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const LOG_PREFIX = "Songsterr import: ";
 const NO_BASS = -1;
+const SEARCH_DELAY_MS = 400;
+const MIN_QUERY_LENGTH = 2;
 
 type Range = [number, number];
 
@@ -63,7 +64,11 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
 }) => {
   const dispatch = useDispatch();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SongsterrSearchResult[]>();
+  // what the person typed, while query also takes the chosen song's name
+  const [searchText, setSearchText] = useState("");
+  const [results, setResults] = useState<SongsterrSearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [song, setSong] = useState<SongsterrSearchResult | null>(null);
   const [meta, setMeta] = useState<SongsterrMeta>();
   const [trackIndex, setTrackIndex] = useState(0);
   const [bassIndex, setBassIndex] = useState(NO_BASS);
@@ -71,6 +76,8 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   const [range, setRange] = useState<Range>([0, 0]);
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
+
+  const isQueryLongEnough = searchText.trim().length >= MIN_QUERY_LENGTH;
 
   const measureCount = melodyTrack?.measures.length ?? 0;
   const sections = melodyTrack ? listSections(melodyTrack.measures) : [];
@@ -88,14 +95,40 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
     }
   };
 
-  const search = () =>
-    run("Searching...", async () => {
-      const { searchSongsterr } =
-        await import("@/app/engine/songs/songsterrImport");
-      setMeta(undefined);
-      setMelodyTrack(undefined);
-      setResults(await searchSongsterr(query.trim()));
-    });
+  // Searches once typing stops, and drops answers to older queries.
+  useEffect(() => {
+    const pattern = searchText.trim();
+    if (pattern.length < MIN_QUERY_LENGTH) {
+      return;
+    }
+    let isStale = false;
+    const timer = setTimeout(() => {
+      void (async () => {
+        try {
+          const { searchSongsterr } =
+            await import("@/app/engine/songs/songsterrImport");
+          const found = await searchSongsterr(pattern);
+          if (!isStale) {
+            setResults(found);
+            setError(undefined);
+          }
+        } catch (e) {
+          if (!isStale) {
+            console.error(LOG_PREFIX + "Searching", e);
+            setError(errorText(e));
+          }
+        } finally {
+          if (!isStale) {
+            setIsSearching(false);
+          }
+        }
+      })();
+    }, SEARCH_DELAY_MS);
+    return () => {
+      isStale = true;
+      clearTimeout(timer);
+    };
+  }, [searchText]);
 
   const loadTrack = async (songMeta: SongsterrMeta, index: number) => {
     const { loadSongsterrTrack } =
@@ -110,11 +143,20 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
     );
   };
 
-  const chooseSong = (song: SongsterrSearchResult) =>
+  const chooseSong = (chosen: SongsterrSearchResult | null) => {
+    setSong(chosen);
+    setMeta(undefined);
+    setMelodyTrack(undefined);
+    if (chosen) {
+      void loadSong(chosen);
+    }
+  };
+
+  const loadSong = (chosen: SongsterrSearchResult) =>
     run("Loading the song...", async () => {
       const { loadSongsterrMeta } =
         await import("@/app/engine/songs/songsterrImport");
-      const songMeta = await loadSongsterrMeta(song.songId);
+      const songMeta = await loadSongsterrMeta(chosen.songId);
       setRange([0, 0]);
       setMeta(songMeta);
       setBassIndex(songMeta.popularTrackBass ?? NO_BASS);
@@ -159,64 +201,67 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
       headerText="Add a song from Songsterr"
       id={SONGSTERR_IMPORT_DIALOG}
     >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (query.trim() !== "" && busy === undefined) {
-            void search();
+      <Autocomplete
+        options={isQueryLongEnough ? results : []}
+        value={song}
+        inputValue={query}
+        loading={isQueryLongEnough && isSearching}
+        disabled={busy !== undefined}
+        // Songsterr already filtered the options by the query
+        filterOptions={(options) => options}
+        getOptionLabel={(option) => `${option.artist} - ${option.title}`}
+        isOptionEqualToValue={(option, value) => option.songId === value.songId}
+        onInputChange={(_, value, reason) => {
+          setQuery(value);
+          if (reason === "input" || reason === "clear") {
+            setSearchText(value);
+            setIsSearching(value.trim().length >= MIN_QUERY_LENGTH);
           }
         }}
-      >
-        <TextField
-          autoFocus
-          fullWidth
-          size="small"
-          placeholder="Band or song, then Enter"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-            htmlInput: { enterKeyHint: "search" },
-          }}
-        />
-      </form>
+        onChange={(_, value) => chooseSong(value)}
+        noOptionsText={
+          !isQueryLongEnough ? "Type a band or a song" : "No songs found"
+        }
+        // two songs can share a name, and MUI keys the options by name
+        getOptionKey={(option) => option.songId}
+        renderOption={({ key, ...props }, option) => (
+          <li key={key} {...props}>
+            <ListItemText primary={option.title} secondary={option.artist} />
+          </li>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            autoFocus
+            placeholder="Band or song"
+            slotProps={{
+              ...params.slotProps,
+              input: {
+                ...params.slotProps.input,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <>
+                    {isQueryLongEnough && isSearching && (
+                      <CircularProgress size={18} />
+                    )}
+                    {params.slotProps.input.endAdornment}
+                  </>
+                ),
+              },
+            }}
+          />
+        )}
+        size="small"
+      />
 
       {error !== undefined && <Alert severity="error">{error}</Alert>}
 
-      {!meta && results?.length === 0 && (
-        <Alert severity="info">No songs found</Alert>
-      )}
-
-      {!meta && results && results.length > 0 && (
-        <List dense className="max-h-72 overflow-y-auto">
-          {results.map((song) => (
-            <ListItemButton
-              key={song.songId}
-              disabled={busy !== undefined}
-              onClick={() => void chooseSong(song)}
-            >
-              <ListItemText primary={song.title} secondary={song.artist} />
-            </ListItemButton>
-          ))}
-        </List>
-      )}
-
       {meta && (
         <>
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-bold">
-              {meta.artist} - {meta.title}
-            </span>
-            <Button size="small" onClick={() => setMeta(undefined)}>
-              Other song
-            </Button>
-          </div>
           <TextField
             select
             size="small"
