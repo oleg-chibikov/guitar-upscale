@@ -40,6 +40,7 @@ import {
 } from "@/app/store/settingsSlice";
 import Konva from "konva";
 import React, {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -479,6 +480,26 @@ export const Fretboard: React.FC = () => {
 
   useFretboardPinchZoom(containerRef, !!neck);
 
+  // stable scene functions, so a render alone doesn't redraw the canvas
+  const drawBoardScene = useCallback((context: Konva.Context) => {
+    if (drawState.current) {
+      drawBoard(getNativeContext(context), drawState.current);
+    }
+  }, []);
+  const drawMarkersScene = useCallback(
+    (context: Konva.Context) => {
+      if (drawState.current) {
+        drawMarkers(
+          getNativeContext(context),
+          drawState.current,
+          store,
+          performance.now(),
+        );
+      }
+    },
+    [store],
+  );
+
   if (!neck) {
     return null;
   }
@@ -595,27 +616,10 @@ export const Fretboard: React.FC = () => {
                 )}
               </Group>
             </Group>
-            <Shape
-              sceneFunc={(context) => {
-                if (drawState.current) {
-                  drawBoard(getNativeContext(context), drawState.current);
-                }
-              }}
-            />
+            <Shape sceneFunc={drawBoardScene} />
           </Layer>
           <Layer ref={markersLayerRef} listening={false}>
-            <Shape
-              sceneFunc={(context) => {
-                if (drawState.current) {
-                  drawMarkers(
-                    getNativeContext(context),
-                    drawState.current,
-                    store,
-                    performance.now(),
-                  );
-                }
-              }}
-            />
+            <Shape sceneFunc={drawMarkersScene} />
           </Layer>
         </Stage>
       </div>
