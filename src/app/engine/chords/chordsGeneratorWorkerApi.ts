@@ -12,7 +12,6 @@ import { WorkerMessageWrapper } from "@/app/data/workerTypes";
 
 let workers: Worker[] = [];
 let isGenerating = false;
-let chordsWaitResolve: (() => void) | undefined;
 
 // One core stays free for the UI thread.
 const WORKER_COUNT = Math.max(
@@ -40,12 +39,6 @@ const startWorkers = () => {
 };
 
 startWorkers();
-
-export const setPromiseToResolveWhenChordsAreLoaded = (
-  resolve: () => void | undefined,
-) => {
-  chordsWaitResolve = resolve;
-};
 
 export const abortGeneratingChords = () => {
   if (!isGenerating) {
@@ -91,8 +84,6 @@ export const generateChords = (
       console.log("All chord modes have been processed");
       isGenerating = false;
       onComplete();
-      chordsWaitResolve?.();
-      chordsWaitResolve = undefined;
     }
   };
 

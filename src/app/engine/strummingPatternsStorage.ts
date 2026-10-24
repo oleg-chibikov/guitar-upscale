@@ -35,11 +35,6 @@ export function deletePattern(id: number): void {
   savePatternsToLocalStorage();
 }
 
-export function editPattern(pattern: StrummingPattern): void {
-  strummingPatternsMap.set(pattern.id, pattern);
-  savePatternsToLocalStorage();
-}
-
 export function getPatternById(id: number): StrummingPattern | undefined {
   return strummingPatternsMap.get(id);
 }
@@ -59,15 +54,6 @@ export function getCustomPatterns(): StrummingPattern[] {
   return Array.from(strummingPatternsMap.values()).filter(
     (pattern) => pattern.id > lastStrummingPatternId,
   );
-}
-
-export function clearCustomPatterns(): void {
-  for (const id of Array.from(strummingPatternsMap.keys())) {
-    if (id > lastStrummingPatternId) {
-      strummingPatternsMap.delete(id);
-    }
-  }
-  localStorage.removeItem("strummingPatterns");
 }
 
 // Console logs for debugging

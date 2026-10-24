@@ -63,8 +63,6 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         <ChordPlayModeSelector />
         {premiumComponents.get("skinSelection") as ReactNode}
         {premiumComponents.get("playbackTypeSelection") as ReactNode}
-        {/* <TempoSlider />
-          <ChordStrummingDelaySlider /> */}
         <ChordNotesToPlaySlider />
         <VolumeSlider />
         <MetronomeVolumeSlider />

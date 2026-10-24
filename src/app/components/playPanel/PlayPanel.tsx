@@ -32,7 +32,6 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
       <PauseButton />
       <NextEventButton />
       <DownloadButton />
-      {/* <ShareMidiButton /> */}
       <MetronomeButton />
       {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
         <DisabledRecordButton />

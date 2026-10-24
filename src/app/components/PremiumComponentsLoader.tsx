@@ -63,11 +63,6 @@ const SaveMidiImmediatelyCheckbox = dynamic(
       await import("@/app/components/settings/checkboxes/SaveMidiImmediatelyCheckbox")
     ).SaveMidiImmediatelyCheckbox,
 );
-// const ErudaConsoleControl = dynamic(
-//   async () =>
-//     (await import("@/app/components/settings/ErudaConsoleControl"))
-//       .ErudaConsoleControl
-// );
 
 export const premiumFeaturesToMap = (
   features: PremiumFeatures,
@@ -144,7 +139,6 @@ export const PremiumComponentsLoader: React.FC<WithPremiumFeatures> = ({
   return (
     <>
       <ClientRoot premiumComponents={premiumComponents} />
-      {/* {process.env.ENABLE_ERUDA_CONSOLE === "true" && <ErudaConsoleControl />} */}
     </>
   );
 };

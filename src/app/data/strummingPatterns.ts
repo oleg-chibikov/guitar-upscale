@@ -125,7 +125,6 @@ export const chordStrummingPatterns: StrummingPattern[] = [
 
 export const lastStrummingPatternId = i;
 
-export const STRUMMING_PLACEHOLDER = "_";
 export type StrumDirection = "" | "↑" | "↓";
 
 // this function gets the number of slots for the patternEditorUI
