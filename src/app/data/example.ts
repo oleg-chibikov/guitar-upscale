@@ -16,6 +16,10 @@ export type Example = {
 
 export type ExamplesMap = Map<string, Map<string, Example[]>>;
 
+// asks for a random song of the current scale, other than the last one
+export const RANDOM_SONG = "random";
+export type SongChoice = Example | typeof RANDOM_SONG;
+
 export const getExampleName = (example: Pick<Example, "band" | "title">) =>
   [example.band, example.title].filter(Boolean).join(" - ");
 

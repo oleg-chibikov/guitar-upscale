@@ -11,7 +11,12 @@ import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
 import { UnknownAction } from "redux";
 import { AlertType } from "../data/alertType";
-import { Example, getExampleName } from "../data/example";
+import {
+  Example,
+  RANDOM_SONG,
+  SongChoice,
+  getExampleName,
+} from "../data/example";
 import { getNoteText } from "../data/notes";
 import { PlaybackType } from "../data/playbackType";
 import { loadInstrument } from "../engine/sound/soundHelper";
@@ -24,6 +29,7 @@ import {
   scaleGroupValue,
   scaleValue,
   setIsPlaying,
+  setNowPlaying,
   setTempoBpm,
   tempoBpmValue,
   wipeExampleCacheTriggerValue,
@@ -44,7 +50,16 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     (s) => s.guitarSettingsUpdateCount,
   );
   const isPlaying = useSettingsSelector((s) => s.isPlaying);
+  const playbackType = useSettingsSelector((s) => s.playbackType);
   const [isWaiting, setIsWaiting] = useState(false);
+  // Play repeats the last song until the scale or the playback type changes
+  const settingsKey = `${guitarSettingsUpdateCount}:${playbackType}`;
+  const [lastPlayed, setLastPlayed] = useState<{
+    example: Example;
+    settingsKey: string;
+  }>();
+  const repeatable =
+    lastPlayed?.settingsKey === settingsKey ? lastPlayed.example : undefined;
 
   // a ref is updated along with the state. It's needed to immediately mark playback as active and therefore prevent any double playback if clicked simultaneously
   const isWaitingRef = useRef<boolean>(false);
@@ -57,7 +72,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const dispatch = useDispatch();
 
   const handlePlay = useCallback(
-    async (chosen?: Example) => {
+    async (choice?: SongChoice) => {
       if (isWaitingRef.current) {
         console.log(
           LOG_PREFIX +
@@ -67,7 +82,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
       }
       updateWaiting(true);
       try {
-        if (chosen && isPlayingValue && !checkLooperPlaying()) {
+        if (choice !== undefined && isPlayingValue && !checkLooperPlaying()) {
           await stop(dispatch);
         }
 
@@ -79,7 +94,13 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
 
           if (pianoRollData) {
             updateWaiting(false);
-            await replay(dispatch, pianoRollData);
+            await replay(
+              dispatch,
+              pianoRollData,
+              repeatable?.decodedTracks === pianoRollData
+                ? getExampleName(repeatable)
+                : undefined,
+            );
             return;
           }
           return;
@@ -89,8 +110,9 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         const example: Example | undefined = await loadExample(
           decodeExample,
           dispatch,
-          chosen,
+          choice === RANDOM_SONG ? undefined : (choice ?? repeatable),
         );
+        setLastPlayed(example && { example, settingsKey });
 
         await loadInstruments(example);
 
@@ -117,7 +139,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
         updateWaiting(false);
       }
     },
-    [dispatch, decodeExample],
+    [dispatch, decodeExample, repeatable, settingsKey],
   );
 
   useEffect(() => {
@@ -144,13 +166,24 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
     };
   }, [handlePlay]); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
 
-  return { isWaiting, handlePlay, isPlaying };
+  return {
+    isWaiting,
+    handlePlay,
+    isPlaying,
+    canPlayAgain: repeatable !== undefined,
+  };
 };
 
-async function replay(dispatch: Dispatch<UnknownAction>, data: EventsByTick) {
+async function replay(
+  dispatch: Dispatch<UnknownAction>,
+  data: EventsByTick,
+  songName: string | undefined,
+) {
   console.log("Replaying");
   const { playMidi } = await import("@/app/engine/midiPlayer");
-  await playMidi(dispatch, data, LOG_PREFIX);
+  await playMidi(dispatch, data, LOG_PREFIX, () =>
+    dispatch(setNowPlaying(songName)),
+  );
 }
 
 async function stop(dispatch: Dispatch<UnknownAction>) {
@@ -186,7 +219,11 @@ async function playExampleOrScale(
         action: "Playback started",
       });
 
-      dispatch(setAndShowAlert({ message, alertType: AlertType.Success }));
+      dispatch(
+        example
+          ? setNowPlaying(message)
+          : setAndShowAlert({ message, alertType: AlertType.Success }),
+      );
 
       // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
       console.log(

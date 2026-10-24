@@ -4,6 +4,7 @@ import { BottomZone } from "@/app/components/BottomZone";
 import { ScaleDetectionDialogWrapper } from "@/app/components/alert/ScaleDetectionDialogWrapper";
 import { AspectRatioModalWrapper } from "@/app/components/aspectRatio/AspectRatioModalWrapper";
 import { PianoRollDialogWrapper } from "@/app/components/pianoRoll/PianoRollDialogWrapper";
+import { NowPlaying } from "@/app/components/playPanel/NowPlaying";
 import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSettingsWrapper";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { isAuthEnabled } from "@/lib/featureFlags";
@@ -51,6 +52,7 @@ export const ClientRoot: React.FC<WithPremiumComponents> = ({
           {isAuthEnabled && <AuthPanel />}
           <StrummingSettingsWrapper />
           <BottomZone premiumComponents={premiumComponents} />
+          <NowPlaying />
           <AspectRatioModalWrapper />
           <PianoRollDialogWrapper />
         </main>

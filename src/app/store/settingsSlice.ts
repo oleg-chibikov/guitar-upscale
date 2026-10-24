@@ -113,6 +113,7 @@ interface SettingsState
   scaleDetectorAvailable?: boolean; // may be undefined
   showReplayTrigger: boolean;
   saveMidiImmediately: boolean;
+  nowPlaying?: string; // the name of the song that plays
 }
 
 const initialState: SettingsState = {
@@ -393,6 +394,8 @@ export const settingsSlice = createSlice({
       chordsAreLoadingValue = state.chordsAreLoading;
       slashChordBassNoteValue = state.slashChordBassNote;
       saveMidiImmediatelyValue = state.saveMidiImmediately;
+      // redux persist may have stored the name of a song that played before the reload
+      state.nowPlaying = undefined;
       onGuitarSettingsUpdate(state);
       void loadInstrument(instrumentValue, reverbStrengthValue);
       void loadInstrument(chordInstrumentValue, reverbStrengthValue);
@@ -529,6 +532,7 @@ export const settingsSlice = createSlice({
       state.isPlaying = isPlayingValue;
       if (!isPlayingValue) {
         updateIsPaused(false, state);
+        state.nowPlaying = undefined;
       }
       tryToggleInterval(isPlayingValue);
     },
@@ -595,6 +599,9 @@ export const settingsSlice = createSlice({
       state.saveMidiImmediately = action.payload;
       saveMidiImmediatelyValue = action.payload;
     },
+    setNowPlaying(state, action: PayloadAction<string | undefined>) {
+      state.nowPlaying = action.payload;
+    },
   },
 });
 
@@ -640,6 +647,7 @@ export const {
   setScaleDetectorAvailable,
   triggerShowReplay,
   setSaveMidiImmediately,
+  setNowPlaying,
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

@@ -38,7 +38,8 @@ import { store } from "@/app/store/store";
 import { Dispatch } from "react";
 import { UnknownAction } from "redux";
 
-const checkFinished = () => !isPlayingValue;
+// a playback that was stopped without waiting can wake up after the next one has started
+let currentPlaybackId = 0;
 
 const toBarPosition = (tick: number) =>
   ((tick % TICKS_IN_BAR) + TICKS_IN_BAR) % TICKS_IN_BAR;
@@ -55,6 +56,7 @@ class MidiPlayer {
     eventsByTick: EventsByTick,
     logPrefix: string,
     tickZeroBarPosition: number,
+    isCurrent: () => boolean,
     onStarted?: () => void,
   ): Promise<boolean> {
     if (isLastEventValue) {
@@ -102,7 +104,7 @@ class MidiPlayer {
         return loop !== undefined && currentTick < loop.end;
       };
       while (currentTick <= lastTick || isInLoop()) {
-        if (checkFinished()) {
+        if (!isPlayingValue || !isCurrent()) {
           console.log(logPrefix + "Finished playback prematurely");
           return false;
         }
@@ -178,7 +180,7 @@ class MidiPlayer {
         lastTick = eventsByTick.lastTick;
       }
     } finally {
-      if (!isStarted) {
+      if (!isStarted && isCurrent()) {
         onStarted?.();
       }
       returnToStart(eventsByTick);
@@ -261,6 +263,8 @@ export const playMidi = async (
   console.log(logPrefix + "Starting new playback");
   recreatePlaybackPromise();
   dispatch(setIsPlaying(true));
+  const playbackId = ++currentPlaybackId;
+  const isCurrent = () => playbackId === currentPlaybackId;
 
   setPianoRollData(eventsByTick, dispatch);
   if (startBarPosition !== undefined) {
@@ -270,8 +274,13 @@ export const playMidi = async (
     eventsByTick,
     logPrefix,
     startBarPositions.get(eventsByTick) ?? 0,
+    isCurrent,
     onStarted,
   );
+  if (!isCurrent()) {
+    console.log(logPrefix + "A newer playback took over");
+    return;
+  }
   dispatch(setIsPlaying(false));
   recreatePlaybackPromise();
   if (isPlayedToEnd) {
