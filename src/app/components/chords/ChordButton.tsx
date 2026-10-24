@@ -39,7 +39,7 @@ interface ChordButtonProps {
 /**
  * Plays one chord and keeps its button state in the store. The chord grid canvas draws the button.
  */
-export const ChordButton: React.FC<ChordButtonProps> = ({
+const ChordButtonComponent: React.FC<ChordButtonProps> = ({
   chordName,
   variations,
   isHidden,
@@ -212,6 +212,10 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   return null;
 };
+
+// the chord view renders hundreds of these on each batch of loaded chords
+export const ChordButton = React.memo(ChordButtonComponent);
+
 function processClearChord(
   chordName: string,
   wasPlayedLastRef: React.MutableRefObject<boolean>,
