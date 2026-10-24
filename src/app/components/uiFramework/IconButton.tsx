@@ -26,6 +26,8 @@ export interface IconButtonWrapperProps extends WithClassName, WithId {
   onLongPress?: (anchor: HTMLElement) => void;
   // the main button of a bar, drawn light on dark
   emphasis?: boolean;
+  // an on and off switch: screen readers hear isActive as pressed
+  toggle?: boolean;
 }
 
 export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
@@ -42,6 +44,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
   allowHandlerInDisabledState,
   onLongPress,
   emphasis = false,
+  toggle = false,
   ...rest
 }) => {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -99,6 +102,7 @@ export const IconButtonWrapper: React.FC<IconButtonWrapperProps> = ({
           <IconButton
             id={id}
             aria-label={tooltip}
+            aria-pressed={toggle ? isActive : undefined}
             disabled={allowHandlerInDisabledState !== true && disabled}
             onClick={handleClick}
             color={getColor()}

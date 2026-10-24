@@ -247,6 +247,7 @@ export const PianoRollToolbar: React.FC = () => {
               }
               onPress={() => dispatch(setSnapToScale(!snapToScale))}
               isActive={snapToScale && !isChromatic}
+              toggle
               disabled={isChromatic}
             />
           </Group>
@@ -274,12 +275,14 @@ export const PianoRollToolbar: React.FC = () => {
               tooltip={`Drag copies notes (or hold ${altKey()})`}
               onPress={() => dispatch(setCopyMode(!copyMode))}
               isActive={copyMode}
+              toggle
             />
             <IconButtonWrapper
               icon={<CompareArrows />}
               tooltip={`Drag notes in time or in pitch only (or hold ${mod})`}
               onPress={() => dispatch(setAxisLock(!axisLock))}
               isActive={axisLock}
+              toggle
             />
           </Group>
           <Group>
@@ -339,6 +342,7 @@ export const PianoRollToolbar: React.FC = () => {
               tooltip="Follow the playhead during playback. The view stays put while notes are selected"
               onPress={() => dispatch(setFollowPlayback(!followPlayback))}
               isActive={followPlayback}
+              toggle
             />
           </Group>
         </div>

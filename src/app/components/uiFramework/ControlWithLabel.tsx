@@ -1,6 +1,11 @@
 import { WithChildren } from "@/app/helpers/withChildren";
 import { Typography } from "@mui/material";
-import { FC } from "react";
+import { createContext, FC, useContext, useId } from "react";
+
+// a select or a slider inside reads the label id to name itself
+const LabelIdContext = createContext<string | undefined>(undefined);
+
+export const useControlLabelId = () => useContext(LabelIdContext);
 
 interface ControlWithLabelProps extends WithChildren {
   label: string;
@@ -12,9 +17,10 @@ export const ControlWithLabel: FC<ControlWithLabelProps> = ({
   label,
   subtitle,
 }) => {
+  const labelId = useId();
   return (
     <>
-      <Typography className="flex items-center select-text">
+      <Typography id={labelId} className="flex items-center select-text">
         {label}:
       </Typography>
       {subtitle !== undefined && (
@@ -22,7 +28,9 @@ export const ControlWithLabel: FC<ControlWithLabelProps> = ({
           {subtitle}:
         </Typography>
       )}
-      {children}
+      <LabelIdContext.Provider value={labelId}>
+        {children}
+      </LabelIdContext.Provider>
     </>
   );
 };
