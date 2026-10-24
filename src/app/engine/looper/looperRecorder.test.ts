@@ -40,7 +40,11 @@ const record = (globalTicks: number[], stopAt: number) => {
   recorder.startRecording();
   for (const globalTick of globalTicks) {
     moveClockTo(globalTick);
-    recorder.recordNote({ note: 0, octave: 4 }, 0, "acoustic_guitar_nylon");
+    recorder.recordNote(
+      { note: 0, octave: 4, string: 0, fret: 0 },
+      0,
+      "acoustic_guitar_nylon",
+    );
   }
   moveClockTo(stopAt);
   recorder.stopRecording();
