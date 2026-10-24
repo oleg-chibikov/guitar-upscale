@@ -60,7 +60,15 @@ import React, {
 export type Preview =
   | { kind: "move"; targets: Map<string, MoveTarget>; copy: boolean }
   | { kind: "resize"; targets: Map<string, ResizeTarget> }
-  | { kind: "rubber"; x: number; y: number; width: number; height: number }
+  | {
+      kind: "rubber";
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      // the notes the rectangle selects. The selection takes them when the drag ends
+      ids: ReadonlySet<string>;
+    }
   | { kind: "draw"; tick: number; event: ChordOrNote }
   | { kind: "erase"; ids: ReadonlySet<string> };
 
@@ -91,6 +99,7 @@ type Gesture =
       start: { x: number; y: number };
       base: ReadonlySet<string>;
       dragging: boolean;
+      hit: ReadonlySet<string>;
     }
   | { kind: "draw"; tick: number; event: ChordOrNote }
   | { kind: "erase"; ids: Set<string> }
@@ -387,8 +396,8 @@ export const useNoteAreaInteraction = ({
               hit.add(event.id);
             }
           });
-          setSelection(hit);
-          setPreview({ kind: "rubber", ...rect });
+          gesture.hit = hit;
+          setPreview({ kind: "rubber", ...rect, ids: hit });
           return;
         }
         case "draw": {
@@ -558,6 +567,9 @@ export const useNoteAreaInteraction = ({
 
       if (cancelled) {
         if (gesture.kind === "pan") clearTimeout(gesture.longPress);
+        if (gesture.kind === "rubber" && gesture.dragging) {
+          setSelection(gesture.hit);
+        }
         return;
       }
 
@@ -595,7 +607,11 @@ export const useNoteAreaInteraction = ({
           return;
         }
         case "rubber":
-          if (!gesture.dragging && pointer?.shiftKey !== true) setSelection([]);
+          if (gesture.dragging) {
+            setSelection(gesture.hit);
+          } else if (pointer?.shiftKey !== true) {
+            setSelection([]);
+          }
           return;
         case "draw":
           apply(addEvent(data, gesture.tick, gesture.event));
@@ -758,6 +774,7 @@ export const useNoteAreaInteraction = ({
           start: point,
           base: selection,
           dragging: false,
+          hit: selection,
         };
         runAutoScroll();
         return;
@@ -780,6 +797,7 @@ export const useNoteAreaInteraction = ({
             start: point,
             base: new Set(),
             dragging: false,
+            hit: new Set(),
           };
           runAutoScroll();
         }, LONG_PRESS_MS),

@@ -190,8 +190,10 @@ const collectBlocks = ({
   }));
   const blocks: Block[] = [];
   const ghosts: Block[] = [];
+  // a rubber band drag shows its notes selected before the selection takes them
+  const selectedIds = preview?.kind === "rubber" ? preview.ids : selection;
   for (const { tick, event } of events) {
-    const selected = selection.has(event.id);
+    const selected = selectedIds.has(event.id);
     const pitch = getEventPitch(event);
     if (preview?.kind === "erase" && preview.ids.has(event.id)) {
       continue;
