@@ -1,13 +1,12 @@
+import { Panel } from "@/app/components/uiFramework/Panel";
 import React, { ReactNode } from "react";
 
-// buttons that belong together sit on one rounded strip
+// buttons that belong together, without a frame of their own
 export const Group: React.FC<{ children: ReactNode; className?: string }> = ({
   children,
   className = "",
 }) => (
-  <div
-    className={`flex shrink-0 flex-row items-center overflow-hidden rounded-md bg-white/5 ${className}`}
-  >
+  <Panel bare className={`shrink-0 ${className}`}>
     {children}
-  </div>
+  </Panel>
 );
