@@ -192,7 +192,7 @@ export const acknowledge = async (subscriptionData: SubscriptionData) => {
     params.itemId,
     wasAcknowledged,
   );
-  // TODO: Validate subscription somehow (we might need to store users and subscriptions in the db)
+  // getSubscriptionFromRequest checked the token with Google. It isn't tied to an account, so one token can serve several people.
 
   if (!wasAcknowledged) {
     await acknowledgeSubscriptionPurchase(params);

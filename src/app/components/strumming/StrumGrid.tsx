@@ -18,7 +18,6 @@ interface StrumGridProps {
   onRemove: () => void;
 }
 
-// TODO: update rendering - changing a cell shouldn't rerender everything
 export const StrumGrid: React.FC<StrumGridProps> = React.memo(
   ({ pattern, onStrum, onAdd, onRemove }) => {
     const theme = useUiSelector((s) => s.theme);

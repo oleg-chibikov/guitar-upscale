@@ -505,7 +505,6 @@ export const settingsSlice = createSlice({
       instrumentValue = action.payload;
     },
     setInstrumentGroup: (state, action: PayloadAction<InstrumentGroup>) => {
-      // TODO: lazy load instruments.ts if permissions allow
       state.instrumentGroup = action.payload;
     },
     setChordInstrument(state, action: PayloadAction<Instrument>) {
