@@ -22,6 +22,21 @@ import {
 } from "../store/settingsSlice";
 import { initUi, setAndShowAlert } from "../store/uiSlice";
 
+// Dev chunks keep their names between edits, so sw.js would serve the old code from its cache.
+// The "smplr" sample cache stays.
+const removeOfflineCopy = async () => {
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  await Promise.all(registrations.map((reg) => reg.unregister()));
+  if (typeof caches !== "undefined") {
+    const names = await caches.keys();
+    await Promise.all(
+      names
+        .filter((name) => name.startsWith("offline-"))
+        .map((name) => caches.delete(name)),
+    );
+  }
+};
+
 // A separate chunk, so the auth code loads only when auth is on
 const AuthInitializer = dynamic(() => import("./auth/AuthInitializer"));
 
@@ -143,10 +158,14 @@ export const Initializer: React.FC = () => {
     blockLongPress();
 
     if (typeof navigator.serviceWorker !== "undefined") {
-      void navigator.serviceWorker.register(
-        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`,
-        { updateViaCache: "none" },
-      );
+      if (process.env.NODE_ENV === "production") {
+        void navigator.serviceWorker.register(
+          `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`,
+          { updateViaCache: "none" },
+        );
+      } else {
+        void removeOfflineCopy();
+      }
     }
   }, []);
   return isAuthEnabled ? <AuthInitializer /> : null;

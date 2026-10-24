@@ -1,7 +1,7 @@
 // Offline copy of the app. Pages and lists go to the network first, so a phone gets the latest build.
 // Hashed chunks don't change, so they come from the cache first. Songs and skins come from the cache too,
 // and refresh in the background.
-const CACHE = "offline-v4";
+const CACHE = "offline-v5";
 // Older offline caches go on update. Other caches, like the "smplr" sound samples, stay.
 // Every deploy adds new chunks, so the oldest entries go once the cache grows past this.
 const MAX_ENTRIES = 400;
