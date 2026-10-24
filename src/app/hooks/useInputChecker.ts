@@ -1,5 +1,8 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 export const useInputChecker = () => {
-  return useRef<boolean>(window.matchMedia("(pointer:coarse)").matches).current;
+  const [hasTouchInput] = useState(
+    () => window.matchMedia("(pointer:coarse)").matches,
+  );
+  return hasTouchInput;
 };

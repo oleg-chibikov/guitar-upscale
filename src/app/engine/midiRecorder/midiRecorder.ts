@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { TICKS_IN_BEAT } from "@/app/data/clockConstants";
 import { TrackKey } from "@/app/data/trackKey";
 import { MAX_VOLUME } from "@/app/data/volume";
@@ -146,7 +147,7 @@ export class MidiRecorder implements NoteRecorder {
     if (!this.isRecording || !this.midiEvents) {
       return;
     }
-    console.log(
+    debugLog(
       `Recording ${getNoteText(note.note)}${note.octave}; delta: ${tick} ticks`,
     );
 

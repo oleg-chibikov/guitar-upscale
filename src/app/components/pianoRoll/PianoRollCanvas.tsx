@@ -16,7 +16,7 @@ import { getChordModesVersion } from "@/app/engine/chords/chordModesByNote";
 import { isChordModeAvailable } from "@/app/engine/pianoRoll/pianoRollEvent";
 import { getNativeContext } from "@/app/helpers/canvas/konvaHelpers";
 import { PianoRollTool } from "@/app/store/pianoRollSlice";
-import Konva from "konva";
+import type Konva from "konva";
 import React, {
   RefObject,
   useCallback,
@@ -24,7 +24,7 @@ import React, {
   useLayoutEffect,
   useRef,
 } from "react";
-import { Layer, Shape, Stage } from "react-konva";
+import { Layer, Shape, Stage } from "react-konva/lib/ReactKonvaCore";
 import { shallowEqual } from "react-redux";
 import { Observable } from "rxjs";
 

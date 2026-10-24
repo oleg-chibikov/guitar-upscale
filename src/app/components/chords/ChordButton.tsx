@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { ChordMode, ChordVariations } from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { Note } from "@/app/data/notes";
@@ -38,7 +39,7 @@ interface ChordButtonProps {
 /**
  * Plays one chord and keeps its button state in the store. The chord grid canvas draws the button.
  */
-export const ChordButton: React.FC<ChordButtonProps> = ({
+const ChordButtonComponent: React.FC<ChordButtonProps> = ({
   chordName,
   variations,
   isHidden,
@@ -149,7 +150,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
           chordDetectorBuilder.clear();
         }
 
-        console.log("Playing chord: %s at tick %d", chordName, currentTick);
+        debugLog("Playing chord: %s at tick %d", chordName, currentTick);
         wasPlayedLastRef.current = true;
         publishState();
 
@@ -211,12 +212,16 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
 
   return null;
 };
+
+// the chord view renders hundreds of these on each batch of loaded chords
+export const ChordButton = React.memo(ChordButtonComponent);
+
 function processClearChord(
   chordName: string,
   wasPlayedLastRef: React.MutableRefObject<boolean>,
   publishState: () => void,
 ) {
-  console.log("Clear previous chord marker: " + chordName);
+  debugLog("Clear previous chord marker: " + chordName);
   wasPlayedLastRef.current = false;
   publishState();
 }

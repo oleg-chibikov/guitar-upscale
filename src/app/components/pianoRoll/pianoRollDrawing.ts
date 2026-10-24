@@ -190,8 +190,10 @@ const collectBlocks = ({
   }));
   const blocks: Block[] = [];
   const ghosts: Block[] = [];
+  // a rubber band drag shows its notes selected before the selection takes them
+  const selectedIds = preview?.kind === "rubber" ? preview.ids : selection;
   for (const { tick, event } of events) {
-    const selected = selection.has(event.id);
+    const selected = selectedIds.has(event.id);
     const pitch = getEventPitch(event);
     if (preview?.kind === "erase" && preview.ids.has(event.id)) {
       continue;
@@ -267,6 +269,30 @@ const collectBlocks = ({
     ...blocks.filter(({ selected }) => selected),
     ...ghosts,
   ];
+};
+
+interface PlacedBlock extends Block {
+  x: number;
+  y: number;
+  width: number;
+}
+
+// scrolling redraws the same scene many times, so its blocks are built once
+const placedBlocksByScene = new WeakMap<PianoRollScene, PlacedBlock[]>();
+
+const getPlacedBlocks = (scene: PianoRollScene) => {
+  let placed = placedBlocksByScene.get(scene);
+  if (!placed) {
+    const { zoom } = scene;
+    placed = collectBlocks(scene).map((block) => ({
+      ...block,
+      x: tickToX(block.tick, zoom),
+      y: pitchToY(block.pitch, zoom),
+      width: blockWidth(block.event, zoom),
+    }));
+    placedBlocksByScene.set(scene, placed);
+  }
+  return placed;
 };
 
 const drawVerticalLines = (
@@ -415,14 +441,12 @@ const drawNoteArea = (
 
   drawGrid(ctx, scene, left, right, top, bottom);
 
-  for (const block of collectBlocks(scene)) {
-    const x = tickToX(block.tick, zoom);
-    const y = pitchToY(block.pitch, zoom);
+  for (const block of getPlacedBlocks(scene)) {
     if (
-      x > right ||
-      x + blockWidth(block.event, zoom) < left ||
-      y > bottom ||
-      y + zoom.noteHeight < top
+      block.x > right ||
+      block.x + block.width < left ||
+      block.y > bottom ||
+      block.y + zoom.noteHeight < top
     ) {
       continue;
     }

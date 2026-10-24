@@ -12,6 +12,8 @@ import uiReducer from "./uiSlice";
 
 // Raising it drops the saved state of every slice
 const VERSION = 11;
+// a burst of changes, such as dragging a slider, saves once
+const PERSIST_THROTTLE_MS = 300;
 
 // the whole state used to sit under one key
 if (typeof window !== "undefined") {
@@ -30,6 +32,7 @@ const persistSlice = <S>(
       version: VERSION,
       storage,
       blacklist,
+      throttle: PERSIST_THROTTLE_MS,
       migrate: createMigrate({ [VERSION]: () => undefined }),
     },
     reducer,
@@ -48,6 +51,14 @@ const rootReducer = combineReducers({
     "isFirstEvent",
     "guitarSettingsUpdateCount",
     "chordsAreLoading",
+    // playback stops on reload, so its state starts fresh
+    "isPlaying",
+    "isPaused",
+    "isLooperPlaying",
+    "nowPlaying",
+    "looperStateUpdateTrigger",
+    "strummingPatternChangedTrigger",
+    "showReplayTrigger",
   ]),
   ui: persistSlice("ui", uiReducer, [
     "settingsExpanded",
@@ -65,12 +76,23 @@ const rootReducer = combineReducers({
 });
 
 export const store = configureStore({
-  devTools: true,
+  devTools: process.env.NODE_ENV !== "production",
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(looperGuard), // The application stores a Set to improve its performance
 });
 
 export const persistor = persistStore(store);
+
+// the throttle holds back the last changes, so they save before the page goes away
+if (typeof window !== "undefined") {
+  const flush = () => void persistor.flush();
+  window.addEventListener("pagehide", flush);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      flush();
+    }
+  });
+}
 
 export type RootState = ReturnType<typeof store.getState>;

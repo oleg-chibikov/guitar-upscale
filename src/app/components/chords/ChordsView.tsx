@@ -1,6 +1,10 @@
 import { SlashChordButtonsContainer } from "@/app/components/chords/SlashChordButtonsContainer";
 import { Expander } from "@/app/components/uiFramework/Expander";
-import { ChordModeVariations, getChordName } from "@/app/data/chordModes";
+import {
+  ChordModeVariations,
+  ChordVariations,
+  getChordName,
+} from "@/app/data/chordModes";
 import { ChordPlayMode } from "@/app/data/chordPlayMode";
 import { MIN_HEIGHT_TO_SHOW_LARGE_CHORDS } from "@/app/data/chordsDisplayMode";
 import { CHORDS_VIEW_ID } from "@/app/data/elementIds";
@@ -37,7 +41,14 @@ import {
 } from "@/app/store/settingsSlice";
 import { setAllChordsShown, setChordsExpanded } from "@/app/store/uiSlice";
 import { Button } from "@mui/material";
-import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch } from "react-redux";
 import { ChordButton } from "./ChordButton";
 import {
@@ -55,6 +66,7 @@ const BOTTOM_BAR_HEIGHT = 56;
 const HORIZONTAL_RESERVED_WIDTH = 600;
 const COMPACT_CHORDS_WIDTH = 220;
 const CHORDS_RENDER_INTERVAL_MS = 150;
+const NO_VARIATIONS: ChordVariations = [];
 
 export const ChordsView: React.FC<{
   mainRef: RefObject<HTMLElement | null>;
@@ -197,6 +209,18 @@ export const ChordsView: React.FC<{
     };
   }, []);
 
+  const handleStrummingStateChange = useCallback(
+    (value: boolean) => {
+      if (!isMobileDeviceValue) {
+        return;
+      }
+      const isStrummingClicked = value || isAnyStrummingClicked();
+      toggleOverflow(isStrummingClicked, ref);
+      toggleOverflow(isStrummingClicked, mainRef);
+    },
+    [mainRef],
+  );
+
   const totalColumns = chordModeVariations.length;
   if (totalColumns === 0) {
     return null;
@@ -286,16 +310,11 @@ export const ChordsView: React.FC<{
                 }
                 chordMode={chordMode.chordMode}
                 note={noteIndex}
-                variations={chordMode.variationsByNote[noteIndex] ?? []}
+                variations={
+                  chordMode.variationsByNote[noteIndex] ?? NO_VARIATIONS
+                }
                 chordName={title}
-                onStrummingStateChange={(value) => {
-                  if (!isMobileDeviceValue) {
-                    return;
-                  }
-                  const isStrummingClicked = value || isAnyStrummingClicked();
-                  toggleOverflow(isStrummingClicked, ref);
-                  toggleOverflow(isStrummingClicked, mainRef);
-                }}
+                onStrummingStateChange={handleStrummingStateChange}
               />
             );
           }),

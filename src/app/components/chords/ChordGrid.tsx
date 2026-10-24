@@ -13,9 +13,10 @@ import {
 } from "@/app/helpers/canvas/palette";
 import { Note } from "@/app/data/notes";
 import { useUiSelector } from "@/app/hooks/storeHooks";
-import Konva from "konva";
+import type Konva from "konva";
+import { Animation as KonvaAnimation } from "konva/lib/Animation";
 import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
-import { Layer, Shape, Stage } from "react-konva";
+import { Layer, Shape, Stage } from "react-konva/lib/ReactKonvaCore";
 import { ChordCellState, ChordGridStore, PULSE_MS } from "./chordGridStore";
 import { ChordGridCell } from "./chordGridLayout";
 import { useChordGridTouch } from "./useChordGridTouch";
@@ -124,21 +125,77 @@ const getCursor = (state: ChordCellState, isDisabled: boolean) => {
   return state.isPlaying || (!isDisabled && !state.isClicked) ? "pointer" : "";
 };
 
+// measuring text is slow, and the grid redraws its labels on every pulse frame
+const fittedTexts = new Map<string, string>();
+
 const fitText = (
   ctx: CanvasRenderingContext2D,
   text: string,
   width: number,
 ) => {
-  if (ctx.measureText(text).width <= width) {
-    return text;
+  const key = `${ctx.font}|${width}|${text}`;
+  const cached = fittedTexts.get(key);
+  if (cached !== undefined) {
+    return cached;
   }
   let fitted = text;
-  while (fitted.length > 1 && ctx.measureText(fitted + "…").width > width) {
-    fitted = fitted.slice(0, -1);
+  if (ctx.measureText(text).width > width) {
+    while (fitted.length > 1 && ctx.measureText(fitted + "…").width > width) {
+      fitted = fitted.slice(0, -1);
+    }
+    fitted += "…";
   }
-  return fitted + "…";
+  fittedTexts.set(key, fitted);
+  return fitted;
 };
 
+const drawCell = (
+  ctx: CanvasRenderingContext2D,
+  { label, x, y, isDisabled }: Cell,
+  cellHeight: number,
+  geometry: Geometry,
+  palette: Palette,
+  state: ChordCellState,
+  scale: number,
+) => {
+  ctx.save();
+  if (scale !== 1) {
+    ctx.translate(x + CELL_WIDTH / 2, y + cellHeight / 2);
+    ctx.scale(scale, scale);
+    ctx.translate(-x - CELL_WIDTH / 2, -y - cellHeight / 2);
+  }
+  ctx.fillStyle = getFill(palette, state, isDisabled);
+  roundedRect(ctx, x, y, CELL_WIDTH, cellHeight, geometry.radius);
+  ctx.fill();
+
+  const border = isDisabled ? undefined : getBorder(palette, state);
+  if (border !== undefined) {
+    ctx.strokeStyle = border;
+    ctx.lineWidth = BORDER;
+    roundedRect(
+      ctx,
+      x + BORDER / 2,
+      y + BORDER / 2,
+      CELL_WIDTH - BORDER,
+      cellHeight - BORDER,
+      geometry.radius,
+    );
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = isDisabled ? GRAY_500 : palette.foreground;
+  ctx.fillText(
+    fitText(ctx, label, CELL_WIDTH - 2 * TEXT_PADDING),
+    x + CELL_WIDTH / 2,
+    y + cellHeight / 2,
+  );
+  ctx.restore();
+};
+
+/**
+ * Draws the grid. A partial draw repaints only the cells that pulse now or pulsed on the last draw.
+ * Returns the cells drawn shrunk, which the next partial draw repaints.
+ */
 const drawCells = (
   ctx: CanvasRenderingContext2D,
   cells: Cell[],
@@ -147,46 +204,28 @@ const drawCells = (
   palette: Palette,
   store: ChordGridStore,
   now: number,
+  pulsedOnLastDraw: ReadonlySet<number> | undefined,
 ) => {
   ctx.font = geometry.font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  for (const { chordName, label, x, y, isDisabled } of cells) {
-    const state = store.get(chordName);
+  const pulsing = new Set<number>();
+  cells.forEach((cell, index) => {
+    const state = store.get(cell.chordName);
     const scale = getPulseScale(state.pulseStartedAt, now);
-    ctx.save();
     if (scale !== 1) {
-      ctx.translate(x + CELL_WIDTH / 2, y + cellHeight / 2);
-      ctx.scale(scale, scale);
-      ctx.translate(-x - CELL_WIDTH / 2, -y - cellHeight / 2);
+      pulsing.add(index);
     }
-    ctx.fillStyle = getFill(palette, state, isDisabled);
-    roundedRect(ctx, x, y, CELL_WIDTH, cellHeight, geometry.radius);
-    ctx.fill();
-
-    const border = isDisabled ? undefined : getBorder(palette, state);
-    if (border !== undefined) {
-      ctx.strokeStyle = border;
-      ctx.lineWidth = BORDER;
-      roundedRect(
-        ctx,
-        x + BORDER / 2,
-        y + BORDER / 2,
-        CELL_WIDTH - BORDER,
-        cellHeight - BORDER,
-        geometry.radius,
-      );
-      ctx.stroke();
+    if (pulsedOnLastDraw) {
+      if (scale === 1 && !pulsedOnLastDraw.has(index)) {
+        return;
+      }
+      // the gap around a cell is empty, so clearing into it is safe
+      ctx.clearRect(cell.x - 1, cell.y - 1, CELL_WIDTH + 2, cellHeight + 2);
     }
-
-    ctx.fillStyle = isDisabled ? GRAY_500 : palette.foreground;
-    ctx.fillText(
-      fitText(ctx, label, CELL_WIDTH - 2 * TEXT_PADDING),
-      x + CELL_WIDTH / 2,
-      y + cellHeight / 2,
-    );
-    ctx.restore();
-  }
+    drawCell(ctx, cell, cellHeight, geometry, palette, state, scale);
+  });
+  return pulsing;
 };
 
 /**
@@ -227,19 +266,35 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
     }),
   );
 
-  const drawRef = useRef<(ctx: CanvasRenderingContext2D) => void>(() => {});
+  const drawRef = useRef<(context: Konva.Context) => void>(() => {});
+  // a pulse frame repaints only the pulsing cells. Any other change repaints the whole grid
+  const needsFullDraw = useRef(true);
   useLayoutEffect(() => {
     const palette = getPalette(theme);
-    drawRef.current = (ctx) =>
-      drawCells(
-        ctx,
+    let pulsedOnLastDraw: ReadonlySet<number> = new Set();
+    let drawnBitmap = "";
+    drawRef.current = (context) => {
+      const canvas = context.getCanvas();
+      // resizing the canvas or changing its pixel ratio wipes it
+      const bitmap = `${canvas.width}x${canvas.height}`;
+      const full = needsFullDraw.current || bitmap !== drawnBitmap;
+      needsFullDraw.current = false;
+      drawnBitmap = bitmap;
+      if (full) {
+        context.clear();
+      }
+      pulsedOnLastDraw = drawCells(
+        getNativeContext(context),
         cells,
         cellHeight,
         geometry,
         palette,
         store,
         performance.now(),
+        full ? undefined : pulsedOnLastDraw,
       );
+    };
+    needsFullDraw.current = true;
     layerRef.current?.batchDraw();
   });
 
@@ -250,12 +305,13 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
     if (!layer) {
       return;
     }
-    const animation = new Konva.Animation(() => {
+    const animation = new KonvaAnimation(() => {
       if (!store.isAnimating(performance.now())) {
         animation.stop();
       }
     }, layer);
     store.onChange(() => {
+      needsFullDraw.current = true;
       layer.batchDraw();
       if (!animation.isRunning() && store.isAnimating(performance.now())) {
         animation.start();
@@ -338,10 +394,8 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
       onMouseMove={hasTouchInput ? undefined : handleHover}
     >
       <Stage width={width} height={height} listening={false}>
-        <Layer ref={layerRef} listening={false}>
-          <Shape
-            sceneFunc={(context) => drawRef.current(getNativeContext(context))}
-          />
+        <Layer ref={layerRef} listening={false} clearBeforeDraw={false}>
+          <Shape sceneFunc={(context) => drawRef.current(context)} />
         </Layer>
       </Stage>
     </div>

@@ -38,15 +38,25 @@ import {
   chordStrummingDelayMsValue,
   tuningValue,
 } from "@/app/store/settingsSlice";
-import Konva from "konva";
+import type Konva from "konva";
+import { Animation as KonvaAnimation } from "konva/lib/Animation";
+// react-konva core registers only the core nodes. The fretboard image needs this one too
+import "konva/lib/shapes/Image";
 import React, {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { Group, Image as KonvaImage, Layer, Shape, Stage } from "react-konva";
+import {
+  Group,
+  Image as KonvaImage,
+  Layer,
+  Shape,
+  Stage,
+} from "react-konva/lib/ReactKonvaCore";
 import {
   FRET_LINE_HEIGHT,
   FRET_LINE_WIDTH,
@@ -458,7 +468,7 @@ export const Fretboard: React.FC = () => {
     if (!layer) {
       return;
     }
-    const animation = new Konva.Animation(() => {
+    const animation = new KonvaAnimation(() => {
       if (!store.isAnimating(performance.now())) {
         animation.stop();
       }
@@ -478,6 +488,26 @@ export const Fretboard: React.FC = () => {
   useEffect(() => (neck ? store.register(neck) : undefined), [neck, store]);
 
   useFretboardPinchZoom(containerRef, !!neck);
+
+  // stable scene functions, so a render alone doesn't redraw the canvas
+  const drawBoardScene = useCallback((context: Konva.Context) => {
+    if (drawState.current) {
+      drawBoard(getNativeContext(context), drawState.current);
+    }
+  }, []);
+  const drawMarkersScene = useCallback(
+    (context: Konva.Context) => {
+      if (drawState.current) {
+        drawMarkers(
+          getNativeContext(context),
+          drawState.current,
+          store,
+          performance.now(),
+        );
+      }
+    },
+    [store],
+  );
 
   if (!neck) {
     return null;
@@ -595,27 +625,10 @@ export const Fretboard: React.FC = () => {
                 )}
               </Group>
             </Group>
-            <Shape
-              sceneFunc={(context) => {
-                if (drawState.current) {
-                  drawBoard(getNativeContext(context), drawState.current);
-                }
-              }}
-            />
+            <Shape sceneFunc={drawBoardScene} />
           </Layer>
           <Layer ref={markersLayerRef} listening={false}>
-            <Shape
-              sceneFunc={(context) => {
-                if (drawState.current) {
-                  drawMarkers(
-                    getNativeContext(context),
-                    drawState.current,
-                    store,
-                    performance.now(),
-                  );
-                }
-              }}
-            />
+            <Shape sceneFunc={drawMarkersScene} />
           </Layer>
         </Stage>
       </div>

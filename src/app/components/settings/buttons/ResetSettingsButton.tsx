@@ -15,6 +15,8 @@ export const ResetSettingsButton: React.FC = () => {
   };
 
   const handleConfirmReset = async () => {
+    // a throttled save still waiting would write the old settings back after the purge
+    await persistor.flush();
     await persistor.purge();
     window.location.reload();
   };
