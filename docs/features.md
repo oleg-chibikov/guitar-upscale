@@ -216,6 +216,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 4. Press Add. The whole song goes in. It moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
 
 - **Bars** the dialog takes every bar. Cut the extra ones in the piano roll.
+- **Drums** the app plays no drums, so the lists leave drum tracks out. When the most popular track is drums, the first other track becomes the melody.
 - **One role per track** a Songsterr track goes in once. The melody list greys out the bass track, the bass list greys out the melody, and "More tracks" leaves both out.
 - **Instruments** each extra track plays with its Songsterr instrument. Its notes move into the scale with the melody.
 - **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes, so it calls `/api/songsterr` on `guitar-upscale.vercel.app`. Those routes allow requests from `oleg-chibikov.github.io` ([cors.ts](../src/lib/cors.ts)).

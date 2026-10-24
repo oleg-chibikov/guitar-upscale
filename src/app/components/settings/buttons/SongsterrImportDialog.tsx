@@ -8,7 +8,8 @@ import {
   SongsterrMeta,
   SongsterrSearchResult,
   SongsterrTrack,
-  listExtraTrackIndexes,
+  listPlayableTrackIndexes,
+  pickMelodyIndex,
 } from "@/app/engine/songs/songsterr";
 import { setAndShowAlert } from "@/app/store/uiSlice";
 import Search from "@mui/icons-material/Search";
@@ -72,12 +73,11 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
   const [error, setError] = useState<string>();
 
   const isQueryLongEnough = searchText.trim().length >= MIN_QUERY_LENGTH;
+  const playable = meta ? listPlayableTrackIndexes(meta) : [];
   // a Songsterr track goes into the song once, so the melody and the bass stay out of this list
-  const extraOptions = meta
-    ? listExtraTrackIndexes(meta).filter(
-        (index) => index !== trackIndex && index !== bassIndex,
-      )
-    : [];
+  const extraOptions = playable.filter(
+    (index) => index !== trackIndex && index !== bassIndex,
+  );
   const pickedExtras = extraOptions.filter((index) =>
     extraIndexes.includes(index),
   );
@@ -152,11 +152,17 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
       const { loadSongsterrMeta } =
         await import("@/app/engine/songs/songsterrImport");
       const songMeta = await loadSongsterrMeta(chosen.songId);
-      const melodyIndex = songMeta.popularTrack ?? 0;
+      const melodyIndex = pickMelodyIndex(songMeta);
+      if (melodyIndex === undefined) {
+        throw new Error("The song has only drums or empty tracks");
+      }
       const bass = songMeta.popularTrackBass ?? NO_BASS;
+      const isBassPlayable =
+        bass !== melodyIndex &&
+        listPlayableTrackIndexes(songMeta).includes(bass);
       setMeta(songMeta);
-      setBassIndex(bass === melodyIndex ? NO_BASS : bass);
-      setExtraIndexes(listExtraTrackIndexes(songMeta));
+      setBassIndex(isBassPlayable ? bass : NO_BASS);
+      setExtraIndexes(listPlayableTrackIndexes(songMeta));
       await loadTrack(songMeta, melodyIndex);
     });
 
@@ -266,7 +272,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
             disabled={busy !== undefined}
             onChange={(e) => void chooseTrack(Number(e.target.value))}
           >
-            {meta.tracks.map((_, index) => (
+            {playable.map((index) => (
               <MenuItem
                 key={index}
                 value={index}
@@ -286,7 +292,7 @@ export const SongsterrImportDialog: React.FC<DialogProps> = ({
             onChange={(e) => setBassIndex(Number(e.target.value))}
           >
             <MenuItem value={NO_BASS}>None</MenuItem>
-            {meta.tracks.map((_, index) => (
+            {playable.map((index) => (
               <MenuItem
                 key={index}
                 value={index}

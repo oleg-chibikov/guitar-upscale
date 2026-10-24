@@ -78,11 +78,19 @@ const DRUMS_INSTRUMENT_ID = 1024;
 export const isSongsterrDrums = (info: SongsterrTrackInfo) =>
   info.instrumentId === DRUMS_INSTRUMENT_ID || /drum/i.test(info.instrument);
 
-// Tracks a song can take on top of the melody and the bass: drums and empty tracks stay out.
-export const listExtraTrackIndexes = (meta: SongsterrMeta) =>
+// The app plays no drums, and an empty track adds no notes.
+export const listPlayableTrackIndexes = (meta: SongsterrMeta) =>
   meta.tracks.flatMap((info, index) =>
     isSongsterrDrums(info) || info.isEmpty === true ? [] : [index],
   );
+
+// Songsterr's most popular track can be the drums, so the first playable track stands in for it.
+export const pickMelodyIndex = (meta: SongsterrMeta) => {
+  const playable = listPlayableTrackIndexes(meta);
+  return meta.popularTrack !== undefined && playable.includes(meta.popularTrack)
+    ? meta.popularTrack
+    : playable[0];
+};
 
 // The General MIDI program of a track, undefined for drums.
 export const songsterrProgram = (info: SongsterrTrackInfo) =>

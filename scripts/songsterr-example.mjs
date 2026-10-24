@@ -17,8 +17,9 @@ import {
   convertSongsterr,
   findSection,
   isSongsterrDrums,
-  listExtraTrackIndexes,
+  listPlayableTrackIndexes,
   listScales,
+  pickMelodyIndex,
   listSections,
   songsterrProgram,
   songsterrSearchUrl,
@@ -125,7 +126,17 @@ const main = async () => {
   if (opts.help) return console.log(HELP);
   const songId = await findSong();
   const meta = await getJson(`https://www.songsterr.com/api/meta/${songId}`);
-  const melodyIndex = Number(opts.track ?? meta.popularTrack ?? 0);
+  const playable = listPlayableTrackIndexes(meta);
+  // the app plays no drums, so a drum track can't take any role
+  const checkPlayable = (index) => {
+    if (!meta.tracks[index]) fail(`No track ${index}`);
+    if (!playable.includes(index))
+      fail(`Track ${index} is drums or empty, the app can't play it`);
+    return index;
+  };
+  const melodyIndex = checkPlayable(
+    opts.track === undefined ? pickMelodyIndex(meta) : Number(opts.track),
+  );
   const melodyTrack = await loadTrack(meta, melodyIndex);
 
   if (!opts.section && !opts.from && !opts.to) {
@@ -135,31 +146,31 @@ const main = async () => {
   }
 
   const [from, to] = pickRange(melodyTrack.measures);
-  const bassIndex = opts["no-bass"]
+  const popularBass = playable.includes(meta.popularTrackBass)
+    ? meta.popularTrackBass
+    : undefined;
+  const bassNumber = opts["no-bass"]
     ? undefined
-    : (opts.bass ?? meta.popularTrackBass);
+    : opts.bass === undefined
+      ? popularBass
+      : checkPlayable(Number(opts.bass));
+  if (bassNumber === melodyIndex && opts.bass !== undefined)
+    fail(`Track ${melodyIndex} can't be the melody and the bass`);
+  const bassIndex = bassNumber === melodyIndex ? undefined : bassNumber;
   const bassTrack =
-    bassIndex === undefined || bassIndex === null
-      ? undefined
-      : await loadTrack(meta, Number(bassIndex));
+    bassIndex === undefined ? undefined : await loadTrack(meta, bassIndex);
 
   // a Songsterr track goes into the song once
-  const bassNumber =
-    bassIndex === undefined || bassIndex === null
-      ? undefined
-      : Number(bassIndex);
-  const taken = [melodyIndex, bassNumber];
+  const taken = [melodyIndex, bassIndex];
   const extraIndexes =
     opts.extra === "all"
-      ? listExtraTrackIndexes(meta).filter((i) => !taken.includes(i))
+      ? playable.filter((i) => !taken.includes(i))
       : (opts.extra?.split(",").map(Number) ?? []);
   extraIndexes.forEach((index, i) => {
-    if (!meta.tracks[index]) fail(`No track ${index}`);
+    checkPlayable(index);
     if (taken.includes(index) || extraIndexes.indexOf(index) !== i)
       fail(`Track ${index} is picked twice`);
   });
-  if (bassNumber === melodyIndex)
-    fail(`Track ${melodyIndex} can't be the melody and the bass`);
   const extraTracks = await Promise.all(
     extraIndexes.map(async (index) => {
       const program = songsterrProgram(meta.tracks[index]);

@@ -5,9 +5,10 @@ import {
   SongsterrTrack,
   convertSongsterr,
   findSection,
-  listExtraTrackIndexes,
+  listPlayableTrackIndexes,
   listScales,
   listSections,
+  pickMelodyIndex,
   songsterrTrackName,
 } from "@/app/engine/songs/songsterr";
 
@@ -167,10 +168,10 @@ describe("convertSongsterr", () => {
   });
 });
 
-describe("listExtraTrackIndexes", () => {
+describe("listPlayableTrackIndexes", () => {
   it("leaves out drums and empty tracks", () => {
     expect(
-      listExtraTrackIndexes({
+      listPlayableTrackIndexes({
         ...meta,
         tracks: [
           { instrumentId: 30, instrument: "Distortion Guitar", name: "" },
@@ -189,5 +190,22 @@ describe("songsterrTrackName", () => {
     expect(songsterrTrackName({ instrument: "Piano", name: "Chords" })).toBe(
       "Piano Chords",
     );
+  });
+});
+
+describe("pickMelodyIndex", () => {
+  const tracks = [
+    { instrumentId: 1024, instrument: "Drums", name: "" },
+    { instrumentId: 30, instrument: "Distortion Guitar", name: "" },
+  ];
+
+  it("skips a popular drum track", () => {
+    expect(pickMelodyIndex({ ...meta, tracks, popularTrack: 0 })).toBe(1);
+  });
+
+  it("finds no melody in a drums only song", () => {
+    expect(
+      pickMelodyIndex({ ...meta, tracks: [tracks[0]], popularTrack: 0 }),
+    ).toBeUndefined();
   });
 });
