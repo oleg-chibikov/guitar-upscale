@@ -8,6 +8,7 @@ import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { setSettingsExpanded } from "@/app/store/uiSlice";
 import { useDispatch } from "react-redux";
+import { HighStringAtBottomCheckbox } from "./checkboxes/HighStringAtBottomCheckbox";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
 import { ChordPlayModeSelector } from "./selectors/ChordPlayModeSelector";
@@ -41,6 +42,7 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
       <UseChordAlterationCheckbox />
       {premiumComponents.get("toggleMetronomeWhenRecordingCheckbox")}
       {premiumComponents.get("saveMidiImmediatelyCheckbox")}
+      <HighStringAtBottomCheckbox />
       {premiumComponents.get("instruments")}
       <div
         className={`grid gap-2 ${

@@ -236,13 +236,13 @@ Code: [DetectChordButton.tsx](../src/app/components/settings/buttons/DetectChord
 
 The gear button opens a drawer. Each value survives a reload.
 
-| Group         | Settings                                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Look**      | theme (dark, light, match system: follows the OS as it changes), note display mode, chords display mode, skin [Composer] |
-| **Chords**    | chord play mode, notes to play in chord, ♯ chords, alternate chords                                                      |
-| **Sound**     | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only]      |
-| **Playback**  | playback type [Explorer]                                                                                                 |
-| **Recording** | start metronome when recording, save MIDI right after recording [Composer]                                               |
+| Group         | Settings                                                                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Look**      | theme (dark, light, match system: follows the OS as it changes), note display mode, chords display mode, skin [Composer], thin string at the bottom |
+| **Chords**    | chord play mode, notes to play in chord, ♯ chords, alternate chords                                                                                 |
+| **Sound**     | lead instrument and chord instrument [Explorer], playback volume, metronome volume, reverb [Explorer, desktop only]                                 |
+| **Playback**  | playback type [Explorer]                                                                                                                            |
+| **Recording** | start metronome when recording, save MIDI right after recording [Composer]                                                                          |
 
 "Reset settings" at the bottom puts the defaults back.
 

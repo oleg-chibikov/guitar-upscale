@@ -48,6 +48,8 @@ interface UiState {
   fretboardScaleY: number;
   lockRatio: boolean;
   useSharpChords: boolean;
+  // the thinnest string is drawn at the bottom of the fretboard, as a player looking down sees it
+  highStringAtBottom: boolean;
   loadingMessage?: string;
   showAspectRatio: boolean;
 }
@@ -77,6 +79,7 @@ const initialState: UiState = {
   fretboardScaleY: 1,
   lockRatio: false,
   useSharpChords: true,
+  highStringAtBottom: false,
   showAspectRatio: false,
 };
 
@@ -235,6 +238,9 @@ export const uiSlice = createSlice({
     setUseSharpChords(state, action: PayloadAction<boolean>) {
       state.useSharpChords = action.payload;
     },
+    setHighStringAtBottom(state, action: PayloadAction<boolean>) {
+      state.highStringAtBottom = action.payload;
+    },
     setLoadingMessage(state, action: PayloadAction<string | undefined>) {
       state.loadingMessage = action.payload;
     },
@@ -285,6 +291,7 @@ export const {
   setFretboardScaleY,
   setLockRatio,
   setUseSharpChords,
+  setHighStringAtBottom,
   setLoadingMessage,
   setShowAspectRatio,
 } = uiSlice.actions;

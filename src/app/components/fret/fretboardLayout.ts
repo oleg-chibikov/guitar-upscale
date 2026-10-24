@@ -29,12 +29,15 @@ export interface FretboardLayout {
   width: number;
   height: number;
   headerCenterY: number;
+  // the line the strings are mirrored over when the thin string is at the bottom
+  stringsCenterY: number;
   getStringCenterY: (string: number, fret: number) => number;
 }
 
 /**
  * Positions of frets and strings in px, before the aspect ratio sliders scale them.
  * Fret 0 sits at x 0. The first string row starts at y rowHeight + HEADER_GAP.
+ * String 0 is the thinnest. It sits at the top unless highStringAtBottom is set.
  */
 export const getFretboardLayout = (
   fretCount: number,
@@ -42,6 +45,7 @@ export const getFretboardLayout = (
   widthStep: number,
   rowHeight: number,
   stringTilt: StringTilt,
+  highStringAtBottom = false,
 ): FretboardLayout => {
   const initialWidth = (NOTE_COUNT + 1) * widthStep;
   const columns: FretColumn[] = [];
@@ -63,6 +67,12 @@ export const getFretboardLayout = (
   }
   const last = columns[columns.length - 1];
   const firstStringTop = rowHeight + HEADER_GAP;
+  const stringsCenterY = firstStringTop + (stringCount * rowHeight) / 2;
+  const getTopDownY = (string: number, fret: number) =>
+    firstStringTop +
+    string * rowHeight +
+    rowHeight / 2 +
+    columns[fret].tiltX * stringTilt.slope * (string - stringTilt.center);
 
   return {
     rowHeight,
@@ -71,11 +81,11 @@ export const getFretboardLayout = (
     height: firstStringTop + stringCount * rowHeight,
     headerCenterY:
       firstStringTop - HEADER_TO_STRING_GAP - HEADER_CELL_HEIGHT / 2,
-    getStringCenterY: (string, fret) =>
-      firstStringTop +
-      string * rowHeight +
-      rowHeight / 2 +
-      columns[fret].tiltX * stringTilt.slope * (string - stringTilt.center),
+    stringsCenterY,
+    // mirroring keeps the tilt in line with the mirrored skin image
+    getStringCenterY: highStringAtBottom
+      ? (string, fret) => 2 * stringsCenterY - getTopDownY(string, fret)
+      : getTopDownY,
   };
 };
 

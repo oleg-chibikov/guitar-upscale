@@ -379,6 +379,7 @@ export const Fretboard: React.FC = () => {
   const chordsExpanded = useUiSelector((s) => s.chordsExpanded);
   const slashChordsExpanded = useUiSelector((s) => s.slashChordsExpanded);
   const noteDisplayMode = useUiSelector((s) => s.noteDisplayMode);
+  const highStringAtBottom = useUiSelector((s) => s.highStringAtBottom);
   const neck = useSettingsSelector((s) => s.neck);
   const { width, height } = useWindowSize();
   const hasTouchInput = useInputChecker();
@@ -397,8 +398,9 @@ export const Fretboard: React.FC = () => {
       widthStep,
       height,
       stringTilt,
+      highStringAtBottom,
     );
-  }, [skin, stringCount]);
+  }, [skin, stringCount, highStringAtBottom]);
 
   const position = getPositionForSkin(skin);
   const isHeightEnoughToShowLargeChords =
@@ -617,7 +619,13 @@ export const Fretboard: React.FC = () => {
                   <KonvaImage
                     image={image}
                     x={imageX}
-                    y={imageY}
+                    // mirrored over the middle of the strings, so the strings stay where they were
+                    y={
+                      highStringAtBottom
+                        ? 2 * (originY + layout.stringsCenterY) - imageY
+                        : imageY
+                    }
+                    scaleY={highStringAtBottom ? -1 : 1}
                     width={IMAGE_WIDTH * IMAGE_SCALE}
                     height={IMAGE_HEIGHT * IMAGE_SCALE}
                   />
