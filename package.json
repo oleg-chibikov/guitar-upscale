@@ -43,6 +43,7 @@
     "dotenv": "^18.0.8",
     "googleapis": "^187.0.0",
     "http-errors": "^2.0.1",
+    "idb": "^8.0.4",
     "konva": "^10.9.0",
     "midi-writer-js": "^3.2.1",
     "midifile-ts": "^1.5.2",

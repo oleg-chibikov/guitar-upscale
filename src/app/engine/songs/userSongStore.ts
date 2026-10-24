@@ -1,5 +1,6 @@
 import { Note } from "@/app/data/notes";
 import { SongFormat } from "@/app/data/song";
+import { DBSchema, openDB } from "idb";
 
 export type UserSongRecord = {
   id: string;
@@ -17,50 +18,32 @@ export type UserSongRecord = {
 const DB_NAME = "guitar-upscale-songs";
 const STORE = "songs";
 
+interface SongsDb extends DBSchema {
+  [STORE]: { key: string; value: UserSongRecord };
+}
+
 const openDb = () =>
-  new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
-    request.onupgradeneeded = () => {
-      request.result.createObjectStore(STORE, { keyPath: "id" });
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+  openDB<SongsDb>(DB_NAME, 1, {
+    upgrade(db) {
+      db.createObjectStore(STORE, { keyPath: "id" });
+    },
   });
 
-const run = async <T>(
-  mode: IDBTransactionMode,
-  action: (store: IDBObjectStore) => IDBRequest<T>,
-) => {
-  const db = await openDb();
-  try {
-    return await new Promise<T>((resolve, reject) => {
-      const request = action(db.transaction(STORE, mode).objectStore(STORE));
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  } finally {
-    db.close();
-  }
-};
+let dbPromise: ReturnType<typeof openDb> | undefined;
+
+const getDb = () => (dbPromise ??= openDb());
 
 export const getUserSongs = async (): Promise<UserSongRecord[]> => {
   if (typeof indexedDB === "undefined") {
     return [];
   }
-  return run(
-    "readonly",
-    (store) => store.getAll() as IDBRequest<UserSongRecord[]>,
-  );
+  return (await getDb()).getAll(STORE);
 };
 
-export const saveUserSong = (record: UserSongRecord) =>
-  run("readwrite", (store) => store.put(record));
+export const saveUserSong = async (record: UserSongRecord) =>
+  (await getDb()).put(STORE, record);
 
-export const getUserSong = (id: string) =>
-  run(
-    "readonly",
-    (store) => store.get(id) as IDBRequest<UserSongRecord | undefined>,
-  );
+export const getUserSong = async (id: string) => (await getDb()).get(STORE, id);
 
-export const deleteUserSong = (id: string) =>
-  run("readwrite", (store) => store.delete(id));
+export const deleteUserSong = async (id: string) =>
+  (await getDb()).delete(STORE, id);
