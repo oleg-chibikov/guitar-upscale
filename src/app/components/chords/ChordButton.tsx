@@ -95,7 +95,7 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
     publishState();
   };
 
-  const { onChordPress, isAlternateRef } = useStrumming(
+  const { onChordPress, releaseChordPress, isAlternateRef } = useStrumming(
     chordName,
     isDisabled,
     hasTouchInput,
@@ -107,15 +107,20 @@ export const ChordButton: React.FC<ChordButtonProps> = ({
   );
 
   const onChordPressRef = useRef(onChordPress);
+  const releaseChordPressRef = useRef(releaseChordPress);
   useEffect(() => {
     onChordPressRef.current = onChordPress;
+    releaseChordPressRef.current = releaseChordPress;
   });
 
   useEffect(() => {
     if (isDisabled || isHidden) {
       return;
     }
-    return store.registerPress(chordName, () => onChordPressRef.current());
+    return store.registerPress(chordName, {
+      press: () => onChordPressRef.current(),
+      release: () => releaseChordPressRef.current(),
+    });
   }, [isDisabled, isHidden, store, chordName]);
 
   useEffect(() => {

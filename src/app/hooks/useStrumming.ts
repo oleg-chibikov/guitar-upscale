@@ -199,6 +199,7 @@ export const useStrumming = (
 ) => {
   const isAlternateRef = useRef<boolean>(false);
   const clickNumberRef = useRef<number>(0);
+  const releasePressRef = useRef<(() => void) | undefined>(undefined);
 
   const onChordPress = async () => {
     const clickNumber = clickNumberRef.current++;
@@ -234,6 +235,45 @@ export const useStrumming = (
       }
     };
 
+    const release = () => {
+      if (releasePressRef.current === release) {
+        releasePressRef.current = undefined;
+      }
+      try {
+        console.log(
+          STRUMMING_LOG_PREFIX + "Chord press released",
+          chordName,
+          clickNumber,
+        );
+        if (!isChordClicked(chordName) || isDisabled) {
+          console.log(
+            STRUMMING_LOG_PREFIX + "Chord not clicked yet - ignoring",
+            chordName,
+            clickNumber,
+          );
+          return;
+        }
+
+        if (!isChordStrumming(chordName)) {
+          console.log(
+            STRUMMING_LOG_PREFIX +
+              "Not playing when press released - stop strumming",
+            chordName,
+            clickNumber,
+          );
+
+          // release clicked promise before removing chord data
+          setClicked(false);
+          // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
+          setPlaying(false);
+        } else {
+          setClicked(false);
+        }
+      } finally {
+        unregister();
+      }
+    };
+
     const handlePressReleased = (event: MouseEvent | TouchEvent) => {
       let target = event.target as Node | null;
 
@@ -241,40 +281,7 @@ export const useStrumming = (
         const id = (target as HTMLElement)?.id;
         // keep playing chord when clicking notes simultaneously
         if (stopStrummingElementIds.includes(id)) {
-          try {
-            console.log(
-              STRUMMING_LOG_PREFIX + "Chord press released",
-              chordName,
-              clickNumber,
-            );
-            if (!isChordClicked(chordName) || isDisabled) {
-              console.log(
-                STRUMMING_LOG_PREFIX + "Chord not clicked yet - ignoring",
-                chordName,
-                clickNumber,
-              );
-              return;
-            }
-
-            if (!isChordStrumming(chordName)) {
-              console.log(
-                STRUMMING_LOG_PREFIX +
-                  "Not playing when press released - stop strumming",
-                chordName,
-                clickNumber,
-              );
-
-              // release clicked promise before removing chord data
-              setClicked(false);
-              // stop ticking if not yet playing - otherwise wait for the pattern to finish - it will stop ticking itself
-              setPlaying(false);
-            } else {
-              setClicked(false);
-            }
-          } finally {
-            unregister();
-          }
-
+          release();
           return;
         }
         target = target.parentNode;
@@ -313,6 +320,7 @@ export const useStrumming = (
     setClicked(true);
 
     register();
+    releasePressRef.current = release;
 
     if (isChordStrummingOrPendingStrumming(chordName)) {
       console.log(
@@ -662,5 +670,13 @@ export const useStrumming = (
     await asyncTimeout(waitAndStrum, 0);
   };
 
-  return { onChordPress, isAlternateRef, isInImmediateChordGracePeriodRef };
+  // lets a gesture end the press before the finger lifts
+  const releaseChordPress = () => releasePressRef.current?.();
+
+  return {
+    onChordPress,
+    releaseChordPress,
+    isAlternateRef,
+    isInImmediateChordGracePeriodRef,
+  };
 };

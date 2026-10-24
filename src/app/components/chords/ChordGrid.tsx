@@ -18,6 +18,7 @@ import React, { RefObject, useEffect, useLayoutEffect, useRef } from "react";
 import { Layer, Shape, Stage } from "react-konva";
 import { ChordCellState, ChordGridStore, PULSE_MS } from "./chordGridStore";
 import { ChordGridCell } from "./chordGridLayout";
+import { useChordGridTouch } from "./useChordGridTouch";
 
 const CELL_WIDTH = 64;
 export const SMALL_CELL_HEIGHT = 24;
@@ -271,7 +272,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
     return { x: clientX - rect.left, y: clientY - rect.top };
   };
 
-  const findPressHandler = (clientX: number, clientY: number) => {
+  const findChord = (clientX: number, clientY: number) => {
     const scroller = scrollerRef.current;
     if (!scroller) {
       return undefined;
@@ -286,8 +287,7 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
       bottom: scrollerRect.bottom - origin.top,
     };
     const playable = cells.flatMap((cell) => {
-      const onPress = store.getPressHandler(cell.chordName);
-      return onPress
+      return store.canPress(cell.chordName)
         ? [
             {
               rect: {
@@ -296,13 +296,15 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
                 right: cell.x + CELL_WIDTH,
                 bottom: cell.y + cellHeight,
               },
-              value: onPress,
+              value: cell.chordName,
             },
           ]
         : [];
     });
     return findClosestCell(playable, x, y, viewport);
   };
+
+  const touchHandlers = useChordGridTouch(store, scrollerRef, findChord);
 
   const handleHover = (e: React.MouseEvent<HTMLDivElement>) => {
     const { x, y } = toLocal(e.clientX, e.clientY);
@@ -322,19 +324,16 @@ export const ChordGrid: React.FC<ChordGridProps> = ({
     <div
       ref={containerRef}
       style={{ width, height }}
-      onTouchStartCapture={
-        hasTouchInput
-          ? (e) => {
-              for (const touch of Array.from(e.changedTouches)) {
-                void findPressHandler(touch.clientX, touch.clientY)?.();
-              }
-            }
-          : undefined
-      }
+      {...(hasTouchInput ? touchHandlers : {})}
       onMouseDownCapture={
         hasTouchInput
           ? undefined
-          : (e) => void findPressHandler(e.clientX, e.clientY)?.()
+          : (e) => {
+              const chordName = findChord(e.clientX, e.clientY);
+              if (chordName !== undefined) {
+                store.press(chordName);
+              }
+            }
       }
       onMouseMove={hasTouchInput ? undefined : handleHover}
     >

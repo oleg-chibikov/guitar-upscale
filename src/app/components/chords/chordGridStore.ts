@@ -9,6 +9,11 @@ export interface ChordCellState {
   pulseStartedAt: number | undefined;
 }
 
+interface PressHandlers {
+  press: () => Promise<void>;
+  release: () => void;
+}
+
 const idle: ChordCellState = {
   isClicked: false,
   isPlaying: false,
@@ -23,15 +28,23 @@ const idle: ChordCellState = {
  */
 export class ChordGridStore {
   private states = new Map<string, ChordCellState>();
-  private pressHandlers = new Map<string, () => Promise<void>>();
+  private pressHandlers = new Map<string, PressHandlers>();
   private listener: (() => void) | undefined;
 
   get(chordName: string): ChordCellState {
     return this.states.get(chordName) ?? idle;
   }
 
-  getPressHandler(chordName: string) {
-    return this.pressHandlers.get(chordName);
+  canPress(chordName: string) {
+    return this.pressHandlers.has(chordName);
+  }
+
+  press(chordName: string) {
+    void this.pressHandlers.get(chordName)?.press();
+  }
+
+  release(chordName: string) {
+    this.pressHandlers.get(chordName)?.release();
   }
 
   onChange(listener: (() => void) | undefined) {
@@ -57,8 +70,8 @@ export class ChordGridStore {
     return false;
   }
 
-  registerPress(chordName: string, onPress: () => Promise<void>) {
-    this.pressHandlers.set(chordName, onPress);
+  registerPress(chordName: string, handlers: PressHandlers) {
+    this.pressHandlers.set(chordName, handlers);
     return () => {
       this.pressHandlers.delete(chordName);
     };

@@ -55,6 +55,7 @@ The chords panel opens on the chords of the key: one chord per scale note, from 
 - **All** in the panel header opens the full grid: every root note against every chord type. Chords outside the scale show grey. **In key** goes back.
 - **Tap a chord** it plays once, strummed string by string.
 - **Hold a chord** it strums with the chosen pattern until release. See [Strumming](#strumming).
+- **Two fingers** put down together scroll the grid on a touch screen. The first finger's chord sounds once and stops. A second finger added later plays its chord as usual.
 - **Slash chords** the `Bass note` strip in the full grid plays every chord over another bass note, and the buttons read `C/E`. The bass goes where the hand reaches it. Chord notes at or under the bass drop out. Notes outside the scale show grey. The key view shows the strip only while a bass note is on.
 - **Basic chord types** major and minor are free. More types such as 7th, sus and dim need Explorer.
 
