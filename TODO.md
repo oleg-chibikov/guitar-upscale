@@ -22,14 +22,6 @@
 | **Аппликатуры с большим пальцем** учитывают, как при этом стоят остальные пальцы                                                                                   | сложная   | [recursiveChordGenerator.ts](src/app/engine/chords/generatorWorker/recursiveChordGenerator.ts) |
 | **Подписка Google Play привязана к аккаунту.** Сейчас один токен могут взять несколько человек. Нужна база пользователей. Важно, только когда включена авторизация | сложная   | [subscriptionHelper.ts](src/lib/subscriptionHelper.ts)                                         |
 
-## Чистка кода
-
-| Задача                                                                                                                                                                     | Сложность | Где                                                                                                                                     |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **Проверить барре у заглушённой и открытой струны.** `preventCurrentBarresToContinueOnHigherStrings` вызывается там на всякий случай. Сравнить аппликатуры с вызовом и без | лёгкая    | [recursiveChordGenerator.ts](src/app/engine/chords/generatorWorker/recursiveChordGenerator.ts)                                          |
-| **Строи гитары считать при сборке.** Сейчас браузер строит их при каждом запуске                                                                                           | лёгкая    | [tuningBuilder.ts](src/app/engine/tuningBuilder.ts)                                                                                     |
-| **Аккорд для детектора массивом по всем струнам.** `chordMatcher` выкидывает пустые струны, а `serializeChord` вставляет их обратно и для этого читает `stringCountValue`  | средняя   | [chordMatcher.ts](src/app/engine/midiParser/chordMatcher.ts), [chordDetector.ts](src/app/engine/chords/detectorWorker/chordDetector.ts) |
-
 ## Когда-нибудь
 
 - **Реклама.**
