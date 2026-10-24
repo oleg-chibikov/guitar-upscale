@@ -276,7 +276,8 @@ Code: [auth/](../src/app/components/auth/), [premiumFeatures.ts](../src/lib/prem
 
 The app is a PWA. It installs to the home screen and opens fullscreen in landscape.
 
-- **Service worker** asks the network first and keeps a copy of each good response. Offline, it serves the copy.
+- **Service worker** asks the network first for pages and keeps a copy of each good response. Offline, it serves the copy.
+- **Fast repeat loads** hashed chunks come from the cache first. Songs and guitar skins come from the cache too, and refresh in the background.
 - **Android** the Play Store app wraps the same PWA.
 
 Code: [sw.js](../public/sw.js), [manifest.json](../public/manifest.json).
