@@ -13,7 +13,7 @@ import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { WithStyle } from "@/app/helpers/withStyle";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import dynamic from "next/dynamic";
-import React, { ReactNode } from "react";
+import React from "react";
 
 const DisabledRecordButton = dynamic(
   async () =>
@@ -28,14 +28,12 @@ export const PlayPanel: React.FC<WithPremiumComponents & WithStyle> = ({
   return (
     <Panel bare id={PLAY_PANEL_ID}>
       <PreviousEventButton />
-      {(premiumComponents.get("melodies") as ReactNode) ?? <PlayButton />}
+      {premiumComponents.get("melodies") ?? <PlayButton />}
       <PauseButton />
       <NextEventButton />
       <DownloadButton />
       <MetronomeButton />
-      {(premiumComponents.get("midiRecorder") as ReactNode) ?? (
-        <DisabledRecordButton />
-      )}
+      {premiumComponents.get("midiRecorder") ?? <DisabledRecordButton />}
       {premiumComponents.has("midiRecorder") && <AutoQuantizeButton />}
       {/* over the piano roll the bar keeps to the transport buttons */}
       {!pianoRollExpanded && (

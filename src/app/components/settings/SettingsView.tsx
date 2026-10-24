@@ -7,7 +7,6 @@ import { isMobileDeviceValue } from "@/app/helpers/deviceHelper";
 import { WithPremiumComponents } from "@/app/helpers/withPremiumFeatures";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { setSettingsExpanded } from "@/app/store/uiSlice";
-import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
 import { UseChordAlterationCheckbox } from "./checkboxes/UseChordAlterationCheckbox";
 import { UseSharpChordsCheckbox } from "./checkboxes/UseSharpChordsChekbox";
@@ -40,13 +39,9 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
     >
       <UseSharpChordsCheckbox />
       <UseChordAlterationCheckbox />
-      {
-        premiumComponents.get(
-          "toggleMetronomeWhenRecordingCheckbox",
-        ) as ReactNode
-      }
-      {premiumComponents.get("saveMidiImmediatelyCheckbox") as ReactNode}
-      {premiumComponents.get("instruments") as ReactNode}
+      {premiumComponents.get("toggleMetronomeWhenRecordingCheckbox")}
+      {premiumComponents.get("saveMidiImmediatelyCheckbox")}
+      {premiumComponents.get("instruments")}
       <div
         className={`grid gap-2 ${
           theme === Theme.Light
@@ -61,13 +56,12 @@ export const SettingsView: React.FC<WithPremiumComponents> = ({
         <NoteDisplayModeSelector />
         <ChordsDisplayModeSelector />
         <ChordPlayModeSelector />
-        {premiumComponents.get("skinSelection") as ReactNode}
-        {premiumComponents.get("playbackTypeSelection") as ReactNode}
+        {premiumComponents.get("skinSelection")}
+        {premiumComponents.get("playbackTypeSelection")}
         <ChordNotesToPlaySlider />
         <VolumeSlider />
         <MetronomeVolumeSlider />
-        {!isMobileDeviceValue &&
-          (premiumComponents.get("reverbStrength") as ReactNode)}
+        {!isMobileDeviceValue && premiumComponents.get("reverbStrength")}
         <ResetSettingsButton />
       </div>
     </DialogWrapper>

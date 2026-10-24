@@ -6,7 +6,7 @@ import { SongUploadButton } from "@/app/components/settings/buttons/SongUploadBu
 import { SongsterrImportButton } from "@/app/components/settings/buttons/SongsterrImportButton";
 import { PremiumFeatureKeys, PremiumFeatures } from "@/lib/premiumFeatures";
 import dynamic from "next/dynamic";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import {
   PremiumComponent,
   WithPremiumFeatures,
@@ -68,7 +68,7 @@ export const premiumFeaturesToMap = (
   features: PremiumFeatures,
 ): Map<PremiumFeatureKeys, PremiumComponent> => {
   const premiumComponents = new Map<PremiumFeatureKeys, PremiumComponent>();
-  const convertKeyToComponent = (key: string) => {
+  const convertKeyToComponent = (key: PremiumFeatureKeys): ReactNode => {
     switch (key) {
       case "midiRecorder":
         return <RecordButton />;
@@ -110,23 +110,24 @@ export const premiumFeaturesToMap = (
           <PremiumPlayButton canImportSongs={features.midiUpload === true} />
         );
       default:
-        return null; // Return null for keys without a mapping
+        // A new feature key fails the type check here until it gets a case.
+        key satisfies never;
+        return null;
     }
   };
 
-  // Iterate over each key-value pair in PremiumFeatures
-  Object.entries(features).forEach(async ([key, value]) => {
-    // If the value is true, add the corresponding React node to the map
+  for (const [key, value] of Object.entries(features) as [
+    PremiumFeatureKeys,
+    boolean | undefined,
+  ][]) {
     if (value === true) {
-      // You can define the React node here based on the key
-      // For simplicity, let's assume it's a string representation of the key
       // Map entries are serialized as an array to the client, so each element needs a key.
       premiumComponents.set(
-        key as PremiumFeatureKeys,
+        key,
         <Fragment key={key}>{convertKeyToComponent(key)}</Fragment>,
       );
     }
-  });
+  }
 
   return premiumComponents;
 };
