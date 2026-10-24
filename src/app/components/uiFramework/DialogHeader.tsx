@@ -4,11 +4,13 @@ import { useUiSelector } from "@/app/hooks/storeHooks";
 import { Box, DialogTitle } from "@mui/material";
 import React from "react";
 interface DialogHeaderProps {
+  id?: string;
   text: string;
   onClose?: () => void;
 }
 
 export const DialogHeader: React.FC<DialogHeaderProps> = ({
+  id,
   text,
   onClose,
 }) => {
@@ -16,6 +18,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
 
   return (
     <DialogTitle
+      id={id}
       variant="h4"
       align="center"
       sx={{

@@ -3,7 +3,7 @@ import { WithChildren } from "@/app/helpers/withChildren";
 import { WithClassName } from "@/app/helpers/withClassName";
 import { WithId } from "@/app/helpers/withId";
 import { Dialog, Drawer, DrawerProps } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useId, useState } from "react";
 
 interface DialogWrapperProps extends WithChildren, WithClassName, WithId {
   isOpen: boolean;
@@ -30,6 +30,8 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
   noPadding = false,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const titleId = useId();
+  const labelledBy = headerText !== undefined ? titleId : undefined;
 
   useEffect(() => {
     setOpen(isOpen);
@@ -46,6 +48,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
       className={className}
       contentClassName={contentClassName}
       id={id}
+      titleId={titleId}
       onClose={close}
       headerText={headerText}
       hasPadding={!noPadding}
@@ -58,7 +61,10 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
     return (
       <Drawer
         className={dialogClassName}
-        slotProps={backdrop}
+        slotProps={{
+          ...backdrop,
+          paper: { role: "dialog", "aria-labelledby": labelledBy },
+        }}
         anchor={anchor}
         open={open}
         onClose={close}
@@ -72,6 +78,7 @@ export const DialogWrapper: FC<DialogWrapperProps> = ({
     <Dialog
       className={className}
       slotProps={backdrop}
+      aria-labelledby={labelledBy}
       open={open}
       onClose={close}
       fullWidth
