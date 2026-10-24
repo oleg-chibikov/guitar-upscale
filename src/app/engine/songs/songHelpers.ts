@@ -1,4 +1,5 @@
-import { NOTE_COUNT, Note, OctaveNote } from "@/app/data/notes";
+import { NOTE_COUNT, Note, OctaveNote, getNoteText } from "@/app/data/notes";
+import { Chord, Note as NoteName } from "tonal";
 
 export const midiToOctaveNote = (midi: number): OctaveNote => ({
   octave: Math.floor(midi / NOTE_COUNT),
@@ -16,31 +17,15 @@ export const parseBandAndTitle = (fileName: string) => {
       };
 };
 
-const FLAT_TO_SHARP: Record<string, string> = {
-  Cb: "B",
-  Db: "C#",
-  Eb: "D#",
-  Fb: "E",
-  Gb: "F#",
-  Ab: "G#",
-  Bb: "A#",
-};
-
-// Accepts "Em", "Bb7", "F#dim", "C/G". Returns undefined for lyrics and other text
+// Accepts "Em", "Bb7", "F#dim", "C/G" and writes the root with a sharp. Returns undefined for lyrics and other text
 export const normalizeChordName = (text: string): string | undefined => {
-  const match = /^([A-G])([#b]?)([^\s/]*)(\/[A-G][#b]?)?$/.exec(text.trim());
-  if (!match) {
+  const name = text.trim();
+  const { empty, tonic } = Chord.get(name);
+  if (empty || tonic === null || tonic === "") {
     return undefined;
   }
-  const [, letter, accidental, suffix] = match;
-  if (!/^(m|M|maj|min|dim|aug|sus|add|\d|\+|-|°|ø|#|b|\(|\))*$/.test(suffix)) {
-    return undefined;
-  }
-  const root =
-    accidental === "b"
-      ? FLAT_TO_SHARP[letter + accidental]
-      : letter + accidental;
-  return root + suffix;
+  const [, type] = Chord.tokenize(name);
+  return getNoteText(NoteName.chroma(tonic)) + type;
 };
 
 // Folder and file names can't hold "/", so "Aeolian / Natural" sits in "Aeolian - Natural"

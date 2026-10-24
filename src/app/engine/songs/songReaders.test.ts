@@ -125,6 +125,9 @@ describe("normalizeChordName", () => {
     ["Bb7", "A#7"],
     ["F#dim", "F#dim"],
     ["C/G", "C"],
+    ["B#", "C"],
+    ["Am(add9)", undefined],
+    ["maj7", undefined],
     ["Verse", undefined],
     ["hello", undefined],
   ])("%s gives %s", (text, expected) => {
