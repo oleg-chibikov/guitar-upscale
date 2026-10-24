@@ -23,6 +23,7 @@ The app installs as a PWA, so it also works from the home screen.
 - **[Features](docs/features.md)** what each part of the screen does.
 - **[User flows](docs/user-flows.md)** common tasks step by step, with diagrams.
 - **[Architecture](docs/architecture.md)** how the code fits together.
+- **[Design](docs/design.md)** colors, shared components and layout rules for new screens.
 
 ## Piano roll keys
 
