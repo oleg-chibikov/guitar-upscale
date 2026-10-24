@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { FC } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { AppShell } from "../components/AppShell";
 import { WithChildren } from "../helpers/withChildren";
 import { WithPremiumFeaturesWithSession } from "../helpers/withPremiumFeatures";
 import { persistor, store } from "../store/store";
@@ -24,7 +25,7 @@ export const ContextProvider: FC<PremiumFeaturesContextProviderProps> = ({
       <MuiThemeProvider>
         <DigitalGoodsServiceInfoProvider>
           <PremiumFeaturesProvider premiumFeatures={premiumFeatures}>
-            <PersistGate loading={null} persistor={persistor}>
+            <PersistGate loading={<AppShell />} persistor={persistor}>
               {children}
             </PersistGate>
           </PremiumFeaturesProvider>
