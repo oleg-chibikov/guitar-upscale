@@ -3,6 +3,7 @@ import { Theme } from "@/app/data/theme";
 import { blockLongPress } from "@/app/helpers/longPressBlocker";
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { isAuthEnabled } from "@/lib/featureFlags";
+import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import ReactGA from "react-ga4";
 import { useDispatch } from "react-redux";
@@ -13,8 +14,6 @@ import {
 } from "../engine/sound/metronomeProvider";
 import { loadInstrument } from "../engine/sound/soundHelper";
 import { playNote } from "../engine/sound/soundProvider";
-import { useGooglePlayAuth } from "../hooks/useGooglePlayAuth";
-import { useSessionAuth } from "../hooks/useSessionAuth";
 import {
   chordInstrumentValue,
   init,
@@ -23,11 +22,8 @@ import {
 } from "../store/settingsSlice";
 import { initUi, setAndShowAlert } from "../store/uiSlice";
 
-const AuthInitializer: React.FC = () => {
-  useSessionAuth();
-  useGooglePlayAuth();
-  return null;
-};
+// A separate chunk, so the auth code loads only when auth is on
+const AuthInitializer = dynamic(() => import("./auth/AuthInitializer"));
 
 export const Initializer: React.FC = () => {
   const theme = useUiSelector((s) => s.theme);

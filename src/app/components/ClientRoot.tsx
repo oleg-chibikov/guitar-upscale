@@ -10,17 +10,20 @@ import { StrummingSettingsWrapper } from "@/app/components/strumming/StrummingSe
 import { useUiSelector } from "@/app/hooks/storeHooks";
 import { useWakeLock } from "@/app/hooks/useWakeLock";
 import { isAuthEnabled } from "@/lib/featureFlags";
+import dynamic from "next/dynamic";
 import { ReactNode, useRef } from "react";
 import { Theme } from "../data/theme";
 import { WithPremiumComponents } from "../helpers/withPremiumFeatures";
 import { GradientCircularProgress } from "./GradientCircularProgress";
 import { Initializer } from "./Initializer";
 import { AlertWrapper } from "./alert/AlertWrapper";
-import AuthPanel from "./auth/AuthPanel";
 import { ChordsView } from "./chords/ChordsView";
 import { Fretboard } from "./fret/Fretboard";
 import { ControlPanel } from "./settings/ControlPanel";
 import { SettingsViewWrapper } from "./settings/SettingsViewWrapper";
+
+// A separate chunk, so the auth code loads only when auth is on
+const AuthPanel = dynamic(() => import("./auth/AuthPanel"));
 
 export const ClientRoot: React.FC<WithPremiumComponents> = ({
   premiumComponents,
