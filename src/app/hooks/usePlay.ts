@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { checkLooperPlaying } from "@/app/engine/looper/looperShared";
@@ -83,7 +84,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
   const handlePlay = useCallback(
     async (choice?: SongChoice) => {
       if (isWaitingRef.current) {
-        console.log(
+        debugLog(
           LOG_PREFIX +
             "Already waiting for playback to start, skipping new request",
         );
@@ -127,7 +128,7 @@ export const usePlay = ({ decodeExample }: UsePlayParams) => {
           }
         }
 
-        console.log(LOG_PREFIX, "Loading examples");
+        debugLog(LOG_PREFIX, "Loading examples");
         const example: Example | undefined = await loadExample(
           decodeExample,
           dispatch,
@@ -209,7 +210,7 @@ async function replay(
   data: EventsByTick,
   songName: string | undefined,
 ) {
-  console.log("Replaying");
+  debugLog("Replaying");
   const { playMidi } = await import("@/app/engine/midiPlayer");
   await playMidi(dispatch, data, LOG_PREFIX, () =>
     dispatch(setNowPlaying(songName)),
@@ -223,7 +224,7 @@ async function stop(dispatch: Dispatch<UnknownAction>) {
 }
 
 async function continueLooper() {
-  console.log(LOG_PREFIX + "Stopping looper playback");
+  debugLog(LOG_PREFIX + "Stopping looper playback");
   const { stopLooperPlayback } = await import("@/app/engine/looper/looper");
   stopLooperPlayback();
 }
@@ -236,14 +237,14 @@ async function playExampleOrScale(
   updateWaiting: (value: boolean) => void,
 ) {
   // Start playback
-  console.log(LOG_PREFIX + "Waiting for playback to start...");
+  debugLog(LOG_PREFIX + "Waiting for playback to start...");
   const { playMidi } = await import("@/app/engine/midiPlayer");
   await playMidi(
     dispatch,
     eventsByTick,
     LOG_PREFIX,
     () => {
-      console.log(LOG_PREFIX + "Start playing");
+      debugLog(LOG_PREFIX + "Start playing");
       ReactGA.event({
         category: "Playback",
         action: "Playback started",
@@ -256,7 +257,7 @@ async function playExampleOrScale(
       );
 
       // remove the waiting mark only after the playback has started. If it's done earlier - race conditions are possible
-      console.log(
+      debugLog(
         LOG_PREFIX + "The playback has started. Removing the waiting mark",
       );
 

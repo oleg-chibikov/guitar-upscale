@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { tryToggleInterval } from "../store/settingsSlice";
 
 export const STRUMMING_LOG_PREFIX = "Strumming: ";
@@ -103,7 +104,7 @@ export const registerChordClick = (chordName: string, clickNumber: number) => {
 
   strummingClickedChords.add(chordName);
 
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Strumming registered",
     chordName,
     clickNumber,
@@ -114,7 +115,7 @@ export const setImmediateChordGracePeriod = (
   chordName: string,
   clickNumber: number,
 ) => {
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Entered immediate chord grace period",
     chordName,
     clickNumber,
@@ -126,7 +127,7 @@ export const releaseImmediateChordGracePeriod = (
   chordName: string,
   clickNumber: number,
 ) => {
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Exited immediate chord grace period",
     chordName,
     clickNumber,
@@ -153,7 +154,7 @@ export const releaseChordClick = (chordName: string, clickNumber: number) => {
 
   strummingClickedChords.delete(chordName);
 
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Strumming click released",
     chordName,
     clickNumber,
@@ -184,7 +185,7 @@ export const markChordAsPendingStrumming = (
   strummingClickedChords.add(chordName);
 
   tryToggleInterval(true);
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Chord pending strumming start",
     chordName,
     clickNumber,
@@ -206,7 +207,7 @@ export const markChordAsStrumming = (
     ...data,
     state: StrummingState.Strumming,
   });
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Started strumming",
     chordName,
     clickNumber,
@@ -244,7 +245,7 @@ export const startChordGracePeriod = (
     strummingPromiseAndResolve: undefined,
     gracePeriodPromiseAndResolve: createStrummingPromise(),
   });
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX +
       "---> Strumming pending finishing. Grace period started",
     chordName,
@@ -261,7 +262,7 @@ export const finishChordGracePeriod = (
   gracePeriodPromiseAndResolve?.resolve();
   strummingChordsMap.delete(chordName);
   tryToggleInterval(false);
-  console.log(
+  debugLog(
     STRUMMING_LOG_PREFIX + "---> Strumming finished. Grace period ended",
     chordName,
     clickNumber,

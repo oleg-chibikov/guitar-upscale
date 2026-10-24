@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import {
   getLastTickBarPosition,
@@ -65,15 +66,15 @@ class MidiPlayer {
     if (isFirstEventValue) {
       store.dispatch(setIsFirstEvent(false));
     }
-    console.log(logPrefix + "Playing midi file");
+    debugLog(logPrefix + "Playing midi file");
 
     if (!eventsByTick.hasItems) {
-      console.log(logPrefix + "No events for playback");
+      debugLog(logPrefix + "No events for playback");
       onStarted?.();
       return true;
     }
 
-    console.log(logPrefix + "Midi info", eventsByTick);
+    debugLog(logPrefix + "Midi info", eventsByTick);
 
     let currentTick = getStartTick(eventsByTick);
     let lastTick = eventsByTick.lastTick;
@@ -105,7 +106,7 @@ class MidiPlayer {
       };
       while (currentTick <= lastTick || isInLoop()) {
         if (!isPlayingValue || !isCurrent()) {
-          console.log(logPrefix + "Finished playback prematurely");
+          debugLog(logPrefix + "Finished playback prematurely");
           return false;
         }
 
@@ -187,7 +188,7 @@ class MidiPlayer {
     }
     store.dispatch(setIsLastEvent(true));
     store.dispatch(setIsFirstEvent(true));
-    console.log(logPrefix + "All events are played");
+    debugLog(logPrefix + "All events are played");
     return true;
   }
 
@@ -244,11 +245,11 @@ export const stopPlayback = async (
   logPrefix: string,
 ) => {
   if (isPlayingValue) {
-    console.log(logPrefix + "Stopping current playback");
+    debugLog(logPrefix + "Stopping current playback");
     dispatch(setIsPlaying(false)); // stop current playback
-    console.log("Waiting for current playback to finish");
+    debugLog("Waiting for current playback to finish");
     await waitForPlaybackToFinish(); // wait for current playback to finish;
-    console.log(logPrefix + "Stopped current playback");
+    debugLog(logPrefix + "Stopped current playback");
   }
 };
 
@@ -260,7 +261,7 @@ export const playMidi = async (
   startBarPosition?: number,
 ) => {
   await stopPlayback(dispatch, logPrefix);
-  console.log(logPrefix + "Starting new playback");
+  debugLog(logPrefix + "Starting new playback");
   recreatePlaybackPromise();
   dispatch(setIsPlaying(true));
   const playbackId = ++currentPlaybackId;
@@ -278,7 +279,7 @@ export const playMidi = async (
     onStarted,
   );
   if (!isCurrent()) {
-    console.log(logPrefix + "A newer playback took over");
+    debugLog(logPrefix + "A newer playback took over");
     return;
   }
   dispatch(setIsPlaying(false));
@@ -286,5 +287,5 @@ export const playMidi = async (
   if (isPlayedToEnd) {
     stopMetronomeIfIdle(dispatch);
   }
-  console.log(logPrefix + "Stopped new playback");
+  debugLog(logPrefix + "Stopped new playback");
 };

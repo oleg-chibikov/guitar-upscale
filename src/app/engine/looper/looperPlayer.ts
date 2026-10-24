@@ -1,3 +1,4 @@
+import { debugLog } from "@/app/helpers/debugLog";
 import { TICKS_IN_BAR } from "@/app/data/clockConstants";
 import { EventsByTick } from "@/app/engine/eventsByTick";
 import { getAudibleEvents } from "@/app/engine/pianoRoll/soloTrack";
@@ -73,7 +74,7 @@ export class LooperPlayer {
       return;
     }
 
-    console.log(LOG_PREFIX + "Loop info", this.options);
+    debugLog(LOG_PREFIX + "Loop info", this.options);
 
     const { loopLengthTicks } = this.options;
     const abortSignal = this.abortController.signal;
@@ -91,7 +92,7 @@ export class LooperPlayer {
         resolveCurrentLoop = resolve;
       });
       let waited = false;
-      console.log(
+      debugLog(
         LOG_PREFIX + "Loop starts at global tick %d, length %d ticks",
         loopStartTick,
         loopLengthTicks,
@@ -99,7 +100,7 @@ export class LooperPlayer {
 
       for (const { tick, events } of items) {
         if (tick > loopLengthTicks) {
-          console.log(
+          debugLog(
             LOG_PREFIX +
               "Recorded tick %d is past the loop end. Skipping the rest of the events",
             tick,
@@ -109,7 +110,7 @@ export class LooperPlayer {
 
         const targetTick = loopStartTick + tick;
         if (globalCurrentTick > targetTick) {
-          console.log(
+          debugLog(
             LOG_PREFIX +
               "Recorded tick %d is earlier than the current tick. Skipping it",
             tick,
@@ -143,7 +144,7 @@ export class LooperPlayer {
         return;
       }
 
-      console.log(LOG_PREFIX + "Loop ends");
+      debugLog(LOG_PREFIX + "Loop ends");
       loopStartTick += loopLengthTicks;
       resolveCurrentLoop();
     }
@@ -152,7 +153,7 @@ export class LooperPlayer {
   private getFirstLoopStartTick(firstEventTick: number) {
     const tickInBar = globalCurrentTick - globalCurrentLastBarTick;
     if (tickInBar <= firstEventTick) {
-      console.log(
+      debugLog(
         LOG_PREFIX +
           "Current tick %d is not later than the first event tick %d. Starting the loop in the current bar",
         tickInBar,
@@ -161,7 +162,7 @@ export class LooperPlayer {
       return globalCurrentLastBarTick;
     }
 
-    console.log(
+    debugLog(
       LOG_PREFIX +
         "Current tick %d is later than the first event tick %d. Starting the loop in the next bar",
       tickInBar,
