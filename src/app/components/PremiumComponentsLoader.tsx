@@ -93,8 +93,7 @@ export const premiumFeaturesToMap = (
         return (
           <>
             <SongUploadButton />
-            {/* the static export has no API routes to reach Songsterr through */}
-            {process.env.STATIC_EXPORT !== "true" && <SongsterrImportButton />}
+            <SongsterrImportButton />
           </>
         );
       case "playbackTypeSelection":

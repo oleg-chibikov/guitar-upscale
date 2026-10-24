@@ -1,5 +1,6 @@
 import { SongsterrMeta, songsterrMetaUrl } from "@/app/engine/songs/songsterr";
 import { apiHandler } from "@/lib/apiHelper";
+import { allowPagesOrigin } from "@/lib/cors";
 import { HttpStatusCode } from "axios";
 import createHttpError from "http-errors";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -9,6 +10,7 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<SongsterrMeta>,
 ) => {
+  allowPagesOrigin(res);
   const songId = Number(req.query.songId);
   if (!Number.isInteger(songId) || songId <= 0) {
     throw new createHttpError.BadRequest("songId must be a positive number");

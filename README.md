@@ -102,7 +102,7 @@ The app has the same steps in a dialog: the cloud button next to upload adds the
 
 Each push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The workflow checks formatting, lints, tests, builds a static export and publishes it to GitHub Pages.
 
-The Pages copy runs with sign-in off. The static export has no server, so the workflow deletes `src/pages/api` before the build.
+The Pages copy runs with sign-in off. The static export has no server, so the workflow deletes `src/pages/api` before the build. The Songsterr dialog on Pages calls the API routes on the Vercel copy, set by `NEXT_PUBLIC_SONGSTERR_API_HOST`.
 
 Dependabot opens update PRs every week. The `automerge` job merges them once the build passes.
 

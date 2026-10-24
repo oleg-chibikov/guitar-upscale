@@ -12,7 +12,12 @@ import {
   songsterrTrackUrl,
 } from "@/app/engine/songs/songsterr";
 
-const API = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/songsterr`;
+// The GitHub Pages build has no API routes and sets the Vercel host here.
+const API = `${
+  process.env.NEXT_PUBLIC_SONGSTERR_API_HOST ??
+  process.env.NEXT_PUBLIC_BASE_PATH ??
+  ""
+}/api/songsterr`;
 
 const getJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url);

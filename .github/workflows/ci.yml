@@ -46,6 +46,8 @@ jobs:
         env:
           STATIC_EXPORT: "true"
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Songsterr allows no browser requests, so Pages searches through the Vercel copy.
+          NEXT_PUBLIC_SONGSTERR_API_HOST: https://guitar-upscale.vercel.app
 
       - uses: actions/upload-pages-artifact@v5
         with:

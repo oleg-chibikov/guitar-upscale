@@ -3,6 +3,7 @@ import {
   songsterrSearchUrl,
 } from "@/app/engine/songs/songsterr";
 import { apiHandler } from "@/lib/apiHelper";
+import { allowPagesOrigin } from "@/lib/cors";
 import { HttpStatusCode } from "axios";
 import createHttpError from "http-errors";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -12,6 +13,7 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<SongsterrSearchResult[]>,
 ) => {
+  allowPagesOrigin(res);
   const pattern = String(req.query.pattern ?? "").trim();
   if (!pattern) {
     throw new createHttpError.BadRequest("Type a band or a song to search");

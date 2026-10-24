@@ -214,7 +214,7 @@ Code: [pianoRoll/](../src/app/components/pianoRoll/), [PianoRollProvider.tsx](..
 3. Press Add. The whole song goes in. It moves to an E tonic and its notes move into the scale that fits best, as in `pnpm songsterr`.
 
 - **Bars** the dialog takes every bar. Cut the extra ones in the piano roll.
-- **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes and hides the button.
+- **Server** Songsterr allows no browser requests, so search and song details go through `/api/songsterr`. The GitHub Pages copy has no API routes, so it calls `/api/songsterr` on `guitar-upscale.vercel.app`. Those routes allow requests from `oleg-chibikov.github.io` ([cors.ts](../src/lib/cors.ts)).
 
 Code: [SongUploadButton.tsx](../src/app/components/settings/buttons/SongUploadButton.tsx), [SongsterrImportDialog.tsx](../src/app/components/settings/buttons/SongsterrImportDialog.tsx), [DownloadButton.tsx](../src/app/components/playPanel/DownloadButton.tsx), [songs/](../src/app/engine/songs/).
 
