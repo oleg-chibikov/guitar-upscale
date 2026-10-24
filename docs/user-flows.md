@@ -122,7 +122,7 @@ sequenceDiagram
 1. Turn on "Start metronome when recording" in Settings for a click track.
 2. Hold Record and pick "A new song", or load a song and pick "A new track in this song".
 3. Play. The plate at the top turns red and counts the time.
-4. Press Stop. The cross next to it drops the take instead.
+4. Press Stop. The cross next to it drops the take instead, and asks first once the take passes 3 seconds.
 5. Press Play to hear it. Click the name on the plate to rename it, or press Download for a `.gp` file.
 
 ## Build a song with the looper

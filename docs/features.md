@@ -135,7 +135,7 @@ Hold the button, or right click it, to pick where the take goes. The pick starts
 - **A new song** the take goes to the song list as "Recording" with the date and time. It loads as the current song.
 - **A new track in this song** the loaded song plays from the playhead and the take lines up with it. The take lands in new tracks named "Take 1" and on, one for notes and one for chords. Recording stops when the song ends. A `+` on the button shows this mode.
 - **Stop** saves the take. A take with no notes isn't saved.
-- **Cancel** a second button drops the take.
+- **Cancel** a second button drops the take. A take longer than 3 seconds asks first.
 - **Save MIDI file immediately after recording** downloads the `.mid` file on stop.
 
 Without a loaded song, a press records a new song. Undo in the piano roll takes a new track out again.
