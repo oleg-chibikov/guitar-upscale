@@ -64,9 +64,10 @@ export const NowPlaying: React.FC = () => {
     if (element === null) {
       return;
     }
-    const observer = new ResizeObserver(([entry]) => {
-      const { inlineSize, blockSize } = entry.borderBoxSize[0];
-      setControlPanel({ width: inlineSize, height: blockSize });
+    // The page is observed too, so the first entry can be the page instead of the panel.
+    const observer = new ResizeObserver(() => {
+      const { width, height } = element.getBoundingClientRect();
+      setControlPanel({ width, height });
       setScreenWidth(window.innerWidth);
     });
     observer.observe(element);
